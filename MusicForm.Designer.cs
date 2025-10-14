@@ -51,7 +51,6 @@ namespace Music
             // 
             // MusicForm
             // 
-            //ClientSize = new Size(1144, 754);
             Controls.Add(lblMidiFilepath);
             Controls.Add(btnPlayMidi);
             Controls.Add(txtSongStructure);

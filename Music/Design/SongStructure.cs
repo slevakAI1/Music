@@ -25,27 +25,38 @@ namespace Music.Design
         /// <summary>
         /// Build the standard top-level structure and return a printable summary.
         /// Structure: Intro → Verse → Chorus → Verse → Chorus → Bridge → Chorus → Outro
-        /// Each section is assigned a single consecutive measure for simplicity.
+        /// Each section spans 4 measures.
         /// </summary>
         public string CreateStructure()
         {
             _sections.Clear();
 
             int measure = 1;
-            void Add(TopLevelSectionType t) => AddSection(t, MeasureRange.Single(measure++));
+            void Add(TopLevelSectionType t, int lengthMeasures)
+            {
+                var span = new MeasureRange(measure, measure + lengthMeasures - 1, true);
+                AddSection(t, span);
+                measure += lengthMeasures;
+            }
 
-            Add(TopLevelSectionType.Intro);
-            Add(TopLevelSectionType.Verse);
-            Add(TopLevelSectionType.Chorus);
-            Add(TopLevelSectionType.Verse);
-            Add(TopLevelSectionType.Chorus);
-            Add(TopLevelSectionType.Bridge);
-            Add(TopLevelSectionType.Chorus);
-            Add(TopLevelSectionType.Outro);
+            Add(TopLevelSectionType.Intro, 4);
+            Add(TopLevelSectionType.Verse, 8);
+            Add(TopLevelSectionType.Chorus, 8);
+            Add(TopLevelSectionType.Verse, 8);
+            Add(TopLevelSectionType.Chorus, 8);
+            Add(TopLevelSectionType.Bridge, 8);
+            Add(TopLevelSectionType.Chorus, 8);
+            Add(TopLevelSectionType.Outro, 4);
 
-            // Build a simple "Intro → Verse → ..." summary string
+            // Build a simple "Intro → Verse → ..." summary string with bar counts
             var names = new List<string>(_sections.Count);
-            foreach (var s in _sections) names.Add(s.Type.ToString());
+            foreach (var s in _sections)
+            {
+                int bars = s.Span.EndMeasure is int end
+                    ? (s.Span.InclusiveEnd ? end - s.Span.StartMeasure + 1 : end - s.Span.StartMeasure)
+                    : 0;
+                names.Add($"{s.Type}, {bars}");
+            }
             return string.Join("\r\n", names);
         }
 
@@ -94,6 +105,7 @@ namespace Music.Design
             Verse,
     //      Refrain,
             Chorus,
+            Solo,
             Bridge,
     //      Ending,
             Outro,
