@@ -15,6 +15,10 @@ namespace Music.Design
         private readonly List<TopLevelSection> _sections = new();
         public IReadOnlyList<TopLevelSection> Sections => _sections;
 
+        // High-level collection of all voices used in the song (per MusicXML: voice is a string identifier).
+        private readonly List<Voice> _voices = new();
+        public IReadOnlyList<Voice> Voices => _voices;
+
         public SongStructure(string? designId = null) // string? sourcePath = null, string? sourceHash = null, 
         {
             DesignId = designId ?? Guid.NewGuid().ToString("N");
@@ -77,6 +81,30 @@ namespace Music.Design
         }
 
         /// <summary>
+        /// Add a voice identifier to the song's voice collection (MusicXML 'voice' value).
+        /// Returns the created or existing voice entry.
+        /// </summary>
+        public Voice AddVoice(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("Voice value must not be null or empty.", nameof(value));
+
+            // Prevent duplicate voice values; return existing if present.
+            foreach (var v in _voices)
+            {
+                if (string.Equals(v.Value, value, StringComparison.Ordinal))
+                    return v;
+            }
+
+            var voice = new Voice(
+                Id: Guid.NewGuid().ToString("N"),
+                Value: value);
+
+            _voices.Add(voice);
+            return voice;
+        }
+
+        /// <summary>
         /// Inclusive measure range; end may be open-ended (null).
         /// </summary>
         public readonly record struct MeasureRange(int StartMeasure, int? EndMeasure, bool InclusiveEnd = true)
@@ -94,6 +122,14 @@ namespace Music.Design
             MeasureRange Span,
             string Name,
             string[] Tags
+        );
+
+        /// <summary>
+        /// High-level voice entry capturing the MusicXML 'voice' value.
+        /// </summary>
+        public sealed record Voice(
+            string Id,
+            string Value
         );
 
         /// <summary>
