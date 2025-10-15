@@ -136,7 +136,7 @@ namespace Music
             txtExportTestChords.TabIndex = 12;
             txtExportTestChords.Text = "Test Chords";
             txtExportTestChords.UseVisualStyleBackColor = true;
-            txtExportTestChords.Click += button1_Click;
+            txtExportTestChords.Click += txtTestChords_Click;
             // 
             // MusicForm
             // 

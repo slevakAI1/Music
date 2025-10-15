@@ -171,7 +171,7 @@ namespace Music
             txtChordSet.Lines = lines.ToArray();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void txtTestChords_Click(object sender, EventArgs e)
         {
 
         }
