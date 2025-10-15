@@ -14,6 +14,10 @@ namespace Music
             txtVoiceSet = new TextBox();
             txtChordSet = new TextBox();
             btnAddChords = new Button();
+            textBox1 = new TextBox();
+            label1 = new Label();
+            label2 = new Label();
+            textBox2 = new TextBox();
             SuspendLayout();
             // 
             // btnCreateStructure
@@ -89,9 +93,47 @@ namespace Music
             btnAddChords.UseVisualStyleBackColor = true;
             btnAddChords.Click += btnAddChords_Click;
             // 
+            // textBox1
+            // 
+            textBox1.Location = new Point(203, 584);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(100, 23);
+            textBox1.TabIndex = 8;
+            textBox1.Text = "4/4";
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(96, 591);
+            label1.Name = "label1";
+            label1.Size = new Size(87, 15);
+            label1.TabIndex = 9;
+            label1.Text = "Time Signature";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(96, 642);
+            label2.Name = "label2";
+            label2.Size = new Size(44, 15);
+            label2.TabIndex = 11;
+            label2.Text = "Tempo";
+            // 
+            // textBox2
+            // 
+            textBox2.Location = new Point(205, 634);
+            textBox2.Name = "textBox2";
+            textBox2.Size = new Size(100, 23);
+            textBox2.TabIndex = 10;
+            textBox2.Text = "90";
+            // 
             // MusicForm
             // 
             ClientSize = new Size(1085, 757);
+            Controls.Add(label2);
+            Controls.Add(textBox2);
+            Controls.Add(label1);
+            Controls.Add(textBox1);
             Controls.Add(txtChordSet);
             Controls.Add(btnAddChords);
             Controls.Add(txtVoiceSet);
@@ -114,5 +156,9 @@ namespace Music
         private TextBox txtVoiceSet;
         private TextBox txtChordSet;
         private Button btnAddChords;
+        private TextBox textBox1;
+        private Label label1;
+        private Label label2;
+        private TextBox textBox2;
     }
 }
