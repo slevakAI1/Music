@@ -12,6 +12,8 @@ namespace Music
             lblMidiFilepath = new Label();
             btnAddVoices = new Button();
             txtVoiceSet = new TextBox();
+            txtChordSet = new TextBox();
+            btnAddChords = new Button();
             SuspendLayout();
             // 
             // btnCreateStructure
@@ -66,12 +68,32 @@ namespace Music
             txtVoiceSet.Location = new Point(252, 367);
             txtVoiceSet.Multiline = true;
             txtVoiceSet.Name = "txtVoiceSet";
-            txtVoiceSet.Size = new Size(529, 173);
+            txtVoiceSet.Size = new Size(180, 173);
             txtVoiceSet.TabIndex = 5;
+            // 
+            // txtChordSet
+            // 
+            txtChordSet.Location = new Point(691, 367);
+            txtChordSet.Multiline = true;
+            txtChordSet.Name = "txtChordSet";
+            txtChordSet.Size = new Size(180, 173);
+            txtChordSet.TabIndex = 7;
+            // 
+            // btnAddChords
+            // 
+            btnAddChords.Location = new Point(491, 367);
+            btnAddChords.Name = "btnAddChords";
+            btnAddChords.Size = new Size(160, 23);
+            btnAddChords.TabIndex = 6;
+            btnAddChords.Text = "Add Chords";
+            btnAddChords.UseVisualStyleBackColor = true;
+            btnAddChords.Click += btnAddChords_Click;
             // 
             // MusicForm
             // 
-            ClientSize = new Size(1085, 635);
+            ClientSize = new Size(1085, 757);
+            Controls.Add(txtChordSet);
+            Controls.Add(btnAddChords);
             Controls.Add(txtVoiceSet);
             Controls.Add(btnAddVoices);
             Controls.Add(lblMidiFilepath);
@@ -90,5 +112,7 @@ namespace Music
         private Label lblMidiFilepath;
         private Button btnAddVoices;
         private TextBox txtVoiceSet;
+        private TextBox txtChordSet;
+        private Button btnAddChords;
     }
 }

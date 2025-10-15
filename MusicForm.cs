@@ -157,5 +157,18 @@ namespace Music
             // One voice per line in the voiceset textbox
             txtVoiceSet.Lines = lines.ToArray();
         }
+
+        private void btnAddChords_Click(object sender, EventArgs e)
+        {
+            var structure = new SongStructure();
+            var chords = structure.CreateChordSet();
+
+            var lines = new System.Collections.Generic.List<string>(chords.Count);
+            foreach (var c in chords)
+                lines.Add(c.Name);
+
+            // One chord per line in the chord set textbox
+            txtChordSet.Lines = lines.ToArray();
+        }
     }
 }

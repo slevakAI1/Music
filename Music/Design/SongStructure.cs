@@ -19,6 +19,10 @@ namespace Music.Design
         private readonly List<Voice> _voices = new();
         public IReadOnlyList<Voice> Voices => _voices;
 
+        // High-level collection of chords (MusicXML 'harmony' compatible: root/kind/bass).
+        private readonly List<Chord> _chords = new();
+        public IReadOnlyList<Chord> Chords => _chords;
+
         public SongStructure(string? designId = null) // string? sourcePath = null, string? sourceHash = null, 
         {
             DesignId = designId ?? Guid.NewGuid().ToString("N");
@@ -118,6 +122,102 @@ namespace Music.Design
         }
 
         /// <summary>
+        /// Add a chord to the song's chord set (compatible with MusicXML 'harmony').
+        /// Prevents duplicates by matching root/kind/bass. Returns the created or existing entry.
+        /// Notes:
+        /// - MusicXML harmony does not encode octave; voicing is applied later when rendering notes.
+        /// - rootAlter and bassAlter use standard semitone offsets: -1=flat, 0=natural, +1=sharp, etc.
+        /// </summary>
+        public Chord AddChord(
+            Step rootStep,
+            int rootAlter,
+            ChordKind kind,
+            Step? bassStep = null,
+            int? bassAlter = null,
+            string? name = null)
+        {
+            // Check for existing equivalent chord (same identity fields).
+            foreach (var c in _chords)
+            {
+                if (c.RootStep == rootStep &&
+                    c.RootAlter == rootAlter &&
+                    c.Kind == kind &&
+                    c.BassStep == bassStep &&
+                    c.BassAlter == bassAlter)
+                {
+                    return c;
+                }
+            }
+
+            var chord = new Chord(
+                Id: Guid.NewGuid().ToString("N"),
+                RootStep: rootStep,
+                RootAlter: rootAlter,
+                Kind: kind,
+                BassStep: bassStep,
+                BassAlter: bassAlter,
+                Name: string.IsNullOrWhiteSpace(name) ? BuildChordDisplayName(rootStep, rootAlter, kind, bassStep, bassAlter) : name!);
+
+            _chords.Add(chord);
+            return chord;
+        }
+
+        /// <summary>
+        /// Initialize a default chord set. For now, adds a C major chord ("Middle C chord" as a class of harmony).
+        /// Returns the full chord list.
+        /// </summary>
+        public IReadOnlyList<Chord> CreateChordSet()
+        {
+            // Middle C chord: represent as a C major harmony (octave/voicing applied later during note rendering).
+            AddChord(Step.C, 0, ChordKind.Major, name: "C");
+            return Chords;
+        }
+
+        private static string BuildChordDisplayName(Step rootStep, int rootAlter, ChordKind chordKind, Step? bassStep, int? bassAlter)
+        {
+            static string StepToText(Step s) => s switch
+            {
+                Step.A => "A",
+                Step.B => "B",
+                Step.C => "C",
+                Step.D => "D",
+                Step.E => "E",
+                Step.F => "F",
+                Step.G => "G",
+                _ => "?"
+            };
+
+            static string AlterToText(int alter) => alter switch
+            {
+                < 0 => new string('b', -alter),
+                > 0 => new string('#', alter),
+                _ => ""
+            };
+
+            static string KindToSuffix(ChordKind k) => k switch
+            {
+                ChordKind.Major => "",
+                ChordKind.Minor => "m",
+                ChordKind.Augmented => "aug",
+                ChordKind.Diminished => "dim",
+                ChordKind.DominantSeventh => "7",
+                ChordKind.MajorSeventh => "maj7",
+                ChordKind.MinorSeventh => "m7",
+                ChordKind.SuspendedFourth => "sus4",
+                ChordKind.SuspendedSecond => "sus2",
+                ChordKind.Power => "5",
+                ChordKind.HalfDiminishedSeventh => "m7b5",
+                ChordKind.DiminishedSeventh => "dim7",
+                _ => ""
+            };
+
+            var root = StepToText(rootStep) + AlterToText(rootAlter);
+            var kindSuffix = KindToSuffix(chordKind);
+            var bass = bassStep is null ? "" : "/" + StepToText(bassStep.Value) + (bassAlter.HasValue ? AlterToText(bassAlter.Value) : "");
+            return root + kindSuffix + bass;
+        }
+
+        /// <summary>
         /// Inclusive measure range; end may be open-ended (null).
         /// </summary>
         public readonly record struct MeasureRange(int StartMeasure, int? EndMeasure, bool InclusiveEnd = true)
@@ -146,6 +246,20 @@ namespace Music.Design
         );
 
         /// <summary>
+        /// High-level chord entry compatible with MusicXML 'harmony' element.
+        /// Octave/voicing are intentionally omitted (they belong to note rendering).
+        /// </summary>
+        public sealed record Chord(
+            string Id,
+            Step RootStep,
+            int RootAlter,
+            ChordKind Kind,
+            Step? BassStep,
+            int? BassAlter,
+            string Name
+        );
+
+        /// <summary>
         /// Top-level structural labels for a song/score.
         /// </summary>
         public enum TopLevelSectionType
@@ -159,6 +273,34 @@ namespace Music.Design
     //      Ending,
             Outro,
             Custom
+        }
+
+        /// <summary>
+        /// Diatonic pitch steps used by MusicXML (A–G).
+        /// </summary>
+        public enum Step
+        {
+            A, B, C, D, E, F, G
+        }
+
+        /// <summary>
+        /// Chord kinds mapped to MusicXML 'kind' values.
+        /// This list can be extended as needed.
+        /// </summary>
+        public enum ChordKind
+        {
+            Major,
+            Minor,
+            Augmented,
+            Diminished,
+            DominantSeventh,
+            MajorSeventh,
+            MinorSeventh,
+            SuspendedFourth,
+            SuspendedSecond,
+            Power,
+            HalfDiminishedSeventh,
+            DiminishedSeventh
         }
     }
 }
