@@ -105,6 +105,19 @@ namespace Music.Design
         }
 
         /// <summary>
+        /// Add the default voice set for this app.
+        /// Calls AddVoice for each entry and returns the full voice list.
+        /// </summary>
+        public IReadOnlyList<Voice> AddVoices()
+        {
+            AddVoice("Guitar");
+            AddVoice("Drum Set");
+            AddVoice("Keyboard");
+            AddVoice("Base Guitar"); // per requirement
+            return Voices;
+        }
+
+        /// <summary>
         /// Inclusive measure range; end may be open-ended (null).
         /// </summary>
         public readonly record struct MeasureRange(int StartMeasure, int? EndMeasure, bool InclusiveEnd = true)

@@ -144,5 +144,18 @@ namespace Music
             }
 
         }
+
+        private void btnAddVoices_Click(object sender, EventArgs e)
+        {
+            var structure = new SongStructure();
+            structure.AddVoices();
+
+            var lines = new System.Collections.Generic.List<string>();
+            foreach (var v in structure.Voices)
+                lines.Add(v.Value);
+
+            // One voice per line in the voiceset textbox
+            txtVoiceSet.Lines = lines.ToArray();
+        }
     }
 }

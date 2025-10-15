@@ -10,15 +10,17 @@ namespace Music
             txtSongStructure = new TextBox();
             btnPlayMidi = new Button();
             lblMidiFilepath = new Label();
+            btnAddVoices = new Button();
+            txtVoiceSet = new TextBox();
             SuspendLayout();
             // 
             // btnCreateStructure
             // 
-            btnCreateStructure.Location = new Point(52, 120);
+            btnCreateStructure.Location = new Point(61, 122);
             btnCreateStructure.Name = "btnCreateStructure";
-            btnCreateStructure.Size = new Size(75, 23);
+            btnCreateStructure.Size = new Size(151, 23);
             btnCreateStructure.TabIndex = 0;
-            btnCreateStructure.Text = "Create Structure";
+            btnCreateStructure.Text = "Create Song Structure";
             btnCreateStructure.UseVisualStyleBackColor = true;
             btnCreateStructure.Click += btnCreateStructure_Click;
             // 
@@ -43,14 +45,35 @@ namespace Music
             // lblMidiFilepath
             // 
             lblMidiFilepath.AutoSize = true;
-            lblMidiFilepath.Location = new Point(260, 72);
+            lblMidiFilepath.Location = new Point(252, 72);
             lblMidiFilepath.Name = "lblMidiFilepath";
-            lblMidiFilepath.Size = new Size(38, 15);
+            lblMidiFilepath.Size = new Size(47, 15);
             lblMidiFilepath.TabIndex = 3;
-            lblMidiFilepath.Text = "label1";
+            lblMidiFilepath.Text = "filepath";
+            // 
+            // btnAddVoices
+            // 
+            btnAddVoices.Location = new Point(52, 367);
+            btnAddVoices.Name = "btnAddVoices";
+            btnAddVoices.Size = new Size(160, 23);
+            btnAddVoices.TabIndex = 4;
+            btnAddVoices.Text = "Add Voices";
+            btnAddVoices.UseVisualStyleBackColor = true;
+            btnAddVoices.Click += btnAddVoices_Click;
+            // 
+            // txtVoiceSet
+            // 
+            txtVoiceSet.Location = new Point(252, 367);
+            txtVoiceSet.Multiline = true;
+            txtVoiceSet.Name = "txtVoiceSet";
+            txtVoiceSet.Size = new Size(529, 173);
+            txtVoiceSet.TabIndex = 5;
             // 
             // MusicForm
             // 
+            ClientSize = new Size(1085, 635);
+            Controls.Add(txtVoiceSet);
+            Controls.Add(btnAddVoices);
             Controls.Add(lblMidiFilepath);
             Controls.Add(btnPlayMidi);
             Controls.Add(txtSongStructure);
@@ -65,5 +88,7 @@ namespace Music
         private TextBox txtSongStructure;
         private Button btnPlayMidi;
         private Label lblMidiFilepath;
+        private Button btnAddVoices;
+        private TextBox txtVoiceSet;
     }
 }
