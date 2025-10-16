@@ -19,6 +19,7 @@ namespace Music
             label2 = new Label();
             textBox2 = new TextBox();
             txtExportTestChords = new Button();
+            btnTestParser = new Button();
             SuspendLayout();
             // 
             // btnCreateStructure
@@ -138,9 +139,19 @@ namespace Music
             txtExportTestChords.UseVisualStyleBackColor = true;
             txtExportTestChords.Click += txtTestChords_Click;
             // 
+            // btnTestParser
+            // 
+            btnTestParser.Location = new Point(437, 587);
+            btnTestParser.Name = "btnTestParser";
+            btnTestParser.Size = new Size(200, 23);
+            btnTestParser.TabIndex = 13;
+            btnTestParser.Text = "Test Parser";
+            btnTestParser.UseVisualStyleBackColor = true;
+            // 
             // MusicForm
             // 
             ClientSize = new Size(1085, 757);
+            Controls.Add(btnTestParser);
             Controls.Add(txtExportTestChords);
             Controls.Add(label2);
             Controls.Add(textBox2);
@@ -173,5 +184,6 @@ namespace Music
         private Label label2;
         private TextBox textBox2;
         private Button txtExportTestChords;
+        private Button btnTestParser;
     }
 }
