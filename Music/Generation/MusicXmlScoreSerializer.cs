@@ -26,7 +26,8 @@ namespace Music.Design
             using var ms = new MemoryStream();
             using (var writer = XmlWriter.Create(ms, settings))
             {
-                writer.WriteStartDocument();
+                // Emit XML declaration with standalone="no"
+                writer.WriteStartDocument(standalone: false);
                 writer.WriteDocType("score-partwise",
                     "-//Recordare//DTD MusicXML 3.1 Partwise//EN",
                     "http://www.musicxml.org/dtds/partwise.dtd",
