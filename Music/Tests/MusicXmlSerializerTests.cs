@@ -1,6 +1,8 @@
 ﻿using Music.Design;
 using MusicXml;
 using System.Text;
+using System.Xml;
+using System.Security.Cryptography.Xml;
 
 namespace Music.Services
 {
@@ -55,6 +57,38 @@ namespace Music.Services
             {
                 return BuildErrorDetails(ex);
             }
+        }
+
+        // Canonical XML (C14N). Removes XML decl/doctype differences, normalizes namespaces/attrs/empty elems/line endings.
+        // Requires System.Security.Cryptography.Xml.
+        private static byte[] CanonicalizeXml(string xml, bool exclusive = false)
+        {
+            var readerSettings = new XmlReaderSettings
+            {
+                DtdProcessing = DtdProcessing.Ignore, // avoid fetching external DTDs (MusicXML has a DOCTYPE)
+                XmlResolver = null
+            };
+
+            using var sr = new StringReader(xml);
+            using var xr = XmlReader.Create(sr, readerSettings);
+
+            var doc = new XmlDocument
+            {
+                PreserveWhitespace = true, // let C14N govern whitespace handling
+                XmlResolver = null
+            };
+            doc.Load(xr);
+
+            Transform transform = exclusive
+                ? new XmlDsigExcC14NTransform()
+                : new XmlDsigC14NTransform();
+
+            transform.LoadInput(doc);
+
+            using var output = (Stream)transform.GetOutput(typeof(Stream));
+            using var ms = new MemoryStream();
+            output.CopyTo(ms);
+            return ms.ToArray(); // canonical UTF-8 bytes
         }
 
         private static int FirstDifferenceIndex(string a, string b)
