@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Music.Services
 {
-    public class MusicXmlTests
+    public class MusicXmlParserTests
     {
         public string TestParser(string path)
         {

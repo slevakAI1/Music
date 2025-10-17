@@ -20,7 +20,7 @@ namespace Music
             textBox2 = new TextBox();
             txtExportTestChords = new Button();
             btnTestParser = new Button();
-            textBox3 = new TextBox();
+            btnTestSerializer = new Button();
             SuspendLayout();
             // 
             // btnCreateStructure
@@ -132,7 +132,7 @@ namespace Music
             // 
             // txtExportTestChords
             // 
-            txtExportTestChords.Location = new Point(299, 389);
+            txtExportTestChords.Location = new Point(300, 415);
             txtExportTestChords.Name = "txtExportTestChords";
             txtExportTestChords.Size = new Size(203, 23);
             txtExportTestChords.TabIndex = 12;
@@ -146,22 +146,24 @@ namespace Music
             btnTestParser.Name = "btnTestParser";
             btnTestParser.Size = new Size(200, 23);
             btnTestParser.TabIndex = 13;
-            btnTestParser.Text = "Test Parser";
+            btnTestParser.Text = "Test Import/Parser";
             btnTestParser.UseVisualStyleBackColor = true;
             btnTestParser.Click += btnTestParser_Click;
             // 
-            // textBox3
+            // btnTestSerializer
             // 
-            textBox3.Location = new Point(524, 302);
-            textBox3.Multiline = true;
-            textBox3.Name = "textBox3";
-            textBox3.Size = new Size(549, 200);
-            textBox3.TabIndex = 14;
+            btnTestSerializer.Location = new Point(302, 375);
+            btnTestSerializer.Name = "btnTestSerializer";
+            btnTestSerializer.Size = new Size(200, 23);
+            btnTestSerializer.TabIndex = 15;
+            btnTestSerializer.Text = "Test Export/Serializer";
+            btnTestSerializer.UseVisualStyleBackColor = true;
+            btnTestSerializer.Click += btnTestSerializer_Click;
             // 
             // MusicForm
             // 
             ClientSize = new Size(1085, 539);
-            Controls.Add(textBox3);
+            Controls.Add(btnTestSerializer);
             Controls.Add(btnTestParser);
             Controls.Add(txtExportTestChords);
             Controls.Add(label2);
@@ -196,6 +198,6 @@ namespace Music
         private TextBox textBox2;
         private Button txtExportTestChords;
         private Button btnTestParser;
-        private TextBox textBox3;
+        private Button btnTestSerializer;
     }
 }
