@@ -175,5 +175,21 @@ namespace Music
         {
 
         }
+
+        private void btnTestParser_Click(object sender, EventArgs e)
+        {
+            using var ofd = new OpenFileDialog
+            {
+                Filter = "MusicXML Files (*.musicxml;*.xml)|*.musicxml;*.xml",
+                Title = "Select a MusicXML file"
+            };
+            if (ofd.ShowDialog(this) != DialogResult.OK) return;
+
+            var result = new Music.Services.MusicXmlTests().TestParser(ofd.FileName);
+            var passed = string.Equals(result, "Passed", StringComparison.OrdinalIgnoreCase);
+
+            MessageBox.Show(this, passed ? "Passed" : result, "MusicXML Parser Test",
+                MessageBoxButtons.OK, passed ? MessageBoxIcon.Information : MessageBoxIcon.Error);
+        }
     }
 }

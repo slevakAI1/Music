@@ -20,11 +20,12 @@ namespace Music
             textBox2 = new TextBox();
             txtExportTestChords = new Button();
             btnTestParser = new Button();
+            textBox3 = new TextBox();
             SuspendLayout();
             // 
             // btnCreateStructure
             // 
-            btnCreateStructure.Location = new Point(61, 122);
+            btnCreateStructure.Location = new Point(21, 48);
             btnCreateStructure.Name = "btnCreateStructure";
             btnCreateStructure.Size = new Size(151, 23);
             btnCreateStructure.TabIndex = 0;
@@ -34,15 +35,15 @@ namespace Music
             // 
             // txtSongStructure
             // 
-            txtSongStructure.Location = new Point(252, 123);
+            txtSongStructure.Location = new Point(212, 49);
             txtSongStructure.Multiline = true;
             txtSongStructure.Name = "txtSongStructure";
-            txtSongStructure.Size = new Size(529, 197);
+            txtSongStructure.Size = new Size(529, 89);
             txtSongStructure.TabIndex = 1;
             // 
             // btnPlayMidi
             // 
-            btnPlayMidi.Location = new Point(61, 68);
+            btnPlayMidi.Location = new Point(21, 12);
             btnPlayMidi.Name = "btnPlayMidi";
             btnPlayMidi.Size = new Size(151, 23);
             btnPlayMidi.TabIndex = 2;
@@ -53,7 +54,7 @@ namespace Music
             // lblMidiFilepath
             // 
             lblMidiFilepath.AutoSize = true;
-            lblMidiFilepath.Location = new Point(252, 72);
+            lblMidiFilepath.Location = new Point(212, 16);
             lblMidiFilepath.Name = "lblMidiFilepath";
             lblMidiFilepath.Size = new Size(47, 15);
             lblMidiFilepath.TabIndex = 3;
@@ -61,7 +62,7 @@ namespace Music
             // 
             // btnAddVoices
             // 
-            btnAddVoices.Location = new Point(52, 367);
+            btnAddVoices.Location = new Point(28, 172);
             btnAddVoices.Name = "btnAddVoices";
             btnAddVoices.Size = new Size(160, 23);
             btnAddVoices.TabIndex = 4;
@@ -71,23 +72,23 @@ namespace Music
             // 
             // txtVoiceSet
             // 
-            txtVoiceSet.Location = new Point(252, 367);
+            txtVoiceSet.Location = new Point(228, 172);
             txtVoiceSet.Multiline = true;
             txtVoiceSet.Name = "txtVoiceSet";
-            txtVoiceSet.Size = new Size(180, 173);
+            txtVoiceSet.Size = new Size(180, 76);
             txtVoiceSet.TabIndex = 5;
             // 
             // txtChordSet
             // 
-            txtChordSet.Location = new Point(691, 367);
+            txtChordSet.Location = new Point(667, 172);
             txtChordSet.Multiline = true;
             txtChordSet.Name = "txtChordSet";
-            txtChordSet.Size = new Size(180, 173);
+            txtChordSet.Size = new Size(180, 76);
             txtChordSet.TabIndex = 7;
             // 
             // btnAddChords
             // 
-            btnAddChords.Location = new Point(491, 367);
+            btnAddChords.Location = new Point(467, 172);
             btnAddChords.Name = "btnAddChords";
             btnAddChords.Size = new Size(160, 23);
             btnAddChords.TabIndex = 6;
@@ -97,7 +98,7 @@ namespace Music
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(203, 584);
+            textBox1.Location = new Point(142, 271);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(100, 23);
             textBox1.TabIndex = 8;
@@ -106,7 +107,7 @@ namespace Music
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(96, 591);
+            label1.Location = new Point(35, 278);
             label1.Name = "label1";
             label1.Size = new Size(87, 15);
             label1.TabIndex = 9;
@@ -115,7 +116,7 @@ namespace Music
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(96, 642);
+            label2.Location = new Point(35, 329);
             label2.Name = "label2";
             label2.Size = new Size(44, 15);
             label2.TabIndex = 11;
@@ -123,7 +124,7 @@ namespace Music
             // 
             // textBox2
             // 
-            textBox2.Location = new Point(205, 634);
+            textBox2.Location = new Point(144, 321);
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(100, 23);
             textBox2.TabIndex = 10;
@@ -131,7 +132,7 @@ namespace Music
             // 
             // txtExportTestChords
             // 
-            txtExportTestChords.Location = new Point(434, 656);
+            txtExportTestChords.Location = new Point(299, 389);
             txtExportTestChords.Name = "txtExportTestChords";
             txtExportTestChords.Size = new Size(203, 23);
             txtExportTestChords.TabIndex = 12;
@@ -141,16 +142,26 @@ namespace Music
             // 
             // btnTestParser
             // 
-            btnTestParser.Location = new Point(437, 587);
+            btnTestParser.Location = new Point(302, 337);
             btnTestParser.Name = "btnTestParser";
             btnTestParser.Size = new Size(200, 23);
             btnTestParser.TabIndex = 13;
             btnTestParser.Text = "Test Parser";
             btnTestParser.UseVisualStyleBackColor = true;
+            btnTestParser.Click += btnTestParser_Click;
+            // 
+            // textBox3
+            // 
+            textBox3.Location = new Point(524, 302);
+            textBox3.Multiline = true;
+            textBox3.Name = "textBox3";
+            textBox3.Size = new Size(549, 200);
+            textBox3.TabIndex = 14;
             // 
             // MusicForm
             // 
-            ClientSize = new Size(1085, 757);
+            ClientSize = new Size(1085, 539);
+            Controls.Add(textBox3);
             Controls.Add(btnTestParser);
             Controls.Add(txtExportTestChords);
             Controls.Add(label2);
@@ -185,5 +196,6 @@ namespace Music
         private TextBox textBox2;
         private Button txtExportTestChords;
         private Button btnTestParser;
+        private TextBox textBox3;
     }
 }

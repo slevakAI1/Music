@@ -16,9 +16,9 @@ namespace Music.Services
                     throw new FileNotFoundException("MusicXML file not found.", path);
 
                 // Attempt to parse. If this succeeds, the test passes.
-                _ = MusicXmlParser.GetScore(path);
+                var parsedScore = MusicXmlParser.GetScore(path);
 
-                return "Passed";
+                 return "Passed";
             }
             catch (Exception ex)
             {
