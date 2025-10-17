@@ -1,14 +1,14 @@
 ﻿using Music.Design;
 using MusicXml;
 using System.Text;
-using System.Xml;
-using System.Security.Cryptography.Xml;
+using DiffPlex;
+using System.Windows.Forms;
 
 namespace Music.Services
 {
     public class MusicXmlSerializerTests
     {
-        // Import → serialize → compare with original; on mismatch, show first difference details
+        // Load → serialize → DiffPlex all differences → show each in a dialog (no special-casing)
         public string TestSerializer(string path)
         {
             try
@@ -22,137 +22,68 @@ namespace Music.Services
                 var score = MusicXmlParser.GetScore(path);
                 var serializedXml = MusicXmlScoreSerializer.Serialize(score);
 
-                if (string.Equals(originalXml, serializedXml, StringComparison.Ordinal))
+                var differ = new Differ();
+                var diff = differ.CreateCharacterDiffs(originalXml, serializedXml, ignoreWhitespace: false, ignoreCase: false);
+
+                // No differences → pass
+                if (diff.DiffBlocks.Count == 0)
                     return "Passed";
 
-                // Save serialized output for inspection
+                // Save serialized output once for inspection
                 var tempOutPath = Path.Combine(Path.GetTempPath(), $"Serialized_{Path.GetFileName(path)}");
                 File.WriteAllText(tempOutPath, serializedXml);
 
-                // Build first-difference report
-                var idx = FirstDifferenceIndex(originalXml, serializedXml);
-                var (line, col) = GetLineColumn(originalXml, idx);
+                int shown = 0;
+                foreach (var block in diff.DiffBlocks)
+                {
+                    // Safely slice the differing segments
+                    static string Slice(string s, int start, int length)
+                    {
+                        if (s.Length == 0) return string.Empty;
+                        start = Math.Clamp(start, 0, s.Length);
+                        length = Math.Max(0, length);
+                        int end = Math.Clamp(start + length, 0, s.Length);
+                        return s.Substring(start, end - start);
+                    }
 
-                var originalChar = CharAtOrEof(originalXml, idx);
-                var serializedChar = CharAtOrEof(serializedXml, idx);
+                    var origSeg = Slice(originalXml, block.DeleteStartA, block.DeleteCountA);
+                    var newSeg  = Slice(serializedXml, block.InsertStartB, block.InsertCountB);
 
-                var originalLineText = GetLineTextAtIndex(originalXml, idx);
-                var serializedLineText = GetLineTextAtIndex(serializedXml, idx);
+                    var sb = new StringBuilder();
+                    sb.AppendLine("Serialized output does not match original file contents.");
+                    sb.AppendLine($"Original index: {block.DeleteStartA}, count: {block.DeleteCountA}");
+                    sb.AppendLine($"Serialized index: {block.InsertStartB}, count: {block.InsertCountB}");
+                    sb.AppendLine();
+                    sb.AppendLine("Original segment:");
+                    sb.AppendLine(origSeg);
+                    sb.AppendLine();
+                    sb.AppendLine("Serialized segment:");
+                    sb.AppendLine(newSeg);
+                    sb.AppendLine();
+                    sb.AppendLine("Note: Full serialized output saved to:");
+                    sb.AppendLine(tempOutPath);
+                    sb.AppendLine();
+                    sb.Append("Click OK for next difference or Cancel to stop.");
 
-                var sb = new StringBuilder();
-                sb.AppendLine("Failed: serialized output does not match original file contents.");
-                sb.AppendLine($"First difference at absolute index {idx} (line {line}, column {col}).");
-                sb.AppendLine($"Original char   : {DescribeChar(originalChar)}");
-                sb.AppendLine($"Serialized char : {DescribeChar(serializedChar)}");
-                sb.AppendLine();
-                sb.AppendLine("Original line   : " + EscapeSnippet(originalLineText));
-                sb.AppendLine("Serialized line : " + EscapeSnippet(serializedLineText));
-                sb.AppendLine();
-                sb.AppendLine("Note: Full serialized output saved to:");
-                sb.Append(tempOutPath);
+                    var result = MessageBox.Show(
+                        sb.ToString(),
+                        $"Serializer Differences ({shown + 1})",
+                        MessageBoxButtons.OKCancel,
+                        MessageBoxIcon.Warning);
 
-                return sb.ToString();
+                    shown++;
+
+                    if (result == DialogResult.Cancel)
+                        break;
+                }
+
+                return $"Completed. Shown {shown} difference(s).";
             }
             catch (Exception ex)
             {
                 return BuildErrorDetails(ex);
             }
         }
-
-        // Canonical XML (C14N). Removes XML decl/doctype differences, normalizes namespaces/attrs/empty elems/line endings.
-        // Requires System.Security.Cryptography.Xml.
-        private static byte[] CanonicalizeXml(string xml, bool exclusive = false)
-        {
-            var readerSettings = new XmlReaderSettings
-            {
-                DtdProcessing = DtdProcessing.Ignore, // avoid fetching external DTDs (MusicXML has a DOCTYPE)
-                XmlResolver = null
-            };
-
-            using var sr = new StringReader(xml);
-            using var xr = XmlReader.Create(sr, readerSettings);
-
-            var doc = new XmlDocument
-            {
-                PreserveWhitespace = true, // let C14N govern whitespace handling
-                XmlResolver = null
-            };
-            doc.Load(xr);
-
-            Transform transform = exclusive
-                ? new XmlDsigExcC14NTransform()
-                : new XmlDsigC14NTransform();
-
-            transform.LoadInput(doc);
-
-            using var output = (Stream)transform.GetOutput(typeof(Stream));
-            using var ms = new MemoryStream();
-            output.CopyTo(ms);
-            return ms.ToArray(); // canonical UTF-8 bytes
-        }
-
-        private static int FirstDifferenceIndex(string a, string b)
-        {
-            var min = Math.Min(a.Length, b.Length);
-            for (int i = 0; i < min; i++)
-            {
-                if (a[i] != b[i]) return i;
-            }
-            return min; // difference is at end if lengths differ
-        }
-
-        private static (int line, int col) GetLineColumn(string text, int index)
-        {
-            // 1-based line/column; treat '\n' as line break; ignore '\r' (handles CRLF)
-            int line = 1, col = 1;
-            int len = Math.Min(index, text.Length);
-            for (int i = 0; i < len; i++)
-            {
-                char c = text[i];
-                if (c == '\n')
-                {
-                    line++;
-                    col = 1;
-                }
-                else if (c != '\r')
-                {
-                    col++;
-                }
-            }
-            return (line, col);
-        }
-
-        private static char? CharAtOrEof(string s, int index) =>
-            index < s.Length ? s[index] : (char?)null;
-
-        private static string DescribeChar(char? c)
-        {
-            if (c == null) return "∅ (end of string)";
-            var ch = c.Value;
-            string visible = ch switch
-            {
-                '\r' => "\\r",
-                '\n' => "\\n",
-                '\t' => "\\t",
-                _ => char.IsControl(ch) ? $"\\u{(int)ch:X4}" : ch.ToString()
-            };
-            return $"'{visible}' (U+{(int)ch:X4})";
-        }
-
-        private static string GetLineTextAtIndex(string text, int index)
-        {
-            index = Math.Min(index, text.Length);
-            int start = text.LastIndexOf('\n', Math.Max(0, index - 1));
-            start = start == -1 ? 0 : start + 1;
-
-            int end = text.IndexOf('\n', index);
-            end = end == -1 ? text.Length : end;
-
-            return text.Substring(start, end - start);
-        }
-
-        private static string EscapeSnippet(string s) =>
-            s.Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t");
 
         private static string BuildErrorDetails(Exception ex)
         {
