@@ -47,7 +47,7 @@ namespace Music
             btnSave.TabIndex = 2;
             btnSave.Text = "Save";
             btnSave.UseVisualStyleBackColor = true;
-            btnSave.Click += btnPlayMidi_Click;
+            btnSave.Click += btnSave_Click;
             // 
             // lblFilepath
             // 
