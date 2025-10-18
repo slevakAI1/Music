@@ -6,7 +6,7 @@ namespace Music
     {
         private void InitializeComponent()
         {
-            btnCreateStructure = new Button();
+            btnAddSections = new Button();
             txtSongStructure = new TextBox();
             btnSave = new Button();
             lblFilepath = new Label();
@@ -19,21 +19,22 @@ namespace Music
             label2 = new Label();
             textBox2 = new TextBox();
             btnCreateScore = new Button();
+            btnNewDesign = new Button();
             SuspendLayout();
             // 
-            // btnCreateStructure
+            // btnAddSections
             // 
-            btnCreateStructure.Location = new Point(28, 49);
-            btnCreateStructure.Name = "btnCreateStructure";
-            btnCreateStructure.Size = new Size(151, 23);
-            btnCreateStructure.TabIndex = 0;
-            btnCreateStructure.Text = "Create Song Structure";
-            btnCreateStructure.UseVisualStyleBackColor = true;
-            btnCreateStructure.Click += btnCreateSections_Click;
+            btnAddSections.Location = new Point(28, 92);
+            btnAddSections.Name = "btnAddSections";
+            btnAddSections.Size = new Size(151, 23);
+            btnAddSections.TabIndex = 0;
+            btnAddSections.Text = "Add Sections";
+            btnAddSections.UseVisualStyleBackColor = true;
+            btnAddSections.Click += btnCreateSections_Click;
             // 
             // txtSongStructure
             // 
-            txtSongStructure.Location = new Point(212, 49);
+            txtSongStructure.Location = new Point(212, 92);
             txtSongStructure.Multiline = true;
             txtSongStructure.Name = "txtSongStructure";
             txtSongStructure.Size = new Size(529, 89);
@@ -41,7 +42,7 @@ namespace Music
             // 
             // btnSave
             // 
-            btnSave.Location = new Point(423, 411);
+            btnSave.Location = new Point(423, 454);
             btnSave.Name = "btnSave";
             btnSave.Size = new Size(151, 23);
             btnSave.TabIndex = 2;
@@ -52,7 +53,7 @@ namespace Music
             // lblFilepath
             // 
             lblFilepath.AutoSize = true;
-            lblFilepath.Location = new Point(599, 415);
+            lblFilepath.Location = new Point(599, 458);
             lblFilepath.Name = "lblFilepath";
             lblFilepath.Size = new Size(47, 15);
             lblFilepath.TabIndex = 3;
@@ -60,7 +61,7 @@ namespace Music
             // 
             // btnAddVoices
             // 
-            btnAddVoices.Location = new Point(28, 172);
+            btnAddVoices.Location = new Point(28, 215);
             btnAddVoices.Name = "btnAddVoices";
             btnAddVoices.Size = new Size(160, 23);
             btnAddVoices.TabIndex = 4;
@@ -70,7 +71,7 @@ namespace Music
             // 
             // txtVoiceSet
             // 
-            txtVoiceSet.Location = new Point(215, 172);
+            txtVoiceSet.Location = new Point(215, 215);
             txtVoiceSet.Multiline = true;
             txtVoiceSet.Name = "txtVoiceSet";
             txtVoiceSet.Size = new Size(180, 76);
@@ -78,7 +79,7 @@ namespace Music
             // 
             // txtChordSet
             // 
-            txtChordSet.Location = new Point(667, 172);
+            txtChordSet.Location = new Point(667, 215);
             txtChordSet.Multiline = true;
             txtChordSet.Name = "txtChordSet";
             txtChordSet.Size = new Size(180, 76);
@@ -86,7 +87,7 @@ namespace Music
             // 
             // btnAddChords
             // 
-            btnAddChords.Location = new Point(467, 172);
+            btnAddChords.Location = new Point(467, 215);
             btnAddChords.Name = "btnAddChords";
             btnAddChords.Size = new Size(160, 23);
             btnAddChords.TabIndex = 6;
@@ -96,7 +97,7 @@ namespace Music
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(142, 271);
+            textBox1.Location = new Point(142, 314);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(100, 23);
             textBox1.TabIndex = 8;
@@ -105,7 +106,7 @@ namespace Music
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(35, 278);
+            label1.Location = new Point(35, 321);
             label1.Name = "label1";
             label1.Size = new Size(87, 15);
             label1.TabIndex = 9;
@@ -114,7 +115,7 @@ namespace Music
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(35, 329);
+            label2.Location = new Point(35, 372);
             label2.Name = "label2";
             label2.Size = new Size(44, 15);
             label2.TabIndex = 11;
@@ -122,7 +123,7 @@ namespace Music
             // 
             // textBox2
             // 
-            textBox2.Location = new Point(144, 321);
+            textBox2.Location = new Point(144, 364);
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(100, 23);
             textBox2.TabIndex = 10;
@@ -130,7 +131,7 @@ namespace Music
             // 
             // btnCreateScore
             // 
-            btnCreateScore.Location = new Point(423, 382);
+            btnCreateScore.Location = new Point(423, 425);
             btnCreateScore.Name = "btnCreateScore";
             btnCreateScore.Size = new Size(238, 23);
             btnCreateScore.TabIndex = 12;
@@ -138,9 +139,20 @@ namespace Music
             btnCreateScore.UseVisualStyleBackColor = true;
             btnCreateScore.Click += btnCreateMusic_Click;
             // 
+            // btnNewDesign
+            // 
+            btnNewDesign.Location = new Point(28, 32);
+            btnNewDesign.Name = "btnNewDesign";
+            btnNewDesign.Size = new Size(151, 23);
+            btnNewDesign.TabIndex = 13;
+            btnNewDesign.Text = "New Design";
+            btnNewDesign.UseVisualStyleBackColor = true;
+            btnNewDesign.Click += btnNewScore_Click;
+            // 
             // GenerateForm
             // 
             ClientSize = new Size(1085, 539);
+            Controls.Add(btnNewDesign);
             Controls.Add(btnCreateScore);
             Controls.Add(label2);
             Controls.Add(textBox2);
@@ -153,14 +165,14 @@ namespace Music
             Controls.Add(lblFilepath);
             Controls.Add(btnSave);
             Controls.Add(txtSongStructure);
-            Controls.Add(btnCreateStructure);
+            Controls.Add(btnAddSections);
             Name = "GenerateForm";
             WindowState = FormWindowState.Maximized;
             Load += MusicForm_Load;
             ResumeLayout(false);
             PerformLayout();
         }
-        private Button btnCreateStructure;
+        private Button btnAddSections;
         private TextBox txtSongStructure;
         private Button btnSave;
         private Label lblFilepath;
@@ -173,5 +185,6 @@ namespace Music
         private Label label2;
         private TextBox textBox2;
         private Button btnCreateScore;
+        private Button btnNewDesign;
     }
 }

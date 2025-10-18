@@ -6,11 +6,11 @@ namespace Music
     {
         // Persisted objects for this form/session
         private SectionsClass _sections = new();
-        private readonly VoiceSet _voiceSet = new();
-        private readonly ChordSet _chordSet = new();
+        private readonly VoiceSetClass _voiceSet = new();
+        private readonly ChordSetClass _chordSet = new();
 
-        private readonly VoiceManager _voiceManager = new VoiceManager();
-        private readonly ChordManager _chordManager = new ChordManager();
+        private readonly VoiceManagerClass _voiceManager = new VoiceManagerClass();
+        private readonly ChordManagerClass _chordManager = new ChordManagerClass();
         private readonly SectionManagerClass _sectionManager = new SectionManagerClass();
 
         public GenerateForm()
@@ -41,7 +41,7 @@ namespace Music
 
         private void btnAddChords_Click(object sender, EventArgs e)
         {
-            _chordManager.AddDefaultChordsAndRender(this, _sections, _chordSet, txtChordSet);
+            _chordManager.AddDefaultChords(this, _sections, _chordSet, txtChordSet);
         }
 
         private void btnCreateMusic_Click(object sender, EventArgs e)
@@ -50,6 +50,11 @@ namespace Music
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+        }
+
+        private void btnNewScore_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

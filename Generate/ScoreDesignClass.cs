@@ -3,7 +3,7 @@
     /// <summary>
     /// Minimal, score-wide structure (top-level only). No voice/staff/part targeting.
     /// </summary>
-    public sealed class ScoreDesign
+    public sealed class ScoreDesignClass
     {
         public string DesignId { get; }
         //public string? SourcePath { get; init; }
@@ -20,7 +20,7 @@
         private readonly List<Chord> _chords = new();
         public IReadOnlyList<Chord> Chords => _chords;
 
-        public ScoreDesign(string? designId = null)
+        public ScoreDesignClass(string? designId = null)
         {
             DesignId = designId ?? Guid.NewGuid().ToString("N");
         }

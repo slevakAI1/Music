@@ -1,12 +1,9 @@
-using System.Collections.Generic;
-using System.Windows.Forms;
-
 namespace Music.Generate
 {
-    public sealed class VoiceManager
+    public sealed class VoiceManagerClass
     {
         // Persist in VoiceSet; text box is display only
-        public void AddDefaultVoicesAndRender(IWin32Window owner, SectionsClass? structure, VoiceSet voiceSet, TextBox txtVoiceSet)
+        public void AddDefaultVoicesAndRender(IWin32Window owner, SectionsClass? structure, VoiceSetClass voiceSet, TextBox txtVoiceSet)
         {
             if (structure == null)
             {

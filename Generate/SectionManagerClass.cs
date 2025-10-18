@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows.Forms;
-
-namespace Music.Generate
+﻿namespace Music.Generate
 {
     public sealed class SectionManagerClass
     {
@@ -11,8 +8,8 @@ namespace Music.Generate
             TextBox txtSongStructure,
             TextBox txtVoiceSet,
             TextBox txtChordSet,
-            VoiceSet voiceSet,
-            ChordSet chordSet)
+            VoiceSetClass voiceSet,
+            ChordSetClass chordSet)
         {
             var structure = new SectionsClass();
             var summary = CreateTestSections(structure);
@@ -39,21 +36,21 @@ namespace Music.Generate
             sections.Reset();
 
             int measure = 1;
-            void Add(ScoreDesign.SectionType t, int lengthMeasures)
+            void Add(ScoreDesignClass.SectionType t, int lengthMeasures)
             {
-                var span = new ScoreDesign.MeasureRange(measure, measure + lengthMeasures - 1, true);
+                var span = new ScoreDesignClass.MeasureRange(measure, measure + lengthMeasures - 1, true);
                 sections.AddSection(t, span);
                 measure += lengthMeasures;
             }
 
-            Add(ScoreDesign.SectionType.Intro, 4);
-            Add(ScoreDesign.SectionType.Verse, 8);
-            Add(ScoreDesign.SectionType.Chorus, 8);
-            Add(ScoreDesign.SectionType.Verse, 8);
-            Add(ScoreDesign.SectionType.Chorus, 8);
-            Add(ScoreDesign.SectionType.Bridge, 8);
-            Add(ScoreDesign.SectionType.Chorus, 8);
-            Add(ScoreDesign.SectionType.Outro, 4);
+            Add(ScoreDesignClass.SectionType.Intro, 4);
+            Add(ScoreDesignClass.SectionType.Verse, 8);
+            Add(ScoreDesignClass.SectionType.Chorus, 8);
+            Add(ScoreDesignClass.SectionType.Verse, 8);
+            Add(ScoreDesignClass.SectionType.Chorus, 8);
+            Add(ScoreDesignClass.SectionType.Bridge, 8);
+            Add(ScoreDesignClass.SectionType.Chorus, 8);
+            Add(ScoreDesignClass.SectionType.Outro, 4);
 
             var names = new List<string>(sections.Sections.Count);
             foreach (var s in sections.Sections)

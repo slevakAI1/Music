@@ -1,20 +1,20 @@
 namespace Music.Generate
 {
-    // Holds the top-level sections for the score
+    // Score Sections
     public sealed class SectionsClass
     {
-        private readonly List<ScoreDesign.Section> _sections = new();
-        public IReadOnlyList<ScoreDesign.Section> Sections => _sections;
+        private readonly List<ScoreDesignClass.Section> _sections = new();
+        public IReadOnlyList<ScoreDesignClass.Section> Sections => _sections;
 
         public void Reset() => _sections.Clear();
 
-        public ScoreDesign.Section AddSection(
-            ScoreDesign.SectionType type,
-            ScoreDesign.MeasureRange span,
+        public ScoreDesignClass.Section AddSection(
+            ScoreDesignClass.SectionType type,
+            ScoreDesignClass.MeasureRange span,
             string? name = null,
             IEnumerable<string>? tags = null)
         {
-            var sec = new ScoreDesign.Section(
+            var sec = new ScoreDesignClass.Section(
                 Id: Guid.NewGuid().ToString("N"),
                 Type: type,
                 Span: span,

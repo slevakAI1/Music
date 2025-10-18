@@ -3,10 +3,9 @@ using System.Windows.Forms;
 
 namespace Music.Generate
 {
-    public sealed class ChordManager
+    public sealed class ChordManagerClass
     {
-        // Persist in ChordSet; text box is display only
-        public void AddDefaultChordsAndRender(IWin32Window owner, SectionsClass? structure, ChordSet chordSet, TextBox txtChordSet)
+        public void AddDefaultChords(IWin32Window owner, SectionsClass? structure, ChordSetClass chordSet, TextBox txtChordSet)
         {
             if (structure == null)
             {

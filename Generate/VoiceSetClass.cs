@@ -1,17 +1,14 @@
-using System;
-using System.Collections.Generic;
-
 namespace Music.Generate
 {
     // Holds the collection of voices used by the score
-    public sealed class VoiceSet
+    public sealed class VoiceSetClass
     {
-        private readonly List<ScoreDesign.Voice> _voices = new();
-        public IReadOnlyList<ScoreDesign.Voice> Voices => _voices;
+        private readonly List<ScoreDesignClass.Voice> _voices = new();
+        public IReadOnlyList<ScoreDesignClass.Voice> Voices => _voices;
 
         public void Reset() => _voices.Clear();
 
-        public ScoreDesign.Voice AddVoice(string value)
+        public ScoreDesignClass.Voice AddVoice(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException("Voice value must not be null or empty.", nameof(value));
@@ -22,7 +19,7 @@ namespace Music.Generate
                     return v;
             }
 
-            var voice = new ScoreDesign.Voice(
+            var voice = new ScoreDesignClass.Voice(
                 Id: Guid.NewGuid().ToString("N"),
                 Value: value);
 
@@ -30,7 +27,7 @@ namespace Music.Generate
             return voice;
         }
 
-        public IReadOnlyList<ScoreDesign.Voice> AddDefaultVoices()
+        public IReadOnlyList<ScoreDesignClass.Voice> AddDefaultVoices()
         {
             AddVoice("Guitar");
             AddVoice("Drum Set");
