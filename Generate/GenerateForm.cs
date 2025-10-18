@@ -1,9 +1,6 @@
-using Music.Services;
-using System;
-using System.Windows.Forms;
-using System.Diagnostics;
-using System.IO;
 using Music.Generate;
+using Music.Tests;
+using System.Diagnostics;
 
 namespace Music
 {

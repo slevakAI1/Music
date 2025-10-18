@@ -1,9 +1,6 @@
-using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Multimedia;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace Music.Services
+namespace Music.Tests
 {
     internal class MidiPlaybackService : IMidiPlaybackService
     {

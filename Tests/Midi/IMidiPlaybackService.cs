@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-
-namespace Music.Services
+namespace Music.Tests
 {
     public interface IMidiPlaybackService
     {

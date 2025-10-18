@@ -1,4 +1,4 @@
-namespace Music
+namespace Music.Tests
 {
     internal static class AppState
     {

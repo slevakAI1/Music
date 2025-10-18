@@ -1,12 +1,12 @@
-using Music.Services;
-using MusicXml.Domain;
+using Music.Tests;
 using MusicXml;
+using MusicXml.Domain;
 
 namespace Music
 {
     public partial class MainForm : Form
     {
-        private readonly IMidiIoService _midiIoService = new MidiIoService();
+        private readonly MidiIoService _midiIoService = new MidiIoService();
         private readonly IMusicXmlService _musicXmlService = new MusicXmlService();
 
         // Persist the last imported MusicXML score at the Form level

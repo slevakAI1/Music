@@ -1,15 +1,15 @@
 using Melanchall.DryWetMidi.Core;
 
-namespace Music.Services
+namespace Music.Tests
 {
-    internal class MidiIoService : IMidiIoService
+    internal class MidiIoService 
     {
-        public Music.MidiSongDocument ImportFromFile(string path)
+        public MidiSongDocument ImportFromFile(string path)
         {
             try
             {
                 var midiFile = MidiFile.Read(path);
-                var doc = new Music.MidiSongDocument(midiFile)
+                var doc = new MidiSongDocument(midiFile)
                 {
                     FileName = Path.GetFileName(path)
                 };
@@ -21,7 +21,7 @@ namespace Music.Services
             }
         }
 
-        public void ExportToFile(string path, Music.MidiSongDocument doc)
+        public void ExportToFile(string path, MidiSongDocument doc)
         {
             try
             {
