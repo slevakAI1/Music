@@ -32,7 +32,7 @@
         /// Structure: Intro → Verse → Chorus → Verse → Chorus → Bridge → Chorus → Outro
         /// Each section spans 4 measures.
         /// </summary>
-        public string CreateStructure()
+        public string CreateTestStructure()
         {
             _sections.Clear();
 

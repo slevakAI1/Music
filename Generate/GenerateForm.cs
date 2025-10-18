@@ -30,7 +30,7 @@ namespace Music
         private void btnCreateStructure_Click(object sender, EventArgs e)
         {
             _structure = new ScoreDesign();
-            var summary = _structure.CreateStructure();
+            var summary = _structure.CreateTestStructure();
             txtSongStructure.Text = summary;
 
             // Clear prior outputs tied to an older structure
