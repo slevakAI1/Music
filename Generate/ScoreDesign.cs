@@ -9,8 +9,8 @@
         //public string? SourcePath { get; init; }
         //public string? SourceHash { get; init; }
 
-        private readonly List<TopLevelSection> _sections = new();
-        public IReadOnlyList<TopLevelSection> Sections => _sections;
+        private readonly List<Section> _sections = new();
+        public IReadOnlyList<Section> Sections => _sections;
 
         // High-level collection of all voices used in the song (per MusicXML: voice is a string identifier).
         private readonly List<Voice> _voices = new();
@@ -31,9 +31,9 @@
         /// <summary>
         /// Add a top-level section that applies to the entire score.
         /// </summary>
-        public TopLevelSection AddSection(TopLevelSectionType type, MeasureRange span, string? name = null, IEnumerable<string>? tags = null)
+        public Section AddSection(TopLevelSectionType type, MeasureRange span, string? name = null, IEnumerable<string>? tags = null)
         {
-            var sec = new TopLevelSection(
+            var sec = new Section(
                 Id: Guid.NewGuid().ToString("N"),
                 Type: type,
                 Span: span,
@@ -180,7 +180,7 @@
             public static MeasureRange Single(int measure) => new(measure, measure, true);
         }
 
-        public sealed record TopLevelSection(
+        public sealed record Section(
             string Id,
             TopLevelSectionType Type,
             MeasureRange Span,

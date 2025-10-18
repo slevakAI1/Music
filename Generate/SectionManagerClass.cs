@@ -6,7 +6,7 @@ namespace Music.Generate
     public sealed class SectionManagerClass
     {
         // Create and persist a new SongStructure, render its summary, and reset dependent sets/displays
-        public SongStructure CreateSections(
+        public SectionsClass CreateSections(
             IWin32Window owner,
             TextBox txtSongStructure,
             TextBox txtVoiceSet,
@@ -14,7 +14,7 @@ namespace Music.Generate
             VoiceSet voiceSet,
             ChordSet chordSet)
         {
-            var structure = new SongStructure();
+            var structure = new SectionsClass();
             var summary = CreateTestSections(structure);
 
             // Display only
@@ -34,15 +34,15 @@ namespace Music.Generate
         /// Structure: Intro → Verse → Chorus → Verse → Chorus → Bridge → Chorus → Outro
         /// Measures per section: Intro=4, Verse/Chorus/Bridge=8, Outro=4
         /// </summary>
-        public string CreateTestSections(SongStructure structure)
+        public string CreateTestSections(SectionsClass sections)
         {
-            structure.Reset();
+            sections.Reset();
 
             int measure = 1;
             void Add(ScoreDesign.TopLevelSectionType t, int lengthMeasures)
             {
                 var span = new ScoreDesign.MeasureRange(measure, measure + lengthMeasures - 1, true);
-                structure.AddSection(t, span);
+                sections.AddSection(t, span);
                 measure += lengthMeasures;
             }
 
@@ -55,8 +55,8 @@ namespace Music.Generate
             Add(ScoreDesign.TopLevelSectionType.Chorus, 8);
             Add(ScoreDesign.TopLevelSectionType.Outro, 4);
 
-            var names = new List<string>(structure.Sections.Count);
-            foreach (var s in structure.Sections)
+            var names = new List<string>(sections.Sections.Count);
+            foreach (var s in sections.Sections)
             {
                 int bars = s.Span.EndMeasure is int end
                     ? (s.Span.InclusiveEnd ? end - s.Span.StartMeasure + 1 : end - s.Span.StartMeasure)

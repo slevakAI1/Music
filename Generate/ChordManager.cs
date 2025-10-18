@@ -6,7 +6,7 @@ namespace Music.Generate
     public sealed class ChordManager
     {
         // Persist in ChordSet; text box is display only
-        public void AddDefaultChordsAndRender(IWin32Window owner, SongStructure? structure, ChordSet chordSet, TextBox txtChordSet)
+        public void AddDefaultChordsAndRender(IWin32Window owner, SectionsClass? structure, ChordSet chordSet, TextBox txtChordSet)
         {
             if (structure == null)
             {

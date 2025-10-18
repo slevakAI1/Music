@@ -5,7 +5,7 @@ namespace Music
     public partial class GenerateForm : Form
     {
         // Persisted objects for this form/session
-        private SongStructure? _sections;
+        private SectionsClass _sections = new();
         private readonly VoiceSet _voiceSet = new();
         private readonly ChordSet _chordSet = new();
 
