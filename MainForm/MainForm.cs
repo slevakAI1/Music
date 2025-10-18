@@ -1,13 +1,7 @@
-using Music.Tests;
-using MusicXml;
-using MusicXml.Domain;
-
 namespace Music
 {
     public partial class MainForm : Form
     {
-        private readonly MidiIoService _midiIoService = new MidiIoService();
-        private readonly IMusicXmlService _musicXmlService = new MusicXmlService();
         private readonly FileManager _fileManager;
 
         public MainForm()
@@ -16,7 +10,7 @@ namespace Music
             this.WindowState = FormWindowState.Maximized;
             this.IsMdiContainer = true;
 
-            _fileManager = new FileManager(_musicXmlService, ShowStatus);
+            _fileManager = new FileManager(ShowStatus);
 
             // Show MusicForm on startup, filling the MDI parent
             ShowChildForm(typeof(GenerateForm));

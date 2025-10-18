@@ -5,13 +5,12 @@ namespace Music
 {
     internal sealed class FileManager
     {
-        private readonly IMusicXmlService _musicXmlService;
         private readonly Action<string>? _showStatus;
         private Score? _currentScore;
+        private string? _lastImportedPath;
 
-        public FileManager(IMusicXmlService musicXmlService, Action<string>? showStatus = null)
+        public FileManager(Action<string>? showStatus = null)
         {
-            _musicXmlService = musicXmlService ?? throw new ArgumentNullException(nameof(musicXmlService));
             _showStatus = showStatus;
         }
 
@@ -26,7 +25,11 @@ namespace Music
             {
                 try
                 {
-                    _currentScore = _musicXmlService.ImportFromMusicXml(ofd.FileName);
+                    if (string.IsNullOrWhiteSpace(ofd.FileName) || !File.Exists(ofd.FileName))
+                        throw new FileNotFoundException("MusicXML file not found.", ofd.FileName);
+
+                    _currentScore = MusicXmlParser.GetScore(ofd.FileName);
+                    _lastImportedPath = ofd.FileName;
 
                     var movement = _currentScore?.MovementTitle ?? "Unknown";
                     _showStatus?.Invoke($"Loaded MusicXML: {Path.GetFileName(ofd.FileName)} (Movement: {movement})");
@@ -45,7 +48,7 @@ namespace Music
 
         public void ExportMusicXml(IWin32Window owner)
         {
-            if (_currentScore == null)
+            if (string.IsNullOrWhiteSpace(_lastImportedPath) || !File.Exists(_lastImportedPath))
             {
                 MessageBox.Show(owner, "No MusicXML score loaded.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -61,7 +64,7 @@ namespace Music
             {
                 try
                 {
-                    _musicXmlService.ExportLastImportedScore(sfd.FileName);
+                    File.Copy(_lastImportedPath, sfd.FileName, overwrite: true);
                     _showStatus?.Invoke($"Exported to {Path.GetFileName(sfd.FileName)}");
                 }
                 catch (Exception ex)
