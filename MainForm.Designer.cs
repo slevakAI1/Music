@@ -39,9 +39,9 @@
             MenuFile = new ToolStripMenuItem();
             MenuImportMusicXml = new ToolStripMenuItem();
             MenuExportMusicXml = new ToolStripMenuItem();
-            MenuImportMidi = new ToolStripMenuItem();
             MenuForm = new ToolStripMenuItem();
             MenuMusic = new ToolStripMenuItem();
+            MenuTestForm = new ToolStripMenuItem();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             menuStrip1.SuspendLayout();
@@ -59,7 +59,7 @@
             // 
             // MenuFile
             // 
-            MenuFile.DropDownItems.AddRange(new ToolStripItem[] { MenuImportMusicXml, MenuExportMusicXml, MenuImportMidi });
+            MenuFile.DropDownItems.AddRange(new ToolStripItem[] { MenuImportMusicXml, MenuExportMusicXml });
             MenuFile.Name = "MenuFile";
             MenuFile.Size = new Size(37, 20);
             MenuFile.Text = "File";
@@ -67,26 +67,20 @@
             // MenuImportMusicXml
             // 
             MenuImportMusicXml.Name = "MenuImportMusicXml";
-            MenuImportMusicXml.Size = new Size(180, 22);
+            MenuImportMusicXml.Size = new Size(166, 22);
             MenuImportMusicXml.Text = "Import MusicXml";
             MenuImportMusicXml.Click += MenuImportMusicXml_Click;
             // 
             // MenuExportMusicXml
             // 
             MenuExportMusicXml.Name = "MenuExportMusicXml";
-            MenuExportMusicXml.Size = new Size(180, 22);
+            MenuExportMusicXml.Size = new Size(166, 22);
             MenuExportMusicXml.Text = "Export MusicXML";
             MenuExportMusicXml.Click += MenuExportMusicXml_Click;
             // 
-            // MenuImportMidi
-            // 
-            MenuImportMidi.Name = "MenuImportMidi";
-            MenuImportMidi.Size = new Size(180, 22);
-            MenuImportMidi.Text = "Import MIDI";
-            // 
             // MenuForm
             // 
-            MenuForm.DropDownItems.AddRange(new ToolStripItem[] { MenuMusic });
+            MenuForm.DropDownItems.AddRange(new ToolStripItem[] { MenuMusic, MenuTestForm });
             MenuForm.Name = "MenuForm";
             MenuForm.Size = new Size(47, 20);
             MenuForm.Text = "Form";
@@ -94,9 +88,16 @@
             // MenuMusic
             // 
             MenuMusic.Name = "MenuMusic";
-            MenuMusic.Size = new Size(106, 22);
+            MenuMusic.Size = new Size(180, 22);
             MenuMusic.Text = "Music";
             MenuMusic.Click += MenuGenerateForm_Click;
+            // 
+            // MenuTestForm
+            // 
+            MenuTestForm.Name = "MenuTestForm";
+            MenuTestForm.Size = new Size(180, 22);
+            MenuTestForm.Text = "Tests";
+            MenuTestForm.Click += MenuTestForm_Click;
             // 
             // statusStrip1
             // 
@@ -135,6 +136,6 @@
         #endregion
 
         private ToolStripMenuItem MenuImportMusicXml;
-        private ToolStripMenuItem MenuImportMidi;
+        private ToolStripMenuItem MenuTestForm;
     }
 }

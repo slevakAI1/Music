@@ -53,7 +53,7 @@ namespace Music
                 statusStrip1.Items[0].Text = message;
         }
 
-       //                   Tool Strip Methods
+        //                   Tool Strip Methods
 
         private void MenuImportMusicXml_Click(object sender, EventArgs e)
         {
@@ -119,6 +119,11 @@ namespace Music
         private void MenuGenerateForm_Click(object sender, EventArgs e)
         {
             ShowChildForm(typeof(GenerateForm));
+        }
+
+        private void MenuTestForm_Click(object sender, EventArgs e)
+        {
+            ShowChildForm(typeof(TestForm));
         }
     }
 }
