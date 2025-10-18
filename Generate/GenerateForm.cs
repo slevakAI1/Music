@@ -4,6 +4,9 @@ namespace Music
 {
     public partial class GenerateForm : Form
     {
+        // Persisted song structure for this form/session
+        private SongStructure? _structure;
+
         public GenerateForm()
         {
             this.Text = "Music";
@@ -24,18 +27,27 @@ namespace Music
 
         private void btnCreateStructure_Click(object sender, EventArgs e)
         {
-            var structure = new SongStructure();
-            var summary = structure.CreateStructure();
+            _structure = new SongStructure();
+            var summary = _structure.CreateStructure();
             txtSongStructure.Text = summary;
+
+            // Clear prior outputs tied to an older structure
+            txtVoiceSet.Clear();
+            txtChordSet.Clear();
         }
 
         private void btnAddVoices_Click(object sender, EventArgs e)
         {
-            var structure = new SongStructure();
-            structure.AddVoices();
+            if (_structure == null)
+            {
+                MessageBox.Show(this, "Create the song structure first.", "No Structure", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            _structure.AddVoices();
 
             var lines = new System.Collections.Generic.List<string>();
-            foreach (var v in structure.Voices)
+            foreach (var v in _structure.Voices)
                 lines.Add(v.Value);
 
             // One voice per line in the voiceset textbox
@@ -44,8 +56,13 @@ namespace Music
 
         private void btnAddChords_Click(object sender, EventArgs e)
         {
-            var structure = new SongStructure();
-            var chords = structure.CreateChordSet();
+            if (_structure == null)
+            {
+                MessageBox.Show(this, "Create the song structure first.", "No Structure", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            var chords = _structure.CreateChordSet();
 
             var lines = new System.Collections.Generic.List<string>(chords.Count);
             foreach (var c in chords)
