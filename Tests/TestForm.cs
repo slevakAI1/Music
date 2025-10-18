@@ -52,12 +52,12 @@ namespace Music
                 MessageBoxButtons.OK, passed ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
         }
 
-        private void btnCreatTestMusicXmlFile_Click(object sender, EventArgs e)
+        private void btnCreateTestMusicXmlFile_Click(object sender, EventArgs e)
         {
             try
             {
                 var score = Music.Tests.MusicXmlCreateValidFileTests.CreateSingleMeasureCChordKeyboardScore();
-                var xml = Music.Generate.MusicXmlScoreSerializer.Serialize(score);
+                var xml = MusicXml.MusicXmlScoreSerializer.Serialize(score);
 
                 var targetDir = @"C:\temp";
                 Directory.CreateDirectory(targetDir);

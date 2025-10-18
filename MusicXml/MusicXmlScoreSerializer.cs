@@ -2,7 +2,7 @@ using MusicXml.Domain;
 using System.Globalization;
 using System.Xml;
 
-namespace Music.Generate
+namespace MusicXml
 {
     public static class MusicXmlScoreSerializer
     {

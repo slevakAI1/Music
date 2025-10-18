@@ -61,7 +61,7 @@
             btnCreatTestMusicXmlFile.TabIndex = 19;
             btnCreatTestMusicXmlFile.Text = "Create Text MusicXml File";
             btnCreatTestMusicXmlFile.UseVisualStyleBackColor = true;
-            btnCreatTestMusicXmlFile.Click += btnCreatTestMusicXmlFile_Click;
+            btnCreatTestMusicXmlFile.Click += btnCreateTestMusicXmlFile_Click;
             // 
             // TestForm
             // 

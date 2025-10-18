@@ -1,5 +1,4 @@
 using MusicXml.Domain;
-using MusicXml;
 
 namespace MusicXml
 {
