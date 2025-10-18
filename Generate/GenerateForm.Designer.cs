@@ -29,7 +29,7 @@ namespace Music
             btnCreateStructure.TabIndex = 0;
             btnCreateStructure.Text = "Create Song Structure";
             btnCreateStructure.UseVisualStyleBackColor = true;
-            btnCreateStructure.Click += btnCreateScoreStructure_Click;
+            btnCreateStructure.Click += btnCreateSections_Click;
             // 
             // txtSongStructure
             // 

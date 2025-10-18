@@ -29,7 +29,7 @@ namespace Music
         {
         }
 
-        private void btnCreateScoreStructure_Click(object sender, EventArgs e)
+        private void btnCreateSections_Click(object sender, EventArgs e)
         {
             _sections = _sectionManager.CreateSections(this, txtSongStructure, txtVoiceSet, txtChordSet, _voiceSet, _chordSet);
         }

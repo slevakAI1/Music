@@ -31,7 +31,7 @@
         /// <summary>
         /// Add a top-level section that applies to the entire score.
         /// </summary>
-        public Section AddSection(TopLevelSectionType type, MeasureRange span, string? name = null, IEnumerable<string>? tags = null)
+        public Section AddSection(SectionType type, MeasureRange span, string? name = null, IEnumerable<string>? tags = null)
         {
             var sec = new Section(
                 Id: Guid.NewGuid().ToString("N"),
@@ -182,7 +182,7 @@
 
         public sealed record Section(
             string Id,
-            TopLevelSectionType Type,
+            SectionType Type,
             MeasureRange Span,
             string Name,
             string[] Tags
@@ -203,7 +203,7 @@
             string Name
         );
 
-        public enum TopLevelSectionType
+        public enum SectionType
         {
             Intro,
             Verse,

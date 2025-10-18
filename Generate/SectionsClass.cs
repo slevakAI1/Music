@@ -9,7 +9,7 @@ namespace Music.Generate
         public void Reset() => _sections.Clear();
 
         public ScoreDesign.Section AddSection(
-            ScoreDesign.TopLevelSectionType type,
+            ScoreDesign.SectionType type,
             ScoreDesign.MeasureRange span,
             string? name = null,
             IEnumerable<string>? tags = null)

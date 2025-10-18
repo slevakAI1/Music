@@ -39,21 +39,21 @@ namespace Music.Generate
             sections.Reset();
 
             int measure = 1;
-            void Add(ScoreDesign.TopLevelSectionType t, int lengthMeasures)
+            void Add(ScoreDesign.SectionType t, int lengthMeasures)
             {
                 var span = new ScoreDesign.MeasureRange(measure, measure + lengthMeasures - 1, true);
                 sections.AddSection(t, span);
                 measure += lengthMeasures;
             }
 
-            Add(ScoreDesign.TopLevelSectionType.Intro, 4);
-            Add(ScoreDesign.TopLevelSectionType.Verse, 8);
-            Add(ScoreDesign.TopLevelSectionType.Chorus, 8);
-            Add(ScoreDesign.TopLevelSectionType.Verse, 8);
-            Add(ScoreDesign.TopLevelSectionType.Chorus, 8);
-            Add(ScoreDesign.TopLevelSectionType.Bridge, 8);
-            Add(ScoreDesign.TopLevelSectionType.Chorus, 8);
-            Add(ScoreDesign.TopLevelSectionType.Outro, 4);
+            Add(ScoreDesign.SectionType.Intro, 4);
+            Add(ScoreDesign.SectionType.Verse, 8);
+            Add(ScoreDesign.SectionType.Chorus, 8);
+            Add(ScoreDesign.SectionType.Verse, 8);
+            Add(ScoreDesign.SectionType.Chorus, 8);
+            Add(ScoreDesign.SectionType.Bridge, 8);
+            Add(ScoreDesign.SectionType.Chorus, 8);
+            Add(ScoreDesign.SectionType.Outro, 4);
 
             var names = new List<string>(sections.Sections.Count);
             foreach (var s in sections.Sections)
