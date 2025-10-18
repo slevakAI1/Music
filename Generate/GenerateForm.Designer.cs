@@ -23,13 +23,13 @@ namespace Music
             // 
             // btnCreateStructure
             // 
-            btnCreateStructure.Location = new Point(21, 48);
+            btnCreateStructure.Location = new Point(28, 49);
             btnCreateStructure.Name = "btnCreateStructure";
             btnCreateStructure.Size = new Size(151, 23);
             btnCreateStructure.TabIndex = 0;
             btnCreateStructure.Text = "Create Song Structure";
             btnCreateStructure.UseVisualStyleBackColor = true;
-            btnCreateStructure.Click += btnCreateStructure_Click;
+            btnCreateStructure.Click += btnCreateScoreStructure_Click;
             // 
             // txtSongStructure
             // 
@@ -70,7 +70,7 @@ namespace Music
             // 
             // txtVoiceSet
             // 
-            txtVoiceSet.Location = new Point(228, 172);
+            txtVoiceSet.Location = new Point(215, 172);
             txtVoiceSet.Multiline = true;
             txtVoiceSet.Name = "txtVoiceSet";
             txtVoiceSet.Size = new Size(180, 76);

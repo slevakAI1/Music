@@ -20,50 +20,13 @@
         private readonly List<Chord> _chords = new();
         public IReadOnlyList<Chord> Chords => _chords;
 
-        public ScoreDesign(string? designId = null) // string? sourcePath = null, string? sourceHash = null, 
+        public ScoreDesign(string? designId = null)
         {
             DesignId = designId ?? Guid.NewGuid().ToString("N");
-        //  SourcePath = sourcePath;
-        //  SourceHash = sourceHash;
         }
 
-        /// <summary>
-        /// Build the standard top-level structure and return a printable summary.
-        /// Structure: Intro → Verse → Chorus → Verse → Chorus → Bridge → Chorus → Outro
-        /// Each section spans 4 measures.
-        /// </summary>
-        public string CreateTestStructure()
-        {
-            _sections.Clear();
-
-            int measure = 1;
-            void Add(TopLevelSectionType t, int lengthMeasures)
-            {
-                var span = new MeasureRange(measure, measure + lengthMeasures - 1, true);
-                AddSection(t, span);
-                measure += lengthMeasures;
-            }
-
-            Add(TopLevelSectionType.Intro, 4);
-            Add(TopLevelSectionType.Verse, 8);
-            Add(TopLevelSectionType.Chorus, 8);
-            Add(TopLevelSectionType.Verse, 8);
-            Add(TopLevelSectionType.Chorus, 8);
-            Add(TopLevelSectionType.Bridge, 8);
-            Add(TopLevelSectionType.Chorus, 8);
-            Add(TopLevelSectionType.Outro, 4);
-
-            // Build a simple "Intro → Verse → ..." summary string with bar counts
-            var names = new List<string>(_sections.Count);
-            foreach (var s in _sections)
-            {
-                int bars = s.Span.EndMeasure is int end
-                    ? (s.Span.InclusiveEnd ? end - s.Span.StartMeasure + 1 : end - s.Span.StartMeasure)
-                    : 0;
-                names.Add($"{s.Type}, {bars}");
-            }
-            return string.Join("\r\n", names);
-        }
+        // Allow managers to rebuild section plans
+        public void ResetSections() => _sections.Clear();
 
         /// <summary>
         /// Add a top-level section that applies to the entire score.
@@ -121,9 +84,6 @@
         /// <summary>
         /// Add a chord to the song's chord set (compatible with MusicXML 'harmony').
         /// Prevents duplicates by matching root/kind/bass. Returns the created or existing entry.
-        /// Notes:
-        /// - MusicXML harmony does not encode octave; voicing is applied later when rendering notes.
-        /// - rootAlter and bassAlter use standard semitone offsets: -1=flat, 0=natural, +1=sharp, etc.
         /// </summary>
         public Chord AddChord(
             Step rootStep,
@@ -214,18 +174,12 @@
             return root + kindSuffix + bass;
         }
 
-        /// <summary>
-        /// Inclusive measure range; end may be open-ended (null).
-        /// </summary>
         public readonly record struct MeasureRange(int StartMeasure, int? EndMeasure, bool InclusiveEnd = true)
         {
             public bool IsOpenEnded => EndMeasure is null;
             public static MeasureRange Single(int measure) => new(measure, measure, true);
         }
 
-        /// <summary>
-        /// One top-level structural section (e.g., Verse, Chorus) with an optional name and tags.
-        /// </summary>
         public sealed record TopLevelSection(
             string Id,
             TopLevelSectionType Type,
@@ -234,18 +188,11 @@
             string[] Tags
         );
 
-        /// <summary>
-        /// High-level voice entry capturing the MusicXML 'voice' value.
-        /// </summary>
         public sealed record Voice(
             string Id,
             string Value
         );
 
-        /// <summary>
-        /// High-level chord entry compatible with MusicXML 'harmony' element.
-        /// Octave/voicing are intentionally omitted (they belong to note rendering).
-        /// </summary>
         public sealed record Chord(
             string Id,
             Step RootStep,
@@ -256,34 +203,22 @@
             string Name
         );
 
-        /// <summary>
-        /// Top-level structural labels for a song/score.
-        /// </summary>
         public enum TopLevelSectionType
         {
             Intro,
             Verse,
-    //      Refrain,
             Chorus,
             Solo,
             Bridge,
-    //      Ending,
             Outro,
             Custom
         }
 
-        /// <summary>
-        /// Diatonic pitch steps used by MusicXML (A–G).
-        /// </summary>
         public enum Step
         {
             A, B, C, D, E, F, G
         }
 
-        /// <summary>
-        /// Chord kinds mapped to MusicXML 'kind' values.
-        /// This list can be extended as needed.
-        /// </summary>
         public enum ChordKind
         {
             Major,
