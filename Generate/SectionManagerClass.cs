@@ -2,14 +2,14 @@
 {
     public sealed class SectionManagerClass
     {
-        public ScoreDesign CreateAndRenderStructure(
+        public ScoreDesign CreateSections(
             IWin32Window owner,
             TextBox txtSongStructure,
             TextBox txtVoiceSet,
             TextBox txtChordSet)
         {
             var design = new ScoreDesign();
-            var summary = CreateTestStructure(design);
+            var summary = CreateTestSections(design);
 
             txtSongStructure.Text = summary;
 
@@ -25,7 +25,7 @@
         /// Structure: Intro → Verse → Chorus → Verse → Chorus → Bridge → Chorus → Outro
         /// Measures per section: Intro=4, Verse=8, Chorus=8, Verse=8, Chorus=8, Bridge=8, Chorus=8, Outro=4
         /// </summary>
-        public string CreateTestStructure(ScoreDesign design)
+        public string CreateTestSections(ScoreDesign design)
         {
             design.ResetSections();
 
