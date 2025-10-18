@@ -4,18 +4,19 @@ namespace Music
 {
     public partial class GenerateForm : Form
     {
-        // Persisted objects for this form/session
-        private SectionsClass _sections = new();
+        // Persisted design and data sets for this form/session
+        private ScoreDesignClass? _scoreDesign;
+        private SectionsClass? _sections;
         private readonly VoiceSetClass _voiceSet = new();
         private readonly ChordSetClass _chordSet = new();
 
-        private readonly VoiceManagerClass _voiceManager = new VoiceManagerClass();
-        private readonly ChordManagerClass _chordManager = new ChordManagerClass();
-        private readonly SectionManagerClass _sectionManager = new SectionManagerClass();
+        private readonly VoiceManagerClass _voiceManager = new();
+        private readonly ChordManagerClass _chordManager = new();
+        private readonly SectionManagerClass _sectionManager = new();
 
         public GenerateForm()
         {
-            this.Text = "Generate Score";
+            this.Text = "Music";
             this.FormBorderStyle = FormBorderStyle.Sizable;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -25,18 +26,20 @@ namespace Music
             InitializeComponent();
         }
 
-        private void MusicForm_Load(object sender, EventArgs e)
+        private void btnNewDesign_Click(object sender, EventArgs e)
         {
-        }
+            // Create and persist a new ScoreDesign instance for this form/session
+            _scoreDesign = new ScoreDesignClass();
 
-        private void btnCreateSections_Click(object sender, EventArgs e)
-        {
-            _sections = _sectionManager.CreateSections(this, txtSongStructure, txtVoiceSet, txtChordSet, _voiceSet, _chordSet);
+            // Display-only fields: clear any prior text tied to older objects
+            txtSongStructure.Clear();
+            txtVoiceSet.Clear();
+            txtChordSet.Clear();
         }
 
         private void btnAddVoices_Click(object sender, EventArgs e)
         {
-            _voiceManager.AddDefaultVoicesAndRender(this, _sections, _voiceSet, txtVoiceSet);
+            _voiceManager.AddDefaultVoices(this, _sections, _voiceSet, txtVoiceSet);
         }
 
         private void btnAddChords_Click(object sender, EventArgs e)
@@ -44,17 +47,9 @@ namespace Music
             _chordManager.AddDefaultChords(this, _sections, _chordSet, txtChordSet);
         }
 
-        private void btnCreateMusic_Click(object sender, EventArgs e)
+        private void btnCreateScoreStructure_Click(object sender, EventArgs e)
         {
-        }
-
-        private void btnSave_Click(object sender, EventArgs e)
-        {
-        }
-
-        private void btnNewScore_Click(object sender, EventArgs e)
-        {
-
+            _sections = _sectionManager.CreateSections(this, txtSongStructure, txtVoiceSet, txtChordSet, _voiceSet, _chordSet);
         }
     }
 }
