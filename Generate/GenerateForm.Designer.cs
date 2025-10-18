@@ -18,6 +18,7 @@ namespace Music
             label1 = new Label();
             label2 = new Label();
             textBox2 = new TextBox();
+            btnCreateMusic = new Button();
             SuspendLayout();
             // 
             // btnCreateStructure
@@ -127,9 +128,20 @@ namespace Music
             textBox2.TabIndex = 10;
             textBox2.Text = "90";
             // 
+            // btnCreateMusic
+            // 
+            btnCreateMusic.Location = new Point(423, 382);
+            btnCreateMusic.Name = "btnCreateMusic";
+            btnCreateMusic.Size = new Size(238, 23);
+            btnCreateMusic.TabIndex = 12;
+            btnCreateMusic.Text = "Create Music";
+            btnCreateMusic.UseVisualStyleBackColor = true;
+            btnCreateMusic.Click += btnCreateMusic_Click;
+            // 
             // GenerateForm
             // 
             ClientSize = new Size(1085, 539);
+            Controls.Add(btnCreateMusic);
             Controls.Add(label2);
             Controls.Add(textBox2);
             Controls.Add(label1);
@@ -160,5 +172,6 @@ namespace Music
         private Label label1;
         private Label label2;
         private TextBox textBox2;
+        private Button btnCreateMusic;
     }
 }

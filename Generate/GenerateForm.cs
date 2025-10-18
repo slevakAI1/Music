@@ -170,5 +170,10 @@ namespace Music
             // One chord per line in the chord set textbox
             txtChordSet.Lines = lines.ToArray();
         }
+
+        private void btnCreateMusic_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
