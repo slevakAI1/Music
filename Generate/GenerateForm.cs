@@ -15,7 +15,7 @@ namespace Music
 
         public GenerateForm()
         {
-            this.Text = "Music";
+            this.Text = "Generate Score";
             this.FormBorderStyle = FormBorderStyle.Sizable;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
