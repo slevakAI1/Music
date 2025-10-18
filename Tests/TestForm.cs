@@ -56,7 +56,7 @@ namespace Music
         {
             try
             {
-                var score = MusicXmlScoreFactory.CreateSingleMeasureCChordKeyboardScore();
+                var score = Music.Tests.MusicXmlCreateValidFileTests.CreateSingleMeasureCChordKeyboardScore();
                 var xml = Music.Generate.MusicXmlScoreSerializer.Serialize(score);
 
                 var targetDir = @"C:\temp";

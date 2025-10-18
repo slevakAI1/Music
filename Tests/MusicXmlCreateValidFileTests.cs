@@ -1,8 +1,8 @@
 using MusicXml.Domain;
 
-namespace Music.Generate
+namespace Music.Tests
 {
-    public static class MusicXmlScoreFactory
+    public static class MusicXmlCreateValidFileTests
     {
         public static Score CreateSingleMeasureCChordKeyboardScore()
         {
