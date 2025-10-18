@@ -6,6 +6,8 @@ namespace Music
     {
         // Persisted song structure for this form/session
         private SongStructure? _structure;
+        private readonly VoiceManager _voiceManager = new VoiceManager();
+        private readonly ChordManager _chordManager = new ChordManager();
 
         public GenerateForm()
         {
@@ -38,38 +40,12 @@ namespace Music
 
         private void btnAddVoices_Click(object sender, EventArgs e)
         {
-            if (_structure == null)
-            {
-                MessageBox.Show(this, "Create the song structure first.", "No Structure", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            _structure.AddVoices();
-
-            var lines = new System.Collections.Generic.List<string>();
-            foreach (var v in _structure.Voices)
-                lines.Add(v.Value);
-
-            // One voice per line in the voiceset textbox
-            txtVoiceSet.Lines = lines.ToArray();
+            _voiceManager.AddDefaultVoicesAndRender(this, _structure, txtVoiceSet);
         }
 
         private void btnAddChords_Click(object sender, EventArgs e)
         {
-            if (_structure == null)
-            {
-                MessageBox.Show(this, "Create the song structure first.", "No Structure", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            var chords = _structure.CreateChordSet();
-
-            var lines = new System.Collections.Generic.List<string>(chords.Count);
-            foreach (var c in chords)
-                lines.Add(c.Name);
-
-            // One chord per line in the chord set textbox
-            txtChordSet.Lines = lines.ToArray();
+            _chordManager.AddDefaultChordsAndRender(this, _structure, txtChordSet);
         }
 
         private void btnCreateMusic_Click(object sender, EventArgs e)
