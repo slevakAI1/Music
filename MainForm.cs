@@ -19,7 +19,7 @@ namespace Music
             this.IsMdiContainer = true;
 
             // Show MusicForm on startup, filling the MDI parent
-            ShowChildForm(typeof(MusicForm));
+            ShowChildForm(typeof(GenerateForm));
         }
 
         // New: Show or activate a child form, and make it fill the MDI parent
@@ -135,7 +135,7 @@ namespace Music
                     ShowStatus($"Loaded {doc.FileName}");
 
                     // Refresh MusicForm if open
-                    var musicForm = this.MdiChildren.OfType<MusicForm>().FirstOrDefault();
+                    var musicForm = this.MdiChildren.OfType<GenerateForm>().FirstOrDefault();
                     musicForm?.RefreshFromState();
                 }
                 catch (Exception ex)
@@ -151,7 +151,7 @@ namespace Music
 
         private void MenuFormMusic_Click(object sender, EventArgs e)
         {
-            ShowChildForm(typeof(MusicForm));
+            ShowChildForm(typeof(GenerateForm));
         }
 
     }

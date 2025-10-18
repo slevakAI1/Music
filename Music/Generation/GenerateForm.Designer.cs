@@ -2,7 +2,7 @@ using System.Windows.Forms;
 
 namespace Music
 {
-    public partial class MusicForm
+    public partial class GenerateForm
     {
         private void InitializeComponent()
         {

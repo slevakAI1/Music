@@ -7,13 +7,13 @@ using Music.Generate;
 
 namespace Music
 {
-    public partial class MusicForm : Form
+    public partial class GenerateForm : Form
     {
         //private Label _label;
         //private Button _playButton;
         private readonly IMidiPlaybackService _playbackService = new MidiPlaybackService();
 
-        public MusicForm()
+        public GenerateForm()
         {
             this.Text = "Music";
             this.FormBorderStyle = FormBorderStyle.Sizable;
