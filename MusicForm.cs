@@ -185,7 +185,7 @@ namespace Music
             };
             if (ofd.ShowDialog(this) != DialogResult.OK) return;
 
-            var result = new Music.Services.MusicXmlParserTests().TestParser(ofd.FileName);
+            var result = new Music.Tests.MusicXmlParserTests().TestParser(ofd.FileName);
             var passed = string.Equals(result, "Passed", StringComparison.OrdinalIgnoreCase);
 
             MessageBox.Show(this, passed ? "Passed" : result, "MusicXML Parser Test",
@@ -202,7 +202,7 @@ namespace Music
             };
             if (ofd.ShowDialog(this) != DialogResult.OK) return;
 
-            var result = new Music.Services.MusicXmlSerializerTests().TestSerializer(ofd.FileName);
+            var result = new Music.Tests.MusicXmlSerializerTests().TestSerializer(ofd.FileName);
             var passed = string.Equals(result, "Passed", StringComparison.OrdinalIgnoreCase);
 
             MessageBox.Show(this, passed ? "Passed" : result, "MusicXML Serializer Test",

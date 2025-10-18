@@ -1,7 +1,7 @@
 using MusicXml;
 using System.Text;
 
-namespace Music.Services
+namespace Music.Tests
 {
     public class MusicXmlParserTests
     {

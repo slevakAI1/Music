@@ -1,11 +1,9 @@
-﻿using Music.Generate;
+﻿using DiffPlex;
+using Music.Generate;
 using MusicXml;
 using System.Text;
-using System.Linq;
-using DiffPlex;
-using System.Windows.Forms;
 
-namespace Music.Services
+namespace Music.Tests
 {
     public class MusicXmlSerializerTests
     {
