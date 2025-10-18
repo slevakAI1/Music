@@ -8,15 +8,15 @@ namespace Music
     {
         private readonly MidiIoService _midiIoService = new MidiIoService();
         private readonly IMusicXmlService _musicXmlService = new MusicXmlService();
-
-        // Persist the last imported MusicXML score at the Form level
-        private Score? _currentScore;
+        private readonly FileManager _fileManager;
 
         public MainForm()
         {
             InitializeComponent();
             this.WindowState = FormWindowState.Maximized;
             this.IsMdiContainer = true;
+
+            _fileManager = new FileManager(_musicXmlService, ShowStatus);
 
             // Show MusicForm on startup, filling the MDI parent
             ShowChildForm(typeof(GenerateForm));
@@ -57,63 +57,12 @@ namespace Music
 
         private void MenuImportMusicXml_Click(object sender, EventArgs e)
         {
-            using var ofd = new OpenFileDialog
-            {
-                Filter = "MusicXML files (*.musicxml;*.xml)|*.musicxml;*.xml",
-                Title = "Import MusicXML File"
-            };
-            if (ofd.ShowDialog() == DialogResult.OK)
-            {
-                try
-                {
-                    // Parse and persist the Score at the Form level
-                    _currentScore = _musicXmlService.ImportFromMusicXml(ofd.FileName);
-
-                    var movement = _currentScore?.MovementTitle ?? "Unknown";
-                    ShowStatus($"Loaded MusicXML: {Path.GetFileName(ofd.FileName)} (Movement: {movement})");
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(
-                        $"Error importing MusicXML file:\n{ex.Message}\n\n{ex.InnerException?.Message}",
-                        "Import Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                }
-            }
+            _fileManager.ImportMusicXml(this);
         }
 
         private void MenuExportMusicXml_Click(object sender, EventArgs e)
         {
-            if (_currentScore == null)
-            {
-                MessageBox.Show("No MusicXML score loaded.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            using var sfd = new SaveFileDialog
-            {
-                Filter = "MusicXML files (*.musicxml;*.xml)|*.musicxml;*.xml",
-                Title = "Export MusicXML File",
-                FileName = "score.musicxml"
-            };
-            if (sfd.ShowDialog() == DialogResult.OK)
-            {
-                try
-                {
-                    // Export the last imported MusicXML score to the selected path
-                    _musicXmlService.ExportLastImportedScore(sfd.FileName);
-                    ShowStatus($"Exported to {Path.GetFileName(sfd.FileName)}");
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(
-                        $"Error exporting MusicXML file:\n{ex.Message}\n\n{ex.InnerException?.Message}",
-                        "Export Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                }
-            }
+            _fileManager.ExportMusicXml(this);
         }
 
         private void MenuGenerateForm_Click(object sender, EventArgs e)
