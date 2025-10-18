@@ -28,15 +28,15 @@ namespace Music
             var song = AppState.CurrentSong;
             if (song == null)
             {
-                lblMidiFilepath.Text = "Music";
-                btnPlayMidi.Enabled = false;
+                lblFilepath.Text = "Music";
+                btnSave.Enabled = false;
             }
             else
             {
                 var duration = song.Duration;
-                lblMidiFilepath.Text = $"{song.FileName} | Tracks: {song.TrackCount} | " +
+                lblFilepath.Text = $"{song.FileName} | Tracks: {song.TrackCount} | " +
                     $"Duration: {duration.Minutes:D2}:{duration.Seconds:D2} | Events: {song.EventCount}";
-                btnPlayMidi.Enabled = true;
+                btnSave.Enabled = true;
             }
         }
 

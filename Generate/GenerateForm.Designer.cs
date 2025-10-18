@@ -8,8 +8,8 @@ namespace Music
         {
             btnCreateStructure = new Button();
             txtSongStructure = new TextBox();
-            btnPlayMidi = new Button();
-            lblMidiFilepath = new Label();
+            btnSave = new Button();
+            lblFilepath = new Label();
             btnAddVoices = new Button();
             txtVoiceSet = new TextBox();
             txtChordSet = new TextBox();
@@ -18,7 +18,7 @@ namespace Music
             label1 = new Label();
             label2 = new Label();
             textBox2 = new TextBox();
-            btnCreateMusic = new Button();
+            btnCreateScore = new Button();
             SuspendLayout();
             // 
             // btnCreateStructure
@@ -39,24 +39,24 @@ namespace Music
             txtSongStructure.Size = new Size(529, 89);
             txtSongStructure.TabIndex = 1;
             // 
-            // btnPlayMidi
+            // btnSave
             // 
-            btnPlayMidi.Location = new Point(21, 12);
-            btnPlayMidi.Name = "btnPlayMidi";
-            btnPlayMidi.Size = new Size(151, 23);
-            btnPlayMidi.TabIndex = 2;
-            btnPlayMidi.Text = "Play";
-            btnPlayMidi.UseVisualStyleBackColor = true;
-            btnPlayMidi.Click += btnPlayMidi_Click;
+            btnSave.Location = new Point(423, 411);
+            btnSave.Name = "btnSave";
+            btnSave.Size = new Size(151, 23);
+            btnSave.TabIndex = 2;
+            btnSave.Text = "Save";
+            btnSave.UseVisualStyleBackColor = true;
+            btnSave.Click += btnPlayMidi_Click;
             // 
-            // lblMidiFilepath
+            // lblFilepath
             // 
-            lblMidiFilepath.AutoSize = true;
-            lblMidiFilepath.Location = new Point(212, 16);
-            lblMidiFilepath.Name = "lblMidiFilepath";
-            lblMidiFilepath.Size = new Size(47, 15);
-            lblMidiFilepath.TabIndex = 3;
-            lblMidiFilepath.Text = "filepath";
+            lblFilepath.AutoSize = true;
+            lblFilepath.Location = new Point(599, 415);
+            lblFilepath.Name = "lblFilepath";
+            lblFilepath.Size = new Size(47, 15);
+            lblFilepath.TabIndex = 3;
+            lblFilepath.Text = "filepath";
             // 
             // btnAddVoices
             // 
@@ -128,20 +128,20 @@ namespace Music
             textBox2.TabIndex = 10;
             textBox2.Text = "90";
             // 
-            // btnCreateMusic
+            // btnCreateScore
             // 
-            btnCreateMusic.Location = new Point(423, 382);
-            btnCreateMusic.Name = "btnCreateMusic";
-            btnCreateMusic.Size = new Size(238, 23);
-            btnCreateMusic.TabIndex = 12;
-            btnCreateMusic.Text = "Create Music";
-            btnCreateMusic.UseVisualStyleBackColor = true;
-            btnCreateMusic.Click += btnCreateMusic_Click;
+            btnCreateScore.Location = new Point(423, 382);
+            btnCreateScore.Name = "btnCreateScore";
+            btnCreateScore.Size = new Size(238, 23);
+            btnCreateScore.TabIndex = 12;
+            btnCreateScore.Text = "Create Score";
+            btnCreateScore.UseVisualStyleBackColor = true;
+            btnCreateScore.Click += btnCreateMusic_Click;
             // 
             // GenerateForm
             // 
             ClientSize = new Size(1085, 539);
-            Controls.Add(btnCreateMusic);
+            Controls.Add(btnCreateScore);
             Controls.Add(label2);
             Controls.Add(textBox2);
             Controls.Add(label1);
@@ -150,8 +150,8 @@ namespace Music
             Controls.Add(btnAddChords);
             Controls.Add(txtVoiceSet);
             Controls.Add(btnAddVoices);
-            Controls.Add(lblMidiFilepath);
-            Controls.Add(btnPlayMidi);
+            Controls.Add(lblFilepath);
+            Controls.Add(btnSave);
             Controls.Add(txtSongStructure);
             Controls.Add(btnCreateStructure);
             Name = "GenerateForm";
@@ -162,8 +162,8 @@ namespace Music
         }
         private Button btnCreateStructure;
         private TextBox txtSongStructure;
-        private Button btnPlayMidi;
-        private Label lblMidiFilepath;
+        private Button btnSave;
+        private Label lblFilepath;
         private Button btnAddVoices;
         private TextBox txtVoiceSet;
         private TextBox txtChordSet;
@@ -172,6 +172,6 @@ namespace Music
         private Label label1;
         private Label label2;
         private TextBox textBox2;
-        private Button btnCreateMusic;
+        private Button btnCreateScore;
     }
 }
