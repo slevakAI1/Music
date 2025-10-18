@@ -1,39 +1,48 @@
-﻿namespace Music.Generate
+﻿using System.Collections.Generic;
+using System.Windows.Forms;
+
+namespace Music.Generate
 {
     public sealed class SectionManagerClass
     {
-        public ScoreDesign CreateSections(
+        // Create and persist a new SongStructure, render its summary, and reset dependent sets/displays
+        public SongStructure CreateSections(
             IWin32Window owner,
             TextBox txtSongStructure,
             TextBox txtVoiceSet,
-            TextBox txtChordSet)
+            TextBox txtChordSet,
+            VoiceSet voiceSet,
+            ChordSet chordSet)
         {
-            var design = new ScoreDesign();
-            var summary = CreateTestSections(design);
+            var structure = new SongStructure();
+            var summary = CreateTestSections(structure);
 
+            // Display only
             txtSongStructure.Text = summary;
 
-            // Clear prior outputs tied to an older structure
+            // Reset dependent sets and displays (persisted objects, textboxes only show data)
+            voiceSet.Reset();
+            chordSet.Reset();
             txtVoiceSet.Clear();
             txtChordSet.Clear();
 
-            return design;
+            return structure;
         }
 
         /// <summary>
-        /// Build the standard top-level structure on the provided design and return a printable summary.
+        /// Build the standard top-level structure on the provided SongStructure and return a printable summary.
         /// Structure: Intro → Verse → Chorus → Verse → Chorus → Bridge → Chorus → Outro
-        /// Measures per section: Intro=4, Verse=8, Chorus=8, Verse=8, Chorus=8, Bridge=8, Chorus=8, Outro=4
+        /// Measures per section: Intro=4, Verse/Chorus/Bridge=8, Outro=4
         /// </summary>
-        public string CreateTestSections(ScoreDesign design)
+        public string CreateTestSections(SongStructure structure)
         {
-            design.ResetSections();
+            structure.Reset();
 
             int measure = 1;
             void Add(ScoreDesign.TopLevelSectionType t, int lengthMeasures)
             {
                 var span = new ScoreDesign.MeasureRange(measure, measure + lengthMeasures - 1, true);
-                design.AddSection(t, span);
+                structure.AddSection(t, span);
                 measure += lengthMeasures;
             }
 
@@ -46,9 +55,8 @@
             Add(ScoreDesign.TopLevelSectionType.Chorus, 8);
             Add(ScoreDesign.TopLevelSectionType.Outro, 4);
 
-            // Build a simple "Intro, bars" summary string per section
-            var names = new List<string>(design.Sections.Count);
-            foreach (var s in design.Sections)
+            var names = new List<string>(structure.Sections.Count);
+            foreach (var s in structure.Sections)
             {
                 int bars = s.Span.EndMeasure is int end
                     ? (s.Span.InclusiveEnd ? end - s.Span.StartMeasure + 1 : end - s.Span.StartMeasure)

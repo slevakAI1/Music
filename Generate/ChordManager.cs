@@ -5,7 +5,8 @@ namespace Music.Generate
 {
     public sealed class ChordManager
     {
-        public void AddDefaultChordsAndRender(IWin32Window owner, ScoreDesign? structure, TextBox txtChordSet)
+        // Persist in ChordSet; text box is display only
+        public void AddDefaultChordsAndRender(IWin32Window owner, SongStructure? structure, ChordSet chordSet, TextBox txtChordSet)
         {
             if (structure == null)
             {
@@ -13,13 +14,12 @@ namespace Music.Generate
                 return;
             }
 
-            var chords = structure.CreateChordSet();
+            var chords = chordSet.AddDefaultChords();
 
             var lines = new List<string>(chords.Count);
             foreach (var c in chords)
                 lines.Add(c.Name);
 
-            // One chord per line in the chord set textbox
             txtChordSet.Lines = lines.ToArray();
         }
     }

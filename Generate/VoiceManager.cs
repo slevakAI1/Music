@@ -5,7 +5,8 @@ namespace Music.Generate
 {
     public sealed class VoiceManager
     {
-        public void AddDefaultVoicesAndRender(IWin32Window owner, ScoreDesign? structure, TextBox txtVoiceSet)
+        // Persist in VoiceSet; text box is display only
+        public void AddDefaultVoicesAndRender(IWin32Window owner, SongStructure? structure, VoiceSet voiceSet, TextBox txtVoiceSet)
         {
             if (structure == null)
             {
@@ -13,13 +14,12 @@ namespace Music.Generate
                 return;
             }
 
-            structure.AddVoices();
+            var voices = voiceSet.AddDefaultVoices();
 
             var lines = new List<string>();
-            foreach (var v in structure.Voices)
+            foreach (var v in voices)
                 lines.Add(v.Value);
 
-            // One voice per line in the voiceset textbox
             txtVoiceSet.Lines = lines.ToArray();
         }
     }
