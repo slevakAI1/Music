@@ -1,6 +1,6 @@
 using System;
 
-namespace Music.Errors
+namespace Music
 {
     internal class MidiImportException : Exception
     {

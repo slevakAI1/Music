@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using MusicXml.Domain;
 
-namespace Music.Design
+namespace Music.Generate
 {
     public static class MusicXmlScoreFactory
     {

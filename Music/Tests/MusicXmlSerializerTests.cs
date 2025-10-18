@@ -1,6 +1,7 @@
-﻿using Music.Design;
+﻿using Music.Generate;
 using MusicXml;
 using System.Text;
+using System.Linq;
 using DiffPlex;
 using System.Windows.Forms;
 
@@ -8,7 +9,7 @@ namespace Music.Services
 {
     public class MusicXmlSerializerTests
     {
-        // Load → serialize → DiffPlex all differences → show each in a dialog (no special-casing)
+        // Load → serialize → DiffPlex line-diff → show each diff block once (no per-character stepping)
         public string TestSerializer(string path)
         {
             try
@@ -23,42 +24,38 @@ namespace Music.Services
                 var serializedXml = MusicXmlScoreSerializer.Serialize(score);
 
                 var differ = new Differ();
-                var diff = differ.CreateCharacterDiffs(originalXml, serializedXml, ignoreWhitespace: false, ignoreCase: false);
+                var lineDiff = differ.CreateLineDiffs(originalXml, serializedXml, ignoreWhitespace: false, ignoreCase: false);
 
-                // No differences → pass
-                if (diff.DiffBlocks.Count == 0)
+                if (lineDiff.DiffBlocks.Count == 0)
                     return "Passed";
 
                 // Save serialized output once for inspection
                 var tempOutPath = Path.Combine(Path.GetTempPath(), $"Serialized_{Path.GetFileName(path)}");
                 File.WriteAllText(tempOutPath, serializedXml);
 
-                int shown = 0;
-                foreach (var block in diff.DiffBlocks)
-                {
-                    // Safely slice the differing segments
-                    static string Slice(string s, int start, int length)
-                    {
-                        if (s.Length == 0) return string.Empty;
-                        start = Math.Clamp(start, 0, s.Length);
-                        length = Math.Max(0, length);
-                        int end = Math.Clamp(start + length, 0, s.Length);
-                        return s.Substring(start, end - start);
-                    }
+                // Normalize to '\n' then split to arrays for line slicing
+                static string[] ToLines(string s) =>
+                    s.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n');
 
-                    var origSeg = Slice(originalXml, block.DeleteStartA, block.DeleteCountA);
-                    var newSeg  = Slice(serializedXml, block.InsertStartB, block.InsertCountB);
+                var oldLines = ToLines(originalXml);
+                var newLines = ToLines(serializedXml);
+
+                int shown = 0;
+                foreach (var block in lineDiff.DiffBlocks)
+                {
+                    string origSeg = string.Join(Environment.NewLine, oldLines.Skip(block.DeleteStartA).Take(block.DeleteCountA));
+                    string newSeg  = string.Join(Environment.NewLine, newLines.Skip(block.InsertStartB).Take(block.InsertCountB));
 
                     var sb = new StringBuilder();
                     sb.AppendLine("Serialized output does not match original file contents.");
-                    sb.AppendLine($"Original index: {block.DeleteStartA}, count: {block.DeleteCountA}");
-                    sb.AppendLine($"Serialized index: {block.InsertStartB}, count: {block.InsertCountB}");
+                    sb.AppendLine($"Original lines: start {block.DeleteStartA}, count {block.DeleteCountA}");
+                    sb.AppendLine($"Serialized lines: start {block.InsertStartB}, count {block.InsertCountB}");
                     sb.AppendLine();
-                    sb.AppendLine("Original segment:");
-                    sb.AppendLine(origSeg);
+                    sb.AppendLine("Original block:");
+                    sb.AppendLine(origSeg.Length == 0 ? "∅" : origSeg);
                     sb.AppendLine();
-                    sb.AppendLine("Serialized segment:");
-                    sb.AppendLine(newSeg);
+                    sb.AppendLine("Serialized block:");
+                    sb.AppendLine(newSeg.Length == 0 ? "∅" : newSeg);
                     sb.AppendLine();
                     sb.AppendLine("Note: Full serialized output saved to:");
                     sb.AppendLine(tempOutPath);
@@ -72,9 +69,7 @@ namespace Music.Services
                         MessageBoxIcon.Warning);
 
                     shown++;
-
-                    if (result == DialogResult.Cancel)
-                        break;
+                    if (result == DialogResult.Cancel) break;
                 }
 
                 return $"Completed. Shown {shown} difference(s).";
