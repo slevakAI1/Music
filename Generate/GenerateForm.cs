@@ -21,8 +21,6 @@ namespace Music
 
             // Create designer-based controls
             InitializeComponent();
-
-            this.Activated += (s, e) => RefreshFromState();
         }
 
         public void RefreshFromState()

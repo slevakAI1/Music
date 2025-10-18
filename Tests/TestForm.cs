@@ -82,5 +82,42 @@ namespace Music
                     MessageBoxIcon.Error);
             }
         }
+
+        private void TestForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
+/*
+
+        private void MenuImportMidi_Click(object sender, EventArgs e)
+        {
+            using var ofd = new OpenFileDialog
+            {
+                Filter = "MIDI files (*.mid;*.midi)|*.mid;*.midi",
+                Title = "Import MIDI File"
+            };
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    var doc = _midiIoService.ImportFromFile(ofd.FileName);
+                    AppState.CurrentSong = doc;
+                    ShowStatus($"Loaded {doc.FileName}");
+
+                    // Refresh MusicForm if open
+                    var musicForm = this.MdiChildren.OfType<GenerateForm>().FirstOrDefault();
+                    musicForm?.RefreshFromState();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"Error importing MIDI file:\n{ex.Message}\n\n{ex.InnerException?.Message}",
+                        "Import Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
+            }
+        }
+*/

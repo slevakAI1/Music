@@ -73,6 +73,7 @@
             Controls.Add(btnTestParser);
             Name = "TestForm";
             Text = "TestForm";
+            Load += TestForm_Load;
             ResumeLayout(false);
         }
 

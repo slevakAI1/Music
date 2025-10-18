@@ -53,9 +53,7 @@ namespace Music
 
         }
 
-
         //                             Menu Item Methods
-
 
         private void MenuImportMusicXml_Click(object sender, EventArgs e)
         {
@@ -118,41 +116,9 @@ namespace Music
             }
         }
 
-
-        private void MenuImportMidi_Click(object sender, EventArgs e)
-        {
-            using var ofd = new OpenFileDialog
-            {
-                Filter = "MIDI files (*.mid;*.midi)|*.mid;*.midi",
-                Title = "Import MIDI File"
-            };
-            if (ofd.ShowDialog() == DialogResult.OK)
-            {
-                try
-                {
-                    var doc = _midiIoService.ImportFromFile(ofd.FileName);
-                    AppState.CurrentSong = doc;
-                    ShowStatus($"Loaded {doc.FileName}");
-
-                    // Refresh MusicForm if open
-                    var musicForm = this.MdiChildren.OfType<GenerateForm>().FirstOrDefault();
-                    musicForm?.RefreshFromState();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(
-                        $"Error importing MIDI file:\n{ex.Message}\n\n{ex.InnerException?.Message}",
-                        "Import Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                }
-            }
-        }
-
-        private void MenuFormMusic_Click(object sender, EventArgs e)
+        private void MenuGenerateForm_Click(object sender, EventArgs e)
         {
             ShowChildForm(typeof(GenerateForm));
         }
-
     }
 }

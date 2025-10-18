@@ -83,7 +83,6 @@
             MenuImportMidi.Name = "MenuImportMidi";
             MenuImportMidi.Size = new Size(180, 22);
             MenuImportMidi.Text = "Import MIDI";
-            MenuImportMidi.Click += MenuImportMidi_Click;
             // 
             // MenuForm
             // 
@@ -97,7 +96,7 @@
             MenuMusic.Name = "MenuMusic";
             MenuMusic.Size = new Size(106, 22);
             MenuMusic.Text = "Music";
-            MenuMusic.Click += MenuFormMusic_Click;
+            MenuMusic.Click += MenuGenerateForm_Click;
             // 
             // statusStrip1
             // 
