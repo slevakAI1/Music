@@ -1,6 +1,7 @@
 using MusicXml.Domain;
+using MusicXml;
 
-namespace Music.Services
+namespace MusicXml
 {
     public interface IMusicXmlService
     {
@@ -14,6 +15,6 @@ namespace Music.Services
         void ExportLastImportedScore(string path);
 
         // Export remains unimplemented for MIDI->MusicXML.
-        void ExportToMusicXml(string path, MidiSongDocument doc);
+        //void ExportToMusicXml(string path, MidiSongDocument doc);
     }
 }

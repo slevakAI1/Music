@@ -1,7 +1,7 @@
 using MusicXml;
 using MusicXml.Domain;
 
-namespace Music.Services
+namespace MusicXml
 {
     public class MusicXmlService : IMusicXmlService
     {
@@ -53,11 +53,11 @@ namespace Music.Services
         /// Exports the given MIDI document to a MusicXML file.
         /// Note: musicxml.net 3.1.0 exposes a parser; implementing a MIDI->MusicXML converter is out of scope here.
         /// </summary>
-        public void ExportToMusicXml(string path, MidiSongDocument doc)
-        {
-            throw new NotImplementedException(
-                "Export to MusicXML is not implemented. The musicxml.net 3.1.0 package provides parsing support. " +
-                "A MIDI->MusicXML conversion step would be required to implement this method.");
-        }
+        //public void ExportToMusicXml(string path, MidiSongDocument doc)
+        //{
+        //    throw new NotImplementedException(
+        //        "Export to MusicXML is not implemented. The musicxml.net 3.1.0 package provides parsing support. " +
+        //        "A MIDI->MusicXML conversion step would be required to implement this method.");
+        //}
     }
 }
