@@ -18,9 +18,6 @@ namespace Music
             label1 = new Label();
             label2 = new Label();
             textBox2 = new TextBox();
-            txtExportTestChords = new Button();
-            btnTestParser = new Button();
-            btnTestSerializer = new Button();
             btnCreateTestXmlFile = new Button();
             SuspendLayout();
             // 
@@ -131,39 +128,9 @@ namespace Music
             textBox2.TabIndex = 10;
             textBox2.Text = "90";
             // 
-            // txtExportTestChords
-            // 
-            txtExportTestChords.Location = new Point(300, 415);
-            txtExportTestChords.Name = "txtExportTestChords";
-            txtExportTestChords.Size = new Size(203, 23);
-            txtExportTestChords.TabIndex = 12;
-            txtExportTestChords.Text = "Test Chords";
-            txtExportTestChords.UseVisualStyleBackColor = true;
-            txtExportTestChords.Click += txtTestChords_Click;
-            // 
-            // btnTestParser
-            // 
-            btnTestParser.Location = new Point(302, 337);
-            btnTestParser.Name = "btnTestParser";
-            btnTestParser.Size = new Size(200, 23);
-            btnTestParser.TabIndex = 13;
-            btnTestParser.Text = "Test Import/Parser";
-            btnTestParser.UseVisualStyleBackColor = true;
-            btnTestParser.Click += btnTestParser_Click;
-            // 
-            // btnTestSerializer
-            // 
-            btnTestSerializer.Location = new Point(302, 375);
-            btnTestSerializer.Name = "btnTestSerializer";
-            btnTestSerializer.Size = new Size(200, 23);
-            btnTestSerializer.TabIndex = 15;
-            btnTestSerializer.Text = "Test Export/Serializer";
-            btnTestSerializer.UseVisualStyleBackColor = true;
-            btnTestSerializer.Click += btnTestSerializer_Click;
-            // 
             // btnCreateTestXmlFile
             // 
-            btnCreateTestXmlFile.Location = new Point(645, 337);
+            btnCreateTestXmlFile.Location = new Point(422, 349);
             btnCreateTestXmlFile.Name = "btnCreateTestXmlFile";
             btnCreateTestXmlFile.Size = new Size(250, 23);
             btnCreateTestXmlFile.TabIndex = 16;
@@ -171,13 +138,10 @@ namespace Music
             btnCreateTestXmlFile.UseVisualStyleBackColor = true;
             btnCreateTestXmlFile.Click += btnCreateTestXmlFile_Click;
             // 
-            // MusicForm
+            // GenerateForm
             // 
             ClientSize = new Size(1085, 539);
             Controls.Add(btnCreateTestXmlFile);
-            Controls.Add(btnTestSerializer);
-            Controls.Add(btnTestParser);
-            Controls.Add(txtExportTestChords);
             Controls.Add(label2);
             Controls.Add(textBox2);
             Controls.Add(label1);
@@ -190,7 +154,7 @@ namespace Music
             Controls.Add(btnPlayMidi);
             Controls.Add(txtSongStructure);
             Controls.Add(btnCreateStructure);
-            Name = "MusicForm";
+            Name = "GenerateForm";
             WindowState = FormWindowState.Maximized;
             Load += MusicForm_Load;
             ResumeLayout(false);
@@ -208,9 +172,6 @@ namespace Music
         private Label label1;
         private Label label2;
         private TextBox textBox2;
-        private Button txtExportTestChords;
-        private Button btnTestParser;
-        private Button btnTestSerializer;
         private Button btnCreateTestXmlFile;
     }
 }

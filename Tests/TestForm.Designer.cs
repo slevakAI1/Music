@@ -28,12 +28,58 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "TestForm";
+            btnTestSerializer = new Button();
+            btnTestParser = new Button();
+            txtExportTestChords = new Button();
+            SuspendLayout();
+            // 
+            // btnTestSerializer
+            // 
+            btnTestSerializer.Location = new Point(301, 213);
+            btnTestSerializer.Name = "btnTestSerializer";
+            btnTestSerializer.Size = new Size(200, 23);
+            btnTestSerializer.TabIndex = 18;
+            btnTestSerializer.Text = "Test Export/Serializer";
+            btnTestSerializer.UseVisualStyleBackColor = true;
+            btnTestSerializer.Click += btnTestSerializer_Click;
+            // 
+            // btnTestParser
+            // 
+            btnTestParser.Location = new Point(301, 175);
+            btnTestParser.Name = "btnTestParser";
+            btnTestParser.Size = new Size(200, 23);
+            btnTestParser.TabIndex = 17;
+            btnTestParser.Text = "Test Import/Parser";
+            btnTestParser.UseVisualStyleBackColor = true;
+            btnTestParser.Click += btnTestParser_Click;
+            // 
+            // txtExportTestChords
+            // 
+            txtExportTestChords.Location = new Point(299, 253);
+            txtExportTestChords.Name = "txtExportTestChords";
+            txtExportTestChords.Size = new Size(203, 23);
+            txtExportTestChords.TabIndex = 16;
+            txtExportTestChords.Text = "Test Chords";
+            txtExportTestChords.UseVisualStyleBackColor = true;
+            txtExportTestChords.Click += txtExportTestChords_Click;
+            // 
+            // TestForm
+            // 
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(800, 450);
+            Controls.Add(btnTestSerializer);
+            Controls.Add(btnTestParser);
+            Controls.Add(txtExportTestChords);
+            Name = "TestForm";
+            Text = "TestForm";
+            ResumeLayout(false);
         }
 
         #endregion
+
+        private Button btnTestSerializer;
+        private Button btnTestParser;
+        private Button txtExportTestChords;
     }
 }
