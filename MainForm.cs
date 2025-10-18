@@ -22,6 +22,11 @@ namespace Music
             ShowChildForm(typeof(GenerateForm));
         }
 
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
         // New: Show or activate a child form, and make it fill the MDI parent
         private void ShowChildForm(Type childType)
         {
@@ -48,12 +53,7 @@ namespace Music
                 statusStrip1.Items[0].Text = message;
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        //                             Menu Item Methods
+       //                   Tool Strip Methods
 
         private void MenuImportMusicXml_Click(object sender, EventArgs e)
         {
