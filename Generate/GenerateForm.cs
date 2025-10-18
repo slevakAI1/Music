@@ -5,7 +5,7 @@ namespace Music
     public partial class GenerateForm : Form
     {
         // Persisted song structure for this form/session
-        private SongStructure? _structure;
+        private ScoreDesign? _structure;
         private readonly VoiceManager _voiceManager = new VoiceManager();
         private readonly ChordManager _chordManager = new ChordManager();
 
@@ -29,7 +29,7 @@ namespace Music
 
         private void btnCreateStructure_Click(object sender, EventArgs e)
         {
-            _structure = new SongStructure();
+            _structure = new ScoreDesign();
             var summary = _structure.CreateStructure();
             txtSongStructure.Text = summary;
 

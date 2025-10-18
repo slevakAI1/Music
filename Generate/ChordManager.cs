@@ -5,7 +5,7 @@ namespace Music.Generate
 {
     public sealed class ChordManager
     {
-        public void AddDefaultChordsAndRender(IWin32Window owner, SongStructure? structure, TextBox txtChordSet)
+        public void AddDefaultChordsAndRender(IWin32Window owner, ScoreDesign? structure, TextBox txtChordSet)
         {
             if (structure == null)
             {

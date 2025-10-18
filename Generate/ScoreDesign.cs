@@ -1,201 +1,303 @@
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
+﻿namespace Music.Generate
+{
+    /// <summary>
+    /// Minimal, score-wide structure (top-level only). No voice/staff/part targeting.
+    /// </summary>
+    public sealed class ScoreDesign
+    {
+        public string DesignId { get; }
+        //public string? SourcePath { get; init; }
+        //public string? SourceHash { get; init; }
 
-//namespace Music.Design
-//{
-//    /// <summary>
-//    /// A design-layer document that decorates a score with high-level, notation-aware sections
-//    /// and flexible annotations (e.g., chords, rhythm patterns). Decoupled from MusicXML types.
-//    /// </summary>
-//    public sealed class ScoreDesign
-//    {
-//        public string DesignId { get; }
-//        public string? SourcePath { get; init; }
-//        public string? SourceHash { get; init; }
+        private readonly List<TopLevelSection> _sections = new();
+        public IReadOnlyList<TopLevelSection> Sections => _sections;
 
-//        private readonly List<Section> _sections = new();
-//        private readonly List<Annotation> _annotations = new();
-//        private readonly Dictionary<string, string> _metadata = new(StringComparer.OrdinalIgnoreCase);
+        // High-level collection of all voices used in the song (per MusicXML: voice is a string identifier).
+        private readonly List<Voice> _voices = new();
+        public IReadOnlyList<Voice> Voices => _voices;
 
-//        public IReadOnlyList<Section> Sections => _sections;
-//        public IReadOnlyList<Annotation> Annotations => _annotations;
-//        public IReadOnlyDictionary<string, string> Metadata => _metadata;
+        // High-level collection of chords (MusicXML 'harmony' compatible: root/kind/bass).
+        private readonly List<Chord> _chords = new();
+        public IReadOnlyList<Chord> Chords => _chords;
 
-//        public ScoreDesign(string? sourcePath = null, string? sourceHash = null, string? designId = null)
-//        {
-//            DesignId = designId ?? Guid.NewGuid().ToString("N");
-//            SourcePath = sourcePath;
-//            SourceHash = sourceHash;
-//        }
+        public ScoreDesign(string? designId = null) // string? sourcePath = null, string? sourceHash = null, 
+        {
+            DesignId = designId ?? Guid.NewGuid().ToString("N");
+        //  SourcePath = sourcePath;
+        //  SourceHash = sourceHash;
+        }
 
-//        // Sections
-//        public Section AddSection(string name, SectionType type, Range<MusicalPosition> span, VoiceScope? scope = null, IEnumerable<string>? tags = null)
-//        {
-//            var sec = new Section(
-//                Id: Guid.NewGuid().ToString("N"),
-//                Name: name,
-//                Type: type,
-//                Span: span,
-//                Scope: scope ?? VoiceScope.All(),
-//                Tags: (tags ?? Array.Empty<string>()).ToArray());
+        /// <summary>
+        /// Build the standard top-level structure and return a printable summary.
+        /// Structure: Intro → Verse → Chorus → Verse → Chorus → Bridge → Chorus → Outro
+        /// Each section spans 4 measures.
+        /// </summary>
+        public string CreateStructure()
+        {
+            _sections.Clear();
 
-//            _sections.Add(sec);
-//            return sec;
-//        }
+            int measure = 1;
+            void Add(TopLevelSectionType t, int lengthMeasures)
+            {
+                var span = new MeasureRange(measure, measure + lengthMeasures - 1, true);
+                AddSection(t, span);
+                measure += lengthMeasures;
+            }
 
-//        // Annotations (extensible: add specific types like ChordAnnotation below and pass instances here)
-//        public T AddAnnotation<T>(T annotation) where T : Annotation
-//        {
-//            if (annotation is null) throw new ArgumentNullException(nameof(annotation));
-//            _annotations.Add(annotation);
-//            return annotation;
-//        }
+            Add(TopLevelSectionType.Intro, 4);
+            Add(TopLevelSectionType.Verse, 8);
+            Add(TopLevelSectionType.Chorus, 8);
+            Add(TopLevelSectionType.Verse, 8);
+            Add(TopLevelSectionType.Chorus, 8);
+            Add(TopLevelSectionType.Bridge, 8);
+            Add(TopLevelSectionType.Chorus, 8);
+            Add(TopLevelSectionType.Outro, 4);
 
-//        public void SetMetadata(string key, string value)
-//        {
-//            if (string.IsNullOrWhiteSpace(key)) throw new ArgumentException("Metadata key must not be empty.", nameof(key));
-//            _metadata[key] = value;
-//        }
+            // Build a simple "Intro → Verse → ..." summary string with bar counts
+            var names = new List<string>(_sections.Count);
+            foreach (var s in _sections)
+            {
+                int bars = s.Span.EndMeasure is int end
+                    ? (s.Span.InclusiveEnd ? end - s.Span.StartMeasure + 1 : end - s.Span.StartMeasure)
+                    : 0;
+                names.Add($"{s.Type}, {bars}");
+            }
+            return string.Join("\r\n", names);
+        }
 
-//        // --------------- Core Types (nested for cohesion and single-file drop-in) ----------------
+        /// <summary>
+        /// Add a top-level section that applies to the entire score.
+        /// </summary>
+        public TopLevelSection AddSection(TopLevelSectionType type, MeasureRange span, string? name = null, IEnumerable<string>? tags = null)
+        {
+            var sec = new TopLevelSection(
+                Id: Guid.NewGuid().ToString("N"),
+                Type: type,
+                Span: span,
+                Name: string.IsNullOrWhiteSpace(name) ? type.ToString() : name!,
+                Tags: tags is null ? Array.Empty<string>() : new List<string>(tags).ToArray());
 
-//        /// <summary>
-//        /// Musical position using measure and fractional beat (notation axis).
-//        /// </summary>
-//        public readonly record struct MusicalPosition(int MeasureNumber, Fraction Beat)
-//        {
-//            public static MusicalPosition FromBeat(int measure, int numerator, int denominator) =>
-//                new(measure, new Fraction(numerator, denominator));
-//        }
+            _sections.Add(sec);
+            return sec;
+        }
 
-//        /// <summary>
-//        /// Simple rational number for beats (e.g., 1/4 = quarter, 3/8 = three eighths).
-//        /// </summary>
-//        public readonly record struct Fraction(int Numerator, int Denominator)
-//        {
-//            public bool IsValid => Denominator > 0;
+        /// <summary>
+        /// Add a voice identifier to the song's voice collection (MusicXML 'voice' value).
+        /// Returns the created or existing voice entry.
+        /// </summary>
+        public Voice AddVoice(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("Voice value must not be null or empty.", nameof(value));
 
-//            public Fraction Normalize()
-//            {
-//                if (!IsValid) return this;
-//                var n = Numerator;
-//                var d = Denominator;
-//                var g = Gcd(Math.Abs(n), d);
-//                return new Fraction(n / g, d / g);
+            // Prevent duplicate voice values; return existing if present.
+            foreach (var v in _voices)
+            {
+                if (string.Equals(v.Value, value, StringComparison.Ordinal))
+                    return v;
+            }
 
-//                static int Gcd(int a, int b)
-//                {
-//                    while (b != 0) { var t = b; b = a % b; a = t; }
-//                    return Math.Max(a, 1);
-//                }
-//            }
+            var voice = new Voice(
+                Id: Guid.NewGuid().ToString("N"),
+                Value: value);
 
-//            public override string ToString() => $"{Numerator}/{Denominator}";
-//        }
+            _voices.Add(voice);
+            return voice;
+        }
 
-//        /// <summary>
-//        /// Generic range with optional open end and inclusive-end semantics.
-//        /// </summary>
-//        public readonly record struct Range<T>(T Start, T? End, bool InclusiveEnd = true)
-//        {
-//            public bool IsOpenEnded => End is null;
-//        }
+        /// <summary>
+        /// Add the default voice set for this app.
+        /// Calls AddVoice for each entry and returns the full voice list.
+        /// </summary>
+        public IReadOnlyList<Voice> AddVoices()
+        {
+            AddVoice("Guitar");
+            AddVoice("Drum Set");
+            AddVoice("Keyboard");
+            AddVoice("Base Guitar"); // per requirement
+            return Voices;
+        }
 
-//        /// <summary>
-//        /// Targets parts/staves/voices by identifiers. Supports "All" flags.
-//        /// </summary>
-//        public sealed record VoiceScope(
-//            IReadOnlySet<string> Parts,
-//            IReadOnlySet<int> Staves,
-//            IReadOnlySet<int> Voices,
-//            bool AllParts = false,
-//            bool AllStaves = false,
-//            bool AllVoices = false)
-//        {
-//            public static VoiceScope All() =>
-//                new(HashSetEmpty<string>(), HashSetEmpty<int>(), HashSetEmpty<int>(), true, true, true);
+        /// <summary>
+        /// Add a chord to the song's chord set (compatible with MusicXML 'harmony').
+        /// Prevents duplicates by matching root/kind/bass. Returns the created or existing entry.
+        /// Notes:
+        /// - MusicXML harmony does not encode octave; voicing is applied later when rendering notes.
+        /// - rootAlter and bassAlter use standard semitone offsets: -1=flat, 0=natural, +1=sharp, etc.
+        /// </summary>
+        public Chord AddChord(
+            Step rootStep,
+            int rootAlter,
+            ChordKind kind,
+            Step? bassStep = null,
+            int? bassAlter = null,
+            string? name = null)
+        {
+            // Check for existing equivalent chord (same identity fields).
+            foreach (var c in _chords)
+            {
+                if (c.RootStep == rootStep &&
+                    c.RootAlter == rootAlter &&
+                    c.Kind == kind &&
+                    c.BassStep == bassStep &&
+                    c.BassAlter == bassAlter)
+                {
+                    return c;
+                }
+            }
 
-//            public static VoiceScope ForPart(string partId) =>
-//                new(HashSetOf(partId), HashSetEmpty<int>(), HashSetEmpty<int>());
+            var chord = new Chord(
+                Id: Guid.NewGuid().ToString("N"),
+                RootStep: rootStep,
+                RootAlter: rootAlter,
+                Kind: kind,
+                BassStep: bassStep,
+                BassAlter: bassAlter,
+                Name: string.IsNullOrWhiteSpace(name) ? BuildChordDisplayName(rootStep, rootAlter, kind, bassStep, bassAlter) : name!);
 
-//            public static VoiceScope ForVoice(string partId, int voiceNumber) =>
-//                new(HashSetOf(partId), HashSetEmpty<int>(), HashSetOf(voiceNumber));
+            _chords.Add(chord);
+            return chord;
+        }
 
-//            private static IReadOnlySet<T> HashSetEmpty<T>() => new HashSet<T>();
-//            private static IReadOnlySet<T> HashSetOf<T>(T item) => new HashSet<T> { item };
-//        }
+        /// <summary>
+        /// Initialize a default chord set. For now, adds a C major chord ("Middle C chord" as a class of harmony).
+        /// Returns the full chord list.
+        /// </summary>
+        public IReadOnlyList<Chord> CreateChordSet()
+        {
+            // Middle C chord: represent as a C major harmony (octave/voicing applied later during note rendering).
+            AddChord(Step.C, 0, ChordKind.Major, name: "C");
+            return Chords;
+        }
 
-//        /// <summary>
-//        /// Hierarchical, named musical region (e.g., Chorus, Verse, Intro), with scope and tags.
-//        /// </summary>
-//        public sealed record Section(
-//            string Id,
-//            string Name,
-//            SectionType Type,
-//            Range<MusicalPosition> Span,
-//            VoiceScope Scope,
-//            string[] Tags)
-//        {
-//            private readonly List<Section> _children = new();
-//            public IReadOnlyList<Section> Children => _children;
+        private static string BuildChordDisplayName(Step rootStep, int rootAlter, ChordKind chordKind, Step? bassStep, int? bassAlter)
+        {
+            static string StepToText(Step s) => s switch
+            {
+                Step.A => "A",
+                Step.B => "B",
+                Step.C => "C",
+                Step.D => "D",
+                Step.E => "E",
+                Step.F => "F",
+                Step.G => "G",
+                _ => "?"
+            };
 
-//            public Section AddChild(string name, SectionType type, Range<MusicalPosition> span, VoiceScope? scope = null, IEnumerable<string>? tags = null)
-//            {
-//                var child = new Section(
-//                    Id: Guid.NewGuid().ToString("N"),
-//                    Name: name,
-//                    Type: type,
-//                    Span: span,
-//                    Scope: scope ?? Scope,
-//                    Tags: (tags ?? Array.Empty<string>()).ToArray());
-//                _children.Add(child);
-//                return child;
-//            }
-//        }
+            static string AlterToText(int alter) => alter switch
+            {
+                < 0 => new string('b', -alter),
+                > 0 => new string('#', alter),
+                _ => ""
+            };
 
-//        public enum SectionType
-//        {
-//            Intro,
-//            Verse,
-//            Refrain,
-//            Chorus,
-//            Bridge,
-//            Ending,
-//            Outro,
-//            Custom
-//        }
+            static string KindToSuffix(ChordKind k) => k switch
+            {
+                ChordKind.Major => "",
+                ChordKind.Minor => "m",
+                ChordKind.Augmented => "aug",
+                ChordKind.Diminished => "dim",
+                ChordKind.DominantSeventh => "7",
+                ChordKind.MajorSeventh => "maj7",
+                ChordKind.MinorSeventh => "m7",
+                ChordKind.SuspendedFourth => "sus4",
+                ChordKind.SuspendedSecond => "sus2",
+                ChordKind.Power => "5",
+                ChordKind.HalfDiminishedSeventh => "m7b5",
+                ChordKind.DiminishedSeventh => "dim7",
+                _ => ""
+            };
 
-//        /// <summary>
-//        /// Base type for annotations that attach behavior/intent to a range and scope.
-//        /// </summary>
-//        public abstract record Annotation(
-//            string Id,
-//            string Kind,
-//            Range<MusicalPosition> Span,
-//            VoiceScope Scope,
-//            int Priority = 0,
-//            string[]? Tags = null)
-//        {
-//            public string[] EffectiveTags { get; init; } = Tags ?? Array.Empty<string>();
-//        }
+            var root = StepToText(rootStep) + AlterToText(rootAlter);
+            var kindSuffix = KindToSuffix(chordKind);
+            var bass = bassStep is null ? "" : "/" + StepToText(bassStep.Value) + (bassAlter.HasValue ? AlterToText(bassAlter.Value) : "");
+            return root + kindSuffix + bass;
+        }
 
-//        /// <summary>
-//        /// Example: chord-level intent over a span (bar, partial bar, multi-bar).
-//        /// </summary>
-//        public sealed record ChordAnnotation(
-//            string Id,
-//            string Symbol,                                // e.g., "Cmaj7/G"
-//            Range<MusicalPosition> Span,
-//            VoiceScope Scope,
-//            string? Key = null,                            // optional tonic/context
-//            string[]? Functions = null,                    // e.g., "T", "SD", "D"
-//            int Priority = 0,
-//            string[]? Tags = null)
-//            : Annotation(Id, "Chord", Span, Scope, Priority, Tags)
-//        {
-//            public string? KeyCenter { get; init; } = Key;
-//            public string[] HarmonicFunctions { get; init; } = Functions ?? Array.Empty<string>();
-//        }
-//    }
-//}
+        /// <summary>
+        /// Inclusive measure range; end may be open-ended (null).
+        /// </summary>
+        public readonly record struct MeasureRange(int StartMeasure, int? EndMeasure, bool InclusiveEnd = true)
+        {
+            public bool IsOpenEnded => EndMeasure is null;
+            public static MeasureRange Single(int measure) => new(measure, measure, true);
+        }
+
+        /// <summary>
+        /// One top-level structural section (e.g., Verse, Chorus) with an optional name and tags.
+        /// </summary>
+        public sealed record TopLevelSection(
+            string Id,
+            TopLevelSectionType Type,
+            MeasureRange Span,
+            string Name,
+            string[] Tags
+        );
+
+        /// <summary>
+        /// High-level voice entry capturing the MusicXML 'voice' value.
+        /// </summary>
+        public sealed record Voice(
+            string Id,
+            string Value
+        );
+
+        /// <summary>
+        /// High-level chord entry compatible with MusicXML 'harmony' element.
+        /// Octave/voicing are intentionally omitted (they belong to note rendering).
+        /// </summary>
+        public sealed record Chord(
+            string Id,
+            Step RootStep,
+            int RootAlter,
+            ChordKind Kind,
+            Step? BassStep,
+            int? BassAlter,
+            string Name
+        );
+
+        /// <summary>
+        /// Top-level structural labels for a song/score.
+        /// </summary>
+        public enum TopLevelSectionType
+        {
+            Intro,
+            Verse,
+    //      Refrain,
+            Chorus,
+            Solo,
+            Bridge,
+    //      Ending,
+            Outro,
+            Custom
+        }
+
+        /// <summary>
+        /// Diatonic pitch steps used by MusicXML (A–G).
+        /// </summary>
+        public enum Step
+        {
+            A, B, C, D, E, F, G
+        }
+
+        /// <summary>
+        /// Chord kinds mapped to MusicXML 'kind' values.
+        /// This list can be extended as needed.
+        /// </summary>
+        public enum ChordKind
+        {
+            Major,
+            Minor,
+            Augmented,
+            Diminished,
+            DominantSeventh,
+            MajorSeventh,
+            MinorSeventh,
+            SuspendedFourth,
+            SuspendedSecond,
+            Power,
+            HalfDiminishedSeventh,
+            DiminishedSeventh
+        }
+    }
+}

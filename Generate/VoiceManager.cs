@@ -5,7 +5,7 @@ namespace Music.Generate
 {
     public sealed class VoiceManager
     {
-        public void AddDefaultVoicesAndRender(IWin32Window owner, SongStructure? structure, TextBox txtVoiceSet)
+        public void AddDefaultVoicesAndRender(IWin32Window owner, ScoreDesign? structure, TextBox txtVoiceSet)
         {
             if (structure == null)
             {
