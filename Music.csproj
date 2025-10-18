@@ -29,8 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Music\Generation\MusicXmlFiles\" />
-    <Folder Include="Music\Tests\Samples\" />
+    <Folder Include="Generate\MusicXmlFiles\" />
+    <Folder Include="Tests\Samples\" />
   </ItemGroup>
 
 </Project>
