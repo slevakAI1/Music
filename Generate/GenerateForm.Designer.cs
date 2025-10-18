@@ -18,7 +18,6 @@ namespace Music
             label1 = new Label();
             label2 = new Label();
             textBox2 = new TextBox();
-            btnCreateTestXmlFile = new Button();
             SuspendLayout();
             // 
             // btnCreateStructure
@@ -128,20 +127,9 @@ namespace Music
             textBox2.TabIndex = 10;
             textBox2.Text = "90";
             // 
-            // btnCreateTestXmlFile
-            // 
-            btnCreateTestXmlFile.Location = new Point(422, 349);
-            btnCreateTestXmlFile.Name = "btnCreateTestXmlFile";
-            btnCreateTestXmlFile.Size = new Size(250, 23);
-            btnCreateTestXmlFile.TabIndex = 16;
-            btnCreateTestXmlFile.Text = "Create Test Xml File";
-            btnCreateTestXmlFile.UseVisualStyleBackColor = true;
-            btnCreateTestXmlFile.Click += btnCreateTestXmlFile_Click;
-            // 
             // GenerateForm
             // 
             ClientSize = new Size(1085, 539);
-            Controls.Add(btnCreateTestXmlFile);
             Controls.Add(label2);
             Controls.Add(textBox2);
             Controls.Add(label1);
@@ -172,6 +160,5 @@ namespace Music
         private Label label1;
         private Label label2;
         private TextBox textBox2;
-        private Button btnCreateTestXmlFile;
     }
 }

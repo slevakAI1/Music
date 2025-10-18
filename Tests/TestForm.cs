@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Music.Generate;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -51,30 +52,35 @@ namespace Music
                 MessageBoxButtons.OK, passed ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
         }
 
-        private void txtExportTestChords_Click(object sender, EventArgs e)
+        private void btnCreatTestMusicXmlFile_Click(object sender, EventArgs e)
         {
+            try
+            {
+                var score = MusicXmlScoreFactory.CreateSingleMeasureCChordKeyboardScore();
+                var xml = Music.Generate.MusicXmlScoreSerializer.Serialize(score);
 
+                var targetDir = @"C:\temp";
+                Directory.CreateDirectory(targetDir);
+
+                var fileName = $"TestScore_{DateTime.Now:yyyyMMdd_HHmmss}.musicxml";
+                var fullPath = Path.Combine(targetDir, fileName);
+
+                File.WriteAllText(fullPath, xml, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+
+                MessageBox.Show(this,
+                    $"Saved MusicXML to:\n{fullPath}",
+                    "MusicXML Saved",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this,
+                    $"Failed to create/save test MusicXML file.\n\n{ex.GetType().FullName}: {ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
         }
-
-        /*
-
-
-        private void txtTestChords_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void btnTestParser_Click(object sender, EventArgs e)
-        {
-        }
-        {
-
-        }
-
-
-        */
-
-
-
     }
 }

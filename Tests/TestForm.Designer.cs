@@ -30,7 +30,7 @@
         {
             btnTestSerializer = new Button();
             btnTestParser = new Button();
-            txtExportTestChords = new Button();
+            btnCreatTestMusicXmlFile = new Button();
             SuspendLayout();
             // 
             // btnTestSerializer
@@ -53,24 +53,24 @@
             btnTestParser.UseVisualStyleBackColor = true;
             btnTestParser.Click += btnTestParser_Click;
             // 
-            // txtExportTestChords
+            // btnCreatTestMusicXmlFile
             // 
-            txtExportTestChords.Location = new Point(299, 253);
-            txtExportTestChords.Name = "txtExportTestChords";
-            txtExportTestChords.Size = new Size(203, 23);
-            txtExportTestChords.TabIndex = 16;
-            txtExportTestChords.Text = "Test Chords";
-            txtExportTestChords.UseVisualStyleBackColor = true;
-            txtExportTestChords.Click += txtExportTestChords_Click;
+            btnCreatTestMusicXmlFile.Location = new Point(308, 298);
+            btnCreatTestMusicXmlFile.Name = "btnCreatTestMusicXmlFile";
+            btnCreatTestMusicXmlFile.Size = new Size(193, 23);
+            btnCreatTestMusicXmlFile.TabIndex = 19;
+            btnCreatTestMusicXmlFile.Text = "Create Text MusicXml File";
+            btnCreatTestMusicXmlFile.UseVisualStyleBackColor = true;
+            btnCreatTestMusicXmlFile.Click += btnCreatTestMusicXmlFile_Click;
             // 
             // TestForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(btnCreatTestMusicXmlFile);
             Controls.Add(btnTestSerializer);
             Controls.Add(btnTestParser);
-            Controls.Add(txtExportTestChords);
             Name = "TestForm";
             Text = "TestForm";
             ResumeLayout(false);
@@ -80,6 +80,6 @@
 
         private Button btnTestSerializer;
         private Button btnTestParser;
-        private Button txtExportTestChords;
+        private Button btnCreatTestMusicXmlFile;
     }
 }
