@@ -39,10 +39,8 @@ namespace Music
             // Create and persist a new ScoreDesign instance for this form/session
             _scoreDesign = new ScoreDesignClass();
 
-            // Display-only fields: clear any prior text tied to older objects
-            txtSections.Clear();
-            txtVoiceSet.Clear();
-            txtChordSet.Clear();
+            // Render combined design space and clear legacy text areas
+            txtDesignSpace.Text = DesignTextHelper.BuildCombinedText(_scoreDesign);
         }
 
         private void btnCreateSections_Click(object sender, EventArgs e)
@@ -53,14 +51,15 @@ namespace Music
                 return;
             }
 
-            _sectionManager.CreateSections(
-                this,
-                _scoreDesign.Sections,   
-                _scoreDesign.VoiceSet,   
-                _scoreDesign.ChordSet,
-                txtSections,
-                txtVoiceSet,
-                txtChordSet);
+            // Build sections without touching the UI textboxes
+            _sectionManager.CreateTestSections(_scoreDesign.Sections);
+
+            // Reset dependent sets
+            _scoreDesign.VoiceSet.Reset();
+            _scoreDesign.ChordSet.Reset();
+
+            // Render combined design space and clear legacy text areas
+            txtDesignSpace.Text = DesignTextHelper.BuildCombinedText(_scoreDesign);
         }
 
         private void btnAddVoices_Click(object sender, EventArgs e)
@@ -71,11 +70,11 @@ namespace Music
                 return;
             }
 
-            _voiceManager.AddDefaultVoices(
-                this,
-                _scoreDesign.Sections,   // pass persisted sections
-                _scoreDesign.VoiceSet,   // pass persisted voice set
-                txtVoiceSet);
+            // Populate voices without touching the UI textboxes
+            _scoreDesign.VoiceSet.AddDefaultVoices();
+
+            // Render combined design space and clear legacy text areas
+            txtDesignSpace.Text = DesignTextHelper.BuildCombinedText(_scoreDesign);
         }
 
         private void btnAddChords_Click(object sender, EventArgs e)
@@ -86,11 +85,11 @@ namespace Music
                 return;
             }
 
-            _chordManager.AddDefaultChords(
-                this,
-                _scoreDesign.Sections,   // pass persisted sections
-                _scoreDesign.ChordSet,   // pass persisted chord set
-                txtChordSet);
+            // Populate chords without touching the UI textboxes
+            _scoreDesign.ChordSet.AddDefaultChords();
+
+            // Render combined design space and clear legacy text areas
+            txtDesignSpace.Text = DesignTextHelper.BuildCombinedText(_scoreDesign);
         }
 
         private void btnCreateMusic_Click(object sender, EventArgs e)
