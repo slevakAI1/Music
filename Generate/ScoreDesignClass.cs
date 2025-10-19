@@ -22,13 +22,8 @@ namespace Music.Generate
             DesignId = designId ?? Guid.NewGuid().ToString("N");
         }
 
-        public readonly record struct MeasureRange(int StartMeasure, int? EndMeasure, bool InclusiveEnd = true)
-        {
-            public bool IsOpenEnded => EndMeasure is null;
-            public static MeasureRange Single(int measure) => new(measure, measure, true);
-        }
 
-        //public sealed record Section(string Id, SectionType Type, MeasureRange Span, string Name, string[] Tags);
+        // TODO  - get rid of these!!!
         public sealed record Voice(string Id, string Value);
         public sealed record Chord(string Id, Step RootStep, int RootAlter, ChordKind Kind, Step? BassStep, int? BassAlter, string Name);
 
