@@ -1,6 +1,6 @@
 ﻿namespace Music.Generate
 {
-    internal class ChordClass
+    public class ChordClass
     {
         public required string ChordName {get; set;}
     }

@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Windows.Forms;
-
 namespace Music.Generate
 {
     public sealed class ChordManagerClass
@@ -17,7 +14,7 @@ namespace Music.Generate
 
             var lines = new List<string>(chords.Count);
             foreach (var c in chords)
-                lines.Add(c.Name);
+                lines.Add(c.ChordName);
 
             txtChordSet.Lines = lines.ToArray();
         }

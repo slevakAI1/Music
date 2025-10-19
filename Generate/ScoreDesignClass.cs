@@ -23,9 +23,8 @@ namespace Music.Generate
         }
 
 
-        // TODO  - get rid of these!!!
-        //public sealed record Voice(string Id, string Value);
-        public sealed record Chord(string Id, Step RootStep, int RootAlter, ChordKind Kind, Step? BassStep, int? BassAlter, string Name);
+        // TODO  - get rid of this
+        //public sealed record Chord(string Id, Step RootStep, int RootAlter, ChordKind Kind, Step? BassStep, int? BassAlter, string Name);
 
         public enum Step { A, B, C, D, E, F, G }
         public enum ChordKind
