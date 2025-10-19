@@ -36,11 +36,6 @@ namespace Music
 
         private void btnNewScore_Click(object sender, EventArgs e)
         {
-            btnNewDesign_Click(sender, e);
-        }
-
-        private void btnNewDesign_Click(object sender, EventArgs e)
-        {
             // Create and persist a new ScoreDesign instance for this form/session
             _scoreDesign = new ScoreDesignClass();
 
