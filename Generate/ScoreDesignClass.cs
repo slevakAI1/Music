@@ -6,20 +6,18 @@
     public sealed class ScoreDesignClass
     {
         public string DesignId { get; }
-        //public string? SourcePath { get; init; }
-        //public string? SourceHash { get; init; }
 
-        // Persist the voice set on the design (so the form doesn't own it)
+        // Persist sets on the design (form should not own these)
         public VoiceSetClass VoiceSet { get; } = new();
+        public ChordSetClass ChordSet { get; } = new();
 
         private readonly List<Section> _sections = new();
         public IReadOnlyList<Section> Sections => _sections;
 
-        // High-level collection of all voices used in the song (per MusicXML: voice is a string identifier).
+        // Legacy collections kept for compatibility with existing APIs (can be removed when fully migrated to the *Set classes)
         private readonly List<Voice> _voices = new();
         public IReadOnlyList<Voice> Voices => _voices;
 
-        // High-level collection of chords (MusicXML 'harmony' compatible: root/kind/bass).
         private readonly List<Chord> _chords = new();
         public IReadOnlyList<Chord> Chords => _chords;
 
@@ -28,12 +26,8 @@
             DesignId = designId ?? Guid.NewGuid().ToString("N");
         }
 
-        // Allow managers to rebuild section plans
         public void ResetSections() => _sections.Clear();
 
-        /// <summary>
-        /// Add a top-level section that applies to the entire score.
-        /// </summary>
         public Section AddSection(SectionType type, MeasureRange span, string? name = null, IEnumerable<string>? tags = null)
         {
             var sec = new Section(
@@ -47,16 +41,11 @@
             return sec;
         }
 
-        /// <summary>
-        /// Add a voice identifier to the song's voice collection (MusicXML 'voice' value).
-        /// Returns the created or existing voice entry.
-        /// </summary>
         public Voice AddVoice(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException("Voice value must not be null or empty.", nameof(value));
 
-            // Prevent duplicate voice values; return existing if present.
             foreach (var v in _voices)
             {
                 if (string.Equals(v.Value, value, StringComparison.Ordinal))
@@ -71,23 +60,15 @@
             return voice;
         }
 
-        /// <summary>
-        /// Add the default voice set for this app.
-        /// Calls AddVoice for each entry and returns the full voice list.
-        /// </summary>
         public IReadOnlyList<Voice> AddVoices()
         {
             AddVoice("Guitar");
             AddVoice("Drum Set");
             AddVoice("Keyboard");
-            AddVoice("Base Guitar"); // per requirement
+            AddVoice("Base Guitar");
             return Voices;
         }
 
-        /// <summary>
-        /// Add a chord to the song's chord set (compatible with MusicXML 'harmony').
-        /// Prevents duplicates by matching root/kind/bass. Returns the created or existing entry.
-        /// </summary>
         public Chord AddChord(
             Step rootStep,
             int rootAlter,
@@ -96,7 +77,6 @@
             int? bassAlter = null,
             string? name = null)
         {
-            // Check for existing equivalent chord (same identity fields).
             foreach (var c in _chords)
             {
                 if (c.RootStep == rootStep &&
@@ -122,13 +102,8 @@
             return chord;
         }
 
-        /// <summary>
-        /// Initialize a default chord set. For now, adds a C major chord ("Middle C chord" as a class of harmony).
-        /// Returns the full chord list.
-        /// </summary>
         public IReadOnlyList<Chord> CreateChordSet()
         {
-            // Middle C chord: represent as a C major harmony (octave/voicing applied later during note rendering).
             AddChord(Step.C, 0, ChordKind.Major, name: "C");
             return Chords;
         }
@@ -191,10 +166,7 @@
             string[] Tags
         );
 
-        public sealed record Voice(
-            string Id,
-            string Value
-        );
+        public sealed record Voice(string Id, string Value);
 
         public sealed record Chord(
             string Id,
@@ -206,36 +178,14 @@
             string Name
         );
 
-        public enum SectionType
-        {
-            Intro,
-            Verse,
-            Chorus,
-            Solo,
-            Bridge,
-            Outro,
-            Custom
-        }
+        public enum SectionType { Intro, Verse, Chorus, Solo, Bridge, Outro, Custom }
 
-        public enum Step
-        {
-            A, B, C, D, E, F, G
-        }
+        public enum Step { A, B, C, D, E, F, G }
 
         public enum ChordKind
         {
-            Major,
-            Minor,
-            Augmented,
-            Diminished,
-            DominantSeventh,
-            MajorSeventh,
-            MinorSeventh,
-            SuspendedFourth,
-            SuspendedSecond,
-            Power,
-            HalfDiminishedSeventh,
-            DiminishedSeventh
+            Major, Minor, Augmented, Diminished, DominantSeventh, MajorSeventh, MinorSeventh,
+            SuspendedFourth, SuspendedSecond, Power, HalfDiminishedSeventh, DiminishedSeventh
         }
     }
 }

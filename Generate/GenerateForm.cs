@@ -7,7 +7,6 @@ namespace Music
         // Persisted design and data sets for this form/session
         private ScoreDesignClass? _scoreDesign;
         private SectionsClass? _sections;
-        private readonly ChordSetClass _chordSet = new();
 
         private readonly VoiceManagerClass _voiceManager = new();
         private readonly ChordManagerClass _chordManager = new();
@@ -48,8 +47,7 @@ namespace Music
 
             // Reset dependent sets and current sections
             _sections = null;
-            // VoiceSet now lives inside _scoreDesign; it's a fresh instance
-            _chordSet.Reset();
+            // VoiceSet/ChordSet now live inside _scoreDesign; both are fresh instances
         }
 
         // Designer may be wired to this (alias to CreateSections)
@@ -71,8 +69,8 @@ namespace Music
                 txtSongStructure,
                 txtVoiceSet,
                 txtChordSet,
-                _scoreDesign.VoiceSet,   // VoiceSet now persisted on the design
-                _chordSet);
+                _scoreDesign.VoiceSet,
+                _scoreDesign.ChordSet); // use persisted ChordSet on the design
         }
 
         private void btnAddVoices_Click(object sender, EventArgs e)
@@ -92,7 +90,17 @@ namespace Music
 
         private void btnAddChords_Click(object sender, EventArgs e)
         {
-            _chordManager.AddDefaultChords(this, _sections, _chordSet, txtChordSet);
+            if (_scoreDesign == null)
+            {
+                MessageBox.Show(this, "Create a new score design first.", "No Design", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            _chordManager.AddDefaultChords(
+                this,
+                _sections,
+                _scoreDesign.ChordSet, // use persisted ChordSet on the design
+                txtChordSet);
         }
 
         // Designer may be wired to this; keep as stub for now
