@@ -45,11 +45,6 @@ namespace Music
 
         private void btnCreateSections_Click(object sender, EventArgs e)
         {
-            btnCreateScoreStructure_Click(sender, e);
-        }
-
-        private void btnCreateScoreStructure_Click(object sender, EventArgs e)
-        {
             if (_scoreDesign == null)
             {
                 MessageBox.Show(this, "Create a new score design first.", "No Design", MessageBoxButtons.OK, MessageBoxIcon.Information);
