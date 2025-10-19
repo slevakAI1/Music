@@ -9,6 +9,9 @@
         //public string? SourcePath { get; init; }
         //public string? SourceHash { get; init; }
 
+        // Persist the voice set on the design (so the form doesn't own it)
+        public VoiceSetClass VoiceSet { get; } = new();
+
         private readonly List<Section> _sections = new();
         public IReadOnlyList<Section> Sections => _sections;
 

@@ -7,7 +7,6 @@ namespace Music
         // Persisted design and data sets for this form/session
         private ScoreDesignClass? _scoreDesign;
         private SectionsClass? _sections;
-        private readonly VoiceSetClass _voiceSet = new();
         private readonly ChordSetClass _chordSet = new();
 
         private readonly VoiceManagerClass _voiceManager = new();
@@ -49,7 +48,7 @@ namespace Music
 
             // Reset dependent sets and current sections
             _sections = null;
-            _voiceSet.Reset();
+            // VoiceSet now lives inside _scoreDesign; it's a fresh instance
             _chordSet.Reset();
         }
 
@@ -61,12 +60,34 @@ namespace Music
 
         private void btnCreateScoreStructure_Click(object sender, EventArgs e)
         {
-            _sections = _sectionManager.CreateSections(this, txtSongStructure, txtVoiceSet, txtChordSet, _voiceSet, _chordSet);
+            if (_scoreDesign == null)
+            {
+                MessageBox.Show(this, "Create a new score design first.", "No Design", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            _sections = _sectionManager.CreateSections(
+                this,
+                txtSongStructure,
+                txtVoiceSet,
+                txtChordSet,
+                _scoreDesign.VoiceSet,   // VoiceSet now persisted on the design
+                _chordSet);
         }
 
         private void btnAddVoices_Click(object sender, EventArgs e)
         {
-            _voiceManager.AddDefaultVoices(this, _sections, _voiceSet, txtVoiceSet);
+            if (_scoreDesign == null)
+            {
+                MessageBox.Show(this, "Create a new score design first.", "No Design", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            _voiceManager.AddDefaultVoices(
+                this,
+                _sections,
+                _scoreDesign.VoiceSet,
+                txtVoiceSet);
         }
 
         private void btnAddChords_Click(object sender, EventArgs e)
@@ -77,14 +98,11 @@ namespace Music
         // Designer may be wired to this; keep as stub for now
         private void btnCreateMusic_Click(object sender, EventArgs e)
         {
-            // Intentionally left empty until music generation is implemented.
-            // This method exists to satisfy designer wiring.
         }
 
         // Designer is wired to this; keep as stub or implement save logic later
         private void btnSave_Click(object sender, EventArgs e)
         {
-            // Intentionally left empty until save behavior is defined.
         }
-    }
+    }    
 }
