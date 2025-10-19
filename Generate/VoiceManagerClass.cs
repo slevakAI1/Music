@@ -3,7 +3,7 @@ namespace Music.Generate
     public sealed class VoiceManagerClass
     {
         // Persist in VoiceSet; text box is display only
-        public void AddDefaultVoices(IWin32Window owner, SectionsClass? structure, VoiceSetClass voiceSet, TextBox txtVoiceSet)
+        public void AddDefaultVoices(IWin32Window owner, SectionSetClass? structure, VoiceSetClass voiceSet, TextBox txtVoiceSet)
         {
             if (structure == null)
             {

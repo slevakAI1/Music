@@ -1,7 +1,7 @@
 namespace Music.Generate
 {
     // Score Sections
-    public sealed class SectionsClass
+    public sealed class SectionSetClass
     {
         private readonly List<ScoreDesignClass.Section> _sections = new();
         public IReadOnlyList<ScoreDesignClass.Section> Sections => _sections;

@@ -9,7 +9,7 @@ namespace Music
 
         private readonly VoiceManagerClass _voiceManager = new();
         private readonly ChordManagerClass _chordManager = new();
-        private readonly SectionManagerClass _sectionManager = new();
+        private readonly SectionSetManagerClass _sectionManager = new();
 
         public GenerateForm()
         {

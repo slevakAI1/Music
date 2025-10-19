@@ -3,12 +3,12 @@ using System.Windows.Forms;
 
 namespace Music.Generate
 {
-    public sealed class SectionManagerClass
+    public sealed class SectionSetManagerClass
     {
         // Populate the provided SectionsClass (persisted on the design), render its summary, and reset dependent sets/displays
         public void CreateSections(
             IWin32Window owner,
-            SectionsClass sections,
+            SectionSetClass sections,
             TextBox txtSongStructure,
             TextBox txtVoiceSet,
             TextBox txtChordSet,
@@ -32,7 +32,7 @@ namespace Music.Generate
         /// Structure: Intro → Verse → Chorus → Verse → Chorus → Bridge → Chorus → Outro
         /// Measures per section: Intro=4, Verse/Chorus/Bridge=8, Outro=4
         /// </summary>
-        public string CreateTestSections(SectionsClass sections)
+        public string CreateTestSections(SectionSetClass sections)
         {
             sections.Reset();
 
