@@ -20,6 +20,7 @@ namespace Music
             textBox2 = new TextBox();
             btnCreateScore = new Button();
             btnNewDesign = new Button();
+            txtDesignSpace = new TextBox();
             SuspendLayout();
             // 
             // btnAddSections
@@ -34,10 +35,10 @@ namespace Music
             // 
             // txtSections
             // 
-            txtSections.Location = new Point(212, 92);
+            txtSections.Location = new Point(230, 33);
             txtSections.Multiline = true;
             txtSections.Name = "txtSections";
-            txtSections.Size = new Size(529, 89);
+            txtSections.Size = new Size(189, 89);
             txtSections.TabIndex = 1;
             // 
             // btnSave
@@ -61,7 +62,7 @@ namespace Music
             // 
             // btnAddVoices
             // 
-            btnAddVoices.Location = new Point(28, 215);
+            btnAddVoices.Location = new Point(35, 140);
             btnAddVoices.Name = "btnAddVoices";
             btnAddVoices.Size = new Size(160, 23);
             btnAddVoices.TabIndex = 4;
@@ -71,7 +72,7 @@ namespace Music
             // 
             // txtVoiceSet
             // 
-            txtVoiceSet.Location = new Point(215, 215);
+            txtVoiceSet.Location = new Point(230, 128);
             txtVoiceSet.Multiline = true;
             txtVoiceSet.Name = "txtVoiceSet";
             txtVoiceSet.Size = new Size(180, 76);
@@ -79,7 +80,7 @@ namespace Music
             // 
             // txtChordSet
             // 
-            txtChordSet.Location = new Point(667, 215);
+            txtChordSet.Location = new Point(230, 210);
             txtChordSet.Multiline = true;
             txtChordSet.Name = "txtChordSet";
             txtChordSet.Size = new Size(180, 76);
@@ -87,7 +88,7 @@ namespace Music
             // 
             // btnAddChords
             // 
-            btnAddChords.Location = new Point(467, 215);
+            btnAddChords.Location = new Point(35, 227);
             btnAddChords.Name = "btnAddChords";
             btnAddChords.Size = new Size(160, 23);
             btnAddChords.TabIndex = 6;
@@ -149,9 +150,18 @@ namespace Music
             btnNewDesign.UseVisualStyleBackColor = true;
             btnNewDesign.Click += btnNewScore_Click;
             // 
+            // txtDesignSpace
+            // 
+            txtDesignSpace.Location = new Point(550, 33);
+            txtDesignSpace.Multiline = true;
+            txtDesignSpace.Name = "txtDesignSpace";
+            txtDesignSpace.Size = new Size(381, 354);
+            txtDesignSpace.TabIndex = 14;
+            // 
             // GenerateForm
             // 
             ClientSize = new Size(1085, 539);
+            Controls.Add(txtDesignSpace);
             Controls.Add(btnNewDesign);
             Controls.Add(btnCreateScore);
             Controls.Add(label2);
@@ -186,5 +196,6 @@ namespace Music
         private TextBox textBox2;
         private Button btnCreateScore;
         private Button btnNewDesign;
+        private TextBox txtDesignSpace;
     }
 }
