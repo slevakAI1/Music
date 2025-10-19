@@ -1,4 +1,7 @@
-﻿namespace Music.Generate
+﻿using System;
+using System.Collections.Generic;
+
+namespace Music.Generate
 {
     /// <summary>
     /// Minimal, score-wide structure (top-level only). No voice/staff/part targeting.
@@ -10,11 +13,12 @@
         // Persist sets on the design (form should not own these)
         public VoiceSetClass VoiceSet { get; } = new();
         public ChordSetClass ChordSet { get; } = new();
+        public SectionsClass Sections { get; } = new();
 
-        private readonly List<Section> _sections = new();
-        public IReadOnlyList<Section> Sections => _sections;
+        // Legacy collections kept for compatibility with existing APIs
+        private readonly List<Section> _sectionsLegacy = new();
+        public IReadOnlyList<Section> SectionsLegacy => _sectionsLegacy;
 
-        // Legacy collections kept for compatibility with existing APIs (can be removed when fully migrated to the *Set classes)
         private readonly List<Voice> _voices = new();
         public IReadOnlyList<Voice> Voices => _voices;
 
@@ -26,7 +30,8 @@
             DesignId = designId ?? Guid.NewGuid().ToString("N");
         }
 
-        public void ResetSections() => _sections.Clear();
+        // Legacy helpers (can be removed once fully migrated to *Set/SectionsClass)
+        public void ResetSections() => _sectionsLegacy.Clear();
 
         public Section AddSection(SectionType type, MeasureRange span, string? name = null, IEnumerable<string>? tags = null)
         {
@@ -37,7 +42,7 @@
                 Name: string.IsNullOrWhiteSpace(name) ? type.ToString() : name!,
                 Tags: tags is null ? Array.Empty<string>() : new List<string>(tags).ToArray());
 
-            _sections.Add(sec);
+            _sectionsLegacy.Add(sec);
             return sec;
         }
 
@@ -158,30 +163,12 @@
             public static MeasureRange Single(int measure) => new(measure, measure, true);
         }
 
-        public sealed record Section(
-            string Id,
-            SectionType Type,
-            MeasureRange Span,
-            string Name,
-            string[] Tags
-        );
-
+        public sealed record Section(string Id, SectionType Type, MeasureRange Span, string Name, string[] Tags);
         public sealed record Voice(string Id, string Value);
-
-        public sealed record Chord(
-            string Id,
-            Step RootStep,
-            int RootAlter,
-            ChordKind Kind,
-            Step? BassStep,
-            int? BassAlter,
-            string Name
-        );
+        public sealed record Chord(string Id, Step RootStep, int RootAlter, ChordKind Kind, Step? BassStep, int? BassAlter, string Name);
 
         public enum SectionType { Intro, Verse, Chorus, Solo, Bridge, Outro, Custom }
-
         public enum Step { A, B, C, D, E, F, G }
-
         public enum ChordKind
         {
             Major, Minor, Augmented, Diminished, DominantSeventh, MajorSeventh, MinorSeventh,

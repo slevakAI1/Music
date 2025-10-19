@@ -1,33 +1,34 @@
-﻿namespace Music.Generate
+﻿using System.Collections.Generic;
+using System.Windows.Forms;
+
+namespace Music.Generate
 {
     public sealed class SectionManagerClass
     {
-        // Create and persist a new SongStructure, render its summary, and reset dependent sets/displays
-        public SectionsClass CreateSections(
+        // Populate the provided SectionsClass (persisted on the design), render its summary, and reset dependent sets/displays
+        public void CreateSections(
             IWin32Window owner,
+            SectionsClass sections,
             TextBox txtSongStructure,
             TextBox txtVoiceSet,
             TextBox txtChordSet,
             VoiceSetClass voiceSet,
             ChordSetClass chordSet)
         {
-            var structure = new SectionsClass();
-            var summary = CreateTestSections(structure);
+            var summary = CreateTestSections(sections);
 
             // Display only
             txtSongStructure.Text = summary;
 
-            // Reset dependent sets and displays (persisted objects, textboxes only show data)
+            // Reset dependent sets and displays (persisted objects; textboxes only show data)
             voiceSet.Reset();
             chordSet.Reset();
             txtVoiceSet.Clear();
             txtChordSet.Clear();
-
-            return structure;
         }
 
         /// <summary>
-        /// Build the standard top-level structure on the provided SongStructure and return a printable summary.
+        /// Build the standard top-level structure on the provided SectionsClass and return a printable summary.
         /// Structure: Intro → Verse → Chorus → Verse → Chorus → Bridge → Chorus → Outro
         /// Measures per section: Intro=4, Verse/Chorus/Bridge=8, Outro=4
         /// </summary>

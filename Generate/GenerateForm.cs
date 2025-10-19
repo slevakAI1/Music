@@ -4,9 +4,8 @@ namespace Music
 {
     public partial class GenerateForm : Form
     {
-        // Persisted design and data sets for this form/session
+        // Persisted design for this form/session (now owns Sections, VoiceSet, and ChordSet)
         private ScoreDesignClass? _scoreDesign;
-        private SectionsClass? _sections;
 
         private readonly VoiceManagerClass _voiceManager = new();
         private readonly ChordManagerClass _chordManager = new();
@@ -24,12 +23,10 @@ namespace Music
             InitializeComponent();
         }
 
-        // Designer is wired to this
         private void MusicForm_Load(object sender, EventArgs e)
         {
         }
 
-        // Designer may be wired to this
         private void btnNewScore_Click(object sender, EventArgs e)
         {
             btnNewDesign_Click(sender, e);
@@ -44,13 +41,8 @@ namespace Music
             txtSongStructure.Clear();
             txtVoiceSet.Clear();
             txtChordSet.Clear();
-
-            // Reset dependent sets and current sections
-            _sections = null;
-            // VoiceSet/ChordSet now live inside _scoreDesign; both are fresh instances
         }
 
-        // Designer may be wired to this (alias to CreateSections)
         private void btnCreateSections_Click(object sender, EventArgs e)
         {
             btnCreateScoreStructure_Click(sender, e);
@@ -64,13 +56,14 @@ namespace Music
                 return;
             }
 
-            _sections = _sectionManager.CreateSections(
+            _sectionManager.CreateSections(
                 this,
+                _scoreDesign.Sections,   // Sections now persisted on the design
                 txtSongStructure,
                 txtVoiceSet,
                 txtChordSet,
-                _scoreDesign.VoiceSet,
-                _scoreDesign.ChordSet); // use persisted ChordSet on the design
+                _scoreDesign.VoiceSet,   // VoiceSet persisted on the design
+                _scoreDesign.ChordSet);  // ChordSet persisted on the design
         }
 
         private void btnAddVoices_Click(object sender, EventArgs e)
@@ -83,8 +76,8 @@ namespace Music
 
             _voiceManager.AddDefaultVoices(
                 this,
-                _sections,
-                _scoreDesign.VoiceSet,
+                _scoreDesign.Sections,   // pass persisted sections
+                _scoreDesign.VoiceSet,   // pass persisted voice set
                 txtVoiceSet);
         }
 
@@ -98,19 +91,17 @@ namespace Music
 
             _chordManager.AddDefaultChords(
                 this,
-                _sections,
-                _scoreDesign.ChordSet, // use persisted ChordSet on the design
+                _scoreDesign.Sections,   // pass persisted sections
+                _scoreDesign.ChordSet,   // pass persisted chord set
                 txtChordSet);
         }
 
-        // Designer may be wired to this; keep as stub for now
         private void btnCreateMusic_Click(object sender, EventArgs e)
         {
         }
 
-        // Designer is wired to this; keep as stub or implement save logic later
         private void btnSave_Click(object sender, EventArgs e)
         {
         }
-    }    
+    }
 }
