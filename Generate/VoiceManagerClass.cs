@@ -13,10 +13,10 @@ namespace Music.Generate
 
             var voices = voiceSet.AddDefaultVoices();
 
+            // Display on form
             var lines = new List<string>();
             foreach (var v in voices)
-                lines.Add(v.Value);
-
+                lines.Add(v.VoiceName);
             txtVoiceSet.Lines = lines.ToArray();
         }
     }

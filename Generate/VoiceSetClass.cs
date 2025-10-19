@@ -3,31 +3,21 @@ namespace Music.Generate
     // Holds the collection of voices used by the score
     public sealed class VoiceSetClass
     {
-        private readonly List<ScoreDesignClass.Voice> _voices = new();
-        public IReadOnlyList<ScoreDesignClass.Voice> Voices => _voices;
+        public readonly List<VoiceClass> _voices = new();
+        public IReadOnlyList<VoiceClass> Voices => _voices;
 
         public void Reset() => _voices.Clear();
 
-        public ScoreDesignClass.Voice AddVoice(string value)
+        public void AddVoice(string voiceName)
         {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Voice value must not be null or empty.", nameof(value));
+            if (string.IsNullOrWhiteSpace(voiceName))
+                throw new ArgumentException("Voice name must not be null or empty.", nameof(voiceName));
 
-            foreach (var v in _voices)
-            {
-                if (string.Equals(v.Value, value, StringComparison.Ordinal))
-                    return v;
-            }
-
-            var voice = new ScoreDesignClass.Voice(
-                Id: Guid.NewGuid().ToString("N"),
-                Value: value);
-
+            var voice = new VoiceClass { VoiceName = voiceName };
             _voices.Add(voice);
-            return voice;
         }
 
-        public IReadOnlyList<ScoreDesignClass.Voice> AddDefaultVoices()
+        public IReadOnlyList<VoiceClass> AddDefaultVoices()
         {
             AddVoice("Guitar");
             AddVoice("Drum Set");

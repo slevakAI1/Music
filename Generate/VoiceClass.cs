@@ -1,6 +1,6 @@
 ﻿namespace Music.Generate
 {
-    internal class VoiceClass
+    public class VoiceClass
     {
         public required string VoiceName {get; set;}
     }
