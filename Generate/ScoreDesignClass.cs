@@ -21,16 +21,5 @@ namespace Music.Generate
         {
             DesignId = designId ?? Guid.NewGuid().ToString("N");
         }
-
-
-        // TODO  - get rid of this
-        //public sealed record Chord(string Id, Step RootStep, int RootAlter, ChordKind Kind, Step? BassStep, int? BassAlter, string Name);
-
-        public enum Step { A, B, C, D, E, F, G }
-        public enum ChordKind
-        {
-            Major, Minor, Augmented, Diminished, DominantSeventh, MajorSeventh, MinorSeventh,
-            SuspendedFourth, SuspendedSecond, Power, HalfDiminishedSeventh, DiminishedSeventh
-        }
     }
 }

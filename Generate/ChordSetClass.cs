@@ -8,8 +8,7 @@ namespace Music.Generate
 
         public void Reset() => _chords.Clear();
 
-        public ChordClass AddChord(
-            ScoreDesignClass.Step rootStep)
+        public ChordClass AddChord(DesignEnums.Step rootStep)
         {
             var chord = new ChordClass
             {
@@ -22,7 +21,7 @@ namespace Music.Generate
 
         public IReadOnlyList<ChordClass> AddDefaultChords()
         {
-            AddChord(ScoreDesignClass.Step.C);
+            AddChord(DesignEnums.Step.C);
             return Chords;
         }
     }

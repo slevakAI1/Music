@@ -8,7 +8,7 @@ namespace Music.Generate
 
         public void Reset() => _sections.Clear();
 
-        public void Add(SectionClass.eSectionType sectionType)
+        public void Add(DesignEnums.eSectionType sectionType)
         {
             var section = new SectionClass();
             section.SectionType = sectionType;

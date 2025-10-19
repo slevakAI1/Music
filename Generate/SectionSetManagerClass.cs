@@ -41,14 +41,14 @@ namespace Music.Generate
         {
             sections.Reset();
 
-            sections.Add(SectionClass.eSectionType.Intro);
-            sections.Add(SectionClass.eSectionType.Verse);
-            sections.Add(SectionClass.eSectionType.Chorus);
-            sections.Add(SectionClass.eSectionType.Verse);
-            sections.Add(SectionClass.eSectionType.Chorus);
-            sections.Add(SectionClass.eSectionType.Bridge);
-            sections.Add(SectionClass.eSectionType.Chorus);
-            sections.Add(SectionClass.eSectionType.Outro);
+            sections.Add(DesignEnums.eSectionType.Intro);
+            sections.Add(DesignEnums.eSectionType.Verse);
+            sections.Add(DesignEnums.eSectionType.Chorus);
+            sections.Add(DesignEnums.eSectionType.Verse);
+            sections.Add(DesignEnums.eSectionType.Chorus);
+            sections.Add(DesignEnums.eSectionType.Bridge);
+            sections.Add(DesignEnums.eSectionType.Chorus);
+            sections.Add(DesignEnums.eSectionType.Outro);
         }
     }
 }
