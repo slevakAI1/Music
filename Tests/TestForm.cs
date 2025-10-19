@@ -16,6 +16,20 @@ namespace Music
         public TestForm()
         {
             InitializeComponent();
+
+            // Design-time size can be set in the designer; at runtime, we maximize on show.
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.StartPosition = FormStartPosition.Manual;
+        }
+
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+            // Maximize once when shown as an MDI child; avoids double-application.
+            if (this.MdiParent != null && this.WindowState != FormWindowState.Maximized)
+                this.WindowState = FormWindowState.Maximized;
         }
 
         private void btnTestParser_Click(object sender, EventArgs e)

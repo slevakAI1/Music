@@ -21,23 +21,21 @@ namespace Music
 
         }
 
-        // New: Show or activate a child form, and make it fill the MDI parent
+        // Show or activate a child form. Let the child manage its own size/state.
         private void ShowChildForm(Type childType)
         {
             var existing = this.MdiChildren.FirstOrDefault(f => f.GetType() == childType);
             if (existing != null)
             {
-                existing.WindowState = FormWindowState.Maximized;
+                if (existing.WindowState != FormWindowState.Maximized)
+                    existing.WindowState = FormWindowState.Maximized;
                 existing.Activate();
                 return;
             }
 
-            Form child = (Form)Activator.CreateInstance(childType);
+            Form child = (Form)Activator.CreateInstance(childType)!;
             child.MdiParent = this;
-            child.WindowState = FormWindowState.Maximized;
-            child.FormBorderStyle = FormBorderStyle.Sizable;
-            child.MaximizeBox = false;
-            child.MinimizeBox = false;
+            // Do not force WindowState/FormBorderStyle/Minimize/Maximize here.
             child.Show();
         }
 

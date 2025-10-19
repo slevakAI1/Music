@@ -17,10 +17,17 @@ namespace Music
             this.FormBorderStyle = FormBorderStyle.Sizable;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.WindowState = FormWindowState.Maximized;
             this.StartPosition = FormStartPosition.Manual;
 
             InitializeComponent();
+        }
+
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+            // Maximize once when shown as an MDI child; preserves design-time size.
+            if (this.MdiParent != null && this.WindowState != FormWindowState.Maximized)
+                this.WindowState = FormWindowState.Maximized;
         }
 
         private void MusicForm_Load(object sender, EventArgs e)
