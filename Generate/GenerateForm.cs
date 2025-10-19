@@ -40,7 +40,7 @@ namespace Music
             _scoreDesign = new ScoreDesignClass();
 
             // Display-only fields: clear any prior text tied to older objects
-            txtSongStructure.Clear();
+            txtSections.Clear();
             txtVoiceSet.Clear();
             txtChordSet.Clear();
         }
@@ -55,12 +55,12 @@ namespace Music
 
             _sectionManager.CreateSections(
                 this,
-                _scoreDesign.Sections,   // Sections now persisted on the design
-                txtSongStructure,
+                _scoreDesign.Sections,   
+                _scoreDesign.VoiceSet,   
+                _scoreDesign.ChordSet,
+                txtSections,
                 txtVoiceSet,
-                txtChordSet,
-                _scoreDesign.VoiceSet,   // VoiceSet persisted on the design
-                _scoreDesign.ChordSet);  // ChordSet persisted on the design
+                txtChordSet);
         }
 
         private void btnAddVoices_Click(object sender, EventArgs e)

@@ -28,11 +28,10 @@ namespace Music.Generate
             public static MeasureRange Single(int measure) => new(measure, measure, true);
         }
 
-        public sealed record Section(string Id, SectionType Type, MeasureRange Span, string Name, string[] Tags);
+        //public sealed record Section(string Id, SectionType Type, MeasureRange Span, string Name, string[] Tags);
         public sealed record Voice(string Id, string Value);
         public sealed record Chord(string Id, Step RootStep, int RootAlter, ChordKind Kind, Step? BassStep, int? BassAlter, string Name);
 
-        public enum SectionType { Intro, Verse, Chorus, Solo, Bridge, Outro, Custom }
         public enum Step { A, B, C, D, E, F, G }
         public enum ChordKind
         {

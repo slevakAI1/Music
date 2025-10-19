@@ -9,16 +9,21 @@ namespace Music.Generate
         public void CreateSections(
             IWin32Window owner,
             SectionSetClass sections,
-            TextBox txtSongStructure,
-            TextBox txtVoiceSet,
-            TextBox txtChordSet,
             VoiceSetClass voiceSet,
-            ChordSetClass chordSet)
+            ChordSetClass chordSet,
+            TextBox txtSections,
+            TextBox txtVoiceSet,
+            TextBox txtChordSet)
         {
-            var summary = CreateTestSections(sections);
+            CreateTestSections(sections);
 
             // Display only
-            txtSongStructure.Text = summary;
+            var names = new List<string>();
+            foreach (var s in sections.Sections)
+            {
+                names.Add(s.SectionType.ToString());
+            }
+            txtSections.Text = string.Join("\r\n", names);
 
             // Reset dependent sets and displays (persisted objects; textboxes only show data)
             voiceSet.Reset();
@@ -32,36 +37,18 @@ namespace Music.Generate
         /// Structure: Intro → Verse → Chorus → Verse → Chorus → Bridge → Chorus → Outro
         /// Measures per section: Intro=4, Verse/Chorus/Bridge=8, Outro=4
         /// </summary>
-        public string CreateTestSections(SectionSetClass sections)
+        public void CreateTestSections(SectionSetClass sections)
         {
             sections.Reset();
 
-            int measure = 1;
-            void Add(ScoreDesignClass.SectionType t, int lengthMeasures)
-            {
-                var span = new ScoreDesignClass.MeasureRange(measure, measure + lengthMeasures - 1, true);
-                sections.AddSection(t, span);
-                measure += lengthMeasures;
-            }
-
-            Add(ScoreDesignClass.SectionType.Intro, 4);
-            Add(ScoreDesignClass.SectionType.Verse, 8);
-            Add(ScoreDesignClass.SectionType.Chorus, 8);
-            Add(ScoreDesignClass.SectionType.Verse, 8);
-            Add(ScoreDesignClass.SectionType.Chorus, 8);
-            Add(ScoreDesignClass.SectionType.Bridge, 8);
-            Add(ScoreDesignClass.SectionType.Chorus, 8);
-            Add(ScoreDesignClass.SectionType.Outro, 4);
-
-            var names = new List<string>(sections.Sections.Count);
-            foreach (var s in sections.Sections)
-            {
-                int bars = s.Span.EndMeasure is int end
-                    ? (s.Span.InclusiveEnd ? end - s.Span.StartMeasure + 1 : end - s.Span.StartMeasure)
-                    : 0;
-                names.Add($"{s.Type}, {bars}");
-            }
-            return string.Join("\r\n", names);
+            sections.Add(SectionClass.eSectionType.Intro);
+            sections.Add(SectionClass.eSectionType.Verse);
+            sections.Add(SectionClass.eSectionType.Chorus);
+            sections.Add(SectionClass.eSectionType.Verse);
+            sections.Add(SectionClass.eSectionType.Chorus);
+            sections.Add(SectionClass.eSectionType.Bridge);
+            sections.Add(SectionClass.eSectionType.Chorus);
+            sections.Add(SectionClass.eSectionType.Outro);
         }
     }
 }

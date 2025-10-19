@@ -7,7 +7,7 @@ namespace Music
         private void InitializeComponent()
         {
             btnAddSections = new Button();
-            txtSongStructure = new TextBox();
+            txtSections = new TextBox();
             btnSave = new Button();
             lblFilepath = new Label();
             btnAddVoices = new Button();
@@ -32,13 +32,13 @@ namespace Music
             btnAddSections.UseVisualStyleBackColor = true;
             btnAddSections.Click += btnCreateSections_Click;
             // 
-            // txtSongStructure
+            // txtSections
             // 
-            txtSongStructure.Location = new Point(212, 92);
-            txtSongStructure.Multiline = true;
-            txtSongStructure.Name = "txtSongStructure";
-            txtSongStructure.Size = new Size(529, 89);
-            txtSongStructure.TabIndex = 1;
+            txtSections.Location = new Point(212, 92);
+            txtSections.Multiline = true;
+            txtSections.Name = "txtSections";
+            txtSections.Size = new Size(529, 89);
+            txtSections.TabIndex = 1;
             // 
             // btnSave
             // 
@@ -164,7 +164,7 @@ namespace Music
             Controls.Add(btnAddVoices);
             Controls.Add(lblFilepath);
             Controls.Add(btnSave);
-            Controls.Add(txtSongStructure);
+            Controls.Add(txtSections);
             Controls.Add(btnAddSections);
             Name = "GenerateForm";
             WindowState = FormWindowState.Maximized;
@@ -173,7 +173,7 @@ namespace Music
             PerformLayout();
         }
         private Button btnAddSections;
-        private TextBox txtSongStructure;
+        private TextBox txtSections;
         private Button btnSave;
         private Label lblFilepath;
         private Button btnAddVoices;

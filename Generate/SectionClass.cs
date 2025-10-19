@@ -1,7 +1,9 @@
 ﻿namespace Music.Generate
 {
-    internal class SectionClass
+    public class SectionClass
     {
-        public required string SectionName {get; set;}
+        public enum eSectionType { Intro, Verse, Chorus, Solo, Bridge, Outro, Custom }
+
+        public eSectionType SectionType {get; set; }
     }
 }
