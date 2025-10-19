@@ -62,7 +62,7 @@ namespace Music
             // 
             // btnAddVoices
             // 
-            btnAddVoices.Location = new Point(35, 140);
+            btnAddVoices.Location = new Point(28, 150);
             btnAddVoices.Name = "btnAddVoices";
             btnAddVoices.Size = new Size(160, 23);
             btnAddVoices.TabIndex = 4;
