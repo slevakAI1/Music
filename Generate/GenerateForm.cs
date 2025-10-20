@@ -88,5 +88,10 @@ namespace Music
         private void btnSave_Click(object sender, EventArgs e)
         {
         }
+
+        private void btnAddHarmonicTimeline_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

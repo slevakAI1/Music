@@ -18,6 +18,7 @@ namespace Music
             btnCreateScore = new Button();
             btnNewDesign = new Button();
             txtDesignSpace = new TextBox();
+            btnAddHarmonicTimeline = new Button();
             SuspendLayout();
             // 
             // btnAddSections
@@ -131,9 +132,20 @@ namespace Music
             txtDesignSpace.Size = new Size(381, 354);
             txtDesignSpace.TabIndex = 14;
             // 
+            // btnAddHarmonicTimeline
+            // 
+            btnAddHarmonicTimeline.Location = new Point(725, 48);
+            btnAddHarmonicTimeline.Name = "btnAddHarmonicTimeline";
+            btnAddHarmonicTimeline.Size = new Size(151, 23);
+            btnAddHarmonicTimeline.TabIndex = 15;
+            btnAddHarmonicTimeline.Text = "Add Harmonic Timeline";
+            btnAddHarmonicTimeline.UseVisualStyleBackColor = true;
+            btnAddHarmonicTimeline.Click += btnAddHarmonicTimeline_Click;
+            // 
             // GenerateForm
             // 
             ClientSize = new Size(1085, 539);
+            Controls.Add(btnAddHarmonicTimeline);
             Controls.Add(txtDesignSpace);
             Controls.Add(btnNewDesign);
             Controls.Add(btnCreateScore);
@@ -164,5 +176,6 @@ namespace Music
         private Button btnCreateScore;
         private Button btnNewDesign;
         private TextBox txtDesignSpace;
+        private Button btnAddHarmonicTimeline;
     }
 }
