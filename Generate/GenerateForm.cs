@@ -4,13 +4,6 @@ namespace Music
 {
     public partial class GenerateForm : Form
     {
-        // Persisted design for this form/session (now owns Sections, VoiceSet, and ChordSet)
-        private ScoreDesignClass? _scoreDesign;
-
-        private readonly VoiceManagerClass _voiceManager = new();
-        private readonly ChordManagerClass _chordManager = new();
-        private readonly SectionSetManagerClass _sectionManager = new();
-
         public GenerateForm()
         {
             this.Text = "Music";
@@ -36,60 +29,60 @@ namespace Music
 
         private void btnNewScore_Click(object sender, EventArgs e)
         {
-            // Create and persist a new ScoreDesign instance for this form/session
-            _scoreDesign = new ScoreDesignClass();
+            // Create and persist a new ScoreDesign instance for this app/session
+            Globals.ScoreDesign = new ScoreDesignClass();
 
             // Render combined design space and clear legacy text areas
-            txtDesignSpace.Text = DesignTextHelper.BuildCombinedText(_scoreDesign);
+            txtDesignSpace.Text = DesignTextHelper.BuildCombinedText(Globals.ScoreDesign);
         }
 
         private void btnCreateSections_Click(object sender, EventArgs e)
         {
-            if (_scoreDesign == null)
+            if (Globals.ScoreDesign == null)
             {
                 MessageBox.Show(this, "Create a new score design first.", "No Design", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
             // Build sections without touching the UI textboxes
-            _sectionManager.CreateTestSections(_scoreDesign.Sections);
+            Globals.SectionManager.CreateTestSections(Globals.ScoreDesign.Sections);
 
             // Reset dependent sets
-            _scoreDesign.VoiceSet.Reset();
-            _scoreDesign.ChordSet.Reset();
+            Globals.ScoreDesign.VoiceSet.Reset();
+            Globals.ScoreDesign.ChordSet.Reset();
 
             // Render combined design space and clear legacy text areas
-            txtDesignSpace.Text = DesignTextHelper.BuildCombinedText(_scoreDesign);
+            txtDesignSpace.Text = DesignTextHelper.BuildCombinedText(Globals.ScoreDesign);
         }
 
         private void btnAddVoices_Click(object sender, EventArgs e)
         {
-            if (_scoreDesign == null)
+            if (Globals.ScoreDesign == null)
             {
                 MessageBox.Show(this, "Create a new score design first.", "No Design", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
             // Populate voices without touching the UI textboxes
-            _scoreDesign.VoiceSet.AddDefaultVoices();
+            Globals.ScoreDesign.VoiceSet.AddDefaultVoices();
 
             // Render combined design space and clear legacy text areas
-            txtDesignSpace.Text = DesignTextHelper.BuildCombinedText(_scoreDesign);
+            txtDesignSpace.Text = DesignTextHelper.BuildCombinedText(Globals.ScoreDesign);
         }
 
         private void btnAddChords_Click(object sender, EventArgs e)
         {
-            if (_scoreDesign == null)
+            if (Globals.ScoreDesign == null)
             {
                 MessageBox.Show(this, "Create a new score design first.", "No Design", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
             // Populate chords without touching the UI textboxes
-            _scoreDesign.ChordSet.AddDefaultChords();
+            Globals.ScoreDesign.ChordSet.AddDefaultChords();
 
             // Render combined design space and clear legacy text areas
-            txtDesignSpace.Text = DesignTextHelper.BuildCombinedText(_scoreDesign);
+            txtDesignSpace.Text = DesignTextHelper.BuildCombinedText(Globals.ScoreDesign);
         }
 
         private void btnCreateMusic_Click(object sender, EventArgs e)
