@@ -47,10 +47,6 @@ namespace Music
             // Build sections without touching the UI textboxes
             Globals.SectionManager.CreateTestSections(Globals.ScoreDesign.Sections);
 
-            // Reset dependent sets
-            Globals.ScoreDesign.VoiceSet.Reset();
-            Globals.ScoreDesign.ChordSet.Reset();
-
             // Render combined design space and clear legacy text areas
             txtDesignSpace.Text = DesignTextHelper.BuildCombinedText(Globals.ScoreDesign);
         }
