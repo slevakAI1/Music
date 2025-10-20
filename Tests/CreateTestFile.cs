@@ -2,7 +2,7 @@ using MusicXml.Domain;
 
 namespace Music.Tests
 {
-    public static class MusicXmlCreateValidFileTests1
+    public static class CreateTestFile
     {
         public static Score CreateSingleMeasureCChordKeyboardScore()
         {
@@ -48,18 +48,56 @@ namespace Music.Tests
             measure.MeasureElements.Add(new MeasureElement { Type = MeasureElementType.Note, Element = noteE });
             measure.MeasureElements.Add(new MeasureElement { Type = MeasureElementType.Note, Element = noteG });
 
+            // Build the first part with the first measure plus 7 empty measures
+            var measures = new List<Measure> { measure };
+            for (int i = 0; i < 7; i++)
+            {
+                measures.Add(new Measure { Attributes = attributes });
+            }
+
             var part = new Part
             {
                 Id = "P1",
-                Name = "Keyboard",
-                Measures = new List<Measure> { measure }
+                Name = "Violins I",          // match Notion sample
+                InstrumentName = "Violins I",
+                MidiChannel = 1,
+                Measures = measures
+            };
+
+            // Second part "Trumpet" with the same pattern
+            var trumpetMeasure = new Measure
+            {
+                Attributes = attributes
+            };
+
+            var tNoteC = WholeNote('C', 4, isChordTone: false);
+            var tNoteE = WholeNote('E', 4, isChordTone: true);
+            var tNoteG = WholeNote('G', 4, isChordTone: true);
+
+            trumpetMeasure.MeasureElements.Add(new MeasureElement { Type = MeasureElementType.Note, Element = tNoteC });
+            trumpetMeasure.MeasureElements.Add(new MeasureElement { Type = MeasureElementType.Note, Element = tNoteE });
+            trumpetMeasure.MeasureElements.Add(new MeasureElement { Type = MeasureElementType.Note, Element = tNoteG });
+
+            var trumpetMeasures = new List<Measure> { trumpetMeasure };
+            for (int i = 0; i < 7; i++)
+            {
+                trumpetMeasures.Add(new Measure { Attributes = attributes });
+            }
+
+            var trumpetPart = new Part
+            {
+                Id = "P2",
+                Name = "Trumpet",
+                InstrumentName = "Trumpet",
+                MidiChannel = 2,
+                Measures = trumpetMeasures
             };
 
             var score = new Score
             {
-                MovementTitle = "One-bar C Major (Keyboard)",
+                MovementTitle = "One-bar C Major (Violin + Trumpet)",
                 Identification = new Identification(),
-                Parts = new List<Part> { part }
+                Parts = new List<Part> { part, trumpetPart }
             };
 
             return score;

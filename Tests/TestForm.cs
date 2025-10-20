@@ -70,7 +70,7 @@ namespace Music
         {
             try
             {
-                var score = Music.Tests.MusicXmlCreateValidFileTests.CreateSingleMeasureCChordKeyboardScore();
+                var score = Music.Tests.CreateTestFile.CreateSingleMeasureCChordKeyboardScore();
                 var xml = MusicXml.MusicXmlScoreSerializer.Serialize(score);
 
                 // Save under the repository's Tests/OutputSamples folder

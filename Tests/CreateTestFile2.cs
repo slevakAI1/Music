@@ -2,7 +2,11 @@ using MusicXml.Domain;
 
 namespace Music.Tests
 {
-    public static class MusicXmlCreateValidFileTests
+
+    // This one has the part named "Violins I" to match Notion sample
+
+
+    public static class CreateTestFile2
     {
         public static Score CreateSingleMeasureCChordKeyboardScore()
         {
