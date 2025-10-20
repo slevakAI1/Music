@@ -30,7 +30,8 @@
 
   <ItemGroup>
     <Folder Include="Generate\MusicXmlFiles\" />
-    <Folder Include="Tests\Samples\" />
+    <Folder Include="Tests\InputSamples\" />
+    <Folder Include="Tests\OutputSamples\" />
   </ItemGroup>
 
 </Project>

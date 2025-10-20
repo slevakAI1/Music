@@ -73,13 +73,15 @@ namespace Music
                 var score = Music.Tests.MusicXmlCreateValidFileTests.CreateSingleMeasureCChordKeyboardScore();
                 var xml = MusicXml.MusicXmlScoreSerializer.Serialize(score);
 
-                var targetDir = @"C:\temp";
-                Directory.CreateDirectory(targetDir);
+                // Save under the repository's Tests/OutputSamples folder
+                var projectRoot = System.IO.Path.GetFullPath(System.IO.Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
+                var targetDir = System.IO.Path.Combine(projectRoot, "Tests", "OutputSamples");
+                System.IO.Directory.CreateDirectory(targetDir);
 
                 var fileName = $"TestScore_{DateTime.Now:yyyyMMdd_HHmmss}.musicxml";
-                var fullPath = Path.Combine(targetDir, fileName);
+                var fullPath = System.IO.Path.Combine(targetDir, fileName);
 
-                File.WriteAllText(fullPath, xml, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+                System.IO.File.WriteAllText(fullPath, xml, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
 
                 MessageBox.Show(this,
                     $"Saved MusicXML to:\n{fullPath}",

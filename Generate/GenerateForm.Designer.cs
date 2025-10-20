@@ -32,7 +32,7 @@ namespace Music
             // 
             // btnSave
             // 
-            btnSave.Location = new Point(42, 256);
+            btnSave.Location = new Point(42, 317);
             btnSave.Name = "btnSave";
             btnSave.Size = new Size(96, 23);
             btnSave.TabIndex = 2;
@@ -43,7 +43,7 @@ namespace Music
             // lblFilepath
             // 
             lblFilepath.AutoSize = true;
-            lblFilepath.Location = new Point(147, 260);
+            lblFilepath.Location = new Point(147, 321);
             lblFilepath.Name = "lblFilepath";
             lblFilepath.Size = new Size(47, 15);
             lblFilepath.TabIndex = 3;
@@ -71,7 +71,7 @@ namespace Music
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(135, 153);
+            textBox1.Location = new Point(135, 214);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(100, 23);
             textBox1.TabIndex = 8;
@@ -80,7 +80,7 @@ namespace Music
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(28, 156);
+            label1.Location = new Point(28, 217);
             label1.Name = "label1";
             label1.Size = new Size(87, 15);
             label1.TabIndex = 9;
@@ -89,7 +89,7 @@ namespace Music
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(28, 189);
+            label2.Location = new Point(28, 250);
             label2.Name = "label2";
             label2.Size = new Size(44, 15);
             label2.TabIndex = 11;
@@ -97,7 +97,7 @@ namespace Music
             // 
             // textBox2
             // 
-            textBox2.Location = new Point(135, 186);
+            textBox2.Location = new Point(135, 247);
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(100, 23);
             textBox2.TabIndex = 10;

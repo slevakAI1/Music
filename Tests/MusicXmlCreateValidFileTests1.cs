@@ -2,7 +2,7 @@ using MusicXml.Domain;
 
 namespace Music.Tests
 {
-    public static class MusicXmlCreateValidFileTests
+    public static class MusicXmlCreateValidFileTests1
     {
         public static Score CreateSingleMeasureCChordKeyboardScore()
         {
@@ -48,18 +48,11 @@ namespace Music.Tests
             measure.MeasureElements.Add(new MeasureElement { Type = MeasureElementType.Note, Element = noteE });
             measure.MeasureElements.Add(new MeasureElement { Type = MeasureElementType.Note, Element = noteG });
 
-            // Build the part with the first measure plus 7 empty measures
-            var measures = new List<Measure> { measure };
-            for (int i = 0; i < 7; i++)
-            {
-                measures.Add(new Measure { Attributes = attributes });
-            }
-
             var part = new Part
             {
                 Id = "P1",
                 Name = "Keyboard",
-                Measures = measures
+                Measures = new List<Measure> { measure }
             };
 
             var score = new Score
