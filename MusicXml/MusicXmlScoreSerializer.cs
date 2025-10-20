@@ -71,8 +71,6 @@ namespace MusicXml
                             writer.WriteStartElement("encoding");
                             if (enc != null)
                             {
-                                // Mirror parser behavior (GetInnerTextOfChildTag) which concatenates multiple tags by newline.
-                                // We split by line-breaks and emit multiple tags so round-tripping preserves semantics.
                                 foreach (var line in SplitLines(enc.Software))
                                 {
                                     writer.WriteElementString("software", line);
@@ -93,7 +91,7 @@ namespace MusicXml
                     }
                 }
 
-                // part-list
+                // part-list (emit instrument mapping like Notion's format)
                 writer.WriteStartElement("part-list");
                 foreach (var part in score.Parts ?? Enumerable.Empty<Part>())
                 {
@@ -103,6 +101,28 @@ namespace MusicXml
                     writer.WriteAttributeString("id", partId);
                     writer.WriteElementString("part-name",
                         string.IsNullOrWhiteSpace(part.Name) ? "Part" : part.Name);
+
+                    // Optional instrument blocks
+                    var instId = partId + "-I1";
+                    var hasInstrumentName = !string.IsNullOrWhiteSpace(part.InstrumentName);
+                    var hasMidiChannel = part.MidiChannel > 0;
+
+                    if (hasInstrumentName)
+                    {
+                        writer.WriteStartElement("score-instrument");
+                        writer.WriteAttributeString("id", instId);
+                        writer.WriteElementString("instrument-name", part.InstrumentName);
+                        writer.WriteEndElement(); // score-instrument
+                    }
+
+                    if (hasMidiChannel)
+                    {
+                        writer.WriteStartElement("midi-instrument");
+                        writer.WriteAttributeString("id", instId);
+                        writer.WriteElementString("midi-channel", part.MidiChannel.ToString());
+                        writer.WriteEndElement(); // midi-instrument
+                    }
+
                     writer.WriteEndElement(); // score-part
                 }
                 writer.WriteEndElement(); // part-list

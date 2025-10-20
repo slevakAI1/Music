@@ -58,7 +58,9 @@ namespace Music.Tests
             var part = new Part
             {
                 Id = "P1",
-                Name = "Keyboard",
+                Name = "Violins I",          // match Notion sample
+                InstrumentName = "Violins I",
+                MidiChannel = 1,
                 Measures = measures
             };
 
