@@ -28,7 +28,7 @@ namespace Music.Generate
         {
             Text = "Select Voices";
 
-            // 1) Fixed, non-resizable dialog that’s right-sized for use
+            // Fixed, non-resizable dialog that’s right-sized for use
             FormBorderStyle = FormBorderStyle.FixedDialog;
             StartPosition = FormStartPosition.CenterParent;
             MinimizeBox = false;
@@ -81,7 +81,7 @@ namespace Music.Generate
                 Dock = DockStyle.Fill,
                 ColumnCount = 1,
                 RowCount = 4,
-                Padding = new Padding(0) // 2) and 3) keep right content within form
+                Padding = new Padding(0) // keep right content within form
             };
             rightPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));     // filter
             rightPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); // list
@@ -124,7 +124,7 @@ namespace Music.Generate
                 Dock = DockStyle.Fill,
                 CheckOnClick = true,
                 IntegralHeight = false,
-                HorizontalScrollbar = true // 3) keep within form; long items scroll instead of overflowing
+                HorizontalScrollbar = true // long items scroll instead of overflowing
             };
             _clbVoices.ItemCheck += OnVoiceItemCheck;
             rightPanel.Controls.Add(_clbVoices, 0, 1);
@@ -178,7 +178,7 @@ namespace Music.Generate
 
         private static string BuildSourceLabel(string? sourcePath)
         {
-            // 4) show only file name without extension (no full path)
+            // show only file name without extension (no full path)
             return sourcePath is { Length: > 0 }
                 ? $"Source: {Path.GetFileNameWithoutExtension(sourcePath)}"
                 : "Source: catalog load error (see 'error' category)";
@@ -189,8 +189,53 @@ namespace Music.Generate
             var categories = _catalog.Keys.OrderBy(k => k, StringComparer.OrdinalIgnoreCase).ToList();
             _lstCategories.Items.Clear();
             _lstCategories.Items.AddRange(categories.Cast<object>().ToArray());
+
             if (_lstCategories.Items.Count > 0)
-                _lstCategories.SelectedIndex = 0;
+            {
+                // Default to Rock Band and check all voices there.
+                SetDefaultVoices();
+
+                // Fallback to first category if the default wasn't applied (e.g., not present).
+                if (_lstCategories.SelectedIndex < 0)
+                    _lstCategories.SelectedIndex = 0;
+            }
+        }
+
+        // Sets the initial default: select the "Rock Band" category and check all voices in it.
+        // Call this to change the app's startup defaults in one place.
+        public void SetDefaultVoices()
+        {
+            const string defaultCategory = "Rock Band";
+
+            var catKey = _catalog.Keys.FirstOrDefault(
+                k => string.Equals(k, defaultCategory, StringComparison.OrdinalIgnoreCase));
+            if (catKey == null)
+                return; // category not found; leave selection unchanged
+
+            // Prime the selection set with all voices from the default category.
+            if (_catalog.TryGetValue(catKey, out var voices) && voices != null)
+            {
+                _selected.Clear();
+                foreach (var v in voices)
+                {
+                    if (!string.IsNullOrWhiteSpace(v))
+                        _selected.Add(v);
+                }
+            }
+
+            // Select the category in the UI; this triggers RefreshVoices and applies checks from _selected.
+            for (int i = 0; i < _lstCategories.Items.Count; i++)
+            {
+                if (string.Equals(_lstCategories.Items[i]?.ToString(), catKey, StringComparison.OrdinalIgnoreCase))
+                {
+                    _lstCategories.SelectedIndex = i;
+                    return;
+                }
+            }
+
+            // If items aren’t loaded yet, set current and refresh explicitly.
+            _currentCategory = catKey;
+            RefreshVoices();
         }
 
         private void OnCategoryChanged(object? sender, EventArgs e)
