@@ -41,13 +41,36 @@ namespace Music
             RefreshDesignSpaceIfReady();
         }
 
-        // Populate voices without touching the UI textboxes
+        // Populate voices via popup selector
         private void btnAddVoices_Click(object sender, EventArgs e)
         {
             if (!EnsureScoreDesignOrNotify()) return;
+
+            using var dlg = new VoiceSelector();
+            if (dlg.ShowDialog(this) == DialogResult.OK)
+            {
+                var score = Globals.ScoreDesign!;
+                var existing = new HashSet<string>(score.VoiceSet.Voices.Select(v => v.VoiceName),
+                    StringComparer.OrdinalIgnoreCase);
+
+                foreach (var name in dlg.SelectedVoices)
+                {
+                    if (!existing.Contains(name))
+                    {
+                        score.VoiceSet.AddVoice(name);
+                        existing.Add(name);
+                    }
+                }
+
+                RefreshDesignSpaceIfReady();
+            }
+        }
+
+/* All code for adding default - keep for now
+ * if (!EnsureScoreDesignOrNotify()) return;
             Globals.ScoreDesign!.VoiceSet.AddDefaultVoices();
             RefreshDesignSpaceIfReady();
-        }
+*/
 
         // Populate chords without touching the UI textboxes
         private void btnAddChords_Click(object sender, EventArgs e)

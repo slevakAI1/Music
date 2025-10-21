@@ -35,4 +35,10 @@
     <Folder Include="Tests\OutputSamples\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Generate\Voices.Notion.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
