@@ -33,13 +33,25 @@ namespace Music
             RefreshDesignSpaceIfReady();
         }
 
-        // Build sections without touching the UI textboxes
+        // Build/edit sections via popup editor and persist back to Globals
         private void btnCreateSections_Click(object sender, EventArgs e)
         {
             if (!EnsureScoreDesignOrNotify()) return;
-            Globals.SectionManager.CreateTestSections(Globals.ScoreDesign!.Sections);
-            RefreshDesignSpaceIfReady();
+
+            var current = Globals.ScoreDesign!.Sections;
+
+            using var dlg = new SectionEditor(current);
+            if (dlg.ShowDialog(this) == DialogResult.OK)
+            {
+                // Persist changes into the existing SectionSet instance
+                current.Reset();
+                foreach (var s in dlg.ResultSections.Sections)
+                    current.Add(s.SectionType, s.BarCount, s.Name);
+
+                RefreshDesignSpaceIfReady();
+            }
         }
+
 
         // Populate voices via popup selector
         private void btnAddVoices_Click(object sender, EventArgs e)
