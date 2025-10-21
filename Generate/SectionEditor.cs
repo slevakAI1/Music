@@ -280,8 +280,17 @@ namespace Music.Generate
             bool hasSel = _lv.SelectedIndices.Count > 0;
             int idx = hasSel ? _lv.SelectedIndices[0] : -1;
 
-            _btnInsert.Enabled = true;
-            _btnAdd.Enabled = true;
+            // Target insert positions
+            int addInsertAt = hasSel ? idx + 1 : _working.Count;  // Add appends after selection or at end
+            int insertAt = hasSel ? idx : 0;                      // Insert goes at selection or at start when none
+
+            // Add/Insert enabled only if Type/Bars/Start are valid for their target position
+            _ = ValidateAndGetEditorValues(addInsertAt, out _, out _, out _, out _, out string? addErr);
+            _ = ValidateAndGetEditorValues(insertAt, out _, out _, out _, out _, out string? insErr);
+
+            _btnAdd.Enabled = addErr == null;
+            _btnInsert.Enabled = insErr == null;
+
             _btnDelete.Enabled = hasSel;
             _btnDuplicate.Enabled = hasSel;
             _btnUp.Enabled = hasSel && idx > 0;
@@ -296,20 +305,22 @@ namespace Music.Generate
 
         private void UpdateEditorFromSelected()
         {
-            if (_lv.SelectedIndices.Count == 0)
+            bool hasSel = _lv.SelectedIndices.Count > 0;
+
+            // Always allow editing so a user can prepare the first section before adding
+            _cbType.Enabled = _numBars.Enabled = _txtName.Enabled = true;
+
+            if (!hasSel)
             {
-                _cbType.Enabled = _numBars.Enabled = _txtName.Enabled = false;
-                _cbType.SelectedIndex = -1;
-                _numBars.Value = 4;
-                _txtName.Text = string.Empty;
-                _lblStart.Text = "-";
+                // When nothing is selected, keep whatever the user typed and show a Start preview
+                _lblStart.Text = PreviewStartForIndex(_working.Count).ToString();
+                UpdateButtonsEnabled();
                 return;
             }
 
+            // Populate from selection
             var s = _lv.SelectedItems[0].Tag as SectionClass;
             if (s == null) return;
-
-            _cbType.Enabled = _numBars.Enabled = _txtName.Enabled = true;
 
             var names = Enum.GetNames(typeof(DesignEnums.eSectionType));
             int idxType = Array.IndexOf(names, s.SectionType.ToString());
@@ -318,40 +329,53 @@ namespace Music.Generate
             _numBars.Value = Math.Max(1, Math.Min((int)_numBars.Maximum, s.BarCount));
             _txtName.Text = s.Name ?? string.Empty;
             _lblStart.Text = s.StartBar.ToString();
+
+            UpdateButtonsEnabled();
         }
 
         private void ApplyEditorToSelected()
         {
-            if (_lv.SelectedIndices.Count == 0) return;
+            if (_lv.SelectedIndices.Count == 0)
+            {
+                // No selection: just recompute Start preview and button states
+                _lblStart.Text = PreviewStartForIndex(_working.Count).ToString();
+                UpdateButtonsEnabled();
+                return;
+            }
 
             var s = (SectionClass)_lv.SelectedItems[0].Tag!;
             if (_cbType.SelectedIndex >= 0)
             {
-                var names = Enum.GetNames(typeof(DesignEnums.eSectionType));
-                var selectedName = names[_cbType.SelectedIndex];
+                var selectedName = (string)_cbType.SelectedItem!;
                 if (Enum.TryParse<DesignEnums.eSectionType>(selectedName, out var et))
-                {
                     s.SectionType = et;
-                }
             }
             s.BarCount = (int)_numBars.Value;
             s.Name = string.IsNullOrWhiteSpace(_txtName.Text) ? null : _txtName.Text.Trim();
 
             RecalculateStartBars();
             UpdateRowVisuals(_lv.SelectedIndices[0]);
+            UpdateButtonsEnabled();
         }
 
         private void AddSection(int afterIndex)
         {
-            // append if none selected
             int insertAt = Math.Max(-1, afterIndex) + 1;
+            if (insertAt < 0 || insertAt > _working.Count) insertAt = _working.Count;
+
+            if (!ValidateAndGetEditorValues(insertAt, out var type, out var bars, out var name, out var _, out var error))
+            {
+                MessageBox.Show(this, error!, "Add Section", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
             var s = new SectionClass
             {
-                SectionType = DesignEnums.eSectionType.Verse,
-                BarCount = 4,
-                Name = null
+                SectionType = type,
+                BarCount = bars,
+                Name = name
             };
-            if (insertAt < 0 || insertAt > _working.Count) insertAt = _working.Count;
+
             _working.Insert(insertAt, s);
             RecalculateStartBars();
             RefreshListView(insertAt);
@@ -360,12 +384,20 @@ namespace Music.Generate
         private void InsertSection(int atIndex)
         {
             int insertAt = Math.Max(0, Math.Min(atIndex, _working.Count));
+
+            if (!ValidateAndGetEditorValues(insertAt, out var type, out var bars, out var name, out var _, out var error))
+            {
+                MessageBox.Show(this, error!, "Insert Section", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
             var s = new SectionClass
             {
-                SectionType = DesignEnums.eSectionType.Verse,
-                BarCount = 4,
-                Name = null
+                SectionType = type,
+                BarCount = bars,
+                Name = name
             };
+
             _working.Insert(insertAt, s);
             RecalculateStartBars();
             RefreshListView(insertAt);
@@ -488,24 +520,21 @@ namespace Music.Generate
             for (int i = 0; i < count; i++)
                 UpdateRowVisuals(i);
 
-            // Update editor label if selection exists (defensive when list is empty or selection is stale)
+            // Update editor label and buttons (defensive when list is empty or selection is stale)
             if (_lv.SelectedIndices.Count > 0)
             {
                 int sel = _lv.SelectedIndices[0];
                 if (sel >= 0 && sel < _working.Count)
-                {
-                    var cur = _working[sel];
-                    _lblStart.Text = cur.StartBar.ToString();
-                }
+                    _lblStart.Text = _working[sel].StartBar.ToString();
                 else
-                {
-                    _lblStart.Text = "-";
-                }
+                    _lblStart.Text = PreviewStartForIndex(_working.Count).ToString();
             }
             else
             {
-                _lblStart.Text = "-";
+                _lblStart.Text = PreviewStartForIndex(_working.Count).ToString();
             }
+
+            UpdateButtonsEnabled();
         }
 
         private SectionSetClass BuildResult()
@@ -517,6 +546,48 @@ namespace Music.Generate
             }
             // StartBar is assigned by Add in order; no extra work needed
             return result;
+        }
+
+        // Predict the Start bar if a new section is inserted at index `insertAt`
+        private int PreviewStartForIndex(int insertAt)
+        {
+            int start = 1;
+            for (int i = 0; i < insertAt && i < _working.Count; i++)
+                start += Math.Max(1, _working[i].BarCount);
+            return start;
+        }
+
+        private bool ValidateAndGetEditorValues(
+            int insertAt,
+            out DesignEnums.eSectionType type,
+            out int bars,
+            out string? name,
+            out int startPreview,
+            out string? error)
+        {
+            error = null;
+            type = default;
+            name = string.IsNullOrWhiteSpace(_txtName.Text) ? null : _txtName.Text.Trim();
+            bars = (int)_numBars.Value;
+
+            if (_cbType.SelectedIndex < 0)
+                error = "Type is required.";
+            else
+            {
+                var selectedName = (string)_cbType.SelectedItem!;
+                if (!Enum.TryParse(selectedName, out type))
+                    error = "Invalid section type.";
+            }
+
+            if (bars < 1)
+                error = (error == null) ? "Bars must be at least 1." : error + " Bars must be at least 1.";
+
+            // Start is required (computed). If we can compute a positive preview, it is considered valid.
+            startPreview = PreviewStartForIndex(insertAt);
+            if (startPreview < 1)
+                error = (error == null) ? "Start could not be determined." : error + " Start could not be determined.";
+
+            return error == null;
         }
     }
 }
