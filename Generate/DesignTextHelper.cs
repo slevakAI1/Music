@@ -27,7 +27,18 @@ namespace Music.Generate
             foreach (var s in design.Sections.Sections)
             {
                 if (!first) sb.Append("\r\n");
-                sb.Append(s?.SectionType.ToString());
+                if (s == null)
+                {
+                    first = false;
+                    continue;
+                }
+
+                var title = string.IsNullOrWhiteSpace(s.Name)
+                    ? s.SectionType.ToString()
+                    : $"{s.SectionType} - {s.Name}";
+
+                var barsText = s.BarCount == 1 ? "1 bar" : $"{s.BarCount} bars";
+                sb.Append($"{title}: Bar {s.StartBar}, {barsText}");
                 first = false;
             }
 
