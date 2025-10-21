@@ -4,12 +4,13 @@ namespace Music.Generate
 {
     public static class DesignTextHelper
     {
-        // Builds a combined string: Voices (each on newline) + 2 newlines + Sections + 2 newlines + Chords
+        // Builds: VOICES + 2 newlines + SECTIONS + 2 newlines + HARMONIC TIMELINE
         public static string BuildCombinedText(ScoreDesignClass design)
         {
             var sb = new StringBuilder();
 
-            // Voices
+            // VOICES
+            sb.Append("VOICES:\r\n");
             var first = true;
             foreach (var v in design.VoiceSet.Voices)
             {
@@ -20,7 +21,8 @@ namespace Music.Generate
 
             sb.Append("\r\n\r\n");
 
-            // Sections
+            // SECTIONS
+            sb.Append("SECTIONS:\r\n");
             first = true;
             foreach (var s in design.Sections.Sections)
             {
@@ -31,13 +33,18 @@ namespace Music.Generate
 
             sb.Append("\r\n\r\n");
 
-            // Chords
+            // HARMONIC TIMELINE
+            sb.Append("HARMONIC TIMELINE:\r\n");
             first = true;
-            foreach (var c in design.ChordSet.Chords)
+            var timeline = Globals.HarmonicTimeline;
+            if (timeline != null)
             {
-                if (!first) sb.Append("\r\n");
-                sb.Append(c?.ChordName ?? string.Empty);
-                first = false;
+                foreach (var he in timeline.Events)
+                {
+                    if (!first) sb.Append("\r\n");
+                    sb.Append($"Bar {he.StartBar} Beat {he.StartBeat}, {he.DurationBeats} beats | Key: {he.Key} | Degree: {he.Degree} | Quality: {he.Quality} | Bass: {he.Bass}");
+                    first = false;
+                }
             }
 
             return sb.ToString();

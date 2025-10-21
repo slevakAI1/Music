@@ -23,7 +23,7 @@ namespace Music
             // 
             // btnAddSections
             // 
-            btnAddSections.Location = new Point(28, 61);
+            btnAddSections.Location = new Point(28, 94);
             btnAddSections.Name = "btnAddSections";
             btnAddSections.Size = new Size(151, 23);
             btnAddSections.TabIndex = 0;
@@ -52,7 +52,7 @@ namespace Music
             // 
             // btnAddVoices
             // 
-            btnAddVoices.Location = new Point(28, 90);
+            btnAddVoices.Location = new Point(28, 61);
             btnAddVoices.Name = "btnAddVoices";
             btnAddVoices.Size = new Size(151, 23);
             btnAddVoices.TabIndex = 4;
@@ -62,12 +62,13 @@ namespace Music
             // 
             // btnAddChords
             // 
-            btnAddChords.Location = new Point(28, 119);
+            btnAddChords.BackColor = Color.Red;
+            btnAddChords.Location = new Point(43, 413);
             btnAddChords.Name = "btnAddChords";
             btnAddChords.Size = new Size(151, 23);
             btnAddChords.TabIndex = 6;
             btnAddChords.Text = "Add Chords";
-            btnAddChords.UseVisualStyleBackColor = true;
+            btnAddChords.UseVisualStyleBackColor = false;
             btnAddChords.Click += btnAddChords_Click;
             // 
             // textBox1
@@ -106,12 +107,13 @@ namespace Music
             // 
             // btnCreateScore
             // 
-            btnCreateScore.Location = new Point(816, 450);
+            btnCreateScore.BackColor = Color.Red;
+            btnCreateScore.Location = new Point(56, 384);
             btnCreateScore.Name = "btnCreateScore";
             btnCreateScore.Size = new Size(126, 23);
             btnCreateScore.TabIndex = 12;
             btnCreateScore.Text = "Create Score";
-            btnCreateScore.UseVisualStyleBackColor = true;
+            btnCreateScore.UseVisualStyleBackColor = false;
             btnCreateScore.Click += btnCreateMusic_Click;
             // 
             // btnNewDesign
@@ -129,12 +131,12 @@ namespace Music
             txtDesignSpace.Location = new Point(280, 12);
             txtDesignSpace.Multiline = true;
             txtDesignSpace.Name = "txtDesignSpace";
-            txtDesignSpace.Size = new Size(381, 354);
+            txtDesignSpace.Size = new Size(775, 489);
             txtDesignSpace.TabIndex = 14;
             // 
             // btnAddHarmonicTimeline
             // 
-            btnAddHarmonicTimeline.Location = new Point(725, 48);
+            btnAddHarmonicTimeline.Location = new Point(28, 128);
             btnAddHarmonicTimeline.Name = "btnAddHarmonicTimeline";
             btnAddHarmonicTimeline.Size = new Size(151, 23);
             btnAddHarmonicTimeline.TabIndex = 15;
