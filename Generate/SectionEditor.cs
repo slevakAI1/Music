@@ -1,3 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Windows.Forms;
+
 namespace Music.Generate
 {
     // Popup editor for arranging Sections: view, add, edit, delete, and drag-reorder.
@@ -378,7 +384,8 @@ namespace Music.Generate
 
             _working.Insert(insertAt, s);
             RecalculateStartBars();
-            RefreshListView(insertAt);
+            RefreshListView(-1); // do not select the newly added item
+            ResetEditorForNextAdd();
         }
 
         private void InsertSection(int atIndex)
@@ -400,7 +407,19 @@ namespace Music.Generate
 
             _working.Insert(insertAt, s);
             RecalculateStartBars();
-            RefreshListView(insertAt);
+            RefreshListView(-1); // do not select the newly inserted item
+            ResetEditorForNextAdd();
+        }
+
+        private void ResetEditorForNextAdd()
+        {
+            // Clear selection and reset editor inputs to defaults for rapid add workflow
+            _lv.SelectedIndices.Clear();
+            _cbType.SelectedIndex = -1;
+            _numBars.Value = Math.Max(_numBars.Minimum, Math.Min(_numBars.Maximum, 4));
+            _txtName.Clear();
+            _lblStart.Text = PreviewStartForIndex(_working.Count).ToString();
+            UpdateButtonsEnabled();
         }
 
         private void DeleteSelected()
