@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.IO;
 using System.Windows.Forms;
 
 namespace Music.Generate
@@ -26,35 +27,39 @@ namespace Music.Generate
         public VoiceSelector()
         {
             Text = "Select Voices";
-            FormBorderStyle = FormBorderStyle.Sizable;
+
+            // 1) Fixed, non-resizable dialog that’s right-sized for use
+            FormBorderStyle = FormBorderStyle.FixedDialog;
             StartPosition = FormStartPosition.CenterParent;
             MinimizeBox = false;
             MaximizeBox = false;
             ShowInTaskbar = false;
+            AutoSizeMode = AutoSizeMode.GrowAndShrink;
             ClientSize = new Size(780, 520);
 
             _catalog = VoiceCatalog.Load(out var sourcePath);
 
-            // Layout root
+            // Layout root with padding so inner controls don’t touch form edges
             var root = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
                 ColumnCount = 2,
-                RowCount = 1
+                RowCount = 1,
+                Padding = new Padding(8)
             };
             root.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 220));
             root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
             Controls.Add(root);
 
             // Left: Categories
-            var leftPanel = new Panel { Dock = DockStyle.Fill, Padding = new Padding(8) };
+            var leftPanel = new Panel { Dock = DockStyle.Fill, Padding = new Padding(0) };
             root.Controls.Add(leftPanel, 0, 0);
 
             _lstCategories = new ListBox
             {
                 Dock = DockStyle.Fill,
-                IntegralHeight = false,             // prevent clipping behind a docked label
-                Margin = new Padding(0, 4, 0, 0)    // space under the header
+                IntegralHeight = false,
+                Margin = new Padding(0, 4, 0, 0)
             };
             _lstCategories.SelectedIndexChanged += OnCategoryChanged;
 
@@ -63,10 +68,10 @@ namespace Music.Generate
                 Text = "Categories",
                 Dock = DockStyle.Top,
                 AutoSize = true,
-                Margin = new Padding(0, 0, 0, 4)   // small bottom margin for clearer separation
+                Margin = new Padding(0, 0, 0, 4)
             };
 
-            // Important: add Fill control first, then Top label so label docks first and doesn't overlap the list.
+            // Add fill control first so top label docks above without overlap
             leftPanel.Controls.Add(_lstCategories);
             leftPanel.Controls.Add(lblCat);
 
@@ -75,7 +80,8 @@ namespace Music.Generate
             {
                 Dock = DockStyle.Fill,
                 ColumnCount = 1,
-                RowCount = 4
+                RowCount = 4,
+                Padding = new Padding(0) // 2) and 3) keep right content within form
             };
             rightPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));     // filter
             rightPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); // list
@@ -88,7 +94,7 @@ namespace Music.Generate
                 Dock = DockStyle.Top,
                 ColumnCount = 2,
                 RowCount = 1,
-                Padding = new Padding(8, 8, 8, 4)
+                Padding = new Padding(0, 0, 0, 4)
             };
             filterPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 60));
             filterPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
@@ -97,10 +103,10 @@ namespace Music.Generate
             var lblFilter = new Label
             {
                 Text = "Filter",
-                AutoSize = true,                         // let it size to text
-                Dock = DockStyle.None,                   // no fill; avoid vertical centering
+                AutoSize = true,
+                Dock = DockStyle.None,
                 Anchor = AnchorStyles.Left | AnchorStyles.Top,
-                Margin = new Padding(0, 2, 8, 0),        // small top offset to align with textbox border
+                Margin = new Padding(0, 2, 8, 0),
                 TextAlign = ContentAlignment.TopLeft
             };
             filterPanel.Controls.Add(lblFilter, 0, 0);
@@ -108,7 +114,7 @@ namespace Music.Generate
             _txtFilter = new TextBox
             {
                 Dock = DockStyle.Fill,
-                Margin = new Padding(0)                  // align with label
+                Margin = new Padding(0)
             };
             _txtFilter.TextChanged += (_, __) => RefreshVoices();
             filterPanel.Controls.Add(_txtFilter, 1, 0);
@@ -116,7 +122,9 @@ namespace Music.Generate
             _clbVoices = new CheckedListBox
             {
                 Dock = DockStyle.Fill,
-                CheckOnClick = true
+                CheckOnClick = true,
+                IntegralHeight = false,
+                HorizontalScrollbar = true // 3) keep within form; long items scroll instead of overflowing
             };
             _clbVoices.ItemCheck += OnVoiceItemCheck;
             rightPanel.Controls.Add(_clbVoices, 0, 1);
@@ -125,16 +133,16 @@ namespace Music.Generate
             {
                 FlowDirection = FlowDirection.LeftToRight,
                 Dock = DockStyle.Top,
-                Padding = new Padding(8, 4, 8, 4),
+                Padding = new Padding(0, 4, 0, 4),
                 AutoSize = true
             };
             rightPanel.Controls.Add(actionPanel, 0, 2);
 
-            _btnSelectAll = new Button { Text = "Select All in View" };
+            _btnSelectAll = new Button { Text = "Select All" };
             _btnSelectAll.Click += (_, __) => SelectAllInView();
             actionPanel.Controls.Add(_btnSelectAll);
 
-            _btnClear = new Button { Text = "Clear in View" };
+            _btnClear = new Button { Text = "Clear" };
             _btnClear.Click += (_, __) => ClearInView();
             actionPanel.Controls.Add(_btnClear);
 
@@ -150,7 +158,7 @@ namespace Music.Generate
             {
                 FlowDirection = FlowDirection.RightToLeft,
                 Dock = DockStyle.Top,
-                Padding = new Padding(8, 4, 8, 8),
+                Padding = new Padding(0, 4, 0, 0),
                 AutoSize = true
             };
             rightPanel.Controls.Add(okCancelPanel, 0, 3);
@@ -170,8 +178,9 @@ namespace Music.Generate
 
         private static string BuildSourceLabel(string? sourcePath)
         {
+            // 4) show only file name without extension (no full path)
             return sourcePath is { Length: > 0 }
-                ? $"Source: {sourcePath}"
+                ? $"Source: {Path.GetFileNameWithoutExtension(sourcePath)}"
                 : "Source: catalog load error (see 'error' category)";
         }
 
