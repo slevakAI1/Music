@@ -484,14 +484,27 @@ namespace Music.Generate
             }
 
             // Update visible "Start" and "#"
-            for (int i = 0; i < _lv.Items.Count && i < _working.Count; i++)
+            int count = Math.Min(_lv.Items.Count, _working.Count);
+            for (int i = 0; i < count; i++)
                 UpdateRowVisuals(i);
 
-            // Update editor label if selection exists
+            // Update editor label if selection exists (defensive when list is empty or selection is stale)
             if (_lv.SelectedIndices.Count > 0)
             {
-                var cur = _working[_lv.SelectedIndices[0]];
-                _lblStart.Text = cur.StartBar.ToString();
+                int sel = _lv.SelectedIndices[0];
+                if (sel >= 0 && sel < _working.Count)
+                {
+                    var cur = _working[sel];
+                    _lblStart.Text = cur.StartBar.ToString();
+                }
+                else
+                {
+                    _lblStart.Text = "-";
+                }
+            }
+            else
+            {
+                _lblStart.Text = "-";
             }
         }
 
