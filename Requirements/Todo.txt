@@ -1,5 +1,5 @@
 ﻿
 
-These can just overwrite each other for now in the Form1 _variables
-	Convert Midi --> MusicXml.Score
-	Convert MusicXml.Score --> Midi
+Update Section to allow for number of measures
+Add a form to create the sections similar to add voices
+Update the combined text builder to include the new measures
