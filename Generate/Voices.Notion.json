@@ -1,0 +1,236 @@
+{
+  "product": "Notion",
+  "schemaVersion": 1,
+  "categories": [
+    {
+      "name": "Basic",
+      "voices": [
+        "NTempo",
+        "Acoustic Guitar",
+        "Treble Clef Staff",
+        "Piano",
+        "Bass Clef Staff"
+      ]
+    },
+    {
+      "name": "Strings",
+      "voices": [
+        "Violin I (section)",
+        "Violin II (section)",
+        "Viola (section)",
+        "Cello (section)",
+        "Double-bass (section)",
+        "Violin (solo)",
+        "Viola (solo)",
+        "Cello (solo)",
+        "Double-bass (solo)"
+      ]
+    },
+    {
+      "name": "Woodwinds",
+      "voices": [
+        "Piccolo",
+        "Flute",
+        "Alto Flute",
+        "Bass Flute",
+        "Flute Section",
+        "Flute Duo",
+        "Oboe",
+        "Oboe Duo",
+        "English Horn",
+        "Oboe d'Amore",
+        "Bass Oboe",
+        "Clarinet",
+        "Clarinet Section",
+        "Clarinet Duo",
+        "Bass Clarinet",
+        "Contrabass Clarinet",
+        "Basset Horn",
+        "Bassoon",
+        "Bassoon Duo",
+        "Piccolo Clarinet",
+        "Contrabassoon",
+        "Clarinet (jazz)"
+      ]
+    },
+    {
+      "name": "Saxophones",
+      "voices": [
+        "Sopranino Sax (orch.)",
+        "Soprano Sax (orch.)",
+        "Alto Sax (orch.)",
+        "Tenor Sax (orch.)",
+        "Bari. Sax (orch.)",
+        "Contrabass Sax (orch.)",
+        "Soprano Sax (jazz)",
+        "Alto Sax (jazz)",
+        "Tenor Sax (jazz)",
+        "Bari. Sax (jazz)"
+      ]
+    },
+    {
+      "name": "Brass",
+      "voices": [
+        "Horn",
+        "Trumpet",
+        "Piccolo Trumpet",
+        "Cornet",
+        "Flugelhorn",
+        "Soprano Trumpet",
+        "Bass Trumpet",
+        "Trombone",
+        "Bass Trombone",
+        "Alto Trombone",
+        "Trumpet 1 (jazz)",
+        "Trumpet 2 (jazz)",
+        "Euphonium",
+        "Horn Section",
+        "Trumpet Section",
+        "Trombone Section",
+        "Tuba",
+        "Wagner Tuba",
+        "Trombone (jazz)",
+        "Bass Trombone (jazz)"
+      ]
+    },
+    {
+      "name": "Guitars/Basses",
+      "voices": [
+        "Electric Guitar",
+        "Electric Guitar (7 string)",
+        "Electric Bass",
+        "Electric Bass (5 string)",
+        "Electric Bass (6 string)",
+        "Upright Bass",
+        "Acoustic Guitar",
+        "Classical Guitar",
+        "Banjo",
+        "Mandolin",
+        "Ukulele"
+      ]
+    },
+    {
+      "name": "Keyboards/Harp",
+      "voices": [
+        "Piano",
+        "Clavinet",
+        "Electric Piano",
+        "Techno Synth",
+        "Harp",
+        "Celeste",
+        "Harpsichord",
+        "Organ Manuals",
+        "Organ Pedals"
+      ]
+    },
+    {
+      "name": "Drums/Cymbals",
+      "voices": [
+        "Drum Set",
+        "Bass Drum",
+        "Bodhrán",
+        "Bongos",
+        "Concert Toms",
+        "Long Drum",
+        "Piccolo Snare",
+        "Snare Drum",
+        "Side Drum",
+        "Tenor Drum",
+        "Chinese Cymbals (Bo)",
+        "Crash Cymbals (orchestral)",
+        "Finger Cymbals",
+        "Sizzle Cymbal",
+        "Splash Cymbal",
+        "Suspended Cymbal"
+      ]
+    },
+    {
+      "name": "Pitched Percussion",
+      "voices": [
+        "Almglocken",
+        "Crotales",
+        "Glockenspiel",
+        "Handbells",
+        "Marimba",
+        "Roto Toms",
+        "Saw",
+        "Temple Blocks",
+        "Timpani",
+        "Tubular Bells",
+        "Tuned Gongs",
+        "Vibraphone",
+        "Whistling",
+        "Wine Glasses",
+        "Xylophone"
+      ]
+    },
+    {
+      "name": "Other Percussion",
+      "voices": [
+        "Agogô",
+        "Anvil",
+        "Bell Tree",
+        "Brake Drum",
+        "Cabasa",
+        "Castanets",
+        "Caxixi",
+        "Claves",
+        "Cowbell",
+        "Cuica",
+        "Drum Sticks",
+        "Flexatone",
+        "Ganza",
+        "Gong",
+        "Guiro",
+        "Log Drum",
+        "Maracas",
+        "Ocean Drum",
+        "Rainstick",
+        "Ratchet",
+        "Sand Blocks",
+        "Sleigh Bells",
+        "Slide Whistle",
+        "Tam-tam",
+        "Tambourine",
+        "Triangle",
+        "Vibrastick",
+        "Vibraslap",
+        "Water Gong",
+        "Wood Block"
+      ]
+    },
+    {
+      "name": "Sound Effects",
+      "voices": [
+        "Car Horn",
+        "Champagne Bottle",
+        "Church Bell",
+        "Cuckoo",
+        "Duck Call",
+        "Flower pots",
+        "Hammer",
+        "Handclap",
+        "Lead Pipe",
+        "Lion's Roar",
+        "Nightingale Whistle",
+        "Referee Whistle",
+        "Siren",
+        "Siren Whistle",
+        "Thunder Sheet",
+        "Train Whistle",
+        "Wind Machine",
+        "Whip"
+      ]
+    },
+    {
+      "name": "Vocal",
+      "voices": [
+        "Voice",
+        "Soprano chorus",
+        "Alto chorus",
+        "Tenor chorus",
+        "Bass chorus"
+      ]
+    }
+  ]
+}
