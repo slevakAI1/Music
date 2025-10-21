@@ -223,6 +223,15 @@
       ]
     },
     {
+      "name": "Rock Band",
+      "voices": [
+        "Drum Set",
+        "Electric Bass",
+        "Electric Guitar",
+        "Techno Synth"
+      ]
+    },
+    {
       "name": "Vocal",
       "voices": [
         "Voice",
