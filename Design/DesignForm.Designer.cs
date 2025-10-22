@@ -10,7 +10,6 @@ namespace Music
             btnSave = new Button();
             lblFilepath = new Label();
             btnSelectVoices = new Button();
-            //btnAddChords = new Button();
             textBox1 = new TextBox();
             label1 = new Label();
             label2 = new Label();
@@ -19,6 +18,7 @@ namespace Music
             btnNew = new Button();
             txtDesignSpace = new TextBox();
             btnEditHarmonicTimeline = new Button();
+            button1 = new Button();
             SuspendLayout();
             // 
             // btnEditSections
@@ -134,9 +134,19 @@ namespace Music
             btnEditHarmonicTimeline.UseVisualStyleBackColor = true;
             btnEditHarmonicTimeline.Click += btnEditHarmonicTimeline_Click;
             // 
+            // button1
+            // 
+            button1.Location = new Point(57, 440);
+            button1.Name = "button1";
+            button1.Size = new Size(116, 23);
+            button1.TabIndex = 16;
+            button1.Text = "Set Default";
+            button1.UseVisualStyleBackColor = true;
+            // 
             // DesignForm
             // 
             ClientSize = new Size(1085, 655);
+            Controls.Add(button1);
             Controls.Add(btnEditHarmonicTimeline);
             Controls.Add(txtDesignSpace);
             Controls.Add(btnNew);
@@ -145,7 +155,6 @@ namespace Music
             Controls.Add(textBox2);
             Controls.Add(label1);
             Controls.Add(textBox1);
-            Controls.Add(btnAddChords);
             Controls.Add(btnSelectVoices);
             Controls.Add(lblFilepath);
             Controls.Add(btnSave);
@@ -169,5 +178,6 @@ namespace Music
         private Button btnNew;
         private TextBox txtDesignSpace;
         private Button btnEditHarmonicTimeline;
+        private Button button1;
     }
 }
