@@ -85,28 +85,6 @@ namespace Music
             }
         }
 
-        /* All code for adding default - keep for now
-         * if (!EnsureScoreDesignOrNotify()) return;
-            Globals.ScoreDesign!.VoiceSet.AddDefaultVoices();
-            RefreshDesignSpaceIfReady();
-        */
-
-        // Populate chords without touching the UI textboxes
-        //private void btnAddChords_Click(object sender, EventArgs e)
-        //{
-        //    if (!EnsureScoreDesignOrNotify()) return;
-        //    Globals.ScoreDesign!.ChordSet.AddDefaultChords();
-        //    RefreshDesignSpaceIfReady();
-        //}
-
-        private void btnCreateMusic_Click(object sender, EventArgs e)
-        {
-        }
-
-        private void btnSave_Click(object sender, EventArgs e)
-        {
-        }
-
         private void btnEditHarmonicTimeline_Click(object sender, EventArgs e)
         {
             if (!EnsureScoreDesignOrNotify()) return;
@@ -196,6 +174,14 @@ namespace Music
             // Reflect defaults in the UI and combined design-space summary
             UpdateUiFromTimeline(design.HarmonicTimeline);
             RefreshDesignSpaceIfReady();
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
         }
     }
 }
