@@ -251,5 +251,10 @@ namespace Music
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void btnEditTimeSignature_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
