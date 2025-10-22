@@ -25,14 +25,17 @@ namespace Music
 
         private void MusicForm_Load(object sender, EventArgs e)
         {
+            // Ensure we have a design object; create one if needed.
+            Globals.ScoreDesign ??= new ScoreDesignClass();
+
+            // Populate UI from current globals.
+            PopulateFormFromGlobals();
         }
 
         private void btnNew_Click(object sender, EventArgs e)
         {
-            Globals.ScoreDesign = new ScoreDesignClass();
-            // Clear any previously created harmonic timeline for a fresh design
-            Globals.HarmonicTimeline = null;
-            RefreshDesignSpaceIfReady();
+            // Clear all design elements and UI.
+            ClearDesignAndForm();
         }
 
         // Launch the Section Editor and apply results back to the design
@@ -112,6 +115,10 @@ namespace Music
         {
             var timeline = HarmonicDefault.BuildDefaultTimeline();
             Globals.HarmonicTimeline = timeline;
+
+            // Reflect meter/tempo in UI when a timeline is created/edited
+            UpdateUiFromTimeline(timeline);
+
             RefreshDesignSpaceIfReady();
         }
 
@@ -133,6 +140,46 @@ namespace Music
         {
             if (Globals.ScoreDesign == null) return;
             txtDesignSpace.Text = DesignTextHelper.BuildCombinedText(Globals.ScoreDesign);
+        }
+
+        private void PopulateFormFromGlobals()
+        {
+            // Combined design-space summary
+            RefreshDesignSpaceIfReady();
+
+            // Meter/tempo from the harmonic timeline (if any)
+            var timeline = Globals.HarmonicTimeline;
+            if (timeline != null)
+            {
+                UpdateUiFromTimeline(timeline);
+            }
+            else
+            {
+                // no timeline -> leave designer defaults as-is
+            }
+        }
+
+        private void UpdateUiFromTimeline(HarmonicTimeline timeline)
+        {
+            // We only track beats-per-bar; default denominator to 4 in UI
+            textBox1.Text = $"{timeline.BeatsPerBar}/4";
+            textBox2.Text = timeline.TempoBpm.ToString();
+        }
+
+        private void ClearDesignAndForm()
+        {
+            // Reset the score design (new instance is fine to ensure clean state)
+            Globals.ScoreDesign = new ScoreDesignClass();
+
+            // Clear global timeline and related UI
+            Globals.HarmonicTimeline = null;
+
+            // Clear UI fields for meter/tempo
+            textBox1.Clear(); // time signature
+            textBox2.Clear(); // tempo
+
+            // Repopulate the design area headings with no data
+            RefreshDesignSpaceIfReady();
         }
     }
 }
