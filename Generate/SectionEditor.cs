@@ -30,6 +30,9 @@ namespace Music.Generate
         // Drag-and-drop support
         private ListViewItem? _dragItem;
 
+        // Prevent programmatic editor changes from writing back into the model
+        private bool _suppressEditorApply;
+
         public SectionSetClass ResultSections { get; private set; } = new SectionSetClass();
 
         public SectionEditor(SectionSetClass? initial = null)
@@ -324,23 +327,33 @@ namespace Music.Generate
                 return;
             }
 
-            // Populate from selection
+            // Populate from selection WITHOUT writing back to the model
             var s = _lv.SelectedItems[0].Tag as SectionClass;
             if (s == null) return;
 
-            var names = Enum.GetNames(typeof(DesignEnums.eSectionType));
-            int idxType = Array.IndexOf(names, s.SectionType.ToString());
-            _cbType.SelectedIndex = Math.Max(0, idxType);
+            _suppressEditorApply = true;
+            try
+            {
+                var names = Enum.GetNames(typeof(DesignEnums.eSectionType));
+                int idxType = Array.IndexOf(names, s.SectionType.ToString());
+                _cbType.SelectedIndex = Math.Max(0, idxType);
 
-            _numBars.Value = Math.Max(1, Math.Min((int)_numBars.Maximum, s.BarCount));
-            _txtName.Text = s.Name ?? string.Empty;
-            _lblStart.Text = s.StartBar.ToString();
+                _numBars.Value = Math.Max(1, Math.Min((int)_numBars.Maximum, s.BarCount));
+                _txtName.Text = s.Name ?? string.Empty;
+                _lblStart.Text = s.StartBar.ToString();
+            }
+            finally
+            {
+                _suppressEditorApply = false;
+            }
 
             UpdateButtonsEnabled();
         }
 
         private void ApplyEditorToSelected()
         {
+            if (_suppressEditorApply) return;
+
             if (_lv.SelectedIndices.Count == 0)
             {
                 // No selection: just recompute Start preview and button states
@@ -350,12 +363,14 @@ namespace Music.Generate
             }
 
             var s = (SectionClass)_lv.SelectedItems[0].Tag!;
+
             if (_cbType.SelectedIndex >= 0)
             {
                 var selectedName = (string)_cbType.SelectedItem!;
                 if (Enum.TryParse<DesignEnums.eSectionType>(selectedName, out var et))
                     s.SectionType = et;
             }
+
             s.BarCount = (int)_numBars.Value;
             s.Name = string.IsNullOrWhiteSpace(_txtName.Text) ? null : _txtName.Text.Trim();
 
@@ -415,10 +430,20 @@ namespace Music.Generate
         {
             // Clear selection and reset editor inputs to defaults for rapid add workflow
             _lv.SelectedIndices.Clear();
-            _cbType.SelectedIndex = -1;
-            _numBars.Value = Math.Max(_numBars.Minimum, Math.Min(_numBars.Maximum, 4));
-            _txtName.Clear();
-            _lblStart.Text = PreviewStartForIndex(_working.Count).ToString();
+
+            _suppressEditorApply = true;
+            try
+            {
+                _cbType.SelectedIndex = -1;
+                _numBars.Value = Math.Max(_numBars.Minimum, Math.Min(_numBars.Maximum, 4));
+                _txtName.Clear();
+                _lblStart.Text = PreviewStartForIndex(_working.Count).ToString();
+            }
+            finally
+            {
+                _suppressEditorApply = false;
+            }
+
             UpdateButtonsEnabled();
         }
 
