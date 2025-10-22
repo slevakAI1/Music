@@ -25,20 +25,20 @@ namespace Music.Design
         /// <summary>
         /// Build the standard top-level structure on the provided SectionsClass and return a printable summary.
         /// Structure: Intro → Verse → Chorus → Verse → Chorus → Bridge → Chorus → Outro
-        /// Measures per section: Intro=4, Verse/Chorus/Bridge=8, Outro=4
+        /// Measures per section (total 48 bars): Intro=4, Verse/Chorus=8, Bridge=4, final Chorus=4, Outro=4
         /// </summary>
         public void CreateTestSections(SectionSetClass sections)
         {
             sections.Reset();
 
-            // Explicit bar counts for clarity
+            // Durations sum to 48 bars to align with default timelines
             sections.Add(MusicEnums.eSectionType.Intro, 4);
             sections.Add(MusicEnums.eSectionType.Verse, 8);
             sections.Add(MusicEnums.eSectionType.Chorus, 8);
             sections.Add(MusicEnums.eSectionType.Verse, 8);
             sections.Add(MusicEnums.eSectionType.Chorus, 8);
-            sections.Add(MusicEnums.eSectionType.Bridge, 8);
-            sections.Add(MusicEnums.eSectionType.Chorus, 8);
+            sections.Add(MusicEnums.eSectionType.Bridge, 4);
+            sections.Add(MusicEnums.eSectionType.Chorus, 4);
             sections.Add(MusicEnums.eSectionType.Outro, 4);
         }
     }

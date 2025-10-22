@@ -1,23 +1,27 @@
 namespace Music.Design
 {
-    // Builds the app's default harmonic timeline (8 events).
+    // Builds the app's default harmonic timeline (48 bars).
     public static class HarmonicDefault
     {
         public static HarmonicTimeline BuildDefaultTimeline()
         {
             var timeline = new HarmonicTimeline();
-            timeline.ConfigureGlobal("4/4");
+            timeline.ConfigureGlobal(DesignDefaults.GlobalTimeSignature);
 
-            // Provided 4-event pattern, repeated to total 8 events.
-            Add(timeline, bar: 1, key: "C major", degree: 1, quality: "maj");
-            Add(timeline, bar: 2, key: "C major", degree: 5, quality: "dom7");
-            Add(timeline, bar: 3, key: "C major", degree: 6, quality: "min7");
-            Add(timeline, bar: 4, key: "C major", degree: 4, quality: "maj");
+            // Common 4-chord loop: I – V – vi – IV, one chord per bar across 48 bars.
+            var pattern = new (int degree, string quality)[]
+            {
+                (1, "maj"),
+                (5, "dom7"),
+                (6, "min7"),
+                (4, "maj")
+            };
 
-            Add(timeline, bar: 5, key: "C major", degree: 1, quality: "maj");
-            Add(timeline, bar: 6, key: "C major", degree: 5, quality: "dom7");
-            Add(timeline, bar: 7, key: "C major", degree: 6, quality: "min7");
-            Add(timeline, bar: 8, key: "C major", degree: 4, quality: "maj");
+            for (int bar = 1; bar <= DesignDefaults.TotalBars; bar++)
+            {
+                var p = pattern[(bar - 1) % pattern.Length];
+                Add(timeline, bar, key: "C major", degree: p.degree, quality: p.quality);
+            }
 
             return timeline;
         }

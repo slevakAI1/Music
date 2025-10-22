@@ -8,13 +8,13 @@ namespace Music.Design
         public static TempoTimeline BuildDefaultTimeline()
         {
             var timeline = new TempoTimeline();
-            // One event at 90 BPM covering 8 bars (default design length); adjust as needed.
+            // Single event covering the entire song length
             timeline.Add(new TempoEvent
             {
                 StartBar = 1,
                 StartBeat = 1,
-                TempoBpm = 90,
-                DurationBeats = 8 * timeline.BeatsPerBar
+                TempoBpm = DesignDefaults.DefaultTempoBpm,
+                DurationBeats = DesignDefaults.TotalBars * timeline.BeatsPerBar
             });
             return timeline;
         }
