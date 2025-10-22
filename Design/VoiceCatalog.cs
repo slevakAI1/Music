@@ -38,7 +38,6 @@ namespace Music.Design
             string? foundPath = null;
             string lastError = "unknown error";
 
-            // Only the single valid input file (keep probe behavior but with a single candidate).
             const string fileName = "Voices.Notion.json";
 
             // Probe 1: exact path in base directory
@@ -58,7 +57,7 @@ namespace Music.Design
                 }
             }
 
-            // Probe 3: Design subfolder under base (new location)
+            // Probe 3: Design subfolder under base (canonical source location)
             if (foundPath == null)
             {
                 var pDesign = Path.Combine(baseDir, "Design", fileName);
@@ -66,16 +65,8 @@ namespace Music.Design
                 if (File.Exists(pDesign)) foundPath = pDesign;
             }
 
-            // Probe 4: Generate subfolder under base (legacy location)
-            if (foundPath == null)
-            {
-                var p2 = Path.Combine(baseDir, "Generate", fileName);
-                probed.Add(p2);
-                if (File.Exists(p2)) foundPath = p2;
-            }
-
-            // Probe 5: walk up parents (dev-time run) and look for Design/Voices.Notion.json,
-            //          Generate/Voices.Notion.json, and the file itself
+            // Probe 4: walk up parents (dev-time run) and look for Design/Voices.Notion.json,
+            //          and the file itself in the parent roots
             if (foundPath == null)
             {
                 var current = new DirectoryInfo(baseDir);
@@ -87,10 +78,6 @@ namespace Music.Design
                     var candidateDesign = Path.Combine(current.FullName, "Design", fileName);
                     probed.Add(candidateDesign);
                     if (File.Exists(candidateDesign)) { foundPath = candidateDesign; break; }
-
-                    var candidateGenerate = Path.Combine(current.FullName, "Generate", fileName);
-                    probed.Add(candidateGenerate);
-                    if (File.Exists(candidateGenerate)) { foundPath = candidateGenerate; break; }
 
                     var candidateRoot = Path.Combine(current.FullName, fileName);
                     probed.Add(candidateRoot);
