@@ -111,13 +111,14 @@ namespace Music
         {
             if (!EnsureScoreDesignOrNotify()) return;
 
-            var timeline = HarmonicDefault.BuildDefaultTimeline();
-            Globals.ScoreDesign!.HarmonicTimeline = timeline;
-
-            // Reflect meter/tempo in UI when a timeline is created/edited
-            UpdateUiFromTimeline(timeline);
-
-            RefreshDesignSpaceIfReady();
+            var existing = Globals.ScoreDesign!.HarmonicTimeline;
+            using var dlg = new HarmonicEditorForm(existing);
+            if (dlg.ShowDialog(this) == DialogResult.OK)
+            {
+                Globals.ScoreDesign!.HarmonicTimeline = dlg.ResultTimeline;
+                UpdateUiFromTimeline(dlg.ResultTimeline);
+                RefreshDesignSpaceIfReady();
+            }
         }
 
         // --------- Helpers ---------
