@@ -2,7 +2,7 @@ using System.Windows.Forms;
 
 namespace Music
 {
-    public partial class ScoreDesignForm
+    public partial class DesignForm
     {
         private void InitializeComponent()
         {

@@ -2,6 +2,6 @@ namespace Music.Design
 {
     public static class Globals
     {
-        public static ScoreDesignClass? ScoreDesign { get; set; }
+        public static DesignClass? ScoreDesign { get; set; }
     }
 }

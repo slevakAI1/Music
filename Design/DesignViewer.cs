@@ -2,10 +2,10 @@ using System.Text;
 
 namespace Music.Design
 {
-    public static class DesignTextHelper
+    public static class DesignViewer
     {
         // Builds: VOICES + 2 newlines + SECTIONS + 2 newlines + HARMONIC TIMELINE
-        public static string BuildCombinedText(ScoreDesignClass design)
+        public static string BuildCombinedText(DesignClass design)
         {
             var sb = new StringBuilder();
 

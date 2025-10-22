@@ -2,9 +2,9 @@ using Music.Design;
 
 namespace Music
 {
-    public partial class ScoreDesignForm : Form
+    public partial class DesignForm : Form
     {
-        public ScoreDesignForm()
+        public DesignForm()
         {
             this.Text = "Music";
             this.FormBorderStyle = FormBorderStyle.Sizable;
@@ -25,7 +25,7 @@ namespace Music
 
         private void MusicForm_Load(object sender, EventArgs e)
         {
-            Globals.ScoreDesign ??= new ScoreDesignClass();
+            Globals.ScoreDesign ??= new DesignClass();
             PopulateFormFromGlobals();
         }
 
@@ -138,7 +138,7 @@ namespace Music
         private void RefreshDesignSpaceIfReady()
         {
             if (Globals.ScoreDesign == null) return;
-            txtDesignSpace.Text = DesignTextHelper.BuildCombinedText(Globals.ScoreDesign);
+            txtDesignSpace.Text = DesignViewer.BuildCombinedText(Globals.ScoreDesign);
         }
 
         private void PopulateFormFromGlobals()
@@ -168,7 +168,7 @@ namespace Music
         private void ClearDesignAndForm()
         {
             // Reset the score design (new instance is fine to ensure clean state)
-            Globals.ScoreDesign = new ScoreDesignClass();
+            Globals.ScoreDesign = new DesignClass();
 
             // Clear UI fields for meter/tempo
             textBox1.Clear(); // time signature

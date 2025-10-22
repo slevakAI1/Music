@@ -3,7 +3,7 @@
     /// <summary>
     /// Design structure for a musical score
     /// </summary>
-    public sealed class ScoreDesignClass
+    public sealed class DesignClass
     {
         public string DesignId { get; }
 
@@ -15,7 +15,7 @@
         // Harmonic timeline persisted with the design
         public HarmonicTimeline? HarmonicTimeline { get; set; }
 
-        public ScoreDesignClass(string? designId = null)
+        public DesignClass(string? designId = null)
         {
             DesignId = designId ?? Guid.NewGuid().ToString("N");
         }
