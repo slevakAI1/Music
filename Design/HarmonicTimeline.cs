@@ -1,15 +1,16 @@
+using System.Text.Json.Serialization;
+
 namespace Music.Design
 {
     // Global bar/beat-aligned harmony timeline
     public class HarmonicTimeline
     {
-        private readonly List<HarmonicEvent> _events = new();
         private readonly Dictionary<int, HarmonicEvent> _barHeads = new(); // bar -> event active at beat 1
 
-        public int BeatsPerBar { get; private set; } = 4;
-        public int TempoBpm { get; private set; } = 96;
+        public int BeatsPerBar { get; set; } = 4;
+        public int TempoBpm { get; set; } = 96;
 
-        public IReadOnlyList<HarmonicEvent> Events => _events;
+        public List<HarmonicEvent> Events { get; set; } = new();
 
         public void ConfigureGlobal(string meter, int tempoBpm)
         {
@@ -28,13 +29,13 @@ namespace Music.Design
 
         public void Reset()
         {
-            _events.Clear();
+            Events.Clear();
             _barHeads.Clear();
         }
 
         public void Add(HarmonicEvent evt)
         {
-            _events.Add(evt);
+            Events.Add(evt);
             IndexEventForBars(evt);
         }
 
@@ -48,7 +49,7 @@ namespace Music.Design
             }
 
             // Fallback scan (also memoizes)
-            foreach (var he in _events)
+            foreach (var he in Events)
             {
                 if (he.Contains(bar, 1, BeatsPerBar))
                 {
@@ -84,8 +85,13 @@ namespace Music.Design
         private void Reindex()
         {
             _barHeads.Clear();
-            foreach (var he in _events)
+            foreach (var he in Events)
                 IndexEventForBars(he);
+        }
+
+        public void EnsureIndexed()
+        {
+            Reindex();
         }
     }
 }

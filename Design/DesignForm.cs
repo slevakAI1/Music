@@ -209,6 +209,47 @@ namespace Music
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
+            try
+            {
+                var baseDir = AppContext.BaseDirectory;
+                var projectRoot = System.IO.Path.GetFullPath(System.IO.Path.Combine(baseDir, "..", "..", ".."));
+                var defaultDir = System.IO.Path.Combine(projectRoot, "Design", "Designs");
+
+                using var ofd = new OpenFileDialog
+                {
+                    Filter = "Design Files (*.json)|*.json|All Files (*.*)|*.*",
+                    Title = "Open Design",
+                    InitialDirectory = defaultDir,
+                    RestoreDirectory = true
+                };
+
+                if (ofd.ShowDialog(this) != DialogResult.OK) return;
+
+                var json = System.IO.File.ReadAllText(ofd.FileName);
+
+                // Robust manual deserialization to rebuild computed fields
+                var loaded = DesignSerialization.DeserializeDesign(json);
+
+                Globals.ScoreDesign = loaded;
+
+                if (loaded.HarmonicTimeline != null)
+                    UpdateUiFromTimeline(loaded.HarmonicTimeline);
+                else
+                {
+                    textBox1.Clear();
+                    textBox2.Clear();
+                }
+
+                RefreshDesignSpaceIfReady();
+
+                MessageBox.Show(this, $"Design loaded from:\n{ofd.FileName}", "Loaded",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, $"Failed to load design.\n{ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

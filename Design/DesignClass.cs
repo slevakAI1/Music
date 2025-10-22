@@ -8,9 +8,9 @@
         public string DesignId { get; }
 
         // Design Space
-        public VoiceSetClass VoiceSet { get; } = new();
+        public VoiceSetClass VoiceSet { get; set; } = new();
 
-        public SectionSetClass SectionSet { get; } = new();
+        public SectionSetClass SectionSet { get; set; } = new();
 
         // Harmonic timeline persisted with the design
         public HarmonicTimeline? HarmonicTimeline { get; set; }

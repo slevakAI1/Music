@@ -3,10 +3,9 @@ namespace Music.Design
     // Holds the collection of voices used by the score
     public sealed class VoiceSetClass
     {
-        public readonly List<VoiceClass> _voices = new();
-        public IReadOnlyList<VoiceClass> Voices => _voices;
+        public List<VoiceClass> Voices { get; set; } = new();
 
-        public void Reset() => _voices.Clear();
+        public void Reset() => Voices.Clear();
 
         public void AddVoice(string voiceName)
         {
@@ -14,7 +13,7 @@ namespace Music.Design
                 throw new ArgumentException("Voice name must not be null or empty.", nameof(voiceName));
 
             var voice = new VoiceClass { VoiceName = voiceName };
-            _voices.Add(voice);
+            Voices.Add(voice);
         }
 
         public IReadOnlyList<VoiceClass> AddDefaultVoices()

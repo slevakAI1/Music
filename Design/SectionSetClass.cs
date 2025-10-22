@@ -3,14 +3,13 @@ namespace Music.Design
     // Score Sections
     public class SectionSetClass
     {
-        public List<SectionClass> _sections = new();
-        public IReadOnlyList<SectionClass> Sections => _sections;
+        public List<SectionClass> Sections { get; set; } = new();
 
         private int _nextBar = 1;
 
         public void Reset()
         {
-            _sections.Clear();
+            Sections.Clear();
             _nextBar = 1;
         }
 
@@ -29,7 +28,7 @@ namespace Music.Design
                 Name = name
             };
 
-            _sections.Add(section);
+            Sections.Add(section);
             _nextBar += section.BarCount;
         }
 
@@ -42,7 +41,7 @@ namespace Music.Design
             if (bar < 1) return null;
             // Sections are appended in time order, so linear scan is fine.
             // If you expect many sections, consider binary search.
-            foreach (var s in _sections)
+            foreach (var s in Sections)
             {
                 if (s.ContainsBar(bar))
                     return s;
@@ -54,9 +53,9 @@ namespace Music.Design
         public void RecalculateStarts()
         {
             _nextBar = 1;
-            for (int i = 0; i < _sections.Count; i++)
+            for (int i = 0; i < Sections.Count; i++)
             {
-                var s = _sections[i];
+                var s = Sections[i];
                 s.StartBar = _nextBar;
                 _nextBar += s.BarCount > 0 ? s.BarCount : 1;
             }
