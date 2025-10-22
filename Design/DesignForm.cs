@@ -177,5 +177,25 @@ namespace Music
             // Repopulate the design area headings with no data
             RefreshDesignSpaceIfReady();
         }
+
+        private void btnSetDefault_Click(object sender, EventArgs e)
+        {
+            // Ensure we have a design to work with
+            var design = Globals.ScoreDesign ??= new DesignClass();
+
+            // 1) Sections: apply default/test structure
+            var sectionsHelper = new SectionDefaultsClass();
+            sectionsHelper.CreateTestSections(design.SectionSet);
+
+            // 2) Voices: apply default voices
+            design.VoiceSet.AddDefaultVoices();
+
+            // 3) Harmonic timeline: use the same defaults as the Harmonic Editor's "Set Defaults"
+            design.HarmonicTimeline = HarmonicDefault.BuildDefaultTimeline();
+
+            // Reflect defaults in the UI and combined design-space summary
+            UpdateUiFromTimeline(design.HarmonicTimeline);
+            RefreshDesignSpaceIfReady();
+        }
     }
 }
