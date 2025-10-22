@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Linq;
 
-namespace Music.Generate
+namespace Music.Design
 {
     // Loads voices from a Notion-style JSON file and exposes them grouped by category.
     // Supports a few flexible JSON shapes:

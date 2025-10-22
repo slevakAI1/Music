@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Music.Generate
+namespace Music.Design
 {
     /// <summary>
     /// Minimal, score-wide structure (top-level only). No voice/staff/part targeting.

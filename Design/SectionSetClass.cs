@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Music.Generate
+namespace Music.Design
 {
     // Score Sections
     public class SectionSetClass

@@ -9,6 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Design\MusicXmlFiles\**" />
+    <EmbeddedResource Remove="Design\MusicXmlFiles\**" />
+    <None Remove="Design\MusicXmlFiles\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DiffPlex" Version="1.9.0" />
     <PackageReference Include="Melanchall.DryWetMidi" Version="8.0.2" />
     <PackageReference Include="MusicTheory" Version="1.4.0" />
@@ -30,13 +36,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Generate\MusicXmlFiles\" />
+    <Folder Include="Generate\" />
     <Folder Include="Tests\InputSamples\" />
     <Folder Include="Tests\OutputSamples\" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Generate\Voices.Notion.json">
+    <None Update="Design\Voices.Notion.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

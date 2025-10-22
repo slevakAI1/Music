@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Music.Generate
+namespace Music.Design
 {
     public static class DesignTextHelper
     {

@@ -4,10 +4,10 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Music.Generate
+namespace Music.Design
 {
     // Popup editor for arranging Sections: view, add, edit, delete, and drag-reorder.
-    public sealed class SectionEditor : Form
+    public sealed class SectionEditorForm : Form
     {
         private readonly ListView _lv;
         private readonly Button _btnAdd;
@@ -35,7 +35,7 @@ namespace Music.Generate
 
         public SectionSetClass ResultSections { get; private set; } = new SectionSetClass();
 
-        public SectionEditor(SectionSetClass? initial = null)
+        public SectionEditorForm(SectionSetClass? initial = null)
         {
             Text = "Edit Sections";
             FormBorderStyle = FormBorderStyle.FixedDialog;

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace Music.Generate
+namespace Music.Design
 {
     public sealed class SectionSetManagerClass
     {

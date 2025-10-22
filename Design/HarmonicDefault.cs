@@ -1,4 +1,4 @@
-namespace Music.Generate
+namespace Music.Design
 {
     // Builds the app's default harmonic timeline (8 events).
     public static class HarmonicDefault

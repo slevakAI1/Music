@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Music.Generate
+namespace Music.Design
 {
     public class SectionClass
     {

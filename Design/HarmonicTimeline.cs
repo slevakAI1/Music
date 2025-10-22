@@ -1,4 +1,4 @@
-namespace Music.Generate
+namespace Music.Design
 {
     // Global bar/beat-aligned harmony timeline
     public class HarmonicTimeline

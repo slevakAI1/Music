@@ -1,7 +1,7 @@
-namespace Music.Generate
+namespace Music.Design
 {
     // Multi-select voice picker powered by a Notion JSON voice catalog.
-    public sealed class VoiceSelector : Form
+    public sealed class VoiceSelectorForm : Form
     {
         private readonly ListBox _lstCategories;
         private readonly CheckedListBox _clbVoices;
@@ -18,7 +18,7 @@ namespace Music.Generate
 
         public List<string> SelectedVoices { get; } = new();
 
-        public VoiceSelector()
+        public VoiceSelectorForm()
         {
             Text = "Select Voices";
 

@@ -1,4 +1,4 @@
-namespace Music.Generate
+namespace Music.Design
 {
     // Central holder for public enums used across the design domain
     public static class DesignEnums

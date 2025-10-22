@@ -1,4 +1,4 @@
-using Music.Generate;
+using Music.Design;
 
 namespace Music
 {
@@ -40,7 +40,7 @@ namespace Music
         {
             if (!EnsureScoreDesignOrNotify()) return;
 
-            using var dlg = new SectionEditor(Globals.ScoreDesign!.Sections);
+            using var dlg = new SectionEditorForm(Globals.ScoreDesign!.Sections);
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 // Copy back into the existing Sections instance to preserve references
@@ -66,7 +66,7 @@ namespace Music
         {
             if (!EnsureScoreDesignOrNotify()) return;
 
-            using var dlg = new VoiceSelector();
+            using var dlg = new VoiceSelectorForm();
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 var score = Globals.ScoreDesign!;

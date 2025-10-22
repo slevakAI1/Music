@@ -1,4 +1,9 @@
-namespace Music.Generate
+
+
+// THIS NEEDS WORK  ... everything should be in design except actual generation
+
+
+namespace Music.Design
 {
     public static class Globals
     {
@@ -6,8 +11,6 @@ namespace Music.Generate
 
         // Holds the app/session harmonic timeline
         public static HarmonicTimeline? HarmonicTimeline { get; set; }
-
-        public static readonly VoiceManagerClass VoiceManager = new();
         public static readonly ChordManagerClass ChordManager = new();
         public static readonly SectionSetManagerClass SectionManager = new();
     }

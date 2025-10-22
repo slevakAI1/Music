@@ -1,4 +1,4 @@
-namespace Music.Generate
+namespace Music.Design
 {
     // Holds the collection of chords (MusicXML harmony-compatible)
     public sealed class ChordSetClass

@@ -1,4 +1,4 @@
-namespace Music.Generate
+namespace Music.Design
 {
     // Holds the collection of voices used by the score
     public sealed class VoiceSetClass
