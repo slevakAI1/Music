@@ -2,9 +2,9 @@ using Music.Design;
 
 namespace Music
 {
-    public partial class GenerateForm : Form
+    public partial class DesignForm : Form
     {
-        public GenerateForm()
+        public DesignForm()
         {
             this.Text = "Music";
             this.FormBorderStyle = FormBorderStyle.Sizable;
@@ -27,7 +27,7 @@ namespace Music
         {
         }
 
-        private void btnNewScore_Click(object sender, EventArgs e)
+        private void btnNew_Click(object sender, EventArgs e)
         {
             Globals.ScoreDesign = new ScoreDesignClass();
             // Clear any previously created harmonic timeline for a fresh design
@@ -36,7 +36,7 @@ namespace Music
         }
 
         // Launch the Section Editor and apply results back to the design
-        private void btnCreateSections_Click(object sender, EventArgs e)
+        private void btnEditSections_Click(object sender, EventArgs e)
         {
             if (!EnsureScoreDesignOrNotify()) return;
 
@@ -62,7 +62,7 @@ namespace Music
          */
 
         // Populate voices via popup selector
-        private void btnAddVoices_Click(object sender, EventArgs e)
+        private void btnSelectVoices_Click(object sender, EventArgs e)
         {
             if (!EnsureScoreDesignOrNotify()) return;
 
@@ -108,7 +108,7 @@ namespace Music
         {
         }
 
-        private void btnAddHarmonicTimeline_Click(object sender, EventArgs e)
+        private void btnEditHarmonicTimeline_Click(object sender, EventArgs e)
         {
             var timeline = HarmonicDefault.BuildDefaultTimeline();
             Globals.HarmonicTimeline = timeline;

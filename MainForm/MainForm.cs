@@ -13,7 +13,7 @@ namespace Music
             _fileManager = new FileManager(ShowStatus);
 
             // Show MusicForm on startup, filling the MDI parent
-            ShowChildForm(typeof(GenerateForm));
+            ShowChildForm(typeof(DesignForm));
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -59,7 +59,7 @@ namespace Music
 
         private void MenuGenerateForm_Click(object sender, EventArgs e)
         {
-            ShowChildForm(typeof(GenerateForm));
+            ShowChildForm(typeof(DesignForm));
         }
 
         private void MenuTestForm_Click(object sender, EventArgs e)

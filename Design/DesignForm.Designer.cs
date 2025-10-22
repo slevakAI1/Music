@@ -2,34 +2,34 @@ using System.Windows.Forms;
 
 namespace Music
 {
-    public partial class GenerateForm
+    public partial class DesignForm
     {
         private void InitializeComponent()
         {
-            btnAddSections = new Button();
+            btnEditSections = new Button();
             btnSave = new Button();
             lblFilepath = new Label();
-            btnAddVoices = new Button();
+            btnSelectVoices = new Button();
             btnAddChords = new Button();
             textBox1 = new TextBox();
             label1 = new Label();
             label2 = new Label();
             textBox2 = new TextBox();
             btnCreateScore = new Button();
-            btnNewDesign = new Button();
+            btnNew = new Button();
             txtDesignSpace = new TextBox();
-            btnAddHarmonicTimeline = new Button();
+            btnEditHarmonicTimeline = new Button();
             SuspendLayout();
             // 
-            // btnAddSections
+            // btnEditSections
             // 
-            btnAddSections.Location = new Point(28, 94);
-            btnAddSections.Name = "btnAddSections";
-            btnAddSections.Size = new Size(151, 23);
-            btnAddSections.TabIndex = 0;
-            btnAddSections.Text = "Add Sections";
-            btnAddSections.UseVisualStyleBackColor = true;
-            btnAddSections.Click += btnCreateSections_Click;
+            btnEditSections.Location = new Point(28, 94);
+            btnEditSections.Name = "btnEditSections";
+            btnEditSections.Size = new Size(151, 23);
+            btnEditSections.TabIndex = 0;
+            btnEditSections.Text = "Edit Sections";
+            btnEditSections.UseVisualStyleBackColor = true;
+            btnEditSections.Click += btnEditSections_Click;
             // 
             // btnSave
             // 
@@ -50,15 +50,15 @@ namespace Music
             lblFilepath.TabIndex = 3;
             lblFilepath.Text = "filepath";
             // 
-            // btnAddVoices
+            // btnSelectVoices
             // 
-            btnAddVoices.Location = new Point(28, 61);
-            btnAddVoices.Name = "btnAddVoices";
-            btnAddVoices.Size = new Size(151, 23);
-            btnAddVoices.TabIndex = 4;
-            btnAddVoices.Text = "Add Voices";
-            btnAddVoices.UseVisualStyleBackColor = true;
-            btnAddVoices.Click += btnAddVoices_Click;
+            btnSelectVoices.Location = new Point(28, 61);
+            btnSelectVoices.Name = "btnSelectVoices";
+            btnSelectVoices.Size = new Size(151, 23);
+            btnSelectVoices.TabIndex = 4;
+            btnSelectVoices.Text = "Select Voices";
+            btnSelectVoices.UseVisualStyleBackColor = true;
+            btnSelectVoices.Click += btnSelectVoices_Click;
             // 
             // btnAddChords
             // 
@@ -116,15 +116,15 @@ namespace Music
             btnCreateScore.UseVisualStyleBackColor = false;
             btnCreateScore.Click += btnCreateMusic_Click;
             // 
-            // btnNewDesign
+            // btnNew
             // 
-            btnNewDesign.Location = new Point(28, 32);
-            btnNewDesign.Name = "btnNewDesign";
-            btnNewDesign.Size = new Size(151, 23);
-            btnNewDesign.TabIndex = 13;
-            btnNewDesign.Text = "New Design";
-            btnNewDesign.UseVisualStyleBackColor = true;
-            btnNewDesign.Click += btnNewScore_Click;
+            btnNew.Location = new Point(28, 32);
+            btnNew.Name = "btnNew";
+            btnNew.Size = new Size(151, 23);
+            btnNew.TabIndex = 13;
+            btnNew.Text = "New";
+            btnNew.UseVisualStyleBackColor = true;
+            btnNew.Click += btnNew_Click;
             // 
             // txtDesignSpace
             // 
@@ -135,50 +135,50 @@ namespace Music
             txtDesignSpace.Size = new Size(775, 631);
             txtDesignSpace.TabIndex = 14;
             // 
-            // btnAddHarmonicTimeline
+            // btnEditHarmonicTimeline
             // 
-            btnAddHarmonicTimeline.Location = new Point(28, 128);
-            btnAddHarmonicTimeline.Name = "btnAddHarmonicTimeline";
-            btnAddHarmonicTimeline.Size = new Size(151, 23);
-            btnAddHarmonicTimeline.TabIndex = 15;
-            btnAddHarmonicTimeline.Text = "Add Harmonic Timeline";
-            btnAddHarmonicTimeline.UseVisualStyleBackColor = true;
-            btnAddHarmonicTimeline.Click += btnAddHarmonicTimeline_Click;
+            btnEditHarmonicTimeline.Location = new Point(28, 128);
+            btnEditHarmonicTimeline.Name = "btnEditHarmonicTimeline";
+            btnEditHarmonicTimeline.Size = new Size(151, 23);
+            btnEditHarmonicTimeline.TabIndex = 15;
+            btnEditHarmonicTimeline.Text = "Edit Harmonic Timeline";
+            btnEditHarmonicTimeline.UseVisualStyleBackColor = true;
+            btnEditHarmonicTimeline.Click += btnEditHarmonicTimeline_Click;
             // 
-            // GenerateForm
+            // DesignForm
             // 
             ClientSize = new Size(1085, 655);
-            Controls.Add(btnAddHarmonicTimeline);
+            Controls.Add(btnEditHarmonicTimeline);
             Controls.Add(txtDesignSpace);
-            Controls.Add(btnNewDesign);
+            Controls.Add(btnNew);
             Controls.Add(btnCreateScore);
             Controls.Add(label2);
             Controls.Add(textBox2);
             Controls.Add(label1);
             Controls.Add(textBox1);
             Controls.Add(btnAddChords);
-            Controls.Add(btnAddVoices);
+            Controls.Add(btnSelectVoices);
             Controls.Add(lblFilepath);
             Controls.Add(btnSave);
-            Controls.Add(btnAddSections);
-            Name = "GenerateForm";
+            Controls.Add(btnEditSections);
+            Name = "DesignForm";
             WindowState = FormWindowState.Maximized;
             Load += MusicForm_Load;
             ResumeLayout(false);
             PerformLayout();
         }
-        private Button btnAddSections;
+        private Button btnEditSections;
         private Button btnSave;
         private Label lblFilepath;
-        private Button btnAddVoices;
+        private Button btnSelectVoices;
         private Button btnAddChords;
         private TextBox textBox1;
         private Label label1;
         private Label label2;
         private TextBox textBox2;
         private Button btnCreateScore;
-        private Button btnNewDesign;
+        private Button btnNew;
         private TextBox txtDesignSpace;
-        private Button btnAddHarmonicTimeline;
+        private Button btnEditHarmonicTimeline;
     }
 }
