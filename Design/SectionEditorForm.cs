@@ -16,6 +16,7 @@ namespace Music.Design
         private readonly Button _btnDuplicate;
         private readonly Button _btnUp;
         private readonly Button _btnDown;
+        private readonly Button _btnDefaults;
         private readonly Button _btnOk;
         private readonly Button _btnCancel;
 
@@ -96,7 +97,8 @@ namespace Music.Design
             var rowButtons = new FlowLayoutPanel
             {
                 Dock = DockStyle.Fill,
-                FlowDirection = FlowDirection.LeftToRight
+                FlowDirection = FlowDirection.LeftToRight,
+                WrapContents = false
             };
             left.Controls.Add(rowButtons, 0, 1);
 
@@ -106,6 +108,7 @@ namespace Music.Design
             _btnDuplicate = new Button { Text = "Duplicate", AutoSize = true };
             _btnUp = new Button { Text = "Move Up", AutoSize = true };
             _btnDown = new Button { Text = "Move Down", AutoSize = true };
+            _btnDefaults = new Button { Text = "Set Defaults", AutoSize = true };
 
             _btnAdd.Click += (s, e) => AddSection(afterIndex: _lv.SelectedIndices.Count > 0 ? _lv.SelectedIndices[0] : (_working.Count - 1));
             _btnInsert.Click += (s, e) => InsertSection(atIndex: _lv.SelectedIndices.Count > 0 ? _lv.SelectedIndices[0] : 0);
@@ -113,6 +116,7 @@ namespace Music.Design
             _btnDuplicate.Click += (s, e) => DuplicateSelected();
             _btnUp.Click += (s, e) => MoveSelected(-1);
             _btnDown.Click += (s, e) => MoveSelected(1);
+            _btnDefaults.Click += (s, e) => ApplyDefaultSections();
 
             rowButtons.Controls.AddRange(new Control[] { _btnAdd, _btnInsert, _btnDelete, _btnDuplicate, _btnUp, _btnDown });
 
@@ -202,7 +206,7 @@ namespace Music.Design
 
             _btnOk = new Button { Text = "OK", DialogResult = DialogResult.OK, AutoSize = true };
             _btnCancel = new Button { Text = "Cancel", DialogResult = DialogResult.Cancel, AutoSize = true };
-            bottomButtons.Controls.AddRange(new Control[] { _btnOk, _btnCancel });
+            bottomButtons.Controls.AddRange(new Control[] { _btnOk, _btnCancel, _btnDefaults });
 
             AcceptButton = _btnOk;
             CancelButton = _btnCancel;
@@ -304,6 +308,7 @@ namespace Music.Design
             _btnDuplicate.Enabled = hasSel;
             _btnUp.Enabled = hasSel && idx > 0;
             _btnDown.Enabled = hasSel && idx >= 0 && idx < _working.Count - 1;
+            _btnDefaults.Enabled = true;
         }
 
         private void OnListSelectionChanged(object? sender, EventArgs e)
@@ -590,6 +595,26 @@ namespace Music.Design
             }
             // StartBar is assigned by Add in order; no extra work needed
             return result;
+        }
+
+        private void ApplyDefaultSections()
+        {
+            var defaults = new SectionSetClass();
+            var defBuilder = new SectionDefaultsClass();
+            defBuilder.CreateTestSections(defaults);
+
+            _working.Clear();
+            foreach (var s in defaults.Sections)
+            {
+                _working.Add(new SectionClass
+                {
+                    SectionType = s.SectionType,
+                    BarCount = Math.Max(1, s.BarCount),
+                    Name = s.Name
+                });
+            }
+            RecalculateStartBars();
+            RefreshListView(selectIndex: _working.Count > 0 ? 0 : -1);
         }
 
         // Predict the Start bar if a new section is inserted at index `insertAt`

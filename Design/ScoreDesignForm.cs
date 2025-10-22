@@ -2,9 +2,9 @@ using Music.Design;
 
 namespace Music
 {
-    public partial class DesignForm : Form
+    public partial class ScoreDesignForm : Form
     {
-        public DesignForm()
+        public ScoreDesignForm()
         {
             this.Text = "Music";
             this.FormBorderStyle = FormBorderStyle.Sizable;
