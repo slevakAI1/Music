@@ -117,7 +117,7 @@ namespace Music
         private void RefreshDesignSpaceIfReady()
         {
             if (Globals.ScoreDesign == null) return;
-            txtDesignSpace.Text = DesignViewer.BuildCombinedText(Globals.ScoreDesign);
+            txtDesignView.Text = DesignViewer.BuildCombinedText(Globals.ScoreDesign);
         }
 
         private void PopulateFormFromGlobals()

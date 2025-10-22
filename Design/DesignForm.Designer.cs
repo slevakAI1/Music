@@ -12,7 +12,7 @@ namespace Music
             label2 = new Label();
             textBox2 = new TextBox();
             btnNew = new Button();
-            txtDesignSpace = new TextBox();
+            txtDesignView = new TextBox();
             btnEditHarmonicTimeline = new Button();
             btnSetDefault = new Button();
             btnLoad = new Button();
@@ -52,7 +52,7 @@ namespace Music
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(28, 250);
+            label2.Location = new Point(42, 267);
             label2.Name = "label2";
             label2.Size = new Size(44, 15);
             label2.TabIndex = 11;
@@ -60,7 +60,7 @@ namespace Music
             // 
             // textBox2
             // 
-            textBox2.Location = new Point(135, 247);
+            textBox2.Location = new Point(114, 264);
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(100, 23);
             textBox2.TabIndex = 10;
@@ -76,14 +76,14 @@ namespace Music
             btnNew.UseVisualStyleBackColor = true;
             btnNew.Click += btnNew_Click;
             // 
-            // txtDesignSpace
+            // txtDesignView
             // 
-            txtDesignSpace.Location = new Point(280, 12);
-            txtDesignSpace.Multiline = true;
-            txtDesignSpace.Name = "txtDesignSpace";
-            txtDesignSpace.ScrollBars = ScrollBars.Vertical;
-            txtDesignSpace.Size = new Size(775, 631);
-            txtDesignSpace.TabIndex = 14;
+            txtDesignView.Location = new Point(280, 12);
+            txtDesignView.Multiline = true;
+            txtDesignView.Name = "txtDesignView";
+            txtDesignView.ScrollBars = ScrollBars.Vertical;
+            txtDesignView.Size = new Size(775, 631);
+            txtDesignView.TabIndex = 14;
             // 
             // btnEditHarmonicTimeline
             // 
@@ -132,7 +132,7 @@ namespace Music
             Controls.Add(btnLoad);
             Controls.Add(btnSetDefault);
             Controls.Add(btnEditHarmonicTimeline);
-            Controls.Add(txtDesignSpace);
+            Controls.Add(txtDesignView);
             Controls.Add(btnNew);
             Controls.Add(label2);
             Controls.Add(textBox2);
@@ -152,7 +152,7 @@ namespace Music
         private Label label2;
         private TextBox textBox2;
         private Button btnNew;
-        private TextBox txtDesignSpace;
+        private TextBox txtDesignView;
         private Button btnEditHarmonicTimeline;
         private Button btnSetDefault;
         private Button btnLoad;
