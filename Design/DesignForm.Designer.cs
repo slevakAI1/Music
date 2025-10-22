@@ -9,19 +9,18 @@ namespace Music
             btnEditSections = new Button();
             btnSave = new Button();
             btnSelectVoices = new Button();
-            label2 = new Label();
-            textBox2 = new TextBox();
             btnNew = new Button();
             txtDesignView = new TextBox();
             btnEditHarmonicTimeline = new Button();
             btnSetDefault = new Button();
             btnLoad = new Button();
             btnEditTimeSignature = new Button();
+            btnEditTempo = new Button();
             SuspendLayout();
             // 
             // btnEditSections
             // 
-            btnEditSections.Location = new Point(28, 94);
+            btnEditSections.Location = new Point(28, 95);
             btnEditSections.Name = "btnEditSections";
             btnEditSections.Size = new Size(151, 23);
             btnEditSections.TabIndex = 0;
@@ -41,30 +40,13 @@ namespace Music
             // 
             // btnSelectVoices
             // 
-            btnSelectVoices.Location = new Point(28, 62);
+            btnSelectVoices.Location = new Point(28, 63);
             btnSelectVoices.Name = "btnSelectVoices";
             btnSelectVoices.Size = new Size(151, 23);
             btnSelectVoices.TabIndex = 4;
             btnSelectVoices.Text = "Select Voices";
             btnSelectVoices.UseVisualStyleBackColor = true;
             btnSelectVoices.Click += btnSelectVoices_Click;
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(42, 267);
-            label2.Name = "label2";
-            label2.Size = new Size(44, 15);
-            label2.TabIndex = 11;
-            label2.Text = "Tempo";
-            // 
-            // textBox2
-            // 
-            textBox2.Location = new Point(114, 264);
-            textBox2.Name = "textBox2";
-            textBox2.Size = new Size(100, 23);
-            textBox2.TabIndex = 10;
-            textBox2.Text = "90";
             // 
             // btnNew
             // 
@@ -87,7 +69,7 @@ namespace Music
             // 
             // btnEditHarmonicTimeline
             // 
-            btnEditHarmonicTimeline.Location = new Point(28, 126);
+            btnEditHarmonicTimeline.Location = new Point(28, 127);
             btnEditHarmonicTimeline.Name = "btnEditHarmonicTimeline";
             btnEditHarmonicTimeline.Size = new Size(151, 23);
             btnEditHarmonicTimeline.TabIndex = 15;
@@ -97,7 +79,7 @@ namespace Music
             // 
             // btnSetDefault
             // 
-            btnSetDefault.Location = new Point(28, 218);
+            btnSetDefault.Location = new Point(28, 245);
             btnSetDefault.Name = "btnSetDefault";
             btnSetDefault.Size = new Size(151, 23);
             btnSetDefault.TabIndex = 16;
@@ -117,7 +99,7 @@ namespace Music
             // 
             // btnEditTimeSignature
             // 
-            btnEditTimeSignature.Location = new Point(28, 158);
+            btnEditTimeSignature.Location = new Point(28, 162);
             btnEditTimeSignature.Name = "btnEditTimeSignature";
             btnEditTimeSignature.Size = new Size(151, 23);
             btnEditTimeSignature.TabIndex = 18;
@@ -125,17 +107,26 @@ namespace Music
             btnEditTimeSignature.UseVisualStyleBackColor = true;
             btnEditTimeSignature.Click += btnEditTimeSignature_Click;
             // 
+            // btnEditTempo
+            // 
+            btnEditTempo.Location = new Point(28, 202);
+            btnEditTempo.Name = "btnEditTempo";
+            btnEditTempo.Size = new Size(151, 23);
+            btnEditTempo.TabIndex = 19;
+            btnEditTempo.Text = "Edit Tempo";
+            btnEditTempo.UseVisualStyleBackColor = true;
+            btnEditTempo.Click += btnEditTempo_Click;
+            // 
             // DesignForm
             // 
             ClientSize = new Size(1085, 655);
+            Controls.Add(btnEditTempo);
             Controls.Add(btnEditTimeSignature);
             Controls.Add(btnLoad);
             Controls.Add(btnSetDefault);
             Controls.Add(btnEditHarmonicTimeline);
             Controls.Add(txtDesignView);
             Controls.Add(btnNew);
-            Controls.Add(label2);
-            Controls.Add(textBox2);
             Controls.Add(btnSelectVoices);
             Controls.Add(btnSave);
             Controls.Add(btnEditSections);
@@ -149,13 +140,12 @@ namespace Music
         private Button btnSave;
         private Button btnSelectVoices;
         private Button btnAddChords;
-        private Label label2;
-        private TextBox textBox2;
         private Button btnNew;
         private TextBox txtDesignView;
         private Button btnEditHarmonicTimeline;
         private Button btnSetDefault;
         private Button btnLoad;
         private Button btnEditTimeSignature;
+        private Button btnEditTempo;
     }
 }

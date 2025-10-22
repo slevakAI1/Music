@@ -253,5 +253,10 @@ namespace Music
                 RefreshDesignSpaceIfReady();
             }
         }
+
+        private void btnEditTempo_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
