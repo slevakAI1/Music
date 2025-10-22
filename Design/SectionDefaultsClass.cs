@@ -3,16 +3,13 @@ using System.Windows.Forms;
 
 namespace Music.Design
 {
-    public sealed class SectionSetManagerClass
+    public sealed class SectionDefaultsClass
     {
         // Populate the provided SectionsClass (persisted on the design), render its summary, and reset dependent sets/displays
-        public void CreateSections(
+        public void SetDefaultSections(
             IWin32Window owner,
             SectionSetClass sections,
-            VoiceSetClass voiceSet,
-            TextBox txtSections,
-            TextBox txtVoiceSet,
-            TextBox txtChordSet)
+            VoiceSetClass voiceSet)
         {
             CreateTestSections(sections);
 
@@ -22,12 +19,7 @@ namespace Music.Design
             {
                 names.Add(s.SectionType.ToString());
             }
-            txtSections.Text = string.Join("\r\n", names);
-
-            // Reset dependent sets and displays (persisted objects; textboxes only show data)
-            voiceSet.Reset();
-            txtVoiceSet.Clear();
-            txtChordSet.Clear();
+            //txtSections.Text = string.Join("\r\n", names);
         }
 
         /// <summary>

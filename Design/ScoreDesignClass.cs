@@ -13,8 +13,8 @@ namespace Music.Design
 
         // Design Space
         public VoiceSetClass VoiceSet { get; } = new();
-        public ChordSetClass ChordSet { get; } = new();
-        public SectionSetClass Sections { get; } = new();
+
+        public SectionSetClass SectionSet { get; } = new();
 
         // Harmonic timeline persisted with the design
         public HarmonicTimeline? HarmonicTimeline { get; set; }

@@ -39,11 +39,11 @@ namespace Music
         {
             if (!EnsureScoreDesignOrNotify()) return;
 
-            using var dlg = new SectionEditorForm(Globals.ScoreDesign!.Sections);
+            using var dlg = new SectionEditorForm(Globals.ScoreDesign!.SectionSet);
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 // Copy back into the existing Sections instance to preserve references
-                var target = Globals.ScoreDesign!.Sections;
+                var target = Globals.ScoreDesign!.SectionSet;
                 target.Reset();
                 foreach (var s in dlg.ResultSections.Sections)
                 {
