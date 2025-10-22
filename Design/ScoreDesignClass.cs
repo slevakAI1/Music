@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Music.Generate;
 
 namespace Music.Design
 {
@@ -12,9 +13,11 @@ namespace Music.Design
 
         // Design Space
         public VoiceSetClass VoiceSet { get; } = new();
+        public ChordSetClass ChordSet { get; } = new();
         public SectionSetClass Sections { get; } = new();
 
-        // Actual Design - not started yet
+        // Harmonic timeline persisted with the design
+        public HarmonicTimeline? HarmonicTimeline { get; set; }
 
         public ScoreDesignClass(string? designId = null)
         {

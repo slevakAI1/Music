@@ -47,7 +47,7 @@ namespace Music.Design
             // HARMONIC TIMELINE
             sb.Append("HARMONIC TIMELINE:\r\n");
             first = true;
-            var timeline = Globals.HarmonicTimeline;
+            var timeline = design.HarmonicTimeline;
             if (timeline != null)
             {
                 foreach (var he in timeline.Events)

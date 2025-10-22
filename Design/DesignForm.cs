@@ -25,16 +25,12 @@ namespace Music
 
         private void MusicForm_Load(object sender, EventArgs e)
         {
-            // Ensure we have a design object; create one if needed.
             Globals.ScoreDesign ??= new ScoreDesignClass();
-
-            // Populate UI from current globals.
             PopulateFormFromGlobals();
         }
 
         private void btnNew_Click(object sender, EventArgs e)
         {
-            // Clear all design elements and UI.
             ClearDesignAndForm();
         }
 
@@ -89,11 +85,11 @@ namespace Music
             }
         }
 
-/* All code for adding default - keep for now
- * if (!EnsureScoreDesignOrNotify()) return;
+        /* All code for adding default - keep for now
+         * if (!EnsureScoreDesignOrNotify()) return;
             Globals.ScoreDesign!.VoiceSet.AddDefaultVoices();
             RefreshDesignSpaceIfReady();
-*/
+        */
 
         // Populate chords without touching the UI textboxes
         //private void btnAddChords_Click(object sender, EventArgs e)
@@ -113,8 +109,10 @@ namespace Music
 
         private void btnEditHarmonicTimeline_Click(object sender, EventArgs e)
         {
+            if (!EnsureScoreDesignOrNotify()) return;
+
             var timeline = HarmonicDefault.BuildDefaultTimeline();
-            Globals.HarmonicTimeline = timeline;
+            Globals.ScoreDesign!.HarmonicTimeline = timeline;
 
             // Reflect meter/tempo in UI when a timeline is created/edited
             UpdateUiFromTimeline(timeline);
@@ -148,7 +146,7 @@ namespace Music
             RefreshDesignSpaceIfReady();
 
             // Meter/tempo from the harmonic timeline (if any)
-            var timeline = Globals.HarmonicTimeline;
+            var timeline = Globals.ScoreDesign!.HarmonicTimeline;
             if (timeline != null)
             {
                 UpdateUiFromTimeline(timeline);
@@ -170,9 +168,6 @@ namespace Music
         {
             // Reset the score design (new instance is fine to ensure clean state)
             Globals.ScoreDesign = new ScoreDesignClass();
-
-            // Clear global timeline and related UI
-            Globals.HarmonicTimeline = null;
 
             // Clear UI fields for meter/tempo
             textBox1.Clear(); // time signature
