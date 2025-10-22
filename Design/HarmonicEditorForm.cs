@@ -27,10 +27,10 @@ namespace Music.Design
         // Event editor controls
         private readonly Label _lblStart; // computed start bar:beat
         private readonly NumericUpDown _numDuration;
-        private readonly TextBox _txtKey;
+        private readonly ComboBox _cbKey;
         private readonly NumericUpDown _numDegree;
-        private readonly TextBox _txtQuality;
-        private readonly TextBox _txtBass;
+        private readonly ComboBox _cbQuality;
+        private readonly ComboBox _cbBass;
 
         // Working list mirroring the ListView
         private readonly List<WorkingEvent> _working = new();
@@ -46,6 +46,36 @@ namespace Music.Design
         private int _tempoBpm = 96;
 
         public HarmonicTimeline ResultTimeline { get; private set; } = new HarmonicTimeline();
+
+        // Predefined values
+        private static readonly string[] AllKeys = new[]
+        {
+            // Major (15)
+            "C major","G major","D major","A major","E major","B major","F# major","C# major",
+            "F major","Bb major","Eb major","Ab major","Db major","Gb major","Cb major",
+            // Minor (15)
+            "A minor","E minor","B minor","F# minor","C# minor","G# minor","D# minor","A# minor",
+            "D minor","G minor","C minor","F minor","Bb minor","Eb minor","Ab minor"
+        };
+
+        private static readonly string[] AllQualities = new[]
+        {
+            // Triads
+            "maj","min","dim","aug","sus2","sus4","5",
+            // 6ths
+            "maj6","min6","6/9",
+            // 7ths
+            "dom7","maj7","min7","dim7","hdim7","minMaj7",
+            // Extensions
+            "9","maj9","min9","11","13",
+            // Adds
+            "add9","add11","add13"
+        };
+
+        private static readonly string[] AllBassOptions = new[]
+        {
+            "root","3rd","5th","7th","9th","11th","13th"
+        };
 
         private sealed class WorkingEvent
         {
@@ -223,9 +253,9 @@ namespace Music.Design
 
             editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
             editor.Controls.Add(new Label { Text = "Key:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) }, 0, row);
-            _txtKey = new TextBox { Anchor = AnchorStyles.Left | AnchorStyles.Right, Text = "C major" };
-            _txtKey.TextChanged += (s, e) => ApplyEditorToSelected();
-            editor.Controls.Add(_txtKey, 1, row);
+            _cbKey = CreateSelectorCombo();
+            _cbKey.TextChanged += (s, e) => ApplyEditorToSelected();
+            editor.Controls.Add(_cbKey, 1, row);
             row++;
 
             editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
@@ -237,16 +267,16 @@ namespace Music.Design
 
             editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
             editor.Controls.Add(new Label { Text = "Quality:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) }, 0, row);
-            _txtQuality = new TextBox { Anchor = AnchorStyles.Left | AnchorStyles.Right, Text = "maj" };
-            _txtQuality.TextChanged += (s, e) => ApplyEditorToSelected();
-            editor.Controls.Add(_txtQuality, 1, row);
+            _cbQuality = CreateSelectorCombo();
+            _cbQuality.TextChanged += (s, e) => ApplyEditorToSelected();
+            editor.Controls.Add(_cbQuality, 1, row);
             row++;
 
             editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
             editor.Controls.Add(new Label { Text = "Bass:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) }, 0, row);
-            _txtBass = new TextBox { Anchor = AnchorStyles.Left | AnchorStyles.Right, Text = "root" };
-            _txtBass.TextChanged += (s, e) => ApplyEditorToSelected();
-            editor.Controls.Add(_txtBass, 1, row);
+            _cbBass = CreateSelectorCombo();
+            _cbBass.TextChanged += (s, e) => ApplyEditorToSelected();
+            editor.Controls.Add(_cbBass, 1, row);
             row++;
 
             for (; row < editor.RowCount; row++)
@@ -262,6 +292,9 @@ namespace Music.Design
             AcceptButton = _btnOk;
             CancelButton = _btnCancel;
 
+            // Populate selectors with predefined values
+            PopulateSelectors();
+
             // Load initial data
             LoadInitial(initial);
             RefreshListView(selectIndex: _working.Count > 0 ? 0 : -1);
@@ -272,6 +305,37 @@ namespace Music.Design
                 DialogResult = DialogResult.OK;
                 Close();
             };
+        }
+
+        private static ComboBox CreateSelectorCombo()
+        {
+            return new ComboBox
+            {
+                Anchor = AnchorStyles.Left | AnchorStyles.Right,
+                DropDownStyle = ComboBoxStyle.DropDown,
+                AutoCompleteMode = AutoCompleteMode.SuggestAppend,
+                AutoCompleteSource = AutoCompleteSource.ListItems
+            };
+        }
+
+        private void PopulateSelectors()
+        {
+            FillCombo(_cbKey, AllKeys);
+            FillCombo(_cbQuality, AllQualities);
+            FillCombo(_cbBass, AllBassOptions);
+
+            if (string.IsNullOrWhiteSpace(_cbKey.Text)) _cbKey.Text = "C major";
+            if (string.IsNullOrWhiteSpace(_cbQuality.Text)) _cbQuality.Text = "maj";
+            if (string.IsNullOrWhiteSpace(_cbBass.Text)) _cbBass.Text = "root";
+        }
+
+        private static void FillCombo(ComboBox cb, IEnumerable<string> values)
+        {
+            cb.BeginUpdate();
+            cb.Items.Clear();
+            foreach (var v in values)
+                cb.Items.Add(v);
+            cb.EndUpdate();
         }
 
         private void LoadInitial(HarmonicTimeline? initial)
@@ -451,7 +515,7 @@ namespace Music.Design
             bool hasSel = _lv.SelectedIndices.Count > 0;
 
             // Always allow editing so user can stage next add
-            _numDuration.Enabled = _txtKey.Enabled = _numDegree.Enabled = _txtQuality.Enabled = _txtBass.Enabled = true;
+            _numDuration.Enabled = _cbKey.Enabled = _numDegree.Enabled = _cbQuality.Enabled = _cbBass.Enabled = true;
 
             if (!hasSel)
             {
@@ -468,10 +532,10 @@ namespace Music.Design
             try
             {
                 _numDuration.Value = Math.Max(_numDuration.Minimum, Math.Min(_numDuration.Maximum, w.DurationBeats));
-                _txtKey.Text = w.Key ?? string.Empty;
+                _cbKey.Text = w.Key ?? string.Empty;
                 _numDegree.Value = Math.Max(_numDegree.Minimum, Math.Min(_numDegree.Maximum, w.Degree));
-                _txtQuality.Text = w.Quality ?? string.Empty;
-                _txtBass.Text = w.Bass ?? string.Empty;
+                _cbQuality.Text = w.Quality ?? string.Empty;
+                _cbBass.Text = w.Bass ?? string.Empty;
                 _lblStart.Text = $"{w.StartBar}:{w.StartBeat}";
             }
             finally
@@ -496,10 +560,10 @@ namespace Music.Design
 
             var w = (WorkingEvent)_lv.SelectedItems[0].Tag!;
             w.DurationBeats = (int)_numDuration.Value;
-            w.Key = string.IsNullOrWhiteSpace(_txtKey.Text) ? "C major" : _txtKey.Text.Trim();
+            w.Key = string.IsNullOrWhiteSpace(_cbKey.Text) ? "C major" : _cbKey.Text.Trim();
             w.Degree = (int)_numDegree.Value;
-            w.Quality = string.IsNullOrWhiteSpace(_txtQuality.Text) ? "maj" : _txtQuality.Text.Trim();
-            w.Bass = string.IsNullOrWhiteSpace(_txtBass.Text) ? "root" : _txtBass.Text.Trim();
+            w.Quality = string.IsNullOrWhiteSpace(_cbQuality.Text) ? "maj" : _cbQuality.Text.Trim();
+            w.Bass = string.IsNullOrWhiteSpace(_cbBass.Text) ? "root" : _cbBass.Text.Trim();
 
             RecalculateStartPositions();
             UpdateRowVisuals(_lv.SelectedIndices[0]);
@@ -778,10 +842,10 @@ namespace Music.Design
             out string? error)
         {
             error = null;
-            key = string.IsNullOrWhiteSpace(_txtKey.Text) ? "C major" : _txtKey.Text.Trim();
+            key = string.IsNullOrWhiteSpace(_cbKey.Text) ? "C major" : _cbKey.Text.Trim();
             degree = (int)_numDegree.Value;
-            quality = string.IsNullOrWhiteSpace(_txtQuality.Text) ? "maj" : _txtQuality.Text.Trim();
-            bass = string.IsNullOrWhiteSpace(_txtBass.Text) ? "root" : _txtBass.Text.Trim();
+            quality = string.IsNullOrWhiteSpace(_cbQuality.Text) ? "maj" : _cbQuality.Text.Trim();
+            bass = string.IsNullOrWhiteSpace(_cbBass.Text) ? "root" : _cbBass.Text.Trim();
             duration = (int)_numDuration.Value;
 
             if (duration < 1)
