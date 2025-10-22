@@ -7,7 +7,7 @@ using System.Windows.Forms;
 namespace Music.Design
 {
     // Popup editor for arranging Tempo Events and configuring their spans (in bars)
-    // Mirrors interaction patterns used by TimeSignatureEditorForm.
+    // Mirrors interaction patterns used by TimeSignatureEditorForm and SectionEditorForm.
     public sealed class TempoEditorForm : Form
     {
         private readonly ListView _lv;
@@ -178,13 +178,15 @@ namespace Music.Design
             _btnDefaults.Click += (_, __) => ApplyDefaults();
             right.Controls.Add(_btnDefaults, 0, 1);
 
-            // OK/Cancel
-            _btnOk = new Button { Text = "OK", DialogResult = DialogResult.OK, Dock = DockStyle.Right, Width = 120 };
-            _btnCancel = new Button { Text = "Cancel", DialogResult = DialogResult.Cancel, Dock = DockStyle.Right, Width = 120 };
-            var okCancel = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.RightToLeft };
-            okCancel.Controls.Add(_btnOk);
-            okCancel.Controls.Add(_btnCancel);
-            right.Controls.Add(okCancel, 0, 3);
+            // OK/Cancel buttons (visible, like SectionEditor)
+            var bottomButtons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.RightToLeft };
+            _btnOk = new Button { Text = "OK", AutoSize = true };
+            _btnCancel = new Button { Text = "Cancel", AutoSize = true };
+            bottomButtons.Controls.AddRange(new Control[] { _btnOk, _btnCancel });
+            right.Controls.Add(bottomButtons, 0, 3);
+
+            AcceptButton = _btnOk;
+            CancelButton = _btnCancel;
 
             // Build initial working set
             if (initial != null && initial.Events.Count > 0)
@@ -214,18 +216,24 @@ namespace Music.Design
             if (_lv.Items.Count > 0)
                 _lv.Items[0].Selected = true;
 
-            // Finalize result on OK
-            AcceptButton = _btnOk;
-            CancelButton = _btnCancel;
-            FormClosing += OnFormClosingCommit;
+            // Commit/cancel like SectionEditor
+            _btnOk.Click += (_, __) =>
+            {
+                ResultTimeline = BuildResultTimeline();
+                DialogResult = DialogResult.OK;
+                Close();
+            };
+            _btnCancel.Click += (_, __) =>
+            {
+                DialogResult = DialogResult.Cancel;
+                Close(); // just return
+            };
         }
 
-        private void OnFormClosingCommit(object? sender, FormClosingEventArgs e)
+        private TempoTimeline BuildResultTimeline()
         {
-            if (DialogResult != DialogResult.OK) return;
-
             var t = new TempoTimeline();
-            int beatsPerBar = 4; // editing uses 4 beats/bar as the neutral unit
+            int beatsPerBar = 4;
             int startBar = 1;
 
             foreach (var we in _working)
@@ -240,7 +248,7 @@ namespace Music.Design
                 startBar += we.BarCount;
             }
 
-            ResultTimeline = t;
+            return t;
         }
 
         // --- Actions ---

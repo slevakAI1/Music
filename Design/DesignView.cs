@@ -4,7 +4,7 @@ namespace Music.Design
 {
     public static class DesignView
     {
-        // Builds: VOICES + 2 newlines + SECTIONS + 2 newlines + HARMONIC TIMELINE + 2 newlines + ALIGNMENT + 2 newlines + TIME SIGNATURES
+        // Builds: VOICES + 2 newlines + SECTIONS + 2 newlines + HARMONIC TIMELINE + 2 newlines + ALIGNMENT + 2 newlines + TIME SIGNATURES + 2 newlines + TEMPO
         public static string CreateDesignView(DesignClass design)
         {
             var sb = new StringBuilder();
@@ -88,7 +88,6 @@ namespace Music.Design
                         var evStartAbs = (he.StartBar - 1) * bpb + (he.StartBeat - 1);
                         var evEndAbsExcl = evStartAbs + he.DurationBeats;
 
-                        // Intersect [sectionStartAbs, sectionEndAbsExcl) with [evStartAbs, evEndAbsExcl)
                         var segStartAbs = evStartAbs > sectionStartAbs ? evStartAbs : sectionStartAbs;
                         var segEndAbsExcl = evEndAbsExcl < sectionEndAbsExcl ? evEndAbsExcl : sectionEndAbsExcl;
                         if (segEndAbsExcl <= segStartAbs)
@@ -138,6 +137,25 @@ namespace Music.Design
                     // List event placement and span in beats. Meter detail (e.g., 4/4) can be added later if needed.
                     sb.Append($"Bar {se.StartBar} Beat {se.StartBeat}, {se.DurationBeats} beats");
                     firstTs = false;
+                }
+            }
+
+            // TEMPO
+            sb.Append("\r\n\r\n");
+            sb.Append("TEMPO:\r\n");
+            var tempoTimeline = design.TempoTimeline;
+            if (tempoTimeline == null || tempoTimeline.Events.Count == 0)
+            {
+                sb.Append("(no tempo timeline)");
+            }
+            else
+            {
+                var firstTempo = true;
+                foreach (var te in tempoTimeline.Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat))
+                {
+                    if (!firstTempo) sb.Append("\r\n");
+                    sb.Append($"Bar {te.StartBar} Beat {te.StartBeat}, {te.DurationBeats} beats | {te.TempoBpm} BPM");
+                    firstTempo = false;
                 }
             }
 

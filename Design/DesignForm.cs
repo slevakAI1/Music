@@ -239,7 +239,8 @@ namespace Music
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 Globals.Design!.TempoTimeline = dlg.ResultTimeline;
-                // Intentionally do NOT update the Design View textbox at this time.
+                // Now reflect changes in the Design View
+                RefreshDesignSpaceIfReady();
             }
         }
     }
