@@ -254,7 +254,15 @@ namespace Music
 
         private void btnEditTimeSignature_Click(object sender, EventArgs e)
         {
+            if (!EnsureScoreDesignOrNotify()) return;
 
+            var existing = Globals.ScoreDesign!.TimeSignatureTimeline;
+            using var dlg = new TimeSignatureEditorForm(existing);
+            if (dlg.ShowDialog(this) == DialogResult.OK)
+            {
+                Globals.ScoreDesign!.TimeSignatureTimeline = dlg.ResultTimeline;
+                // do not update designspace builder here per instructions
+            }
         }
     }
 }
