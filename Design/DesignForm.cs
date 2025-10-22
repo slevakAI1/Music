@@ -94,7 +94,8 @@ namespace Music
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 Globals.ScoreDesign!.HarmonicTimeline = dlg.ResultTimeline;
-                UpdateUiFromTimeline(dlg.ResultTimeline);
+                // Only update tempo in UI for now
+                textBox2.Text = dlg.ResultTimeline.TempoBpm.ToString();
                 RefreshDesignSpaceIfReady();
             }
         }
@@ -124,11 +125,11 @@ namespace Music
             // Combined design-space summary
             RefreshDesignSpaceIfReady();
 
-            // Meter/tempo from the harmonic timeline (if any)
+            // Tempo from the harmonic timeline (if any)
             var timeline = Globals.ScoreDesign!.HarmonicTimeline;
             if (timeline != null)
             {
-                UpdateUiFromTimeline(timeline);
+                textBox2.Text = timeline.TempoBpm.ToString();
             }
             else
             {
@@ -136,20 +137,12 @@ namespace Music
             }
         }
 
-        private void UpdateUiFromTimeline(HarmonicTimeline timeline)
-        {
-            // We only track beats-per-bar; default denominator to 4 in UI
-            textBox1.Text = $"{timeline.BeatsPerBar}/4";
-            textBox2.Text = timeline.TempoBpm.ToString();
-        }
-
         private void ClearDesignAndForm()
         {
             // Reset the score design (new instance is fine to ensure clean state)
             Globals.ScoreDesign = new DesignClass();
 
-            // Clear UI fields for meter/tempo
-            textBox1.Clear(); // time signature
+            // Clear UI fields for tempo only
             textBox2.Clear(); // tempo
 
             // Repopulate the design area headings with no data
@@ -171,8 +164,8 @@ namespace Music
             // 3) Harmonic timeline: use the same defaults as the Harmonic Editor's "Set Defaults"
             design.HarmonicTimeline = HarmonicDefault.BuildDefaultTimeline();
 
-            // Reflect defaults in the UI and combined design-space summary
-            UpdateUiFromTimeline(design.HarmonicTimeline);
+            // Reflect defaults in the UI and combined design-space summary (tempo only)
+            textBox2.Text = design.HarmonicTimeline.TempoBpm.ToString();
             RefreshDesignSpaceIfReady();
         }
 
@@ -233,10 +226,9 @@ namespace Music
                 Globals.ScoreDesign = loaded;
 
                 if (loaded.HarmonicTimeline != null)
-                    UpdateUiFromTimeline(loaded.HarmonicTimeline);
+                    textBox2.Text = loaded.HarmonicTimeline.TempoBpm.ToString();
                 else
                 {
-                    textBox1.Clear();
                     textBox2.Clear();
                 }
 
@@ -261,7 +253,7 @@ namespace Music
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 Globals.ScoreDesign!.TimeSignatureTimeline = dlg.ResultTimeline;
-                // do not update designspace builder here per instructions
+                // do not update designspace builder or UI here per instructions
             }
         }
     }

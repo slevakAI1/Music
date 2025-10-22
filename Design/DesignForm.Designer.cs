@@ -9,8 +9,6 @@ namespace Music
             btnEditSections = new Button();
             btnSave = new Button();
             btnSelectVoices = new Button();
-            label1 = new Label();
-            textBox1 = new TextBox();
             label2 = new Label();
             textBox2 = new TextBox();
             btnNew = new Button();
@@ -50,23 +48,6 @@ namespace Music
             btnSelectVoices.Text = "Select Voices";
             btnSelectVoices.UseVisualStyleBackColor = true;
             btnSelectVoices.Click += btnSelectVoices_Click;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(28, 186);
-            label1.Name = "label1";
-            label1.Size = new Size(89, 15);
-            label1.TabIndex = 9;
-            label1.Text = "Time Signature";
-            // 
-            // textBox1
-            // 
-            textBox1.Location = new Point(135, 183);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(100, 23);
-            textBox1.TabIndex = 8;
-            textBox1.Text = "4/4";
             // 
             // label2
             // 
@@ -155,8 +136,6 @@ namespace Music
             Controls.Add(btnNew);
             Controls.Add(label2);
             Controls.Add(textBox2);
-            Controls.Add(label1);
-            Controls.Add(textBox1);
             Controls.Add(btnSelectVoices);
             Controls.Add(btnSave);
             Controls.Add(btnEditSections);
@@ -170,8 +149,6 @@ namespace Music
         private Button btnSave;
         private Button btnSelectVoices;
         private Button btnAddChords;
-        private Label label1;
-        private TextBox textBox1;
         private Label label2;
         private TextBox textBox2;
         private Button btnNew;
