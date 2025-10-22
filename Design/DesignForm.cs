@@ -78,6 +78,7 @@ namespace Music
                 RefreshDesignSpaceIfReady();
             }
         }
+
         private void btnEditHarmonicTimeline_Click(object sender, EventArgs e)
         {
             if (!EnsureDesignOrNotify()) return;
@@ -87,8 +88,6 @@ namespace Music
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 Globals.Design!.HarmonicTimeline = dlg.ResultTimeline;
-                // Only update tempo in UI for now
-                textBox2.Text = dlg.ResultTimeline.TempoBpm.ToString();
                 RefreshDesignSpaceIfReady();
             }
         }
@@ -117,26 +116,12 @@ namespace Music
         {
             // Combined design-space summary
             RefreshDesignSpaceIfReady();
-
-            // Tempo from the harmonic timeline (if any)
-            var timeline = Globals.Design!.HarmonicTimeline;
-            if (timeline != null)
-            {
-                textBox2.Text = timeline.TempoBpm.ToString();
-            }
-            else
-            {
-                // no timeline -> leave designer defaults as-is
-            }
         }
 
         private void ClearDesignAndForm()
         {
             // Reset the score design (new instance is fine to ensure clean state)
             Globals.Design = new DesignClass();
-
-            // Clear UI fields for tempo only
-            textBox2.Clear(); // tempo
 
             // Repopulate the design area headings with no data
             RefreshDesignSpaceIfReady();
@@ -160,8 +145,6 @@ namespace Music
             // 4) Time signature timeline: apply default (4/4 starting at bar 1)
             design.TimeSignatureTimeline = TimeSignatureDefault.BuildDefaultTimeline();
 
-            // Reflect defaults in the UI and combined design-space summary (tempo only)
-            textBox2.Text = design.HarmonicTimeline.TempoBpm.ToString();
             RefreshDesignSpaceIfReady();
         }
 
@@ -221,13 +204,6 @@ namespace Music
 
                 Globals.Design = loaded;
 
-                if (loaded.HarmonicTimeline != null)
-                    textBox2.Text = loaded.HarmonicTimeline.TempoBpm.ToString();
-                else
-                {
-                    textBox2.Clear();
-                }
-
                 RefreshDesignSpaceIfReady();
 
                 MessageBox.Show(this, $"Design loaded from:\n{ofd.FileName}", "Loaded",
@@ -256,7 +232,15 @@ namespace Music
 
         private void btnEditTempo_Click(object sender, EventArgs e)
         {
+            if (!EnsureDesignOrNotify()) return;
 
+            var existing = Globals.Design!.TempoTimeline;
+            using var dlg = new TempoEditorForm(existing);
+            if (dlg.ShowDialog(this) == DialogResult.OK)
+            {
+                Globals.Design!.TempoTimeline = dlg.ResultTimeline;
+                // Intentionally do NOT update the Design View textbox at this time.
+            }
         }
     }
 }
