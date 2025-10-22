@@ -6,7 +6,7 @@ namespace Music.Design
         public static HarmonicTimeline BuildDefaultTimeline()
         {
             var timeline = new HarmonicTimeline();
-            timeline.ConfigureGlobal("4/4", 96);
+            timeline.ConfigureGlobal("4/4");
 
             // Provided 4-event pattern, repeated to total 8 events.
             Add(timeline, bar: 1, key: "C major", degree: 1, quality: "maj");

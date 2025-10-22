@@ -50,8 +50,8 @@ namespace Music.Design
             {
                 var tl = new HarmonicTimeline
                 {
-                    BeatsPerBar = dto.HarmonicTimeline.BeatsPerBar > 0 ? dto.HarmonicTimeline.BeatsPerBar : 4,
-                    TempoBpm = dto.HarmonicTimeline.TempoBpm
+                    BeatsPerBar = dto.HarmonicTimeline.BeatsPerBar > 0 ? dto.HarmonicTimeline.BeatsPerBar : 4
+                    // TempoBpm removed from HarmonicTimeline; dto.HarmonicTimeline.TempoBpm is ignored (migrated to TempoTimeline separately)
                 };
                 if (dto.HarmonicTimeline.Events != null)
                 {
@@ -109,7 +109,7 @@ namespace Music.Design
         private sealed class HarmonicTimelineDto
         {
             public int BeatsPerBar { get; set; }
-            public int TempoBpm { get; set; }
+            // Deprecated: was stored alongside Harmony; retained for back-compat but ignored here.
             public List<HarmonicEvent>? Events { get; set; }
         }
     }

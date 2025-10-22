@@ -8,11 +8,10 @@ namespace Music.Design
         private readonly Dictionary<int, HarmonicEvent> _barHeads = new(); // bar -> event active at beat 1
 
         public int BeatsPerBar { get; set; } = 4;
-        public int TempoBpm { get; set; } = 96;
 
         public List<HarmonicEvent> Events { get; set; } = new();
 
-        public void ConfigureGlobal(string meter, int tempoBpm)
+        public void ConfigureGlobal(string meter)
         {
             // Expect "x/y". For now, only x matters for bar length in beats.
             if (string.IsNullOrWhiteSpace(meter)) throw new ArgumentException(nameof(meter));
@@ -21,7 +20,6 @@ namespace Music.Design
                 throw new ArgumentException("Invalid meter format. Expected like \"4/4\".", nameof(meter));
 
             BeatsPerBar = Math.Max(1, beats);
-            TempoBpm = tempoBpm;
 
             // Reindex any existing events with the new meter
             Reindex();

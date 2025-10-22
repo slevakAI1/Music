@@ -22,7 +22,6 @@ namespace Music.Design
 
         // Global timeline controls
         private readonly TextBox _txtMeter;   // e.g., 4/4 (only numerator used)
-        private readonly NumericUpDown _numTempo; // bpm
 
         // Event editor controls
         private readonly Label _lblStart; // computed start bar:beat
@@ -43,7 +42,6 @@ namespace Music.Design
 
         // Current global settings
         private int _beatsPerBar = 4;
-        private int _tempoBpm = 96;
 
         public HarmonicTimeline ResultTimeline { get; private set; } = new HarmonicTimeline();
 
@@ -196,29 +194,22 @@ namespace Music.Design
             right.RowStyles.Add(new RowStyle(SizeType.Absolute, 40)); // buttons
             root.Controls.Add(right, 1, 0);
 
-            // Global settings panel
+            // Global settings panel (Meter only)
             var globalsPanel = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
-                ColumnCount = 4,
-                RowCount = 2,
+                ColumnCount = 2,
+                RowCount = 1,
                 Padding = new Padding(6)
             };
             globalsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 110));
-            globalsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
-            globalsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80));
-            globalsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+            globalsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
             right.Controls.Add(globalsPanel, 0, 0);
 
             globalsPanel.Controls.Add(new Label { Text = "Meter:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) }, 0, 0);
             _txtMeter = new TextBox { Anchor = AnchorStyles.Left | AnchorStyles.Right, Text = "4/4" };
             _txtMeter.TextChanged += (s, e) => OnGlobalsChanged();
             globalsPanel.Controls.Add(_txtMeter, 1, 0);
-
-            globalsPanel.Controls.Add(new Label { Text = "Tempo (bpm):", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(12, 6, 0, 0) }, 2, 0);
-            _numTempo = new NumericUpDown { Minimum = 20, Maximum = 400, Value = 96, Anchor = AnchorStyles.Left, Width = 80 };
-            _numTempo.ValueChanged += (s, e) => OnGlobalsChanged();
-            globalsPanel.Controls.Add(_numTempo, 3, 0);
 
             // Event editor panel
             var editor = new TableLayoutPanel
@@ -344,18 +335,15 @@ namespace Music.Design
 
             if (initial == null || initial.Events.Count == 0)
             {
-                // Respect any initial timeline globals if provided
                 if (initial != null)
                 {
                     _beatsPerBar = Math.Max(1, initial.BeatsPerBar);
-                    _tempoBpm = Math.Max(1, initial.TempoBpm);
                 }
                 ApplyGlobalsToUi();
                 return;
             }
 
             _beatsPerBar = Math.Max(1, initial.BeatsPerBar);
-            _tempoBpm = Math.Max(1, initial.TempoBpm);
             ApplyGlobalsToUi();
 
             foreach (var he in initial.Events)
@@ -382,7 +370,6 @@ namespace Music.Design
             try
             {
                 _txtMeter.Text = $"{_beatsPerBar}/4";
-                _numTempo.Value = Math.Max(_numTempo.Minimum, Math.Min(_numTempo.Maximum, _tempoBpm));
             }
             finally
             {
@@ -404,9 +391,6 @@ namespace Music.Design
                     beats = b;
             }
 
-            var tempo = (int)_numTempo.Value;
-            tempo = Math.Max(1, tempo);
-
             if (beats != _beatsPerBar)
             {
                 _beatsPerBar = beats;
@@ -414,14 +398,13 @@ namespace Music.Design
                 RefreshListView(_lv.SelectedIndices.Count > 0 ? _lv.SelectedIndices[0] : -1);
             }
 
-            _tempoBpm = tempo;
             UpdateButtonsEnabled();
         }
 
         private HarmonicTimeline BuildResult()
         {
             var tl = new HarmonicTimeline();
-            tl.ConfigureGlobal($"{_beatsPerBar}/4", _tempoBpm);
+            tl.ConfigureGlobal($"{_beatsPerBar}/4");
             foreach (var w in _working)
             {
                 tl.Add(new HarmonicEvent
@@ -748,7 +731,6 @@ namespace Music.Design
 
             _working.Clear();
             _beatsPerBar = Math.Max(1, defaults.BeatsPerBar);
-            _tempoBpm = Math.Max(1, defaults.TempoBpm);
             ApplyGlobalsToUi();
 
             foreach (var he in defaults.Events)
