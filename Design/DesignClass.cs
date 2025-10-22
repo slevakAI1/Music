@@ -15,6 +15,10 @@
         // Harmonic timeline persisted with the design
         public HarmonicTimeline? HarmonicTimeline { get; set; }
 
+        // New: independent timelines for tempo and time signature
+        public TempoTimeline? TempoTimeline { get; set; }
+        public TimeSignatureTimeline? TimeSignatureTimeline { get; set; }
+
         public DesignClass(string? designId = null)
         {
             DesignId = designId ?? Guid.NewGuid().ToString("N");
