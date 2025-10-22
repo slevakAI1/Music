@@ -58,7 +58,15 @@ namespace Music.Design
                 }
             }
 
-            // Probe 3: Generate subfolder under base (in case content keeps subfolders)
+            // Probe 3: Design subfolder under base (new location)
+            if (foundPath == null)
+            {
+                var pDesign = Path.Combine(baseDir, "Design", fileName);
+                probed.Add(pDesign);
+                if (File.Exists(pDesign)) foundPath = pDesign;
+            }
+
+            // Probe 4: Generate subfolder under base (legacy location)
             if (foundPath == null)
             {
                 var p2 = Path.Combine(baseDir, "Generate", fileName);
@@ -66,7 +74,8 @@ namespace Music.Design
                 if (File.Exists(p2)) foundPath = p2;
             }
 
-            // Probe 4: walk up parents (dev-time run) and look for Generate/Voices.Notion.json and the file itself
+            // Probe 5: walk up parents (dev-time run) and look for Design/Voices.Notion.json,
+            //          Generate/Voices.Notion.json, and the file itself
             if (foundPath == null)
             {
                 var current = new DirectoryInfo(baseDir);
@@ -75,13 +84,17 @@ namespace Music.Design
                     current = current.Parent;
                     if (current == null) break;
 
-                    var candidateA = Path.Combine(current.FullName, "Generate", fileName);
-                    probed.Add(candidateA);
-                    if (File.Exists(candidateA)) { foundPath = candidateA; break; }
+                    var candidateDesign = Path.Combine(current.FullName, "Design", fileName);
+                    probed.Add(candidateDesign);
+                    if (File.Exists(candidateDesign)) { foundPath = candidateDesign; break; }
 
-                    var candidateB = Path.Combine(current.FullName, fileName);
-                    probed.Add(candidateB);
-                    if (File.Exists(candidateB)) { foundPath = candidateB; break; }
+                    var candidateGenerate = Path.Combine(current.FullName, "Generate", fileName);
+                    probed.Add(candidateGenerate);
+                    if (File.Exists(candidateGenerate)) { foundPath = candidateGenerate; break; }
+
+                    var candidateRoot = Path.Combine(current.FullName, fileName);
+                    probed.Add(candidateRoot);
+                    if (File.Exists(candidateRoot)) { foundPath = candidateRoot; break; }
                 }
             }
 
