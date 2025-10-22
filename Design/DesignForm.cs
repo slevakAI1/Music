@@ -145,6 +145,9 @@ namespace Music
             // 4) Time signature timeline: apply default (4/4 starting at bar 1)
             design.TimeSignatureTimeline = TimeSignatureDefault.BuildDefaultTimeline();
 
+            // 5) Tempo timeline: include default tempo (90 BPM starting at bar 1)
+            design.TempoTimeline = TempoDefault.BuildDefaultTimeline();
+
             RefreshDesignSpaceIfReady();
         }
 
@@ -155,8 +158,20 @@ namespace Music
             try
             {
                 var design = Globals.Design!;
+
+                // Explicit snapshot to ensure TempoTimeline and TimeSignatureTimeline (and their Events) are serialized.
+                var snapshot = new
+                {
+                    design.DesignId,
+                    design.VoiceSet,
+                    design.SectionSet,
+                    design.HarmonicTimeline,
+                    design.TempoTimeline,
+                    design.TimeSignatureTimeline
+                };
+
                 var json = System.Text.Json.JsonSerializer.Serialize(
-                    design,
+                    snapshot,
                     new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
 
                 // Assume the folder exists under the project root: Design/Designs

@@ -8,16 +8,14 @@ namespace Music.Design
         public static TempoTimeline BuildDefaultTimeline()
         {
             var timeline = new TempoTimeline();
-
-            // Default: one 90 BPM event spanning 4 bars (assuming quarter-note beat = 4 beats/bar)
+            // One event at 90 BPM covering 8 bars (default design length); adjust as needed.
             timeline.Add(new TempoEvent
             {
                 StartBar = 1,
                 StartBeat = 1,
                 TempoBpm = 90,
-                DurationBeats = 4 * 4 // 4 bars at 4 beats/bar
+                DurationBeats = 8 * timeline.BeatsPerBar
             });
-
             return timeline;
         }
     }
