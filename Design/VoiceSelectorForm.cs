@@ -8,6 +8,7 @@ namespace Music.Design
         private readonly TextBox _txtFilter;
         private readonly Button _btnSelectAll;
         private readonly Button _btnClear;
+        private readonly Button _btnDefaults;
         private readonly Button _btnOk;
         private readonly Button _btnCancel;
         private readonly Label _lblSource;
@@ -140,6 +141,11 @@ namespace Music.Design
             _btnClear.Click += (_, __) => ClearInView();
             actionPanel.Controls.Add(_btnClear);
 
+            // Ensure full text always shows and doesn’t change
+            _btnDefaults = new Button { Text = "Set Defaults", AutoSize = true };
+            _btnDefaults.Click += OnSetDefaults;
+            actionPanel.Controls.Add(_btnDefaults);
+
             _lblSource = new Label
             {
                 Text = BuildSourceLabel(sourcePath),
@@ -186,50 +192,54 @@ namespace Music.Design
 
             if (_lstCategories.Items.Count > 0)
             {
-                // Default to Rock Band and check all voices there.
-                SetDefaultVoices();
-
-                // Fallback to first category if the default wasn't applied (e.g., not present).
-                if (_lstCategories.SelectedIndex < 0)
-                    _lstCategories.SelectedIndex = 0;
+                // Do NOT set defaults on launch anymore; just select the first category with nothing checked.
+                _lstCategories.SelectedIndex = 0;
             }
         }
 
         // Sets the initial default: select the "Rock Band" category and check all voices in it.
-        // Call this to change the app's startup defaults in one place.
+        // Idempotent and always refreshes the view.
         public void SetDefaultVoices()
         {
             const string defaultCategory = "Rock Band";
 
             var catKey = _catalog.Keys.FirstOrDefault(
                 k => string.Equals(k, defaultCategory, StringComparison.OrdinalIgnoreCase));
-            if (catKey == null)
-                return; // category not found; leave selection unchanged
 
-            // Prime the selection set with all voices from the default category.
-            if (_catalog.TryGetValue(catKey, out var voices) && voices != null)
+            // Always clear current selections first
+            _selected.Clear();
+
+            if (catKey != null && _catalog.TryGetValue(catKey, out var voices) && voices != null)
             {
-                _selected.Clear();
                 foreach (var v in voices)
                 {
                     if (!string.IsNullOrWhiteSpace(v))
                         _selected.Add(v);
                 }
-            }
 
-            // Select the category in the UI; this triggers RefreshVoices and applies checks from _selected.
-            for (int i = 0; i < _lstCategories.Items.Count; i++)
-            {
-                if (string.Equals(_lstCategories.Items[i]?.ToString(), catKey, StringComparison.OrdinalIgnoreCase))
+                // Ensure category selection reflects defaults
+                _currentCategory = catKey;
+
+                // Update selected index only if different; we always refresh view anyway.
+                for (int i = 0; i < _lstCategories.Items.Count; i++)
                 {
-                    _lstCategories.SelectedIndex = i;
-                    return;
+                    if (string.Equals(_lstCategories.Items[i]?.ToString(), catKey, StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (_lstCategories.SelectedIndex != i)
+                            _lstCategories.SelectedIndex = i;
+                        break;
+                    }
                 }
             }
 
-            // If items aren’t loaded yet, set current and refresh explicitly.
-            _currentCategory = catKey;
+            // Always refresh so checks are applied even if category didn’t change
             RefreshVoices();
+        }
+
+        private void OnSetDefaults(object? sender, EventArgs e)
+        {
+            // Idempotent: always sets defaults; no toggling/un-do.
+            SetDefaultVoices();
         }
 
         private void OnCategoryChanged(object? sender, EventArgs e)
