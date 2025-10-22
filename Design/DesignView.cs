@@ -2,10 +2,10 @@ using System.Text;
 
 namespace Music.Design
 {
-    public static class DesignViewer
+    public static class DesignView
     {
-        // Builds: VOICES + 2 newlines + SECTIONS + 2 newlines + HARMONIC TIMELINE
-        public static string BuildCombinedText(DesignClass design)
+        // Builds: VOICES + 2 newlines + SECTIONS + 2 newlines + HARMONIC TIMELINE + 2 newlines + ALIGNMENT + 2 newlines + TIME SIGNATURES
+        public static string CreateDesignView(DesignClass design)
         {
             var sb = new StringBuilder();
 
@@ -118,6 +118,26 @@ namespace Music.Design
                     {
                         sb.Append("  (no overlapping harmony)\r\n");
                     }
+                }
+            }
+
+            // TIME SIGNATURES
+            sb.Append("\r\n\r\n");
+            sb.Append("TIME SIGNATURES:\r\n");
+            var tsTimeline = design.TimeSignatureTimeline;
+            if (tsTimeline == null || tsTimeline.Events.Count == 0)
+            {
+                sb.Append("(no time signature timeline)");
+            }
+            else
+            {
+                var firstTs = true;
+                foreach (var se in tsTimeline.Events)
+                {
+                    if (!firstTs) sb.Append("\r\n");
+                    // List event placement and span in beats. Meter detail (e.g., 4/4) can be added later if needed.
+                    sb.Append($"Bar {se.StartBar} Beat {se.StartBeat}, {se.DurationBeats} beats");
+                    firstTs = false;
                 }
             }
 

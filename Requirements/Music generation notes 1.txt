@@ -37,7 +37,7 @@ Below is a focused explanation of each element and how they work together in the
 •	public IReadOnlyDictionary<string, string> Metadata => _metadata;
 •	Purpose: Read-only view of metadata with the same characteristics as above.
 
-•	public ScoreDesign(string? sourcePath = null, string? sourceHash = null, string? designId = null)
+•	public Design(string? sourcePath = null, string? sourceHash = null, string? designId = null)
 •	Responsibility: Initializes identity and optional source linkage.
 •	Behavior:
 

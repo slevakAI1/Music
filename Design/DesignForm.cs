@@ -25,7 +25,7 @@ namespace Music
 
         private void MusicForm_Load(object sender, EventArgs e)
         {
-            Globals.ScoreDesign ??= new DesignClass();
+            Globals.Design ??= new DesignClass();
             PopulateFormFromGlobals();
         }
 
@@ -37,13 +37,13 @@ namespace Music
         // Launch the Section Editor and apply results back to the design
         private void btnEditSections_Click(object sender, EventArgs e)
         {
-            if (!EnsureScoreDesignOrNotify()) return;
+            if (!EnsureDesignOrNotify()) return;
 
-            using var dlg = new SectionEditorForm(Globals.ScoreDesign!.SectionSet);
+            using var dlg = new SectionEditorForm(Globals.Design!.SectionSet);
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 // Copy back into the existing Sections instance to preserve references
-                var target = Globals.ScoreDesign!.SectionSet;
+                var target = Globals.Design!.SectionSet;
                 target.Reset();
                 foreach (var s in dlg.ResultSections.Sections)
                 {
@@ -54,21 +54,15 @@ namespace Music
             }
         }
 
-        /*   keep for now
-                    if (!EnsureScoreDesignOrNotify()) return;
-                    Globals.SectionManager.CreateTestSections(Globals.ScoreDesign!.Sections);
-                    RefreshDesignSpaceIfReady();
-         */
-
         // Populate voices via popup selector
         private void btnSelectVoices_Click(object sender, EventArgs e)
         {
-            if (!EnsureScoreDesignOrNotify()) return;
+            if (!EnsureDesignOrNotify()) return;
 
             using var dlg = new VoiceSelectorForm();
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
-                var score = Globals.ScoreDesign!;
+                var score = Globals.Design!;
                 var existing = new HashSet<string>(score.VoiceSet.Voices.Select(v => v.VoiceName),
                     StringComparer.OrdinalIgnoreCase);
 
@@ -84,16 +78,15 @@ namespace Music
                 RefreshDesignSpaceIfReady();
             }
         }
-
         private void btnEditHarmonicTimeline_Click(object sender, EventArgs e)
         {
-            if (!EnsureScoreDesignOrNotify()) return;
+            if (!EnsureDesignOrNotify()) return;
 
-            var existing = Globals.ScoreDesign!.HarmonicTimeline;
+            var existing = Globals.Design!.HarmonicTimeline;
             using var dlg = new HarmonicEditorForm(existing);
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
-                Globals.ScoreDesign!.HarmonicTimeline = dlg.ResultTimeline;
+                Globals.Design!.HarmonicTimeline = dlg.ResultTimeline;
                 // Only update tempo in UI for now
                 textBox2.Text = dlg.ResultTimeline.TempoBpm.ToString();
                 RefreshDesignSpaceIfReady();
@@ -102,9 +95,9 @@ namespace Music
 
         // --------- Helpers ---------
 
-        private bool EnsureScoreDesignOrNotify()
+        private bool EnsureDesignOrNotify()
         {
-            if (Globals.ScoreDesign != null) return true;
+            if (Globals.Design != null) return true;
 
             MessageBox.Show(this,
                 "Create a new score design first.",
@@ -116,8 +109,8 @@ namespace Music
 
         private void RefreshDesignSpaceIfReady()
         {
-            if (Globals.ScoreDesign == null) return;
-            txtDesignView.Text = DesignViewer.BuildCombinedText(Globals.ScoreDesign);
+            if (Globals.Design == null) return;
+            txtDesignView.Text = DesignView.CreateDesignView(Globals.Design);
         }
 
         private void PopulateFormFromGlobals()
@@ -126,7 +119,7 @@ namespace Music
             RefreshDesignSpaceIfReady();
 
             // Tempo from the harmonic timeline (if any)
-            var timeline = Globals.ScoreDesign!.HarmonicTimeline;
+            var timeline = Globals.Design!.HarmonicTimeline;
             if (timeline != null)
             {
                 textBox2.Text = timeline.TempoBpm.ToString();
@@ -140,7 +133,7 @@ namespace Music
         private void ClearDesignAndForm()
         {
             // Reset the score design (new instance is fine to ensure clean state)
-            Globals.ScoreDesign = new DesignClass();
+            Globals.Design = new DesignClass();
 
             // Clear UI fields for tempo only
             textBox2.Clear(); // tempo
@@ -152,7 +145,7 @@ namespace Music
         private void btnSetDefault_Click(object sender, EventArgs e)
         {
             // Ensure we have a design to work with
-            var design = Globals.ScoreDesign ??= new DesignClass();
+            var design = Globals.Design ??= new DesignClass();
 
             // 1) Sections: apply default/test structure
             var sectionsHelper = new SectionDefaultsClass();
@@ -164,6 +157,9 @@ namespace Music
             // 3) Harmonic timeline: use the same defaults as the Harmonic Editor's "Set Defaults"
             design.HarmonicTimeline = HarmonicDefault.BuildDefaultTimeline();
 
+            // 4) Time signature timeline: apply default (4/4 starting at bar 1)
+            design.TimeSignatureTimeline = TimeSignatureDefault.BuildDefaultTimeline();
+
             // Reflect defaults in the UI and combined design-space summary (tempo only)
             textBox2.Text = design.HarmonicTimeline.TempoBpm.ToString();
             RefreshDesignSpaceIfReady();
@@ -171,11 +167,11 @@ namespace Music
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            if (!EnsureScoreDesignOrNotify()) return;
+            if (!EnsureDesignOrNotify()) return;
 
             try
             {
-                var design = Globals.ScoreDesign!;
+                var design = Globals.Design!;
                 var json = System.Text.Json.JsonSerializer.Serialize(
                     design,
                     new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
@@ -223,7 +219,7 @@ namespace Music
                 // Robust manual deserialization to rebuild computed fields
                 var loaded = DesignSerialization.DeserializeDesign(json);
 
-                Globals.ScoreDesign = loaded;
+                Globals.Design = loaded;
 
                 if (loaded.HarmonicTimeline != null)
                     textBox2.Text = loaded.HarmonicTimeline.TempoBpm.ToString();
@@ -246,14 +242,15 @@ namespace Music
 
         private void btnEditTimeSignature_Click(object sender, EventArgs e)
         {
-            if (!EnsureScoreDesignOrNotify()) return;
+            if (!EnsureDesignOrNotify()) return;
 
-            var existing = Globals.ScoreDesign!.TimeSignatureTimeline;
+            var existing = Globals.Design!.TimeSignatureTimeline;
             using var dlg = new TimeSignatureEditorForm(existing);
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
-                Globals.ScoreDesign!.TimeSignatureTimeline = dlg.ResultTimeline;
-                // do not update designspace builder or UI here per instructions
+                Globals.Design!.TimeSignatureTimeline = dlg.ResultTimeline;
+                // Update combined design-space summary to reflect time signatures
+                RefreshDesignSpaceIfReady();
             }
         }
     }
