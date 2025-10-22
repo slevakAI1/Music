@@ -3,7 +3,7 @@
     public class SectionClass
     {
         // Existing
-        public DesignEnums.eSectionType SectionType { get; set; }
+        public MusicEnums.eSectionType SectionType { get; set; }
 
         // New: placement and size in bars
         // StartBar is 1-based and assigned by SectionSetClass.Add(...)

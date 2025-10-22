@@ -148,7 +148,7 @@ namespace Music.Design
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Anchor = AnchorStyles.Left | AnchorStyles.Right
             };
-            _cbType.Items.AddRange(Enum.GetNames(typeof(DesignEnums.eSectionType)));
+            _cbType.Items.AddRange(Enum.GetNames(typeof(MusicEnums.eSectionType)));
             _cbType.SelectedIndexChanged += (s, e) => ApplyEditorToSelected();
 
             _numBars = new NumericUpDown
@@ -334,7 +334,7 @@ namespace Music.Design
             _suppressEditorApply = true;
             try
             {
-                var names = Enum.GetNames(typeof(DesignEnums.eSectionType));
+                var names = Enum.GetNames(typeof(MusicEnums.eSectionType));
                 int idxType = Array.IndexOf(names, s.SectionType.ToString());
                 _cbType.SelectedIndex = Math.Max(0, idxType);
 
@@ -367,7 +367,7 @@ namespace Music.Design
             if (_cbType.SelectedIndex >= 0)
             {
                 var selectedName = (string)_cbType.SelectedItem!;
-                if (Enum.TryParse<DesignEnums.eSectionType>(selectedName, out var et))
+                if (Enum.TryParse<MusicEnums.eSectionType>(selectedName, out var et))
                     s.SectionType = et;
             }
 
@@ -603,7 +603,7 @@ namespace Music.Design
 
         private bool ValidateAndGetEditorValues(
             int insertAt,
-            out DesignEnums.eSectionType type,
+            out MusicEnums.eSectionType type,
             out int bars,
             out string? name,
             out int startPreview,

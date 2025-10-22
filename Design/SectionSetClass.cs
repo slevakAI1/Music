@@ -15,11 +15,11 @@ namespace Music.Design
         }
 
         // Back-compat: default to 4 bars when not specified
-        public void Add(DesignEnums.eSectionType sectionType)
+        public void Add(MusicEnums.eSectionType sectionType)
             => Add(sectionType, barCount: 4, name: null);
 
         // New overload: specify length and optional name
-        public void Add(DesignEnums.eSectionType sectionType, int barCount, string? name = null)
+        public void Add(MusicEnums.eSectionType sectionType, int barCount, string? name = null)
         {
             var section = new SectionClass
             {

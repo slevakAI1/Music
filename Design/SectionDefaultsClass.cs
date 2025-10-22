@@ -31,14 +31,14 @@ namespace Music.Design
         {
             sections.Reset();
 
-            sections.Add(DesignEnums.eSectionType.Intro);
-            sections.Add(DesignEnums.eSectionType.Verse);
-            sections.Add(DesignEnums.eSectionType.Chorus);
-            sections.Add(DesignEnums.eSectionType.Verse);
-            sections.Add(DesignEnums.eSectionType.Chorus);
-            sections.Add(DesignEnums.eSectionType.Bridge);
-            sections.Add(DesignEnums.eSectionType.Chorus);
-            sections.Add(DesignEnums.eSectionType.Outro);
+            sections.Add(MusicEnums.eSectionType.Intro);
+            sections.Add(MusicEnums.eSectionType.Verse);
+            sections.Add(MusicEnums.eSectionType.Chorus);
+            sections.Add(MusicEnums.eSectionType.Verse);
+            sections.Add(MusicEnums.eSectionType.Chorus);
+            sections.Add(MusicEnums.eSectionType.Bridge);
+            sections.Add(MusicEnums.eSectionType.Chorus);
+            sections.Add(MusicEnums.eSectionType.Outro);
         }
     }
 }
