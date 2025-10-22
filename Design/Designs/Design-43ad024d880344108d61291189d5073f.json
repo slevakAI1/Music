@@ -1,0 +1,170 @@
+{
+  "DesignId": "43ad024d880344108d61291189d5073f",
+  "VoiceSet": {
+    "Voices": [
+      {
+        "VoiceName": "Drum Set"
+      },
+      {
+        "VoiceName": "Electric Bass"
+      },
+      {
+        "VoiceName": "Electric Guitar"
+      },
+      {
+        "VoiceName": "Techno Synth"
+      },
+      {
+        "VoiceName": "Guitar"
+      },
+      {
+        "VoiceName": "Drum Set"
+      },
+      {
+        "VoiceName": "Keyboard"
+      },
+      {
+        "VoiceName": "Base Guitar"
+      }
+    ]
+  },
+  "SectionSet": {
+    "Sections": [
+      {
+        "SectionType": 0,
+        "StartBar": 1,
+        "BarCount": 4,
+        "Name": null,
+        "Id": "f4047684-4d04-4938-939e-71f4309f1b9c"
+      },
+      {
+        "SectionType": 1,
+        "StartBar": 5,
+        "BarCount": 8,
+        "Name": null,
+        "Id": "59ac211e-3873-4ff2-b463-23c4e68df49b"
+      },
+      {
+        "SectionType": 2,
+        "StartBar": 13,
+        "BarCount": 8,
+        "Name": null,
+        "Id": "f5d6f5b9-74e5-4985-b057-0a26e5537f72"
+      },
+      {
+        "SectionType": 1,
+        "StartBar": 21,
+        "BarCount": 8,
+        "Name": null,
+        "Id": "9bf04768-3836-4a6e-9aa9-5151772a1d4e"
+      },
+      {
+        "SectionType": 2,
+        "StartBar": 29,
+        "BarCount": 8,
+        "Name": null,
+        "Id": "9cc0e363-7b4f-42c9-9a0c-f7498ae30551"
+      },
+      {
+        "SectionType": 4,
+        "StartBar": 37,
+        "BarCount": 8,
+        "Name": null,
+        "Id": "5d515fb4-122c-40f6-9238-4c92f4e780a3"
+      },
+      {
+        "SectionType": 2,
+        "StartBar": 45,
+        "BarCount": 8,
+        "Name": null,
+        "Id": "4b3ba60b-44f8-49c5-92ad-1ccea63263b5"
+      },
+      {
+        "SectionType": 5,
+        "StartBar": 53,
+        "BarCount": 4,
+        "Name": null,
+        "Id": "e19d2664-c296-401c-8cf2-b876ad675cd3"
+      }
+    ],
+    "TotalBars": 56
+  },
+  "HarmonicTimeline": {
+    "BeatsPerBar": 4,
+    "TempoBpm": 96,
+    "Events": [
+      {
+        "StartBar": 1,
+        "StartBeat": 1,
+        "DurationBeats": 4,
+        "Key": "C major",
+        "Degree": 1,
+        "Quality": "maj",
+        "Bass": "root"
+      },
+      {
+        "StartBar": 2,
+        "StartBeat": 1,
+        "DurationBeats": 4,
+        "Key": "C major",
+        "Degree": 5,
+        "Quality": "dom7",
+        "Bass": "root"
+      },
+      {
+        "StartBar": 3,
+        "StartBeat": 1,
+        "DurationBeats": 4,
+        "Key": "C major",
+        "Degree": 6,
+        "Quality": "min7",
+        "Bass": "root"
+      },
+      {
+        "StartBar": 4,
+        "StartBeat": 1,
+        "DurationBeats": 4,
+        "Key": "C major",
+        "Degree": 4,
+        "Quality": "maj",
+        "Bass": "root"
+      },
+      {
+        "StartBar": 5,
+        "StartBeat": 1,
+        "DurationBeats": 4,
+        "Key": "C major",
+        "Degree": 1,
+        "Quality": "maj",
+        "Bass": "root"
+      },
+      {
+        "StartBar": 6,
+        "StartBeat": 1,
+        "DurationBeats": 4,
+        "Key": "C major",
+        "Degree": 5,
+        "Quality": "dom7",
+        "Bass": "root"
+      },
+      {
+        "StartBar": 7,
+        "StartBeat": 1,
+        "DurationBeats": 4,
+        "Key": "C major",
+        "Degree": 6,
+        "Quality": "min7",
+        "Bass": "root"
+      },
+      {
+        "StartBar": 8,
+        "StartBeat": 1,
+        "DurationBeats": 4,
+        "Key": "C major",
+        "Degree": 4,
+        "Quality": "maj",
+        "Bass": "root"
+      }
+    ]
+  }
+}

@@ -178,6 +178,33 @@ namespace Music
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+            if (!EnsureScoreDesignOrNotify()) return;
+
+            try
+            {
+                var design = Globals.ScoreDesign!;
+                var json = System.Text.Json.JsonSerializer.Serialize(
+                    design,
+                    new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+
+                // Assume the folder exists under the project root: Design/Designs
+                var baseDir = AppContext.BaseDirectory;
+                var projectRoot = System.IO.Path.GetFullPath(System.IO.Path.Combine(baseDir, "..", "..", ".."));
+                var targetDir = System.IO.Path.Combine(projectRoot, "Design", "Designs");
+
+                var fileName = $"Design-{design.DesignId}.json";
+                var fullPath = System.IO.Path.Combine(targetDir, fileName);
+
+                System.IO.File.WriteAllText(fullPath, json);
+
+                MessageBox.Show(this, $"Design saved to:\n{fullPath}", "Saved",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, $"Failed to save design.\n{ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
