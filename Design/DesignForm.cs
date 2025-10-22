@@ -96,12 +96,12 @@ namespace Music
 */
 
         // Populate chords without touching the UI textboxes
-        private void btnAddChords_Click(object sender, EventArgs e)
-        {
-            if (!EnsureScoreDesignOrNotify()) return;
-            Globals.ScoreDesign!.ChordSet.AddDefaultChords();
-            RefreshDesignSpaceIfReady();
-        }
+        //private void btnAddChords_Click(object sender, EventArgs e)
+        //{
+        //    if (!EnsureScoreDesignOrNotify()) return;
+        //    Globals.ScoreDesign!.ChordSet.AddDefaultChords();
+        //    RefreshDesignSpaceIfReady();
+        //}
 
         private void btnCreateMusic_Click(object sender, EventArgs e)
         {

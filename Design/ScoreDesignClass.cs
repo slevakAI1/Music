@@ -12,7 +12,6 @@ namespace Music.Design
 
         // Design Space
         public VoiceSetClass VoiceSet { get; } = new();
-        public ChordSetClass ChordSet { get; } = new();
         public SectionSetClass Sections { get; } = new();
 
         // Actual Design - not started yet

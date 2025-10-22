@@ -11,7 +11,6 @@ namespace Music.Design
 
         // Holds the app/session harmonic timeline
         public static HarmonicTimeline? HarmonicTimeline { get; set; }
-        public static readonly ChordManagerClass ChordManager = new();
         public static readonly SectionSetManagerClass SectionManager = new();
     }
 }

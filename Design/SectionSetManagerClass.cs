@@ -10,7 +10,6 @@ namespace Music.Design
             IWin32Window owner,
             SectionSetClass sections,
             VoiceSetClass voiceSet,
-            ChordSetClass chordSet,
             TextBox txtSections,
             TextBox txtVoiceSet,
             TextBox txtChordSet)
@@ -27,7 +26,6 @@ namespace Music.Design
 
             // Reset dependent sets and displays (persisted objects; textboxes only show data)
             voiceSet.Reset();
-            chordSet.Reset();
             txtVoiceSet.Clear();
             txtChordSet.Clear();
         }

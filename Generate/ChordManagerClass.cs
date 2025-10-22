@@ -1,4 +1,6 @@
-namespace Music.Design
+using Music.Design;
+
+namespace Music.Generate
 {
     public sealed class ChordManagerClass
     {

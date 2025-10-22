@@ -1,4 +1,4 @@
-﻿namespace Music.Design
+﻿namespace Music.Generate
 {
     public class ChordClass
     {

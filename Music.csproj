@@ -36,7 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Generate\" />
     <Folder Include="Tests\InputSamples\" />
     <Folder Include="Tests\OutputSamples\" />
   </ItemGroup>

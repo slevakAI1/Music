@@ -10,7 +10,7 @@ namespace Music
             btnSave = new Button();
             lblFilepath = new Label();
             btnSelectVoices = new Button();
-            btnAddChords = new Button();
+            //btnAddChords = new Button();
             textBox1 = new TextBox();
             label1 = new Label();
             label2 = new Label();
@@ -59,17 +59,6 @@ namespace Music
             btnSelectVoices.Text = "Select Voices";
             btnSelectVoices.UseVisualStyleBackColor = true;
             btnSelectVoices.Click += btnSelectVoices_Click;
-            // 
-            // btnAddChords
-            // 
-            btnAddChords.BackColor = Color.Red;
-            btnAddChords.Location = new Point(43, 413);
-            btnAddChords.Name = "btnAddChords";
-            btnAddChords.Size = new Size(151, 23);
-            btnAddChords.TabIndex = 6;
-            btnAddChords.Text = "Add Chords";
-            btnAddChords.UseVisualStyleBackColor = false;
-            btnAddChords.Click += btnAddChords_Click;
             // 
             // textBox1
             // 
