@@ -131,7 +131,8 @@ namespace Music
             txtDesignSpace.Location = new Point(280, 12);
             txtDesignSpace.Multiline = true;
             txtDesignSpace.Name = "txtDesignSpace";
-            txtDesignSpace.Size = new Size(775, 489);
+            txtDesignSpace.ScrollBars = ScrollBars.Vertical;
+            txtDesignSpace.Size = new Size(775, 631);
             txtDesignSpace.TabIndex = 14;
             // 
             // btnAddHarmonicTimeline
@@ -146,7 +147,7 @@ namespace Music
             // 
             // GenerateForm
             // 
-            ClientSize = new Size(1085, 539);
+            ClientSize = new Size(1085, 655);
             Controls.Add(btnAddHarmonicTimeline);
             Controls.Add(txtDesignSpace);
             Controls.Add(btnNewDesign);
