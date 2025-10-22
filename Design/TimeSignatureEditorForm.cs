@@ -195,13 +195,9 @@ namespace Music.Design
 
             editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
             var meterPanel = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, AutoSize = true };
-            meterPanel.Controls.AddRange(new Control[]
-            {
-                new Label { Text = "Numerator:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 6, 0) },
-                _numNumerator,
-                new Label { Text = "Denominator:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(12, 6, 6, 0) },
-                _numDenominator
-            });
+            // Compact meter layout: [numerator] [/] [denominator]
+            var slashLabel = new Label { Text = "/", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(6, 6, 6, 0) };
+            meterPanel.Controls.AddRange(new Control[] { _numNumerator, slashLabel, _numDenominator });
             editor.Controls.Add(lblMeter, 0, row);
             editor.Controls.Add(meterPanel, 1, row);
             row++;
