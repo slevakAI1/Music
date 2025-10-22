@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Music.Design
+﻿namespace Music.Design
 {
     public class SectionClass
     {
