@@ -79,7 +79,7 @@ namespace Music
             }
         }
 
-        private void btnEditHarmonicTimeline_Click(object sender, EventArgs e)
+        private void btnEditHarmony_Click(object sender, EventArgs e)
         {
             if (!EnsureDesignOrNotify()) return;
 

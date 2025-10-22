@@ -25,7 +25,7 @@ namespace Music
             // 
             // btnEditSections
             // 
-            btnEditSections.Location = new Point(43, 323);
+            btnEditSections.Location = new Point(43, 316);
             btnEditSections.Name = "btnEditSections";
             btnEditSections.Size = new Size(96, 23);
             btnEditSections.TabIndex = 0;
@@ -35,7 +35,7 @@ namespace Music
             // 
             // btnSave
             // 
-            btnSave.Location = new Point(43, 153);
+            btnSave.Location = new Point(43, 149);
             btnSave.Name = "btnSave";
             btnSave.Size = new Size(96, 23);
             btnSave.TabIndex = 2;
@@ -45,7 +45,7 @@ namespace Music
             // 
             // btnEditVoices
             // 
-            btnEditVoices.Location = new Point(43, 278);
+            btnEditVoices.Location = new Point(43, 281);
             btnEditVoices.Name = "btnEditVoices";
             btnEditVoices.Size = new Size(96, 23);
             btnEditVoices.TabIndex = 4;
@@ -55,7 +55,7 @@ namespace Music
             // 
             // btnNew
             // 
-            btnNew.Location = new Point(43, 120);
+            btnNew.Location = new Point(43, 116);
             btnNew.Name = "btnNew";
             btnNew.Size = new Size(96, 23);
             btnNew.TabIndex = 13;
@@ -74,17 +74,17 @@ namespace Music
             // 
             // btnEditHarmony
             // 
-            btnEditHarmony.Location = new Point(43, 352);
+            btnEditHarmony.Location = new Point(43, 351);
             btnEditHarmony.Name = "btnEditHarmony";
             btnEditHarmony.Size = new Size(96, 23);
             btnEditHarmony.TabIndex = 15;
             btnEditHarmony.Text = "Harmony";
             btnEditHarmony.UseVisualStyleBackColor = true;
-            btnEditHarmony.Click += btnEditHarmonicTimeline_Click;
+            btnEditHarmony.Click += btnEditHarmony_Click;
             // 
             // btnSetDefault
             // 
-            btnSetDefault.Location = new Point(43, 88);
+            btnSetDefault.Location = new Point(43, 83);
             btnSetDefault.Name = "btnSetDefault";
             btnSetDefault.Size = new Size(96, 23);
             btnSetDefault.TabIndex = 16;
@@ -94,7 +94,7 @@ namespace Music
             // 
             // btnLoad
             // 
-            btnLoad.Location = new Point(43, 186);
+            btnLoad.Location = new Point(43, 182);
             btnLoad.Name = "btnLoad";
             btnLoad.Size = new Size(96, 23);
             btnLoad.TabIndex = 17;
@@ -152,6 +152,7 @@ namespace Music
             // 
             // panel1
             // 
+            panel1.BorderStyle = BorderStyle.FixedSingle;
             panel1.Location = new Point(28, 73);
             panel1.Name = "panel1";
             panel1.Size = new Size(138, 145);
@@ -159,9 +160,10 @@ namespace Music
             // 
             // panel2
             // 
+            panel2.BorderStyle = BorderStyle.FixedSingle;
             panel2.Location = new Point(28, 268);
             panel2.Name = "panel2";
-            panel2.Size = new Size(138, 194);
+            panel2.Size = new Size(138, 191);
             panel2.TabIndex = 24;
             // 
             // DesignForm
