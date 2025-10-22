@@ -60,5 +60,26 @@ namespace Music.Design
                 _nextBar += s.BarCount > 0 ? s.BarCount : 1;
             }
         }
+
+        // Preserve StartBar values and only sync internal next-bar based on existing sections
+        public void SyncAfterExternalLoad()
+        {
+            if (Sections.Count == 0)
+            {
+                _nextBar = 1;
+                return;
+            }
+
+            int lastEnd = 0;
+            foreach (var s in Sections)
+            {
+                if (s == null) continue;
+                int start = s.StartBar > 0 ? s.StartBar : 1;
+                int len = s.BarCount > 0 ? s.BarCount : 1;
+                int end = start + len - 1;
+                if (end > lastEnd) lastEnd = end;
+            }
+            _nextBar = lastEnd + 1;
+        }
     }
 }

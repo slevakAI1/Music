@@ -15,7 +15,7 @@ namespace Music.Design
 
             var design = new DesignClass(dto.DesignId);
 
-            // Voices
+            // Voices (preserve order as given in JSON)
             design.VoiceSet.Reset();
             if (dto.VoiceSet?.Voices != null)
             {
@@ -26,27 +26,38 @@ namespace Music.Design
                 }
             }
 
-            // Sections (compute StartBar via Add)
+            // Sections: preserve StartBar and order from JSON (no recalculation)
             design.SectionSet.Reset();
             if (dto.SectionSet?.Sections != null)
             {
                 foreach (var s in dto.SectionSet.Sections)
                 {
-                    design.SectionSet.Add((MusicEnums.eSectionType)s.SectionType, s.BarCount > 0 ? s.BarCount : 1, s.Name);
+                    design.SectionSet.Sections.Add(new SectionClass
+                    {
+                        SectionType = (MusicEnums.eSectionType)s.SectionType,
+                        StartBar = s.StartBar > 0 ? s.StartBar : 1,
+                        BarCount = s.BarCount > 0 ? s.BarCount : 1,
+                        Name = s.Name,
+                        // Id is runtime-only; keep a new Guid or copy if needed
+                    });
                 }
+                // Sync internal state based on existing StartBar/BarCount without changing them
+                design.SectionSet.SyncAfterExternalLoad();
             }
 
-            // Harmonic timeline
+            // Harmonic timeline: preserve order and values
             if (dto.HarmonicTimeline != null)
             {
-                var tl = new HarmonicTimeline();
-                tl.ConfigureGlobal($"{dto.HarmonicTimeline.BeatsPerBar}/4", dto.HarmonicTimeline.TempoBpm);
+                var tl = new HarmonicTimeline
+                {
+                    BeatsPerBar = dto.HarmonicTimeline.BeatsPerBar > 0 ? dto.HarmonicTimeline.BeatsPerBar : 4,
+                    TempoBpm = dto.HarmonicTimeline.TempoBpm
+                };
                 if (dto.HarmonicTimeline.Events != null)
                 {
                     foreach (var e in dto.HarmonicTimeline.Events)
                     {
-                        // Ensure each event is inserted to build index
-                        tl.Add(new HarmonicEvent
+                        tl.Events.Add(new HarmonicEvent
                         {
                             StartBar = e.StartBar,
                             StartBeat = e.StartBeat,
@@ -58,6 +69,8 @@ namespace Music.Design
                         });
                     }
                 }
+                // Build index without changing the list or StartBar values
+                tl.EnsureIndexed();
                 design.HarmonicTimeline = tl;
             }
 

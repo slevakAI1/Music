@@ -5,9 +5,9 @@
         // Existing
         public MusicEnums.eSectionType SectionType { get; set; }
 
-        // New: placement and size in bars
-        // StartBar is 1-based and assigned by SectionSetClass.Add(...)
-        public int StartBar { get; internal set; }
+        // Placement and size in bars
+        // StartBar is 1-based
+        public int StartBar { get; set; }
 
         // Defaults to 4 bars unless specified at add time
         public int BarCount { get; set; } = 4;
