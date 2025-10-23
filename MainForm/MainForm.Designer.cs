@@ -42,6 +42,9 @@
             MenuForm = new ToolStripMenuItem();
             MenuMusic = new ToolStripMenuItem();
             MenuTestForm = new ToolStripMenuItem();
+            designToolStripMenuItem = new ToolStripMenuItem();
+            generateToolStripMenuItem = new ToolStripMenuItem();
+            testToolStripMenuItem = new ToolStripMenuItem();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             menuStrip1.SuspendLayout();
@@ -50,7 +53,7 @@
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { MenuFile, MenuForm });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { MenuFile, MenuForm, designToolStripMenuItem, generateToolStripMenuItem, testToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(613, 24);
@@ -88,16 +91,37 @@
             // MenuMusic
             // 
             MenuMusic.Name = "MenuMusic";
-            MenuMusic.Size = new Size(180, 22);
+            MenuMusic.Size = new Size(106, 22);
             MenuMusic.Text = "Music";
             MenuMusic.Click += MenuGenerateForm_Click;
             // 
             // MenuTestForm
             // 
             MenuTestForm.Name = "MenuTestForm";
-            MenuTestForm.Size = new Size(180, 22);
+            MenuTestForm.Size = new Size(106, 22);
             MenuTestForm.Text = "Tests";
             MenuTestForm.Click += MenuTestForm_Click;
+            // 
+            // designToolStripMenuItem
+            // 
+            designToolStripMenuItem.Name = "designToolStripMenuItem";
+            designToolStripMenuItem.Size = new Size(55, 20);
+            designToolStripMenuItem.Text = "Design";
+            designToolStripMenuItem.Click += designToolStripMenuItem_Click;
+            // 
+            // generateToolStripMenuItem
+            // 
+            generateToolStripMenuItem.Name = "generateToolStripMenuItem";
+            generateToolStripMenuItem.Size = new Size(66, 20);
+            generateToolStripMenuItem.Text = "Generate";
+            generateToolStripMenuItem.Click += generateToolStripMenuItem_Click;
+            // 
+            // testToolStripMenuItem
+            // 
+            testToolStripMenuItem.Name = "testToolStripMenuItem";
+            testToolStripMenuItem.Size = new Size(40, 20);
+            testToolStripMenuItem.Text = "Test";
+            testToolStripMenuItem.Click += testToolStripMenuItem_Click;
             // 
             // statusStrip1
             // 
@@ -137,5 +161,8 @@
 
         private ToolStripMenuItem MenuImportMusicXml;
         private ToolStripMenuItem MenuTestForm;
+        private ToolStripMenuItem designToolStripMenuItem;
+        private ToolStripMenuItem generateToolStripMenuItem;
+        private ToolStripMenuItem testToolStripMenuItem;
     }
 }
