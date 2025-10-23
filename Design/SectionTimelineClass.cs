@@ -1,7 +1,7 @@
 namespace Music.Design
 {
     // Score Sections
-    public class SectionSetClass
+    public class SectionTimelineClass
     {
         public List<SectionClass> Sections { get; set; } = new();
 

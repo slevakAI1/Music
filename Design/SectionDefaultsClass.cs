@@ -8,7 +8,7 @@ namespace Music.Design
         // Populate the provided SectionsClass (persisted on the design), render its summary, and reset dependent sets/displays
         public void SetDefaultSections(
             IWin32Window owner,
-            SectionSetClass sections,
+            SectionTimelineClass sections,
             VoiceSetClass voiceSet)
         {
             CreateTestSections(sections);
@@ -27,7 +27,7 @@ namespace Music.Design
         /// Structure: Intro → Verse → Chorus → Verse → Chorus → Bridge → Chorus → Outro
         /// Measures per section (total 48 bars): Intro=4, Verse/Chorus=8, Bridge=4, final Chorus=4, Outro=4
         /// </summary>
-        public void CreateTestSections(SectionSetClass sections)
+        public void CreateTestSections(SectionTimelineClass sections)
         {
             sections.Reset();
 

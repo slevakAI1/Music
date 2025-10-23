@@ -10,7 +10,7 @@
         // Design Space
         public VoiceSetClass VoiceSet { get; set; } = new();
 
-        public SectionSetClass SectionSet { get; set; } = new();
+        public SectionTimelineClass SectionSet { get; set; } = new();
 
         // Harmonic timeline persisted with the design
         public HarmonicTimeline? HarmonicTimeline { get; set; }

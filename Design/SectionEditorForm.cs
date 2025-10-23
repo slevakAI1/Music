@@ -34,9 +34,9 @@ namespace Music.Design
         // Prevent programmatic editor changes from writing back into the model
         private bool _suppressEditorApply;
 
-        public SectionSetClass ResultSections { get; private set; } = new SectionSetClass();
+        public SectionTimelineClass ResultSections { get; private set; } = new SectionTimelineClass();
 
-        public SectionEditorForm(SectionSetClass? initial = null)
+        public SectionEditorForm(SectionTimelineClass? initial = null)
         {
             Text = "Edit Sections";
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -224,7 +224,7 @@ namespace Music.Design
             };
         }
 
-        private void LoadInitial(SectionSetClass? initial)
+        private void LoadInitial(SectionTimelineClass? initial)
         {
             _working.Clear();
 
@@ -586,9 +586,9 @@ namespace Music.Design
             UpdateButtonsEnabled();
         }
 
-        private SectionSetClass BuildResult()
+        private SectionTimelineClass BuildResult()
         {
-            var result = new SectionSetClass();
+            var result = new SectionTimelineClass();
             foreach (var s in _working)
             {
                 result.Add(s.SectionType, s.BarCount, s.Name);
@@ -599,7 +599,7 @@ namespace Music.Design
 
         private void ApplyDefaultSections()
         {
-            var defaults = new SectionSetClass();
+            var defaults = new SectionTimelineClass();
             var defBuilder = new SectionDefaultsClass();
             defBuilder.CreateTestSections(defaults);
 
