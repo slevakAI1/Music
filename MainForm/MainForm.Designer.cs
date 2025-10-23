@@ -9,8 +9,6 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem MenuFile;
         private System.Windows.Forms.ToolStripMenuItem MenuExportMusicXml;
-        private System.Windows.Forms.ToolStripMenuItem MenuForm;
-        private System.Windows.Forms.ToolStripMenuItem MenuMusic;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
 
@@ -39,9 +37,6 @@
             MenuFile = new ToolStripMenuItem();
             MenuImportMusicXml = new ToolStripMenuItem();
             MenuExportMusicXml = new ToolStripMenuItem();
-            MenuForm = new ToolStripMenuItem();
-            MenuMusic = new ToolStripMenuItem();
-            MenuTestForm = new ToolStripMenuItem();
             designToolStripMenuItem = new ToolStripMenuItem();
             generateToolStripMenuItem = new ToolStripMenuItem();
             testToolStripMenuItem = new ToolStripMenuItem();
@@ -53,7 +48,7 @@
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { MenuFile, MenuForm, designToolStripMenuItem, generateToolStripMenuItem, testToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { MenuFile, designToolStripMenuItem, generateToolStripMenuItem, testToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(613, 24);
@@ -80,27 +75,6 @@
             MenuExportMusicXml.Size = new Size(166, 22);
             MenuExportMusicXml.Text = "Export MusicXML";
             MenuExportMusicXml.Click += MenuExportMusicXml_Click;
-            // 
-            // MenuForm
-            // 
-            MenuForm.DropDownItems.AddRange(new ToolStripItem[] { MenuMusic, MenuTestForm });
-            MenuForm.Name = "MenuForm";
-            MenuForm.Size = new Size(47, 20);
-            MenuForm.Text = "Form";
-            // 
-            // MenuMusic
-            // 
-            MenuMusic.Name = "MenuMusic";
-            MenuMusic.Size = new Size(106, 22);
-            MenuMusic.Text = "Music";
-            MenuMusic.Click += MenuGenerateForm_Click;
-            // 
-            // MenuTestForm
-            // 
-            MenuTestForm.Name = "MenuTestForm";
-            MenuTestForm.Size = new Size(106, 22);
-            MenuTestForm.Text = "Tests";
-            MenuTestForm.Click += MenuTestForm_Click;
             // 
             // designToolStripMenuItem
             // 
@@ -160,7 +134,6 @@
         #endregion
 
         private ToolStripMenuItem MenuImportMusicXml;
-        private ToolStripMenuItem MenuTestForm;
         private ToolStripMenuItem designToolStripMenuItem;
         private ToolStripMenuItem generateToolStripMenuItem;
         private ToolStripMenuItem testToolStripMenuItem;

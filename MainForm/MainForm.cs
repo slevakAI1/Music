@@ -56,17 +56,7 @@ namespace Music
         {
             _fileManager.ExportMusicXml(this);
         }
-
-        private void MenuGenerateForm_Click(object sender, EventArgs e)
-        {
-            ShowChildForm(typeof(DesignForm));
-        }
-
-        private void MenuTestForm_Click(object sender, EventArgs e)
-        {
-            ShowChildForm(typeof(TestForm));
-        }
-
+     
         // Your top-level menu item handlers (wired via designer)
         private void designToolStripMenuItem_Click(object sender, EventArgs e)
         {
