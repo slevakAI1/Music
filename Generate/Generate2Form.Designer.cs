@@ -94,6 +94,20 @@ namespace Music.Generate
             tt = new ToolTip(components);
             groupBox1 = new GroupBox();
             label2 = new Label();
+
+            // New time/duration controls
+            lblNoteValue = new Label();
+            cbNoteValue = new ComboBox();
+            lblDots = new Label();
+            numDots = new NumericUpDown();
+            chkTupletEnabled = new CheckBox();
+            lblTupletCount = new Label();
+            numTupletCount = new NumericUpDown();
+            lblTupletOf = new Label();
+            numTupletOf = new NumericUpDown();
+            chkTieAcross = new CheckBox();
+            chkFermata = new CheckBox();
+
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -106,6 +120,10 @@ namespace Music.Generate
             grpKeyRelative.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numDegree).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numOctaveKR).BeginInit();
+            // BeginInit for new numeric controls
+            ((System.ComponentModel.ISupportInitialize)numDots).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numTupletCount).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numTupletOf).BeginInit();
             groupBox1.SuspendLayout();
             SuspendLayout();
             // 
@@ -482,6 +500,18 @@ namespace Music.Generate
             // groupBox1
             // 
             groupBox1.Controls.Add(label2);
+            // add new controls into groupBox1
+            groupBox1.Controls.Add(lblNoteValue);
+            groupBox1.Controls.Add(cbNoteValue);
+            groupBox1.Controls.Add(lblDots);
+            groupBox1.Controls.Add(numDots);
+            groupBox1.Controls.Add(chkTupletEnabled);
+            groupBox1.Controls.Add(lblTupletCount);
+            groupBox1.Controls.Add(numTupletCount);
+            groupBox1.Controls.Add(lblTupletOf);
+            groupBox1.Controls.Add(numTupletOf);
+            groupBox1.Controls.Add(chkTieAcross);
+            groupBox1.Controls.Add(chkFermata);
             groupBox1.Location = new Point(458, 330);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(285, 220);
@@ -492,11 +522,112 @@ namespace Music.Generate
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(15, 41);
+            label2.Location = new Point(15, 15);
             label2.Name = "label2";
             label2.Size = new Size(82, 15);
             label2.TabIndex = 6;
             label2.Text = "Note Duration";
+            // 
+            // lblNoteValue
+            // 
+            lblNoteValue.AutoSize = true;
+            lblNoteValue.Location = new Point(15, 40);
+            lblNoteValue.Name = "lblNoteValue";
+            lblNoteValue.Size = new Size(65, 15);
+            lblNoteValue.TabIndex = 7;
+            lblNoteValue.Text = "Base value:";
+            // 
+            // cbNoteValue
+            // 
+            cbNoteValue.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbNoteValue.Location = new Point(90, 36);
+            cbNoteValue.Name = "cbNoteValue";
+            cbNoteValue.Size = new Size(175, 23);
+            cbNoteValue.TabIndex = 8;
+            // items will be populated in code-behind later (breve, whole, half, quarter, eighth, 16th, 32nd, 64th, 128th, 256th)
+            // 
+            // lblDots
+            // 
+            lblDots.AutoSize = true;
+            lblDots.Location = new Point(15, 70);
+            lblDots.Name = "lblDots";
+            lblDots.Size = new Size(33, 15);
+            lblDots.TabIndex = 9;
+            lblDots.Text = "Dots:";
+            // 
+            // numDots
+            // 
+            numDots.Location = new Point(90, 66);
+            numDots.Maximum = new decimal(new int[] { 3, 0, 0, 0 });
+            numDots.Name = "numDots";
+            numDots.Size = new Size(60, 23);
+            numDots.TabIndex = 10;
+            numDots.Value = new decimal(new int[] { 0, 0, 0, 0 });
+            // 
+            // chkTupletEnabled
+            // 
+            chkTupletEnabled.AutoSize = true;
+            chkTupletEnabled.Location = new Point(15, 100);
+            chkTupletEnabled.Name = "chkTupletEnabled";
+            chkTupletEnabled.Size = new Size(102, 19);
+            chkTupletEnabled.TabIndex = 11;
+            chkTupletEnabled.Text = "Enable Tuplet";
+            // 
+            // lblTupletCount
+            // 
+            lblTupletCount.AutoSize = true;
+            lblTupletCount.Location = new Point(30, 128);
+            lblTupletCount.Name = "lblTupletCount";
+            lblTupletCount.Size = new Size(60, 15);
+            lblTupletCount.TabIndex = 12;
+            lblTupletCount.Text = "Count (m):";
+            // 
+            // numTupletCount
+            // 
+            numTupletCount.Location = new Point(100, 124);
+            numTupletCount.Maximum = new decimal(new int[] { 64, 0, 0, 0 });
+            numTupletCount.Minimum = new decimal(new int[] { 2, 0, 0, 0 });
+            numTupletCount.Name = "numTupletCount";
+            numTupletCount.Size = new Size(60, 23);
+            numTupletCount.TabIndex = 13;
+            numTupletCount.Value = new decimal(new int[] { 3, 0, 0, 0 });
+            // 
+            // lblTupletOf
+            // 
+            lblTupletOf.AutoSize = true;
+            lblTupletOf.Location = new Point(170, 128);
+            lblTupletOf.Name = "lblTupletOf";
+            lblTupletOf.Size = new Size(36, 15);
+            lblTupletOf.TabIndex = 14;
+            lblTupletOf.Text = "Of (n):";
+            // 
+            // numTupletOf
+            // 
+            numTupletOf.Location = new Point(210, 124);
+            numTupletOf.Maximum = new decimal(new int[] { 64, 0, 0, 0 });
+            numTupletOf.Minimum = new decimal(new int[] { 2, 0, 0, 0 });
+            numTupletOf.Name = "numTupletOf";
+            numTupletOf.Size = new Size(55, 23);
+            numTupletOf.TabIndex = 15;
+            numTupletOf.Value = new decimal(new int[] { 2, 0, 0, 0 });
+            // 
+            // chkTieAcross
+            // 
+            chkTieAcross.AutoSize = true;
+            chkTieAcross.Location = new Point(15, 160);
+            chkTieAcross.Name = "chkTieAcross";
+            chkTieAcross.Size = new Size(106, 19);
+            chkTieAcross.TabIndex = 16;
+            chkTieAcross.Text = "Allow ties across";
+            // 
+            // chkFermata
+            // 
+            chkFermata.AutoSize = true;
+            chkFermata.Location = new Point(150, 160);
+            chkFermata.Name = "chkFermata";
+            chkFermata.Size = new Size(68, 19);
+            chkFermata.TabIndex = 17;
+            chkFermata.Text = "Fermata";
             // 
             // Generate2Form
             // 
@@ -526,6 +657,10 @@ namespace Music.Generate
             grpKeyRelative.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)numDegree).EndInit();
             ((System.ComponentModel.ISupportInitialize)numOctaveKR).EndInit();
+            // EndInit for new numeric controls
+            ((System.ComponentModel.ISupportInitialize)numDots).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numTupletCount).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numTupletOf).EndInit();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             ResumeLayout(false);
@@ -539,5 +674,18 @@ namespace Music.Generate
         private Label label1;
         private GroupBox groupBox1;
         private Label label2;
+
+        // New time/duration control fields
+        private Label lblNoteValue;
+        private ComboBox cbNoteValue;
+        private Label lblDots;
+        private NumericUpDown numDots;
+        private CheckBox chkTupletEnabled;
+        private Label lblTupletCount;
+        private NumericUpDown numTupletCount;
+        private Label lblTupletOf;
+        private NumericUpDown numTupletOf;
+        private CheckBox chkTieAcross;
+        private CheckBox chkFermata;
     }
 }
