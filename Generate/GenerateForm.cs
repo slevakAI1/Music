@@ -31,7 +31,7 @@ namespace Music.Generate
             rbPitchAbsolute.Checked = true;
 
             // Load current global score and design into form-local fields for later use
-            _score = Globals.CurrentScore;
+            _score = Globals.Score;
             _design = Globals.Design;
         }
 

@@ -8,6 +8,6 @@ namespace Music
         public static DesignClass? Design { get; set; }
 
         // Holds the currently loaded MusicXML score for application-wide access
-        public static Score? CurrentScore { get; set; }
+        public static Score? Score { get; set; }
     }
 }

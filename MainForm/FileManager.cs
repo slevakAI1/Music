@@ -27,10 +27,10 @@ namespace Music
                     if (string.IsNullOrWhiteSpace(ofd.FileName) || !File.Exists(ofd.FileName))
                         throw new FileNotFoundException("MusicXML file not found.", ofd.FileName);
 
-                    Globals.CurrentScore = MusicXmlParser.GetScore(ofd.FileName);
+                    Globals.Score = MusicXmlParser.GetScore(ofd.FileName);
                     _lastImportedPath = ofd.FileName;
 
-                    var movement = Globals.CurrentScore?.MovementTitle ?? "Unknown";
+                    var movement = Globals.Score?.MovementTitle ?? "Unknown";
                     _showStatus?.Invoke($"Loaded MusicXML: {Path.GetFileName(ofd.FileName)} (Movement: {movement})");
                 }
                 catch (Exception ex)
