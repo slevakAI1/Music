@@ -92,6 +92,8 @@ namespace Music.Generate
             lblStatus = new Label();
             tt = new ToolTip(components);
             groupBox1 = new GroupBox();
+            label3 = new Label();
+            numericUpDown1 = new NumericUpDown();
             lblNoteValue = new Label();
             cbNoteValue = new ComboBox();
             lblDots = new Label();
@@ -103,8 +105,6 @@ namespace Music.Generate
             numTupletOf = new NumericUpDown();
             chkTieAcross = new CheckBox();
             chkFermata = new CheckBox();
-            numericUpDown1 = new NumericUpDown();
-            label3 = new Label();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -118,21 +118,21 @@ namespace Music.Generate
             ((System.ComponentModel.ISupportInitialize)numDegree).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numOctaveKR).BeginInit();
             groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numDots).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numTupletCount).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numTupletOf).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             SuspendLayout();
             // 
             // lblTitle
             // 
             lblTitle.AutoSize = true;
             lblTitle.Font = new Font("Segoe UI", 18F);
-            lblTitle.Location = new Point(20, 15);
+            lblTitle.Location = new Point(369, 9);
             lblTitle.Name = "lblTitle";
-            lblTitle.Size = new Size(262, 32);
+            lblTitle.Size = new Size(111, 32);
             lblTitle.TabIndex = 0;
-            lblTitle.Text = "Generate 2 (MusicXML)";
+            lblTitle.Text = "Generate";
             // 
             // cbPattern
             // 
@@ -523,6 +523,22 @@ namespace Music.Generate
             groupBox1.TabStop = false;
             groupBox1.Text = "Rhythm options";
             // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(15, 166);
+            label3.Name = "label3";
+            label3.Size = new Size(99, 15);
+            label3.TabIndex = 19;
+            label3.Text = "Number of Notes";
+            // 
+            // numericUpDown1
+            // 
+            numericUpDown1.Location = new Point(124, 164);
+            numericUpDown1.Name = "numericUpDown1";
+            numericUpDown1.Size = new Size(71, 23);
+            numericUpDown1.TabIndex = 18;
+            // 
             // lblNoteValue
             // 
             lblNoteValue.AutoSize = true;
@@ -622,22 +638,6 @@ namespace Music.Generate
             chkFermata.TabIndex = 17;
             chkFermata.Text = "Fermata";
             // 
-            // numericUpDown1
-            // 
-            numericUpDown1.Location = new Point(124, 164);
-            numericUpDown1.Name = "numericUpDown1";
-            numericUpDown1.Size = new Size(71, 23);
-            numericUpDown1.TabIndex = 18;
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new Point(15, 166);
-            label3.Name = "label3";
-            label3.Size = new Size(99, 15);
-            label3.TabIndex = 19;
-            label3.Text = "Number of Notes";
-            // 
             // GenerateForm
             // 
             ClientSize = new Size(900, 600);
@@ -668,10 +668,10 @@ namespace Music.Generate
             ((System.ComponentModel.ISupportInitialize)numOctaveKR).EndInit();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
             ((System.ComponentModel.ISupportInitialize)numDots).EndInit();
             ((System.ComponentModel.ISupportInitialize)numTupletCount).EndInit();
             ((System.ComponentModel.ISupportInitialize)numTupletOf).EndInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
