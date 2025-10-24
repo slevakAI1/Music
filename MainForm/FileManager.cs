@@ -6,7 +6,6 @@ namespace Music
     internal sealed class FileManager
     {
         private readonly Action<string>? _showStatus;
-        private Score? _currentScore;
         private string? _lastImportedPath;
 
         public FileManager(Action<string>? showStatus = null)
@@ -28,10 +27,10 @@ namespace Music
                     if (string.IsNullOrWhiteSpace(ofd.FileName) || !File.Exists(ofd.FileName))
                         throw new FileNotFoundException("MusicXML file not found.", ofd.FileName);
 
-                    _currentScore = MusicXmlParser.GetScore(ofd.FileName);
+                    Globals.CurrentScore = MusicXmlParser.GetScore(ofd.FileName);
                     _lastImportedPath = ofd.FileName;
 
-                    var movement = _currentScore?.MovementTitle ?? "Unknown";
+                    var movement = Globals.CurrentScore?.MovementTitle ?? "Unknown";
                     _showStatus?.Invoke($"Loaded MusicXML: {Path.GetFileName(ofd.FileName)} (Movement: {movement})");
                 }
                 catch (Exception ex)

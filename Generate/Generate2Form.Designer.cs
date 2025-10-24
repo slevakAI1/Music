@@ -55,6 +55,9 @@ namespace Music.Generate
             lblTitle = new Label();
             cbPattern = new ComboBox();
             grpTarget = new GroupBox();
+            checkBox1 = new CheckBox();
+            txtSections = new TextBox();
+            lblSections = new Label();
             lblStartBeat = new Label();
             numStartBeat = new NumericUpDown();
             lblEndBeat = new Label();
@@ -101,9 +104,6 @@ namespace Music.Generate
             numTupletOf = new NumericUpDown();
             chkTieAcross = new CheckBox();
             chkFermata = new CheckBox();
-            lblSections = new Label();
-            txtSections = new TextBox();
-            checkBox1 = new CheckBox();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -166,6 +166,32 @@ namespace Music.Generate
             grpTarget.TabStop = false;
             grpTarget.Text = "Target Scope";
             // 
+            // checkBox1
+            // 
+            checkBox1.AutoSize = true;
+            checkBox1.Location = new Point(215, 62);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(40, 19);
+            checkBox1.TabIndex = 18;
+            checkBox1.Text = "All";
+            // 
+            // txtSections
+            // 
+            txtSections.BorderStyle = BorderStyle.FixedSingle;
+            txtSections.Location = new Point(81, 89);
+            txtSections.Name = "txtSections";
+            txtSections.Size = new Size(297, 23);
+            txtSections.TabIndex = 17;
+            // 
+            // lblSections
+            // 
+            lblSections.AutoSize = true;
+            lblSections.Location = new Point(15, 93);
+            lblSections.Name = "lblSections";
+            lblSections.Size = new Size(54, 15);
+            lblSections.TabIndex = 16;
+            lblSections.Text = "Sections:";
+            // 
             // lblStartBeat
             // 
             lblStartBeat.AutoSize = true;
@@ -202,7 +228,7 @@ namespace Music.Generate
             numericUpDown2.Name = "numericUpDown2";
             numericUpDown2.Size = new Size(120, 23);
             numericUpDown2.TabIndex = 14;
-            numericUpDown2.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            numericUpDown2.Value = new decimal(new int[] { 4, 0, 0, 0 });
             // 
             // lblPart
             // 
@@ -576,7 +602,7 @@ namespace Music.Generate
             // 
             // numTupletOf
             // 
-            numTupletOf.Location = new Point(210, 143);
+            numTupletOf.Location = new Point(212, 143);
             numTupletOf.Maximum = new decimal(new int[] { 64, 0, 0, 0 });
             numTupletOf.Minimum = new decimal(new int[] { 2, 0, 0, 0 });
             numTupletOf.Name = "numTupletOf";
@@ -601,32 +627,6 @@ namespace Music.Generate
             chkFermata.Size = new Size(69, 19);
             chkFermata.TabIndex = 17;
             chkFermata.Text = "Fermata";
-            // 
-            // lblSections
-            // 
-            lblSections.AutoSize = true;
-            lblSections.Location = new Point(15, 93);
-            lblSections.Name = "lblSections";
-            lblSections.Size = new Size(54, 15);
-            lblSections.TabIndex = 16;
-            lblSections.Text = "Sections:";
-            // 
-            // txtSections
-            // 
-            txtSections.BorderStyle = BorderStyle.FixedSingle;
-            txtSections.Location = new Point(81, 89);
-            txtSections.Name = "txtSections";
-            txtSections.Size = new Size(297, 23);
-            txtSections.TabIndex = 17;
-            // 
-            // checkBox1
-            // 
-            checkBox1.AutoSize = true;
-            checkBox1.Location = new Point(215, 62);
-            checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(40, 19);
-            checkBox1.TabIndex = 18;
-            checkBox1.Text = "All";
             // 
             // Generate2Form
             // 
