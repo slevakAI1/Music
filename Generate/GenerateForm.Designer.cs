@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            btnEditVoices = new Button();
+            btnSetWholeNote = new Button();
             label1 = new Label();
             lblDesign = new Label();
             lblEdit = new Label();
@@ -45,14 +45,14 @@
             panel2 = new Panel();
             SuspendLayout();
             // 
-            // btnEditVoices
+            // btnSetWholeNote
             // 
-            btnEditVoices.Location = new Point(30, 285);
-            btnEditVoices.Name = "btnEditVoices";
-            btnEditVoices.Size = new Size(96, 23);
-            btnEditVoices.TabIndex = 27;
-            btnEditVoices.Text = "?";
-            btnEditVoices.UseVisualStyleBackColor = true;
+            btnSetWholeNote.Location = new Point(30, 285);
+            btnSetWholeNote.Name = "btnSetWholeNote";
+            btnSetWholeNote.Size = new Size(119, 23);
+            btnSetWholeNote.TabIndex = 27;
+            btnSetWholeNote.Text = "Set Whole Note";
+            btnSetWholeNote.UseVisualStyleBackColor = true;
             // 
             // label1
             // 
@@ -184,7 +184,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1039, 777);
-            Controls.Add(btnEditVoices);
+            Controls.Add(btnSetWholeNote);
             Controls.Add(label1);
             Controls.Add(lblDesign);
             Controls.Add(lblEdit);
@@ -208,7 +208,7 @@
 
         #endregion
 
-        private Button btnEditVoices;
+        private Button btnSetWholeNote;
         private Label label1;
         private Label lblDesign;
         private Label lblEdit;

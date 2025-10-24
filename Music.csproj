@@ -10,8 +10,11 @@
 
   <ItemGroup>
     <Compile Remove="Design\MusicXmlFiles\**" />
+    <Compile Remove="Generate\Prototypes\**" />
     <EmbeddedResource Remove="Design\MusicXmlFiles\**" />
+    <EmbeddedResource Remove="Generate\Prototypes\**" />
     <None Remove="Design\MusicXmlFiles\**" />
+    <None Remove="Generate\Prototypes\**" />
   </ItemGroup>
 
   <ItemGroup>

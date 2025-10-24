@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+
 namespace Music
 {
     public partial class MainForm : Form
@@ -65,7 +70,14 @@ namespace Music
 
         private void generateToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // Launch the new Generate2 form.
+            ShowChildForm(typeof(Music.Generate.Generate2Form));
+
+            // Previous behavior: launch the original Generate form.
+            // Commented out per request — do not remove.
+            /*
             ShowChildForm(typeof(Music.Generate.GenerateForm));
+            */
         }
 
         private void testToolStripMenuItem_Click(object sender, EventArgs e)

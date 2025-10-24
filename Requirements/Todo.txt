@@ -3,3 +3,28 @@
 Update Section to allow for number of measures
 Add a form to create the sections similar to add voices
 Update the combined text builder to include the new measures
+
+
+
+
+(Pattern Specific) ParameterDefinitions - control type, data type, range, (dependencies later)
+
+Pattern - this will be pattern name + the config of the pattern specific parameters - just list of parameters
+Patterns - this is the collection of all available patterns?
+
+Pattern(Instances) - this will be the instance of a pattern with the standard and
+    pattern specific parameter values
+PatternManager - this will manage the loading and saving of patterns and instances
+
+On the form -- list of available patterns in drop down
+on form  - list of avaiable patterns instances in drop down
+
+Pattern instances and targets may be separate - so you 
+    can apply the same pattern instance to different targets?
+
+to apply - select pattern instance, then targets, then apply
+
+
+
+
+
