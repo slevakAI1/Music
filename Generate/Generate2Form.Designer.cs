@@ -11,8 +11,6 @@ namespace Music.Generate
         private System.Windows.Forms.CheckBox chkAllParts;
         private System.Windows.Forms.ComboBox cbPart;
         private System.Windows.Forms.Label lblPart;
-        private System.Windows.Forms.Label lblVoices;
-        private System.Windows.Forms.TextBox txtVoices;
         private System.Windows.Forms.Label lblStaff;
         private System.Windows.Forms.NumericUpDown numStaff;
         private System.Windows.Forms.Label lblStartBar;
@@ -64,8 +62,6 @@ namespace Music.Generate
             lblPart = new Label();
             cbPart = new ComboBox();
             chkAllParts = new CheckBox();
-            lblVoices = new Label();
-            txtVoices = new TextBox();
             lblStaff = new Label();
             numStaff = new NumericUpDown();
             lblStartBar = new Label();
@@ -94,8 +90,6 @@ namespace Music.Generate
             tt = new ToolTip(components);
             groupBox1 = new GroupBox();
             label2 = new Label();
-
-            // New time/duration controls
             lblNoteValue = new Label();
             cbNoteValue = new ComboBox();
             lblDots = new Label();
@@ -107,7 +101,9 @@ namespace Music.Generate
             numTupletOf = new NumericUpDown();
             chkTieAcross = new CheckBox();
             chkFermata = new CheckBox();
-
+            lblSections = new Label();
+            txtSections = new TextBox();
+            checkBox1 = new CheckBox();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -120,11 +116,10 @@ namespace Music.Generate
             grpKeyRelative.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numDegree).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numOctaveKR).BeginInit();
-            // BeginInit for new numeric controls
+            groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numDots).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numTupletCount).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numTupletOf).BeginInit();
-            groupBox1.SuspendLayout();
             SuspendLayout();
             // 
             // lblTitle
@@ -147,6 +142,9 @@ namespace Music.Generate
             // 
             // grpTarget
             // 
+            grpTarget.Controls.Add(checkBox1);
+            grpTarget.Controls.Add(txtSections);
+            grpTarget.Controls.Add(lblSections);
             grpTarget.Controls.Add(lblStartBeat);
             grpTarget.Controls.Add(numStartBeat);
             grpTarget.Controls.Add(lblEndBeat);
@@ -154,8 +152,6 @@ namespace Music.Generate
             grpTarget.Controls.Add(lblPart);
             grpTarget.Controls.Add(cbPart);
             grpTarget.Controls.Add(chkAllParts);
-            grpTarget.Controls.Add(lblVoices);
-            grpTarget.Controls.Add(txtVoices);
             grpTarget.Controls.Add(lblStaff);
             grpTarget.Controls.Add(numStaff);
             grpTarget.Controls.Add(lblStartBar);
@@ -165,7 +161,7 @@ namespace Music.Generate
             grpTarget.Controls.Add(chkOverwrite);
             grpTarget.Location = new Point(20, 100);
             grpTarget.Name = "grpTarget";
-            grpTarget.Size = new Size(400, 220);
+            grpTarget.Size = new Size(400, 236);
             grpTarget.TabIndex = 2;
             grpTarget.TabStop = false;
             grpTarget.Text = "Target Scope";
@@ -173,7 +169,7 @@ namespace Music.Generate
             // lblStartBeat
             // 
             lblStartBeat.AutoSize = true;
-            lblStartBeat.Location = new Point(15, 157);
+            lblStartBeat.Location = new Point(15, 155);
             lblStartBeat.Name = "lblStartBeat";
             lblStartBeat.Size = new Size(57, 15);
             lblStartBeat.TabIndex = 15;
@@ -181,7 +177,7 @@ namespace Music.Generate
             // 
             // numStartBeat
             // 
-            numStartBeat.Location = new Point(80, 154);
+            numStartBeat.Location = new Point(80, 152);
             numStartBeat.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numStartBeat.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numStartBeat.Name = "numStartBeat";
@@ -192,7 +188,7 @@ namespace Music.Generate
             // lblEndBeat
             // 
             lblEndBeat.AutoSize = true;
-            lblEndBeat.Location = new Point(203, 157);
+            lblEndBeat.Location = new Point(203, 155);
             lblEndBeat.Name = "lblEndBeat";
             lblEndBeat.Size = new Size(53, 15);
             lblEndBeat.TabIndex = 13;
@@ -200,7 +196,7 @@ namespace Music.Generate
             // 
             // numericUpDown2
             // 
-            numericUpDown2.Location = new Point(256, 153);
+            numericUpDown2.Location = new Point(256, 151);
             numericUpDown2.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numericUpDown2.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numericUpDown2.Name = "numericUpDown2";
@@ -213,9 +209,9 @@ namespace Music.Generate
             lblPart.AutoSize = true;
             lblPart.Location = new Point(15, 30);
             lblPart.Name = "lblPart";
-            lblPart.Size = new Size(31, 15);
+            lblPart.Size = new Size(61, 15);
             lblPart.TabIndex = 0;
-            lblPart.Text = "Part:";
+            lblPart.Text = "Voice/Part";
             // 
             // cbPart
             // 
@@ -233,28 +229,10 @@ namespace Music.Generate
             chkAllParts.TabIndex = 2;
             chkAllParts.Text = "All";
             // 
-            // lblVoices
-            // 
-            lblVoices.AutoSize = true;
-            lblVoices.Location = new Point(15, 65);
-            lblVoices.Name = "lblVoices";
-            lblVoices.Size = new Size(51, 15);
-            lblVoices.TabIndex = 3;
-            lblVoices.Text = "Voice(s):";
-            // 
-            // txtVoices
-            // 
-            txtVoices.Location = new Point(80, 60);
-            txtVoices.Name = "txtVoices";
-            txtVoices.Size = new Size(220, 23);
-            txtVoices.TabIndex = 4;
-            txtVoices.Text = "1";
-            tt.SetToolTip(txtVoices, "Comma-separated voices (e.g., 1 or 1,2)");
-            // 
             // lblStaff
             // 
             lblStaff.AutoSize = true;
-            lblStaff.Location = new Point(15, 95);
+            lblStaff.Location = new Point(15, 63);
             lblStaff.Name = "lblStaff";
             lblStaff.Size = new Size(34, 15);
             lblStaff.TabIndex = 5;
@@ -262,7 +240,7 @@ namespace Music.Generate
             // 
             // numStaff
             // 
-            numStaff.Location = new Point(80, 91);
+            numStaff.Location = new Point(80, 59);
             numStaff.Maximum = new decimal(new int[] { 4, 0, 0, 0 });
             numStaff.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numStaff.Name = "numStaff";
@@ -273,7 +251,7 @@ namespace Music.Generate
             // lblStartBar
             // 
             lblStartBar.AutoSize = true;
-            lblStartBar.Location = new Point(15, 125);
+            lblStartBar.Location = new Point(15, 123);
             lblStartBar.Name = "lblStartBar";
             lblStartBar.Size = new Size(54, 15);
             lblStartBar.TabIndex = 7;
@@ -281,7 +259,7 @@ namespace Music.Generate
             // 
             // numStartBar
             // 
-            numStartBar.Location = new Point(80, 122);
+            numStartBar.Location = new Point(80, 120);
             numStartBar.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numStartBar.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numStartBar.Name = "numStartBar";
@@ -292,7 +270,7 @@ namespace Music.Generate
             // lblEndBar
             // 
             lblEndBar.AutoSize = true;
-            lblEndBar.Location = new Point(203, 125);
+            lblEndBar.Location = new Point(203, 123);
             lblEndBar.Name = "lblEndBar";
             lblEndBar.Size = new Size(50, 15);
             lblEndBar.TabIndex = 9;
@@ -300,7 +278,7 @@ namespace Music.Generate
             // 
             // numEndBar
             // 
-            numEndBar.Location = new Point(256, 121);
+            numEndBar.Location = new Point(256, 119);
             numEndBar.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numEndBar.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numEndBar.Name = "numEndBar";
@@ -313,7 +291,7 @@ namespace Music.Generate
             chkOverwrite.AutoSize = true;
             chkOverwrite.Checked = true;
             chkOverwrite.CheckState = CheckState.Checked;
-            chkOverwrite.Location = new Point(18, 188);
+            chkOverwrite.Location = new Point(18, 186);
             chkOverwrite.Name = "chkOverwrite";
             chkOverwrite.Size = new Size(196, 19);
             chkOverwrite.TabIndex = 11;
@@ -325,7 +303,7 @@ namespace Music.Generate
             grpPitch.Controls.Add(rbPitchKeyRelative);
             grpPitch.Controls.Add(grpAbsolute);
             grpPitch.Controls.Add(grpKeyRelative);
-            grpPitch.Location = new Point(20, 330);
+            grpPitch.Location = new Point(20, 342);
             grpPitch.Name = "grpPitch";
             grpPitch.Size = new Size(400, 220);
             grpPitch.TabIndex = 3;
@@ -340,7 +318,6 @@ namespace Music.Generate
             rbPitchAbsolute.Size = new Size(209, 19);
             rbPitchAbsolute.TabIndex = 0;
             rbPitchAbsolute.Text = "Absolute (Step/Accidental/Octave)";
-            rbPitchAbsolute.CheckedChanged += rbPitchMode_CheckedChanged;
             // 
             // rbPitchKeyRelative
             // 
@@ -350,7 +327,6 @@ namespace Music.Generate
             rbPitchKeyRelative.Size = new Size(177, 19);
             rbPitchKeyRelative.TabIndex = 1;
             rbPitchKeyRelative.Text = "Key-relative (Degree/Octave)";
-            rbPitchKeyRelative.CheckedChanged += rbPitchMode_CheckedChanged;
             // 
             // grpAbsolute
             // 
@@ -481,7 +457,7 @@ namespace Music.Generate
             // 
             // btnApply
             // 
-            btnApply.Location = new Point(510, 109);
+            btnApply.Location = new Point(537, 113);
             btnApply.Name = "btnApply";
             btnApply.Size = new Size(120, 36);
             btnApply.TabIndex = 4;
@@ -491,7 +467,7 @@ namespace Music.Generate
             // lblStatus
             // 
             lblStatus.AutoSize = true;
-            lblStatus.Location = new Point(510, 159);
+            lblStatus.Location = new Point(537, 163);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(42, 15);
             lblStatus.TabIndex = 5;
@@ -500,7 +476,6 @@ namespace Music.Generate
             // groupBox1
             // 
             groupBox1.Controls.Add(label2);
-            // add new controls into groupBox1
             groupBox1.Controls.Add(lblNoteValue);
             groupBox1.Controls.Add(cbNoteValue);
             groupBox1.Controls.Add(lblDots);
@@ -512,7 +487,7 @@ namespace Music.Generate
             groupBox1.Controls.Add(numTupletOf);
             groupBox1.Controls.Add(chkTieAcross);
             groupBox1.Controls.Add(chkFermata);
-            groupBox1.Location = new Point(458, 330);
+            groupBox1.Location = new Point(459, 342);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(285, 220);
             groupBox1.TabIndex = 6;
@@ -544,14 +519,13 @@ namespace Music.Generate
             cbNoteValue.Name = "cbNoteValue";
             cbNoteValue.Size = new Size(175, 23);
             cbNoteValue.TabIndex = 8;
-            // items will be populated in code-behind later (breve, whole, half, quarter, eighth, 16th, 32nd, 64th, 128th, 256th)
             // 
             // lblDots
             // 
             lblDots.AutoSize = true;
             lblDots.Location = new Point(15, 70);
             lblDots.Name = "lblDots";
-            lblDots.Size = new Size(33, 15);
+            lblDots.Size = new Size(34, 15);
             lblDots.TabIndex = 9;
             lblDots.Text = "Dots:";
             // 
@@ -562,14 +536,13 @@ namespace Music.Generate
             numDots.Name = "numDots";
             numDots.Size = new Size(60, 23);
             numDots.TabIndex = 10;
-            numDots.Value = new decimal(new int[] { 0, 0, 0, 0 });
             // 
             // chkTupletEnabled
             // 
             chkTupletEnabled.AutoSize = true;
             chkTupletEnabled.Location = new Point(15, 100);
             chkTupletEnabled.Name = "chkTupletEnabled";
-            chkTupletEnabled.Size = new Size(102, 19);
+            chkTupletEnabled.Size = new Size(98, 19);
             chkTupletEnabled.TabIndex = 11;
             chkTupletEnabled.Text = "Enable Tuplet";
             // 
@@ -578,7 +551,7 @@ namespace Music.Generate
             lblTupletCount.AutoSize = true;
             lblTupletCount.Location = new Point(30, 128);
             lblTupletCount.Name = "lblTupletCount";
-            lblTupletCount.Size = new Size(60, 15);
+            lblTupletCount.Size = new Size(65, 15);
             lblTupletCount.TabIndex = 12;
             lblTupletCount.Text = "Count (m):";
             // 
@@ -597,7 +570,7 @@ namespace Music.Generate
             lblTupletOf.AutoSize = true;
             lblTupletOf.Location = new Point(170, 128);
             lblTupletOf.Name = "lblTupletOf";
-            lblTupletOf.Size = new Size(36, 15);
+            lblTupletOf.Size = new Size(41, 15);
             lblTupletOf.TabIndex = 14;
             lblTupletOf.Text = "Of (n):";
             // 
@@ -616,7 +589,7 @@ namespace Music.Generate
             chkTieAcross.AutoSize = true;
             chkTieAcross.Location = new Point(15, 160);
             chkTieAcross.Name = "chkTieAcross";
-            chkTieAcross.Size = new Size(106, 19);
+            chkTieAcross.Size = new Size(113, 19);
             chkTieAcross.TabIndex = 16;
             chkTieAcross.Text = "Allow ties across";
             // 
@@ -625,9 +598,35 @@ namespace Music.Generate
             chkFermata.AutoSize = true;
             chkFermata.Location = new Point(150, 160);
             chkFermata.Name = "chkFermata";
-            chkFermata.Size = new Size(68, 19);
+            chkFermata.Size = new Size(69, 19);
             chkFermata.TabIndex = 17;
             chkFermata.Text = "Fermata";
+            // 
+            // lblSections
+            // 
+            lblSections.AutoSize = true;
+            lblSections.Location = new Point(15, 93);
+            lblSections.Name = "lblSections";
+            lblSections.Size = new Size(54, 15);
+            lblSections.TabIndex = 16;
+            lblSections.Text = "Sections:";
+            // 
+            // txtSections
+            // 
+            txtSections.BorderStyle = BorderStyle.FixedSingle;
+            txtSections.Location = new Point(81, 89);
+            txtSections.Name = "txtSections";
+            txtSections.Size = new Size(297, 23);
+            txtSections.TabIndex = 17;
+            // 
+            // checkBox1
+            // 
+            checkBox1.AutoSize = true;
+            checkBox1.Location = new Point(215, 62);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(40, 19);
+            checkBox1.TabIndex = 18;
+            checkBox1.Text = "All";
             // 
             // Generate2Form
             // 
@@ -657,12 +656,11 @@ namespace Music.Generate
             grpKeyRelative.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)numDegree).EndInit();
             ((System.ComponentModel.ISupportInitialize)numOctaveKR).EndInit();
-            // EndInit for new numeric controls
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)numDots).EndInit();
             ((System.ComponentModel.ISupportInitialize)numTupletCount).EndInit();
             ((System.ComponentModel.ISupportInitialize)numTupletOf).EndInit();
-            groupBox1.ResumeLayout(false);
-            groupBox1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -687,5 +685,8 @@ namespace Music.Generate
         private NumericUpDown numTupletOf;
         private CheckBox chkTieAcross;
         private CheckBox chkFermata;
+        private Label lblSections;
+        private TextBox txtSections;
+        private CheckBox checkBox1;
     }
 }

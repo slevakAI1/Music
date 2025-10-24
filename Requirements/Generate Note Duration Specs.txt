@@ -1,0 +1,81 @@
+﻿Skip to content
+Chat history
+
+You said:
+In Music writing  - what are all the possible values for note duration. ex: quarter note, half note, dotted.., triplets... etc
+ChatGPT said:
+
+Thought for 29s
+Here’s the blunt truth: in (Western) music notation, durations are built from a small, fixed ladder of note values, and everything else (dots, ties, tuplets) just modifies those basics.
+
+Core note values (with 4/4 “beats”)
+Name	Symbol (name)	Fraction of a whole note	Beats in 4/4
+Longa (very rare)	(⟵ rarely used)	4×	16
+Double whole	Breve	2×	8
+Whole	Semibreve	1×	4
+Half	Minim	1/2	2
+Quarter	Crotchet	1/4	1
+Eighth	Quaver	1/8	1/2
+Sixteenth	Semiquaver	1/16	1/4
+32nd	Demisemiquaver	1/32	1/8
+64th	Hemidemisemiquaver	1/64	1/16
+128th		1/128	1/32
+256th (and beyond)		1/256	1/64
+Rests exist in exactly the same values (whole rest, half rest, quarter rest, etc.) and take the same amount of time.
+
+Augmentation dots
+One dot = add half the note’s value. Multiplier = 1.5×
+(dotted quarter = 1/4 + 1/8 = 3/8, i.e., 1.5 beats in 4/4)
+
+Two dots = add half and a quarter of the original. Multiplier = 1.75×
+(double-dotted half = 1/2 × 1.75 = 7/8 = 3.5 beats)
+
+Three dots = add half + quarter + eighth of the original. Multiplier = 1.875×
+(triple-dotted quarter = 1/4 × 1.875 = 3/8 + 3/32 = 1.875 beats)
+
+Ties
+A tie sums any two (or more) note values into one continuous duration across beats or barlines. There’s no upper limit: if you can write the pieces, you can tie them together to get the total.
+
+Tuplets (irregular divisions)
+General rule: m:n means m notes take the time normally occupied by n of the same written value.
+
+In simple meter (beat normally splits into 2):
+
+Triplet (3:2) – three in the time of two (e.g., 3 eighths in the time of 2 eighths).
+
+Quintuplet (5:4), Septuplet (7:4) – five or seven in the time of four, etc.
+
+Sextuplet often treated as 6:4 (i.e., two triplets per beat pair) or as two triplets—context decides.
+
+In compound meter (beat normally splits into 3):
+
+Duplet (2:3) – two in the time of three.
+
+Quadruplet (4:3), Sextuplet (6:3) – four or six in the time of three, etc.
+
+You’ll also see other counts (9s, 10s, 11s, 13s…). The number printed is m; the implied n is “what that span would normally divide into” (2s in simple time, 3s in compound) unless explicitly shown as m:n.
+
+Other modifiers that affect “effective” duration
+Fermata (hold): extends a note or rest by performer/conductor discretion (often ~1.5–2×, but it’s interpretive).
+
+Swing/shuffle: written as straight eighths but performed with a long–short feel (often approximating a triplet 2:1 ratio).
+
+Breath mark / caesura: creates a tiny break after a note; effectively shortens it slightly in performance.
+
+Grace notes: not counted as a fixed duration; they borrow time from the surrounding note(s).
+
+Bottom line
+The only fundamental durations are the powers-of-two ladder (…breve, whole, half, quarter, eighth, 16th, 32nd, 64th, 128th, 256th…).
+
+Dots multiply that base value (1.5×, 1.75×, 1.875×).
+
+Ties add values.
+
+Tuplets compress or expand subdivisions using the m:n rule.
+Everything you see on a page is some combo of those.
+
+
+
+
+No file chosenNo file chosen
+ChatGPT can make mistakes. Check important info.
