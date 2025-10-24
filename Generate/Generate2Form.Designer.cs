@@ -57,6 +57,10 @@ namespace Music.Generate
             lblTitle = new Label();
             cbPattern = new ComboBox();
             grpTarget = new GroupBox();
+            lblStartBeat = new Label();
+            numStartBeat = new NumericUpDown();
+            lblEndBeat = new Label();
+            numericUpDown2 = new NumericUpDown();
             lblPart = new Label();
             cbPart = new ComboBox();
             chkAllParts = new CheckBox();
@@ -80,6 +84,7 @@ namespace Music.Generate
             lblOctaveAbs = new Label();
             numOctaveAbs = new NumericUpDown();
             grpKeyRelative = new GroupBox();
+            label1 = new Label();
             lblDegree = new Label();
             numDegree = new NumericUpDown();
             lblOctaveKR = new Label();
@@ -87,14 +92,11 @@ namespace Music.Generate
             btnApply = new Button();
             lblStatus = new Label();
             tt = new ToolTip(components);
-            numStartBeat = new NumericUpDown();
-            lblEndBeat = new Label();
-            numericUpDown2 = new NumericUpDown();
-            lblStartBeat = new Label();
-            label1 = new Label();
             groupBox1 = new GroupBox();
             label2 = new Label();
             grpTarget.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numStaff).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numStartBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numEndBar).BeginInit();
@@ -104,8 +106,6 @@ namespace Music.Generate
             grpKeyRelative.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numDegree).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numOctaveKR).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
             groupBox1.SuspendLayout();
             SuspendLayout();
             // 
@@ -151,6 +151,44 @@ namespace Music.Generate
             grpTarget.TabIndex = 2;
             grpTarget.TabStop = false;
             grpTarget.Text = "Target Scope";
+            // 
+            // lblStartBeat
+            // 
+            lblStartBeat.AutoSize = true;
+            lblStartBeat.Location = new Point(15, 157);
+            lblStartBeat.Name = "lblStartBeat";
+            lblStartBeat.Size = new Size(57, 15);
+            lblStartBeat.TabIndex = 15;
+            lblStartBeat.Text = "Start Beat";
+            // 
+            // numStartBeat
+            // 
+            numStartBeat.Location = new Point(80, 154);
+            numStartBeat.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            numStartBeat.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numStartBeat.Name = "numStartBeat";
+            numStartBeat.Size = new Size(120, 23);
+            numStartBeat.TabIndex = 12;
+            numStartBeat.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            // 
+            // lblEndBeat
+            // 
+            lblEndBeat.AutoSize = true;
+            lblEndBeat.Location = new Point(203, 157);
+            lblEndBeat.Name = "lblEndBeat";
+            lblEndBeat.Size = new Size(53, 15);
+            lblEndBeat.TabIndex = 13;
+            lblEndBeat.Text = "End Beat";
+            // 
+            // numericUpDown2
+            // 
+            numericUpDown2.Location = new Point(256, 153);
+            numericUpDown2.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            numericUpDown2.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numericUpDown2.Name = "numericUpDown2";
+            numericUpDown2.Size = new Size(120, 23);
+            numericUpDown2.TabIndex = 14;
+            numericUpDown2.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // lblPart
             // 
@@ -350,16 +388,16 @@ namespace Music.Generate
             lblOctaveAbs.AutoSize = true;
             lblOctaveAbs.Location = new Point(255, 30);
             lblOctaveAbs.Name = "lblOctaveAbs";
-            lblOctaveAbs.Size = new Size(29, 15);
+            lblOctaveAbs.Size = new Size(47, 15);
             lblOctaveAbs.TabIndex = 4;
-            lblOctaveAbs.Text = "Oct:";
+            lblOctaveAbs.Text = "Octave:";
             // 
             // numOctaveAbs
             // 
-            numOctaveAbs.Location = new Point(285, 26);
+            numOctaveAbs.Location = new Point(305, 26);
             numOctaveAbs.Maximum = new decimal(new int[] { 9, 0, 0, 0 });
             numOctaveAbs.Name = "numOctaveAbs";
-            numOctaveAbs.Size = new Size(69, 23);
+            numOctaveAbs.Size = new Size(47, 23);
             numOctaveAbs.TabIndex = 5;
             numOctaveAbs.Value = new decimal(new int[] { 4, 0, 0, 0 });
             // 
@@ -376,6 +414,15 @@ namespace Music.Generate
             grpKeyRelative.TabIndex = 3;
             grpKeyRelative.TabStop = false;
             grpKeyRelative.Text = "Key-relative";
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(193, 30);
+            label1.Name = "label1";
+            label1.Size = new Size(44, 15);
+            label1.TabIndex = 4;
+            label1.Text = "Octave";
             // 
             // lblDegree
             // 
@@ -416,7 +463,7 @@ namespace Music.Generate
             // 
             // btnApply
             // 
-            btnApply.Location = new Point(666, 109);
+            btnApply.Location = new Point(510, 109);
             btnApply.Name = "btnApply";
             btnApply.Size = new Size(120, 36);
             btnApply.TabIndex = 4;
@@ -426,58 +473,11 @@ namespace Music.Generate
             // lblStatus
             // 
             lblStatus.AutoSize = true;
-            lblStatus.Location = new Point(666, 159);
+            lblStatus.Location = new Point(510, 159);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(42, 15);
             lblStatus.TabIndex = 5;
             lblStatus.Text = "Ready.";
-            // 
-            // numStartBeat
-            // 
-            numStartBeat.Location = new Point(80, 154);
-            numStartBeat.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
-            numStartBeat.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            numStartBeat.Name = "numStartBeat";
-            numStartBeat.Size = new Size(120, 23);
-            numStartBeat.TabIndex = 12;
-            numStartBeat.Value = new decimal(new int[] { 1, 0, 0, 0 });
-            // 
-            // lblEndBeat
-            // 
-            lblEndBeat.AutoSize = true;
-            lblEndBeat.Location = new Point(203, 157);
-            lblEndBeat.Name = "lblEndBeat";
-            lblEndBeat.Size = new Size(53, 15);
-            lblEndBeat.TabIndex = 13;
-            lblEndBeat.Text = "End Beat";
-            // 
-            // numericUpDown2
-            // 
-            numericUpDown2.Location = new Point(256, 153);
-            numericUpDown2.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
-            numericUpDown2.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            numericUpDown2.Name = "numericUpDown2";
-            numericUpDown2.Size = new Size(120, 23);
-            numericUpDown2.TabIndex = 14;
-            numericUpDown2.Value = new decimal(new int[] { 1, 0, 0, 0 });
-            // 
-            // lblStartBeat
-            // 
-            lblStartBeat.AutoSize = true;
-            lblStartBeat.Location = new Point(15, 157);
-            lblStartBeat.Name = "lblStartBeat";
-            lblStartBeat.Size = new Size(57, 15);
-            lblStartBeat.TabIndex = 15;
-            lblStartBeat.Text = "Start Beat";
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(193, 30);
-            label1.Name = "label1";
-            label1.Size = new Size(44, 15);
-            label1.TabIndex = 4;
-            label1.Text = "Octave";
             // 
             // groupBox1
             // 
@@ -512,6 +512,8 @@ namespace Music.Generate
             Text = "Generate 2 (MusicXML)";
             grpTarget.ResumeLayout(false);
             grpTarget.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numStartBeat).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown2).EndInit();
             ((System.ComponentModel.ISupportInitialize)numStaff).EndInit();
             ((System.ComponentModel.ISupportInitialize)numStartBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)numEndBar).EndInit();
@@ -524,8 +526,6 @@ namespace Music.Generate
             grpKeyRelative.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)numDegree).EndInit();
             ((System.ComponentModel.ISupportInitialize)numOctaveKR).EndInit();
-            ((System.ComponentModel.ISupportInitialize)numStartBeat).EndInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown2).EndInit();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             ResumeLayout(false);
