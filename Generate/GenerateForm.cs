@@ -19,7 +19,7 @@ namespace Music.Generate
             this.StartPosition = FormStartPosition.Manual;
 
             // Initialize static UI
-            cbPattern.Items.Add("Set Whole Note");
+            cbPattern.Items.Add("Set Notes");
             cbPattern.SelectedIndex = 0;
 
             cbStep.Items.AddRange(new object[] { "C", "D", "E", "F", "G", "A", "B" });
