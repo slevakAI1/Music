@@ -1,10 +1,12 @@
 using MusicXml.Domain;
+using Music.Design;
 
 namespace Music.Generate
 {
     public partial class GenerateForm : Form
     {
         private Score? _score;
+        private DesignClass? _design;
 
         public GenerateForm()
         {
@@ -27,6 +29,10 @@ namespace Music.Generate
             cbAccidental.SelectedIndex = 0;
 
             rbPitchAbsolute.Checked = true;
+
+            // Load current global score and design into form-local fields for later use
+            _score = Globals.CurrentScore;
+            _design = Globals.Design;
         }
 
         protected override void OnShown(EventArgs e)
@@ -34,12 +40,6 @@ namespace Music.Generate
             base.OnShown(e);
             if (this.MdiParent != null && this.WindowState != FormWindowState.Maximized)
                 this.WindowState = FormWindowState.Maximized;
-        }
-
-        public void SetScore(Score score)
-        {
-            _score = score;
-            lblStatus.Text = "Score loaded.";
         }
 
         private void btnApply_Click(object sender, EventArgs e)
