@@ -41,6 +41,7 @@
 
   <ItemGroup>
     <Folder Include="Design\Designs\" />
+    <Folder Include="Generate\Prototypes\" />
     <Folder Include="Tests\InputSamples\" />
     <Folder Include="Tests\OutputSamples\" />
   </ItemGroup>

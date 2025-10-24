@@ -71,7 +71,7 @@ namespace Music
         private void generateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Launch the new Generate2 form.
-            ShowChildForm(typeof(Music.Generate.Generate2Form));
+            ShowChildForm(typeof(Music.Generate.GenerateForm));
 
             // Previous behavior: launch the original Generate form.
             // Commented out per request — do not remove.
