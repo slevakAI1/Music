@@ -171,9 +171,9 @@ namespace Music.Generate
             lblStartBeat.AutoSize = true;
             lblStartBeat.Location = new Point(15, 155);
             lblStartBeat.Name = "lblStartBeat";
-            lblStartBeat.Size = new Size(57, 15);
+            lblStartBeat.Size = new Size(60, 15);
             lblStartBeat.TabIndex = 15;
-            lblStartBeat.Text = "Start Beat";
+            lblStartBeat.Text = "Start Beat:";
             // 
             // numStartBeat
             // 
@@ -190,13 +190,13 @@ namespace Music.Generate
             lblEndBeat.AutoSize = true;
             lblEndBeat.Location = new Point(203, 155);
             lblEndBeat.Name = "lblEndBeat";
-            lblEndBeat.Size = new Size(53, 15);
+            lblEndBeat.Size = new Size(56, 15);
             lblEndBeat.TabIndex = 13;
-            lblEndBeat.Text = "End Beat";
+            lblEndBeat.Text = "End Beat:";
             // 
             // numericUpDown2
             // 
-            numericUpDown2.Location = new Point(256, 151);
+            numericUpDown2.Location = new Point(262, 151);
             numericUpDown2.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numericUpDown2.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numericUpDown2.Name = "numericUpDown2";
@@ -278,7 +278,7 @@ namespace Music.Generate
             // 
             // numEndBar
             // 
-            numEndBar.Location = new Point(256, 119);
+            numEndBar.Location = new Point(262, 119);
             numEndBar.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numEndBar.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numEndBar.Name = "numEndBar";
@@ -497,7 +497,7 @@ namespace Music.Generate
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(15, 15);
+            label2.Location = new Point(100, 28);
             label2.Name = "label2";
             label2.Size = new Size(82, 15);
             label2.TabIndex = 6;
@@ -506,7 +506,7 @@ namespace Music.Generate
             // lblNoteValue
             // 
             lblNoteValue.AutoSize = true;
-            lblNoteValue.Location = new Point(15, 40);
+            lblNoteValue.Location = new Point(15, 57);
             lblNoteValue.Name = "lblNoteValue";
             lblNoteValue.Size = new Size(65, 15);
             lblNoteValue.TabIndex = 7;
@@ -515,7 +515,7 @@ namespace Music.Generate
             // cbNoteValue
             // 
             cbNoteValue.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbNoteValue.Location = new Point(90, 36);
+            cbNoteValue.Location = new Point(90, 55);
             cbNoteValue.Name = "cbNoteValue";
             cbNoteValue.Size = new Size(175, 23);
             cbNoteValue.TabIndex = 8;
@@ -523,7 +523,7 @@ namespace Music.Generate
             // lblDots
             // 
             lblDots.AutoSize = true;
-            lblDots.Location = new Point(15, 70);
+            lblDots.Location = new Point(15, 89);
             lblDots.Name = "lblDots";
             lblDots.Size = new Size(34, 15);
             lblDots.TabIndex = 9;
@@ -531,7 +531,7 @@ namespace Music.Generate
             // 
             // numDots
             // 
-            numDots.Location = new Point(90, 66);
+            numDots.Location = new Point(90, 85);
             numDots.Maximum = new decimal(new int[] { 3, 0, 0, 0 });
             numDots.Name = "numDots";
             numDots.Size = new Size(60, 23);
@@ -540,7 +540,7 @@ namespace Music.Generate
             // chkTupletEnabled
             // 
             chkTupletEnabled.AutoSize = true;
-            chkTupletEnabled.Location = new Point(15, 100);
+            chkTupletEnabled.Location = new Point(15, 119);
             chkTupletEnabled.Name = "chkTupletEnabled";
             chkTupletEnabled.Size = new Size(98, 19);
             chkTupletEnabled.TabIndex = 11;
@@ -549,7 +549,7 @@ namespace Music.Generate
             // lblTupletCount
             // 
             lblTupletCount.AutoSize = true;
-            lblTupletCount.Location = new Point(30, 128);
+            lblTupletCount.Location = new Point(30, 147);
             lblTupletCount.Name = "lblTupletCount";
             lblTupletCount.Size = new Size(65, 15);
             lblTupletCount.TabIndex = 12;
@@ -557,7 +557,7 @@ namespace Music.Generate
             // 
             // numTupletCount
             // 
-            numTupletCount.Location = new Point(100, 124);
+            numTupletCount.Location = new Point(100, 143);
             numTupletCount.Maximum = new decimal(new int[] { 64, 0, 0, 0 });
             numTupletCount.Minimum = new decimal(new int[] { 2, 0, 0, 0 });
             numTupletCount.Name = "numTupletCount";
@@ -568,7 +568,7 @@ namespace Music.Generate
             // lblTupletOf
             // 
             lblTupletOf.AutoSize = true;
-            lblTupletOf.Location = new Point(170, 128);
+            lblTupletOf.Location = new Point(170, 147);
             lblTupletOf.Name = "lblTupletOf";
             lblTupletOf.Size = new Size(41, 15);
             lblTupletOf.TabIndex = 14;
@@ -576,7 +576,7 @@ namespace Music.Generate
             // 
             // numTupletOf
             // 
-            numTupletOf.Location = new Point(210, 124);
+            numTupletOf.Location = new Point(210, 143);
             numTupletOf.Maximum = new decimal(new int[] { 64, 0, 0, 0 });
             numTupletOf.Minimum = new decimal(new int[] { 2, 0, 0, 0 });
             numTupletOf.Name = "numTupletOf";
@@ -587,7 +587,7 @@ namespace Music.Generate
             // chkTieAcross
             // 
             chkTieAcross.AutoSize = true;
-            chkTieAcross.Location = new Point(15, 160);
+            chkTieAcross.Location = new Point(15, 179);
             chkTieAcross.Name = "chkTieAcross";
             chkTieAcross.Size = new Size(113, 19);
             chkTieAcross.TabIndex = 16;
@@ -596,7 +596,7 @@ namespace Music.Generate
             // chkFermata
             // 
             chkFermata.AutoSize = true;
-            chkFermata.Location = new Point(150, 160);
+            chkFermata.Location = new Point(150, 179);
             chkFermata.Name = "chkFermata";
             chkFermata.Size = new Size(69, 19);
             chkFermata.TabIndex = 17;
