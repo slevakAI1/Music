@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Windows.Forms;
 using MusicXml.Domain;
 using Music.Design;
 
@@ -142,7 +143,147 @@ namespace Music.Generate
                 MessageBox.Show(this, "No Score is loaded. Use SetScore(Score) to provide a MusicXML Score.", "No Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            // TODO - implement apply logic 
+
+            // Collect selected part(s) - the UI uses a ComboBox (single selection)
+            var selectedPartObj = cbPart.SelectedItem;
+            if (selectedPartObj == null || string.Equals(selectedPartObj.ToString(), "Choose", StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show(this, "Please select a part to apply notes to.", "No Part Selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            var selectedParts = new[] { selectedPartObj.ToString()! };
+
+            // Staff value: try multiple candidate control names (NumericUpDown preferred, then TextBox)
+            if (!TryGetIntFromControls(new[] { "txtStaff", "numStaff", "nudStaff", "Staff" }, out var staff))
+            {
+                MessageBox.Show(this, "Staff must be a valid integer (check Staff control).", "Invalid Staff", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Start/End bars (NumericUpDown controls expected)
+            var startBar = (int)numStartBar.Value;
+            var endBar = (int)numEndBar.Value;
+            if (startBar < 1 || endBar < startBar)
+            {
+                MessageBox.Show(this, "Start and End bars must be valid (Start >= 1 and End >= Start).", "Invalid Bar Range", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Step (absolute)
+            var stepStr = cbStep.SelectedItem?.ToString();
+            if (string.IsNullOrWhiteSpace(stepStr) || stepStr.Length == 0)
+            {
+                MessageBox.Show(this, "Please select a step (A-G).", "Invalid Step", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            var stepChar = stepStr![0];
+
+            // Accidental
+            var accidental = cbAccidental.SelectedItem?.ToString() ?? "Natural";
+
+            // Octave: accept several candidate control names
+            if (!TryGetIntFromControls(new[] { "numOctave", "nudOctave", "OctaveAbsolute", "numOctaveAbsolute" }, out var octave))
+            {
+                MessageBox.Show(this, "Octave must be a valid integer (check Octave control).", "Invalid Octave", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Base duration - map from the UI string via _noteValueMap
+            var noteValueKey = cbNoteValue.SelectedItem?.ToString();
+            if (noteValueKey == null || !_noteValueMap.TryGetValue(noteValueKey, out var denom))
+            {
+                MessageBox.Show(this, "Please select a valid base duration.", "Invalid Duration", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            ApplySetNote.BaseDuration baseDuration = denom switch
+            {
+                1 => ApplySetNote.BaseDuration.Whole,
+                2 => ApplySetNote.BaseDuration.Half,
+                4 => ApplySetNote.BaseDuration.Quarter,
+                8 => ApplySetNote.BaseDuration.Eighth,
+                16 => ApplySetNote.BaseDuration.Sixteenth,
+                _ => ApplySetNote.BaseDuration.Quarter
+            };
+
+            // Number of notes: accept multiple candidate control names
+            if (!TryGetIntFromControls(new[] { "numNumberOfNotes", "numNotes", "nudNumberOfNotes", "NumberOfNotes" }, out var numberOfNotes))
+            {
+                MessageBox.Show(this, "Number of Notes must be a valid integer (check Number of Notes control).", "Invalid Number", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (numberOfNotes <= 0)
+            {
+                MessageBox.Show(this, "Number of Notes must be greater than zero.", "Invalid Number", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Call ApplySetNote to mutate the _score in-place. Catch validation errors from Apply.
+            try
+            {
+                ApplySetNote.Apply(
+                    _score,
+                    selectedParts,
+                    staff,
+                    startBar,
+                    endBar,
+                    stepChar,
+                    accidental,
+                    octave,
+                    baseDuration,
+                    numberOfNotes);
+
+                // _score has been updated in-place by ApplySetNote.
+                MessageBox.Show(this, "Notes applied successfully.", "Applied", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, $"Error applying notes:\n{ex.Message}", "Apply Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Attempts to retrieve an integer value from one of the named controls.
+        /// Supports NumericUpDown and TextBox controls. Search is recursive (child controls included).
+        /// </summary>
+        private bool TryGetIntFromControls(string[] candidateNames, out int value)
+        {
+            value = 0;
+            foreach (var name in candidateNames)
+            {
+                var ctrl = FindControlByName(name);
+                if (ctrl == null) continue;
+
+                if (ctrl is NumericUpDown nud)
+                {
+                    value = (int)nud.Value;
+                    return true;
+                }
+
+                if (ctrl is TextBox tb && int.TryParse(tb.Text.Trim(), out var v1))
+                {
+                    value = v1;
+                    return true;
+                }
+
+                if (ctrl is ComboBox cb && int.TryParse(cb.Text.Trim(), out var v2))
+                {
+                    value = v2;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Finds a control by name anywhere in the form's control hierarchy.
+        /// </summary>
+        private Control? FindControlByName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return null;
+            var matches = this.Controls.Find(name, true);
+            return matches.FirstOrDefault();
         }
 
         private void btnSetDefault_Click(object? sender, EventArgs e)
