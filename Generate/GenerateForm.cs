@@ -8,6 +8,15 @@ namespace Music.Generate
         private Score? _score;
         private DesignClass? _design;
 
+        private readonly Dictionary<string,int> _noteValueMap = new()
+        {
+            ["Whole (1)"]    = 1,
+            ["Half (1/2)"]    = 2,
+            ["Quarter (1/4)"] = 4,
+            ["Eighth (1/8)"]  = 8,
+            ["16th (1/16)"]   = 16
+        };
+
         public GenerateForm()
         {
             InitializeComponent();
@@ -18,21 +27,15 @@ namespace Music.Generate
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.Manual;
 
-            // Initialize static UI
-            cbPattern.Items.Add("Set Notes");
-            cbPattern.SelectedIndex = 0;
-
-            cbStep.Items.AddRange(new object[] { "C", "D", "E", "F", "G", "A", "B" });
-            cbStep.SelectedIndex = 0;
-
-            cbAccidental.Items.AddRange(new object[] { "Natural", "Sharp", "Flat" });
-            cbAccidental.SelectedIndex = 0;
-
+            // Keep pitch-mode radio settable repeatedly (not a list)
             rbPitchAbsolute.Checked = true;
 
             // Load current global score and design into form-local fields for later use
             _score = Globals.Score;
             _design = Globals.Design;
+
+            // Note: list-type controls are NOT populated here.
+            // They will be populated on activation by the Populate...() methods.
         }
 
         protected override void OnShown(EventArgs e)
@@ -40,6 +43,76 @@ namespace Music.Generate
             base.OnShown(e);
             if (this.MdiParent != null && this.WindowState != FormWindowState.Maximized)
                 this.WindowState = FormWindowState.Maximized;
+        }
+
+        protected override void OnActivated(EventArgs e)
+        {
+            base.OnActivated(e);
+
+            // Minimal: only call per-control populate helpers (no other logic here).
+            PopulatePattern();
+            PopulateStep();
+            PopulateAccidental();
+            PopulatePartsFromDesign();
+            PopulateNoteValue();
+        }
+
+        private void PopulatePattern()
+        {
+            if (cbPattern.Items.Count != 0) return;
+
+            cbPattern.Items.Add("Set Notes");
+            cbPattern.SelectedIndex = 0;
+        }
+
+        private void PopulateStep()
+        {
+            if (cbStep.Items.Count != 0) return;
+
+            cbStep.Items.AddRange(new object[] { "C", "D", "E", "F", "G", "A", "B" });
+            cbStep.SelectedIndex = 0;
+        }
+
+        private void PopulateAccidental()
+        {
+            if (cbAccidental.Items.Count != 0) return;
+
+            cbAccidental.Items.AddRange(new object[] { "Natural", "Sharp", "Flat" });
+            cbAccidental.SelectedIndex = 0;
+        }
+
+        private void PopulatePartsFromDesign()
+        {
+            // Populate only when empty
+            if (cbPart.Items.Count != 0) return;
+
+            cbPart.Items.Clear();
+            cbPart.Items.Add("Choose");
+
+            var design = _design;
+            if (design?.VoiceSet?.Voices != null)
+            {
+                foreach (var v in design.VoiceSet.Voices)
+                {
+                    var name = v?.VoiceName ?? string.Empty;
+                    if (!string.IsNullOrWhiteSpace(name))
+                        cbPart.Items.Add(name);
+                }
+            }
+
+            if (cbPart.Items.Count > 0)
+                cbPart.SelectedIndex = 0;
+        }
+
+        private void PopulateNoteValue()
+        {
+            if (cbNoteValue.Items.Count != 0) return;
+
+            cbNoteValue.DropDownStyle = ComboBoxStyle.DropDownList;
+            foreach (var key in _noteValueMap.Keys)
+                cbNoteValue.Items.Add(key);
+
+            cbNoteValue.SelectedItem = "Quarter (1/4)";
         }
 
         private void btnApply_Click(object sender, EventArgs e)
