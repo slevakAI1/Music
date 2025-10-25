@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+using System.Reflection;
 using MusicXml.Domain;
 using Music.Design;
 
@@ -141,57 +144,69 @@ namespace Music.Generate
             }
             // TODO - implement apply logic 
         }
+
+        private void btnSetDefault_Click(object? sender, EventArgs e)
+        {
+            // 1) Run Design form's Set Default logic if a DesignForm MDI child is available.
+            var mdi = this.MdiParent;
+            if (mdi != null)
+            {
+                var designForm = mdi.MdiChildren.FirstOrDefault(f => f.GetType().Name == "DesignForm");
+                if (designForm != null)
+                {
+                    // Invoke the private click handler on DesignForm to reuse its exact behavior.
+                    var mi = designForm.GetType().GetMethod("btnSetDefault_Click", BindingFlags.Instance | BindingFlags.NonPublic);
+                    if (mi != null)
+                    {
+                        try
+                        {
+                            mi.Invoke(designForm, new object[] { designForm, EventArgs.Empty });
+                        }
+                        catch
+                        {
+                            // swallow reflection errors; fall back to central defaults below
+                        }
+                    }
+                }
+            }
+
+            // If no design exists yet, or reflection call didn't run, ensure central defaults are applied
+            Globals.Design ??= new DesignClass();
+            DesignDefaults.ApplyDefaultDesign(Globals.Design);
+
+            // Update local cache and set generate-specific defaults
+            _design = Globals.Design;
+            SetDefaultsForGenerate();
+
+            // Refresh parts and end-total UI
+            PopulatePartsFromDesign();
+            PopulateEndBarTotal();
+        }
+
+        private void SetDefaultsForGenerate()
+        {
+            // Ensure parts are populated
+            PopulatePartsFromDesign();
+
+            // Ensure "Keyboard" voice exists and select it
+            var idx = cbPart.Items.IndexOf("Keyboard");
+            if (idx == -1)
+            {
+                cbPart.Items.Add("Keyboard");
+                idx = cbPart.Items.Count - 1;
+            }
+            if (idx >= 0)
+                cbPart.SelectedIndex = idx;
+
+            // Set End Bar to design total (clamped inside numEndBar range)
+            var total = _design?.SectionSet?.TotalBars ?? Globals.Design?.SectionSet?.TotalBars ?? 0;
+            if (total > 0)
+            {
+                var clamped = Math.Max((int)numEndBar.Minimum, Math.Min((int)numEndBar.Maximum, total));
+                numEndBar.Value = clamped;
+            }
+        }
                
         //================================  SAVE FOR NOW     ========================================
-
-
-        //private static (char tonicStep, int tonicAlter) GetTonicForKey(int fifths, string? mode)
-        //{
-        //    bool isMinor = string.Equals(mode, "minor", StringComparison.OrdinalIgnoreCase);
-
-        //    var major = new Dictionary<int, (char, int)>
-        //    {
-        //        [-7] = ('C', -1),
-        //        [-6] = ('G', -1),
-        //        [-5] = ('D', -1),
-        //        [-4] = ('A', -1),
-        //        [-3] = ('E', -1),
-        //        [-2] = ('B', -1),
-        //        [-1] = ('F',  0),
-        //        [ 0] = ('C',  0),
-        //        [ 1] = ('G',  0),
-        //        [ 2] = ('D',  0),
-        //        [ 3] = ('A',  0),
-        //        [ 4] = ('E',  0),
-        //        [ 5] = ('B',  0),
-        //        [ 6] = ('F',  1),
-        //        [ 7] = ('C',  1),
-        //    };
-
-        //    var minor = new Dictionary<int, (char, int)>
-        //    {
-        //        [-7] = ('A', -1),
-        //        [-6] = ('E', -1),
-        //        [-5] = ('B', -1),
-        //        [-4] = ('F',  0),
-        //        [-3] = ('C',  0),
-        //        [-2] = ('G',  0),
-        //        [-1] = ('D',  0),
-        //        [ 0] = ('A',  0),
-        //        [ 1] = ('E',  0),
-        //        [ 2] = ('B',  0),
-        //        [ 3] = ('F',  1),
-        //        [ 4] = ('C',  1),
-        //        [ 5] = ('G',  1),
-        //        [ 6] = ('D',  1),
-        //        [ 7] = ('A',  1),
-        //    };
-
-        //    var table = isMinor ? minor : major;
-        //    if (!table.TryGetValue(fifths, out var tonic))
-        //        tonic = table[0];
-
-        //    return tonic;
-        //}
     }
 }

@@ -17,8 +17,10 @@ namespace Music
 
             _fileManager = new FileManager(ShowStatus);
 
-            // Show MusicForm on startup, filling the MDI parent
-            ShowChildForm(typeof(DesignForm));
+            // D E F A U L T   F O R M   O N   S T A R T U P
+
+            // Show GenerateForm on startup, filling the MDI parent
+            ShowChildForm(typeof(Music.Generate.GenerateForm));
         }
 
         private void Form1_Load(object sender, EventArgs e)
