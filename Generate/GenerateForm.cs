@@ -8,13 +8,13 @@ namespace Music.Generate
         private Score? _score;
         private DesignClass? _design;
 
-        private readonly Dictionary<string,int> _noteValueMap = new()
+        private readonly Dictionary<string, int> _noteValueMap = new()
         {
-            ["Whole (1)"]    = 1,
-            ["Half (1/2)"]    = 2,
+            ["Whole (1)"] = 1,
+            ["Half (1/2)"] = 2,
             ["Quarter (1/4)"] = 4,
-            ["Eighth (1/8)"]  = 8,
-            ["16th (1/16)"]   = 16
+            ["Eighth (1/8)"] = 8,
+            ["16th (1/16)"] = 16
         };
 
         public GenerateForm()
@@ -31,6 +31,7 @@ namespace Music.Generate
             rbPitchAbsolute.Checked = true;
 
             // Load current global score and design into form-local fields for later use
+            // Constructor is the only place that reads Globals per requirement.
             _score = Globals.Score;
             _design = Globals.Design;
 
@@ -49,12 +50,16 @@ namespace Music.Generate
         {
             base.OnActivated(e);
 
+            // Ensure design sections have up-to-date starts/derived values before reading totals
+            _design?.SectionSet?.RecalculateStarts();
+
             // Minimal: only call per-control populate helpers (no other logic here).
             PopulatePattern();
             PopulateStep();
             PopulateAccidental();
             PopulatePartsFromDesign();
             PopulateNoteValue();
+            PopulateEndBarTotal(); // populate the total bars label (uses cached _design)
         }
 
         private void PopulatePattern()
@@ -89,6 +94,7 @@ namespace Music.Generate
             cbPart.Items.Clear();
             cbPart.Items.Add("Choose");
 
+            // Use the cached _design set in the constructor (no Globals access here)
             var design = _design;
             if (design?.VoiceSet?.Voices != null)
             {
@@ -115,6 +121,17 @@ namespace Music.Generate
             cbNoteValue.SelectedItem = "Quarter (1/4)";
         }
 
+        private void PopulateEndBarTotal()
+        {
+            // Always refresh the label when called (caller ensures this runs on activate)
+            var total = _design?.SectionSet?.TotalBars ?? 0;
+            if (total > 0)
+                // show as a simple slash + total (appears right of the End Bar control)
+                lblEndBarTotal.Text = $"/ {total}";
+            else
+                lblEndBarTotal.Text = string.Empty;
+        }
+
         private void btnApply_Click(object sender, EventArgs e)
         {
             if (_score == null)
@@ -124,7 +141,7 @@ namespace Music.Generate
             }
             // TODO - implement apply logic 
         }
-
+               
         //================================  SAVE FOR NOW     ========================================
 
 
