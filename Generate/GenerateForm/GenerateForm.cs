@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Forms;
 using MusicXml.Domain;
 using Music.Design;
@@ -59,10 +59,9 @@ namespace Music.Generate
             if (cbPart.Items.Count != 0) return;
 
             cbPart.Items.Clear();
-            cbPart.Items.Add("Choose");
 
             // Use the cached _design set in the constructor (no Globals access here)
-             if (_design?.VoiceSet?.Voices != null)
+            if (_design?.VoiceSet?.Voices != null)
             {
                 foreach (var v in _design.VoiceSet.Voices)
                 {
@@ -72,8 +71,7 @@ namespace Music.Generate
                 }
             }
 
-            if (cbPart.Items.Count > 0)
-                cbPart.SelectedIndex = 0;
+            // no automatic checks here; UI starts with none checked
         }
 
         // CONFIRMED OKAY - FORM CONTROL INITIALIZATION - STATIC NOTE VALUES FROM MUSIC CONSTANTS
@@ -116,14 +114,19 @@ namespace Music.Generate
 
 
 
-            // Collect selected part(s) - the UI uses a ComboBox (single selection)
-            var partObj = cbPart.SelectedItem;
-            if (partObj == null || string.Equals(partObj.ToString(), "Choose", StringComparison.OrdinalIgnoreCase))
+            // Collect selected part(s) - the UI uses a CheckedListBox (multiple selection)
+            string? chosenPart = null;
+            if (cbPart.CheckedItems.Count > 0)
+            {
+                chosenPart = cbPart.CheckedItems[0]?.ToString();
+            }
+
+            if (string.IsNullOrWhiteSpace(chosenPart))
             {
                 MessageBox.Show(this, "Please select a part to apply notes to.", "No Part Selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            var parts = new[] { partObj.ToString()! };  // TODO There are too many variables for parts! Fix.
+            var parts = new[] { chosenPart };
 
             // Staff value
             var staff = (int)numStaff.Value;
@@ -206,7 +209,7 @@ namespace Music.Generate
 
             SetDefaultsForGenerate();
 
-            // Refresh parts and end-total UI
+            // Refresh parts and end-total UI - RECHECK WHICH IS NEEDED! TODO
             PopulatePartsFromDesign();
             LoadEndBarTotal();
         }
@@ -223,8 +226,9 @@ namespace Music.Generate
                 cbPart.Items.Add("Keyboard");
                 idx = cbPart.Items.Count - 1;
             }
+            // check the first matching item (CheckedListBox uses SetItemChecked)
             if (idx >= 0)
-                cbPart.SelectedIndex = idx;
+                cbPart.SetItemChecked(idx, true);
 
             // Set End Bar to design total (clamped inside numEndBar range)
             var total = _design?.SectionSet?.TotalBars ?? Globals.Design?.SectionSet?.TotalBars ?? 0;

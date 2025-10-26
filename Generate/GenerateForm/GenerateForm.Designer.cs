@@ -9,7 +9,7 @@ namespace Music.Generate
 
         private System.Windows.Forms.GroupBox grpTarget;
         private System.Windows.Forms.CheckBox chkAllParts;
-        private System.Windows.Forms.ComboBox cbPart;
+        private System.Windows.Forms.CheckedListBox cbPart;
         private System.Windows.Forms.Label lblPart;
         private System.Windows.Forms.Label lblStaff;
         private System.Windows.Forms.NumericUpDown numStaff;
@@ -65,7 +65,7 @@ namespace Music.Generate
             lblEndBeat = new Label();
             numericUpDown2 = new NumericUpDown();
             lblPart = new Label();
-            cbPart = new ComboBox();
+            cbPart = new CheckedListBox();
             chkAllParts = new CheckBox();
             lblStaff = new Label();
             numStaff = new NumericUpDown();
@@ -171,7 +171,7 @@ namespace Music.Generate
             grpTarget.Controls.Add(chkOverwrite);
             grpTarget.Location = new Point(20, 100);
             grpTarget.Name = "grpTarget";
-            grpTarget.Size = new Size(442, 236);
+            grpTarget.Size = new Size(442, 335);
             grpTarget.TabIndex = 2;
             grpTarget.TabStop = false;
             grpTarget.Text = "Target Scope";
@@ -179,7 +179,7 @@ namespace Music.Generate
             // checkBox1
             // 
             checkBox1.AutoSize = true;
-            checkBox1.Location = new Point(215, 62);
+            checkBox1.Location = new Point(327, 137);
             checkBox1.Name = "checkBox1";
             checkBox1.Size = new Size(40, 19);
             checkBox1.TabIndex = 18;
@@ -188,7 +188,7 @@ namespace Music.Generate
             // txtSections
             // 
             txtSections.BorderStyle = BorderStyle.FixedSingle;
-            txtSections.Location = new Point(81, 89);
+            txtSections.Location = new Point(81, 170);
             txtSections.Name = "txtSections";
             txtSections.Size = new Size(297, 23);
             txtSections.TabIndex = 17;
@@ -196,7 +196,7 @@ namespace Music.Generate
             // lblSections
             // 
             lblSections.AutoSize = true;
-            lblSections.Location = new Point(15, 93);
+            lblSections.Location = new Point(15, 174);
             lblSections.Name = "lblSections";
             lblSections.Size = new Size(54, 15);
             lblSections.TabIndex = 16;
@@ -205,7 +205,7 @@ namespace Music.Generate
             // lblStartBeat
             // 
             lblStartBeat.AutoSize = true;
-            lblStartBeat.Location = new Point(15, 155);
+            lblStartBeat.Location = new Point(15, 244);
             lblStartBeat.Name = "lblStartBeat";
             lblStartBeat.Size = new Size(60, 15);
             lblStartBeat.TabIndex = 15;
@@ -213,7 +213,7 @@ namespace Music.Generate
             // 
             // numStartBeat
             // 
-            numStartBeat.Location = new Point(80, 152);
+            numStartBeat.Location = new Point(80, 241);
             numStartBeat.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numStartBeat.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numStartBeat.Name = "numStartBeat";
@@ -224,7 +224,7 @@ namespace Music.Generate
             // lblEndBeat
             // 
             lblEndBeat.AutoSize = true;
-            lblEndBeat.Location = new Point(203, 155);
+            lblEndBeat.Location = new Point(203, 244);
             lblEndBeat.Name = "lblEndBeat";
             lblEndBeat.Size = new Size(56, 15);
             lblEndBeat.TabIndex = 13;
@@ -232,7 +232,7 @@ namespace Music.Generate
             // 
             // numericUpDown2
             // 
-            numericUpDown2.Location = new Point(262, 151);
+            numericUpDown2.Location = new Point(262, 240);
             numericUpDown2.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numericUpDown2.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numericUpDown2.Name = "numericUpDown2";
@@ -251,15 +251,17 @@ namespace Music.Generate
             // 
             // cbPart
             // 
-            cbPart.Location = new Point(92, 26);
+            cbPart.CheckOnClick = true;
+            cbPart.FormattingEnabled = true;
+            cbPart.Location = new Point(85, 28);
             cbPart.Name = "cbPart";
-            cbPart.Size = new Size(220, 23);
+            cbPart.Size = new Size(220, 94);
             cbPart.TabIndex = 1;
             // 
             // chkAllParts
             // 
             chkAllParts.AutoSize = true;
-            chkAllParts.Location = new Point(322, 28);
+            chkAllParts.Location = new Point(314, 31);
             chkAllParts.Name = "chkAllParts";
             chkAllParts.Size = new Size(40, 19);
             chkAllParts.TabIndex = 2;
@@ -268,7 +270,7 @@ namespace Music.Generate
             // lblStaff
             // 
             lblStaff.AutoSize = true;
-            lblStaff.Location = new Point(15, 63);
+            lblStaff.Location = new Point(15, 138);
             lblStaff.Name = "lblStaff";
             lblStaff.Size = new Size(34, 15);
             lblStaff.TabIndex = 5;
@@ -276,7 +278,7 @@ namespace Music.Generate
             // 
             // numStaff
             // 
-            numStaff.Location = new Point(80, 59);
+            numStaff.Location = new Point(80, 134);
             numStaff.Maximum = new decimal(new int[] { 4, 0, 0, 0 });
             numStaff.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numStaff.Name = "numStaff";
@@ -287,7 +289,7 @@ namespace Music.Generate
             // lblStartBar
             // 
             lblStartBar.AutoSize = true;
-            lblStartBar.Location = new Point(15, 123);
+            lblStartBar.Location = new Point(15, 212);
             lblStartBar.Name = "lblStartBar";
             lblStartBar.Size = new Size(54, 15);
             lblStartBar.TabIndex = 7;
@@ -295,7 +297,7 @@ namespace Music.Generate
             // 
             // numStartBar
             // 
-            numStartBar.Location = new Point(80, 120);
+            numStartBar.Location = new Point(80, 209);
             numStartBar.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numStartBar.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numStartBar.Name = "numStartBar";
@@ -306,7 +308,7 @@ namespace Music.Generate
             // lblEndBar
             // 
             lblEndBar.AutoSize = true;
-            lblEndBar.Location = new Point(203, 123);
+            lblEndBar.Location = new Point(203, 212);
             lblEndBar.Name = "lblEndBar";
             lblEndBar.Size = new Size(50, 15);
             lblEndBar.TabIndex = 9;
@@ -314,7 +316,7 @@ namespace Music.Generate
             // 
             // numEndBar
             // 
-            numEndBar.Location = new Point(262, 119);
+            numEndBar.Location = new Point(262, 208);
             numEndBar.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numEndBar.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numEndBar.Name = "numEndBar";
@@ -325,7 +327,7 @@ namespace Music.Generate
             // lblEndBarTotal
             // 
             lblEndBarTotal.AutoSize = true;
-            lblEndBarTotal.Location = new Point(392, 123);
+            lblEndBarTotal.Location = new Point(392, 212);
             lblEndBarTotal.Name = "lblEndBarTotal";
             lblEndBarTotal.Size = new Size(33, 15);
             lblEndBarTotal.TabIndex = 19;
@@ -336,7 +338,7 @@ namespace Music.Generate
             chkOverwrite.AutoSize = true;
             chkOverwrite.Checked = true;
             chkOverwrite.CheckState = CheckState.Checked;
-            chkOverwrite.Location = new Point(18, 186);
+            chkOverwrite.Location = new Point(18, 275);
             chkOverwrite.Name = "chkOverwrite";
             chkOverwrite.Size = new Size(196, 19);
             chkOverwrite.TabIndex = 11;
@@ -348,7 +350,7 @@ namespace Music.Generate
             grpPitch.Controls.Add(rbPitchKeyRelative);
             grpPitch.Controls.Add(grpAbsolute);
             grpPitch.Controls.Add(grpKeyRelative);
-            grpPitch.Location = new Point(20, 342);
+            grpPitch.Location = new Point(20, 454);
             grpPitch.Name = "grpPitch";
             grpPitch.Size = new Size(442, 235);
             grpPitch.TabIndex = 3;
