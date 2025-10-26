@@ -10,6 +10,10 @@ namespace Music.Generate
     /// of a Score instance. Validates that inserted durations do not exceed the bar length.
     /// This class is form-control-agnostic; GenerateForm should call Apply() with values read
     /// from its controls.
+    /// 
+    /// The assumption for this method is that the parts and measures already exist in the Score!!! 
+    /// Somewhere in Generate form is needs to construct the score framework first Parts/Measures.
+    /// 
     /// </summary>
     public static class ApplySetNote
     {
@@ -28,7 +32,7 @@ namespace Music.Generate
         /// The score object is mutated in-place.
         /// </summary>
         /// <param name="score">Score to modify (must not be null)</param>
-        /// <param name="partNames">Part names selected in the UI (one or more). Only parts with matching Name will be modified.</param>
+        /// <param name="designPartNames">Part names selected in the UI (one or more). Only parts with matching Name will be modified.</param>
         /// <param name="staff">Staff number (textbox value). Only this single staff will receive notes.</param>
         /// <param name="startBar">1-based start bar number (inclusive)</param>
         /// <param name="endBar">1-based end bar number (inclusive)</param>
@@ -41,7 +45,7 @@ namespace Music.Generate
         /// <exception cref="InvalidOperationException">if insertion would overflow a measure</exception>
         public static void Apply(
             MusicXml.Domain.Score score,
-            IEnumerable<string> partNames,
+            IEnumerable<string> designPartNames,
             int staff,
             int startBar,
             int endBar,
@@ -52,49 +56,23 @@ namespace Music.Generate
             int numberOfNotes)
         {
             if (score == null) throw new ArgumentNullException(nameof(score));
-            if (partNames == null) throw new ArgumentNullException(nameof(partNames));
+            if (designPartNames == null) throw new ArgumentNullException(nameof(designPartNames));
             if (startBar < 1) throw new ArgumentException("startBar must be >= 1", nameof(startBar));
             if (endBar < startBar) throw new ArgumentException("endBar must be >= startBar", nameof(endBar));
             if (numberOfNotes <= 0) throw new ArgumentException("numberOfNotes must be > 0", nameof(numberOfNotes));
             if (!"ABCDEFG".Contains(char.ToUpper(step))) throw new ArgumentException("step must be a letter A-G", nameof(step));
 
-            var parts = new HashSet<string>(partNames.Where(n => !string.IsNullOrWhiteSpace(n)), StringComparer.OrdinalIgnoreCase);
-            if (parts.Count == 0) return; // nothing selected -> nothing to do
-
             // Ensure the Score has a Parts list and create missing Part entries for any selected names.
-            score.Parts ??= new List<Part>();
+            // This logic was extracted to a helper for reuse and clarity.
 
-            // Add any selected part names that don't already exist in score.Parts
-            var existingNames = new HashSet<string>(
-                score.Parts.Where(p => !string.IsNullOrWhiteSpace(p?.Name)).Select(p => p.Name!),
-                StringComparer.OrdinalIgnoreCase);
+            ScorePartsHelper.EnsurePartsExist(score, designPartNames);
 
-            foreach (var partName in parts)
-            {
-                if (existingNames.Contains(partName)) continue;
-
-                // generate a unique part Id like "P1", "P2", ...
-                int idx = 1;
-                string newId;
-                do
-                {
-                    newId = "P" + idx++;
-                } while (score.Parts.Any(p => string.Equals(p?.Id, newId, StringComparison.OrdinalIgnoreCase)));
-
-                var newPart = new Part
-                {
-                    Id = newId,
-                    Name = partName,
-                    InstrumentName = partName,
-                    MidiChannel = 1,
-                    Measures = new List<Measure>()
-                };
-
-                score.Parts.Add(newPart);
-                existingNames.Add(partName);
-            }
-
+            //===========================================================================================
             // Map accidental to alter value (MusicXml uses -1,0,1 commonly)
+            //
+            //  TODO  this value should map in the form control for accidentals !!!
+            //
+
             int? alter = accidental switch
             {
                 null => 0,
@@ -107,24 +85,24 @@ namespace Music.Generate
 
             // For each matching part, insert notes for each bar in the range.
 
-            foreach (var part in score.Parts ?? Enumerable.Empty<Part>())
+            foreach (var scorePart in score.Parts ?? Enumerable.Empty<Part>())
             {
-                if (part?.Name == null) continue;
-                if (!parts.Contains(part.Name)) continue;
+                if (scorePart?.Name == null) continue;
+                if (!designPartNames.Contains(scorePart.Name)) continue;
 
                 // Ensure Measures collection exists
-                part.Measures ??= new List<Measure>();
+                scorePart.Measures ??= new List<Measure>();
 
                 // Ensure there are at least endBar measures (1-based)
-                while (part.Measures.Count < endBar)
+                while (scorePart.Measures.Count < endBar)
                 {
                     // Copy attributes from first measure if available, otherwise create reasonable defaults.
                     MeasureAttributes attrs = null!;
-                    if (part.Measures.Count > 0 && part.Measures[0]?.Attributes != null)
+                    if (scorePart.Measures.Count > 0 && scorePart.Measures[0]?.Attributes != null)
                     {
                         // shallow copy reference is acceptable for attributes that describe meter/key/clef,
                         // but to be safe create a new instance and copy common fields if they exist.
-                        var src = part.Measures[0].Attributes;
+                        var src = scorePart.Measures[0].Attributes;
                         attrs = new MeasureAttributes
                         {
                             Divisions = src.Divisions,
@@ -144,17 +122,17 @@ namespace Music.Generate
                         };
                     }
 
-                    part.Measures.Add(new Measure { Attributes = attrs });
+                    scorePart.Measures.Add(new Measure { Attributes = attrs });
                 }
 
                 // Now process each measure index in the requested range
                 for (int bar = startBar; bar <= endBar; bar++)
                 {
-                    var measure = part.Measures[bar - 1];
+                    var measure = scorePart.Measures[bar - 1];
                     if (measure == null)
                     {
                         measure = new Measure();
-                        part.Measures[bar - 1] = measure;
+                        scorePart.Measures[bar - 1] = measure;
                     }
 
                     // Ensure MeasureElements list exists
@@ -192,7 +170,7 @@ namespace Music.Generate
                     if (existingDuration + totalNewDuration > barLengthDivisions)
                     {
                         throw new InvalidOperationException(
-                            $"Insertion would overflow bar {bar} of part '{part.Name}'. Bar capacity (in divisions): {barLengthDivisions}. Existing occupied: {existingDuration}. Attempting to add: {totalNewDuration}.");
+                            $"Insertion would overflow bar {bar} of part '{scorePart.Name}'. Bar capacity (in divisions): {barLengthDivisions}. Existing occupied: {existingDuration}. Attempting to add: {totalNewDuration}.");
                     }
 
                     // Append notes after existing elements (per requirement)
@@ -234,5 +212,48 @@ namespace Music.Generate
             BaseDuration.Sixteenth => "16th",
             _ => "quarter"
         };
+    }
+
+    /// <summary>
+    /// Helper extracted from ApplySetNote.Apply to ensure score parts exist for the requested part names.
+    /// Callers may reuse this helper when parts need to be created before further modification.
+    /// </summary>
+    public static class ScorePartsHelper
+    {
+        public static void EnsurePartsExist(Score score, IEnumerable<string> designPartNames)
+        {
+            if (score == null) throw new ArgumentNullException(nameof(score));
+            if (designPartNames == null) throw new ArgumentNullException(nameof(designPartNames));
+
+            // TODO this is outside scope. Adding parts should be a separate operation.
+            if (designPartNames.Count() == 0)
+            {
+                throw new ArgumentException("At least one part must be selected.", nameof(designPartNames));
+            }
+
+            score.Parts ??= new List<Part>();
+
+            // Build a case-insensitive set of existing part names for quick lookup.
+            var scorePartNames = new HashSet<string>(
+                score.Parts.Where(p => !string.IsNullOrWhiteSpace(p?.Name)).Select(p => p.Name!),
+                StringComparer.OrdinalIgnoreCase);
+
+            int count = 0;
+            foreach (var partName in designPartNames)
+            {
+                if (scorePartNames.Contains(partName)) continue;
+                var newPart = new Part
+                {
+                    Id = count.ToString(),
+                    Name = partName,
+                    InstrumentName = partName,
+                    MidiChannel = count,
+                    Measures = new List<Measure>()
+                };
+
+                score.Parts.Add(newPart);
+                scorePartNames.Add(partName);
+            }
+        }
     }
 }

@@ -9,17 +9,10 @@ namespace Music.Generate
 {
     public partial class GenerateForm : Form
     {
+
+        // CORRECT
         private Score? _score;
         private DesignClass? _design;
-
-        private readonly Dictionary<string, int> _noteValueMap = new()
-        {
-            ["Whole (1)"] = 1,
-            ["Half (1/2)"] = 2,
-            ["Quarter (1/4)"] = 4,
-            ["Eighth (1/8)"] = 8,
-            ["16th (1/16)"] = 16
-        };
 
         public GenerateForm()
         {
@@ -30,10 +23,8 @@ namespace Music.Generate
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.Manual;
-
-            // Keep pitch-mode radio settable repeatedly (not a list)
-            rbPitchAbsolute.Checked = true;
-
+           
+            // CORRECT
             // Load current global score and design into form-local fields for later use
             // Constructor is the only place that reads Globals per requirement.
             _score = Globals.Score;
@@ -43,6 +34,7 @@ namespace Music.Generate
             // They will be populated on activation by the Populate...() methods.
         }
 
+        // CORRECT
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
@@ -54,12 +46,9 @@ namespace Music.Generate
         {
             base.OnActivated(e);
 
-            // Ensure design sections have up-to-date starts/derived values before reading totals
-            _design?.SectionSet?.RecalculateStarts();
-
             // Minimal: only call per-control populate helpers (no other logic here).
             PopulatePattern();
-            PopulateStep();
+            //PopulateStep();
             PopulateAccidental();
             PopulatePartsFromDesign();
             PopulateNoteValue();
@@ -74,13 +63,13 @@ namespace Music.Generate
             cbPattern.SelectedIndex = 0;
         }
 
-        private void PopulateStep()
-        {
-            if (cbStep.Items.Count != 0) return;
+        //private void PopulateStep()
+        //{
+        //    if (cbStep.Items.Count != 0) return;
 
-            cbStep.Items.AddRange(new object[] { "C", "D", "E", "F", "G", "A", "B" });
-            cbStep.SelectedIndex = 0;
-        }
+        //    cbStep.Items.AddRange(new object[] { "C", "D", "E", "F", "G", "A", "B" });
+        //    cbStep.SelectedIndex = 0;
+        //}
 
         private void PopulateAccidental()
         {
@@ -119,7 +108,7 @@ namespace Music.Generate
             if (cbNoteValue.Items.Count != 0) return;
 
             cbNoteValue.DropDownStyle = ComboBoxStyle.DropDownList;
-            foreach (var key in _noteValueMap.Keys)
+            foreach (var key in Music.MusicConstants.NoteValueMap.Keys)
                 cbNoteValue.Items.Add(key);
 
             cbNoteValue.SelectedItem = "Quarter (1/4)";
@@ -138,15 +127,18 @@ namespace Music.Generate
 
         private void btnApply_Click(object sender, EventArgs e)
         {
-            // Ensure best score source available, but cannot be null
             if (_score == null)
             {
-             _score = Globals.Score;
+                throw new Exception("Cannnot apply to a null score");
             }
-            if (_score == null)
-            {
-                _score = new MusicXml.Domain.Score();
-            }
+
+            // APPLY TO DESIGN OBJECT FIRST
+
+
+
+            // THEN 
+
+
 
 
             // Collect selected part(s) - the UI uses a ComboBox (single selection)
@@ -158,12 +150,8 @@ namespace Music.Generate
             }
             var parts = new[] { partObj.ToString()! };  // TODO There are too many variables for parts! Fix.
 
-            // Staff value: try multiple candidate control names (NumericUpDown preferred, then TextBox)
-            if (!TryGetIntFromControls(new[] { "txtStaff", "numStaff", "nudStaff", "Staff" }, out var staff))
-            {
-                MessageBox.Show(this, "Staff must be a valid integer (check Staff control).", "Invalid Staff", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
+            // Staff value
+            var staff = (int)numStaff.Value;
 
             // Start/End bars (NumericUpDown controls expected)
             var startBar = (int)numStartBar.Value;
@@ -191,7 +179,7 @@ namespace Music.Generate
 
             // Base duration - map from the UI string via _noteValueMap
             var noteValueKey = cbNoteValue.SelectedItem?.ToString();
-            if (noteValueKey == null || !_noteValueMap.TryGetValue(noteValueKey, out var denom))
+            if (noteValueKey == null || !Music.MusicConstants.NoteValueMap.TryGetValue(noteValueKey, out var denom))
             {
                 MessageBox.Show(this, "Please select a valid base duration.", "Invalid Duration", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -234,81 +222,13 @@ namespace Music.Generate
             }
         }
 
-        /// <summary>
-        /// Attempts to retrieve an integer value from one of the named controls.
-        /// Supports NumericUpDown and TextBox controls. Search is recursive (child controls included).
-        /// </summary>
-        private bool TryGetIntFromControls(string[] candidateNames, out int value)
-        {
-            value = 0;
-            foreach (var name in candidateNames)
-            {
-                var ctrl = FindControlByName(name);
-                if (ctrl == null) continue;
-
-                if (ctrl is NumericUpDown nud)
-                {
-                    value = (int)nud.Value;
-                    return true;
-                }
-
-                if (ctrl is TextBox tb && int.TryParse(tb.Text.Trim(), out var v1))
-                {
-                    value = v1;
-                    return true;
-                }
-
-                if (ctrl is ComboBox cb && int.TryParse(cb.Text.Trim(), out var v2))
-                {
-                    value = v2;
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Finds a control by name anywhere in the form's control hierarchy.
-        /// </summary>
-        private Control? FindControlByName(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name)) return null;
-            var matches = this.Controls.Find(name, true);
-            return matches.FirstOrDefault();
-        }
-
+        // SET DESIGN AND GENERATE DEFAULTS
         private void btnSetDefault_Click(object? sender, EventArgs e)
         {
-            // 1) Run Design form's Set Default logic if a DesignForm MDI child is available.
-            var mdi = this.MdiParent;
-            if (mdi != null)
-            {
-                var designForm = mdi.MdiChildren.FirstOrDefault(f => f.GetType().Name == "DesignForm");
-                if (designForm != null)
-                {
-                    // Invoke the private click handler on DesignForm to reuse its exact behavior.
-                    var mi = designForm.GetType().GetMethod("btnSetDefault_Click", BindingFlags.Instance | BindingFlags.NonPublic);
-                    if (mi != null)
-                    {
-                        try
-                        {
-                            mi.Invoke(designForm, new object[] { designForm, EventArgs.Empty });
-                        }
-                        catch
-                        {
-                            // swallow reflection errors; fall back to central defaults below
-                        }
-                    }
-                }
-            }
-
-            // If no design exists yet, or reflection call didn't run, ensure central defaults are applied
             Globals.Design ??= new DesignClass();
             DesignDefaults.ApplyDefaultDesign(Globals.Design);
-
-            // Update local cache and set generate-specific defaults
             _design = Globals.Design;
+
             SetDefaultsForGenerate();
 
             // Refresh parts and end-total UI
@@ -341,8 +261,79 @@ namespace Music.Generate
 
             numNumberOfNotes.Value = 4;
 
+            // pitch-mode radio buttons - set to Absolute
+            rbPitchAbsolute.Checked = true;
+
+            cbStep.SelectedItem = "C";
         }
-               
+
+        private void btnNewScore_Click(object sender, EventArgs e)
+        {
+            // Create a fresh Score instance and assign to the local cache
+            _score = new Score
+            {
+                MovementTitle = string.Empty,
+                Identification = new Identification(),
+                Parts = new List<Part>()
+            };
+
+            // Prefer the form-local design, fall back to Globals if missing
+            var design = _design ?? Globals.Design;
+            if (design == null)
+            {
+                MessageBox.Show(this, "No design available. Create or set a design before creating a new score.", "No Design", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Collect part names from design voices (same logic as PopulatePartsFromDesign)
+            var partNames = new List<string>();
+            if (design.VoiceSet?.Voices != null)
+            {
+                foreach (var v in design.VoiceSet.Voices)
+                {
+                    var name = v?.VoiceName;
+                    if (!string.IsNullOrWhiteSpace(name))
+                        partNames.Add(name);
+                }
+            }
+
+            if (partNames.Count == 0)
+            {
+                MessageBox.Show(this, "Design contains no voices to create parts from.", "No Parts", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Ensure parts exist in the new score (this will add Part entries for each name)
+            try
+            {
+                ScorePartsHelper.EnsurePartsExist(_score, partNames);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, $"Error creating parts: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Determine how many measures to create from the design's section set
+            var totalBars = design.SectionSet?.TotalBars ?? 0;
+
+            // Ensure each part has a Measures list and enough Measure entries
+            foreach (var part in _score.Parts ?? Enumerable.Empty<Part>())
+            {
+                part.Measures ??= new List<Measure>();
+                while (part.Measures.Count < totalBars)
+                {
+                    part.Measures.Add(new Measure());
+                }
+            }
+
+            // Refresh UI that depends on design/parts
+            PopulatePartsFromDesign();
+            PopulateEndBarTotal();
+
+            MessageBox.Show(this, "New score created from design.", "New Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
         //================================  SAVE FOR NOW     ========================================
     }
 }

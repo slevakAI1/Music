@@ -17,6 +17,8 @@ namespace Music.Design
             design.TimeSignatureTimeline = TimeSignatureDefault.BuildDefaultTimeline();
             design.TempoTimeline = TempoDefault.BuildDefaultTimeline();
             design.HarmonicTimeline = HarmonicDefault.BuildDefaultTimeline();
+
+            design.VoiceSet.AddDefaultVoices();
         }
     }
 }

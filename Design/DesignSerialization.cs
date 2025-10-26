@@ -34,7 +34,7 @@ namespace Music.Design
                 {
                     design.SectionSet.Sections.Add(new SectionClass
                     {
-                        SectionType = (MusicEnums.eSectionType)s.SectionType,
+                        SectionType = (MusicConstants.eSectionType)s.SectionType,
                         StartBar = s.StartBar > 0 ? s.StartBar : 1,
                         BarCount = s.BarCount > 0 ? s.BarCount : 1,
                         Name = s.Name,

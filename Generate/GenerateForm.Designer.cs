@@ -109,7 +109,8 @@ namespace Music.Generate
             chkTieAcross = new CheckBox();
             chkFermata = new CheckBox();
             label2 = new Label();
-            btnSetDefault = new Button();
+            btnSetDefaults = new Button();
+            btnNewScore = new Button();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -398,6 +399,7 @@ namespace Music.Generate
             // cbStep
             // 
             cbStep.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbStep.Items.AddRange(new object[] { "C", "D", "E", "F", "G", "A", "B" });
             cbStep.Location = new Point(50, 26);
             cbStep.Name = "cbStep";
             cbStep.Size = new Size(60, 23);
@@ -500,7 +502,7 @@ namespace Music.Generate
             // 
             // btnApply
             // 
-            btnApply.Location = new Point(537, 113);
+            btnApply.Location = new Point(537, 155);
             btnApply.Name = "btnApply";
             btnApply.Size = new Size(120, 36);
             btnApply.TabIndex = 4;
@@ -510,7 +512,7 @@ namespace Music.Generate
             // lblStatus
             // 
             lblStatus.AutoSize = true;
-            lblStatus.Location = new Point(537, 163);
+            lblStatus.Location = new Point(537, 205);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(42, 15);
             lblStatus.TabIndex = 5;
@@ -662,20 +664,31 @@ namespace Music.Generate
             label2.TabIndex = 7;
             label2.Text = "Pattern";
             // 
-            // btnSetDefault
+            // btnSetDefaults
             // 
-            btnSetDefault.Location = new Point(361, 629);
-            btnSetDefault.Name = "btnSetDefault";
-            btnSetDefault.Size = new Size(75, 23);
-            btnSetDefault.TabIndex = 8;
-            btnSetDefault.Text = "Set Default";
-            btnSetDefault.UseVisualStyleBackColor = true;
-            btnSetDefault.Click += btnSetDefault_Click;
+            btnSetDefaults.Location = new Point(543, 68);
+            btnSetDefaults.Name = "btnSetDefaults";
+            btnSetDefaults.Size = new Size(114, 23);
+            btnSetDefaults.TabIndex = 8;
+            btnSetDefaults.Text = "Set Defaults";
+            btnSetDefaults.UseVisualStyleBackColor = true;
+            btnSetDefaults.Click += btnSetDefault_Click;
+            // 
+            // btnNewScore
+            // 
+            btnNewScore.Location = new Point(539, 113);
+            btnNewScore.Name = "btnNewScore";
+            btnNewScore.Size = new Size(118, 23);
+            btnNewScore.TabIndex = 9;
+            btnNewScore.Text = "New Score";
+            btnNewScore.UseVisualStyleBackColor = true;
+            btnNewScore.Click += btnNewScore_Click;
             // 
             // GenerateForm
             // 
             ClientSize = new Size(832, 701);
-            Controls.Add(btnSetDefault);
+            Controls.Add(btnNewScore);
+            Controls.Add(btnSetDefaults);
             Controls.Add(label2);
             Controls.Add(groupBox1);
             Controls.Add(lblTitle);
@@ -736,6 +749,7 @@ namespace Music.Generate
         private Label label3;
         private NumericUpDown numNumberOfNotes;
         private Label label2;
-        private Button btnSetDefault;
+        private Button btnSetDefaults;
+        private Button btnNewScore;
     }
 }
