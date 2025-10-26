@@ -138,10 +138,16 @@ namespace Music.Generate
 
         private void btnApply_Click(object sender, EventArgs e)
         {
+            // Ensure best score source available, but cannot be null
             if (_score == null)
             {
              _score = Globals.Score;
             }
+            if (_score == null)
+            {
+                _score = new MusicXml.Domain.Score();
+            }
+
 
             // Collect selected part(s) - the UI uses a ComboBox (single selection)
             var selectedPartObj = cbPart.SelectedItem;
