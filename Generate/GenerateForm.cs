@@ -140,8 +140,7 @@ namespace Music.Generate
         {
             if (_score == null)
             {
-                MessageBox.Show(this, "No Score is loaded. Use SetScore(Score) to provide a MusicXML Score.", "No Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+             _score = Globals.Score;
             }
 
             // Collect selected part(s) - the UI uses a ComboBox (single selection)
