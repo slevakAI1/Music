@@ -150,13 +150,13 @@ namespace Music.Generate
 
 
             // Collect selected part(s) - the UI uses a ComboBox (single selection)
-            var selectedPartObj = cbPart.SelectedItem;
-            if (selectedPartObj == null || string.Equals(selectedPartObj.ToString(), "Choose", StringComparison.OrdinalIgnoreCase))
+            var partObj = cbPart.SelectedItem;
+            if (partObj == null || string.Equals(partObj.ToString(), "Choose", StringComparison.OrdinalIgnoreCase))
             {
                 MessageBox.Show(this, "Please select a part to apply notes to.", "No Part Selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            var selectedParts = new[] { selectedPartObj.ToString()! };
+            var parts = new[] { partObj.ToString()! };  // TODO There are too many variables for parts! Fix.
 
             // Staff value: try multiple candidate control names (NumericUpDown preferred, then TextBox)
             if (!TryGetIntFromControls(new[] { "txtStaff", "numStaff", "nudStaff", "Staff" }, out var staff))
@@ -215,7 +215,7 @@ namespace Music.Generate
             {
                 ApplySetNote.Apply(
                     _score,
-                    selectedParts,
+                    parts,
                     staff,
                     startBar,
                     endBar,

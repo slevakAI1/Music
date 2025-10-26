@@ -243,13 +243,13 @@ namespace Music.Generate
             lblPart.AutoSize = true;
             lblPart.Location = new Point(15, 30);
             lblPart.Name = "lblPart";
-            lblPart.Size = new Size(61, 15);
+            lblPart.Size = new Size(70, 15);
             lblPart.TabIndex = 0;
-            lblPart.Text = "Voice/Part";
+            lblPart.Text = "Part (Voice):";
             // 
             // cbPart
             // 
-            cbPart.Location = new Point(80, 26);
+            cbPart.Location = new Point(92, 26);
             cbPart.Name = "cbPart";
             cbPart.Size = new Size(220, 23);
             cbPart.TabIndex = 1;
@@ -257,7 +257,7 @@ namespace Music.Generate
             // chkAllParts
             // 
             chkAllParts.AutoSize = true;
-            chkAllParts.Location = new Point(310, 28);
+            chkAllParts.Location = new Point(322, 28);
             chkAllParts.Name = "chkAllParts";
             chkAllParts.Size = new Size(40, 19);
             chkAllParts.TabIndex = 2;
@@ -433,7 +433,6 @@ namespace Music.Generate
             // 
             numOctaveAbs.Location = new Point(305, 26);
             numOctaveAbs.Maximum = new decimal(new int[] { 8, 0, 0, 0 });
-            numOctaveAbs.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
             numOctaveAbs.Name = "numOctaveAbs";
             numOctaveAbs.Size = new Size(47, 23);
             numOctaveAbs.TabIndex = 5;
@@ -494,7 +493,6 @@ namespace Music.Generate
             // 
             numOctaveKR.Location = new Point(250, 26);
             numOctaveKR.Maximum = new decimal(new int[] { 8, 0, 0, 0 });
-            numOctaveKR.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
             numOctaveKR.Name = "numOctaveKR";
             numOctaveKR.Size = new Size(104, 23);
             numOctaveKR.TabIndex = 3;
@@ -549,10 +547,10 @@ namespace Music.Generate
             label3.TabIndex = 19;
             label3.Text = "Number of Notes";
             // 
-            // numericUpDown1
+            // numNumberOfNotes
             // 
             numNumberOfNotes.Location = new Point(124, 164);
-            numNumberOfNotes.Name = "numericUpDown1";
+            numNumberOfNotes.Name = "numNumberOfNotes";
             numNumberOfNotes.Size = new Size(71, 23);
             numNumberOfNotes.TabIndex = 18;
             // 

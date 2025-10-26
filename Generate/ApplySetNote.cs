@@ -6,7 +6,7 @@ using MusicXml.Domain;
 namespace Music.Generate
 {
     /// <summary>
-    /// Inserts a repeated set of notes (beat-1 insertions) into selected parts / staffs / bars
+    /// Inserts a repeated set of notes (beat-1 insertions) into parts / staffs / bars
     /// of a Score instance. Validates that inserted durations do not exceed the bar length.
     /// This class is form-control-agnostic; GenerateForm should call Apply() with values read
     /// from its controls.
@@ -28,7 +28,7 @@ namespace Music.Generate
         /// The score object is mutated in-place.
         /// </summary>
         /// <param name="score">Score to modify (must not be null)</param>
-        /// <param name="selectedPartNames">Part names selected in the UI (one or more). Only parts with matching Name will be modified.</param>
+        /// <param name="partNames">Part names selected in the UI (one or more). Only parts with matching Name will be modified.</param>
         /// <param name="staff">Staff number (textbox value). Only this single staff will receive notes.</param>
         /// <param name="startBar">1-based start bar number (inclusive)</param>
         /// <param name="endBar">1-based end bar number (inclusive)</param>
@@ -41,7 +41,7 @@ namespace Music.Generate
         /// <exception cref="InvalidOperationException">if insertion would overflow a measure</exception>
         public static void Apply(
             MusicXml.Domain.Score score,
-            IEnumerable<string> selectedPartNames,
+            IEnumerable<string> partNames,
             int staff,
             int startBar,
             int endBar,
@@ -52,14 +52,14 @@ namespace Music.Generate
             int numberOfNotes)
         {
             if (score == null) throw new ArgumentNullException(nameof(score));
-            if (selectedPartNames == null) throw new ArgumentNullException(nameof(selectedPartNames));
+            if (partNames == null) throw new ArgumentNullException(nameof(partNames));
             if (startBar < 1) throw new ArgumentException("startBar must be >= 1", nameof(startBar));
             if (endBar < startBar) throw new ArgumentException("endBar must be >= startBar", nameof(endBar));
             if (numberOfNotes <= 0) throw new ArgumentException("numberOfNotes must be > 0", nameof(numberOfNotes));
             if (!"ABCDEFG".Contains(char.ToUpper(step))) throw new ArgumentException("step must be a letter A-G", nameof(step));
 
-            var selectedParts = new HashSet<string>(selectedPartNames.Where(n => !string.IsNullOrWhiteSpace(n)), StringComparer.OrdinalIgnoreCase);
-            if (selectedParts.Count == 0) return; // nothing selected -> nothing to do
+            var parts = new HashSet<string>(partNames.Where(n => !string.IsNullOrWhiteSpace(n)), StringComparer.OrdinalIgnoreCase);
+            if (parts.Count == 0) return; // nothing selected -> nothing to do
 
             // Ensure the Score has a Parts list and create missing Part entries for any selected names.
             score.Parts ??= new List<Part>();
@@ -69,7 +69,7 @@ namespace Music.Generate
                 score.Parts.Where(p => !string.IsNullOrWhiteSpace(p?.Name)).Select(p => p.Name!),
                 StringComparer.OrdinalIgnoreCase);
 
-            foreach (var partName in selectedParts)
+            foreach (var partName in parts)
             {
                 if (existingNames.Contains(partName)) continue;
 
@@ -107,14 +107,10 @@ namespace Music.Generate
 
             // For each matching part, insert notes for each bar in the range.
 
-
-            // TODO SCORE.PARTS is empty? where are the parts?
-
-
             foreach (var part in score.Parts ?? Enumerable.Empty<Part>())
             {
                 if (part?.Name == null) continue;
-                if (!selectedParts.Contains(part.Name)) continue;
+                if (!parts.Contains(part.Name)) continue;
 
                 // Ensure Measures collection exists
                 part.Measures ??= new List<Measure>();
