@@ -43,21 +43,14 @@ namespace Music.Generate
         {
             base.OnActivated(e);
 
-            // Minimal: only call per-control populate helpers (no other logic here).
-            //PopulatePattern();
-
-            // CONFIRMED CORRECT - DATA INITIALIZATION - POPULATION OF PARTS DATA FROM (LOCAL) DESIGN
+            // CONFIRMED CORRECT
+            // DATA INITIALIZATION - POPULATION OF PARTS DATA FROM (LOCAL) DESIGN
             PopulatePartsFromDesign();
-            PopulateNoteValue();
-            PopulateEndBarTotal(); // populate the total bars label (uses cached _design)
-        }
 
-        private void PopulatePattern()
-        {
-            if (cbPattern.Items.Count != 0) return;
-
-            cbPattern.Items.Add("Set Notes");
-            cbPattern.SelectedIndex = 0;
+            // CONFIRMED OK
+            // FORM CONTROL INITIALIZATION
+            LoadNoteValues();
+            LoadEndBarTotal();
         }
 
         private void PopulatePartsFromDesign()
@@ -83,7 +76,8 @@ namespace Music.Generate
                 cbPart.SelectedIndex = 0;
         }
 
-        private void PopulateNoteValue()
+        // CONFIRMED OKAY - FORM CONTROL INITIALIZATION - STATIC NOTE VALUES FROM MUSIC CONSTANTS
+        private void LoadNoteValues()
         {
             if (cbNoteValue.Items.Count != 0) return;
 
@@ -94,7 +88,8 @@ namespace Music.Generate
             cbNoteValue.SelectedItem = "Quarter (1/4)";
         }
 
-        private void PopulateEndBarTotal()
+        // CONFIRMED OKAY - FORM DATA INITIALIZATION - DESSIGN END BAR TOTAL
+        private void LoadEndBarTotal()
         {
             // Always refresh the label when called (caller ensures this runs on activate)
             var total = _design?.SectionSet?.TotalBars ?? 0;
@@ -213,7 +208,7 @@ namespace Music.Generate
 
             // Refresh parts and end-total UI
             PopulatePartsFromDesign();
-            PopulateEndBarTotal();
+            LoadEndBarTotal();
         }
 
         private void SetDefaultsForGenerate()
@@ -309,11 +304,9 @@ namespace Music.Generate
 
             // Refresh UI that depends on design/parts
             PopulatePartsFromDesign();
-            PopulateEndBarTotal();
+            LoadEndBarTotal();
 
             MessageBox.Show(this, "New score created from design.", "New Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-
-        //================================  SAVE FOR NOW     ========================================
     }
 }
