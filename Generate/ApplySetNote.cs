@@ -58,8 +58,41 @@ namespace Music.Generate
             if (numberOfNotes <= 0) throw new ArgumentException("numberOfNotes must be > 0", nameof(numberOfNotes));
             if (!"ABCDEFG".Contains(char.ToUpper(step))) throw new ArgumentException("step must be a letter A-G", nameof(step));
 
-            var selectedSet = new HashSet<string>(selectedPartNames.Where(n => !string.IsNullOrWhiteSpace(n)), StringComparer.OrdinalIgnoreCase);
-            if (selectedSet.Count == 0) return; // nothing selected -> nothing to do
+            var selectedParts = new HashSet<string>(selectedPartNames.Where(n => !string.IsNullOrWhiteSpace(n)), StringComparer.OrdinalIgnoreCase);
+            if (selectedParts.Count == 0) return; // nothing selected -> nothing to do
+
+            // Ensure the Score has a Parts list and create missing Part entries for any selected names.
+            score.Parts ??= new List<Part>();
+
+            // Add any selected part names that don't already exist in score.Parts
+            var existingNames = new HashSet<string>(
+                score.Parts.Where(p => !string.IsNullOrWhiteSpace(p?.Name)).Select(p => p.Name!),
+                StringComparer.OrdinalIgnoreCase);
+
+            foreach (var partName in selectedParts)
+            {
+                if (existingNames.Contains(partName)) continue;
+
+                // generate a unique part Id like "P1", "P2", ...
+                int idx = 1;
+                string newId;
+                do
+                {
+                    newId = "P" + idx++;
+                } while (score.Parts.Any(p => string.Equals(p?.Id, newId, StringComparison.OrdinalIgnoreCase)));
+
+                var newPart = new Part
+                {
+                    Id = newId,
+                    Name = partName,
+                    InstrumentName = partName,
+                    MidiChannel = 1,
+                    Measures = new List<Measure>()
+                };
+
+                score.Parts.Add(newPart);
+                existingNames.Add(partName);
+            }
 
             // Map accidental to alter value (MusicXml uses -1,0,1 commonly)
             int? alter = accidental switch
@@ -73,10 +106,15 @@ namespace Music.Generate
             };
 
             // For each matching part, insert notes for each bar in the range.
+
+
+            // TODO SCORE.PARTS is empty? where are the parts?
+
+
             foreach (var part in score.Parts ?? Enumerable.Empty<Part>())
             {
                 if (part?.Name == null) continue;
-                if (!selectedSet.Contains(part.Name)) continue;
+                if (!selectedParts.Contains(part.Name)) continue;
 
                 // Ensure Measures collection exists
                 part.Measures ??= new List<Measure>();
