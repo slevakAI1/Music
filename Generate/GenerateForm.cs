@@ -29,9 +29,6 @@ namespace Music.Generate
             // Constructor is the only place that reads Globals per requirement.
             _score = Globals.Score;
             _design = Globals.Design;
-
-            // Note: list-type controls are NOT populated here.
-            // They will be populated on activation by the Populate...() methods.
         }
 
         // CORRECT
@@ -47,9 +44,9 @@ namespace Music.Generate
             base.OnActivated(e);
 
             // Minimal: only call per-control populate helpers (no other logic here).
-            PopulatePattern();
-            //PopulateStep();
-            PopulateAccidental();
+            //PopulatePattern();
+
+            // CONFIRMED CORRECT - DATA INITIALIZATION - POPULATION OF PARTS DATA FROM (LOCAL) DESIGN
             PopulatePartsFromDesign();
             PopulateNoteValue();
             PopulateEndBarTotal(); // populate the total bars label (uses cached _design)
@@ -63,22 +60,6 @@ namespace Music.Generate
             cbPattern.SelectedIndex = 0;
         }
 
-        //private void PopulateStep()
-        //{
-        //    if (cbStep.Items.Count != 0) return;
-
-        //    cbStep.Items.AddRange(new object[] { "C", "D", "E", "F", "G", "A", "B" });
-        //    cbStep.SelectedIndex = 0;
-        //}
-
-        private void PopulateAccidental()
-        {
-            if (cbAccidental.Items.Count != 0) return;
-
-            cbAccidental.Items.AddRange(new object[] { "Natural", "Sharp", "Flat" });
-            cbAccidental.SelectedIndex = 0;
-        }
-
         private void PopulatePartsFromDesign()
         {
             // Populate only when empty
@@ -88,10 +69,9 @@ namespace Music.Generate
             cbPart.Items.Add("Choose");
 
             // Use the cached _design set in the constructor (no Globals access here)
-            var design = _design;
-            if (design?.VoiceSet?.Voices != null)
+             if (_design?.VoiceSet?.Voices != null)
             {
-                foreach (var v in design.VoiceSet.Voices)
+                foreach (var v in _design.VoiceSet.Voices)
                 {
                     var name = v?.VoiceName ?? string.Empty;
                     if (!string.IsNullOrWhiteSpace(name))
@@ -259,12 +239,12 @@ namespace Music.Generate
                 numEndBar.Value = clamped;
             }
 
+            // Other control defaults
             numNumberOfNotes.Value = 4;
-
-            // pitch-mode radio buttons - set to Absolute
             rbPitchAbsolute.Checked = true;
-
-            cbStep.SelectedItem = "C";
+            cbStep.SelectedIndex = 0;       // C
+            cbAccidental.SelectedIndex = 0; // Natural
+            cbPattern.SelectedIndex = 0;    // Set Notes                                            
         }
 
         private void btnNewScore_Click(object sender, EventArgs e)

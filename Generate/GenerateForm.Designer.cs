@@ -143,6 +143,7 @@ namespace Music.Generate
             // cbPattern
             // 
             cbPattern.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbPattern.Items.AddRange(new object[] { "Set Note" });
             cbPattern.Location = new Point(100, 65);
             cbPattern.Name = "cbPattern";
             cbPattern.Size = new Size(250, 23);
@@ -382,7 +383,7 @@ namespace Music.Generate
             grpAbsolute.Controls.Add(numOctaveAbs);
             grpAbsolute.Location = new Point(18, 75);
             grpAbsolute.Name = "grpAbsolute";
-            grpAbsolute.Size = new Size(360, 65);
+            grpAbsolute.Size = new Size(407, 65);
             grpAbsolute.TabIndex = 2;
             grpAbsolute.TabStop = false;
             grpAbsolute.Text = "Absolute";
@@ -410,14 +411,15 @@ namespace Music.Generate
             lblAccidental.AutoSize = true;
             lblAccidental.Location = new Point(120, 30);
             lblAccidental.Name = "lblAccidental";
-            lblAccidental.Size = new Size(40, 15);
+            lblAccidental.Size = new Size(66, 15);
             lblAccidental.TabIndex = 2;
-            lblAccidental.Text = "Accid:";
+            lblAccidental.Text = "Accidental:";
             // 
             // cbAccidental
             // 
             cbAccidental.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbAccidental.Location = new Point(165, 26);
+            cbAccidental.Items.AddRange(new object[] { "Natural", "Sharp", "Flat" });
+            cbAccidental.Location = new Point(194, 26);
             cbAccidental.Name = "cbAccidental";
             cbAccidental.Size = new Size(80, 23);
             cbAccidental.TabIndex = 3;
@@ -425,7 +427,7 @@ namespace Music.Generate
             // lblOctaveAbs
             // 
             lblOctaveAbs.AutoSize = true;
-            lblOctaveAbs.Location = new Point(255, 30);
+            lblOctaveAbs.Location = new Point(284, 30);
             lblOctaveAbs.Name = "lblOctaveAbs";
             lblOctaveAbs.Size = new Size(47, 15);
             lblOctaveAbs.TabIndex = 4;
@@ -433,7 +435,7 @@ namespace Music.Generate
             // 
             // numOctaveAbs
             // 
-            numOctaveAbs.Location = new Point(305, 26);
+            numOctaveAbs.Location = new Point(336, 26);
             numOctaveAbs.Maximum = new decimal(new int[] { 8, 0, 0, 0 });
             numOctaveAbs.Name = "numOctaveAbs";
             numOctaveAbs.Size = new Size(47, 23);
