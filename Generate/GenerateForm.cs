@@ -186,12 +186,8 @@ namespace Music.Generate
             // Accidental
             var accidental = cbAccidental.SelectedItem?.ToString() ?? "Natural";
 
-            // Octave: accept several candidate control names
-            if (!TryGetIntFromControls(new[] { "numOctave", "nudOctave", "OctaveAbsolute", "numOctaveAbsolute" }, out var octave))
-            {
-                MessageBox.Show(this, "Octave must be a valid integer (check Octave control).", "Invalid Octave", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
+            // Octave: use only the specific control named "numOcataveAbs"
+            var octave = (int)numOctaveAbs.Value;
 
             // Base duration - map from the UI string via _noteValueMap
             var noteValueKey = cbNoteValue.SelectedItem?.ToString();
@@ -212,16 +208,7 @@ namespace Music.Generate
             };
 
             // Number of notes: accept multiple candidate control names
-            if (!TryGetIntFromControls(new[] { "numNumberOfNotes", "numNotes", "nudNumberOfNotes", "NumberOfNotes" }, out var numberOfNotes))
-            {
-                MessageBox.Show(this, "Number of Notes must be a valid integer (check Number of Notes control).", "Invalid Number", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-            if (numberOfNotes <= 0)
-            {
-                MessageBox.Show(this, "Number of Notes must be greater than zero.", "Invalid Number", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
+            var numberOfNotes = (int)numNumberOfNotes.Value;
 
             // Call ApplySetNote to mutate the _score in-place. Catch validation errors from Apply.
             try
@@ -351,6 +338,9 @@ namespace Music.Generate
                 var clamped = Math.Max((int)numEndBar.Minimum, Math.Min((int)numEndBar.Maximum, total));
                 numEndBar.Value = clamped;
             }
+
+            numNumberOfNotes.Value = 4;
+
         }
                
         //================================  SAVE FOR NOW     ========================================

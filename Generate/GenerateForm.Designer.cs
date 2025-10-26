@@ -96,7 +96,7 @@ namespace Music.Generate
             tt = new ToolTip(components);
             groupBox1 = new GroupBox();
             label3 = new Label();
-            numericUpDown1 = new NumericUpDown();
+            numNumberOfNotes = new NumericUpDown();
             lblNoteValue = new Label();
             cbNoteValue = new ComboBox();
             lblDots = new Label();
@@ -123,7 +123,7 @@ namespace Music.Generate
             ((System.ComponentModel.ISupportInitialize)numDegree).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numOctaveKR).BeginInit();
             groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numNumberOfNotes).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numDots).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numTupletCount).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numTupletOf).BeginInit();
@@ -432,11 +432,12 @@ namespace Music.Generate
             // numOctaveAbs
             // 
             numOctaveAbs.Location = new Point(305, 26);
-            numOctaveAbs.Maximum = new decimal(new int[] { 5, 0, 0, 0 });
-            numOctaveAbs.Minimum = new decimal(new int[] { 5, 0, 0, int.MinValue });
+            numOctaveAbs.Maximum = new decimal(new int[] { 8, 0, 0, 0 });
+            numOctaveAbs.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
             numOctaveAbs.Name = "numOctaveAbs";
             numOctaveAbs.Size = new Size(47, 23);
             numOctaveAbs.TabIndex = 5;
+            numOctaveAbs.Value = new decimal(new int[] { 4, 0, 0, 0 });
             // 
             // grpKeyRelative
             // 
@@ -492,7 +493,8 @@ namespace Music.Generate
             // numOctaveKR
             // 
             numOctaveKR.Location = new Point(250, 26);
-            numOctaveKR.Maximum = new decimal(new int[] { 9, 0, 0, 0 });
+            numOctaveKR.Maximum = new decimal(new int[] { 8, 0, 0, 0 });
+            numOctaveKR.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
             numOctaveKR.Name = "numOctaveKR";
             numOctaveKR.Size = new Size(104, 23);
             numOctaveKR.TabIndex = 3;
@@ -519,7 +521,7 @@ namespace Music.Generate
             // groupBox1
             // 
             groupBox1.Controls.Add(label3);
-            groupBox1.Controls.Add(numericUpDown1);
+            groupBox1.Controls.Add(numNumberOfNotes);
             groupBox1.Controls.Add(lblNoteValue);
             groupBox1.Controls.Add(cbNoteValue);
             groupBox1.Controls.Add(lblDots);
@@ -549,10 +551,10 @@ namespace Music.Generate
             // 
             // numericUpDown1
             // 
-            numericUpDown1.Location = new Point(124, 164);
-            numericUpDown1.Name = "numericUpDown1";
-            numericUpDown1.Size = new Size(71, 23);
-            numericUpDown1.TabIndex = 18;
+            numNumberOfNotes.Location = new Point(124, 164);
+            numNumberOfNotes.Name = "numericUpDown1";
+            numNumberOfNotes.Size = new Size(71, 23);
+            numNumberOfNotes.TabIndex = 18;
             // 
             // lblNoteValue
             // 
@@ -704,7 +706,7 @@ namespace Music.Generate
             ((System.ComponentModel.ISupportInitialize)numOctaveKR).EndInit();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numNumberOfNotes).EndInit();
             ((System.ComponentModel.ISupportInitialize)numDots).EndInit();
             ((System.ComponentModel.ISupportInitialize)numTupletCount).EndInit();
             ((System.ComponentModel.ISupportInitialize)numTupletOf).EndInit();
@@ -734,7 +736,7 @@ namespace Music.Generate
         private TextBox txtSections;
         private CheckBox checkBox1;
         private Label label3;
-        private NumericUpDown numericUpDown1;
+        private NumericUpDown numNumberOfNotes;
         private Label label2;
         private Button btnSetDefault;
     }
