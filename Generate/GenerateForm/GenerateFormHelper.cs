@@ -11,23 +11,36 @@ namespace Music.Generate
     {
         public static void PopulatePartsFromDesign(CheckedListBox cbPart, DesignClass? design)
         {
-            // Populate only when empty
-            if (cbPart.Items.Count != 0) return;
+            // Preserve currently checked part names so we can re-apply them after repopulating.
+            var previouslyChecked = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var item in cbPart.CheckedItems.Cast<object?>())
+            {
+                var name = item?.ToString();
+                if (!string.IsNullOrWhiteSpace(name))
+                    previouslyChecked.Add(name!);
+            }
 
+            // Always rebuild the list from the design (clear then add).
             cbPart.Items.Clear();
 
-            // Use the provided design instance (no Globals access here except fallback where original code had it)
+            // Use the provided design instance (no Globals access here)
             if (design?.VoiceSet?.Voices != null)
             {
                 foreach (var v in design.VoiceSet.Voices)
                 {
                     var name = v?.VoiceName ?? string.Empty;
                     if (!string.IsNullOrWhiteSpace(name))
+                    {
                         cbPart.Items.Add(name);
+                        // Re-apply previously checked state (or any state set by callers before this refresh)
+                        if (previouslyChecked.Contains(name))
+                            cbPart.SetItemChecked(cbPart.Items.Count - 1, true);
+                    }
                 }
             }
 
-            // no automatic checks here; UI starts with none checked
+            // no automatic checks here beyond re-applying preserved checked names;
+            // callers (e.g., SetDefaults) can explicitly check the Keyboard item if required.
         }
 
         public static void LoadNoteValues(ComboBox cbNoteValue)
