@@ -1,5 +1,4 @@
 using MusicXml;
-using MusicXml.Domain;
 
 namespace Music
 {
@@ -47,7 +46,7 @@ namespace Music
 
         public void ExportMusicXml(IWin32Window owner)
         {
-            if (string.IsNullOrWhiteSpace(_lastImportedPath) || !File.Exists(_lastImportedPath))
+            if (Globals.Score == null)
             {
                 MessageBox.Show(owner, "No MusicXML score loaded.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -57,13 +56,14 @@ namespace Music
             {
                 Filter = "MusicXML files (*.musicxml;*.xml)|*.musicxml;*.xml",
                 Title = "Export MusicXML File",
-                FileName = "score.musicxml"
+                FileName = !string.IsNullOrWhiteSpace(_lastImportedPath) ? Path.GetFileName(_lastImportedPath) : "score.musicxml"
             };
             if (sfd.ShowDialog(owner) == DialogResult.OK)
             {
                 try
                 {
-                    File.Copy(_lastImportedPath, sfd.FileName, overwrite: true);
+                    var xml = MusicXmlScoreSerializer.Serialize(Globals.Score);
+                    File.WriteAllText(sfd.FileName, xml, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
                     _showStatus?.Invoke($"Exported to {Path.GetFileName(sfd.FileName)}");
                 }
                 catch (Exception ex)

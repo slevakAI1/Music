@@ -80,6 +80,7 @@ namespace Music.Generate
                 octave,
                 noteValueKey,
                 numberOfNotes);
+            Globals.Score = _score;
         }
 
         // SET DESIGN AND GENERATE DEFAULTS

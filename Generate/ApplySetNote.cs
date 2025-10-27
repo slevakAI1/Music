@@ -251,6 +251,8 @@ namespace Music.Generate
             int count = 0;
             foreach (var partName in designPartNames)
             {
+                count++;  // THIS ASSUMES that parts are added in sequence 1,2,3,...and some may not be affected
+                          // by this operation
                 if (scorePartNames.Contains(partName)) continue;
                 var newPart = new Part
                 {
