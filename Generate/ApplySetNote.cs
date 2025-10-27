@@ -17,16 +17,6 @@ namespace Music.Generate
     /// </summary>
     public static class ApplySetNote
     {
-        // Denominator values used by the Generate UI: Whole=1, Half=2, Quarter=4, etc.
-        public enum BaseDuration
-        {
-            Whole = 1,
-            Half = 2,
-            Quarter = 4,
-            Eighth = 8,
-            Sixteenth = 16
-        }
-
         /// <summary>
         /// Apply the "Set Notes" operation to the provided score.
         /// The score object is mutated in-place.
@@ -39,7 +29,7 @@ namespace Music.Generate
         /// <param name="step">Absolute step letter (A..G)</param>
         /// <param name="accidental">"Natural", "Sharp", "Flat" (case-insensitive). If null/empty treated as Natural.</param>
         /// <param name="octave">Octave offset to use for the pitch (e.g. 4 for middle C)</param>
-        /// <param name="baseDuration">Base duration enum</param>
+        /// <param name="noteValue">Denominator value (1=whole,2=half,4=quarter,8=eighth,16=16th)</param>
         /// <param name="numberOfNotes">Number of identical notes to insert at beat 1 in each bar</param>
         /// <exception cref="ArgumentException">for invalid arguments</exception>
         /// <exception cref="InvalidOperationException">if insertion would overflow a measure</exception>
@@ -52,7 +42,7 @@ namespace Music.Generate
             char step,
             string? accidental,
             int octave,
-            BaseDuration baseDuration,
+            int noteValue,
             int numberOfNotes)
         {
             if (score == null) throw new ArgumentNullException(nameof(score));
@@ -61,6 +51,11 @@ namespace Music.Generate
             if (endBar < startBar) throw new ArgumentException("endBar must be >= startBar", nameof(endBar));
             if (numberOfNotes <= 0) throw new ArgumentException("numberOfNotes must be > 0", nameof(numberOfNotes));
             if (!"ABCDEFG".Contains(char.ToUpper(step))) throw new ArgumentException("step must be a letter A-G", nameof(step));
+
+            if (!(new[] { 1, 2, 4, 8, 16 }).Contains(noteValue))
+            {
+                throw new ArgumentException("denominator must be one of: 1,2,4,8,16", nameof(noteValue));
+            }
 
             // Ensure the Score has a Parts list and create missing Part entries for any selected names.
             // This logic was extracted to a helper for reuse and clarity.
@@ -158,11 +153,11 @@ namespace Music.Generate
 
                     // Compute single inserted note duration in divisions.
                     // Formula: durationDiv = (divisions * 4) / denom
-                    var denom = (int)baseDuration;
+                    var denom = noteValue;
                     var numerator = divisions * 4;
                     if (numerator % denom != 0)
                     {
-                        throw new InvalidOperationException($"Cannot represent base duration '{baseDuration}' with measure divisions={divisions}. Resulting duration would not be an integer number of divisions.");
+                        throw new InvalidOperationException($"Cannot represent base duration '{denom}' with measure divisions={divisions}. Resulting duration would not be an integer number of divisions.");
                     }
                     int noteDuration = numerator / denom;
 
@@ -178,7 +173,7 @@ namespace Music.Generate
                     {
                         var note = new Note
                         {
-                            Type = DurationTypeString(baseDuration),
+                            Type = DurationTypeString(denom),
                             Duration = noteDuration,
                             Voice = 1,           // voice number unspecified by requirement; default to 1
                             Staff = staff,
@@ -203,13 +198,13 @@ namespace Music.Generate
             }
         }
 
-        private static string DurationTypeString(BaseDuration d) => d switch
+        private static string DurationTypeString(int denom) => denom switch
         {
-            BaseDuration.Whole => "whole",
-            BaseDuration.Half => "half",
-            BaseDuration.Quarter => "quarter",
-            BaseDuration.Eighth => "eighth",
-            BaseDuration.Sixteenth => "16th",
+            1 => "whole",
+            2 => "half",
+            4 => "quarter",
+            8 => "eighth",
+            16 => "16th",
             _ => "quarter"
         };
     }

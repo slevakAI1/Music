@@ -45,21 +45,13 @@ namespace Music.Generate
             // Octave: value provided
 
             // Base duration - map from the UI string via _noteValueMap
-            if (noteValueKey == null || !Music.MusicConstants.NoteValueMap.TryGetValue(noteValueKey, out var denom))
+            if (noteValueKey == null || !Music.MusicConstants.NoteValueMap.TryGetValue(noteValueKey, out var noteValue))
             {
                 MessageBox.Show(owner, "Please select a valid base duration.", "Invalid Duration", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            ApplySetNote.BaseDuration baseDuration = denom switch
-            {
-                1 => ApplySetNote.BaseDuration.Whole,
-                2 => ApplySetNote.BaseDuration.Half,
-                4 => ApplySetNote.BaseDuration.Quarter,
-                8 => ApplySetNote.BaseDuration.Eighth,
-                16 => ApplySetNote.BaseDuration.Sixteenth,
-                _ => ApplySetNote.BaseDuration.Quarter
-            };
+            // Pass the denominator directly to ApplySetNote to avoid unnecessary remapping to an enum and back.
 
             // Number of notes already provided
 
@@ -75,7 +67,7 @@ namespace Music.Generate
                     stepChar,
                     accidental,
                     octave,
-                    baseDuration,
+                    noteValue,
                     numberOfNotes);
 
                 // score has been updated in-place by ApplySetNote.
