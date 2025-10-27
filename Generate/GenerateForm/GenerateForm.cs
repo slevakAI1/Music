@@ -44,35 +44,49 @@ namespace Music.Generate
         {
             base.OnActivated(e);
 
-            // DATA INITIALIZATION - POPULATION OF PARTS DATA FROM (LOCAL) DESIGN
-            GenerateFormHelper.PopulatePartsFromDesign(cbPart, _design);
-            GenerateFormHelper.LoadEndBarTotalFromDesign(lblEndBarTotal, _design);
-
-            // FORM CONTROL INITIALIZATION
-            GenerateFormHelper.LoadNoteValues(cbNoteValue);
+            // Refresh all UI that depends on the current design
+            GenerateFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, cbNoteValue, _design);
         }
 
-        // TODO REVISIT
+        // CONFIRMED CORRECT
         private void btnApply_Click(object sender, EventArgs e)
         {
-            GenerateApply.Apply(this, 
-                _score, 
-                cbPart, 
-                numStaff, 
-                numStartBar, 
-                numEndBar, 
-                cbStep, 
-                cbAccidental, 
-                numOctaveAbs, 
-                cbNoteValue, 
-                numNumberOfNotes);
+            // Collect selected parts from the CheckedListBox as strings
+            var parts = cbPart.CheckedItems
+                .Cast<object?>()
+                .Select(x => x?.ToString())
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .ToArray();
+
+            // Gather scalar values from controls
+            var staff = (int)numStaff.Value;
+            var startBar = (int)numStartBar.Value;
+            var endBar = (int)numEndBar.Value;
+            var step = cbStep.SelectedItem?.ToString();
+            var accidental = cbAccidental.SelectedItem?.ToString() ?? "Natural";
+            var octave = (int)numOctaveAbs.Value;
+            var noteValueKey = cbNoteValue.SelectedItem?.ToString();
+            var numberOfNotes = (int)numNumberOfNotes.Value;
+
+            GenerateApply.Apply(this,
+                _score,
+                parts,
+                staff,
+                startBar,
+                endBar,
+                step,
+                accidental,
+                octave,
+                noteValueKey,
+                numberOfNotes);
         }
 
         // SET DESIGN AND GENERATE DEFAULTS
         private void btnSetDefault_Click(object? sender, EventArgs e)
         {
             _design = GenerateFormHelper.SetDefaults(cbPart, numEndBar, numNumberOfNotes, rbPitchAbsolute, cbStep, cbAccidental, cbPattern, lblEndBarTotal);
-            // TODO - Must refresh UI - only those that use _design in the signature!
+            // Refresh UI elements that depend on the design
+            GenerateFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, cbNoteValue, _design);
         }
 
         private void btnNewScore_Click(object sender, EventArgs e)

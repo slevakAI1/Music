@@ -52,6 +52,17 @@ namespace Music.Generate
                 lblEndBarTotal.Text = string.Empty;
         }
 
+        // New helper to refresh all UI that depends on the current design
+        public static void RefreshFromDesign(CheckedListBox cbPart, Label lblEndBarTotal, ComboBox cbNoteValue, DesignClass? design)
+        {
+            // Ensure note value list is loaded
+            LoadNoteValues(cbNoteValue);
+
+            // Populate parts and update end-bar total based on the provided design
+            PopulatePartsFromDesign(cbPart, design);
+            LoadEndBarTotalFromDesign(lblEndBarTotal, design);
+        }
+
         public static void SetDefaultsForGenerate(DesignClass? design, CheckedListBox cbPart, NumericUpDown numEndBar, NumericUpDown numNumberOfNotes, RadioButton rbPitchAbsolute, ComboBox cbStep, ComboBox cbAccidental, ComboBox cbPattern)
         {
             // Ensure parts are populated

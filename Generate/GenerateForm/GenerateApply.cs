@@ -9,7 +9,7 @@ namespace Music.Generate
 {
     internal static class GenerateApply
     {
-        public static void Apply(Form owner, Score? score, CheckedListBox cbPart, NumericUpDown numStaff, NumericUpDown numStartBar, NumericUpDown numEndBar, ComboBox cbStep, ComboBox cbAccidental, NumericUpDown numOctaveAbs, ComboBox cbNoteValue, NumericUpDown numNumberOfNotes)
+        public static void Apply(Form owner, Score? score, string[] parts, int staff, int startBar, int endBar, string? stepStr, string accidental, int octave, string? noteValueKey, int numberOfNotes)
         {
             if (score == null)
             {
@@ -27,26 +27,16 @@ namespace Music.Generate
 
 
 
-            // Collect selected part(s) - the UI uses a CheckedListBox (multiple selection)
-            string? chosenPart = null;
-            if (cbPart.CheckedItems.Count > 0)
-            {
-                chosenPart = cbPart.CheckedItems[0]?.ToString();
-            }
-
-            if (string.IsNullOrWhiteSpace(chosenPart))
+            // Validate parts
+            if (parts == null || parts.Length == 0)
             {
                 MessageBox.Show(owner, "Please select a part to apply notes to.", "No Part Selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            var parts = new[] { chosenPart };
 
-            // Staff value
-            var staff = (int)numStaff.Value;
+            // Staff value already provided
 
-            // Start/End bars (NumericUpDown controls expected)
-            var startBar = (int)numStartBar.Value;
-            var endBar = (int)numEndBar.Value;
+            // Start/End bars
             if (startBar < 1 || endBar < startBar)
             {
                 MessageBox.Show(owner, "Start and End bars must be valid (Start >= 1 and End >= Start).", "Invalid Bar Range", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -54,7 +44,6 @@ namespace Music.Generate
             }
 
             // Step (absolute)
-            var stepStr = cbStep.SelectedItem?.ToString();
             if (string.IsNullOrWhiteSpace(stepStr) || stepStr.Length == 0)
             {
                 MessageBox.Show(owner, "Please select a step (A-G).", "Invalid Step", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -62,14 +51,11 @@ namespace Music.Generate
             }
             var stepChar = stepStr![0];
 
-            // Accidental
-            var accidental = cbAccidental.SelectedItem?.ToString() ?? "Natural";
+            // Accidental already provided
 
-            // Octave: use only the specific control named "numOcataveAbs"
-            var octave = (int)numOctaveAbs.Value;
+            // Octave: value provided
 
             // Base duration - map from the UI string via _noteValueMap
-            var noteValueKey = cbNoteValue.SelectedItem?.ToString();
             if (noteValueKey == null || !Music.MusicConstants.NoteValueMap.TryGetValue(noteValueKey, out var denom))
             {
                 MessageBox.Show(owner, "Please select a valid base duration.", "Invalid Duration", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -86,8 +72,7 @@ namespace Music.Generate
                 _ => ApplySetNote.BaseDuration.Quarter
             };
 
-            // Number of notes: accept multiple candidate control names
-            var numberOfNotes = (int)numNumberOfNotes.Value;
+            // Number of notes already provided
 
             // Call ApplySetNote to mutate the score in-place. Catch validation errors from Apply.
             try
