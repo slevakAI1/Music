@@ -55,7 +55,7 @@ namespace Music.Generate
         // TODO REVISIT
         private void btnApply_Click(object sender, EventArgs e)
         {
-            GenerateFormHelper.Apply(this, 
+            GenerateApply.Apply(this, 
                 _score, 
                 cbPart, 
                 numStaff, 
