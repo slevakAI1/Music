@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 using MusicXml.Domain;
 
 namespace Music.Generate
@@ -20,20 +21,34 @@ namespace Music.Generate
         /// <summary>
         /// Apply the "Set Notes" operation to the provided score.
         /// The score object is mutated in-place.
+        /// This overload accepts UI-style inputs (owner, step string, note value key) and will
+        /// call the validation helper which shows any necessary message boxes.
         /// </summary>
-        /// <param name="score">Score to modify (must not be null)</param>
-        /// <param name="designPartNames">Part names selected in the UI (one or more). Only parts with matching Name will be modified.</param>
-        /// <param name="staff">Staff number (textbox value). Only this single staff will receive notes.</param>
-        /// <param name="startBar">1-based start bar number (inclusive)</param>
-        /// <param name="endBar">1-based end bar number (inclusive)</param>
-        /// <param name="step">Absolute step letter (A..G)</param>
-        /// <param name="accidental">"Natural", "Sharp", "Flat" (case-insensitive). If null/empty treated as Natural.</param>
-        /// <param name="octave">Octave offset to use for the pitch (e.g. 4 for middle C)</param>
-        /// <param name="noteValue">Denominator value (1=whole,2=half,4=quarter,8=eighth,16=16th)</param>
-        /// <param name="numberOfNotes">Number of identical notes to insert at beat 1 in each bar</param>
-        /// <exception cref="ArgumentException">for invalid arguments</exception>
-        /// <exception cref="InvalidOperationException">if insertion would overflow a measure</exception>
         public static void Apply(
+            Form? owner,
+            MusicXml.Domain.Score score,
+            IEnumerable<string> designPartNames,
+            int staff,
+            int startBar,
+            int endBar,
+            string? stepStr,
+            string? accidental,
+            int octave,
+            string? noteValueKey,
+            int numberOfNotes)
+        {
+            // Validate UI-level parameters first; this will show message boxes on failure.
+            if (!ValidateApplyParameters.Validate(owner, score, designPartNames, staff, startBar, endBar, stepStr, accidental ?? "Natural", octave, noteValueKey, numberOfNotes, out var stepChar, out var noteValue))
+            {
+                return;
+            }
+
+            // After validation, call the core implementation (same logic as before) using mapped values.
+            ApplyCore(score, designPartNames, staff, startBar, endBar, stepChar, accidental, octave, noteValue, numberOfNotes);
+        }
+
+        // Extracted core implementation that assumes validated and already-mapped parameters.
+        private static void ApplyCore(
             MusicXml.Domain.Score score,
             IEnumerable<string> designPartNames,
             int staff,
@@ -251,4 +266,76 @@ namespace Music.Generate
             }
         }
     }
-}
+
+    /// <summary>
+    /// Validation helper that contains the UI-level checks previously in GenerateApply.
+    /// This shows MessageBoxes when inputs are invalid and maps the UI strings to the
+    /// primitive values used by the core Apply logic.
+    /// </summary>
+    internal static class ValidateApplyParameters
+    {
+        public static bool Validate(
+            Form? owner,
+            Score? score,
+            IEnumerable<string>? parts,
+            int staff,
+            int startBar,
+            int endBar,
+            string? stepStr,
+            string accidental,
+            int octave,
+            string? noteValueKey,
+            int numberOfNotes,
+            out char stepChar,
+            out int noteValue)
+        {
+            stepChar = '\0';
+            noteValue = 4;
+
+            if (score == null)
+            {
+                MessageBox.Show(owner, "Cannnot apply to a null score", "No Score", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            // Validate parts
+            if (parts == null || !parts.Any())
+            {
+                MessageBox.Show(owner, "Please select a part to apply notes to.", "No Part Selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return false;
+            }
+
+            // Start/End bars
+            if (startBar < 1 || endBar < startBar)
+            {
+                MessageBox.Show(owner, "Start and End bars must be valid (Start >= 1 and End >= Start).", "Invalid Bar Range", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return false;
+            }
+
+            // Step (absolute)
+            if (string.IsNullOrWhiteSpace(stepStr) || stepStr.Length == 0)
+            {
+                MessageBox.Show(owner, "Please select a step (A-G).", "Invalid Step", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return false;
+            }
+            stepChar = stepStr![0];
+
+            // Base duration - map from the UI string via _noteValueMap
+            if (noteValueKey == null || !Music.MusicConstants.NoteValueMap.TryGetValue(noteValueKey, out var nv))
+            {
+                MessageBox.Show(owner, "Please select a valid base duration.", "Invalid Duration", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return false;
+            }
+
+            noteValue = nv;
+
+            // numberOfNotes validated by core but ensure positive here too
+            if (numberOfNotes <= 0)
+            {
+                MessageBox.Show(owner, "Number of notes must be at least 1.", "Invalid Number", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return false;
+            }
+
+            return true;
+        }
+    }}
