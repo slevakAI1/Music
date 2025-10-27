@@ -15,18 +15,7 @@ namespace Music.Generate
             {
                 throw new Exception("Cannnot apply to a null score");
             }
-
-            // APPLY TO DESIGN OBJECT FIRST
-
-
-
-            // THEN 
-
-
-
-
-
-
+            
             // Validate parts
             if (parts == null || parts.Length == 0)
             {
