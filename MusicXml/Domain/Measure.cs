@@ -17,8 +17,18 @@ namespace MusicXml.Domain
 		
 		public MeasureAttributes Attributes { get; internal set; }
 
-
-		//public direction...
-
-	}
+		// New: direction for the measure (tempo / metronome, sound)
+		public Direction Direction { get; internal set; }
+        /*
+		 			<direction>
+				<direction-type>
+					<metronome default-y='20'>
+						<beat-unit>quarter</beat-unit>
+						<per-minute>112</per-minute>
+					</metronome>
+				</direction-type>
+				<sound tempo='112'/>
+			</direction>
+		 */
+    }
 }

@@ -127,6 +127,9 @@ namespace MusicXml
                 }
                 writer.WriteEndElement(); // part-list
 
+                // Track whether we've written a Direction already. Per requirement: only the first measure serialized gets the Direction.
+                var directionWritten = false;
+
                 // parts and measures
                 foreach (var part in score.Parts ?? Enumerable.Empty<Part>())
                 {
@@ -190,6 +193,39 @@ namespace MusicXml
                             }
 
                             writer.WriteEndElement(); // attributes
+                        }
+
+                        // Write direction if present and not yet written for the score.
+                        if (!directionWritten && measure.Direction != null)
+                        {
+                            writer.WriteStartElement("direction");
+
+                            // direction-type (metronome)
+                            writer.WriteStartElement("direction-type");
+                            var dt = measure.Direction.DirectionType;
+                            var met = dt?.Metronome;
+                            if (met != null)
+                            {
+                                writer.WriteStartElement("metronome");
+                                if (!string.IsNullOrWhiteSpace(met.BeatUnit))
+                                    writer.WriteElementString("beat-unit", met.BeatUnit);
+                                if (met.PerMinute > 0)
+                                    writer.WriteElementString("per-minute", met.PerMinute.ToString());
+                                writer.WriteEndElement(); // metronome
+                            }
+                            writer.WriteEndElement(); // direction-type
+
+                            // sound (tempo attribute)
+                            if (measure.Direction.Sound != null && measure.Direction.Sound.Tempo > 0)
+                            {
+                                writer.WriteStartElement("sound");
+                                writer.WriteAttributeString("tempo", measure.Direction.Sound.Tempo.ToString(CultureInfo.InvariantCulture));
+                                writer.WriteEndElement(); // sound
+                            }
+
+                            writer.WriteEndElement(); // direction
+
+                            directionWritten = true;
                         }
 
                         // measure elements (notes, backup, forward)
