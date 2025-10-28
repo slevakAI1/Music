@@ -42,6 +42,7 @@
             testToolStripMenuItem = new ToolStripMenuItem();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
+            viewMusicXmlToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             SuspendLayout();
@@ -57,7 +58,7 @@
             // 
             // MenuFile
             // 
-            MenuFile.DropDownItems.AddRange(new ToolStripItem[] { MenuImportMusicXml, MenuExportMusicXml });
+            MenuFile.DropDownItems.AddRange(new ToolStripItem[] { MenuImportMusicXml, MenuExportMusicXml, viewMusicXmlToolStripMenuItem });
             MenuFile.Name = "MenuFile";
             MenuFile.Size = new Size(37, 20);
             MenuFile.Text = "File";
@@ -65,14 +66,14 @@
             // MenuImportMusicXml
             // 
             MenuImportMusicXml.Name = "MenuImportMusicXml";
-            MenuImportMusicXml.Size = new Size(166, 22);
+            MenuImportMusicXml.Size = new Size(180, 22);
             MenuImportMusicXml.Text = "Import MusicXml";
             MenuImportMusicXml.Click += MenuImportMusicXml_Click;
             // 
             // MenuExportMusicXml
             // 
             MenuExportMusicXml.Name = "MenuExportMusicXml";
-            MenuExportMusicXml.Size = new Size(166, 22);
+            MenuExportMusicXml.Size = new Size(180, 22);
             MenuExportMusicXml.Text = "Export MusicXML";
             MenuExportMusicXml.Click += MenuExportMusicXml_Click;
             // 
@@ -112,6 +113,13 @@
             toolStripStatusLabel1.Size = new Size(63, 17);
             toolStripStatusLabel1.Text = "Status Info";
             // 
+            // viewMusicXmlToolStripMenuItem
+            // 
+            viewMusicXmlToolStripMenuItem.Name = "viewMusicXmlToolStripMenuItem";
+            viewMusicXmlToolStripMenuItem.Size = new Size(180, 22);
+            viewMusicXmlToolStripMenuItem.Text = "View MusicXml";
+            viewMusicXmlToolStripMenuItem.Click += viewMusicXmlToolStripMenuItem_Click;
+            // 
             // MainForm
             // 
             ClientSize = new Size(613, 346);
@@ -137,5 +145,6 @@
         private ToolStripMenuItem designToolStripMenuItem;
         private ToolStripMenuItem generateToolStripMenuItem;
         private ToolStripMenuItem testToolStripMenuItem;
+        private ToolStripMenuItem viewMusicXmlToolStripMenuItem;
     }
 }

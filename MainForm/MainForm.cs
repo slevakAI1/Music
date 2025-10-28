@@ -63,7 +63,7 @@ namespace Music
         {
             _fileManager.ExportMusicXml(this);
         }
-     
+
         // Your top-level menu item handlers (wired via designer)
         private void designToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -85,6 +85,11 @@ namespace Music
         private void testToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ShowChildForm(typeof(TestForm));
+        }
+
+        private void viewMusicXmlToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // TODO: Implement MusicXML viewer form
         }
     }
 }

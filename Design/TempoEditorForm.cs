@@ -36,7 +36,7 @@ namespace Music.Design
 
         private sealed class WorkingEvent
         {
-            public int Bpm { get; set; } = 90;
+            public int Bpm { get; set; } = 112;
             public int BarCount { get; set; } = 4;
             public int StartBar { get; set; } = 1; // computed
         }
@@ -152,7 +152,7 @@ namespace Music.Design
                 Minimum = 20,
                 Maximum = 300,
                 Increment = 1,
-                Value = 90,
+                Value = 112,
                 Anchor = AnchorStyles.Left | AnchorStyles.Right,
                 TextAlign = HorizontalAlignment.Right
             };
@@ -208,7 +208,7 @@ namespace Music.Design
             else
             {
                 // Defaults
-                _working.Add(new WorkingEvent { Bpm = 90, BarCount = 4 });
+                _working.Add(new WorkingEvent { Bpm = 112, BarCount = 4 });
             }
 
             RecomputeStarts();
@@ -256,7 +256,7 @@ namespace Music.Design
         private void ApplyDefaults()
         {
             _working.Clear();
-            _working.Add(new WorkingEvent { Bpm = 90, BarCount = 4 });
+            _working.Add(new WorkingEvent { Bpm = 112, BarCount = 4 });
             RecomputeStarts();
             RebuildListView();
             SelectRow(0);
@@ -264,7 +264,7 @@ namespace Music.Design
 
         private void AddEvent()
         {
-            var bpm = _working.Count > 0 ? _working.Last().Bpm : 90;
+            var bpm = _working.Count > 0 ? _working.Last().Bpm : 112;
             _working.Add(new WorkingEvent { Bpm = bpm, BarCount = 4 });
             RecomputeStarts();
             RebuildListView();
@@ -275,7 +275,7 @@ namespace Music.Design
         {
             int idx = SelectedIndex();
             if (idx < 0) idx = _working.Count;
-            var bpm = idx > 0 ? _working[idx - 1].Bpm : 90;
+            var bpm = idx > 0 ? _working[idx - 1].Bpm : 112;
             _working.Insert(idx, new WorkingEvent { Bpm = bpm, BarCount = 4 });
             RecomputeStarts();
             RebuildListView();

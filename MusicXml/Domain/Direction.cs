@@ -13,7 +13,8 @@ namespace MusicXml.Domain
 		public Metronome Metronome { get; set; }
 	}
 
-	public class Metronome
+    // Important: This shows on the score only, that's why it can be text.
+    public class Metronome
 	{
 		// e.g. "quarter"
 		public string BeatUnit { get; set; }
@@ -22,7 +23,8 @@ namespace MusicXml.Domain
 		public int PerMinute { get; set; }
 	}
 
-	public class Sound
+    // Important: This sets the actual playback tempo
+    public class Sound
 	{
 		// tempo attribute value
 		public decimal Tempo { get; set; }

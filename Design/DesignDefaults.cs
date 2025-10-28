@@ -5,7 +5,7 @@ namespace Music.Design
     {
         public const int TotalBars = 48;
         public const string GlobalTimeSignature = "4/4";
-        public const int DefaultTempoBpm = 90;
+        public const int DefaultTempoBpm = 112;
 
         // Apply all defaults so the timelines end on the same beat
         public static void ApplyDefaultDesign(DesignClass design)
@@ -23,7 +23,7 @@ namespace Music.Design
             // 4) Time signature timeline: apply default (4/4 starting at bar 1)
             design.TimeSignatureTimeline = TimeSignatureDefault.BuildDefaultTimeline();
 
-            // 5) Tempo timeline: include default tempo (90 BPM starting at bar 1)
+            // 5) Tempo timeline: include default tempo (112 BPM starting at bar 1)
             design.TempoTimeline = TempoDefault.BuildDefaultTimeline();
         }
     }

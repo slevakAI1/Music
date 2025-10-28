@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using MusicXml.Domain;
+using Music.Design;
 
 namespace Music.Generate
 {
@@ -45,6 +46,61 @@ namespace Music.Generate
 
             // After validation, call the core implementation (same logic as before) using mapped values.
             ApplyCore(score, designPartNames, staff, startBar, endBar, stepChar, accidental, octave, noteValue, numberOfNotes);
+
+
+
+
+
+            // Minimal: apply tempo info from the design's TempoTimeline first event to the Score's Direction
+            try
+            {
+                var design = Globals.Design;
+                var te = design?.TempoTimeline?.Events?.FirstOrDefault();
+                if (te != null)
+                {
+                    // Create Direction structure from TempoEvent
+                    var dir = new Direction
+                    {
+                        DirectionType = new DirectionType
+                        {
+                            Metronome = new Metronome
+                            {
+                                BeatUnit = "quarter",
+                                PerMinute = te.TempoBpm
+                            }
+                        },
+                        Sound = new Sound
+                        {
+                            Tempo = te.TempoBpm
+                        }
+                    };
+
+                    // TODO MAYBE THIS SHOULD PUT IT ON 1st measure, each part, then the serializer will just write it once regardless!
+
+                    // Apply to the first matching part's first measure (ensure at least one measure exists)
+                    if (score.Parts != null)
+                    {
+                        foreach (var p in score.Parts)
+                        {
+                            if (p == null || string.IsNullOrWhiteSpace(p.Name)) continue;
+                            if (!designPartNames.Contains(p.Name)) continue;
+                            if (p.Measures == null || p.Measures.Count == 0) continue;
+
+                            p.Measures[0].Direction = dir;
+                            break;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Swallow any exceptions from optional tempo application; don't block main operation.
+            }
+
+
+
+
+
         }
 
         // Extracted core implementation that assumes validated and already-mapped parameters.
