@@ -106,7 +106,6 @@ namespace Music.Generate
             cbStep.SelectedIndex = 0;       // C
             cbAccidental.SelectedIndex = 0; // Natural
             cbPattern.SelectedIndex = 0;    // Set Notes                                            
-        }
 
         public static DesignClass? SetDefaults(CheckedListBox cbPart, NumericUpDown numEndBar, NumericUpDown numNumberOfNotes, RadioButton rbPitchAbsolute, ComboBox cbStep, ComboBox cbAccidental, ComboBox cbPattern, Label lblEndBarTotal)
         {
