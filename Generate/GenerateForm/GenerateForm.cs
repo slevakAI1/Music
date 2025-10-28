@@ -64,7 +64,7 @@ namespace Music.Generate
             var noteValueKey = cbNoteValue.SelectedItem?.ToString();
             var numberOfNotes = (int)numNumberOfNotes.Value;
 
-            // Call ApplySetNote directly; GenerateApply was removed during refactor.
+            // This updates the score based on the pattern
             ApplySetNote.Apply(this,
                 _design,
                 _score!,
