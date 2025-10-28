@@ -66,6 +66,7 @@ namespace Music.Generate
 
             // Call ApplySetNote directly; GenerateApply was removed during refactor.
             ApplySetNote.Apply(this,
+                _design,
                 _score!,
                 parts,
                 staff,
