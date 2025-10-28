@@ -16,5 +16,9 @@ namespace MusicXml.Domain
 		public List<MeasureElement> MeasureElements { get; internal set; }
 		
 		public MeasureAttributes Attributes { get; internal set; }
+
+
+		//public direction...
+
 	}
 }

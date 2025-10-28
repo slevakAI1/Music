@@ -124,7 +124,12 @@ namespace Music.Generate
             return Globals.Design;
         }
 
-        public static Score? NewScore(Form owner, DesignClass? design, CheckedListBox cbPart, Label lblEndBarTotal)
+        public static Score? NewScore(
+            Form owner, 
+            DesignClass? 
+            design, 
+            CheckedListBox cbPart, 
+            Label lblEndBarTotal)
         {
             // Create a fresh Score instance and assign to the local cache (returned to caller)
             var score = new Score
