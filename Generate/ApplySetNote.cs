@@ -108,33 +108,8 @@ namespace Music.Generate
                 // Ensure there are at least endBar measures (1-based)
                 while (scorePart.Measures.Count < endBar)
                 {
-                    // Copy attributes from first measure if available, otherwise create reasonable defaults.
-                    MeasureAttributes attrs = null!;
-                    if (scorePart.Measures.Count > 0 && scorePart.Measures[0]?.Attributes != null)
-                    {
-                        // shallow copy reference is acceptable for attributes that describe meter/key/clef,
-                        // but to be safe create a new instance and copy common fields if they exist.
-                        var src = scorePart.Measures[0].Attributes;
-                        attrs = new MeasureAttributes
-                        {
-                            Divisions = src.Divisions,
-                            Key = src.Key,
-                            Time = src.Time,
-                            Clef = src.Clef
-                        };
-                    }
-                    else
-                    {
-                        attrs = new MeasureAttributes
-                        {
-                            Divisions = 1,
-                            Key = new Key { Fifths = 0, Mode = "major" },
-                            Time = new Time { Beats = 4, Mode = "4" },
-                            Clef = new Clef { Sign = "G", Line = 2 }
-                        };
-                    }
-
-                    scorePart.Measures.Add(new Measure { Attributes = attrs });
+                    // NOTE: do not populate full Attributes here — NewScore() is responsible for setting Divisions on all measures.
+                    scorePart.Measures.Add(new Measure());
                 }
 
                 // Now process each measure index in the requested range

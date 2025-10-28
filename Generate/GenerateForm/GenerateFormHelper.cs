@@ -196,6 +196,46 @@ namespace Music.Generate
                 }
             }
 
+            // -- New: populate attributes for measures
+            // Set a full attributes snapshot on the first measure (divisions, key, time, clef).
+            // For every subsequent measure in the part set only an Attributes with Divisions is created
+            // so the serialized MusicXML shows <attributes><divisions>...</divisions></attributes> per measure.
+            if (score.Parts != null)
+            {
+                foreach (var p in score.Parts)
+                {
+                    if (p.Measures == null || p.Measures.Count == 0) continue;
+
+                    // Ensure first measure has full attributes (4/4, divisions=4)
+                    var first = p.Measures[0];
+                    first.Attributes ??= new MeasureAttributes();
+                    first.Attributes.Divisions = 4;
+                    first.Attributes.Key ??= new Key { Fifths = 0, Mode = "major" };
+                    first.Attributes.Time ??= new Time();
+                    first.Attributes.Time.Beats = 4;
+                    first.Attributes.Time.Mode = "4";
+                    first.Attributes.Clef ??= new Clef { Sign = "G", Line = 2 };
+
+                    var divisions = first.Attributes.Divisions;
+
+                    // For each subsequent measure create a minimal attributes object containing only Divisions.
+                    for (int i = 1; i < p.Measures.Count; i++)
+                    {
+                        var m = p.Measures[i];
+                        if (m == null)
+                        {
+                            m = new Measure();
+                            p.Measures[i] = m;
+                        }
+
+                        // Ensure only Divisions is present for subsequent measures
+                        m.Attributes = new MeasureAttributes
+                        {
+                            Divisions = divisions
+                        };
+                    }
+                }
+            }
 
             // Apply tempo to score here. Adding to first measure of each part. Will only serialize once though.
             try
@@ -232,7 +272,6 @@ namespace Music.Generate
             {
                 // Swallow any exceptions from optional tempo application; don't block main operation.
             }
-
 
             // Refresh UI that depends on design/parts
             PopulatePartsFromDesign(cbPart, usedDesign);
