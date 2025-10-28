@@ -10,35 +10,21 @@ namespace Music.Design
         // Apply all defaults so the timelines end on the same beat
         public static void ApplyDefaultDesign(DesignClass design)
         {
-            // Sections
-            new SectionDefaultsClass().CreateTestSections(design.SectionSet);
+            // 1) Sections: apply default/test structure
+            var sectionsHelper = new SectionDefaultsClass();
+            sectionsHelper.CreateTestSections(design.SectionSet);
 
-            // Timelines
-            design.TimeSignatureTimeline = TimeSignatureDefault.BuildDefaultTimeline();
-            design.TempoTimeline = TempoDefault.BuildDefaultTimeline();
-            design.HarmonicTimeline = HarmonicDefault.BuildDefaultTimeline();
-
+            // 2) Voices: apply default voices
             design.VoiceSet.AddDefaultVoices();
 
-            //TEMPO DEFAULT - TODO TEST THIS
-            //
-            // Ensure the design has a tempo timeline and that the first tempo event
-            // represents the default tempo value. If missing, insert a default tempo event.
-            design.TempoTimeline ??= new TempoTimeline();
+            // 3) Harmonic timeline: use the same defaults as the Harmonic Editor's "Set Defaults"
+            design.HarmonicTimeline = HarmonicDefault.BuildDefaultTimeline();
 
-            // Ensure Events list exists
-            design.TempoTimeline.Events ??= new List<TempoEvent>();
+            // 4) Time signature timeline: apply default (4/4 starting at bar 1)
+            design.TimeSignatureTimeline = TimeSignatureDefault.BuildDefaultTimeline();
 
-            // Add a single default event covering the default total bars
-            var duration = DesignDefaults.TotalBars * design.TempoTimeline.BeatsPerBar;
-            design.TempoTimeline.Add(new TempoEvent
-            {
-                StartBar = 1,
-                StartBeat = 1,
-                TempoBpm = DesignDefaults.DefaultTempoBpm,
-                DurationBeats = duration
-            });
-
+            // 5) Tempo timeline: include default tempo (90 BPM starting at bar 1)
+            design.TempoTimeline = TempoDefault.BuildDefaultTimeline();
         }
     }
 }

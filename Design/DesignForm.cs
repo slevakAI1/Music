@@ -131,23 +131,7 @@ namespace Music
         {
             // Ensure we have a design to work with
             var design = Globals.Design ??= new DesignClass();
-
-            // 1) Sections: apply default/test structure
-            var sectionsHelper = new SectionDefaultsClass();
-            sectionsHelper.CreateTestSections(design.SectionSet);
-
-            // 2) Voices: apply default voices
-            design.VoiceSet.AddDefaultVoices();
-
-            // 3) Harmonic timeline: use the same defaults as the Harmonic Editor's "Set Defaults"
-            design.HarmonicTimeline = HarmonicDefault.BuildDefaultTimeline();
-
-            // 4) Time signature timeline: apply default (4/4 starting at bar 1)
-            design.TimeSignatureTimeline = TimeSignatureDefault.BuildDefaultTimeline();
-
-            // 5) Tempo timeline: include default tempo (90 BPM starting at bar 1)
-            design.TempoTimeline = TempoDefault.BuildDefaultTimeline();
-
+            Music.Design.DesignDefaults.ApplyDefaultDesign(design);
             RefreshDesignSpaceIfReady();
         }
 

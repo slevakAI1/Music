@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using MusicXml.Domain;
 using Music.Design;
+using MusicXml.Domain;
 
 namespace Music.Generate
 {
@@ -86,7 +82,15 @@ namespace Music.Generate
         // SET DESIGN AND GENERATE DEFAULTS
         private void btnSetDefault_Click(object? sender, EventArgs e)
         {
-            _design = GenerateFormHelper.SetDefaults(cbPart, numEndBar, numNumberOfNotes, rbPitchAbsolute, cbStep, cbAccidental, cbPattern, lblEndBarTotal);
+            _design = GenerateFormHelper.SetDefaults(
+                cbPart, 
+                numEndBar, 
+                numNumberOfNotes, 
+                rbPitchAbsolute, 
+                cbStep, 
+                cbAccidental, 
+                cbPattern, 
+                lblEndBarTotal);
             // Refresh UI elements that depend on the design
             GenerateFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, cbNoteValue, _design);
         }

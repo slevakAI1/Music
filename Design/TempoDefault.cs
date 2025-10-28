@@ -16,6 +16,7 @@ namespace Music.Design
                 TempoBpm = DesignDefaults.DefaultTempoBpm,
                 DurationBeats = DesignDefaults.TotalBars * timeline.BeatsPerBar
             });
+
             return timeline;
         }
     }

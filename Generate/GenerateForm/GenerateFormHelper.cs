@@ -113,7 +113,15 @@ namespace Music.Generate
             DesignDefaults.ApplyDefaultDesign(Globals.Design);
 
             // Call into helper SetDefaultsForGenerate using the global design (mirrors original)
-            SetDefaultsForGenerate(Globals.Design, cbPart, numEndBar, numNumberOfNotes, rbPitchAbsolute, cbStep, cbAccidental, cbPattern);
+            SetDefaultsForGenerate(
+                Globals.Design, 
+                cbPart, 
+                numEndBar, 
+                numNumberOfNotes, 
+                rbPitchAbsolute, 
+                cbStep, 
+                cbAccidental, 
+                cbPattern);
 
             // Refresh parts and end-total UI - keep same sequence as original method
             PopulatePartsFromDesign(cbPart, Globals.Design);
