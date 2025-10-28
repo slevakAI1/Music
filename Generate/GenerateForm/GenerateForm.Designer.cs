@@ -508,9 +508,9 @@ namespace Music.Generate
             // 
             btnApply.Location = new Point(537, 155);
             btnApply.Name = "btnApply";
-            btnApply.Size = new Size(120, 36);
+            btnApply.Size = new Size(215, 29);
             btnApply.TabIndex = 4;
-            btnApply.Text = "Apply";
+            btnApply.Text = "Appy Set Notes";
             btnApply.Click += btnApply_Click;
             // 
             // lblStatus
@@ -672,19 +672,19 @@ namespace Music.Generate
             // 
             btnSetDefaults.Location = new Point(543, 68);
             btnSetDefaults.Name = "btnSetDefaults";
-            btnSetDefaults.Size = new Size(114, 23);
+            btnSetDefaults.Size = new Size(209, 31);
             btnSetDefaults.TabIndex = 8;
-            btnSetDefaults.Text = "Set Defaults";
+            btnSetDefaults.Text = "Set Design + Generate Form Defaults";
             btnSetDefaults.UseVisualStyleBackColor = true;
             btnSetDefaults.Click += btnSetDefault_Click;
             // 
             // btnNewScore
             // 
-            btnNewScore.Location = new Point(539, 113);
+            btnNewScore.Location = new Point(539, 110);
             btnNewScore.Name = "btnNewScore";
-            btnNewScore.Size = new Size(118, 23);
+            btnNewScore.Size = new Size(213, 32);
             btnNewScore.TabIndex = 9;
-            btnNewScore.Text = "New Score";
+            btnNewScore.Text = "New Score From Design";
             btnNewScore.UseVisualStyleBackColor = true;
             btnNewScore.Click += btnNewScore_Click;
             // 
