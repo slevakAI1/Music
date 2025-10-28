@@ -66,7 +66,6 @@ namespace Music.Generate
 
             // This updates the score based on the pattern
             ApplySetNote.Apply(this,
-                _design,
                 _score!,
                 parts,
                 staff,

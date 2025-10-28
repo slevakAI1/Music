@@ -196,6 +196,44 @@ namespace Music.Generate
                 }
             }
 
+
+            // Apply tempo to score here. Adding to first measure of each part. Will only serialize once though.
+            try
+            {
+                var te = usedDesign?.TempoTimeline?.Events?.FirstOrDefault();
+                if (te != null)
+                {
+                    var dir = new Direction
+                    {
+                        DirectionType = new DirectionType
+                        {
+                            Metronome = new Metronome
+                            {
+                                BeatUnit = "quarter",
+                                PerMinute = te.TempoBpm
+                            }
+                        },
+                        Sound = new Sound
+                        {
+                            Tempo = te.TempoBpm
+                        }
+                    };
+
+                    if (score.Parts != null)
+                    {
+                        foreach (var p in score.Parts)
+                        {
+                            p.Measures[0].Direction = dir;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Swallow any exceptions from optional tempo application; don't block main operation.
+            }
+
+
             // Refresh UI that depends on design/parts
             PopulatePartsFromDesign(cbPart, usedDesign);
             LoadEndBarTotalFromDesign(lblEndBarTotal, usedDesign);
