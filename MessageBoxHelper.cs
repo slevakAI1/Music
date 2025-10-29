@@ -90,5 +90,11 @@ namespace Music
         /// </summary>
         public static DialogResult ShowError(string text, string caption = "Error") => 
                 Show(text, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+        /// <summary>
+        /// Convenience shorthand for showing a non-error information message with an OK button.
+        /// </summary>
+        public static DialogResult ShowMessage(string text, string caption = "Message") =>
+                Show(text, caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 }

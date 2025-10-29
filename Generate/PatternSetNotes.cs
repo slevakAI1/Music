@@ -40,7 +40,6 @@ namespace Music.Generate
             ApplyCore(score, designPartNames, staff, startBar, endBar, stepChar, accidental, octave, noteValue, numberOfNotes);
         }
 
-
         // Extracted core implementation that assumes validated and already-mapped parameters.
         private static void ApplyCore(
             MusicXml.Domain.Score score,
@@ -183,8 +182,8 @@ namespace Music.Generate
                     }
                 }
             }
-            // Inform the user that the pattern was applied
-            MessageBox.Show("Execution Finished.", "Apply Pattern Set Notes", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // Inform the user that pattern application is complete.
+            MessageBoxHelper.ShowMessage("Pattern has been applied to the score.", "Apply Pattern Set Notes");
 
         }
 
