@@ -50,32 +50,19 @@ namespace Music.Generate
             if (score == null) throw new ArgumentNullException(nameof(score));
             if (data == null) throw new ArgumentNullException(nameof(data));
 
-
-
-            //  I THINK THESE NEED TO BE PART OF GENERATIONDATA CLASS!!! Why do they need to be changed at all??? 
-
-            // Map list of selected parts (may be null/empty)
+            // Use GenerationData's getters which provide sensible defaults.
             var parts = data.SelectedParts ?? Enumerable.Empty<string>();
 
-            // Numeric defaults: if a value wasn't provided, fall back to sensible defaults.
-            var staff = data.Staff ?? 1;
-            var startBar = data.StartBar ?? 1;
-            var endBar = data.EndBar ?? startBar; // if EndBar not provided, treat single-bar range
+            var staff = data.Staff.GetValueOrDefault();
+            var startBar = data.StartBar.GetValueOrDefault();
+            var endBar = data.EndBar.GetValueOrDefault(startBar);
 
-            // Pitch mapping:
-            // - If the user selected absolute pitch use OctaveAbsolute/Step/Accidental.
-            // - If key-relative was selected and absolute octave not provided, fall back to OctaveKeyRelative when available.
             string? stepStr = data.Step;
-            string? accidental = data.Accidental ?? "Natural";
-            int octave = data.OctaveAbsolute ?? data.OctaveKeyRelative ?? 4;
+            string accidental = data.Accidental ?? "Natural";
+            int octave = data.Octave;
 
-            // Rhythm / duration mapping
             string? noteValueKey = data.NoteValue;
-            var numberOfNotes = data.NumberOfNotes ?? 1;
-
-
-
-
+            var numberOfNotes = data.NumberOfNotes.GetValueOrDefault();
 
             // Delegate to existing validation + core implementation
             Apply(score, parts, staff, startBar, endBar, stepStr, accidental, octave, noteValueKey, numberOfNotes);

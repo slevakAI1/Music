@@ -7,44 +7,204 @@ namespace Music.Generate
 {
     // Data holder object for GenerateForm user-editable values.
     // - All properties are simple data types (strings, ints, bools, List<string>)
-    // - Value types are nullable so Apply/Restore only writes when a property has a value.
+    // - Value types remain nullable for compatibility, but getters now provide sensible defaults
+    //   so callers can rely on the property value without repeating the same fallback logic.
     public sealed class GenerationData
     {
+        // Backing fields
+        private List<string>? _selectedParts;
+        private int? _staff;
+        private int? _startBar;
+        private int? _endBar;
+        private int? _startBeat;
+        private int? _endBeat;
+        private bool? _overwriteExisting;
+        private bool? _pitchAbsolute;
+        private string? _step;
+        private string? _accidental;
+        private int? _octaveAbsolute;
+        private int? _degreeKeyRelative;
+        private int? _octaveKeyRelative;
+        private string? _noteValue;
+        private int? _dots;
+        private bool? _tupletEnabled;
+        private int? _tupletCount;
+        private int? _tupletOf;
+        private bool? _tieAcross;
+        private bool? _fermata;
+        private int? _numberOfNotes;
+        private string? _pattern;
+        private bool? _allPartsChecked;
+        private bool? _allStaffChecked;
+        private string? _sectionsText;
+
         // General / Pattern
-        public string? Pattern { get; set; }
+        public string? Pattern
+        {
+            get => _pattern;
+            set => _pattern = value;
+        }
 
         // Parts / scope
-        public List<string>? SelectedParts { get; set; }
-        public bool? AllPartsChecked { get; set; }
-        public bool? AllStaffChecked { get; set; } // corresponds to `checkBox1` in designer (labeled "All")
+        // Getter returns an empty list when nothing recorded to avoid callers having to null-check.
+        public List<string>? SelectedParts
+        {
+            get => _selectedParts ?? new List<string>();
+            set => _selectedParts = value;
+        }
+
+        public bool? AllPartsChecked
+        {
+            get => _allPartsChecked;
+            set => _allPartsChecked = value;
+        }
+
+        public bool? AllStaffChecked
+        {
+            get => _allStaffChecked;
+            set => _allStaffChecked = value;
+        } // corresponds to `checkBox1` in designer (labeled "All")
 
         // Staff / sections / bars / beats
-        public int? Staff { get; set; }
-        public string? SectionsText { get; set; }
-        public int? StartBar { get; set; }
-        public int? EndBar { get; set; }
-        public int? StartBeat { get; set; }
-        public int? EndBeat { get; set; }
+        // Provide sensible defaults in getters so callers need not repeat fallback code.
+        public int? Staff
+        {
+            get => _staff ?? 1;
+            set => _staff = value;
+        }
+
+        public string? SectionsText
+        {
+            get => _sectionsText;
+            set => _sectionsText = value;
+        }
+
+        public int? StartBar
+        {
+            get => _startBar ?? 1;
+            set => _startBar = value;
+        }
+
+        public int? EndBar
+        {
+            // If EndBar not specified, default to StartBar (which itself defaults to 1)
+            get => _endBar ?? StartBar;
+            set => _endBar = value;
+        }
+
+        public int? StartBeat
+        {
+            get => _startBeat ?? 1;
+            set => _startBeat = value;
+        }
+
+        public int? EndBeat
+        {
+            get => _endBeat ?? StartBeat;
+            set => _endBeat = value;
+        }
 
         // Overwrite existing notes
-        public bool? OverwriteExisting { get; set; }
+        public bool? OverwriteExisting
+        {
+            get => _overwriteExisting;
+            set => _overwriteExisting = value;
+        }
 
         // Pitch options
-        public bool? PitchAbsolute { get; set; } // true = Absolute, false = Key-relative
-        public string? Step { get; set; } // e.g., "C"
-        public string? Accidental { get; set; } // "Natural"/"Sharp"/"Flat"
-        public int? OctaveAbsolute { get; set; }
-        public int? DegreeKeyRelative { get; set; }
-        public int? OctaveKeyRelative { get; set; }
+        public bool? PitchAbsolute
+        {
+            get => _pitchAbsolute;
+            set => _pitchAbsolute = value;
+        } // true = Absolute, false = Key-relative
+
+        public string? Step
+        {
+            get => _step;
+            set => _step = value;
+        } // e.g., "C"
+
+        // Always return a non-null accidental string for consumers (default "Natural").
+        public string? Accidental
+        {
+            get => _accidental ?? "Natural";
+            set => _accidental = value;
+        } // "Natural"/"Sharp"/"Flat"
+
+        public int? OctaveAbsolute
+        {
+            get => _octaveAbsolute;
+            set => _octaveAbsolute = value;
+        }
+
+        public int? DegreeKeyRelative
+        {
+            get => _degreeKeyRelative;
+            set => _degreeKeyRelative = value;
+        }
+
+        public int? OctaveKeyRelative
+        {
+            get => _octaveKeyRelative;
+            set => _octaveKeyRelative = value;
+        }
+
+        // Derived effective octave (combines absolute/key-relative fallbacks).
+        // Consumers that previously did: data.OctaveAbsolute ?? data.OctaveKeyRelative ?? 4
+        // can now use this property to get the resolved octave.
+        public int Octave
+        {
+            get => _octaveAbsolute ?? _octaveKeyRelative ?? 4;
+        }
 
         // Rhythm options
-        public string? NoteValue { get; set; } // selected key from cbNoteValue
-        public int? Dots { get; set; }
-        public bool? TupletEnabled { get; set; }
-        public int? TupletCount { get; set; }
-        public int? TupletOf { get; set; }
-        public bool? TieAcross { get; set; }
-        public bool? Fermata { get; set; }
-        public int? NumberOfNotes { get; set; }
+        public string? NoteValue
+        {
+            get => _noteValue;
+            set => _noteValue = value;
+        } // selected key from cbNoteValue
+
+        public int? Dots
+        {
+            get => _dots ?? 0;
+            set => _dots = value;
+        }
+
+        public bool? TupletEnabled
+        {
+            get => _tupletEnabled;
+            set => _tupletEnabled = value;
+        }
+
+        public int? TupletCount
+        {
+            get => _tupletCount ?? 0;
+            set => _tupletCount = value;
+        }
+
+        public int? TupletOf
+        {
+            get => _tupletOf ?? 0;
+            set => _tupletOf = value;
+        }
+
+        public bool? TieAcross
+        {
+            get => _tieAcross;
+            set => _tieAcross = value;
+        }
+
+        public bool? Fermata
+        {
+            get => _fermata;
+            set => _fermata = value;
+        }
+
+        // Always provide a default of 1 note when not explicitly set.
+        public int? NumberOfNotes
+        {
+            get => _numberOfNotes ?? 1;
+            set => _numberOfNotes = value;
+        }
     }
 }
