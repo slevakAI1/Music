@@ -9,13 +9,9 @@ namespace Music.Generate
 {
     public partial class GenerateForm : Form
     {
-
         private Score? _score;
         private DesignClass? _design;
-
-        // Local persisted form data for the GenerateForm controls
-        private FormData? _formData;
-
+        private GenerationData? _GenerationData;
 
         // CORRECT
         public GenerateForm()
@@ -34,8 +30,7 @@ namespace Music.Generate
             _design = Globals.Design;
 
             // Initialize local FormData and capture the initial control state - this will get any control default values
-            _formData = new FormData(this);
-            _formData.GatherFromControls();
+            _GenerationData = CaptureFormData();
         }
 
         // CORRECT
@@ -46,7 +41,7 @@ namespace Music.Generate
                 this.WindowState = FormWindowState.Maximized;
         }
 
-        // ???
+        // Updated: avoid overwriting design-driven UI when re-applying persisted data.
         protected override void OnActivated(EventArgs e)
         {
             base.OnActivated(e);
@@ -54,14 +49,15 @@ namespace Music.Generate
             // Refresh all UI that depends on the current design
             GenerateFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, cbNoteValue, _design);
 
-            // Re-apply any persisted form data after design-driven refresh - double check
-            //_formData?.ApplyToControls();
+            // Re-apply any persisted form data after design-driven refresh
+            if (_GenerationData != null)
+                ApplyFormData(_GenerationData);
         }
 
         private void btnApply_Click(object sender, EventArgs e)
         {
             // Persist current control state before applying pattern
-            //_formData?.GatherFromControls();
+            _GenerationData = CaptureFormData();
 
             // Collect selected parts from the CheckedListBox as strings
             var parts = cbPart.CheckedItems
@@ -112,7 +108,7 @@ namespace Music.Generate
             GenerateFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, cbNoteValue, _design);
 
             // Persist the control state after defaults are applied
-            //_formData?.GatherFromControls();
+            _GenerationData = CaptureFormData();
         }
 
         private void btnNewScore_Click(object sender, EventArgs e)
@@ -120,205 +116,161 @@ namespace Music.Generate
             _score = GenerateFormHelper.NewScore(this, _design, cbPart, lblEndBarTotal);
         }
 
-        // Data holder object for GenerateForm user-editable values.
-        // - All properties are simple data types (strings, ints, bools, List<string>)
-        // - Value types are nullable so ApplyToControls() only writes when a property has a value.
-        public sealed class FormData
+        // Capture current control values into a GenerateFormData DTO.
+        public GenerationData CaptureFormData()
         {
-            private readonly GenerateForm _owner;
-
-            public FormData(GenerateForm owner)
-            {
-                _owner = owner ?? throw new ArgumentNullException(nameof(owner));
-            }
-
-            // General / Pattern
-            public string? Pattern { get; set; }
-
-            // Parts / scope
-            public List<string>? SelectedParts { get; set; }
-            public bool? AllPartsChecked { get; set; }
-            public bool? AllStaffChecked { get; set; } // corresponds to `checkBox1` in designer (labeled "All")
-
-            // Staff / sections / bars / beats
-            public int? Staff { get; set; }
-            public string? SectionsText { get; set; }
-            public int? StartBar { get; set; }
-            public int? EndBar { get; set; }
-            public int? StartBeat { get; set; }
-            public int? EndBeat { get; set; }
-
-            // Overwrite existing notes
-            public bool? OverwriteExisting { get; set; }
-
-            // Pitch options
-            public bool? PitchAbsolute { get; set; } // true = Absolute, false = Key-relative
-            public string? Step { get; set; } // e.g., "C"
-            public string? Accidental { get; set; } // "Natural"/"Sharp"/"Flat"
-            public int? OctaveAbsolute { get; set; }
-            public int? DegreeKeyRelative { get; set; }
-            public int? OctaveKeyRelative { get; set; }
-
-            // Rhythm options
-            public string? NoteValue { get; set; } // selected key from cbNoteValue
-            public int? Dots { get; set; }
-            public bool? TupletEnabled { get; set; }
-            public int? TupletCount { get; set; }
-            public int? TupletOf { get; set; }
-            public bool? TieAcross { get; set; }
-            public bool? Fermata { get; set; }
-            public int? NumberOfNotes { get; set; }
-
-            // Gather current values from the form controls into this object's properties
-            public void GatherFromControls()
+            var data = new GenerationData
             {
                 // Pattern
-                Pattern = _owner.cbPattern.SelectedItem?.ToString();
+                Pattern = cbPattern.SelectedItem?.ToString(),
 
                 // Parts
-                SelectedParts = _owner.cbPart.CheckedItems
+                SelectedParts = cbPart.CheckedItems
                     .Cast<object?>()
                     .Select(x => x?.ToString() ?? string.Empty)
                     .Where(s => !string.IsNullOrWhiteSpace(s))
-                    .ToList();
+                    .ToList(),
 
-                AllPartsChecked = _owner.chkAllParts.Checked;
-                AllStaffChecked = _owner.checkBox1.Checked;
-
-                // Staff / sections / bars / beats
-                Staff = (int)_owner.numStaff.Value;
-                SectionsText = _owner.txtSections.Text;
-                StartBar = (int)_owner.numStartBar.Value;
-                EndBar = (int)_owner.numEndBar.Value;
-                StartBeat = (int)_owner.numStartBeat.Value;
-                EndBeat = (int)_owner.numericUpDown2.Value;
-
-                OverwriteExisting = _owner.chkOverwrite.Checked;
-
-                // Pitch
-                PitchAbsolute = _owner.rbPitchAbsolute.Checked;
-                Step = _owner.cbStep.SelectedItem?.ToString();
-                Accidental = _owner.cbAccidental.SelectedItem?.ToString();
-                OctaveAbsolute = (int)_owner.numOctaveAbs.Value;
-                DegreeKeyRelative = (int)_owner.numDegree.Value;
-                OctaveKeyRelative = (int)_owner.numOctaveKR.Value;
-
-                // Rhythm
-                NoteValue = _owner.cbNoteValue.SelectedItem?.ToString();
-                Dots = (int)_owner.numDots.Value;
-                TupletEnabled = _owner.chkTupletEnabled.Checked;
-                TupletCount = (int)_owner.numTupletCount.Value;
-                TupletOf = (int)_owner.numTupletOf.Value;
-                TieAcross = _owner.chkTieAcross.Checked;
-                Fermata = _owner.chkFermata.Checked;
-                NumberOfNotes = (int)_owner.numNumberOfNotes.Value;
-            }
-
-            // Apply the current property values back to the form controls.
-            // Only properties that are not null are written to controls (so callers can use partial updates).
-            public void ApplyToControls()
-            {
-                // Pattern
-                if (Pattern != null && _owner.cbPattern.Items.Contains(Pattern))
-                    _owner.cbPattern.SelectedItem = Pattern;
-
-                // Parts - if provided, set checked state for matching items
-                if (SelectedParts != null)
-                {
-                    var set = new HashSet<string>(SelectedParts, StringComparer.OrdinalIgnoreCase);
-                    for (int i = 0; i < _owner.cbPart.Items.Count; i++)
-                    {
-                        var name = _owner.cbPart.Items[i]?.ToString() ?? string.Empty;
-                        if (!string.IsNullOrWhiteSpace(name))
-                            _owner.cbPart.SetItemChecked(i, set.Contains(name));
-                        else
-                            _owner.cbPart.SetItemChecked(i, false);
-                    }
-                }
-
-                if (AllPartsChecked.HasValue)
-                    _owner.chkAllParts.Checked = AllPartsChecked.Value;
-
-                if (AllStaffChecked.HasValue)
-                    _owner.checkBox1.Checked = AllStaffChecked.Value;
+                AllPartsChecked = chkAllParts.Checked,
+                AllStaffChecked = checkBox1.Checked,
 
                 // Staff / sections / bars / beats
-                if (Staff.HasValue)
-                    _owner.numStaff.Value = ClampDecimal(_owner.numStaff, Staff.Value);
+                Staff = (int)numStaff.Value,
+                SectionsText = txtSections.Text,
+                StartBar = (int)numStartBar.Value,
+                EndBar = (int)numEndBar.Value,
+                StartBeat = (int)numStartBeat.Value,
+                EndBeat = (int)numericUpDown2.Value,
 
-                if (SectionsText != null)
-                    _owner.txtSections.Text = SectionsText;
-
-                if (StartBar.HasValue)
-                    _owner.numStartBar.Value = ClampDecimal(_owner.numStartBar, StartBar.Value);
-
-                if (EndBar.HasValue)
-                    _owner.numEndBar.Value = ClampDecimal(_owner.numEndBar, EndBar.Value);
-
-                if (StartBeat.HasValue)
-                    _owner.numStartBeat.Value = ClampDecimal(_owner.numStartBeat, StartBeat.Value);
-
-                if (EndBeat.HasValue)
-                    _owner.numericUpDown2.Value = ClampDecimal(_owner.numericUpDown2, EndBeat.Value);
-
-                if (OverwriteExisting.HasValue)
-                    _owner.chkOverwrite.Checked = OverwriteExisting.Value;
+                OverwriteExisting = chkOverwrite.Checked,
 
                 // Pitch
-                if (PitchAbsolute.HasValue)
-                {
-                    _owner.rbPitchAbsolute.Checked = PitchAbsolute.Value;
-                    _owner.rbPitchKeyRelative.Checked = !PitchAbsolute.Value;
-                }
-
-                if (Step != null && _owner.cbStep.Items.Contains(Step))
-                    _owner.cbStep.SelectedItem = Step;
-
-                if (Accidental != null && _owner.cbAccidental.Items.Contains(Accidental))
-                    _owner.cbAccidental.SelectedItem = Accidental;
-
-                if (OctaveAbsolute.HasValue)
-                    _owner.numOctaveAbs.Value = ClampDecimal(_owner.numOctaveAbs, OctaveAbsolute.Value);
-
-                if (DegreeKeyRelative.HasValue)
-                    _owner.numDegree.Value = ClampDecimal(_owner.numDegree, DegreeKeyRelative.Value);
-
-                if (OctaveKeyRelative.HasValue)
-                    _owner.numOctaveKR.Value = ClampDecimal(_owner.numOctaveKR, OctaveKeyRelative.Value);
+                PitchAbsolute = rbPitchAbsolute.Checked,
+                Step = cbStep.SelectedItem?.ToString(),
+                Accidental = cbAccidental.SelectedItem?.ToString(),
+                OctaveAbsolute = (int)numOctaveAbs.Value,
+                DegreeKeyRelative = (int)numDegree.Value,
+                OctaveKeyRelative = (int)numOctaveKR.Value,
 
                 // Rhythm
-                if (NoteValue != null && _owner.cbNoteValue.Items.Contains(NoteValue))
-                    _owner.cbNoteValue.SelectedItem = NoteValue;
+                NoteValue = cbNoteValue.SelectedItem?.ToString(),
+                Dots = (int)numDots.Value,
+                TupletEnabled = chkTupletEnabled.Checked,
+                TupletCount = (int)numTupletCount.Value,
+                TupletOf = (int)numTupletOf.Value,
+                TieAcross = chkTieAcross.Checked,
+                Fermata = chkFermata.Checked,
+                NumberOfNotes = (int)numNumberOfNotes.Value
+            };
 
-                if (Dots.HasValue)
-                    _owner.numDots.Value = ClampDecimal(_owner.numDots, Dots.Value);
+            return data;
+        }
 
-                if (TupletEnabled.HasValue)
-                    _owner.chkTupletEnabled.Checked = TupletEnabled.Value;
+        // Apply a GenerateFormData DTO back to the private form controls.
+        public void ApplyFormData(GenerationData data)
+        {
+            if (data == null) return;
 
-                if (TupletCount.HasValue)
-                    _owner.numTupletCount.Value = ClampDecimal(_owner.numTupletCount, TupletCount.Value);
+            // Pattern
+            if (data.Pattern != null && cbPattern.Items.Contains(data.Pattern))
+                cbPattern.SelectedItem = data.Pattern;
 
-                if (TupletOf.HasValue)
-                    _owner.numTupletOf.Value = ClampDecimal(_owner.numTupletOf, TupletOf.Value);
-
-                if (TieAcross.HasValue)
-                    _owner.chkTieAcross.Checked = TieAcross.Value;
-
-                if (Fermata.HasValue)
-                    _owner.chkFermata.Checked = Fermata.Value;
-
-                if (NumberOfNotes.HasValue)
-                    _owner.numNumberOfNotes.Value = ClampDecimal(_owner.numNumberOfNotes, NumberOfNotes.Value);
-            }
-
-            private static decimal ClampDecimal(NumericUpDown control, int value)
+            // Parts - if provided, set checked state for matching items
+            if (data.SelectedParts != null)
             {
-                var min = (int)control.Minimum;
-                var max = (int)control.Maximum;
-                var clamped = Math.Max(min, Math.Min(max, value));
-                return (decimal)clamped;
+                var set = new HashSet<string>(data.SelectedParts, StringComparer.OrdinalIgnoreCase);
+                for (int i = 0; i < cbPart.Items.Count; i++)
+                {
+                    var name = cbPart.Items[i]?.ToString() ?? string.Empty;
+                    if (!string.IsNullOrWhiteSpace(name))
+                        cbPart.SetItemChecked(i, set.Contains(name));
+                    else
+                        cbPart.SetItemChecked(i, false);
+                }
             }
+
+            if (data.AllPartsChecked.HasValue)
+                chkAllParts.Checked = data.AllPartsChecked.Value;
+
+            if (data.AllStaffChecked.HasValue)
+                checkBox1.Checked = data.AllStaffChecked.Value;
+
+            // Staff / sections / bars / beats
+            if (data.Staff.HasValue)
+                numStaff.Value = ClampDecimal(numStaff, data.Staff.Value);
+
+            if (data.SectionsText != null)
+                txtSections.Text = data.SectionsText;
+
+            if (data.StartBar.HasValue)
+                numStartBar.Value = ClampDecimal(numStartBar, data.StartBar.Value);
+
+            if (data.EndBar.HasValue)
+                numEndBar.Value = ClampDecimal(numEndBar, data.EndBar.Value);
+
+            if (data.StartBeat.HasValue)
+                numStartBeat.Value = ClampDecimal(numStartBeat, data.StartBeat.Value);
+
+            if (data.EndBeat.HasValue)
+                numericUpDown2.Value = ClampDecimal(numericUpDown2, data.EndBeat.Value);
+
+            if (data.OverwriteExisting.HasValue)
+                chkOverwrite.Checked = data.OverwriteExisting.Value;
+
+            // Pitch
+            if (data.PitchAbsolute.HasValue)
+            {
+                rbPitchAbsolute.Checked = data.PitchAbsolute.Value;
+                rbPitchKeyRelative.Checked = !data.PitchAbsolute.Value;
+            }
+
+            if (data.Step != null && cbStep.Items.Contains(data.Step))
+                cbStep.SelectedItem = data.Step;
+
+            if (data.Accidental != null && cbAccidental.Items.Contains(data.Accidental))
+                cbAccidental.SelectedItem = data.Accidental;
+
+            if (data.OctaveAbsolute.HasValue)
+                numOctaveAbs.Value = ClampDecimal(numOctaveAbs, data.OctaveAbsolute.Value);
+
+            if (data.DegreeKeyRelative.HasValue)
+                numDegree.Value = ClampDecimal(numDegree, data.DegreeKeyRelative.Value);
+
+            if (data.OctaveKeyRelative.HasValue)
+                numOctaveKR.Value = ClampDecimal(numOctaveKR, data.OctaveKeyRelative.Value);
+
+            // Rhythm
+            if (data.NoteValue != null && cbNoteValue.Items.Contains(data.NoteValue))
+                cbNoteValue.SelectedItem = data.NoteValue;
+
+            if (data.Dots.HasValue)
+                numDots.Value = ClampDecimal(numDots, data.Dots.Value);
+
+            if (data.TupletEnabled.HasValue)
+                chkTupletEnabled.Checked = data.TupletEnabled.Value;
+
+            if (data.TupletCount.HasValue)
+                numTupletCount.Value = ClampDecimal(numTupletCount, data.TupletCount.Value);
+
+            if (data.TupletOf.HasValue)
+                numTupletOf.Value = ClampDecimal(numTupletOf, data.TupletOf.Value);
+
+            if (data.TieAcross.HasValue)
+                chkTieAcross.Checked = data.TieAcross.Value;
+
+            if (data.Fermata.HasValue)
+                chkFermata.Checked = data.Fermata.Value;
+
+            if (data.NumberOfNotes.HasValue)
+                numNumberOfNotes.Value = ClampDecimal(numNumberOfNotes, data.NumberOfNotes.Value);
+        }
+
+        private static decimal ClampDecimal(NumericUpDown control, int value)
+        {
+            var min = (int)control.Minimum;
+            var max = (int)control.Maximum;
+            var clamped = Math.Max(min, Math.Min(max, value));
+            return (decimal)clamped;
         }
     }
 }

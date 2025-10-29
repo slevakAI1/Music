@@ -68,7 +68,7 @@ namespace Music.Generate
         // New helper to refresh all UI that depends on the current design
         public static void RefreshFromDesign(CheckedListBox cbPart, Label lblEndBarTotal, ComboBox cbNoteValue, DesignClass? design)
         {
-            // Ensure note value list is loaded
+            // Ensure note value list is loaded 
             LoadNoteValues(cbNoteValue);
 
             // Populate parts and update end-bar total based on the provided design
