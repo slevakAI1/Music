@@ -65,7 +65,7 @@ namespace Music.Generate
             var numberOfNotes = (int)numNumberOfNotes.Value;
 
             // This updates the score based on the pattern
-            ApplySetNote.Apply(this,
+            PatternSetNotes.Apply(this,
                 _score!,
                 parts,
                 staff,

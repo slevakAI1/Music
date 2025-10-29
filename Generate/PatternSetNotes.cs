@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 using MusicXml.Domain;
-using Music.Design;
 
 namespace Music.Generate
 {
@@ -17,7 +12,7 @@ namespace Music.Generate
     /// Somewhere in Generate form is needs to construct the score framework first Parts/Measures.
     /// 
     /// </summary>
-    public static class ApplySetNote
+    public static class PatternSetNotes
     {
         /// <summary>
         /// Apply the "Set Notes" operation to the provided score.
