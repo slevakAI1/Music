@@ -1,27 +1,24 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using Music;
 using MusicXml.Domain;
 
 namespace Music.Generate
 {
     /// <summary>
-    /// Inserts a repeated set of notes (beat-1 insertions) into parts / staffs / bars
-    /// of a Score instance. Validates that inserted durations do not exceed the bar length.
-    /// This class is form-control-agnostic; GenerateForm should call Apply() with values read
-    /// from its controls.
-    /// 
-    /// The assumption for this method is that the parts and measures already exist in the Score!!! 
-    /// Somewhere in Generate form is needs to construct the score framework first Parts/Measures.
+    /// Inserts a set of notes based on user parameters.
+    /// Method assumes the score has already be initialized with parts, measure, tempo, time signature.
     /// 
     /// </summary>
     public static class PatternSetNotes
     {
         /// <summary>
         /// Apply the "Set Notes" operation to the provided score.
-        /// The score object is mutated in-place.
-        /// This overload accepts UI-style inputs (owner, step string, note value key) and will
-        /// call the validation helper which shows any necessary message boxes.
+        /// The score object is updated in-place.
         /// </summary>
         public static void Apply(
-            Form? owner,
             MusicXml.Domain.Score score,
             IEnumerable<string> designPartNames,
             int staff,
@@ -34,7 +31,7 @@ namespace Music.Generate
             int numberOfNotes)
         {
             // Validate UI-level parameters first; this will show message boxes on failure.
-            if (!ValidateApplyParameters.Validate(owner, score, designPartNames, staff, startBar, endBar, stepStr, accidental ?? "Natural", octave, noteValueKey, numberOfNotes, out var stepChar, out var noteValue))
+            if (!ValidateApplyParameters.Validate(score, designPartNames, staff, startBar, endBar, stepStr, accidental ?? "Natural", octave, noteValueKey, numberOfNotes, out var stepChar, out var noteValue))
             {
                 return;
             }
@@ -144,15 +141,18 @@ namespace Music.Generate
                     var numerator = divisions * 4;
                     if (numerator % denom != 0)
                     {
-                        throw new InvalidOperationException($"Cannot represent base duration '{denom}' with measure divisions={divisions}. Resulting duration would not be an integer number of divisions.");
+                        var msg = $"Cannot represent base duration '{denom}' with measure divisions={divisions}. Resulting duration would not be an integer number of divisions.";
+                        MessageBoxHelper.ShowError(msg, "Invalid Duration");
+                        return;
                     }
                     int noteDuration = numerator / denom;
 
                     long totalNewDuration = (long)noteDuration * numberOfNotes;
                     if (existingDuration + totalNewDuration > barLengthDivisions)
                     {
-                        throw new InvalidOperationException(
-                            $"Insertion would overflow bar {bar} of part '{scorePart.Name}'. Bar capacity (in divisions): {barLengthDivisions}. Existing occupied: {existingDuration}. Attempting to add: {totalNewDuration}.");
+                        var msg = $"Insertion would overflow bar {bar} of part '{scorePart.Name}'. Bar capacity (in divisions): {barLengthDivisions}. Existing occupied: {existingDuration}. Attempting to add: {totalNewDuration}.";
+                        MessageBoxHelper.ShowError(msg, "Bar Overflow");
+                        return;
                     }
 
                     // Append notes after existing elements (per requirement)
@@ -183,6 +183,9 @@ namespace Music.Generate
                     }
                 }
             }
+            // Inform the user that the pattern was applied
+            MessageBox.Show("Execution Finished.", "Apply Pattern Set Notes", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
         }
 
         private static string DurationTypeString(int denom) => denom switch
@@ -249,7 +252,6 @@ namespace Music.Generate
     internal static class ValidateApplyParameters
     {
         public static bool Validate(
-            Form? owner,
             Score? score,
             IEnumerable<string>? parts,
             int staff,
@@ -268,28 +270,28 @@ namespace Music.Generate
 
             if (score == null)
             {
-                MessageBox.Show(owner, "Cannnot apply to a null score", "No Score", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxHelper.ShowError("Cannot apply to a null score", "No Score");
                 return false;
             }
 
             // Validate parts
             if (parts == null || !parts.Any())
             {
-                MessageBox.Show(owner, "Please select a part to apply notes to.", "No Part Selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show("Please select a part to apply notes to.", "No Part Selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return false;
             }
 
             // Start/End bars
             if (startBar < 1 || endBar < startBar)
             {
-                MessageBox.Show(owner, "Start and End bars must be valid (Start >= 1 and End >= Start).", "Invalid Bar Range", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show("Start and End bars must be valid (Start >= 1 and End >= Start).", "Invalid Bar Range", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return false;
             }
 
             // Step (absolute)
             if (string.IsNullOrWhiteSpace(stepStr) || stepStr.Length == 0)
             {
-                MessageBox.Show(owner, "Please select a step (A-G).", "Invalid Step", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show("Please select a step (A-G).", "Invalid Step", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return false;
             }
             stepChar = stepStr![0];
@@ -297,7 +299,7 @@ namespace Music.Generate
             // Base duration - map from the UI string via _noteValueMap
             if (noteValueKey == null || !Music.MusicConstants.NoteValueMap.TryGetValue(noteValueKey, out var nv))
             {
-                MessageBox.Show(owner, "Please select a valid base duration.", "Invalid Duration", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show("Please select a valid base duration.", "Invalid Duration", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return false;
             }
 
@@ -306,10 +308,11 @@ namespace Music.Generate
             // numberOfNotes validated by core but ensure positive here too
             if (numberOfNotes <= 0)
             {
-                MessageBox.Show(owner, "Number of notes must be at least 1.", "Invalid Number", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show("Number of notes must be at least 1.", "Invalid Number", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return false;
             }
 
             return true;
         }
-    }}
+    }
+}

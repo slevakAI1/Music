@@ -65,7 +65,7 @@ namespace Music.Generate
             var numberOfNotes = (int)numNumberOfNotes.Value;
 
             // This updates the score based on the pattern
-            PatternSetNotes.Apply(this,
+            PatternSetNotes.Apply(
                 _score!,
                 parts,
                 staff,
@@ -77,9 +77,6 @@ namespace Music.Generate
                 noteValueKey,
                 numberOfNotes);
             Globals.Score = _score;
-
-            // Inform the user that the pattern was applied
-            MessageBox.Show("Pattern applied to the Score.", "Apply Pattern", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         // SET DESIGN AND GENERATE DEFAULTS
