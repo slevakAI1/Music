@@ -29,7 +29,12 @@ namespace Music.Generate
             _score = Globals.Score;
             _design = Globals.Design;
 
-            // Initialize local FormData and capture the initial control state - this will get any control default values
+            // Load static note-value choices once (they do not change during runtime).
+            // InitializeComponent has created `cbNoteValue`, so it's safe to call here.
+            GenerateFormHelper.LoadNoteValues(cbNoteValue);
+
+            // Initialize local FormData and capture the initial control state
+            // - this will get any control default values
             _GenerationData = CaptureFormData();
         }
 
@@ -45,13 +50,15 @@ namespace Music.Generate
         protected override void OnActivated(EventArgs e)
         {
             base.OnActivated(e);
-
-            // Refresh all UI that depends on the current design
-            GenerateFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, cbNoteValue, _design);
+            // NOTE!: This will need to be revisited when allowed to edit voices, measures later
+            // Refresh all UI that depends on the current design (parts, voices, total bar count)
+            // Note: LoadNoteValues is intentionally NOT called here — it's static and loaded once at construction.
+            GenerateFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, _design);
 
             // Re-apply any persisted form data after design-driven refresh
-            if (_GenerationData != null)
-                ApplyFormData(_GenerationData);
+            // DONT THINK THIS IS NEEDEDYET. KEEP AS COMMENTED FOR NOW.
+            // if (_GenerationData != null)
+            //    ApplyFormData(_GenerationData);
         }
 
         private void btnApply_Click(object sender, EventArgs e)
@@ -105,10 +112,10 @@ namespace Music.Generate
                 lblEndBarTotal);
 
             // Refresh UI elements that depend on the design
-            GenerateFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, cbNoteValue, _design);
+            GenerateFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, _design);
 
             // Persist the control state after defaults are applied
-            _GenerationData = CaptureFormData();
+            //_GenerationData = CaptureFormData();
         }
 
         private void btnNewScore_Click(object sender, EventArgs e)
