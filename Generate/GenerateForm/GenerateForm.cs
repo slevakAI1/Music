@@ -63,39 +63,15 @@ namespace Music.Generate
 
         private void btnApply_Click(object sender, EventArgs e)
         {
-            // Persist current control state before applying pattern
+            // Persist current control state and pass the captured DTO to PatternSetNotes.
+            // All control-to-primitive mapping/logic is handled inside PatternSetNotes.Apply(Score, GenerationData).
             _GenerationData = CaptureFormData();
 
-            // Collect selected parts from the CheckedListBox as strings
-            var parts = cbPart.CheckedItems
-                .Cast<object?>()
-                .Select(x => x?.ToString())
-                .Where(s => !string.IsNullOrWhiteSpace(s))
-                .ToArray();
-
-            // Gather scalar values from controls
-            var staff = (int)numStaff.Value;
-            var startBar = (int)numStartBar.Value;
-            var endBar = (int)numEndBar.Value;
-            var step = cbStep.SelectedItem?.ToString();
-            var accidental = cbAccidental.SelectedItem?.ToString() ?? "Natural";
-            var octave = (int)numOctaveAbs.Value;
-            var noteValueKey = cbNoteValue.SelectedItem?.ToString();
-            var numberOfNotes = (int)numNumberOfNotes.Value;
-
-            // This updates the score based on the pattern
-            PatternSetNotes.Apply(
-                _score!,
-                parts,
-                staff,
-                startBar,
-                endBar,
-                step,
-                accidental,
-                octave,
-                noteValueKey,
-                numberOfNotes);
-            Globals.Score = _score;
+            if (_GenerationData != null)
+            {
+                PatternSetNotes.Apply(_score!, _GenerationData);
+                Globals.Score = _score;
+            }
         }
 
         // SET DESIGN AND GENERATE DEFAULTS

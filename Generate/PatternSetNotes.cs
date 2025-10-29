@@ -40,6 +40,47 @@ namespace Music.Generate
             ApplyCore(score, designPartNames, staff, startBar, endBar, stepChar, accidental, octave, noteValue, numberOfNotes);
         }
 
+        /// <summary>
+        /// Overload: accept the GenerationData DTO from the form, perform the necessary mapping/formatting
+        /// and delegate to the existing Apply(...) implementation.
+        /// All control-specific transformation logic (defaults, null handling) lives here.
+        /// </summary>
+        public static void Apply(Score score, GenerationData data)
+        {
+            if (score == null) throw new ArgumentNullException(nameof(score));
+            if (data == null) throw new ArgumentNullException(nameof(data));
+
+
+
+            //  I THINK THESE NEED TO BE PART OF GENERATIONDATA CLASS!!! Why do they need to be changed at all??? 
+
+            // Map list of selected parts (may be null/empty)
+            var parts = data.SelectedParts ?? Enumerable.Empty<string>();
+
+            // Numeric defaults: if a value wasn't provided, fall back to sensible defaults.
+            var staff = data.Staff ?? 1;
+            var startBar = data.StartBar ?? 1;
+            var endBar = data.EndBar ?? startBar; // if EndBar not provided, treat single-bar range
+
+            // Pitch mapping:
+            // - If the user selected absolute pitch use OctaveAbsolute/Step/Accidental.
+            // - If key-relative was selected and absolute octave not provided, fall back to OctaveKeyRelative when available.
+            string? stepStr = data.Step;
+            string? accidental = data.Accidental ?? "Natural";
+            int octave = data.OctaveAbsolute ?? data.OctaveKeyRelative ?? 4;
+
+            // Rhythm / duration mapping
+            string? noteValueKey = data.NoteValue;
+            var numberOfNotes = data.NumberOfNotes ?? 1;
+
+
+
+
+
+            // Delegate to existing validation + core implementation
+            Apply(score, parts, staff, startBar, endBar, stepStr, accidental, octave, noteValueKey, numberOfNotes);
+        }
+
         // Extracted core implementation that assumes validated and already-mapped parameters.
         private static void ApplyCore(
             MusicXml.Domain.Score score,
