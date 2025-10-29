@@ -26,7 +26,11 @@ namespace Music
             return ShowInternal(text, caption, buttons, icon);
         }
 
-        private static DialogResult ShowInternal(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
+        private static DialogResult ShowInternal(
+            string text, 
+            string caption, 
+            MessageBoxButtons buttons, 
+            MessageBoxIcon icon)
         {
             // Save currently active form (if any) so we can restore activation later.
             Form? previouslyActive = Form.ActiveForm ?? Application.OpenForms.Cast<Form>().FirstOrDefault();
@@ -84,6 +88,7 @@ namespace Music
         /// <summary>
         /// Convenience shorthand for showing an error message with an OK button.
         /// </summary>
-        public static DialogResult ShowError(string text, string caption = "Error") => Show(text, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        public static DialogResult ShowError(string text, string caption = "Error") => 
+                Show(text, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
     }
 }
