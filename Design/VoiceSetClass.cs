@@ -19,7 +19,7 @@ namespace Music.Design
         public IReadOnlyList<VoiceClass> AddDefaultVoices()
         {
             AddVoice("Guitar");
-            AddVoice("Drum Set");
+            AddVoice("Flute");
             AddVoice("Keyboard");
             AddVoice("Base Guitar"); // per requirement
             return Voices;

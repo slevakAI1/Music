@@ -1,11 +1,17 @@
 ﻿
 
-Update Section to allow for number of measures
-Add a form to create the sections similar to add voices
-Update the combined text builder to include the new measures
+
+Next: (1) Apply half and/or eighth notes to selected voice
+      (2) Apply different length notes to all voices
 
 
 
+
+
+
+
+
+======================================================================================
 
 (Pattern Specific) ParameterDefinitions - control type, data type, range, (dependencies later)
 

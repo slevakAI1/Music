@@ -81,16 +81,30 @@ namespace Music.Generate
             // Ensure parts are populated
             PopulatePartsFromDesign(cbPart, design);
 
+
+            //      S E L E C T   K E Y B O A R D   O N L Y
+
             // Ensure "Keyboard" voice exists and select it
-            var idx = cbPart.Items.IndexOf("Keyboard");
-            if (idx == -1)
+            //var idx = cbPart.Items.IndexOf("Keyboard");
+            //if (idx == -1)
+            //{
+            //    cbPart.Items.Add("Keyboard");
+            //    idx = cbPart.Items.Count - 1;
+            //}
+            //// check the first matching item (CheckedListBox uses SetItemChecked)
+            //if (idx >= 0)
+            //    cbPart.SetItemChecked(idx, true);
+
+
+            //      S E L E C T   A L L   V O I C E S
+            // Check every non-empty item in the parts CheckedListBox
+            for (int i = 0; i < cbPart.Items.Count; i++)
             {
-                cbPart.Items.Add("Keyboard");
-                idx = cbPart.Items.Count - 1;
+                var name = cbPart.Items[i]?.ToString();
+                if (!string.IsNullOrWhiteSpace(name))
+                    cbPart.SetItemChecked(i, true);
             }
-            // check the first matching item (CheckedListBox uses SetItemChecked)
-            if (idx >= 0)
-                cbPart.SetItemChecked(idx, true);
+
 
             // Set End Bar to design total (clamped inside numEndBar range)
             var total = design?.SectionSet?.TotalBars ?? Globals.Design?.SectionSet?.TotalBars ?? 0;
