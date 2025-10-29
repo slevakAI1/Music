@@ -10,10 +10,14 @@ namespace Music.Generate
     public partial class GenerateForm : Form
     {
 
-        // CORRECT
         private Score? _score;
         private DesignClass? _design;
 
+        // Local persisted form data for the GenerateForm controls
+        private FormData? _formData;
+
+
+        // CORRECT
         public GenerateForm()
         {
             InitializeComponent();
@@ -24,11 +28,14 @@ namespace Music.Generate
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.Manual;
            
-            // CORRECT
             // Load current global score and design into form-local fields for later use
             // Constructor is the only place that reads Globals per requirement.
             _score = Globals.Score;
             _design = Globals.Design;
+
+            // Initialize local FormData and capture the initial control state - this will get any control default values
+            _formData = new FormData(this);
+            _formData.GatherFromControls();
         }
 
         // CORRECT
@@ -39,18 +46,23 @@ namespace Music.Generate
                 this.WindowState = FormWindowState.Maximized;
         }
 
-        // CONFIRMED CORRECT
+        // ???
         protected override void OnActivated(EventArgs e)
         {
             base.OnActivated(e);
 
             // Refresh all UI that depends on the current design
             GenerateFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, cbNoteValue, _design);
+
+            // Re-apply any persisted form data after design-driven refresh - double check
+            //_formData?.ApplyToControls();
         }
 
-        // CONFIRMED CORRECT
         private void btnApply_Click(object sender, EventArgs e)
         {
+            // Persist current control state before applying pattern
+            //_formData?.GatherFromControls();
+
             // Collect selected parts from the CheckedListBox as strings
             var parts = cbPart.CheckedItems
                 .Cast<object?>()
@@ -98,6 +110,9 @@ namespace Music.Generate
 
             // Refresh UI elements that depend on the design
             GenerateFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, cbNoteValue, _design);
+
+            // Persist the control state after defaults are applied
+            //_formData?.GatherFromControls();
         }
 
         private void btnNewScore_Click(object sender, EventArgs e)
