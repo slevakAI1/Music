@@ -1,100 +1,111 @@
-namespace Music
+using System;
+using System.Windows.Forms;
+
+namespace Music.Generate
 {
-    /// <summary>
-    /// Application-scoped MessageBox helper that does not require a Form to be passed in.
-    /// It creates a tiny invisible owner form so the MessageBox is modal to this application
-    /// only (no Desktop-only flag) and restores activation to the previously active form
-    /// when the user dismisses the dialog.
-    /// </summary>
-    public static class MessageBoxHelper
+    internal static class MessageBoxHelper
     {
-        /// <summary>
-        /// Show a message box modal to this application. Safe to call from any class.
-        /// If called from a non-UI thread this will marshal the call to an existing UI form.
-        /// </summary>
-        public static DialogResult Show(string text, string caption = "Error", MessageBoxButtons buttons = MessageBoxButtons.OK, MessageBoxIcon icon = MessageBoxIcon.Error)
+        // Fire-and-forget show; safe to call from any thread.
+        public static void ShowMessage(Form? owner, string text, string caption)
         {
-            // Find a form that can be used to marshal to the UI thread if required.
-            var dispatcher = Form.ActiveForm ?? Application.OpenForms.Cast<Form>().FirstOrDefault();
-
-            if (dispatcher != null && dispatcher.InvokeRequired)
-            {
-                // Marshal to UI thread of an existing form
-                return (DialogResult)dispatcher.Invoke(new Func<DialogResult>(() => ShowInternal(text, caption, buttons, icon)));
-            }
-
-            return ShowInternal(text, caption, buttons, icon);
+            ShowInternal(owner, text, caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private static DialogResult ShowInternal(
-            string text, 
-            string caption, 
-            MessageBoxButtons buttons, 
-            MessageBoxIcon icon)
+        // Convenience overload used across the codebase where no owner was supplied.
+        public static void ShowMessage(string text, string caption)
         {
-            // Save currently active form (if any) so we can restore activation later.
-            Form? previouslyActive = Form.ActiveForm ?? Application.OpenForms.Cast<Form>().FirstOrDefault();
+            ShowInternal(null, text, caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
 
-            // Create a tiny invisible form to act as the owner for the MessageBox. This ensures
-            // the MessageBox is modal to this application only and won't affect other applications.
-            using var owner = new Form
+        public static void ShowError(string text, string caption)
+        {
+            ShowInternal(null, text, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        public static void ShowError(Form? owner, string text, string caption)
+        {
+            ShowInternal(owner, text, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        // Synchronous "Show" helpers kept for compatibility with existing callers.
+        // These return the DialogResult and will execute on the correct thread.
+        public static DialogResult Show(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
+        {
+            // No owner provided: use default synchronous MessageBox on current thread.
+            return MessageBox.Show(text, caption, buttons, icon);
+        }
+
+        public static DialogResult Show(Form? owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
+        {
+            if (owner == null || !owner.IsHandleCreated)
             {
-                ShowInTaskbar = false,
-                StartPosition = FormStartPosition.Manual,
-                Size = new Size(1, 1),
-                Location = new Point(-32000, -32000),
-                FormBorderStyle = FormBorderStyle.None,
-                Opacity = 0
-            };
+                return MessageBox.Show(text, caption, buttons, icon);
+            }
 
-            // Show the owner so it has a valid window handle.
-            owner.Show();
-            // Force creation of the handle
-            var _ = owner.Handle;
+            // If caller is not on UI thread for the owner, marshal synchronously to ensure a true modal dialog.
+            if (owner.InvokeRequired)
+            {
+                try
+                {
+                    return (DialogResult)owner.Invoke(new Func<DialogResult>(() => MessageBox.Show(owner, text, caption, buttons, icon)));
+                }
+                catch
+                {
+                    // Fall back to non-owned message box if invoke fails.
+                    return MessageBox.Show(text, caption, buttons, icon);
+                }
+            }
+            else
+            {
+                return MessageBox.Show(owner, text, caption, buttons, icon);
+            }
+        }
 
-            // Display the MessageBox with the owner. Do not use DefaultDesktopOnly.
-            var result = MessageBox.Show(owner, text, caption, buttons, icon);
-
-            // After the user dismisses the box, attempt to restore activation to the previously active form.
+        // Centralized: always execute the UI show on the UI thread, asynchronously.
+        // Used by ShowMessage/ShowError to avoid deadlocks when called from background threads.
+        private static void ShowInternal(Form? owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
+        {
             try
             {
-                if (previouslyActive != null && !previouslyActive.IsDisposed && previouslyActive != owner)
+                if (owner != null && owner.IsHandleCreated)
                 {
-                    // Ensure the previously active form is visible and has a handle, then activate.
-                    if (!previouslyActive.Visible)
+                    // Use BeginInvoke to avoid deadlock if caller is a worker thread and UI is waiting.
+                    // We intentionally do not capture and return the DialogResult here — for error/info messages
+                    // we simply display them and return immediately.
+                    owner.BeginInvoke(new Action(() =>
                     {
-                        previouslyActive.Show();
-                    }
-
-                    if (!previouslyActive.IsHandleCreated)
-                    {
-                        var h = previouslyActive.Handle; // force handle create
-                    }
-
-                    previouslyActive.Activate();
+                        try
+                        {
+                            // If the owner is disposed between scheduling and execution, guard against exceptions.
+                            if (!owner.IsHandleCreated || owner.Disposing || owner.IsDisposed)
+                            {
+                                MessageBox.Show(text, caption, buttons, icon);
+                            }
+                            else
+                            {
+                                MessageBox.Show(owner, text, caption, buttons, icon);
+                            }
+                        }
+                        catch
+                        {
+                            // Swallow secondary exceptions to avoid crashing the app from an error dialog.
+                            try { MessageBox.Show(text, caption, buttons, icon); } catch { }
+                        }
+                    }));
+                }
+                else
+                {
+                    // No valid owner, show on default UI thread (safe to call from UI thread or background)
+                    // This is synchronous but only used when owner null/invalid; background callers should
+                    // prefer providing the owner or using the other overloads.
+                    MessageBox.Show(text, caption, buttons, icon);
                 }
             }
             catch
             {
-                // Swallow any exceptions here; we don't want to crash the caller because of activation restore.
+                // As a last resort, try a plain (no-owner) MessageBox on the calling thread.
+                try { MessageBox.Show(text, caption, buttons, icon); } catch { }
             }
-
-            // Close the invisible owner.
-            try { owner.Close(); } catch { }
-
-            return result;
         }
-
-        /// <summary>
-        /// Convenience shorthand for showing an error message with an OK button.
-        /// </summary>
-        public static DialogResult ShowError(string text, string caption = "Error") => 
-                Show(text, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-        /// <summary>
-        /// Convenience shorthand for showing a non-error information message with an OK button.
-        /// </summary>
-        public static DialogResult ShowMessage(string text, string caption = "Message") =>
-                Show(text, caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 }
