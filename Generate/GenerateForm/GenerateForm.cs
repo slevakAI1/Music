@@ -91,17 +91,6 @@ namespace Music.Generate
             GenerateFormHelper.PopulatePartsFromDesign(cbPart, Globals.Design);
             GenerateFormHelper.LoadEndBarTotalFromDesign(lblEndBarTotal, Globals.Design);
 
-            //====================== old 
-            //_design = GenerateFormHelper.SetDefaultDesignAndGenerate(
-            //    cbPart, 
-            //    numEndBar, 
-            //    numNumberOfNotes, 
-            //    rbPitchAbsolute, 
-            //    cbStep, 
-            //    cbAccidental, 
-            //    cbPattern, 
-            //    lblEndBarTotal);
-
             // Refresh UI elements that depend on the design
             GenerateFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, _design);
 
