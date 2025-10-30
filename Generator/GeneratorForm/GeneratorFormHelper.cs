@@ -7,7 +7,7 @@ using MusicXml.Domain;
 
 namespace Music.Generate
 {
-    internal static class GenerationFormHelper
+    internal static class GeneratorFormHelper
     {
         public static void PopulatePartsFromDesign(CheckedListBox cbPart, DesignerClass? design)
         {
@@ -63,9 +63,9 @@ namespace Music.Generate
 
         // NOTE: This helper now builds and returns GenerationData instead of manipulating controls.
         // The caller (form) should apply the returned GenerationData to controls via ApplyFormData(...)
-        public static GenerationData SetDefaultsForGenerate(DesignerClass? design)
+        public static GeneratorData SetDefaultsForGenerate(DesignerClass? design)
         {
-            var data = new GenerationData();
+            var data = new GeneratorData();
 
             // Parts: select all named voices from the design
             var partNames = new List<string>();

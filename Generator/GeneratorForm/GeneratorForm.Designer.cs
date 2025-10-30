@@ -1,6 +1,6 @@
 namespace Music.Generate
 {
-    partial class GenerationForm
+    partial class GeneratorForm
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -136,9 +136,9 @@ namespace Music.Generate
             lblTitle.Font = new Font("Segoe UI", 18F);
             lblTitle.Location = new Point(363, 9);
             lblTitle.Name = "lblTitle";
-            lblTitle.Size = new Size(132, 32);
+            lblTitle.Size = new Size(120, 32);
             lblTitle.TabIndex = 0;
-            lblTitle.Text = "Generation";
+            lblTitle.Text = "Generator";
             // 
             // cbPattern
             // 
@@ -689,7 +689,7 @@ namespace Music.Generate
             btnNewScore.UseVisualStyleBackColor = true;
             btnNewScore.Click += btnNewScore_Click;
             // 
-            // GenerationForm
+            // GeneratorForm
             // 
             ClientSize = new Size(832, 701);
             Controls.Add(btnNewScore);
@@ -702,7 +702,7 @@ namespace Music.Generate
             Controls.Add(grpPitch);
             Controls.Add(btnApplySetNotes);
             Controls.Add(lblStatus);
-            Name = "GenerationForm";
+            Name = "GeneratorForm";
             Text = "Generate 2 (MusicXML)";
             grpTarget.ResumeLayout(false);
             grpTarget.PerformLayout();

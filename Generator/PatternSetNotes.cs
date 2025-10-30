@@ -45,7 +45,7 @@ namespace Music.Generate
         /// and delegate to the existing Apply(...) implementation.
         /// All control-specific transformation logic (defaults, null handling) lives here.
         /// </summary>
-        public static void Apply(Score score, GenerationData data)
+        public static void Apply(Score score, GeneratorData data)
         {
             if (score == null) throw new ArgumentNullException(nameof(score));
             if (data == null) throw new ArgumentNullException(nameof(data));
