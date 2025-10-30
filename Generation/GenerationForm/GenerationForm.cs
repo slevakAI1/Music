@@ -7,14 +7,14 @@ using MusicXml.Domain;
 
 namespace Music.Generate
 {
-    public partial class GenerateForm : Form
+    public partial class GenerationForm : Form
     {
         private Score? _score;
         private DesignClass? _design;
         private GenerationData? _GenerationData;
 
         // CORRECT
-        public GenerateForm()
+        public GenerationForm()
         {
             InitializeComponent();
 
@@ -51,7 +51,7 @@ namespace Music.Generate
             base.OnActivated(e);
             // NOTE!: This will need to be revisited when allowed to edit voices, measures later
             // Refresh all UI that depends on the current design (parts, voices, total bar count)
-            GenerateFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, _design);
+            GenerationFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, _design);
 
             // Re-apply any persisted form data after design-driven refresh
             if (_GenerationData != null)
@@ -78,12 +78,12 @@ namespace Music.Generate
             DesignDefaults.ApplyDefaultDesign(Globals.Design);
 
             // Refresh parts and end-total UI from the design
-            GenerateFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, Globals.Design);
+            GenerationFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, Globals.Design);
 
             // ==========================================================================================
 
             // Get GenerationData defaults from helper (no UI controls passed)
-            _GenerationData = GenerateFormHelper.SetDefaultsForGenerate(Globals.Design);
+            _GenerationData = GenerationFormHelper.SetDefaultsForGenerate(Globals.Design);
 
             // Apply the generated defaults into the form controls via the existing method
             if (_GenerationData != null)
@@ -92,7 +92,7 @@ namespace Music.Generate
 
         private void btnNewScore_Click(object sender, EventArgs e)
         {
-            _score = GenerateFormHelper.NewScore(this, _design, cbPart, lblEndBarTotal);
+            _score = GenerationFormHelper.NewScore(this, _design, cbPart, lblEndBarTotal);
         }
 
         // Capture current control values into a GenerateFormData DTO.

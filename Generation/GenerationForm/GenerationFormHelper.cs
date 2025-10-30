@@ -7,7 +7,7 @@ using MusicXml.Domain;
 
 namespace Music.Generate
 {
-    internal static class GenerateFormHelper
+    internal static class GenerationFormHelper
     {
         public static void PopulatePartsFromDesign(CheckedListBox cbPart, DesignClass? design)
         {

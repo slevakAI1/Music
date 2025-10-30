@@ -10,13 +10,13 @@
 
   <ItemGroup>
     <Compile Remove="Design\MusicXmlFiles\**" />
-    <Compile Remove="Generate\Prototypes\**" />
+    <Compile Remove="Archives\Prototypes\**" />
     <Compile Remove="Tests\InputSamples\**" />
     <EmbeddedResource Remove="Design\MusicXmlFiles\**" />
-    <EmbeddedResource Remove="Generate\Prototypes\**" />
+    <EmbeddedResource Remove="Archives\Prototypes\**" />
     <EmbeddedResource Remove="Tests\InputSamples\**" />
     <None Remove="Design\MusicXmlFiles\**" />
-    <None Remove="Generate\Prototypes\**" />
+    <None Remove="Archives\Prototypes\**" />
     <None Remove="Tests\InputSamples\**" />
   </ItemGroup>
 
@@ -44,7 +44,7 @@
 
   <ItemGroup>
     <Folder Include="Design\Designs\" />
-    <Folder Include="Generate\Prototypes\" />
+    <Folder Include="Archives\Prototypes\" />
     <Folder Include="Files\OutputSamples\" />
   </ItemGroup>
 
