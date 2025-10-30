@@ -120,7 +120,7 @@ namespace Music.Generate
             cbAccidental.SelectedIndex = 0; // Natural
             cbPattern.SelectedIndex = 0;    // Set Notes                                            
         }
-        public static DesignClass? SetDefaults(CheckedListBox cbPart, NumericUpDown numEndBar, NumericUpDown numNumberOfNotes, RadioButton rbPitchAbsolute, ComboBox cbStep, ComboBox cbAccidental, ComboBox cbPattern, Label lblEndBarTotal)
+        public static DesignClass? SetDefaultDesignAndGenerate(CheckedListBox cbPart, NumericUpDown numEndBar, NumericUpDown numNumberOfNotes, RadioButton rbPitchAbsolute, ComboBox cbStep, ComboBox cbAccidental, ComboBox cbPattern, Label lblEndBarTotal)
         {
             Globals.Design ??= new DesignClass();
             DesignDefaults.ApplyDefaultDesign(Globals.Design);

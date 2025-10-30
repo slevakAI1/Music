@@ -66,7 +66,6 @@ namespace Music.Generate
             // Persist current control state and pass the captured DTO to PatternSetNotes.
             // All control-to-primitive mapping/logic is handled inside PatternSetNotes.Apply(Score, GenerationData).
             _GenerationData = CaptureFormData();
-
             if (_GenerationData != null)
             {
                 PatternSetNotes.Apply(_score!, _GenerationData);
@@ -77,7 +76,7 @@ namespace Music.Generate
         // SET DESIGN AND GENERATE DEFAULTS
         private void btnSetDefault_Click(object? sender, EventArgs e)
         {
-            _design = GenerateFormHelper.SetDefaults(
+            _design = GenerateFormHelper.SetDefaultDesignAndGenerate(
                 cbPart, 
                 numEndBar, 
                 numNumberOfNotes, 
