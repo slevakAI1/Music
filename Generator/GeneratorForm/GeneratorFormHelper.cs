@@ -54,7 +54,7 @@ namespace Music.Generate
         // New: merge design-driven defaults into an existing GeneratorData instance.
         // This does not blindly overwrite unrelated persisted fields — it seeds or clamps
         // only the values the design is authoritative for (available part names, end bar, and related flags).
-        public static void UpdateGeneratorControlsFromDesign(GeneratorData data, DesignerData? design)
+        public static void UpdateGeneratorDataFromDesignData(GeneratorData data, DesignerData? design)
         {
             if (data == null) return;
 

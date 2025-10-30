@@ -12,7 +12,6 @@ namespace Music.Generate
         private Score? _score;
         private DesignerData? _design;
 
-        // CORRECT
         public GeneratorForm()
         {
             InitializeComponent();
@@ -28,13 +27,11 @@ namespace Music.Generate
             _score = Globals.Score;
             _design = Globals.Design;
 
-            // Initialize local FormData and capture the initial control state
-            // - this will get any control default values
-            // Persist defaults into Globals 
+            // Capture form control values manually set in the form designer
+            // This will only be done once, at form construction time.
             Globals.GenerationData ??= CaptureFormData();
         }
 
-        // CORRECT
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
@@ -49,22 +46,24 @@ namespace Music.Generate
         {
             base.OnActivated(e);
 
-            // Ensure there is a DTO to update and re-apply to controls
-            Globals.GenerationData ??= new GeneratorData();
+            // Merge in any design changes that may have happened while outside this form
+            GeneratorFormHelper.UpdateGeneratorDataFromDesignData(Globals.GenerationData, _design);
 
-            // Merge design-driven values into the DTO first (available parts, end-bar clamp/seed, flags)
-            GeneratorFormHelper.UpdateGeneratorControlsFromDesign(Globals.GenerationData, _design);
-
-            // Now update controls that depend on the design (parts list and end-bar label)
-            // Populate the parts list so ApplyFormData has consistent items to operate on.
-            GeneratorFormHelper.UpdatePartsControlFromDesign(cbPart, _design);
-            GeneratorFormHelper.UpdateEndBarTotalControlFromDesign(lblEndBarTotal, _design);
-
-            // Re-apply any persisted form data (now merged with design-driven values)
+            // Update the form to take into account any design changes
             if (Globals.GenerationData != null)
                ApplyFormData(Globals.GenerationData);
         }
 
+        // Persist current control state whenever the form loses activation (user switches to another MDI child)
+        protected override void OnDeactivate(EventArgs e)
+        {
+            base.OnDeactivate(e);
+            GeneratorFormHelper.UpdateGeneratorDataFromDesignData(Globals.GenerationData, _design);
+            ApplyFormData(Globals.GenerationData);
+        }
+
+        //===========================================================================================
+        
         private void btnApplySetNotes_Click(object sender, EventArgs e)
         {
             // Persist current control state and pass the captured DTO to PatternSetNotes.
