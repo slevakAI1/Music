@@ -57,7 +57,7 @@ namespace Music.Generate
             //    ApplyFormData(_GenerationData);
         }
 
-        private void btnApply_Click(object sender, EventArgs e)
+        private void btnApplySetNotes_Click(object sender, EventArgs e)
         {
             // Persist current control state and pass the captured DTO to PatternSetNotes.
             // All control-to-primitive mapping/logic is handled inside PatternSetNotes.Apply(Score, GenerationData).

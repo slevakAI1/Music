@@ -511,7 +511,7 @@ namespace Music.Generate
             btnApply.Size = new Size(215, 29);
             btnApply.TabIndex = 4;
             btnApply.Text = "Appy Set Notes";
-            btnApply.Click += btnApply_Click;
+            btnApply.Click += btnApplySetNotes_Click;
             // 
             // lblStatus
             // 
