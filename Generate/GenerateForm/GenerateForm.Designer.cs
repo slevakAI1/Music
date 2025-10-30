@@ -677,7 +677,7 @@ namespace Music.Generate
             btnSetDefaults.TabIndex = 8;
             btnSetDefaults.Text = "Set Design + Generate Form Defaults";
             btnSetDefaults.UseVisualStyleBackColor = true;
-            btnSetDefaults.Click += btnSetDefault_Click;
+            btnSetDefaults.Click += btnSetDefaultsDesignAndGeneration_Click;
             // 
             // btnNewScore
             // 

@@ -106,30 +106,6 @@ namespace Music.Generate
             cbAccidental.SelectedIndex = 0; // Natural
             cbPattern.SelectedIndex = 0;    // Set Notes                                            
         }
-        public static DesignClass? SetDefaultDesignAndGenerate(CheckedListBox cbPart, NumericUpDown numEndBar, NumericUpDown numNumberOfNotes, RadioButton rbPitchAbsolute, ComboBox cbStep, ComboBox cbAccidental, ComboBox cbPattern, Label lblEndBarTotal)
-        {
-            Globals.Design ??= new DesignClass();
-            DesignDefaults.ApplyDefaultDesign(Globals.Design);
-
-            // Call into helper SetDefaultsForGenerate using the global design (mirrors original)
-            SetDefaultsForGenerate(
-                Globals.Design, 
-                cbPart, 
-                numEndBar, 
-                numNumberOfNotes, 
-                rbPitchAbsolute, 
-                cbStep, 
-                cbAccidental, 
-                cbPattern);
-            //cbNoteValue.SelectedItem = "Quarter (1/4)";
-
-            // Refresh parts and end-total UI - keep same sequence as original method
-            PopulatePartsFromDesign(cbPart, Globals.Design);
-            LoadEndBarTotalFromDesign(lblEndBarTotal, Globals.Design);
-
-            // Return the design so the form can update its local cache
-            return Globals.Design;
-        }
 
         public static Score? NewScore(
             Form owner, 

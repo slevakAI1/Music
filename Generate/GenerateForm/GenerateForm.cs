@@ -29,10 +29,6 @@ namespace Music.Generate
             _score = Globals.Score;
             _design = Globals.Design;
 
-            // Load static note-value choices once (they do not change during runtime).
-            // InitializeComponent has created `cbNoteValue`, so it's safe to call here.
-            GenerateFormHelper.LoadNoteValues(cbNoteValue);
-
             // Initialize local FormData and capture the initial control state
             // - this will get any control default values
             _GenerationData = CaptureFormData();
@@ -74,17 +70,37 @@ namespace Music.Generate
         }
 
         // SET DESIGN AND GENERATE DEFAULTS
-        private void btnSetDefault_Click(object? sender, EventArgs e)
+        private void btnSetDefaultsDesignAndGeneration_Click(object? sender, EventArgs e)
         {
-            _design = GenerateFormHelper.SetDefaultDesignAndGenerate(
-                cbPart, 
-                numEndBar, 
-                numNumberOfNotes, 
-                rbPitchAbsolute, 
-                cbStep, 
-                cbAccidental, 
-                cbPattern, 
-                lblEndBarTotal);
+            Globals.Design ??= new DesignClass();
+            DesignDefaults.ApplyDefaultDesign(Globals.Design);
+
+            // Call into helper SetDefaultsForGenerate using the global design (mirrors original)
+            GenerateFormHelper.SetDefaultsForGenerate(
+                Globals.Design,
+                cbPart,
+                numEndBar,
+                numNumberOfNotes,
+                rbPitchAbsolute,
+                cbStep,
+                cbAccidental,
+                cbPattern);
+            //cbNoteValue.SelectedItem = "Quarter (1/4)";
+
+            // Refresh parts and end-total UI - keep same sequence as original method
+            GenerateFormHelper.PopulatePartsFromDesign(cbPart, Globals.Design);
+            GenerateFormHelper.LoadEndBarTotalFromDesign(lblEndBarTotal, Globals.Design);
+
+            //====================== old 
+            //_design = GenerateFormHelper.SetDefaultDesignAndGenerate(
+            //    cbPart, 
+            //    numEndBar, 
+            //    numNumberOfNotes, 
+            //    rbPitchAbsolute, 
+            //    cbStep, 
+            //    cbAccidental, 
+            //    cbPattern, 
+            //    lblEndBarTotal);
 
             // Refresh UI elements that depend on the design
             GenerateFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, _design);
