@@ -2,6 +2,6 @@
 {
     public class VoiceClass
     {
-        public required string VoiceName {get; set;}
+        public required string PartName {get; set;}
     }
 }

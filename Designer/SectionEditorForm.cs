@@ -600,8 +600,8 @@ namespace Music.Design
         private void ApplyDefaultSections()
         {
             var defaults = new SectionTimelineClass();
-            var defBuilder = new SectionDefaultsClass();
-            defBuilder.CreateTestSections(defaults);
+            var defBuilder = new SectionTests();
+            defBuilder.SetTestSectionsD1(defaults);
 
             _working.Clear();
             foreach (var s in defaults.Sections)

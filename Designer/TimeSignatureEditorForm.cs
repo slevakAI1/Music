@@ -594,7 +594,7 @@ namespace Music.Design
 
         private void ApplyDefaultTimeline()
         {
-            var defaults = TimeSignatureDefault.BuildDefaultTimeline();
+            var defaults = TimeSignatureTests.CreateTestTimelineD1();
 
             _working.Clear();
             foreach (var e in defaults.Events)

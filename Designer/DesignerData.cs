@@ -8,7 +8,7 @@
         public string DesignId { get; }
 
         // Design Space
-        public VoiceSetClass VoiceSet { get; set; } = new();
+        public PartSetClass PartSet { get; set; } = new();
 
         public SectionTimelineClass SectionSet { get; set; } = new();
 

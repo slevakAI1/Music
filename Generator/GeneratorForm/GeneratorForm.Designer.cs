@@ -109,8 +109,9 @@ namespace Music.Generate
             chkTieAcross = new CheckBox();
             chkFermata = new CheckBox();
             label2 = new Label();
-            btnSetDefaults = new Button();
+            btnSetGeneratorTestScenarioG1 = new Button();
             btnNewScore = new Button();
+            btnSetDesignTestScenarioD1 = new Button();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -506,7 +507,7 @@ namespace Music.Generate
             // 
             // btnApplySetNotes
             // 
-            btnApplySetNotes.Location = new Point(537, 155);
+            btnApplySetNotes.Location = new Point(537, 216);
             btnApplySetNotes.Name = "btnApplySetNotes";
             btnApplySetNotes.Size = new Size(215, 29);
             btnApplySetNotes.TabIndex = 4;
@@ -516,7 +517,7 @@ namespace Music.Generate
             // lblStatus
             // 
             lblStatus.AutoSize = true;
-            lblStatus.Location = new Point(537, 205);
+            lblStatus.Location = new Point(537, 266);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(42, 15);
             lblStatus.TabIndex = 5;
@@ -669,19 +670,19 @@ namespace Music.Generate
             label2.TabIndex = 7;
             label2.Text = "Pattern";
             // 
-            // btnSetDefaults
+            // btnSetGeneratorTestScenarioG1
             // 
-            btnSetDefaults.Location = new Point(543, 68);
-            btnSetDefaults.Name = "btnSetDefaults";
-            btnSetDefaults.Size = new Size(209, 31);
-            btnSetDefaults.TabIndex = 8;
-            btnSetDefaults.Text = "Set Design + Generate Form Defaults";
-            btnSetDefaults.UseVisualStyleBackColor = true;
-            btnSetDefaults.Click += btnSetDefaultsDesignAndGeneration_Click;
+            btnSetGeneratorTestScenarioG1.Location = new Point(543, 130);
+            btnSetGeneratorTestScenarioG1.Name = "btnSetGeneratorTestScenarioG1";
+            btnSetGeneratorTestScenarioG1.Size = new Size(209, 31);
+            btnSetGeneratorTestScenarioG1.TabIndex = 8;
+            btnSetGeneratorTestScenarioG1.Text = "Set Generator - Test Scenario G1";
+            btnSetGeneratorTestScenarioG1.UseVisualStyleBackColor = true;
+            btnSetGeneratorTestScenarioG1.Click += btnSetGeneratorTestScenarioG1_Click;
             // 
             // btnNewScore
             // 
-            btnNewScore.Location = new Point(539, 110);
+            btnNewScore.Location = new Point(539, 171);
             btnNewScore.Name = "btnNewScore";
             btnNewScore.Size = new Size(213, 32);
             btnNewScore.TabIndex = 9;
@@ -689,11 +690,22 @@ namespace Music.Generate
             btnNewScore.UseVisualStyleBackColor = true;
             btnNewScore.Click += btnNewScore_Click;
             // 
+            // btnSetDesignTestScenarioD1
+            // 
+            btnSetDesignTestScenarioD1.Location = new Point(543, 93);
+            btnSetDesignTestScenarioD1.Name = "btnSetDesignTestScenarioD1";
+            btnSetDesignTestScenarioD1.Size = new Size(209, 31);
+            btnSetDesignTestScenarioD1.TabIndex = 10;
+            btnSetDesignTestScenarioD1.Text = "Set Design - Test Scenario D1";
+            btnSetDesignTestScenarioD1.UseVisualStyleBackColor = true;
+            btnSetDesignTestScenarioD1.Click += btnSetDesignTestScenarioD1_Click;
+            // 
             // GeneratorForm
             // 
             ClientSize = new Size(832, 701);
+            Controls.Add(btnSetDesignTestScenarioD1);
             Controls.Add(btnNewScore);
-            Controls.Add(btnSetDefaults);
+            Controls.Add(btnSetGeneratorTestScenarioG1);
             Controls.Add(label2);
             Controls.Add(groupBox1);
             Controls.Add(lblTitle);
@@ -754,7 +766,8 @@ namespace Music.Generate
         private Label label3;
         private NumericUpDown numNumberOfNotes;
         private Label label2;
-        private Button btnSetDefaults;
+        private Button btnSetGeneratorTestScenarioG1;
         private Button btnNewScore;
+        private Button btnSetDesignTestScenarioD1;
     }
 }

@@ -1,28 +1,28 @@
 namespace Music.Design
 {
     // Holds the collection of voices used by the score
-    public sealed class VoiceSetClass
+    public sealed class PartSetClass
     {
-        public List<VoiceClass> Voices { get; set; } = new();
+        public List<VoiceClass> Parts { get; set; } = new();
 
-        public void Reset() => Voices.Clear();
+        public void Reset() => Parts.Clear();
 
         public void AddVoice(string voiceName)
         {
             if (string.IsNullOrWhiteSpace(voiceName))
                 throw new ArgumentException("Voice name must not be null or empty.", nameof(voiceName));
 
-            var voice = new VoiceClass { VoiceName = voiceName };
-            Voices.Add(voice);
+            var voice = new VoiceClass { PartName = voiceName };
+            Parts.Add(voice);
         }
 
-        public IReadOnlyList<VoiceClass> AddDefaultVoices()
+        public IReadOnlyList<VoiceClass> SetTestVoicesD1()
         {
             AddVoice("Guitar");
             AddVoice("Flute");
             AddVoice("Keyboard");
             AddVoice("Base Guitar"); // per requirement
-            return Voices;
+            return Parts;
         }
     }
 }

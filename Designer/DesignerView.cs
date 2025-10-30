@@ -15,10 +15,10 @@ namespace Music.Design
             // VOICES
             sb.Append("VOICES:\r\n");
             var first = true;
-            foreach (var v in design.VoiceSet.Voices)
+            foreach (var v in design.PartSet.Parts)
             {
                 if (!first) sb.Append("\r\n");
-                sb.Append(v?.VoiceName ?? string.Empty);
+                sb.Append(v?.PartName ?? string.Empty);
                 first = false;
             }
 

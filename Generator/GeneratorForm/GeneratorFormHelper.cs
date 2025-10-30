@@ -9,47 +9,47 @@ namespace Music.Generate
 {
     internal static class GeneratorFormHelper
     {
-        public static void UpdatePartsControlFromDesign(CheckedListBox cbPart, DesignerData? design)
-        {
-            // Preserve currently checked part names so we can re-apply them after repopulating.
-            var previouslyChecked = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var item in cbPart.CheckedItems.Cast<object?>())
-            {
-                var name = item?.ToString();
-                if (!string.IsNullOrWhiteSpace(name))
-                    previouslyChecked.Add(name!);
-            }
+        //public static void UpdatePartsControlFromDesign(CheckedListBox cbPart, DesignerData? design)
+        //{
+        //    // Preserve currently checked part names so we can re-apply them after repopulating.
+        //    var previouslyChecked = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        //    foreach (var item in cbPart.CheckedItems.Cast<object?>())
+        //    {
+        //        var name = item?.ToString();
+        //        if (!string.IsNullOrWhiteSpace(name))
+        //            previouslyChecked.Add(name!);
+        //    }
 
-            // Always rebuild the list from the design (clear then add).
-            cbPart.Items.Clear();
+        //    // Always rebuild the list from the design (clear then add).
+        //    cbPart.Items.Clear();
 
-            // Use the provided design instance (no Globals access here)
-            if (design?.VoiceSet?.Voices != null)
-            {
-                foreach (var v in design.VoiceSet.Voices)
-                {
-                    var name = v?.VoiceName ?? string.Empty;
-                    if (!string.IsNullOrWhiteSpace(name))
-                    {
-                        cbPart.Items.Add(name);
-                        // Re-apply previously checked state (or any state set by callers before this refresh)
-                        if (previouslyChecked.Contains(name))
-                            cbPart.SetItemChecked(cbPart.Items.Count - 1, true);
-                    }
-                }
-            }
-        }
+        //    // Use the provided design instance (no Globals access here)
+        //    if (design?.VoiceSet?.Voices != null)
+        //    {
+        //        foreach (var v in design.VoiceSet.Voices)
+        //        {
+        //            var name = v?.VoiceName ?? string.Empty;
+        //            if (!string.IsNullOrWhiteSpace(name))
+        //            {
+        //                cbPart.Items.Add(name);
+        //                // Re-apply previously checked state (or any state set by callers before this refresh)
+        //                if (previouslyChecked.Contains(name))
+        //                    cbPart.SetItemChecked(cbPart.Items.Count - 1, true);
+        //            }
+        //        }
+        //    }
+        //}
 
-        public static void UpdateEndBarTotalControlFromDesign(Label lblEndBarTotal, DesignerData? design)
-        {
-            // Always refresh the label when called (caller ensures this runs on activate)
-            var total = design?.SectionSet?.TotalBars ?? 0;
-            if (total > 0)
-                // show as a simple slash + total (appears right of the End Bar control)
-                lblEndBarTotal.Text = $"/ {total}";
-            else
-                lblEndBarTotal.Text = string.Empty;
-        }
+        //public static void UpdateEndBarTotalControlFromDesign(Label lblEndBarTotal, DesignerData? design)
+        //{
+        //    // Always refresh the label when called (caller ensures this runs on activate)
+        //    var total = design?.SectionSet?.TotalBars ?? 0;
+        //    if (total > 0)
+        //        // show as a simple slash + total (appears right of the End Bar control)
+        //        lblEndBarTotal.Text = $"/ {total}";
+        //    else
+        //        lblEndBarTotal.Text = string.Empty;
+        //}
 
         // New: merge design-driven defaults into an existing GeneratorData instance.
         // This does not blindly overwrite unrelated persisted fields — it seeds or clamps
@@ -60,11 +60,11 @@ namespace Music.Generate
 
             // Build set of available part names from the design
             var available = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            if (design?.VoiceSet?.Voices != null)
+            if (design?.PartSet?.Parts != null)
             {
-                foreach (var v in design.VoiceSet.Voices)
+                foreach (var v in design.PartSet.Parts)
                 {
-                    var name = v?.VoiceName;
+                    var name = v?.PartName;
                     if (!string.IsNullOrWhiteSpace(name))
                         available.Add(name!);
                 }
@@ -103,17 +103,17 @@ namespace Music.Generate
 
         // NOTE: This helper now builds and returns GenerationData instead of manipulating controls.
         // The caller (form) should apply the returned GenerationData to controls via ApplyFormData(...)
-        public static GeneratorData SetDefaultsForGenerate(DesignerData? design)
+        public static GeneratorData SetTestGeneratorG1(DesignerData? design)
         {
             var data = new GeneratorData();
 
             // Parts: select all named voices from the design
             var partNames = new List<string>();
-            if (design?.VoiceSet?.Voices != null)
+            if (design?.PartSet?.Parts != null)
             {
-                foreach (var v in design.VoiceSet.Voices)
+                foreach (var v in design.PartSet.Parts)
                 {
-                    var name = v?.VoiceName;
+                    var name = v?.PartName;
                     if (!string.IsNullOrWhiteSpace(name))
                         partNames.Add(name!);
                 }
@@ -171,11 +171,11 @@ namespace Music.Generate
 
             // Collect part names from design voices (same logic as PopulatePartsFromDesign)
             var partNames = new List<string>();
-            if (usedDesign.VoiceSet?.Voices != null)
+            if (usedDesign.PartSet?.Parts != null)
             {
-                foreach (var v in usedDesign.VoiceSet.Voices)
+                foreach (var v in usedDesign.PartSet.Parts)
                 {
-                    var name = v?.VoiceName;
+                    var name = v?.PartName;
                     if (!string.IsNullOrWhiteSpace(name))
                         partNames.Add(name);
                 }
@@ -288,12 +288,7 @@ namespace Music.Generate
                 // Swallow any exceptions from optional tempo application; don't block main operation.
             }
 
-            // Refresh UI that depends on design/parts
-            UpdatePartsControlFromDesign(cbPart, usedDesign);
-            UpdateEndBarTotalControlFromDesign(lblEndBarTotal, usedDesign);
-
             MessageBox.Show(owner, "New score created from design.", "New Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
             return score;
         }
     }

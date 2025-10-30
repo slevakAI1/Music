@@ -63,14 +63,14 @@ namespace Music
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 var score = Globals.Design!;
-                var existing = new HashSet<string>(score.VoiceSet.Voices.Select(v => v.VoiceName),
+                var existing = new HashSet<string>(score.PartSet.Parts.Select(v => v.PartName),
                     StringComparer.OrdinalIgnoreCase);
 
                 foreach (var name in dlg.SelectedVoices)
                 {
                     if (!existing.Contains(name))
                     {
-                        score.VoiceSet.AddVoice(name);
+                        score.PartSet.AddVoice(name);
                         existing.Add(name);
                     }
                 }
@@ -131,7 +131,7 @@ namespace Music
         {
             // Ensure we have a design to work with
             var design = Globals.Design ??= new DesignerData();
-            Music.Design.DesignerDefaults.ApplyDefaultDesign(design);
+            Music.Design.DesignerTests.SetTestDesignD1(design);
             RefreshDesignSpaceIfReady();
         }
 
@@ -147,7 +147,7 @@ namespace Music
                 var snapshot = new
                 {
                     design.DesignId,
-                    design.VoiceSet,
+                    design.PartSet,
                     design.SectionSet,
                     design.HarmonicTimeline,
                     design.TempoTimeline,

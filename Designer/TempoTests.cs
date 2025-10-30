@@ -3,9 +3,9 @@ using Music.Design;
 namespace Music.Design
 {
     // Builds the app's default tempo timeline (single 90 BPM event starting at bar 1).
-    public static class TempoDefault
+    public static class TempoTests
     {
-        public static TempoTimeline BuildDefaultTimeline()
+        public static TempoTimeline CreateTestTimelineD1()
         {
             var timeline = new TempoTimeline();
             // Single event covering the entire song length
@@ -13,8 +13,8 @@ namespace Music.Design
             {
                 StartBar = 1,
                 StartBeat = 1,
-                TempoBpm = DesignerDefaults.DefaultTempoBpm,
-                DurationBeats = DesignerDefaults.TotalBars * timeline.BeatsPerBar
+                TempoBpm = DesignerTests.DefaultTempoBpm,
+                DurationBeats = DesignerTests.TotalBars * timeline.BeatsPerBar
             });
 
             return timeline;

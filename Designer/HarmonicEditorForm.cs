@@ -727,7 +727,7 @@ namespace Music.Design
 
         private void ApplyDefaultTimeline()
         {
-            var defaults = HarmonicDefault.BuildDefaultTimeline();
+            var defaults = HarmonicTests.CreateTestTimelineD1();
 
             _working.Clear();
             _beatsPerBar = Math.Max(1, defaults.BeatsPerBar);

@@ -1,12 +1,12 @@
 namespace Music.Design
 {
     // Builds the app's default harmonic timeline (48 bars).
-    public static class HarmonicDefault
+    public static class HarmonicTests
     {
-        public static HarmonicTimeline BuildDefaultTimeline()
+        public static HarmonicTimeline CreateTestTimelineD1()
         {
             var timeline = new HarmonicTimeline();
-            timeline.ConfigureGlobal(DesignerDefaults.GlobalTimeSignature);
+            timeline.ConfigureGlobal(DesignerTests.GlobalTimeSignature);
 
             // Common 4-chord loop: I – V – vi – IV, one chord per bar across 48 bars.
             var pattern = new (int degree, string quality)[]
@@ -17,7 +17,7 @@ namespace Music.Design
                 (4, "maj")
             };
 
-            for (int bar = 1; bar <= DesignerDefaults.TotalBars; bar++)
+            for (int bar = 1; bar <= DesignerTests.TotalBars; bar++)
             {
                 var p = pattern[(bar - 1) % pattern.Length];
                 Add(timeline, bar, key: "C major", degree: p.degree, quality: p.quality);

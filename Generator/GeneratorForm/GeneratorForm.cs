@@ -21,7 +21,7 @@ namespace Music.Generate
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.Manual;
-           
+
             // Load current global score and design into form-local fields for later use
             // Constructor is the only place that reads Globals per requirement.
             _score = Globals.Score;
@@ -62,7 +62,7 @@ namespace Music.Generate
         }
 
         //===========================================================================================
-        
+
         private void btnApplySetNotes_Click(object sender, EventArgs e)
         {
             // Persist current control state and pass the captured DTO to PatternSetNotes.
@@ -75,26 +75,7 @@ namespace Music.Generate
             }
         }
 
-        // SET DESIGN OBJECT AND GENERATION FORM DEFAULTS
-        private void btnSetDefaultsDesignAndGeneration_Click(object? sender, EventArgs e)
-        {
-            // Ensure design exists and apply design defaults
-            Globals.Design ??= new DesignerData();
-            DesignerDefaults.ApplyDefaultDesign(Globals.Design);
 
-            // Refresh parts and end-total UI from the design
-            GeneratorFormHelper.UpdatePartsControlFromDesign(cbPart, Globals.Design);
-            GeneratorFormHelper.UpdateEndBarTotalControlFromDesign(lblEndBarTotal, Globals.Design);
-
-            // ==========================================================================================
-
-            // Get GenerationData defaults from helper (no UI controls passed)
-            Globals.GenerationData = GeneratorFormHelper.SetDefaultsForGenerate(Globals.Design);
-
-            // Apply the generated defaults into the form controls via the existing method
-            if (Globals.GenerationData != null)
-                ApplyFormData(Globals.GenerationData);
-        }
 
         private void btnNewScore_Click(object sender, EventArgs e)
         {
@@ -256,6 +237,28 @@ namespace Music.Generate
             var max = (int)control.Maximum;
             var clamped = Math.Max(min, Math.Min(max, value));
             return (decimal)clamped;
+        }
+
+        // This sets design test scenario D1
+        private void btnSetDesignTestScenarioD1_Click(object sender, EventArgs e)
+        {
+            // Ensure design exists and apply design defaults
+            Globals.Design ??= new DesignerData();
+            DesignerTests.SetTestDesignD1(Globals.Design);
+        }
+
+        // This sets generator test scenario G1
+        // Description: Set generator test values using the current design (in Globals)
+        private void btnSetGeneratorTestScenarioG1_Click(object sender, EventArgs e)
+        {
+            // Merge in any design changes
+            GeneratorFormHelper.UpdateGeneratorDataFromDesignData(Globals.GenerationData, _design);
+
+            // Get GenerationData defaults from helper (no UI controls passed)
+            Globals.GenerationData = GeneratorFormHelper.SetTestGeneratorG1(Globals.Design);
+
+            // Apply the generated defaults into the form controls via the existing method
+            ApplyFormData(Globals.GenerationData);
         }
     }
 }
