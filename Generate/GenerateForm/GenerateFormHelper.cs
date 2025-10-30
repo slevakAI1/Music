@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using MusicXml.Domain;
 using Music.Design;
+using MusicXml.Domain;
 
 namespace Music.Generate
 {
@@ -61,57 +61,53 @@ namespace Music.Generate
             LoadEndBarTotalFromDesign(lblEndBarTotal, design);
         }
 
-        public static void SetDefaultsForGenerate(DesignClass? design, CheckedListBox cbPart, NumericUpDown numEndBar, NumericUpDown numNumberOfNotes, RadioButton rbPitchAbsolute, ComboBox cbStep, ComboBox cbAccidental, ComboBox cbPattern)
+        // NOTE: This helper now builds and returns GenerationData instead of manipulating controls.
+        // The caller (form) should apply the returned GenerationData to controls via ApplyFormData(...)
+        public static GenerationData SetDefaultsForGenerate(DesignClass? design)
         {
-            // Ensure parts are populated
-            PopulatePartsFromDesign(cbPart, design);
+            var data = new GenerationData();
 
-
-            //      S E L E C T   K E Y B O A R D   O N L Y
-
-            // Ensure "Keyboard" voice exists and select it
-            //var idx = cbPart.Items.IndexOf("Keyboard");
-            //if (idx == -1)
-            //{
-            //    cbPart.Items.Add("Keyboard");
-            //    idx = cbPart.Items.Count - 1;
-            //}
-            //// check the first matching item (CheckedListBox uses SetItemChecked)
-            //if (idx >= 0)
-            //    cbPart.SetItemChecked(idx, true);
-
-
-            //      S E L E C T   A L L   V O I C E S
-            // Check every non-empty item in the parts CheckedListBox
-            for (int i = 0; i < cbPart.Items.Count; i++)
+            // Parts: select all named voices from the design
+            var partNames = new List<string>();
+            if (design?.VoiceSet?.Voices != null)
             {
-                var name = cbPart.Items[i]?.ToString();
-                if (!string.IsNullOrWhiteSpace(name))
-                    cbPart.SetItemChecked(i, true);
+                foreach (var v in design.VoiceSet.Voices)
+                {
+                    var name = v?.VoiceName;
+                    if (!string.IsNullOrWhiteSpace(name))
+                        partNames.Add(name!);
+                }
             }
 
+            data.SelectedParts = partNames;
+            data.AllPartsChecked = partNames.Count > 0;
+            data.AllStaffChecked = true; // keep previous behavior of checking "All staff" by default
 
-            // Set End Bar to design total (clamped inside numEndBar range)
-            var total = design?.SectionSet?.TotalBars ?? Globals.Design?.SectionSet?.TotalBars ?? 0;
+            // End bar: default to design total bars when available
+            var total = design?.SectionSet?.TotalBars ?? 0;
             if (total > 0)
-            {
-                var clamped = Math.Max((int)numEndBar.Minimum, Math.Min((int)numEndBar.Maximum, total));
-                numEndBar.Value = clamped;
-            }
+                data.EndBar = total;
+            else
+                data.EndBar = null;
 
-            // Other control defaults
-            numNumberOfNotes.Value = 4;
-            rbPitchAbsolute.Checked = true;
-            cbStep.SelectedIndex = 0;       // C
-            cbAccidental.SelectedIndex = 0; // Natural
-            cbPattern.SelectedIndex = 0;    // Set Notes                                            
+            // Other control defaults (mirror previous behavior)
+            data.NumberOfNotes = 4;
+            data.PitchAbsolute = true;
+            data.Step = "C";             // matches cbStep default index 0
+            data.Accidental = "Natural"; // matches cbAccidental default index 0
+            data.Pattern = "Set Note";   // matches cbPattern which contained "Set Note"
+
+            // Staff default
+            data.Staff = 1;
+
+            return data;
         }
 
         public static Score? NewScore(
-            Form owner, 
-            DesignClass? 
-            design, 
-            CheckedListBox cbPart, 
+            Form owner,
+            DesignClass?
+            design,
+            CheckedListBox cbPart,
             Label lblEndBarTotal)
         {
             // Create a fresh Score instance and assign to the local cache (returned to caller)

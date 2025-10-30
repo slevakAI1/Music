@@ -72,30 +72,21 @@ namespace Music.Generate
         // SET DESIGN OBJECT AND GENERATION FORM DEFAULTS
         private void btnSetDefaultsDesignAndGeneration_Click(object? sender, EventArgs e)
         {
+            // Ensure design exists and apply design defaults
             Globals.Design ??= new DesignClass();
             DesignDefaults.ApplyDefaultDesign(Globals.Design);
 
-            // Call into helper SetDefaultsForGenerate using the global design (mirrors original)
-            GenerateFormHelper.SetDefaultsForGenerate(
-                Globals.Design,
-                cbPart,
-                numEndBar,
-                numNumberOfNotes,
-                rbPitchAbsolute,
-                cbStep,
-                cbAccidental,
-                cbPattern);
-            //cbNoteValue.SelectedItem = "Quarter (1/4)";
+            // Refresh parts and end-total UI from the design
+            GenerateFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, Globals.Design);
 
-            // Refresh parts and end-total UI - keep same sequence as original method
-            GenerateFormHelper.PopulatePartsFromDesign(cbPart, Globals.Design);
-            GenerateFormHelper.LoadEndBarTotalFromDesign(lblEndBarTotal, Globals.Design);
+            // ==========================================================================================
 
-            // Refresh UI elements that depend on the design
-            GenerateFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, _design);
+            // Get GenerationData defaults from helper (no UI controls passed)
+            _GenerationData = GenerateFormHelper.SetDefaultsForGenerate(Globals.Design);
 
-            // Persist the control state after defaults are applied
-            //_GenerationData = CaptureFormData();
+            // Apply the generated defaults into the form controls via the existing method
+            if (_GenerationData != null)
+                ApplyFormData(_GenerationData);
         }
 
         private void btnNewScore_Click(object sender, EventArgs e)
