@@ -50,8 +50,7 @@ namespace Music.Generate
             GeneratorFormHelper.UpdateGeneratorDataFromDesignData(Globals.GenerationData, _design);
 
             // Update the form to take into account any design changes
-            if (Globals.GenerationData != null)
-               ApplyFormData(Globals.GenerationData);
+            ApplyFormData(Globals.GenerationData);
         }
 
         // Persist current control state whenever the form loses activation (user switches to another MDI child)
