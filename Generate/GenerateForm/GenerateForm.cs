@@ -42,19 +42,20 @@ namespace Music.Generate
                 this.WindowState = FormWindowState.Maximized;
         }
 
+
+        // TODO THIS ALL NEEDS WORK. SHOULD BE USING THE OBJECTS MORE!!!
+
         // Updated: avoid overwriting design-driven UI when re-applying persisted data.
         protected override void OnActivated(EventArgs e)
         {
             base.OnActivated(e);
             // NOTE!: This will need to be revisited when allowed to edit voices, measures later
             // Refresh all UI that depends on the current design (parts, voices, total bar count)
-            // Note: LoadNoteValues is intentionally NOT called here — it's static and loaded once at construction.
             GenerateFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, _design);
 
             // Re-apply any persisted form data after design-driven refresh
-            // DONT THINK THIS IS NEEDEDYET. KEEP AS COMMENTED FOR NOW.
-            // if (_GenerationData != null)
-            //    ApplyFormData(_GenerationData);
+            if (_GenerationData != null)
+               ApplyFormData(_GenerationData);
         }
 
         private void btnApplySetNotes_Click(object sender, EventArgs e)

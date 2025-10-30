@@ -39,7 +39,7 @@ namespace Music.Generate
         private System.Windows.Forms.Label lblOctaveKR;
         private System.Windows.Forms.NumericUpDown numOctaveKR;
 
-        private System.Windows.Forms.Button btnApply;
+        private System.Windows.Forms.Button btnApplySetNotes;
         private System.Windows.Forms.Label lblStatus;
 
         protected override void Dispose(bool disposing)
@@ -91,7 +91,7 @@ namespace Music.Generate
             numDegree = new NumericUpDown();
             lblOctaveKR = new Label();
             numOctaveKR = new NumericUpDown();
-            btnApply = new Button();
+            btnApplySetNotes = new Button();
             lblStatus = new Label();
             tt = new ToolTip(components);
             groupBox1 = new GroupBox();
@@ -504,14 +504,14 @@ namespace Music.Generate
             numOctaveKR.TabIndex = 3;
             numOctaveKR.Value = new decimal(new int[] { 4, 0, 0, 0 });
             // 
-            // btnApply
+            // btnApplySetNotes
             // 
-            btnApply.Location = new Point(537, 155);
-            btnApply.Name = "btnApply";
-            btnApply.Size = new Size(215, 29);
-            btnApply.TabIndex = 4;
-            btnApply.Text = "Appy Set Notes";
-            btnApply.Click += btnApplySetNotes_Click;
+            btnApplySetNotes.Location = new Point(537, 155);
+            btnApplySetNotes.Name = "btnApplySetNotes";
+            btnApplySetNotes.Size = new Size(215, 29);
+            btnApplySetNotes.TabIndex = 4;
+            btnApplySetNotes.Text = "Appy Set Notes";
+            btnApplySetNotes.Click += btnApplySetNotes_Click;
             // 
             // lblStatus
             // 
@@ -700,7 +700,7 @@ namespace Music.Generate
             Controls.Add(cbPattern);
             Controls.Add(grpTarget);
             Controls.Add(grpPitch);
-            Controls.Add(btnApply);
+            Controls.Add(btnApplySetNotes);
             Controls.Add(lblStatus);
             Name = "GenerateForm";
             Text = "Generate 2 (MusicXML)";
