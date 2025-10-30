@@ -69,7 +69,7 @@ namespace Music.Generate
             }
         }
 
-        // SET DESIGN AND GENERATE DEFAULTS
+        // SET DESIGN OBJECT AND GENERATION FORM DEFAULTS
         private void btnSetDefaultsDesignAndGeneration_Click(object? sender, EventArgs e)
         {
             Globals.Design ??= new DesignClass();
