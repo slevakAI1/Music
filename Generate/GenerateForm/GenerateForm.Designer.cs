@@ -539,7 +539,7 @@ namespace Music.Generate
             groupBox1.Controls.Add(chkFermata);
             groupBox1.Location = new Point(487, 342);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(285, 235);
+            groupBox1.Size = new Size(321, 235);
             groupBox1.TabIndex = 6;
             groupBox1.TabStop = false;
             groupBox1.Text = "Rhythm options";
@@ -565,14 +565,15 @@ namespace Music.Generate
             lblNoteValue.AutoSize = true;
             lblNoteValue.Location = new Point(15, 40);
             lblNoteValue.Name = "lblNoteValue";
-            lblNoteValue.Size = new Size(80, 15);
+            lblNoteValue.Size = new Size(112, 15);
             lblNoteValue.TabIndex = 7;
-            lblNoteValue.Text = "Base Duration";
+            lblNoteValue.Text = "Note Value (Length)";
             // 
             // cbNoteValue
             // 
             cbNoteValue.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbNoteValue.Location = new Point(99, 38);
+            cbNoteValue.Items.AddRange(new object[] { "Whole (1)", "Half (1/2)", "Quarter (1/4)", "Eighth (1/8)", "16th (1/16)" });
+            cbNoteValue.Location = new Point(133, 38);
             cbNoteValue.Name = "cbNoteValue";
             cbNoteValue.Size = new Size(175, 23);
             cbNoteValue.TabIndex = 8;

@@ -38,20 +38,6 @@ namespace Music.Generate
                     }
                 }
             }
-
-            // no automatic checks here beyond re-applying preserved checked names;
-            // callers (e.g., SetDefaults) can explicitly check the Keyboard item if required.
-        }
-
-        public static void LoadNoteValues(ComboBox cbNoteValue)
-        {
-            if (cbNoteValue.Items.Count != 0) return;
-
-            cbNoteValue.DropDownStyle = ComboBoxStyle.DropDownList;
-            foreach (var key in Music.MusicConstants.NoteValueMap.Keys)
-                cbNoteValue.Items.Add(key);
-
-            cbNoteValue.SelectedItem = "Quarter (1/4)";
         }
 
         public static void LoadEndBarTotalFromDesign(Label lblEndBarTotal, DesignClass? design)
@@ -135,6 +121,7 @@ namespace Music.Generate
                 cbStep, 
                 cbAccidental, 
                 cbPattern);
+            //cbNoteValue.SelectedItem = "Quarter (1/4)";
 
             // Refresh parts and end-total UI - keep same sequence as original method
             PopulatePartsFromDesign(cbPart, Globals.Design);
