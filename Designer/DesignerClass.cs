@@ -3,7 +3,7 @@
     /// <summary>
     /// Design structure for a musical score
     /// </summary>
-    public sealed class DesignClass
+    public sealed class DesignerClass
     {
         public string DesignId { get; }
 
@@ -19,7 +19,7 @@
         public TempoTimeline? TempoTimeline { get; set; }
         public TimeSignatureTimeline? TimeSignatureTimeline { get; set; }
 
-        public DesignClass(string? designId = null)
+        public DesignerClass(string? designId = null)
         {
             DesignId = designId ?? Guid.NewGuid().ToString("N");
         }

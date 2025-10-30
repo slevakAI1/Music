@@ -2,7 +2,7 @@ using System.Windows.Forms;
 
 namespace Music
 {
-    public partial class DesignForm
+    public partial class DesignerForm
     {
         private void InitializeComponent()
         {
@@ -144,11 +144,11 @@ namespace Music
             // 
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 26.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label1.Location = new Point(495, 9);
+            label1.Location = new Point(492, 9);
             label1.Name = "label1";
-            label1.Size = new Size(127, 47);
+            label1.Size = new Size(157, 47);
             label1.TabIndex = 22;
-            label1.Text = "Design";
+            label1.Text = "Designer";
             // 
             // panel1
             // 
@@ -166,7 +166,7 @@ namespace Music
             panel2.Size = new Size(138, 191);
             panel2.TabIndex = 24;
             // 
-            // DesignForm
+            // DesignerForm
             // 
             ClientSize = new Size(1085, 804);
             Controls.Add(btnEditVoices);
@@ -184,7 +184,7 @@ namespace Music
             Controls.Add(btnEditSections);
             Controls.Add(panel1);
             Controls.Add(panel2);
-            Name = "DesignForm";
+            Name = "DesignerForm";
             WindowState = FormWindowState.Maximized;
             Load += MusicForm_Load;
             ResumeLayout(false);

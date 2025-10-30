@@ -8,7 +8,7 @@ namespace Music.Design
         public const int DefaultTempoBpm = 112;
 
         // Apply all defaults so the timelines end on the same beat
-        public static void ApplyDefaultDesign(DesignClass design)
+        public static void ApplyDefaultDesign(DesignerClass design)
         {
             // 1) Sections: apply default/test structure
             var sectionsHelper = new SectionDefaultsClass();

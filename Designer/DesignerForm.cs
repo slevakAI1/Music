@@ -2,9 +2,9 @@ using Music.Design;
 
 namespace Music
 {
-    public partial class DesignForm : Form
+    public partial class DesignerForm : Form
     {
-        public DesignForm()
+        public DesignerForm()
         {
             this.Text = "Music";
             this.FormBorderStyle = FormBorderStyle.Sizable;
@@ -25,7 +25,7 @@ namespace Music
 
         private void MusicForm_Load(object sender, EventArgs e)
         {
-            Globals.Design ??= new DesignClass();
+            Globals.Design ??= new DesignerClass();
             PopulateFormFromGlobals();
         }
 
@@ -109,7 +109,7 @@ namespace Music
         private void RefreshDesignSpaceIfReady()
         {
             if (Globals.Design == null) return;
-            txtDesignView.Text = DesignView.CreateDesignView(Globals.Design);
+            txtDesignView.Text = DesignerView.CreateDesignView(Globals.Design);
         }
 
         private void PopulateFormFromGlobals()
@@ -121,7 +121,7 @@ namespace Music
         private void ClearDesignAndForm()
         {
             // Reset the score design (new instance is fine to ensure clean state)
-            Globals.Design = new DesignClass();
+            Globals.Design = new DesignerClass();
 
             // Repopulate the design area headings with no data
             RefreshDesignSpaceIfReady();
@@ -130,7 +130,7 @@ namespace Music
         private void btnSetDefault_Click(object sender, EventArgs e)
         {
             // Ensure we have a design to work with
-            var design = Globals.Design ??= new DesignClass();
+            var design = Globals.Design ??= new DesignerClass();
             Music.Design.DesignDefaults.ApplyDefaultDesign(design);
             RefreshDesignSpaceIfReady();
         }
@@ -199,7 +199,7 @@ namespace Music
                 var json = System.IO.File.ReadAllText(ofd.FileName);
 
                 // Robust manual deserialization to rebuild computed fields
-                var loaded = DesignSerialization.DeserializeDesign(json);
+                var loaded = DesignerSerialization.DeserializeDesign(json);
 
                 Globals.Design = loaded;
 

@@ -9,7 +9,7 @@ namespace Music.Generate
 {
     internal static class GenerationFormHelper
     {
-        public static void PopulatePartsFromDesign(CheckedListBox cbPart, DesignClass? design)
+        public static void PopulatePartsFromDesign(CheckedListBox cbPart, DesignerClass? design)
         {
             // Preserve currently checked part names so we can re-apply them after repopulating.
             var previouslyChecked = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -40,7 +40,7 @@ namespace Music.Generate
             }
         }
 
-        public static void LoadEndBarTotalFromDesign(Label lblEndBarTotal, DesignClass? design)
+        public static void LoadEndBarTotalFromDesign(Label lblEndBarTotal, DesignerClass? design)
         {
             // Always refresh the label when called (caller ensures this runs on activate)
             var total = design?.SectionSet?.TotalBars ?? 0;
@@ -52,7 +52,7 @@ namespace Music.Generate
         }
 
         // New helper to refresh all UI that depends on the current design
-        public static void RefreshFromDesign(CheckedListBox cbPart, Label lblEndBarTotal, DesignClass? design)
+        public static void RefreshFromDesign(CheckedListBox cbPart, Label lblEndBarTotal, DesignerClass? design)
         {
             // NOTE: LoadNoteValues is intentionally NOT called here because note-value items are static
             // and are loaded once during form initialization (GenerateForm constructor).
@@ -63,7 +63,7 @@ namespace Music.Generate
 
         // NOTE: This helper now builds and returns GenerationData instead of manipulating controls.
         // The caller (form) should apply the returned GenerationData to controls via ApplyFormData(...)
-        public static GenerationData SetDefaultsForGenerate(DesignClass? design)
+        public static GenerationData SetDefaultsForGenerate(DesignerClass? design)
         {
             var data = new GenerationData();
 
@@ -108,7 +108,7 @@ namespace Music.Generate
 
         public static Score? NewScore(
             Form owner,
-            DesignClass?
+            DesignerClass?
             design,
             CheckedListBox cbPart,
             Label lblEndBarTotal)

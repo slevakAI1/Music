@@ -2,9 +2,9 @@ using System.Text.Json;
 
 namespace Music.Design
 {
-    internal static class DesignSerialization
+    internal static class DesignerSerialization
     {
-        internal static DesignClass DeserializeDesign(string json)
+        internal static DesignerClass DeserializeDesign(string json)
         {
             var dto = JsonSerializer.Deserialize<DesignDto>(json, new JsonSerializerOptions
             {
@@ -13,7 +13,7 @@ namespace Music.Design
             if (dto == null)
                 throw new InvalidOperationException("Invalid design JSON.");
 
-            var design = new DesignClass(dto.DesignId);
+            var design = new DesignerClass(dto.DesignId);
 
             // Voices (preserve order as given in JSON)
             design.VoiceSet.Reset();
