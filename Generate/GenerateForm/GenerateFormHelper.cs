@@ -97,6 +97,9 @@ namespace Music.Generate
             data.Accidental = "Natural"; // matches cbAccidental default index 0
             data.Pattern = "Set Note";   // matches cbPattern which contained "Set Note"
 
+            // Set default note value (matches designer-loaded cbNoteValue items)
+            data.NoteValue = "Quarter (1/4)";
+
             // Staff default
             data.Staff = 1;
 
