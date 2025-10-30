@@ -6,7 +6,7 @@ namespace Music.Design
         public static HarmonicTimeline BuildDefaultTimeline()
         {
             var timeline = new HarmonicTimeline();
-            timeline.ConfigureGlobal(DesignDefaults.GlobalTimeSignature);
+            timeline.ConfigureGlobal(DesignerDefaults.GlobalTimeSignature);
 
             // Common 4-chord loop: I – V – vi – IV, one chord per bar across 48 bars.
             var pattern = new (int degree, string quality)[]
@@ -17,7 +17,7 @@ namespace Music.Design
                 (4, "maj")
             };
 
-            for (int bar = 1; bar <= DesignDefaults.TotalBars; bar++)
+            for (int bar = 1; bar <= DesignerDefaults.TotalBars; bar++)
             {
                 var p = pattern[(bar - 1) % pattern.Length];
                 Add(timeline, bar, key: "C major", degree: p.degree, quality: p.quality);

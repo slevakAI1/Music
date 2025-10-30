@@ -1,14 +1,14 @@
 namespace Music.Design
 {
     // Central defaults to keep timelines aligned
-    public static class DesignDefaults
+    public static class DesignerDefaults
     {
         public const int TotalBars = 48;
         public const string GlobalTimeSignature = "4/4";
         public const int DefaultTempoBpm = 112;
 
         // Apply all defaults so the timelines end on the same beat
-        public static void ApplyDefaultDesign(DesignerClass design)
+        public static void ApplyDefaultDesign(DesignerData design)
         {
             // 1) Sections: apply default/test structure
             var sectionsHelper = new SectionDefaultsClass();

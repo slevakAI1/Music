@@ -10,7 +10,7 @@ namespace Music.Generate
     public partial class GeneratorForm : Form
     {
         private Score? _score;
-        private DesignerClass? _design;
+        private DesignerData? _design;
         private GeneratorData? _GenerationData;
 
         // CORRECT
@@ -74,8 +74,8 @@ namespace Music.Generate
         private void btnSetDefaultsDesignAndGeneration_Click(object? sender, EventArgs e)
         {
             // Ensure design exists and apply design defaults
-            Globals.Design ??= new DesignerClass();
-            DesignDefaults.ApplyDefaultDesign(Globals.Design);
+            Globals.Design ??= new DesignerData();
+            DesignerDefaults.ApplyDefaultDesign(Globals.Design);
 
             // Refresh parts and end-total UI from the design
             GeneratorFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, Globals.Design);

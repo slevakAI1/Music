@@ -2,10 +2,13 @@ using System.Text;
 
 namespace Music.Design
 {
+    /// <summary>
+    /// THIS IS BASICALLY A DEBUG VIEW FOR THE DESIGN DATA STRUCTURE.
+    /// </summary>
     public static class DesignerView
     {
         // Builds: VOICES + 2 newlines + SECTIONS + 2 newlines + HARMONIC TIMELINE + 2 newlines + ALIGNMENT + 2 newlines + TIME SIGNATURES + 2 newlines + TEMPO
-        public static string CreateDesignView(DesignerClass design)
+        public static string CreateDesignView(DesignerData design)
         {
             var sb = new StringBuilder();
 

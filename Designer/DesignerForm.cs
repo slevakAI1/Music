@@ -25,7 +25,7 @@ namespace Music
 
         private void MusicForm_Load(object sender, EventArgs e)
         {
-            Globals.Design ??= new DesignerClass();
+            Globals.Design ??= new DesignerData();
             PopulateFormFromGlobals();
         }
 
@@ -121,7 +121,7 @@ namespace Music
         private void ClearDesignAndForm()
         {
             // Reset the score design (new instance is fine to ensure clean state)
-            Globals.Design = new DesignerClass();
+            Globals.Design = new DesignerData();
 
             // Repopulate the design area headings with no data
             RefreshDesignSpaceIfReady();
@@ -130,8 +130,8 @@ namespace Music
         private void btnSetDefault_Click(object sender, EventArgs e)
         {
             // Ensure we have a design to work with
-            var design = Globals.Design ??= new DesignerClass();
-            Music.Design.DesignDefaults.ApplyDefaultDesign(design);
+            var design = Globals.Design ??= new DesignerData();
+            Music.Design.DesignerDefaults.ApplyDefaultDesign(design);
             RefreshDesignSpaceIfReady();
         }
 

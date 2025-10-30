@@ -13,8 +13,8 @@ namespace Music.Design
             {
                 StartBar = 1,
                 StartBeat = 1,
-                TempoBpm = DesignDefaults.DefaultTempoBpm,
-                DurationBeats = DesignDefaults.TotalBars * timeline.BeatsPerBar
+                TempoBpm = DesignerDefaults.DefaultTempoBpm,
+                DurationBeats = DesignerDefaults.TotalBars * timeline.BeatsPerBar
             });
 
             return timeline;

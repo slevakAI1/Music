@@ -6,7 +6,7 @@ namespace Music.Design
         public static TimeSignatureTimeline BuildDefaultTimeline()
         {
             var timeline = new TimeSignatureTimeline();
-            timeline.ConfigureGlobal(DesignDefaults.GlobalTimeSignature);
+            timeline.ConfigureGlobal(DesignerDefaults.GlobalTimeSignature);
 
             // One 4/4 event spanning the entire song (48 bars)
             timeline.Add(new TimeSignatureEvent
@@ -15,7 +15,7 @@ namespace Music.Design
                 StartBeat = 1,
                 Numerator = 4,
                 Denominator = 4,
-                DurationBeats = DesignDefaults.TotalBars * 4
+                DurationBeats = DesignerDefaults.TotalBars * 4
             });
 
             return timeline;
