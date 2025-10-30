@@ -9,7 +9,7 @@ namespace Music.Generate
 {
     internal static class GeneratorFormHelper
     {
-        public static void PopulatePartsFromDesign(CheckedListBox cbPart, DesignerData? design)
+        public static void UpdatePartsControlFromDesign(CheckedListBox cbPart, DesignerData? design)
         {
             // Preserve currently checked part names so we can re-apply them after repopulating.
             var previouslyChecked = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -40,7 +40,7 @@ namespace Music.Generate
             }
         }
 
-        public static void LoadEndBarTotalFromDesign(Label lblEndBarTotal, DesignerData? design)
+        public static void UpdateEndBarTotalControlFromDesign(Label lblEndBarTotal, DesignerData? design)
         {
             // Always refresh the label when called (caller ensures this runs on activate)
             var total = design?.SectionSet?.TotalBars ?? 0;
@@ -51,14 +51,54 @@ namespace Music.Generate
                 lblEndBarTotal.Text = string.Empty;
         }
 
-        // New helper to refresh all UI that depends on the current design
-        public static void RefreshFromDesign(CheckedListBox cbPart, Label lblEndBarTotal, DesignerData? design)
+        // New: merge design-driven defaults into an existing GeneratorData instance.
+        // This does not blindly overwrite unrelated persisted fields — it seeds or clamps
+        // only the values the design is authoritative for (available part names, end bar, and related flags).
+        public static void UpdateGeneratorControlsFromDesign(GeneratorData data, DesignerData? design)
         {
-            // NOTE: LoadNoteValues is intentionally NOT called here because note-value items are static
-            // and are loaded once during form initialization (GenerateForm constructor).
-            // Populate parts and update end-bar total based on the provided design
-            PopulatePartsFromDesign(cbPart, design);
-            LoadEndBarTotalFromDesign(lblEndBarTotal, design);
+            if (data == null) return;
+
+            // Build set of available part names from the design
+            var available = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (design?.VoiceSet?.Voices != null)
+            {
+                foreach (var v in design.VoiceSet.Voices)
+                {
+                    var name = v?.VoiceName;
+                    if (!string.IsNullOrWhiteSpace(name))
+                        available.Add(name!);
+                }
+            }
+
+            // If no selected parts stored, default to all available parts; otherwise filter out any selected parts that no longer exist.
+            if (data.SelectedParts == null || data.SelectedParts.Count == 0)
+            {
+                data.SelectedParts = available.ToList();
+            }
+            else
+            {
+                data.SelectedParts = data.SelectedParts
+                    .Where(s => !string.IsNullOrWhiteSpace(s) && available.Contains(s!))
+                    .ToList();
+            }
+
+            // If the AllPartsChecked flag wasn't set previously, default to true when there are available parts.
+            if (!data.AllPartsChecked.HasValue)
+                data.AllPartsChecked = available.Count > 0;
+
+            // Preserve any explicit AllStaffChecked setting; if unset keep the previous default behavior of true.
+            if (!data.AllStaffChecked.HasValue)
+                data.AllStaffChecked = true;
+
+            // End bar: if design has a total, clamp or seed the DTO's EndBar to it.
+            var total = design?.SectionSet?.TotalBars ?? 0;
+            if (total > 0)
+            {
+                if (!data.EndBar.HasValue)
+                    data.EndBar = total;
+                else
+                    data.EndBar = Math.Max(1, Math.Min(total, data.EndBar.Value));
+            }
         }
 
         // NOTE: This helper now builds and returns GenerationData instead of manipulating controls.
@@ -249,8 +289,8 @@ namespace Music.Generate
             }
 
             // Refresh UI that depends on design/parts
-            PopulatePartsFromDesign(cbPart, usedDesign);
-            LoadEndBarTotalFromDesign(lblEndBarTotal, usedDesign);
+            UpdatePartsControlFromDesign(cbPart, usedDesign);
+            UpdateEndBarTotalControlFromDesign(lblEndBarTotal, usedDesign);
 
             MessageBox.Show(owner, "New score created from design.", "New Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
 

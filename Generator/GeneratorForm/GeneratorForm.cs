@@ -42,18 +42,25 @@ namespace Music.Generate
                 this.WindowState = FormWindowState.Maximized;
         }
 
-
-        // TODO THIS ALL NEEDS WORK. SHOULD BE USING THE OBJECTS MORE!!!
-
-        // Updated: avoid overwriting design-driven UI when re-applying persisted data.
+        // The Generator form is activated each time it gains focus.
+        // The initialization of controls is controlled entirely by the current Design and persisted GenerationData.
+        // It does not depend on the prior state of the controls.
         protected override void OnActivated(EventArgs e)
         {
             base.OnActivated(e);
-            // NOTE!: This will need to be revisited when allowed to edit voices, measures later
-            // Refresh all UI that depends on the current design (parts, voices, total bar count)
-            GeneratorFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, _design);
 
-            // Re-apply any persisted form data after design-driven refresh
+            // Ensure there is a DTO to update and re-apply to controls
+            Globals.GenerationData ??= new GeneratorData();
+
+            // Merge design-driven values into the DTO first (available parts, end-bar clamp/seed, flags)
+            GeneratorFormHelper.UpdateGeneratorControlsFromDesign(Globals.GenerationData, _design);
+
+            // Now update controls that depend on the design (parts list and end-bar label)
+            // Populate the parts list so ApplyFormData has consistent items to operate on.
+            GeneratorFormHelper.UpdatePartsControlFromDesign(cbPart, _design);
+            GeneratorFormHelper.UpdateEndBarTotalControlFromDesign(lblEndBarTotal, _design);
+
+            // Re-apply any persisted form data (now merged with design-driven values)
             if (Globals.GenerationData != null)
                ApplyFormData(Globals.GenerationData);
         }
@@ -78,7 +85,8 @@ namespace Music.Generate
             DesignerDefaults.ApplyDefaultDesign(Globals.Design);
 
             // Refresh parts and end-total UI from the design
-            GeneratorFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, Globals.Design);
+            GeneratorFormHelper.UpdatePartsControlFromDesign(cbPart, Globals.Design);
+            GeneratorFormHelper.UpdateEndBarTotalControlFromDesign(lblEndBarTotal, Globals.Design);
 
             // ==========================================================================================
 
