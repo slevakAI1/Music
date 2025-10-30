@@ -11,7 +11,6 @@ namespace Music.Generate
     {
         private Score? _score;
         private DesignerData? _design;
-        private GeneratorData? _GenerationData;
 
         // CORRECT
         public GeneratorForm()
@@ -31,7 +30,8 @@ namespace Music.Generate
 
             // Initialize local FormData and capture the initial control state
             // - this will get any control default values
-            _GenerationData = CaptureFormData();
+            // Persist defaults into Globals 
+            Globals.GenerationData ??= CaptureFormData();
         }
 
         // CORRECT
@@ -54,18 +54,18 @@ namespace Music.Generate
             GeneratorFormHelper.RefreshFromDesign(cbPart, lblEndBarTotal, _design);
 
             // Re-apply any persisted form data after design-driven refresh
-            if (_GenerationData != null)
-               ApplyFormData(_GenerationData);
+            if (Globals.GenerationData != null)
+               ApplyFormData(Globals.GenerationData);
         }
 
         private void btnApplySetNotes_Click(object sender, EventArgs e)
         {
             // Persist current control state and pass the captured DTO to PatternSetNotes.
             // All control-to-primitive mapping/logic is handled inside PatternSetNotes.Apply(Score, GenerationData).
-            _GenerationData = CaptureFormData();
-            if (_GenerationData != null)
+            Globals.GenerationData = CaptureFormData();
+            if (Globals.GenerationData != null)
             {
-                PatternSetNotes.Apply(_score!, _GenerationData);
+                PatternSetNotes.Apply(_score!, Globals.GenerationData);
                 Globals.Score = _score;
             }
         }
@@ -83,11 +83,11 @@ namespace Music.Generate
             // ==========================================================================================
 
             // Get GenerationData defaults from helper (no UI controls passed)
-            _GenerationData = GeneratorFormHelper.SetDefaultsForGenerate(Globals.Design);
+            Globals.GenerationData = GeneratorFormHelper.SetDefaultsForGenerate(Globals.Design);
 
             // Apply the generated defaults into the form controls via the existing method
-            if (_GenerationData != null)
-                ApplyFormData(_GenerationData);
+            if (Globals.GenerationData != null)
+                ApplyFormData(Globals.GenerationData);
         }
 
         private void btnNewScore_Click(object sender, EventArgs e)

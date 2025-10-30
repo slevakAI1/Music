@@ -1,5 +1,6 @@
 using Music.Design;
 using MusicXml.Domain;
+using Music.Generate;
 
 namespace Music
 {
@@ -9,5 +10,8 @@ namespace Music
 
         // Holds the currently loaded MusicXML score for application-wide access
         public static Score? Score { get; set; }
+
+        // Persist GeneratorForm's data application-wide (refactor: moved from form instance to Globals)
+        public static GeneratorData? GenerationData { get; set; }
     }
 }
