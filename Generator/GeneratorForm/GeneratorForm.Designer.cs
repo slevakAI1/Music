@@ -9,7 +9,7 @@ namespace Music.Generate
 
         private System.Windows.Forms.GroupBox grpTarget;
         private System.Windows.Forms.CheckBox chkAllParts;
-        private System.Windows.Forms.CheckedListBox cbPart;
+        private System.Windows.Forms.CheckedListBox clbParts;
         private System.Windows.Forms.Label lblPart;
         private System.Windows.Forms.Label lblStaff;
         private System.Windows.Forms.NumericUpDown numStaff;
@@ -65,7 +65,7 @@ namespace Music.Generate
             lblEndBeat = new Label();
             numericUpDown2 = new NumericUpDown();
             lblPart = new Label();
-            cbPart = new CheckedListBox();
+            clbParts = new CheckedListBox();
             chkAllParts = new CheckBox();
             lblStaff = new Label();
             numStaff = new NumericUpDown();
@@ -160,7 +160,7 @@ namespace Music.Generate
             grpTarget.Controls.Add(lblEndBeat);
             grpTarget.Controls.Add(numericUpDown2);
             grpTarget.Controls.Add(lblPart);
-            grpTarget.Controls.Add(cbPart);
+            grpTarget.Controls.Add(clbParts);
             grpTarget.Controls.Add(chkAllParts);
             grpTarget.Controls.Add(lblStaff);
             grpTarget.Controls.Add(numStaff);
@@ -250,14 +250,14 @@ namespace Music.Generate
             lblPart.TabIndex = 0;
             lblPart.Text = "Part (Voice):";
             // 
-            // cbPart
+            // clbParts
             // 
-            cbPart.CheckOnClick = true;
-            cbPart.FormattingEnabled = true;
-            cbPart.Location = new Point(85, 28);
-            cbPart.Name = "cbPart";
-            cbPart.Size = new Size(220, 94);
-            cbPart.TabIndex = 1;
+            clbParts.CheckOnClick = true;
+            clbParts.FormattingEnabled = true;
+            clbParts.Location = new Point(85, 28);
+            clbParts.Name = "clbParts";
+            clbParts.Size = new Size(220, 94);
+            clbParts.TabIndex = 1;
             // 
             // chkAllParts
             // 

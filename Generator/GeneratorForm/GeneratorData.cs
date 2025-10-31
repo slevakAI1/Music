@@ -47,7 +47,7 @@ namespace Music.Generate
 
         // Parts / scope
         // Getter returns an empty list when nothing recorded to avoid callers having to null-check.
-        public List<string>? SelectedParts
+        public List<string>? Parts
         {
             get => _selectedParts ?? new List<string>();
             set => _selectedParts = value;

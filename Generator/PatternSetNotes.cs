@@ -51,7 +51,7 @@ namespace Music.Generate
             if (data == null) throw new ArgumentNullException(nameof(data));
 
             // Use GenerationData's getters which provide sensible defaults.
-            var parts = data.SelectedParts ?? Enumerable.Empty<string>();
+            var parts = data.Parts ?? Enumerable.Empty<string>();
 
             var staff = data.Staff.GetValueOrDefault();
             var startBar = data.StartBar.GetValueOrDefault();

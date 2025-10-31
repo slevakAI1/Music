@@ -79,7 +79,7 @@ namespace Music.Generate
 
         private void btnNewScore_Click(object sender, EventArgs e)
         {
-            _score = GeneratorFormHelper.NewScore(this, _design, cbPart, lblEndBarTotal);
+            _score = GeneratorFormHelper.NewScore(this, _design, clbParts, lblEndBarTotal);
         }
 
         // Capture current control values into a GenerateFormData DTO.
@@ -91,7 +91,7 @@ namespace Music.Generate
                 Pattern = cbPattern.SelectedItem?.ToString(),
 
                 // Parts
-                SelectedParts = cbPart.CheckedItems
+                Parts = clbParts.CheckedItems
                     .Cast<object?>()
                     .Select(x => x?.ToString() ?? string.Empty)
                     .Where(s => !string.IsNullOrWhiteSpace(s))
@@ -142,16 +142,16 @@ namespace Music.Generate
                 cbPattern.SelectedItem = data.Pattern;
 
             // Parts - if provided, set checked state for matching items
-            if (data.SelectedParts != null)
+            if (data.Parts != null)
             {
-                var set = new HashSet<string>(data.SelectedParts, StringComparer.OrdinalIgnoreCase);
-                for (int i = 0; i < cbPart.Items.Count; i++)
+                var set = new HashSet<string>(data.Parts, StringComparer.OrdinalIgnoreCase);
+                for (int i = 0; i < clbParts.Items.Count; i++)
                 {
-                    var name = cbPart.Items[i]?.ToString() ?? string.Empty;
+                    var name = clbParts.Items[i]?.ToString() ?? string.Empty;
                     if (!string.IsNullOrWhiteSpace(name))
-                        cbPart.SetItemChecked(i, set.Contains(name));
+                        clbParts.SetItemChecked(i, set.Contains(name));
                     else
-                        cbPart.SetItemChecked(i, false);
+                        clbParts.SetItemChecked(i, false);
                 }
             }
 
