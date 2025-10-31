@@ -10,7 +10,7 @@ namespace Music
             btnSave = new Button();
             btnEditVoices = new Button();
             btnNew = new Button();
-            txtDesignView = new TextBox();
+            txtDesignerReport = new TextBox();
             btnEditHarmony = new Button();
             btnSetDefault = new Button();
             btnLoad = new Button();
@@ -63,14 +63,14 @@ namespace Music
             btnNew.UseVisualStyleBackColor = true;
             btnNew.Click += btnNew_Click;
             // 
-            // txtDesignView
+            // txtDesignReport
             // 
-            txtDesignView.Location = new Point(201, 64);
-            txtDesignView.Multiline = true;
-            txtDesignView.Name = "txtDesignView";
-            txtDesignView.ScrollBars = ScrollBars.Vertical;
-            txtDesignView.Size = new Size(824, 747);
-            txtDesignView.TabIndex = 14;
+            txtDesignerReport.Location = new Point(201, 64);
+            txtDesignerReport.Multiline = true;
+            txtDesignerReport.Name = "txtDesignReport";
+            txtDesignerReport.ScrollBars = ScrollBars.Vertical;
+            txtDesignerReport.Size = new Size(824, 747);
+            txtDesignerReport.TabIndex = 14;
             // 
             // btnEditHarmony
             // 
@@ -178,7 +178,7 @@ namespace Music
             Controls.Add(btnLoad);
             Controls.Add(btnSetDefault);
             Controls.Add(btnEditHarmony);
-            Controls.Add(txtDesignView);
+            Controls.Add(txtDesignerReport);
             Controls.Add(btnNew);
             Controls.Add(btnSave);
             Controls.Add(btnEditSections);
@@ -195,7 +195,7 @@ namespace Music
         private Button btnEditVoices;
         private Button btnAddChords;
         private Button btnNew;
-        private TextBox txtDesignView;
+        private TextBox txtDesignerReport;
         private Button btnEditHarmony;
         private Button btnSetDefault;
         private Button btnLoad;

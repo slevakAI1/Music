@@ -127,7 +127,7 @@ namespace Music
         private void RefreshDesignSpaceIfReady()
         {
             if (Globals.Design == null) return;
-            txtDesignView.Text = DesignerView.CreateDesignView(Globals.Design);
+            txtDesignerReport.Text = DesignerReport.CreateDesignerReport(Globals.Design);
         }
 
         private void PopulateFormFromGlobals()
@@ -156,80 +156,15 @@ namespace Music
         private void btnSave_Click(object sender, EventArgs e)
         {
             if (!EnsureDesignOrNotify()) return;
-
-            try
-            {
-                var design = Globals.Design!;
-
-                // Explicit snapshot to ensure TempoTimeline and TimeSignatureTimeline (and their Events) are serialized.
-                var snapshot = new
-                {
-                    design.DesignId,
-                    design.PartSet,
-                    design.SectionSet,
-                    design.HarmonicTimeline,
-                    design.TempoTimeline,
-                    design.TimeSignatureTimeline
-                };
-
-                var json = System.Text.Json.JsonSerializer.Serialize(
-                    snapshot,
-                    new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
-
-                // Assume the folder exists under the project root: Design/Designs
-                var baseDir = AppContext.BaseDirectory;
-                var projectRoot = System.IO.Path.GetFullPath(System.IO.Path.Combine(baseDir, "..", "..", ".."));
-                var targetDir = System.IO.Path.Combine(projectRoot, "Design", "Designs");
-
-                var fileName = $"Design-{design.DesignId}.json";
-                var fullPath = System.IO.Path.Combine(targetDir, fileName);
-
-                System.IO.File.WriteAllText(fullPath, json);
-
-                MessageBox.Show(this, $"Design saved to:\n{fullPath}", "Saved",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(this, $"Failed to save design.\n{ex.Message}", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            DesignerFileManager.SaveDesign(this);
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
-            try
+            var loaded = DesignerFileManager.LoadDesign(this);
+            if (loaded)
             {
-                var baseDir = AppContext.BaseDirectory;
-                var projectRoot = System.IO.Path.GetFullPath(System.IO.Path.Combine(baseDir, "..", "..", ".."));
-                var defaultDir = System.IO.Path.Combine(projectRoot, "Design", "Designs");
-
-                using var ofd = new OpenFileDialog
-                {
-                    Filter = "Design Files (*.json)|*.json|All Files (*.*)|*.*",
-                    Title = "Open Design",
-                    InitialDirectory = defaultDir,
-                    RestoreDirectory = true
-                };
-
-                if (ofd.ShowDialog(this) != DialogResult.OK) return;
-
-                var json = System.IO.File.ReadAllText(ofd.FileName);
-
-                // Robust manual deserialization to rebuild computed fields
-                var loaded = DesignerSerialization.DeserializeDesign(json);
-
-                Globals.Design = loaded;
-
                 RefreshDesignSpaceIfReady();
-
-                MessageBox.Show(this, $"Design loaded from:\n{ofd.FileName}", "Loaded",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(this, $"Failed to load design.\n{ex.Message}", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

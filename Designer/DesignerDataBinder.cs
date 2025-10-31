@@ -42,7 +42,7 @@ namespace Music.Designer.DesignerForm
             if (txtDesignView != null)
             {
                 // Use the same helper as the existing form to build the view string
-                txtDesignView.Text = DesignerView.CreateDesignView(data);
+                txtDesignView.Text = DesignerReport.CreateDesignerReport(data);
             }
 
             // Future control mappings (e.g., part lists, timelines) can be added here using GetField<T>

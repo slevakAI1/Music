@@ -3,12 +3,12 @@ using System.Text;
 namespace Music.Designer
 {
     /// <summary>
-    /// THIS IS BASICALLY A DEBUG VIEW FOR THE DESIGN DATA STRUCTURE.
+    /// THIS IS BASICALLY A REPORT FOR THE DESIGN DATA STRUCTURE.
     /// </summary>
-    public static class DesignerView
+    public static class DesignerReport
     {
         // Builds: VOICES + 2 newlines + SECTIONS + 2 newlines + HARMONIC TIMELINE + 2 newlines + ALIGNMENT + 2 newlines + TIME SIGNATURES + 2 newlines + TEMPO
-        public static string CreateDesignView(DesignerData design)
+        public static string CreateDesignerReport(DesignerData design)
         {
             var sb = new StringBuilder();
 
