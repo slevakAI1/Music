@@ -6,13 +6,13 @@ using System.Windows.Forms;
 namespace Music.Generate
 {
     // Data holder object for GenerateForm user-editable values.
-    // - All properties are simple data types (strings, ints, bools, List<string>)
+    // - All properties are simple data types (strings, ints, bools, Dictionary<string,bool>)
     // - Value types remain nullable for compatibility, but getters now provide sensible defaults
     //   so callers can rely on the property value without repeating the same fallback logic.
     public sealed class GeneratorData
     {
         // Backing fields
-        private List<string>? _selectedParts;
+        private Dictionary<string, bool>? _partsState;
         private int? _staff;
         private int? _startBar;
         private int? _endBar;
@@ -46,11 +46,11 @@ namespace Music.Generate
         }
 
         // Parts / scope
-        // Getter returns an empty list when nothing recorded to avoid callers having to null-check.
-        public List<string>? Parts
+        // New: map of part name to checked state. Getter returns an empty dictionary when not set.
+        public Dictionary<string, bool>? PartsState
         {
-            get => _selectedParts ?? new List<string>();
-            set => _selectedParts = value;
+            get => _partsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            set => _partsState = value;
         }
 
         public bool? AllPartsChecked

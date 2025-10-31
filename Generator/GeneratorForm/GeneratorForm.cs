@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using Music.Design;
 using MusicXml.Domain;
+using static Music.Helpers;
 
 namespace Music.Generate
 {
@@ -12,6 +13,7 @@ namespace Music.Generate
         private Score? _score;
         private DesignerData? _design;
 
+        //===========================   I N I T I A L I Z A T I O N   ===========================
         public GeneratorForm()
         {
             InitializeComponent();
@@ -61,7 +63,7 @@ namespace Music.Generate
             ApplyFormData(Globals.GenerationData);
         }
 
-        //===========================================================================================
+        //===============================   E V E N T S   ==============================
 
         private void btnApplySetNotes_Click(object sender, EventArgs e)
         {
@@ -75,27 +77,33 @@ namespace Music.Generate
             }
         }
 
-
-
         private void btnNewScore_Click(object sender, EventArgs e)
         {
             _score = GeneratorFormHelper.NewScore(this, _design, clbParts, lblEndBarTotal);
         }
 
+        //========================   F O R M   D A T A   M A N A G E M E N T   ========================
+        // TODO Move this to owner/helper class
+
         // Capture current control values into a GenerateFormData DTO.
         public GeneratorData CaptureFormData()
         {
+            // Capture parts items and their checked state into a dictionary
+            var partsState = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < clbParts.Items.Count; i++)
+            {
+                var name = clbParts.Items[i]?.ToString() ?? string.Empty;
+                if (!string.IsNullOrWhiteSpace(name))
+                    partsState[name] = clbParts.GetItemChecked(i);
+            }
+
             var data = new GeneratorData
             {
                 // Pattern
                 Pattern = cbPattern.SelectedItem?.ToString(),
 
-                // Parts
-                Parts = clbParts.CheckedItems
-                    .Cast<object?>()
-                    .Select(x => x?.ToString() ?? string.Empty)
-                    .Where(s => !string.IsNullOrWhiteSpace(s))
-                    .ToList(),
+                // New: store the full items -> checked state map
+                PartsState = partsState,
 
                 AllPartsChecked = chkAllParts.Checked,
                 AllStaffChecked = checkBox1.Checked,
@@ -132,6 +140,10 @@ namespace Music.Generate
             return data;
         }
 
+
+
+
+
         // Apply a GenerateFormData DTO back to the private form controls.
         public void ApplyFormData(GeneratorData data)
         {
@@ -142,16 +154,29 @@ namespace Music.Generate
                 cbPattern.SelectedItem = data.Pattern;
 
             // Parts - if provided, set checked state for matching items
-            if (data.Parts != null)
+            if (data.PartsState != null && data.PartsState.Count > 0)
             {
-                var set = new HashSet<string>(data.Parts, StringComparer.OrdinalIgnoreCase);
-                for (int i = 0; i < clbParts.Items.Count; i++)
+                // Use case-insensitive lookup
+                var map = new Dictionary<string, bool>(data.PartsState, StringComparer.OrdinalIgnoreCase);
+
+                // Clear existing items and populate from the map so control contains exactly the map entries
+                clbParts.BeginUpdate();
+                try
                 {
-                    var name = clbParts.Items[i]?.ToString() ?? string.Empty;
-                    if (!string.IsNullOrWhiteSpace(name))
-                        clbParts.SetItemChecked(i, set.Contains(name));
-                    else
-                        clbParts.SetItemChecked(i, false);
+                    clbParts.Items.Clear();
+                    foreach (var kv in map)
+                    {
+                        var name = kv.Key ?? string.Empty;
+                        if (string.IsNullOrWhiteSpace(name))
+                            continue;
+
+                        var idx = clbParts.Items.Add(name);
+                        clbParts.SetItemChecked(idx, kv.Value);
+                    }
+                }
+                finally
+                {
+                    clbParts.EndUpdate();
                 }
             }
 
@@ -163,22 +188,22 @@ namespace Music.Generate
 
             // Staff / sections / bars / beats
             if (data.Staff.HasValue)
-                numStaff.Value = ClampDecimal(numStaff, data.Staff.Value);
+                numStaff.Value = LimitRange(numStaff, data.Staff.Value);
 
             if (data.SectionsText != null)
                 txtSections.Text = data.SectionsText;
 
             if (data.StartBar.HasValue)
-                numStartBar.Value = ClampDecimal(numStartBar, data.StartBar.Value);
+                numStartBar.Value = LimitRange(numStartBar, data.StartBar.Value);
 
             if (data.EndBar.HasValue)
-                numEndBar.Value = ClampDecimal(numEndBar, data.EndBar.Value);
+                numEndBar.Value = LimitRange(numEndBar, data.EndBar.Value);
 
             if (data.StartBeat.HasValue)
-                numStartBeat.Value = ClampDecimal(numStartBeat, data.StartBeat.Value);
+                numStartBeat.Value = LimitRange(numStartBeat, data.StartBeat.Value);
 
             if (data.EndBeat.HasValue)
-                numericUpDown2.Value = ClampDecimal(numericUpDown2, data.EndBeat.Value);
+                numericUpDown2.Value = LimitRange(numericUpDown2, data.EndBeat.Value);
 
             if (data.OverwriteExisting.HasValue)
                 chkOverwrite.Checked = data.OverwriteExisting.Value;
@@ -197,29 +222,29 @@ namespace Music.Generate
                 cbAccidental.SelectedItem = data.Accidental;
 
             if (data.OctaveAbsolute.HasValue)
-                numOctaveAbs.Value = ClampDecimal(numOctaveAbs, data.OctaveAbsolute.Value);
+                numOctaveAbs.Value = LimitRange(numOctaveAbs, data.OctaveAbsolute.Value);
 
             if (data.DegreeKeyRelative.HasValue)
-                numDegree.Value = ClampDecimal(numDegree, data.DegreeKeyRelative.Value);
+                numDegree.Value = LimitRange(numDegree, data.DegreeKeyRelative.Value);
 
             if (data.OctaveKeyRelative.HasValue)
-                numOctaveKR.Value = ClampDecimal(numOctaveKR, data.OctaveKeyRelative.Value);
+                numOctaveKR.Value = LimitRange(numOctaveKR, data.OctaveKeyRelative.Value);
 
             // Rhythm
             if (data.NoteValue != null && cbNoteValue.Items.Contains(data.NoteValue))
                 cbNoteValue.SelectedItem = data.NoteValue;
 
             if (data.Dots.HasValue)
-                numDots.Value = ClampDecimal(numDots, data.Dots.Value);
+                numDots.Value = LimitRange(numDots, data.Dots.Value);
 
             if (data.TupletEnabled.HasValue)
                 chkTupletEnabled.Checked = data.TupletEnabled.Value;
 
             if (data.TupletCount.HasValue)
-                numTupletCount.Value = ClampDecimal(numTupletCount, data.TupletCount.Value);
+                numTupletCount.Value = LimitRange(numTupletCount, data.TupletCount.Value);
 
             if (data.TupletOf.HasValue)
-                numTupletOf.Value = ClampDecimal(numTupletOf, data.TupletOf.Value);
+                numTupletOf.Value = LimitRange(numTupletOf, data.TupletOf.Value);
 
             if (data.TieAcross.HasValue)
                 chkTieAcross.Checked = data.TieAcross.Value;
@@ -228,16 +253,12 @@ namespace Music.Generate
                 chkFermata.Checked = data.Fermata.Value;
 
             if (data.NumberOfNotes.HasValue)
-                numNumberOfNotes.Value = ClampDecimal(numNumberOfNotes, data.NumberOfNotes.Value);
+                numNumberOfNotes.Value = LimitRange(numNumberOfNotes, data.NumberOfNotes.Value);
         }
 
-        private static decimal ClampDecimal(NumericUpDown control, int value)
-        {
-            var min = (int)control.Minimum;
-            var max = (int)control.Maximum;
-            var clamped = Math.Max(min, Math.Min(max, value));
-            return (decimal)clamped;
-        }
+        //===========================================================================================
+        //                      T E S T   S C E N A R I O   B U T T O N S
+        //  
 
         // This sets design test scenario D1
         private void btnSetDesignTestScenarioD1_Click(object sender, EventArgs e)

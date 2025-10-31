@@ -28,17 +28,31 @@ namespace Music.Generate
                 }
             }
 
-            // If no selected parts stored, default to all available parts; otherwise filter out any selected parts that no longer exist.
-            if (data.Parts == null || data.Parts.Count == 0)
+            // Merge existing PartsState with available parts.
+            var existing = data.PartsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            var newState = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+            if (existing.Count == 0)
             {
-                data.Parts = available.ToList();
+                // No persisted state: default to all available parts checked
+                foreach (var name in available)
+                {
+                    newState[name] = true;
+                }
             }
             else
             {
-                data.Parts = data.Parts
-                    .Where(s => !string.IsNullOrWhiteSpace(s) && available.Contains(s!))
-                    .ToList();
+                // Preserve checked state for parts that still exist; do not carry over missing parts.
+                foreach (var name in available)
+                {
+                    if (existing.TryGetValue(name, out var isChecked))
+                        newState[name] = isChecked;
+                    else
+                        newState[name] = false; // new part added to design defaults to unchecked
+                }
             }
+
+            data.PartsState = newState;
 
             // If the AllPartsChecked flag wasn't set previously, default to true when there are available parts.
             if (!data.AllPartsChecked.HasValue)
@@ -59,6 +73,9 @@ namespace Music.Generate
             }
         }
 
+
+        // ==================================   T E S T   H E L P E R S   ==================================
+
         // NOTE: This helper now builds and returns GenerationData instead of manipulating controls.
         // The caller (form) should apply the returned GenerationData to controls via ApplyFormData(...)
         public static GeneratorData SetTestGeneratorG1(DesignerData? design)
@@ -77,7 +94,12 @@ namespace Music.Generate
                 }
             }
 
-            data.Parts = partNames;
+            // Populate PartsState with all parts checked
+            var partsState = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            foreach (var p in partNames)
+                partsState[p] = true;
+
+            data.PartsState = partsState;
             data.AllPartsChecked = partNames.Count > 0;
             data.AllStaffChecked = true; // keep previous behavior of checking "All staff" by default
 
@@ -103,6 +125,8 @@ namespace Music.Generate
 
             return data;
         }
+
+        // ==================================   S C O R E   H E L P E R S   ==================================
 
         public static Score? NewScore(
             Form owner,

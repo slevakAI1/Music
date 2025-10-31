@@ -50,8 +50,11 @@ namespace Music.Generate
             if (score == null) throw new ArgumentNullException(nameof(score));
             if (data == null) throw new ArgumentNullException(nameof(data));
 
-            // Use GenerationData's getters which provide sensible defaults.
-            var parts = data.Parts ?? Enumerable.Empty<string>();
+            // Derive selected parts from PartsState dictionary (keys with true value)
+            var parts = (data.PartsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase))
+                .Where(kv => kv.Value)
+                .Select(kv => kv.Key)
+                .ToList();
 
             var staff = data.Staff.GetValueOrDefault();
             var startBar = data.StartBar.GetValueOrDefault();
@@ -127,7 +130,7 @@ namespace Music.Generate
                 // Ensure there are at least endBar measures (1-based)
                 while (scorePart.Measures.Count < endBar)
                 {
-                    // NOTE: do not populate full Attributes here — NewScore() is responsible for setting Divisions on all measures.
+                    // NOTE: do not populate full Attributes here ? NewScore() is responsible for setting Divisions on all measures.
                     scorePart.Measures.Add(new Measure());
                 }
 
