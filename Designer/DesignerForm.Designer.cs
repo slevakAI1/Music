@@ -21,11 +21,12 @@ namespace Music
             label1 = new Label();
             panel1 = new Panel();
             panel2 = new Panel();
+            label2 = new Label();
             SuspendLayout();
             // 
             // btnEditSections
             // 
-            btnEditSections.Location = new Point(43, 316);
+            btnEditSections.Location = new Point(41, 349);
             btnEditSections.Name = "btnEditSections";
             btnEditSections.Size = new Size(96, 23);
             btnEditSections.TabIndex = 0;
@@ -35,7 +36,7 @@ namespace Music
             // 
             // btnSave
             // 
-            btnSave.Location = new Point(43, 149);
+            btnSave.Location = new Point(41, 182);
             btnSave.Name = "btnSave";
             btnSave.Size = new Size(96, 23);
             btnSave.TabIndex = 2;
@@ -45,7 +46,7 @@ namespace Music
             // 
             // btnEditVoices
             // 
-            btnEditVoices.Location = new Point(43, 281);
+            btnEditVoices.Location = new Point(41, 314);
             btnEditVoices.Name = "btnEditVoices";
             btnEditVoices.Size = new Size(96, 23);
             btnEditVoices.TabIndex = 4;
@@ -55,7 +56,7 @@ namespace Music
             // 
             // btnNew
             // 
-            btnNew.Location = new Point(43, 116);
+            btnNew.Location = new Point(41, 149);
             btnNew.Name = "btnNew";
             btnNew.Size = new Size(96, 23);
             btnNew.TabIndex = 13;
@@ -63,18 +64,18 @@ namespace Music
             btnNew.UseVisualStyleBackColor = true;
             btnNew.Click += btnNew_Click;
             // 
-            // txtDesignReport
+            // txtDesignerReport
             // 
-            txtDesignerReport.Location = new Point(201, 64);
+            txtDesignerReport.Location = new Point(201, 132);
             txtDesignerReport.Multiline = true;
-            txtDesignerReport.Name = "txtDesignReport";
+            txtDesignerReport.Name = "txtDesignerReport";
             txtDesignerReport.ScrollBars = ScrollBars.Vertical;
-            txtDesignerReport.Size = new Size(824, 747);
+            txtDesignerReport.Size = new Size(824, 679);
             txtDesignerReport.TabIndex = 14;
             // 
             // btnEditHarmony
             // 
-            btnEditHarmony.Location = new Point(43, 351);
+            btnEditHarmony.Location = new Point(41, 384);
             btnEditHarmony.Name = "btnEditHarmony";
             btnEditHarmony.Size = new Size(96, 23);
             btnEditHarmony.TabIndex = 15;
@@ -84,17 +85,17 @@ namespace Music
             // 
             // btnSetDefault
             // 
-            btnSetDefault.Location = new Point(43, 83);
+            btnSetDefault.Location = new Point(36, 83);
             btnSetDefault.Name = "btnSetDefault";
-            btnSetDefault.Size = new Size(96, 23);
+            btnSetDefault.Size = new Size(119, 23);
             btnSetDefault.TabIndex = 16;
-            btnSetDefault.Text = "Set Default Timeline";
+            btnSetDefault.Text = "Set Test Design D1";
             btnSetDefault.UseVisualStyleBackColor = true;
             btnSetDefault.Click += btnSetDefault_Click;
             // 
             // btnLoad
             // 
-            btnLoad.Location = new Point(43, 182);
+            btnLoad.Location = new Point(41, 215);
             btnLoad.Name = "btnLoad";
             btnLoad.Size = new Size(96, 23);
             btnLoad.TabIndex = 17;
@@ -104,7 +105,7 @@ namespace Music
             // 
             // btnEditTimeSignature
             // 
-            btnEditTimeSignature.Location = new Point(43, 386);
+            btnEditTimeSignature.Location = new Point(41, 419);
             btnEditTimeSignature.Name = "btnEditTimeSignature";
             btnEditTimeSignature.Size = new Size(96, 23);
             btnEditTimeSignature.TabIndex = 18;
@@ -114,7 +115,7 @@ namespace Music
             // 
             // btnEditTempo
             // 
-            btnEditTempo.Location = new Point(43, 421);
+            btnEditTempo.Location = new Point(41, 454);
             btnEditTempo.Name = "btnEditTempo";
             btnEditTempo.Size = new Size(96, 23);
             btnEditTempo.TabIndex = 19;
@@ -125,7 +126,7 @@ namespace Music
             // lblEdit
             // 
             lblEdit.AutoSize = true;
-            lblEdit.Location = new Point(77, 260);
+            lblEdit.Location = new Point(75, 293);
             lblEdit.Name = "lblEdit";
             lblEdit.Size = new Size(27, 15);
             lblEdit.TabIndex = 20;
@@ -134,7 +135,7 @@ namespace Music
             // lblDesign
             // 
             lblDesign.AutoSize = true;
-            lblDesign.Location = new Point(72, 64);
+            lblDesign.Location = new Point(72, 127);
             lblDesign.Name = "lblDesign";
             lblDesign.Size = new Size(43, 15);
             lblDesign.TabIndex = 21;
@@ -153,22 +154,33 @@ namespace Music
             // panel1
             // 
             panel1.BorderStyle = BorderStyle.FixedSingle;
-            panel1.Location = new Point(28, 73);
+            panel1.Location = new Point(26, 136);
             panel1.Name = "panel1";
-            panel1.Size = new Size(138, 145);
+            panel1.Size = new Size(138, 115);
             panel1.TabIndex = 23;
             // 
             // panel2
             // 
             panel2.BorderStyle = BorderStyle.FixedSingle;
-            panel2.Location = new Point(28, 268);
+            panel2.Location = new Point(26, 301);
             panel2.Name = "panel2";
             panel2.Size = new Size(138, 191);
             panel2.TabIndex = 24;
             // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Font = new Font("Segoe UI", 15F);
+            label2.Location = new Point(493, 96);
+            label2.Name = "label2";
+            label2.Size = new Size(153, 28);
+            label2.TabIndex = 25;
+            label2.Text = "Designer Report";
+            // 
             // DesignerForm
             // 
             ClientSize = new Size(1085, 804);
+            Controls.Add(label2);
             Controls.Add(btnEditVoices);
             Controls.Add(label1);
             Controls.Add(lblDesign);
@@ -206,5 +218,6 @@ namespace Music
         private Label label1;
         private Panel panel1;
         private Panel panel2;
+        private Label label2;
     }
 }

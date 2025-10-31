@@ -5,6 +5,9 @@ namespace Music
 {
     public partial class DesignerForm : Form
     {
+
+        //===============   I N I T I A L I Z E   ===============
+
         public DesignerForm()
         {
             this.Text = "Music";
@@ -47,11 +50,29 @@ namespace Music
             PopulateFormFromGlobals(); // keep existing behavior that builds/refreshes other UI pieces
         }
 
+
+        //===============   B U T T O N   E V E N T S   ===============
+
+
         private void btnNew_Click(object sender, EventArgs e)
         {
             ClearDesignAndForm();
         }
 
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            if (!EnsureDesignOrNotify()) return;
+            DesignerFileManager.SaveDesign(this);
+        }
+
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
+            var loaded = DesignerFileManager.LoadDesign(this);
+            if (loaded)
+            {
+                RefreshDesignSpaceIfReady();
+            }
+        }
         // Launch the Section Editor and apply results back to the design
         private void btnEditSections_Click(object sender, EventArgs e)
         {
@@ -153,20 +174,7 @@ namespace Music
             RefreshDesignSpaceIfReady();
         }
 
-        private void btnSave_Click(object sender, EventArgs e)
-        {
-            if (!EnsureDesignOrNotify()) return;
-            DesignerFileManager.SaveDesign(this);
-        }
 
-        private void btnLoad_Click(object sender, EventArgs e)
-        {
-            var loaded = DesignerFileManager.LoadDesign(this);
-            if (loaded)
-            {
-                RefreshDesignSpaceIfReady();
-            }
-        }
 
         private void btnEditTimeSignature_Click(object sender, EventArgs e)
         {
