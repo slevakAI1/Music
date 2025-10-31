@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 using Music.Design;
+using Music.Generator;
 using MusicXml.Domain;
 using static Music.Helpers;
 
@@ -140,10 +137,6 @@ namespace Music.Generate
             return data;
         }
 
-
-
-
-
         // Apply a GenerateFormData DTO back to the private form controls.
         public void ApplyFormData(GeneratorData data)
         {
@@ -276,7 +269,7 @@ namespace Music.Generate
             GeneratorFormHelper.UpdateGeneratorDataFromDesignData(Globals.GenerationData, _design);
 
             // Get GenerationData defaults from helper (no UI controls passed)
-            Globals.GenerationData = GeneratorFormHelper.SetTestGeneratorG1(Globals.Design);
+            Globals.GenerationData = GeneratorTestHelpers.SetTestGeneratorG1(Globals.Design);
 
             // Apply the generated defaults into the form controls via the existing method
             ApplyFormData(Globals.GenerationData);
