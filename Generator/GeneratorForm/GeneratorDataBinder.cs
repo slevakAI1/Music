@@ -14,12 +14,7 @@ namespace Music.Generator
 {
     internal class GeneratorDataBinder
     {
-        //========================   F O R M   D A T A   M A N A G E M E N T   ========================
-        // TODO Move this to owner/helper class
-
-        // Capture current control values into a GenerateFormData DTO.
-        // Note: we accept the form instance and access its controls via reflection to avoid
-        // passing individual controls or changing the form's access modifiers.
+        // Capture current control values into a class object.
         public GeneratorData CaptureFormData(GeneratorForm form)
         {
             // Helper to fetch private fields by name on the form (searching base types as needed)
@@ -121,7 +116,7 @@ namespace Music.Generator
             return data;
         }
 
-        // Apply a GenerateFormData DTO back to the private form controls.
+        // Apply a GenerateFormData object back to the private form controls.
         public void ApplyFormData(GeneratorForm form, GeneratorData data)
         {
             if (data == null || form == null) return;
