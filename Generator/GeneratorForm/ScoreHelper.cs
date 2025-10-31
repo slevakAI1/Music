@@ -7,7 +7,7 @@ using MusicXml.Domain;
 
 namespace Music.Generate
 {
-    internal static class GeneratorFormHelper
+    internal static class ScoreHelper
     {
         // New: merge design-driven defaults into an existing GeneratorData instance.
         // This does not blindly overwrite unrelated persisted fields — it seeds or clamps

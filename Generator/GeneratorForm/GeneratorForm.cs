@@ -46,7 +46,7 @@ namespace Music.Generate
             base.OnActivated(e);
 
             // Merge in any design changes that may have happened while outside this form
-            GeneratorFormHelper.UpdateGeneratorDataFromDesignData(Globals.GenerationData, _design);
+            ScoreHelper.UpdateGeneratorDataFromDesignData(Globals.GenerationData, _design);
 
             // Update the form to take into account any design changes
             ApplyFormData(Globals.GenerationData);
@@ -56,7 +56,7 @@ namespace Music.Generate
         protected override void OnDeactivate(EventArgs e)
         {
             base.OnDeactivate(e);
-            GeneratorFormHelper.UpdateGeneratorDataFromDesignData(Globals.GenerationData, _design);
+            ScoreHelper.UpdateGeneratorDataFromDesignData(Globals.GenerationData, _design);
             ApplyFormData(Globals.GenerationData);
         }
 
@@ -76,7 +76,7 @@ namespace Music.Generate
 
         private void btnNewScore_Click(object sender, EventArgs e)
         {
-            _score = GeneratorFormHelper.NewScore(this, _design, clbParts, lblEndBarTotal);
+            _score = ScoreHelper.NewScore(this, _design, clbParts, lblEndBarTotal);
         }
 
         //========================   F O R M   D A T A   M A N A G E M E N T   ========================
@@ -266,7 +266,7 @@ namespace Music.Generate
         private void btnSetGeneratorTestScenarioG1_Click(object sender, EventArgs e)
         {
             // Merge in any design changes
-            GeneratorFormHelper.UpdateGeneratorDataFromDesignData(Globals.GenerationData, _design);
+            ScoreHelper.UpdateGeneratorDataFromDesignData(Globals.GenerationData, _design);
 
             // Get GenerationData defaults from helper (no UI controls passed)
             Globals.GenerationData = GeneratorTestHelpers.SetTestGeneratorG1(Globals.Design);
