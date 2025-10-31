@@ -1,4 +1,5 @@
 using Music.Designer;
+using Music;
 
 namespace Music
 {
@@ -23,10 +24,27 @@ namespace Music
                 this.WindowState = FormWindowState.Maximized;
         }
 
+        protected override void OnActivated(EventArgs e)
+        {
+            base.OnActivated(e);
+            // When entering the Designer form, apply the current design into the controls
+            new Music.Designer.DesignerForm.DesignerDataBinder().ApplyFormData(this, Globals.Design);
+        }
+
+        protected override void OnDeactivate(EventArgs e)
+        {
+            base.OnDeactivate(e);
+            // When leaving the Designer form, persist any form-backed values into Globals.Design
+            Globals.Design = new Music.Designer.DesignerForm.DesignerDataBinder().CaptureFormData(this);
+        }
+
         private void MusicForm_Load(object sender, EventArgs e)
         {
             Globals.Design ??= new DesignerData();
-            PopulateFormFromGlobals();
+            // Initialize controls from Globals.Design using the binder (parallel to GeneratorForm approach)
+            new Music.Designer.DesignerForm.DesignerDataBinder().ApplyFormData(this, Globals.Design);
+
+            PopulateFormFromGlobals(); // keep existing behavior that builds/refreshes other UI pieces
         }
 
         private void btnNew_Click(object sender, EventArgs e)
