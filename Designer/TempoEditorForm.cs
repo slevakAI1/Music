@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Music.Design
+namespace Music.Designer
 {
     // Popup editor for arranging Tempo Events and configuring their spans (in bars)
     // Mirrors interaction patterns used by TimeSignatureEditorForm and SectionEditorForm.

@@ -1,4 +1,4 @@
-using Music.Design;
+using Music.Designer;
 
 namespace Music
 {
@@ -131,7 +131,7 @@ namespace Music
         {
             // Ensure we have a design to work with
             var design = Globals.Design ??= new DesignerData();
-            Music.Design.DesignerTests.SetTestDesignD1(design);
+            Music.Designer.DesignerTests.SetTestDesignD1(design);
             RefreshDesignSpaceIfReady();
         }
 

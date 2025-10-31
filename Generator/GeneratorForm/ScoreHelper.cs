@@ -2,76 +2,76 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using Music.Design;
+using Music.Designer;
 using MusicXml.Domain;
 
-namespace Music.Generate
+namespace Music.Generator
 {
     internal static class ScoreHelper
     {
         // New: merge design-driven defaults into an existing GeneratorData instance.
         // This does not blindly overwrite unrelated persisted fields — it seeds or clamps
         // only the values the design is authoritative for (available part names, end bar, and related flags).
-        public static void UpdateGeneratorDataFromDesignData(GeneratorData data, DesignerData? design)
-        {
-            if (data == null) return;
+        //public static void UpdateGeneratorDataFromDesignData(GeneratorData data, DesignerData? design)
+        //{
+        //    if (data == null) return;
 
-            // Build set of available part names from the design
-            var available = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            if (design?.PartSet?.Parts != null)
-            {
-                foreach (var v in design.PartSet.Parts)
-                {
-                    var name = v?.PartName;
-                    if (!string.IsNullOrWhiteSpace(name))
-                        available.Add(name!);
-                }
-            }
+        //    // Build set of available part names from the design
+        //    var available = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        //    if (design?.PartSet?.Parts != null)
+        //    {
+        //        foreach (var v in design.PartSet.Parts)
+        //        {
+        //            var name = v?.PartName;
+        //            if (!string.IsNullOrWhiteSpace(name))
+        //                available.Add(name!);
+        //        }
+        //    }
 
-            // Merge existing PartsState with available parts.
-            var existing = data.PartsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            var newState = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        //    // Merge existing PartsState with available parts.
+        //    var existing = data.PartsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        //    var newState = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
-            if (existing.Count == 0)
-            {
-                // No persisted state: default to all available parts checked
-                foreach (var name in available)
-                {
-                    newState[name] = true;
-                }
-            }
-            else
-            {
-                // Preserve checked state for parts that still exist; do not carry over missing parts.
-                foreach (var name in available)
-                {
-                    if (existing.TryGetValue(name, out var isChecked))
-                        newState[name] = isChecked;
-                    else
-                        newState[name] = false; // new part added to design defaults to unchecked
-                }
-            }
+        //    if (existing.Count == 0)
+        //    {
+        //        // No persisted state: default to all available parts checked
+        //        foreach (var name in available)
+        //        {
+        //            newState[name] = true;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        // Preserve checked state for parts that still exist; do not carry over missing parts.
+        //        foreach (var name in available)
+        //        {
+        //            if (existing.TryGetValue(name, out var isChecked))
+        //                newState[name] = isChecked;
+        //            else
+        //                newState[name] = false; // new part added to design defaults to unchecked
+        //        }
+        //    }
 
-            data.PartsState = newState;
+        //    data.PartsState = newState;
 
-            // If the AllPartsChecked flag wasn't set previously, default to true when there are available parts.
-            if (!data.AllPartsChecked.HasValue)
-                data.AllPartsChecked = available.Count > 0;
+        //    // If the AllPartsChecked flag wasn't set previously, default to true when there are available parts.
+        //    if (!data.AllPartsChecked.HasValue)
+        //        data.AllPartsChecked = available.Count > 0;
 
-            // Preserve any explicit AllStaffChecked setting; if unset keep the previous default behavior of true.
-            if (!data.AllStaffChecked.HasValue)
-                data.AllStaffChecked = true;
+        //    // Preserve any explicit AllStaffChecked setting; if unset keep the previous default behavior of true.
+        //    if (!data.AllStaffChecked.HasValue)
+        //        data.AllStaffChecked = true;
 
-            // End bar: if design has a total, clamp or seed the DTO's EndBar to it.
-            var total = design?.SectionSet?.TotalBars ?? 0;
-            if (total > 0)
-            {
-                if (!data.EndBar.HasValue)
-                    data.EndBar = total;
-                else
-                    data.EndBar = Math.Max(1, Math.Min(total, data.EndBar.Value));
-            }
-        }
+        //    // End bar: if design has a total, clamp or seed the DTO's EndBar to it.
+        //    var total = design?.SectionSet?.TotalBars ?? 0;
+        //    if (total > 0)
+        //    {
+        //        if (!data.EndBar.HasValue)
+        //            data.EndBar = total;
+        //        else
+        //            data.EndBar = Math.Max(1, Math.Min(total, data.EndBar.Value));
+        //    }
+        //}
 
 
 

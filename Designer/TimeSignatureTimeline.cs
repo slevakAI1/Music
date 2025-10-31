@@ -1,4 +1,4 @@
-namespace Music.Design
+namespace Music.Designer
 {
     // Global bar/beat-aligned time signature timeline
     public class TimeSignatureTimeline

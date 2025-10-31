@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Music.Design
+namespace Music.Designer
 {
     internal static class DesignerSerialization
     {

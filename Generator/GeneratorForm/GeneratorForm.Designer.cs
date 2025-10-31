@@ -1,4 +1,4 @@
-namespace Music.Generate
+namespace Music.Generator
 {
     partial class GeneratorForm
     {

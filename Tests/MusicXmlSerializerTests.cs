@@ -1,5 +1,5 @@
 ﻿using DiffPlex;
-using Music.Design;
+using Music.Designer;
 using MusicXml;
 using System.Text;
 

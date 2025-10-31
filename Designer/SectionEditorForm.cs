@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Music.Design
+namespace Music.Designer
 {
     // Popup editor for arranging Sections: view, add, edit, delete, and drag-reorder.
     public sealed class SectionEditorForm : Form

@@ -1,5 +1,5 @@
-﻿using Music.Design;
-using Music.Generate;
+﻿using Music.Designer;
+using Music.Generator;
 using System;
 using System.Collections.Generic;
 using System.Linq;

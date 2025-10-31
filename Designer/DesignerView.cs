@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Music.Design
+namespace Music.Designer
 {
     /// <summary>
     /// THIS IS BASICALLY A DEBUG VIEW FOR THE DESIGN DATA STRUCTURE.

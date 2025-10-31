@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Music.Design
+namespace Music.Designer
 {
     // Popup editor for arranging Time Signature Events and configuring their spans
     public sealed class TimeSignatureEditorForm : Form

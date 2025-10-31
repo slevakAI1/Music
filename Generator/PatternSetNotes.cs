@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using Music;
 using MusicXml.Domain;
 
-namespace Music.Generate
+namespace Music.Generator
 {
     /// <summary>
     /// Inserts a set of notes based on user parameters.

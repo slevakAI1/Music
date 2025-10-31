@@ -1,4 +1,4 @@
-namespace Music.Design
+namespace Music.Designer
 {
     // Score Sections
     public class SectionTimelineClass

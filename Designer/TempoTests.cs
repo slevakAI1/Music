@@ -1,6 +1,6 @@
-using Music.Design;
+using Music.Designer;
 
-namespace Music.Design
+namespace Music.Designer
 {
     // Builds the app's default tempo timeline (single 90 BPM event starting at bar 1).
     public static class TempoTests

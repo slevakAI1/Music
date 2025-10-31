@@ -1,9 +1,9 @@
-using Music.Design;
+using Music.Designer;
 using Music.Generator;
 using MusicXml.Domain;
 using static Music.Helpers;
 
-namespace Music.Generate
+namespace Music.Generator
 {
     public partial class GeneratorForm : Form
     {
@@ -46,7 +46,7 @@ namespace Music.Generate
             base.OnActivated(e);
 
             // Merge in any design changes that may have happened while outside this form
-            ScoreHelper.UpdateGeneratorDataFromDesignData(Globals.GenerationData, _design);
+            Globals.GenerationData?.ApplyDesignDefaults(_design);
 
             // Update the form to take into account any design changes
             ApplyFormData(Globals.GenerationData);
@@ -56,7 +56,7 @@ namespace Music.Generate
         protected override void OnDeactivate(EventArgs e)
         {
             base.OnDeactivate(e);
-            ScoreHelper.UpdateGeneratorDataFromDesignData(Globals.GenerationData, _design);
+            Globals.GenerationData?.ApplyDesignDefaults(_design);
             ApplyFormData(Globals.GenerationData);
         }
 
@@ -266,7 +266,7 @@ namespace Music.Generate
         private void btnSetGeneratorTestScenarioG1_Click(object sender, EventArgs e)
         {
             // Merge in any design changes
-            ScoreHelper.UpdateGeneratorDataFromDesignData(Globals.GenerationData, _design);
+            Globals.GenerationData?.ApplyDesignDefaults(_design);
 
             // Get GenerationData defaults from helper (no UI controls passed)
             Globals.GenerationData = GeneratorTestHelpers.SetTestGeneratorG1(Globals.Design);

@@ -1,4 +1,4 @@
-namespace Music.Design
+namespace Music.Designer
 {
     // One time signature event, potentially spanning multiple bars
     public sealed class TimeSignatureEvent

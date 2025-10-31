@@ -1,4 +1,4 @@
-﻿namespace Music.Design
+﻿namespace Music.Designer
 {
     /// <summary>
     /// Design structure for a musical score

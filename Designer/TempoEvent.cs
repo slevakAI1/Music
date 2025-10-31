@@ -1,4 +1,4 @@
-namespace Music.Design
+namespace Music.Designer
 {
     // One tempo event, potentially spanning multiple bars
     public sealed class TempoEvent

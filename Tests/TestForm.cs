@@ -1,4 +1,4 @@
-﻿using Music.Design;
+﻿using Music.Designer;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

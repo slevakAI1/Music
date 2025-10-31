@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Music.Design
+namespace Music.Designer
 {
     // Global bar/beat-aligned harmony timeline
     public class HarmonicTimeline

@@ -1,4 +1,4 @@
-namespace Music.Design
+namespace Music.Designer
 {
     // Builds the app's default harmonic timeline (48 bars).
     public static class HarmonicTests

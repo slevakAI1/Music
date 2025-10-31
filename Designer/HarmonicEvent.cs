@@ -1,4 +1,4 @@
-namespace Music.Design
+namespace Music.Designer
 {
     // One harmonic event, potentially spanning multiple bars
     public sealed class HarmonicEvent

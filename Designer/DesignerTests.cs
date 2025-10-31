@@ -1,4 +1,4 @@
-namespace Music.Design
+namespace Music.Designer
 {
     // Central defaults to keep timelines aligned
     public static class DesignerTests

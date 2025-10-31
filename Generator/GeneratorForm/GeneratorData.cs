@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Music.Generate
+namespace Music.Generator
 {
     // Data holder object for GenerateForm user-editable values.
     // - All properties are simple data types (strings, ints, bools, Dictionary<string,bool>)

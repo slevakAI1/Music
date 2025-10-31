@@ -1,4 +1,4 @@
-namespace Music.Design
+namespace Music.Designer
 {
     // Multi-select voice picker powered by a Notion JSON voice catalog.
     public sealed class VoiceSelectorForm : Form

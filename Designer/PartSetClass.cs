@@ -1,4 +1,4 @@
-namespace Music.Design
+namespace Music.Designer
 {
     // Holds the collection of voices used by the score
     public sealed class PartSetClass

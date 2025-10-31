@@ -20,7 +20,7 @@ namespace Music
             // D E F A U L T   F O R M   O N   S T A R T U P
 
             // Show GenerateForm on startup, filling the MDI parent
-            ShowChildForm(typeof(Music.Generate.GeneratorForm));
+            ShowChildForm(typeof(Music.Generator.GeneratorForm));
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -73,7 +73,7 @@ namespace Music
         private void generateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Launch the new Generate2 form.
-            ShowChildForm(typeof(Music.Generate.GeneratorForm));
+            ShowChildForm(typeof(Music.Generator.GeneratorForm));
 
             // Previous behavior: launch the original Generate form.
             // Commented out per request — do not remove.
