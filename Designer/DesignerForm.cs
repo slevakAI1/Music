@@ -63,7 +63,16 @@ namespace Music
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            if (!EnsureDesignOrNotify()) return;
+            if (Globals.Design == null)
+            {
+                MessageBox.Show(this,
+                    "Create a new score design first.",
+                    "No Design",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
             DesignerFileManager.SaveDesign(this);
         }
 
@@ -79,108 +88,37 @@ namespace Music
 
         //==============   E D I T   B U T T O N S   ===============
 
-
-        // Launch the Section Editor and apply results back to the design
         private void btnEditSections_Click(object sender, EventArgs e)
         {
-            if (!EnsureDesignOrNotify()) return;
-
-            using var dlg = new SectionEditorForm(Globals.Design!.SectionSet);
-            if (dlg.ShowDialog(this) == DialogResult.OK)
-            {
-                // Copy back into the existing Sections instance to preserve references
-                var target = Globals.Design!.SectionSet;
-                target.Reset();
-                foreach (var s in dlg.ResultSections.Sections)
-                {
-                    target.Add(s.SectionType, s.BarCount, s.Name);
-                }
-
-                UpdateDesignerReport();
-            }
+            DesignerFormHandler.EditSections(this);
         }
 
         // Populate voices via popup selector
         private void btnSelectVoices_Click(object sender, EventArgs e)
         {
-            if (!EnsureDesignOrNotify()) return;
-
-            using var dlg = new VoiceSelectorForm();
-            if (dlg.ShowDialog(this) == DialogResult.OK)
-            {
-                var score = Globals.Design!;
-                var existing = new HashSet<string>(score.PartSet.Parts.Select(v => v.PartName),
-                    StringComparer.OrdinalIgnoreCase);
-
-                foreach (var name in dlg.SelectedVoices)
-                {
-                    if (!existing.Contains(name))
-                    {
-                        score.PartSet.AddVoice(name);
-                        existing.Add(name);
-                    }
-                }
-
-                UpdateDesignerReport();
-            }
+            DesignerFormHandler.SelectVoices(this);
         }
 
         private void btnEditHarmony_Click(object sender, EventArgs e)
         {
-            if (!EnsureDesignOrNotify()) return;
-
-            var existing = Globals.Design!.HarmonicTimeline;
-            using var dlg = new HarmonicEditorForm(existing);
-            if (dlg.ShowDialog(this) == DialogResult.OK)
-            {
-                Globals.Design!.HarmonicTimeline = dlg.ResultTimeline;
-                UpdateDesignerReport();
-            }
+            DesignerFormHandler.EditHarmony(this);
         }
 
         private void btnEditTimeSignature_Click(object sender, EventArgs e)
         {
-            if (!EnsureDesignOrNotify()) return;
-
-            var existing = Globals.Design!.TimeSignatureTimeline;
-            using var dlg = new TimeSignatureEditorForm(existing);
-            if (dlg.ShowDialog(this) == DialogResult.OK)
-            {
-                Globals.Design!.TimeSignatureTimeline = dlg.ResultTimeline;
-                // Update combined design-space summary to reflect time signatures
-                UpdateDesignerReport();
-            }
+            DesignerFormHandler.EditTimeSignature(this);
         }
 
         private void btnEditTempo_Click(object sender, EventArgs e)
         {
-            if (!EnsureDesignOrNotify()) return;
-
-            var existing = Globals.Design!.TempoTimeline;
-            using var dlg = new TempoEditorForm(existing);
-            if (dlg.ShowDialog(this) == DialogResult.OK)
-            {
-                Globals.Design!.TempoTimeline = dlg.ResultTimeline;
-                // Now reflect changes in the Design View
-                UpdateDesignerReport();
-            }
+            DesignerFormHandler.EditTempo(this);
         }
 
         // ===============   H E L P E R S   ===============
 
-        private bool EnsureDesignOrNotify()
-        {
-            if (Globals.Design != null) return true;
+        // Note: EnsureDesignOrNotify logic moved to DesignerEdit to centralize checks.
 
-            MessageBox.Show(this,
-                "Create a new score design first.",
-                "No Design",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Information);
-            return false;
-        }
-
-        private void UpdateDesignerReport()
+        internal void UpdateDesignerReport()
         {
             txtDesignerReport.Text = DesignerReport.CreateDesignerReport(Globals.Design);
         }
