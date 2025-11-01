@@ -549,7 +549,7 @@ namespace Music.Generator
             // lblNoteValue
             // 
             lblNoteValue.AutoSize = true;
-            lblNoteValue.ForeColor = Color.FromArgb(0, 192, 0);
+            lblNoteValue.ForeColor = Color.FromArgb(255, 128, 0);
             lblNoteValue.Location = new Point(15, 40);
             lblNoteValue.Name = "lblNoteValue";
             lblNoteValue.Size = new Size(112, 15);
