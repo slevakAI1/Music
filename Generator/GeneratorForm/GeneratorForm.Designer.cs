@@ -183,6 +183,7 @@ namespace Music.Generator
             // lblSections
             // 
             lblSections.AutoSize = true;
+            lblSections.ForeColor = Color.Red;
             lblSections.Location = new Point(15, 174);
             lblSections.Name = "lblSections";
             lblSections.Size = new Size(54, 15);
@@ -249,6 +250,7 @@ namespace Music.Generator
             // lblStaff
             // 
             lblStaff.AutoSize = true;
+            lblStaff.ForeColor = Color.Red;
             lblStaff.Location = new Point(15, 138);
             lblStaff.Name = "lblStaff";
             lblStaff.Size = new Size(34, 15);
@@ -268,7 +270,7 @@ namespace Music.Generator
             // lblStartBar
             // 
             lblStartBar.AutoSize = true;
-            lblStartBar.ForeColor = Color.Orange;
+            lblStartBar.ForeColor = Color.FromArgb(0, 192, 0);
             lblStartBar.Location = new Point(15, 212);
             lblStartBar.Name = "lblStartBar";
             lblStartBar.Size = new Size(54, 15);
