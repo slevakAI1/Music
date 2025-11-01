@@ -268,6 +268,7 @@ namespace Music.Generator
             // lblStartBar
             // 
             lblStartBar.AutoSize = true;
+            lblStartBar.ForeColor = Color.Orange;
             lblStartBar.Location = new Point(15, 212);
             lblStartBar.Name = "lblStartBar";
             lblStartBar.Size = new Size(54, 15);
