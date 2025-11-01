@@ -36,6 +36,9 @@ namespace Music.Generator
         private string? _pattern;
         private string? _sectionsText;
 
+        // NEW: backing field for Rest flag
+        private bool? _isRest;
+
         // General / Pattern
         public string? Pattern
         {
@@ -109,6 +112,14 @@ namespace Music.Generator
             get => _step;
             set => _step = value;
         } // e.g., "C"
+
+        // New: indicates the selection of a Rest in the step control.
+        // Default to false when not explicitly set.
+        public bool? IsRest
+        {
+            get => _isRest ?? false;
+            set => _isRest = value;
+        }
 
         // Always return a non-null accidental string for consumers (default "Natural").
         public string? Accidental

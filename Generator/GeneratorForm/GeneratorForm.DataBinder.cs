@@ -1,4 +1,6 @@
-﻿using static Music.Helpers;
+﻿using System;
+using System.Linq;
+using static Music.Helpers;
 
 namespace Music.Generator
 {
@@ -21,6 +23,10 @@ namespace Music.Generator
                 }
             }
 
+            // Determine step selection and Rest handling
+            string? stepSelected = cbStep?.SelectedItem?.ToString();
+            var isRest = !string.IsNullOrWhiteSpace(stepSelected) && stepSelected.Equals("Rest", StringComparison.OrdinalIgnoreCase);
+
             var data = new GeneratorData
             {
                 // Pattern
@@ -41,7 +47,9 @@ namespace Music.Generator
 
                 // Pitch
                 PitchAbsolute = rbPitchAbsolute?.Checked ?? true,
-                Step = cbStep?.SelectedItem?.ToString(),
+                // When "Rest" is chosen, Step should be null and IsRest true.
+                Step = isRest ? null : stepSelected,
+                IsRest = isRest,
                 Accidental = cbAccidental?.SelectedItem?.ToString(),
                 OctaveAbsolute = (int?)(numOctaveAbs?.Value ?? 4),
                 DegreeKeyRelative = (int?)(numDegree?.Value ?? 0),
@@ -127,7 +135,10 @@ namespace Music.Generator
                 rbPitchKeyRelative.Checked = !data.PitchAbsolute.Value;
             }
 
-            if (data.Step != null && cbStep != null && cbStep.Items.Contains(data.Step))
+            // If IsRest is true (assume "Rest" exists in cbStep items), select it directly.
+            if (data.IsRest == true && cbStep != null)
+                cbStep.SelectedItem = "Rest";
+            else if (data.Step != null && cbStep != null && cbStep.Items.Contains(data.Step))
                 cbStep.SelectedItem = data.Step;
 
             if (data.Accidental != null && cbAccidental != null && cbAccidental.Items.Contains(data.Accidental))
