@@ -29,9 +29,6 @@ namespace Music.Generator
                 // New: store the full items -> checked state map
                 PartsState = partsState,
 
-                AllPartsChecked = chkAllParts?.Checked ?? false,
-                AllStaffChecked = checkBox1?.Checked ?? false,
-
                 // Staff / sections / bars / beats
                 Staff = (int?)(numStaff?.Value ?? 1),
                 SectionsText = txtSections?.Text,
@@ -100,12 +97,6 @@ namespace Music.Generator
                     clbParts.EndUpdate();
                 }
             }
-
-            if (data.AllPartsChecked.HasValue && chkAllParts != null)
-                chkAllParts.Checked = data.AllPartsChecked.Value;
-
-            if (data.AllStaffChecked.HasValue && checkBox1 != null)
-                checkBox1.Checked = data.AllStaffChecked.Value;
 
             // Staff / sections / bars / beats
             if (data.Staff.HasValue && numStaff != null)

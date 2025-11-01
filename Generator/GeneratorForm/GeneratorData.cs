@@ -34,8 +34,6 @@ namespace Music.Generator
         private bool? _fermata;
         private int? _numberOfNotes;
         private string? _pattern;
-        private bool? _allPartsChecked;
-        private bool? _allStaffChecked;
         private string? _sectionsText;
 
         // General / Pattern
@@ -52,18 +50,6 @@ namespace Music.Generator
             get => _partsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             set => _partsState = value;
         }
-
-        public bool? AllPartsChecked
-        {
-            get => _allPartsChecked;
-            set => _allPartsChecked = value;
-        }
-
-        public bool? AllStaffChecked
-        {
-            get => _allStaffChecked;
-            set => _allStaffChecked = value;
-        } // corresponds to `checkBox1` in designer (labeled "All")
 
         // Staff / sections / bars / beats
         // Provide sensible defaults in getters so callers need not repeat fallback code.

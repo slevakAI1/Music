@@ -46,12 +46,6 @@ namespace Music.Generator
 
             data.PartsState = newState;
 
-            if (!data.AllPartsChecked.HasValue)
-                data.AllPartsChecked = available.Count > 0;
-
-            if (!data.AllStaffChecked.HasValue)
-                data.AllStaffChecked = true;
-
             var total = design?.SectionSet?.TotalBars ?? 0;
             if (total > 0)
             {

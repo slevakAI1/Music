@@ -8,7 +8,6 @@ namespace Music.Generator
         private System.Windows.Forms.ComboBox cbPattern;
 
         private System.Windows.Forms.GroupBox grpTarget;
-        private System.Windows.Forms.CheckBox chkAllParts;
         private System.Windows.Forms.CheckedListBox clbParts;
         private System.Windows.Forms.Label lblPart;
         private System.Windows.Forms.Label lblStaff;
@@ -57,7 +56,6 @@ namespace Music.Generator
             lblTitle = new Label();
             cbPattern = new ComboBox();
             grpTarget = new GroupBox();
-            checkBox1 = new CheckBox();
             txtSections = new TextBox();
             lblSections = new Label();
             lblStartBeat = new Label();
@@ -66,7 +64,6 @@ namespace Music.Generator
             numericUpDown2 = new NumericUpDown();
             lblPart = new Label();
             clbParts = new CheckedListBox();
-            chkAllParts = new CheckBox();
             lblStaff = new Label();
             numStaff = new NumericUpDown();
             lblStartBar = new Label();
@@ -152,7 +149,6 @@ namespace Music.Generator
             // 
             // grpTarget
             // 
-            grpTarget.Controls.Add(checkBox1);
             grpTarget.Controls.Add(txtSections);
             grpTarget.Controls.Add(lblSections);
             grpTarget.Controls.Add(lblStartBeat);
@@ -161,7 +157,6 @@ namespace Music.Generator
             grpTarget.Controls.Add(numericUpDown2);
             grpTarget.Controls.Add(lblPart);
             grpTarget.Controls.Add(clbParts);
-            grpTarget.Controls.Add(chkAllParts);
             grpTarget.Controls.Add(lblStaff);
             grpTarget.Controls.Add(numStaff);
             grpTarget.Controls.Add(lblStartBar);
@@ -176,15 +171,6 @@ namespace Music.Generator
             grpTarget.TabIndex = 2;
             grpTarget.TabStop = false;
             grpTarget.Text = "Target Scope";
-            // 
-            // checkBox1
-            // 
-            checkBox1.AutoSize = true;
-            checkBox1.Location = new Point(327, 137);
-            checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(40, 19);
-            checkBox1.TabIndex = 18;
-            checkBox1.Text = "All";
             // 
             // txtSections
             // 
@@ -244,6 +230,7 @@ namespace Music.Generator
             // lblPart
             // 
             lblPart.AutoSize = true;
+            lblPart.ForeColor = Color.FromArgb(0, 192, 0);
             lblPart.Location = new Point(15, 30);
             lblPart.Name = "lblPart";
             lblPart.Size = new Size(70, 15);
@@ -258,15 +245,6 @@ namespace Music.Generator
             clbParts.Name = "clbParts";
             clbParts.Size = new Size(220, 94);
             clbParts.TabIndex = 1;
-            // 
-            // chkAllParts
-            // 
-            chkAllParts.AutoSize = true;
-            chkAllParts.Location = new Point(314, 31);
-            chkAllParts.Name = "chkAllParts";
-            chkAllParts.Size = new Size(40, 19);
-            chkAllParts.TabIndex = 2;
-            chkAllParts.Text = "All";
             // 
             // lblStaff
             // 
@@ -309,6 +287,7 @@ namespace Music.Generator
             // lblEndBar
             // 
             lblEndBar.AutoSize = true;
+            lblEndBar.ForeColor = Color.FromArgb(0, 192, 0);
             lblEndBar.Location = new Point(203, 212);
             lblEndBar.Name = "lblEndBar";
             lblEndBar.Size = new Size(50, 15);
@@ -361,6 +340,7 @@ namespace Music.Generator
             // rbPitchAbsolute
             // 
             rbPitchAbsolute.AutoSize = true;
+            rbPitchAbsolute.ForeColor = Color.Orange;
             rbPitchAbsolute.Location = new Point(18, 28);
             rbPitchAbsolute.Name = "rbPitchAbsolute";
             rbPitchAbsolute.Size = new Size(209, 19);
@@ -394,6 +374,7 @@ namespace Music.Generator
             // lblStep
             // 
             lblStep.AutoSize = true;
+            lblStep.ForeColor = Color.FromArgb(0, 192, 0);
             lblStep.Location = new Point(10, 30);
             lblStep.Name = "lblStep";
             lblStep.Size = new Size(33, 15);
@@ -548,6 +529,7 @@ namespace Music.Generator
             // label3
             // 
             label3.AutoSize = true;
+            label3.ForeColor = Color.FromArgb(0, 192, 0);
             label3.Location = new Point(15, 166);
             label3.Name = "label3";
             label3.Size = new Size(99, 15);
@@ -564,6 +546,7 @@ namespace Music.Generator
             // lblNoteValue
             // 
             lblNoteValue.AutoSize = true;
+            lblNoteValue.ForeColor = Color.FromArgb(0, 192, 0);
             lblNoteValue.Location = new Point(15, 40);
             lblNoteValue.Name = "lblNoteValue";
             lblNoteValue.Size = new Size(112, 15);
@@ -762,7 +745,6 @@ namespace Music.Generator
         private CheckBox chkFermata;
         private Label lblSections;
         private TextBox txtSections;
-        private CheckBox checkBox1;
         private Label label3;
         private NumericUpDown numNumberOfNotes;
         private Label label2;

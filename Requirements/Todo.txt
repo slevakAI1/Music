@@ -1,9 +1,7 @@
 ﻿
 
 
-Next: (1) Apply half and/or eighth notes to selected voice
-      (2) Apply different length notes to all voices
-
+Next: 
 
 
 

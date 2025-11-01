@@ -36,9 +36,7 @@ namespace Music.Generator
                 partsState[p] = true;
 
             data.PartsState = partsState;
-            data.AllPartsChecked = partNames.Count > 0;
-            data.AllStaffChecked = true; // keep previous behavior of checking "All staff" by default
-
+ 
             // End bar: default to design total bars when available
             var total = design?.SectionSet?.TotalBars ?? 0;
             if (total > 0)
