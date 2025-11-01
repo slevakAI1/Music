@@ -1,3 +1,5 @@
+using System;
+using System.Windows.Forms;
 using Music.Designer;
 using Music;
 
@@ -32,21 +34,21 @@ namespace Music
         {
             base.OnActivated(e);
             // When entering the Designer form, apply the current design into the controls
-            new Music.Designer.DesignerForm.DesignerDataBinder().ApplyFormData(this, Globals.Design);
+            ApplyFormData(Globals.Design);
         }
 
         protected override void OnDeactivate(EventArgs e)
         {
             base.OnDeactivate(e);
             // When leaving the Designer form, persist any form-backed values into Globals.Design
-            Globals.Design = new Music.Designer.DesignerForm.DesignerDataBinder().CaptureFormData(this);
+            Globals.Design = CaptureFormData();
         }
 
         private void MusicForm_Load(object sender, EventArgs e)
         {
             Globals.Design ??= new DesignerData();
             // Initialize controls from Globals.Design using the binder (parallel to GeneratorForm approach)
-            new Music.Designer.DesignerForm.DesignerDataBinder().ApplyFormData(this, Globals.Design);
+            ApplyFormData(Globals.Design);
 
             DesignerFormHandler.UpdateDesignerReport(this); // keep existing behavior that builds/refreshes other UI pieces
         }
