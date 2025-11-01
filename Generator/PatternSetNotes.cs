@@ -14,38 +14,13 @@ namespace Music.Generator
     /// </summary>
     public static class PatternSetNotes
     {
-        /// <summary>
-        /// Apply the "Set Notes" operation to the provided score.
-        /// The score object is updated in-place.
-        /// </summary>
-        public static void Apply(
-            MusicXml.Domain.Score score,
-            IEnumerable<string> designPartNames,
-            int staff,
-            int startBar,
-            int endBar,
-            string? stepStr,
-            string? accidental,
-            int octave,
-            string? noteValueKey,
-            int numberOfNotes)
-        {
-            // Validate UI-level parameters first; this will show message boxes on failure.
-            if (!ValidateApplyParameters.Validate(score, designPartNames, staff, startBar, endBar, stepStr, accidental ?? "Natural", octave, noteValueKey, numberOfNotes, out var stepChar, out var noteValue))
-            {
-                return;
-            }
-
-            // After validation, call the core implementation (same logic as before) using mapped values.
-            ApplyCore(score, designPartNames, staff, startBar, endBar, stepChar, accidental, octave, noteValue, numberOfNotes);
-        }
 
         /// <summary>
         /// Overload: accept the GenerationData DTO from the form, perform the necessary mapping/formatting
         /// and delegate to the existing Apply(...) implementation.
         /// All control-specific transformation logic (defaults, null handling) lives here.
         /// </summary>
-        public static void Apply(Score score, GeneratorData data)
+        public static void Apply1(Score score, GeneratorData data)
         {
             if (score == null) throw new ArgumentNullException(nameof(score));
             if (data == null) throw new ArgumentNullException(nameof(data));
@@ -68,11 +43,45 @@ namespace Music.Generator
             var numberOfNotes = data.NumberOfNotes.GetValueOrDefault();
 
             // Delegate to existing validation + core implementation
-            Apply(score, parts, staff, startBar, endBar, stepStr, accidental, octave, noteValueKey, numberOfNotes);
+            Apply2(score, parts, staff, startBar, endBar, stepStr, accidental, octave, noteValueKey, numberOfNotes);
         }
 
+
+        //===========================================================================================
+
+
+        /// <summary>
+        /// Apply the "Set Notes" operation to the provided score.
+        /// The score object is updated in-place.
+        /// </summary>
+        public static void Apply2(
+            MusicXml.Domain.Score score,
+            IEnumerable<string> designPartNames,
+            int staff,
+            int startBar,
+            int endBar,
+            string? stepStr,
+            string? accidental,
+            int octave,
+            string? noteValueKey,
+            int numberOfNotes)
+        {
+            // Validate UI-level parameters first; this will show message boxes on failure.
+            if (!ValidateApplyParameters.Validate(score, designPartNames, staff, startBar, endBar, stepStr, accidental ?? "Natural", octave, noteValueKey, numberOfNotes, out var stepChar, out var noteValue))
+            {
+                return;
+            }
+
+            // After validation, call the core implementation (same logic as before) using mapped values.
+            Apply3(score, designPartNames, staff, startBar, endBar, stepChar, accidental, octave, noteValue, numberOfNotes);
+        }
+
+
+        //===========================================================================================
+
+
         // Extracted core implementation that assumes validated and already-mapped parameters.
-        private static void ApplyCore(
+        private static void Apply3(
             MusicXml.Domain.Score score,
             IEnumerable<string> designPartNames,
             int staff,

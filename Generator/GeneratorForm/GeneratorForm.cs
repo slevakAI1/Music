@@ -67,7 +67,7 @@ namespace Music.Generator
             Globals.GenerationData = CaptureFormData();
             if (Globals.GenerationData != null)
             {
-                PatternSetNotes.Apply(_score!, Globals.GenerationData);
+                PatternSetNotes.Apply1(_score!, Globals.GenerationData);
                 Globals.Score = _score;
             }
         }
