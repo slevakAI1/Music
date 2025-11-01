@@ -48,7 +48,7 @@ namespace Music
             // Initialize controls from Globals.Design using the binder (parallel to GeneratorForm approach)
             new Music.Designer.DesignerForm.DesignerDataBinder().ApplyFormData(this, Globals.Design);
 
-            UpdateDesignerReport(); // keep existing behavior that builds/refreshes other UI pieces
+            DesignerFormHandler.UpdateDesignerReport(this); // keep existing behavior that builds/refreshes other UI pieces
         }
 
 
@@ -57,32 +57,17 @@ namespace Music
 
         private void btnNew_Click(object sender, EventArgs e)
         {
-            Globals.Design = new DesignerData();
-            UpdateDesignerReport();
+            DesignerFormHandler.NewDesign(this);
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            if (Globals.Design == null)
-            {
-                MessageBox.Show(this,
-                    "Create a new score design first.",
-                    "No Design",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-                return;
-            }
-
-            DesignerFileManager.SaveDesign(this);
+            DesignerFormHandler.SaveDesign(this);
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
-            var loaded = DesignerFileManager.LoadDesign(this);
-            if (loaded)
-            {
-                UpdateDesignerReport();
-            }
+            DesignerFormHandler.LoadDesign(this);
         }
 
 
@@ -114,16 +99,6 @@ namespace Music
             DesignerFormHandler.EditTempo(this);
         }
 
-        // ===============   H E L P E R S   ===============
-
-        // Note: EnsureDesignOrNotify logic moved to DesignerEdit to centralize checks.
-
-        internal void UpdateDesignerReport()
-        {
-            txtDesignerReport.Text = DesignerReport.CreateDesignerReport(Globals.Design);
-        }
-
-
         // ==========================   T E S T    D E S I G N S   ==========================
 
         private void btnSetTestDesignD1_Click(object sender, EventArgs e)
@@ -131,7 +106,7 @@ namespace Music
             // Ensure we have a design to work with
             var design = Globals.Design ??= new DesignerData();
             Music.Designer.DesignerTests.SetTestDesignD1(design);
-            UpdateDesignerReport();
+            DesignerFormHandler.UpdateDesignerReport(this);
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 using Music.Designer;
 using Music;
@@ -22,6 +23,61 @@ namespace Music
             return false;
         }
 
+        public static void NewDesign(DesignerForm form)
+        {
+            Globals.Design = new DesignerData();
+            UpdateDesignerReport(form);
+        }
+
+        public static void SaveDesign(DesignerForm form)
+        {
+            if (Globals.Design == null)
+            {
+                MessageBox.Show(form,
+                    "Create a new score design first.",
+                    "No Design",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            DesignerFileManager.SaveDesign(form);
+        }
+
+        public static void LoadDesign(DesignerForm form)
+        {
+            var loaded = DesignerFileManager.LoadDesign(form);
+            if (loaded)
+            {
+                UpdateDesignerReport(form);
+            }
+        }
+
+        // Update the txtDesignerReport TextBox (if present) with the current Globals.Design snapshot.
+        public static void UpdateDesignerReport(Form form)
+        {
+            if (form == null) return;
+
+            T? GetField<T>(string name) where T : class
+            {
+                var t = form.GetType();
+                while (t != null)
+                {
+                    var fi = t.GetField(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                    if (fi != null)
+                        return fi.GetValue(form) as T;
+                    t = t.BaseType;
+                }
+                return null;
+            }
+
+            var txtDesignerReport = GetField<TextBox>("txtDesignerReport");
+            if (txtDesignerReport != null)
+            {
+                txtDesignerReport.Text = DesignerReport.CreateDesignerReport(Globals.Design);
+            }
+        }
+
         public static void EditSections(DesignerForm form)
         {
             if (!EnsureDesignOrNotify(form)) return;
@@ -37,7 +93,7 @@ namespace Music
                     target.Add(s.SectionType, s.BarCount, s.Name);
                 }
 
-                form.UpdateDesignerReport();
+                UpdateDesignerReport(form);
             }
         }
 
@@ -61,7 +117,7 @@ namespace Music
                     }
                 }
 
-                form.UpdateDesignerReport();
+                UpdateDesignerReport(form);
             }
         }
 
@@ -74,7 +130,7 @@ namespace Music
             if (dlg.ShowDialog(form) == DialogResult.OK)
             {
                 Globals.Design!.HarmonicTimeline = dlg.ResultTimeline;
-                form.UpdateDesignerReport();
+                UpdateDesignerReport(form);
             }
         }
 
@@ -87,7 +143,7 @@ namespace Music
             if (dlg.ShowDialog(form) == DialogResult.OK)
             {
                 Globals.Design!.TimeSignatureTimeline = dlg.ResultTimeline;
-                form.UpdateDesignerReport();
+                UpdateDesignerReport(form);
             }
         }
 
@@ -100,7 +156,7 @@ namespace Music
             if (dlg.ShowDialog(form) == DialogResult.OK)
             {
                 Globals.Design!.TempoTimeline = dlg.ResultTimeline;
-                form.UpdateDesignerReport();
+                UpdateDesignerReport(form);
             }
         }
     }
