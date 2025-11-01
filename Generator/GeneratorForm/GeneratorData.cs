@@ -35,8 +35,6 @@ namespace Music.Generator
         private int? _numberOfNotes;
         private string? _pattern;
         private string? _sectionsText;
-
-        // NEW: backing field for Rest flag
         private bool? _isRest;
 
         // General / Pattern
