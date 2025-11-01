@@ -21,6 +21,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Remove="Designer\DesignerFrom.DataBinder.resx" />
+    <EmbeddedResource Remove="Generator\GeneratorForm\GeneratorForm.DataBinder.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DiffPlex" Version="1.9.0" />
     <PackageReference Include="Melanchall.DryWetMidi" Version="8.0.2" />
     <PackageReference Include="MusicTheory" Version="1.4.0" />
