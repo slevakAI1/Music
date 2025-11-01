@@ -91,7 +91,7 @@ namespace Music
             btnSetDefault.TabIndex = 16;
             btnSetDefault.Text = "Set Test Design D1";
             btnSetDefault.UseVisualStyleBackColor = true;
-            btnSetDefault.Click += btnSetDefault_Click;
+            btnSetDefault.Click += btnSetTestDesignD1_Click;
             // 
             // btnLoad
             // 

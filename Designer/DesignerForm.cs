@@ -47,16 +47,17 @@ namespace Music
             // Initialize controls from Globals.Design using the binder (parallel to GeneratorForm approach)
             new Music.Designer.DesignerForm.DesignerDataBinder().ApplyFormData(this, Globals.Design);
 
-            PopulateFormFromGlobals(); // keep existing behavior that builds/refreshes other UI pieces
+            UpdateDesignerReport(); // keep existing behavior that builds/refreshes other UI pieces
         }
 
 
-        //===============   B U T T O N   E V E N T S   ===============
+        //===============   F I L E    E V E N T S   ===============
 
 
         private void btnNew_Click(object sender, EventArgs e)
         {
-            ClearDesignAndForm();
+            Globals.Design = new DesignerData();
+            UpdateDesignerReport();
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -70,9 +71,14 @@ namespace Music
             var loaded = DesignerFileManager.LoadDesign(this);
             if (loaded)
             {
-                RefreshDesignSpaceIfReady();
+                UpdateDesignerReport();
             }
         }
+
+
+        //==============   E D I T   B U T T O N S   ===============
+
+
         // Launch the Section Editor and apply results back to the design
         private void btnEditSections_Click(object sender, EventArgs e)
         {
@@ -89,7 +95,7 @@ namespace Music
                     target.Add(s.SectionType, s.BarCount, s.Name);
                 }
 
-                RefreshDesignSpaceIfReady();
+                UpdateDesignerReport();
             }
         }
 
@@ -114,7 +120,7 @@ namespace Music
                     }
                 }
 
-                RefreshDesignSpaceIfReady();
+                UpdateDesignerReport();
             }
         }
 
@@ -127,54 +133,9 @@ namespace Music
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 Globals.Design!.HarmonicTimeline = dlg.ResultTimeline;
-                RefreshDesignSpaceIfReady();
+                UpdateDesignerReport();
             }
         }
-
-        // --------- Helpers ---------
-
-        private bool EnsureDesignOrNotify()
-        {
-            if (Globals.Design != null) return true;
-
-            MessageBox.Show(this,
-                "Create a new score design first.",
-                "No Design",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Information);
-            return false;
-        }
-
-        private void RefreshDesignSpaceIfReady()
-        {
-            if (Globals.Design == null) return;
-            txtDesignerReport.Text = DesignerReport.CreateDesignerReport(Globals.Design);
-        }
-
-        private void PopulateFormFromGlobals()
-        {
-            // Combined design-space summary
-            RefreshDesignSpaceIfReady();
-        }
-
-        private void ClearDesignAndForm()
-        {
-            // Reset the score design (new instance is fine to ensure clean state)
-            Globals.Design = new DesignerData();
-
-            // Repopulate the design area headings with no data
-            RefreshDesignSpaceIfReady();
-        }
-
-        private void btnSetDefault_Click(object sender, EventArgs e)
-        {
-            // Ensure we have a design to work with
-            var design = Globals.Design ??= new DesignerData();
-            Music.Designer.DesignerTests.SetTestDesignD1(design);
-            RefreshDesignSpaceIfReady();
-        }
-
-
 
         private void btnEditTimeSignature_Click(object sender, EventArgs e)
         {
@@ -186,7 +147,7 @@ namespace Music
             {
                 Globals.Design!.TimeSignatureTimeline = dlg.ResultTimeline;
                 // Update combined design-space summary to reflect time signatures
-                RefreshDesignSpaceIfReady();
+                UpdateDesignerReport();
             }
         }
 
@@ -200,8 +161,41 @@ namespace Music
             {
                 Globals.Design!.TempoTimeline = dlg.ResultTimeline;
                 // Now reflect changes in the Design View
-                RefreshDesignSpaceIfReady();
+                UpdateDesignerReport();
             }
+        }
+
+        // TODO    ELIMINATE OR MOVE THESE !!!!!!!!!!!!!!
+
+        // ===============   H E L P E R S   ===============
+
+        private bool EnsureDesignOrNotify()
+        {
+            if (Globals.Design != null) return true;
+
+            MessageBox.Show(this,
+                "Create a new score design first.",
+                "No Design",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+            return false;
+        }
+
+        private void UpdateDesignerReport()
+        {
+            if (Globals.Design == null) return;
+            txtDesignerReport.Text = DesignerReport.CreateDesignerReport(Globals.Design);
+        }
+
+
+        // ==========================   T E S T    D E S I G N S   ==========================
+
+        private void btnSetTestDesignD1_Click(object sender, EventArgs e)
+        {
+            // Ensure we have a design to work with
+            var design = Globals.Design ??= new DesignerData();
+            Music.Designer.DesignerTests.SetTestDesignD1(design);
+            UpdateDesignerReport();
         }
     }
 }
