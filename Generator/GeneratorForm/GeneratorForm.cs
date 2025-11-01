@@ -1,7 +1,5 @@
 using Music.Designer;
-using Music.Generator;
 using MusicXml.Domain;
-using static Music.Helpers;
 
 namespace Music.Generator
 {
@@ -28,7 +26,7 @@ namespace Music.Generator
 
             // Capture form control values manually set in the form designer
             // This will only be done once, at form construction time.
-            Globals.GenerationData ??= new GeneratorDataBinder().CaptureFormData(this);
+            Globals.GenerationData ??= CaptureFormData();
         }
 
         protected override void OnShown(EventArgs e)
@@ -49,7 +47,7 @@ namespace Music.Generator
             Globals.GenerationData?.ApplyDesignDefaults(_design);
 
             // Update the form to take into account any design changes
-            new GeneratorDataBinder().ApplyFormData(this, Globals.GenerationData);
+            ApplyFormData(Globals.GenerationData);
         }
 
         // Persist current control state whenever the form loses activation (user switches to another MDI child)
@@ -57,7 +55,7 @@ namespace Music.Generator
         {
             base.OnDeactivate(e);
             Globals.GenerationData?.ApplyDesignDefaults(_design);
-            new GeneratorDataBinder().ApplyFormData(this, Globals.GenerationData);
+            ApplyFormData(Globals.GenerationData);
         }
 
         //===============================   E V E N T S   ==============================
@@ -66,7 +64,7 @@ namespace Music.Generator
         {
             // Persist current control state and pass the captured DTO to PatternSetNotes.
             // All control-to-primitive mapping/logic is handled inside PatternSetNotes.Apply(Score, GenerationData).
-            Globals.GenerationData = new GeneratorDataBinder().CaptureFormData(this);
+            Globals.GenerationData = CaptureFormData();
             if (Globals.GenerationData != null)
             {
                 PatternSetNotes.Apply(_score!, Globals.GenerationData);
@@ -102,8 +100,8 @@ namespace Music.Generator
             // Get GenerationData defaults from helper (no UI controls passed)
             Globals.GenerationData = GeneratorTestHelpers.SetTestGeneratorG1(Globals.Design);
 
-            // Apply the generated defaults into the form controls via the existing method
-            new GeneratorDataBinder().ApplyFormData(this, Globals.GenerationData);
+            // Apply the generated defaults into the form controls via the instance method
+            ApplyFormData(Globals.GenerationData);
         }
     }
 }

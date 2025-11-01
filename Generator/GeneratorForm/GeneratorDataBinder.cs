@@ -1,39 +1,16 @@
-﻿using Melanchall.DryWetMidi.Composing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Reflection;
-using Music.Generator;
-using static Music.Helpers;
-using static Music.MusicConstants;
+﻿using static Music.Helpers;
 
 namespace Music.Generator
 {
-    internal class GeneratorDataBinder
+    // Converted helper into a partial class so it can access designer controls directly
+    public partial class GeneratorForm
     {
         // Capture current control values into a class object.
-        public GeneratorData CaptureFormData(GeneratorForm form)
+        // No form parameter required because this is now a partial of GeneratorForm.
+        public GeneratorData CaptureFormData()
         {
-            // Helper to fetch private fields by name on the form (searching base types as needed)
-            T GetField<T>(string name) where T : class
-            {
-                var t = form.GetType();
-                while (t != null)
-                {
-                    var fi = t.GetField(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-                    if (fi != null)
-                        return fi.GetValue(form) as T;
-                    t = t.BaseType;
-                }
-                return null;
-            }
-
             // Capture parts items and their checked state into a dictionary
             var partsState = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            var clbParts = GetField<CheckedListBox>("clbParts");
             if (clbParts != null)
             {
                 for (int i = 0; i < clbParts.Items.Count; i++)
@@ -43,35 +20,6 @@ namespace Music.Generator
                         partsState[name] = clbParts.GetItemChecked(i);
                 }
             }
-
-            var cbPattern = GetField<ComboBox>("cbPattern");
-            var chkAllParts = GetField<CheckBox>("chkAllParts");
-            var checkBox1 = GetField<CheckBox>("checkBox1");
-
-            var numStaff = GetField<NumericUpDown>("numStaff");
-            var txtSections = GetField<TextBox>("txtSections");
-            var numStartBar = GetField<NumericUpDown>("numStartBar");
-            var numEndBar = GetField<NumericUpDown>("numEndBar");
-            var numStartBeat = GetField<NumericUpDown>("numStartBeat");
-            var numericUpDown2 = GetField<NumericUpDown>("numericUpDown2");
-
-            var chkOverwrite = GetField<CheckBox>("chkOverwrite");
-
-            var rbPitchAbsolute = GetField<RadioButton>("rbPitchAbsolute");
-            var cbStep = GetField<ComboBox>("cbStep");
-            var cbAccidental = GetField<ComboBox>("cbAccidental");
-            var numOctaveAbs = GetField<NumericUpDown>("numOctaveAbs");
-            var numDegree = GetField<NumericUpDown>("numDegree");
-            var numOctaveKR = GetField<NumericUpDown>("numOctaveKR");
-
-            var cbNoteValue = GetField<ComboBox>("cbNoteValue");
-            var numDots = GetField<NumericUpDown>("numDots");
-            var chkTupletEnabled = GetField<CheckBox>("chkTupletEnabled");
-            var numTupletCount = GetField<NumericUpDown>("numTupletCount");
-            var numTupletOf = GetField<NumericUpDown>("numTupletOf");
-            var chkTieAcross = GetField<CheckBox>("chkTieAcross");
-            var chkFermata = GetField<CheckBox>("chkFermata");
-            var numNumberOfNotes = GetField<NumericUpDown>("numNumberOfNotes");
 
             var data = new GeneratorData
             {
@@ -117,30 +65,16 @@ namespace Music.Generator
         }
 
         // Apply a GenerateFormData object back to the private form controls.
-        public void ApplyFormData(GeneratorForm form, GeneratorData data)
+        // No form parameter required because this is a partial of GeneratorForm.
+        public void ApplyFormData(GeneratorData data)
         {
-            if (data == null || form == null) return;
-
-            T GetField<T>(string name) where T : class
-            {
-                var t = form.GetType();
-                while (t != null)
-                {
-                    var fi = t.GetField(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-                    if (fi != null)
-                        return fi.GetValue(form) as T;
-                    t = t.BaseType;
-                }
-                return null;
-            }
+            if (data == null) return;
 
             // Pattern
-            var cbPattern = GetField<ComboBox>("cbPattern");
             if (data.Pattern != null && cbPattern != null && cbPattern.Items.Contains(data.Pattern))
                 cbPattern.SelectedItem = data.Pattern;
 
             // Parts - if provided, set checked state for matching items
-            var clbParts = GetField<CheckedListBox>("clbParts");
             if (data.PartsState != null && data.PartsState.Count > 0 && clbParts != null)
             {
                 // Use case-insensitive lookup
@@ -167,9 +101,6 @@ namespace Music.Generator
                 }
             }
 
-            var chkAllParts = GetField<CheckBox>("chkAllParts");
-            var checkBox1 = GetField<CheckBox>("checkBox1");
-
             if (data.AllPartsChecked.HasValue && chkAllParts != null)
                 chkAllParts.Checked = data.AllPartsChecked.Value;
 
@@ -177,14 +108,6 @@ namespace Music.Generator
                 checkBox1.Checked = data.AllStaffChecked.Value;
 
             // Staff / sections / bars / beats
-            var numStaff = GetField<NumericUpDown>("numStaff");
-            var txtSections = GetField<TextBox>("txtSections");
-            var numStartBar = GetField<NumericUpDown>("numStartBar");
-            var numEndBar = GetField<NumericUpDown>("numEndBar");
-            var numStartBeat = GetField<NumericUpDown>("numStartBeat");
-            var numericUpDown2 = GetField<NumericUpDown>("numericUpDown2");
-            var chkOverwrite = GetField<CheckBox>("chkOverwrite");
-
             if (data.Staff.HasValue && numStaff != null)
                 numStaff.Value = LimitRange(numStaff, data.Staff.Value);
 
@@ -207,14 +130,6 @@ namespace Music.Generator
                 chkOverwrite.Checked = data.OverwriteExisting.Value;
 
             // Pitch
-            var rbPitchAbsolute = GetField<RadioButton>("rbPitchAbsolute");
-            var rbPitchKeyRelative = GetField<RadioButton>("rbPitchKeyRelative");
-            var cbStep = GetField<ComboBox>("cbStep");
-            var cbAccidental = GetField<ComboBox>("cbAccidental");
-            var numOctaveAbs = GetField<NumericUpDown>("numOctaveAbs");
-            var numDegree = GetField<NumericUpDown>("numDegree");
-            var numOctaveKR = GetField<NumericUpDown>("numOctaveKR");
-
             if (data.PitchAbsolute.HasValue && rbPitchAbsolute != null && rbPitchKeyRelative != null)
             {
                 rbPitchAbsolute.Checked = data.PitchAbsolute.Value;
@@ -237,15 +152,6 @@ namespace Music.Generator
                 numOctaveKR.Value = LimitRange(numOctaveKR, data.OctaveKeyRelative.Value);
 
             // Rhythm
-            var cbNoteValue = GetField<ComboBox>("cbNoteValue");
-            var numDots = GetField<NumericUpDown>("numDots");
-            var chkTupletEnabled = GetField<CheckBox>("chkTupletEnabled");
-            var numTupletCount = GetField<NumericUpDown>("numTupletCount");
-            var numTupletOf = GetField<NumericUpDown>("numTupletOf");
-            var chkTieAcross = GetField<CheckBox>("chkTieAcross");
-            var chkFermata = GetField<CheckBox>("chkFermata");
-            var numNumberOfNotes = GetField<NumericUpDown>("numNumberOfNotes");
-
             if (data.NoteValue != null && cbNoteValue != null && cbNoteValue.Items.Contains(data.NoteValue))
                 cbNoteValue.SelectedItem = data.NoteValue;
 
@@ -270,6 +176,5 @@ namespace Music.Generator
             if (data.NumberOfNotes.HasValue && numNumberOfNotes != null)
                 numNumberOfNotes.Value = LimitRange(numNumberOfNotes, data.NumberOfNotes.Value);
         }
-
     }
 }
