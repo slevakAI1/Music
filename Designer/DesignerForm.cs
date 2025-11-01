@@ -15,6 +15,7 @@ namespace Music
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.Manual;
+            Globals.Design ??= new DesignerData();
 
             InitializeComponent();
         }
@@ -165,8 +166,6 @@ namespace Music
             }
         }
 
-        // TODO    ELIMINATE OR MOVE THESE !!!!!!!!!!!!!!
-
         // ===============   H E L P E R S   ===============
 
         private bool EnsureDesignOrNotify()
@@ -183,7 +182,6 @@ namespace Music
 
         private void UpdateDesignerReport()
         {
-            if (Globals.Design == null) return;
             txtDesignerReport.Text = DesignerReport.CreateDesignerReport(Globals.Design);
         }
 
