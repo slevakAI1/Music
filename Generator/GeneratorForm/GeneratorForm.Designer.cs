@@ -335,7 +335,7 @@ namespace Music.Generator
             grpPitch.Controls.Add(grpKeyRelative);
             grpPitch.Location = new Point(20, 454);
             grpPitch.Name = "grpPitch";
-            grpPitch.Size = new Size(442, 235);
+            grpPitch.Size = new Size(442, 285);
             grpPitch.TabIndex = 3;
             grpPitch.TabStop = false;
             grpPitch.Text = "Pitch Options";
@@ -387,7 +387,7 @@ namespace Music.Generator
             // cbStep
             // 
             cbStep.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbStep.Items.AddRange(new object[] { "C", "D", "E", "F", "G", "A", "B", "Rest" });
+            cbStep.Items.AddRange(new object[] { "C", "D", "E", "F", "G", "A", "B" });
             cbStep.Location = new Point(50, 26);
             cbStep.Name = "cbStep";
             cbStep.Size = new Size(60, 23);
@@ -688,7 +688,7 @@ namespace Music.Generator
             // 
             // GeneratorForm
             // 
-            ClientSize = new Size(832, 701);
+            ClientSize = new Size(832, 751);
             Controls.Add(btnSetDesignTestScenarioD1);
             Controls.Add(btnNewScore);
             Controls.Add(btnSetGeneratorTestScenarioG1);
