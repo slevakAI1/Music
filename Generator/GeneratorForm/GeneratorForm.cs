@@ -67,7 +67,7 @@ namespace Music.Generator
             Globals.GenerationData = CaptureFormData();
             if (Globals.GenerationData != null)
             {
-                PatternSetNotes.Apply1(_score!, Globals.GenerationData);
+                PatternSetNotes.Apply(_score!, Globals.GenerationData);
                 Globals.Score = _score;
             }
         }
@@ -88,6 +88,7 @@ namespace Music.Generator
             // Ensure design exists and apply design defaults
             Globals.Design ??= new DesignerData();
             DesignerTests.SetTestDesignD1(Globals.Design);
+            MessageBox.Show("Test Design D1 has been applied to the current design.", "Design Test Scenario D1", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         // This sets generator test scenario G1
@@ -96,12 +97,9 @@ namespace Music.Generator
         {
             // Merge in any design changes
             Globals.GenerationData?.ApplyDesignDefaults(_design);
-
-            // Get GenerationData defaults from helper (no UI controls passed)
             Globals.GenerationData = GeneratorTestHelpers.SetTestGeneratorG1(Globals.Design);
-
-            // Apply the generated defaults into the form controls via the instance method
             ApplyFormData(Globals.GenerationData);
+            MessageBox.Show("Test Generator G1 has been applied to the current generator settings.", "Generator Test Scenario G1", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

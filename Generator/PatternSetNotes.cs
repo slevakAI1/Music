@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 using Music;
 using MusicXml.Domain;
 
@@ -9,23 +8,22 @@ namespace Music.Generator
 {
     /// <summary>
     /// Inserts a set of notes based on user parameters.
-    /// Method assumes the score has already be initialized with parts, measure, tempo, time signature.
-    /// 
+    /// Method assumes the score has already been initialized with parts, measure, tempo, time signature.
+    /// All parameters are expected to be pre-validated.
     /// </summary>
     public static class PatternSetNotes
     {
-
         /// <summary>
-        /// Overload: accept the GenerationData DTO from the form, perform the necessary mapping/formatting
-        /// and delegate to the existing Apply(...) implementation.
-        /// All control-specific transformation logic (defaults, null handling) lives here.
+        /// Apply the "Set Notes" operation to the provided score.
+        /// The score object is updated in-place.
+        /// All parameters are expected to be pre-validated.
         /// </summary>
-        public static void Apply1(Score score, GeneratorData data)
+        public static void Apply(Score score, GeneratorData data)
         {
             if (score == null) throw new ArgumentNullException(nameof(score));
             if (data == null) throw new ArgumentNullException(nameof(data));
 
-            // Derive selected parts from PartsState dictionary (keys with true value)
+            // Extract and transform data from GeneratorData DTO
             var parts = (data.PartsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase))
                 .Where(kv => kv.Value)
                 .Select(kv => kv.Key)
@@ -34,104 +32,39 @@ namespace Music.Generator
             var staff = data.Staff.GetValueOrDefault();
             var startBar = data.StartBar.GetValueOrDefault();
             var endBar = data.EndBar.GetValueOrDefault(startBar);
-
-            string? stepStr = data.Step;
+            
+            // Map Step string to char
+            char step = string.IsNullOrWhiteSpace(data.Step) ? 'C' : data.Step[0];
+            
+            // Map accidental to alter value (MusicXml uses -1, 0, 1)
             string accidental = data.Accidental ?? "Natural";
-            int octave = data.Octave;
-
-            string? noteValueKey = data.NoteValue;
-            var numberOfNotes = data.NumberOfNotes.GetValueOrDefault();
-
-            // Delegate to existing validation + core implementation
-            Apply2(score, parts, staff, startBar, endBar, stepStr, accidental, octave, noteValueKey, numberOfNotes);
-        }
-
-
-        //===========================================================================================
-
-
-        /// <summary>
-        /// Apply the "Set Notes" operation to the provided score.
-        /// The score object is updated in-place.
-        /// </summary>
-        public static void Apply2(
-            MusicXml.Domain.Score score,
-            IEnumerable<string> designPartNames,
-            int staff,
-            int startBar,
-            int endBar,
-            string? stepStr,
-            string? accidental,
-            int octave,
-            string? noteValueKey,
-            int numberOfNotes)
-        {
-            // Validate UI-level parameters first; this will show message boxes on failure.
-            if (!ValidateApplyParameters.Validate(score, designPartNames, staff, startBar, endBar, stepStr, accidental ?? "Natural", octave, noteValueKey, numberOfNotes, out var stepChar, out var noteValue))
-            {
-                return;
-            }
-
-            // After validation, call the core implementation (same logic as before) using mapped values.
-            Apply3(score, designPartNames, staff, startBar, endBar, stepChar, accidental, octave, noteValue, numberOfNotes);
-        }
-
-
-        //===========================================================================================
-
-
-        // Extracted core implementation that assumes validated and already-mapped parameters.
-        private static void Apply3(
-            MusicXml.Domain.Score score,
-            IEnumerable<string> designPartNames,
-            int staff,
-            int startBar,
-            int endBar,
-            char step,
-            string? accidental,
-            int octave,
-            int noteValue,
-            int numberOfNotes)
-        {
-            if (score == null) throw new ArgumentNullException(nameof(score));
-            if (designPartNames == null) throw new ArgumentNullException(nameof(designPartNames));
-            if (startBar < 1) throw new ArgumentException("startBar must be >= 1", nameof(startBar));
-            if (endBar < startBar) throw new ArgumentException("endBar must be >= startBar", nameof(endBar));
-            if (numberOfNotes <= 0) throw new ArgumentException("numberOfNotes must be > 0", nameof(numberOfNotes));
-            if (!"ABCDEFG".Contains(char.ToUpper(step))) throw new ArgumentException("step must be a letter A-G", nameof(step));
-
-            if (!(new[] { 1, 2, 4, 8, 16 }).Contains(noteValue))
-            {
-                throw new ArgumentException("denominator must be one of: 1,2,4,8,16", nameof(noteValue));
-            }
-
-            // Ensure the Score has a Parts list and create missing Part entries for any selected names.
-            // This logic was extracted to a helper for reuse and clarity.
-
-            ScorePartsHelper.EnsurePartsExist(score, designPartNames);
-
-            //===========================================================================================
-            // Map accidental to alter value (MusicXml uses -1,0,1 commonly)
-            //
-            //  TODO  this value should map in the form control for accidentals !!!
-            //
-
             int? alter = accidental switch
             {
-                null => 0,
-                "" => 0,
                 var s when s.Equals("Sharp", StringComparison.OrdinalIgnoreCase) => 1,
                 var s when s.Equals("Flat", StringComparison.OrdinalIgnoreCase) => -1,
                 var s when s.Equals("Natural", StringComparison.OrdinalIgnoreCase) => 0,
                 _ => 0
             };
 
-            // For each matching part, insert notes for each bar in the range.
+            int octave = data.Octave;
+            
+            // Map NoteValue string to int denominator
+            int noteValue = 4; // default
+            if (data.NoteValue != null && Music.MusicConstants.NoteValueMap.TryGetValue(data.NoteValue, out var nv))
+            {
+                noteValue = nv;
+            }
+            
+            var numberOfNotes = data.NumberOfNotes.GetValueOrDefault();
 
+            // Ensure the Score has a Parts list and create missing Part entries for any selected names
+            ScorePartsHelper.EnsurePartsExist(score, parts);
+
+            // For each matching part, insert notes for each bar in the range
             foreach (var scorePart in score.Parts ?? Enumerable.Empty<Part>())
             {
                 if (scorePart?.Name == null) continue;
-                if (!designPartNames.Contains(scorePart.Name)) continue;
+                if (!parts.Contains(scorePart.Name)) continue;
 
                 // Ensure Measures collection exists
                 scorePart.Measures ??= new List<Measure>();
@@ -222,9 +155,9 @@ namespace Music.Generator
                     }
                 }
             }
+            
             // Inform the user that pattern application is complete.
             MessageBoxHelper.ShowMessage("Pattern has been applied to the score.", "Apply Pattern Set Notes");
-
         }
 
         private static string DurationTypeString(int denom) => denom switch
@@ -280,78 +213,6 @@ namespace Music.Generator
                 score.Parts.Add(newPart);
                 scorePartNames.Add(partName);
             }
-        }
-    }
-
-    /// <summary>
-    /// Validation helper that contains the UI-level checks previously in GenerateApply.
-    /// This shows MessageBoxes when inputs are invalid and maps the UI strings to the
-    /// primitive values used by the core Apply logic.
-    /// </summary>
-    internal static class ValidateApplyParameters
-    {
-        public static bool Validate(
-            Score? score,
-            IEnumerable<string>? parts,
-            int staff,
-            int startBar,
-            int endBar,
-            string? stepStr,
-            string accidental,
-            int octave,
-            string? noteValueKey,
-            int numberOfNotes,
-            out char stepChar,
-            out int noteValue)
-        {
-            stepChar = '\0';
-            noteValue = 4;
-
-            if (score == null)
-            {
-                MessageBoxHelper.ShowError("Cannot apply to a null score", "No Score");
-                return false;
-            }
-
-            // Validate parts
-            if (parts == null || !parts.Any())
-            {
-                MessageBoxHelper.Show("Please select a part to apply notes to.", "No Part Selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return false;
-            }
-
-            // Start/End bars
-            if (startBar < 1 || endBar < startBar)
-            {
-                MessageBoxHelper.Show("Start and End bars must be valid (Start >= 1 and End >= Start).", "Invalid Bar Range", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return false;
-            }
-
-            // Step (absolute)
-            if (string.IsNullOrWhiteSpace(stepStr) || stepStr.Length == 0)
-            {
-                MessageBoxHelper.Show("Please select a step (A-G).", "Invalid Step", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return false;
-            }
-            stepChar = stepStr![0];
-
-            // Base duration - map from the UI string via _noteValueMap
-            if (noteValueKey == null || !Music.MusicConstants.NoteValueMap.TryGetValue(noteValueKey, out var nv))
-            {
-                MessageBoxHelper.Show("Please select a valid base duration.", "Invalid Duration", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return false;
-            }
-
-            noteValue = nv;
-
-            // numberOfNotes validated by core but ensure positive here too
-            if (numberOfNotes <= 0)
-            {
-                MessageBoxHelper.Show("Number of notes must be at least 1.", "Invalid Number", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return false;
-            }
-
-            return true;
         }
     }
 }
