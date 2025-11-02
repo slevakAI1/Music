@@ -7,7 +7,7 @@ namespace Music.Designer
     {
         private readonly Dictionary<int, HarmonicEvent> _barHeads = new(); // bar -> event active at beat 1
 
-        public int BeatsPerBar { get; set; } = 4;
+        public int BeatsPerBar { get; set; } = 4; // Remove - this is represented elsewhere
 
         public List<HarmonicEvent> Events { get; set; } = new();
 
@@ -17,9 +17,9 @@ namespace Music.Designer
             if (string.IsNullOrWhiteSpace(meter)) throw new ArgumentException(nameof(meter));
             var parts = meter.Split('/');
             if (parts.Length != 2 || !int.TryParse(parts[0], out var beats))
-                throw new ArgumentException("Invalid meter format. Expected like \"4/4\".", nameof(meter));
+                throw new ArgumentException("Invalid meter format. Expected like \"4/4\".", nameof(meter));   // REMOVE METER!!
 
-            BeatsPerBar = Math.Max(1, beats);
+            BeatsPerBar = Math.Max(1, beats); // REMOVE - this is represented elsewhere
 
             // Reindex any existing events with the new meter
             Reindex();

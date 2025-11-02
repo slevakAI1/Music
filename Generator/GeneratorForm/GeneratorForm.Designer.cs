@@ -410,6 +410,7 @@ namespace Music.Generator
             // lblAccidental
             // 
             lblAccidental.AutoSize = true;
+            lblAccidental.ForeColor = Color.FromArgb(0, 192, 0);
             lblAccidental.Location = new Point(120, 30);
             lblAccidental.Name = "lblAccidental";
             lblAccidental.Size = new Size(66, 15);
@@ -428,6 +429,7 @@ namespace Music.Generator
             // lblOctaveAbs
             // 
             lblOctaveAbs.AutoSize = true;
+            lblOctaveAbs.ForeColor = Color.FromArgb(0, 192, 0);
             lblOctaveAbs.Location = new Point(284, 30);
             lblOctaveAbs.Name = "lblOctaveAbs";
             lblOctaveAbs.Size = new Size(47, 15);
