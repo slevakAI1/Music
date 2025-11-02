@@ -345,7 +345,7 @@ namespace Music.Generator
             // rbIsRest
             // 
             rbIsRest.AutoSize = true;
-            rbIsRest.ForeColor = Color.FromArgb(255, 128, 0);
+            rbIsRest.ForeColor = Color.FromArgb(0, 192, 0);
             rbIsRest.Location = new Point(18, 216);
             rbIsRest.Name = "rbIsRest";
             rbIsRest.Size = new Size(58, 19);
@@ -355,12 +355,13 @@ namespace Music.Generator
             // rbPitchAbsolute
             // 
             rbPitchAbsolute.AutoSize = true;
+            rbPitchAbsolute.Checked = true;
             rbPitchAbsolute.ForeColor = Color.FromArgb(0, 192, 0);
             rbPitchAbsolute.Location = new Point(18, 28);
             rbPitchAbsolute.Name = "rbPitchAbsolute";
             rbPitchAbsolute.Size = new Size(209, 19);
             rbPitchAbsolute.TabIndex = 0;
-            rbPitchAbsolute.Checked = true;
+            rbPitchAbsolute.TabStop = true;
             rbPitchAbsolute.Text = "Absolute (Step/Accidental/Octave)";
             // 
             // rbPitchKeyRelative
@@ -572,7 +573,7 @@ namespace Music.Generator
             // cbNoteValue
             // 
             cbNoteValue.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbNoteValue.Items.AddRange(new object[] { "Whole (1)", "Half (1/2)", "Quarter (1/4)", "Eighth (1/8)", "16th (1/16)" });
+            cbNoteValue.Items.AddRange(new object[] { "Whole (1)", "Half (1/2)", "Quarter (1/4)", "Eighth (1/8)", "16th (1/16)", "32nd (1/32)", "64th (1/64)" });
             cbNoteValue.Location = new Point(133, 38);
             cbNoteValue.Name = "cbNoteValue";
             cbNoteValue.Size = new Size(175, 23);
