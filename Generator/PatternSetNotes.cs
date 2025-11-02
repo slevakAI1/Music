@@ -137,6 +137,7 @@ namespace Music.Generator
                             Voice = 1,           // voice number unspecified by requirement; default to 1
                             Staff = staff,
                             IsChordTone = false,
+                            IsRest = data.IsRest ?? false,
                             Pitch = new Pitch
                             {
                                 Step = char.ToUpper(step),
