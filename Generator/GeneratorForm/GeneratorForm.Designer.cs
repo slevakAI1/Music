@@ -109,6 +109,7 @@ namespace Music.Generator
             btnSetGeneratorTestScenarioG1 = new Button();
             btnNewScore = new Button();
             btnSetDesignTestScenarioD1 = new Button();
+            rbIsRest = new RadioButton();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -329,6 +330,7 @@ namespace Music.Generator
             // 
             // grpPitch
             // 
+            grpPitch.Controls.Add(rbIsRest);
             grpPitch.Controls.Add(rbPitchAbsolute);
             grpPitch.Controls.Add(rbPitchKeyRelative);
             grpPitch.Controls.Add(grpAbsolute);
@@ -686,6 +688,15 @@ namespace Music.Generator
             btnSetDesignTestScenarioD1.UseVisualStyleBackColor = true;
             btnSetDesignTestScenarioD1.Click += btnSetDesignTestScenarioD1_Click;
             // 
+            // rbIsRest
+            // 
+            rbIsRest.AutoSize = true;
+            rbIsRest.Location = new Point(18, 216);
+            rbIsRest.Name = "rbIsRest";
+            rbIsRest.Size = new Size(58, 19);
+            rbIsRest.TabIndex = 4;
+            rbIsRest.Text = "Is Rest";
+            // 
             // GeneratorForm
             // 
             ClientSize = new Size(832, 751);
@@ -754,5 +765,6 @@ namespace Music.Generator
         private Button btnSetGeneratorTestScenarioG1;
         private Button btnNewScore;
         private Button btnSetDesignTestScenarioD1;
+        private RadioButton rbIsRest;
     }
 }
