@@ -47,7 +47,7 @@ namespace Music.Generator
             // Other control defaults (mirror previous behavior)
             data.NumberOfNotes = 4;
             data.PitchAbsolute = true;
-            data.Step = "C";             // matches cbStep default index 0
+            data.Step = 'C';             // Now char type instead of string
             data.Accidental = "Natural"; // matches cbAccidental default index 0
             data.Pattern = "Set Note";   // matches cbPattern which contained "Set Note"
 

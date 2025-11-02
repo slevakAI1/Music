@@ -33,8 +33,8 @@ namespace Music.Generator
             var startBar = data.StartBar.GetValueOrDefault();
             var endBar = data.EndBar.GetValueOrDefault(startBar);
             
-            // Map Step string to char
-            char step = string.IsNullOrWhiteSpace(data.Step) ? 'C' : data.Step[0];
+            // Step is now char type - use directly, default to 'C' if '\0'
+            char step = data.Step != '\0' ? data.Step : 'C';
             
             // Map accidental to alter value (MusicXml uses -1, 0, 1)
             string accidental = data.Accidental ?? "Natural";

@@ -20,7 +20,7 @@ namespace Music.Generator
         private int? _endBeat;
         private bool? _overwriteExisting;
         private bool? _pitchAbsolute;
-        private string? _step;
+        private char _step;
         private string? _accidental;
         private int? _octaveAbsolute;
         private int? _degreeKeyRelative;
@@ -105,11 +105,12 @@ namespace Music.Generator
             set => _pitchAbsolute = value;
         } // true = Absolute, false = Key-relative
 
-        public string? Step
+        // Changed from char? to char. Default to '\0' when IsRest is true.
+        public char Step
         {
             get => _step;
             set => _step = value;
-        } // e.g., "C"
+        }
 
         // New: indicates the selection of a Rest in the step control.
         // Default to false when not explicitly set.

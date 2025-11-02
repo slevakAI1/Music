@@ -27,6 +27,13 @@ namespace Music.Generator
             string? stepSelected = cbStep?.SelectedItem?.ToString();
             var isRest = !string.IsNullOrWhiteSpace(stepSelected) && stepSelected.Equals("Rest", StringComparison.OrdinalIgnoreCase);
 
+            // Convert step string to char (use '\0' for Rest)
+            char stepChar = '\0';
+            if (!isRest && !string.IsNullOrWhiteSpace(stepSelected))
+            {
+                stepChar = stepSelected[0];
+            }
+
             var data = new GeneratorData
             {
                 // Pattern
@@ -47,8 +54,8 @@ namespace Music.Generator
 
                 // Pitch
                 PitchAbsolute = rbPitchAbsolute?.Checked ?? true,
-                // When "Rest" is chosen, Step should be null and IsRest true.
-                Step = isRest ? null : stepSelected,
+                // Step is now char type; '\0' when Rest is selected
+                Step = stepChar,
                 IsRest = isRest,
                 Accidental = cbAccidental?.SelectedItem?.ToString(),
                 OctaveAbsolute = (int?)(numOctaveAbs?.Value ?? 4),
@@ -136,10 +143,20 @@ namespace Music.Generator
             }
 
             // If IsRest is true (assume "Rest" exists in cbStep items), select it directly.
-            if (data.IsRest == true && cbStep != null)
-                cbStep.SelectedItem = "Rest";
-            else if (data.Step != null && cbStep != null && cbStep.Items.Contains(data.Step))
-                cbStep.SelectedItem = data.Step;
+            // Otherwise, convert the char Step to string for selection.
+            if (cbStep != null)
+            {
+                if (data.IsRest == true)
+                {
+                    cbStep.SelectedItem = "Rest";
+                }
+                else if (data.Step != '\0')
+                {
+                    string stepString = data.Step.ToString();
+                    if (cbStep.Items.Contains(stepString))
+                        cbStep.SelectedItem = stepString;
+                }
+            }
 
             if (data.Accidental != null && cbAccidental != null && cbAccidental.Items.Contains(data.Accidental))
                 cbAccidental.SelectedItem = data.Accidental;
