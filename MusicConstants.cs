@@ -18,7 +18,9 @@ namespace Music
             ["Half (1/2)"] = 2,
             ["Quarter (1/4)"] = 4,
             ["Eighth (1/8)"] = 8,
-            ["16th (1/16)"] = 16
+            ["16th (1/16)"] = 16,
+            ["32nd (1/32)"] = 32,  // Not Implemented yet
+            ["64th (1/64)"] = 64   // Not Implemented yet
         };
     }
 }

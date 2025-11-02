@@ -573,7 +573,7 @@ namespace Music.Generator
             // cbNoteValue
             // 
             cbNoteValue.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbNoteValue.Items.AddRange(new object[] { "Whole (1)", "Half (1/2)", "Quarter (1/4)", "Eighth (1/8)", "16th (1/16)", "32nd (1/32)", "64th (1/64)" });
+            cbNoteValue.Items.AddRange(new object[] { "Whole (1)", "Half (1/2)", "Quarter (1/4)", "Eighth (1/8)", "16th (1/16)", "32nd & 64th (Todo)" });
             cbNoteValue.Location = new Point(133, 38);
             cbNoteValue.Name = "cbNoteValue";
             cbNoteValue.Size = new Size(175, 23);
