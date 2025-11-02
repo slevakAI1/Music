@@ -101,5 +101,56 @@ namespace Music.Generator
             ApplyFormData(Globals.GenerationData);
             MessageBox.Show("Test Generator G1 has been applied to the current generator settings.", "Generator Test Scenario G1", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
+        private void btnChordTest_Click(object sender, EventArgs e)
+        {
+            if (Globals.Design?.HarmonicTimeline == null || Globals.Design.HarmonicTimeline.Events.Count == 0)
+            {
+                MessageBox.Show(this,
+                    "No harmonic events available in the current design.",
+                    "Chord Test",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            var harmonicEvent = Globals.Design.HarmonicTimeline.Events[1];
+
+            List<HarmonicChordConverter.ChordNote> notes;
+            try
+            {
+                notes = HarmonicChordConverter.Convert(harmonicEvent, baseOctave: 4);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this,
+                    $"Failed to build chord: {ex.Message}",
+                    "Chord Test",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+
+            if (notes == null || notes.Count == 0)
+            {
+                MessageBox.Show(this,
+                    "Chord conversion returned no notes.",
+                    "Chord Test",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            var lines = new List<string>();
+            foreach (var note in notes)
+                lines.Add($"{note.Step}{note.Accidental} {note.Octave}");
+
+            var title = $"Chord: {harmonicEvent.Key} (Deg {harmonicEvent.Degree}, {harmonicEvent.Quality})";
+            MessageBox.Show(this,
+                string.Join(Environment.NewLine, lines),
+                title,
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
     }
 }

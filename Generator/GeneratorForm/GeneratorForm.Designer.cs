@@ -110,6 +110,7 @@ namespace Music.Generator
             btnSetGeneratorTestScenarioG1 = new Button();
             btnNewScore = new Button();
             btnSetDesignTestScenarioD1 = new Button();
+            btnChordTest = new Button();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -507,9 +508,9 @@ namespace Music.Generator
             // 
             // btnApplySetNotes
             // 
-            btnApplySetNotes.Location = new Point(537, 216);
+            btnApplySetNotes.Location = new Point(485, 207);
             btnApplySetNotes.Name = "btnApplySetNotes";
-            btnApplySetNotes.Size = new Size(215, 29);
+            btnApplySetNotes.Size = new Size(176, 29);
             btnApplySetNotes.TabIndex = 4;
             btnApplySetNotes.Text = "Appy Set Notes";
             btnApplySetNotes.Click += btnApplySetNotes_Click;
@@ -674,9 +675,9 @@ namespace Music.Generator
             // 
             // btnSetGeneratorTestScenarioG1
             // 
-            btnSetGeneratorTestScenarioG1.Location = new Point(543, 130);
+            btnSetGeneratorTestScenarioG1.Location = new Point(491, 121);
             btnSetGeneratorTestScenarioG1.Name = "btnSetGeneratorTestScenarioG1";
-            btnSetGeneratorTestScenarioG1.Size = new Size(209, 31);
+            btnSetGeneratorTestScenarioG1.Size = new Size(170, 31);
             btnSetGeneratorTestScenarioG1.TabIndex = 8;
             btnSetGeneratorTestScenarioG1.Text = "Set Generator - Test Scenario G1";
             btnSetGeneratorTestScenarioG1.UseVisualStyleBackColor = true;
@@ -684,9 +685,9 @@ namespace Music.Generator
             // 
             // btnNewScore
             // 
-            btnNewScore.Location = new Point(539, 171);
+            btnNewScore.Location = new Point(487, 162);
             btnNewScore.Name = "btnNewScore";
-            btnNewScore.Size = new Size(213, 32);
+            btnNewScore.Size = new Size(174, 32);
             btnNewScore.TabIndex = 9;
             btnNewScore.Text = "New Score From Design";
             btnNewScore.UseVisualStyleBackColor = true;
@@ -694,17 +695,28 @@ namespace Music.Generator
             // 
             // btnSetDesignTestScenarioD1
             // 
-            btnSetDesignTestScenarioD1.Location = new Point(543, 93);
+            btnSetDesignTestScenarioD1.Location = new Point(491, 84);
             btnSetDesignTestScenarioD1.Name = "btnSetDesignTestScenarioD1";
-            btnSetDesignTestScenarioD1.Size = new Size(209, 31);
+            btnSetDesignTestScenarioD1.Size = new Size(170, 31);
             btnSetDesignTestScenarioD1.TabIndex = 10;
             btnSetDesignTestScenarioD1.Text = "Set Design - Test Scenario D1";
             btnSetDesignTestScenarioD1.UseVisualStyleBackColor = true;
             btnSetDesignTestScenarioD1.Click += btnSetDesignTestScenarioD1_Click;
             // 
+            // btnChordTest
+            // 
+            btnChordTest.Location = new Point(698, 95);
+            btnChordTest.Name = "btnChordTest";
+            btnChordTest.Size = new Size(112, 23);
+            btnChordTest.TabIndex = 11;
+            btnChordTest.Text = "Chord Test";
+            btnChordTest.UseVisualStyleBackColor = true;
+            btnChordTest.Click += btnChordTest_Click;
+            // 
             // GeneratorForm
             // 
             ClientSize = new Size(832, 751);
+            Controls.Add(btnChordTest);
             Controls.Add(btnSetDesignTestScenarioD1);
             Controls.Add(btnNewScore);
             Controls.Add(btnSetGeneratorTestScenarioG1);
@@ -771,5 +783,6 @@ namespace Music.Generator
         private Button btnNewScore;
         private Button btnSetDesignTestScenarioD1;
         private RadioButton rbIsRest;
+        private Button btnChordTest;
     }
 }
