@@ -73,6 +73,7 @@ namespace Music.Generator
             lblEndBarTotal = new Label();
             chkOverwrite = new CheckBox();
             grpPitch = new GroupBox();
+            rbIsRest = new RadioButton();
             rbPitchAbsolute = new RadioButton();
             rbPitchKeyRelative = new RadioButton();
             grpAbsolute = new GroupBox();
@@ -109,7 +110,6 @@ namespace Music.Generator
             btnSetGeneratorTestScenarioG1 = new Button();
             btnNewScore = new Button();
             btnSetDesignTestScenarioD1 = new Button();
-            rbIsRest = new RadioButton();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -342,10 +342,20 @@ namespace Music.Generator
             grpPitch.TabStop = false;
             grpPitch.Text = "Pitch Options";
             // 
+            // rbIsRest
+            // 
+            rbIsRest.AutoSize = true;
+            rbIsRest.ForeColor = Color.FromArgb(255, 128, 0);
+            rbIsRest.Location = new Point(18, 216);
+            rbIsRest.Name = "rbIsRest";
+            rbIsRest.Size = new Size(58, 19);
+            rbIsRest.TabIndex = 4;
+            rbIsRest.Text = "Is Rest";
+            // 
             // rbPitchAbsolute
             // 
             rbPitchAbsolute.AutoSize = true;
-            rbPitchAbsolute.ForeColor = Color.Orange;
+            rbPitchAbsolute.ForeColor = Color.FromArgb(0, 192, 0);
             rbPitchAbsolute.Location = new Point(18, 28);
             rbPitchAbsolute.Name = "rbPitchAbsolute";
             rbPitchAbsolute.Size = new Size(209, 19);
@@ -687,15 +697,6 @@ namespace Music.Generator
             btnSetDesignTestScenarioD1.Text = "Set Design - Test Scenario D1";
             btnSetDesignTestScenarioD1.UseVisualStyleBackColor = true;
             btnSetDesignTestScenarioD1.Click += btnSetDesignTestScenarioD1_Click;
-            // 
-            // rbIsRest
-            // 
-            rbIsRest.AutoSize = true;
-            rbIsRest.Location = new Point(18, 216);
-            rbIsRest.Name = "rbIsRest";
-            rbIsRest.Size = new Size(58, 19);
-            rbIsRest.TabIndex = 4;
-            rbIsRest.Text = "Is Rest";
             // 
             // GeneratorForm
             // 
