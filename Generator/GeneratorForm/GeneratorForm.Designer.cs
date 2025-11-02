@@ -360,6 +360,7 @@ namespace Music.Generator
             rbPitchAbsolute.Name = "rbPitchAbsolute";
             rbPitchAbsolute.Size = new Size(209, 19);
             rbPitchAbsolute.TabIndex = 0;
+            rbPitchAbsolute.Checked = true;
             rbPitchAbsolute.Text = "Absolute (Step/Accidental/Octave)";
             // 
             // rbPitchKeyRelative
