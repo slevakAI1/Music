@@ -25,7 +25,8 @@ namespace Music.Generator
 
             // Determine step selection and Rest handling
             string? stepSelected = cbStep?.SelectedItem?.ToString();
-            var isRest = !string.IsNullOrWhiteSpace(stepSelected) && stepSelected.Equals("Rest", StringComparison.OrdinalIgnoreCase);
+            // Assume IsRest radiobutton exists; read its checked state directly.
+            var isRest = rbIsRest.Checked;
 
             // Convert step string to char (use '\0' for Rest)
             char stepChar = '\0';
@@ -141,6 +142,10 @@ namespace Music.Generator
                 rbPitchAbsolute.Checked = data.PitchAbsolute.Value;
                 rbPitchKeyRelative.Checked = !data.PitchAbsolute.Value;
             }
+
+            // Set IsRest radiobutton state from data
+            if (data.IsRest.HasValue)
+                rbIsRest.Checked = data.IsRest.Value;
 
             // If IsRest is true (assume "Rest" exists in cbStep items), select it directly.
             // Otherwise, convert the char Step to string for selection.

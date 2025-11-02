@@ -112,11 +112,10 @@ namespace Music.Generator
             set => _step = value;
         }
 
-        // New: indicates the selection of a Rest in the step control.
-        // Default to false when not explicitly set.
+        // Single added field: track IsRest radiobutton state
         public bool? IsRest
         {
-            get => _isRest ?? false;
+            get => _isRest;
             set => _isRest = value;
         }
 
