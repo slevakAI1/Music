@@ -72,11 +72,10 @@ namespace Music.Generator
             lblStartBar = new Label();
             grpPitch = new GroupBox();
             label8 = new Label();
-            label7 = new Label();
-            label6 = new Label();
-            label5 = new Label();
+            lblQuality = new Label();
+            lblDegree2 = new Label();
             lblOctaveAbs = new Label();
-            label4 = new Label();
+            lblKey = new Label();
             numOctaveAbs = new NumericUpDown();
             rbChord = new RadioButton();
             rbIsRest = new RadioButton();
@@ -113,6 +112,7 @@ namespace Music.Generator
             btnNewScore = new Button();
             btnSetDesignTestScenarioD1 = new Button();
             btnChordTest = new Button();
+            grpChord = new GroupBox();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numStaff).BeginInit();
@@ -129,6 +129,7 @@ namespace Music.Generator
             ((System.ComponentModel.ISupportInitialize)numDots).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numTupletCount).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numTupletOf).BeginInit();
+            grpChord.SuspendLayout();
             SuspendLayout();
             // 
             // lblTitle
@@ -331,12 +332,8 @@ namespace Music.Generator
             // 
             // grpPitch
             // 
-            grpPitch.Controls.Add(label8);
-            grpPitch.Controls.Add(label7);
-            grpPitch.Controls.Add(label6);
-            grpPitch.Controls.Add(label5);
+            grpPitch.Controls.Add(grpChord);
             grpPitch.Controls.Add(lblOctaveAbs);
-            grpPitch.Controls.Add(label4);
             grpPitch.Controls.Add(numOctaveAbs);
             grpPitch.Controls.Add(rbChord);
             grpPitch.Controls.Add(rbIsRest);
@@ -354,38 +351,29 @@ namespace Music.Generator
             // label8
             // 
             label8.AutoSize = true;
-            label8.Location = new Point(401, 371);
+            label8.Location = new Point(381, 24);
             label8.Name = "label8";
             label8.Size = new Size(31, 15);
             label8.TabIndex = 10;
             label8.Text = "Base";
             // 
-            // label7
+            // lblQuality
             // 
-            label7.AutoSize = true;
-            label7.Location = new Point(208, 249);
-            label7.Name = "label7";
-            label7.Size = new Size(45, 15);
-            label7.TabIndex = 9;
-            label7.Text = "Quality";
+            lblQuality.AutoSize = true;
+            lblQuality.Location = new Point(194, 24);
+            lblQuality.Name = "lblQuality";
+            lblQuality.Size = new Size(45, 15);
+            lblQuality.TabIndex = 8;
+            lblQuality.Text = "Quality";
             // 
-            // label6
+            // lblDegree2
             // 
-            label6.AutoSize = true;
-            label6.Location = new Point(232, 371);
-            label6.Name = "label6";
-            label6.Size = new Size(45, 15);
-            label6.TabIndex = 8;
-            label6.Text = "Quality";
-            // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Location = new Point(132, 371);
-            label5.Name = "label5";
-            label5.Size = new Size(44, 15);
-            label5.TabIndex = 7;
-            label5.Text = "Degree";
+            lblDegree2.AutoSize = true;
+            lblDegree2.Location = new Point(92, 24);
+            lblDegree2.Name = "lblDegree2";
+            lblDegree2.Size = new Size(44, 15);
+            lblDegree2.TabIndex = 7;
+            lblDegree2.Text = "Degree";
             // 
             // lblOctaveAbs
             // 
@@ -397,14 +385,14 @@ namespace Music.Generator
             lblOctaveAbs.TabIndex = 4;
             lblOctaveAbs.Text = "Octave:";
             // 
-            // label4
+            // lblKey
             // 
-            label4.AutoSize = true;
-            label4.Location = new Point(49, 371);
-            label4.Name = "label4";
-            label4.Size = new Size(26, 15);
-            label4.TabIndex = 6;
-            label4.Text = "Key";
+            lblKey.AutoSize = true;
+            lblKey.Location = new Point(12, 24);
+            lblKey.Name = "lblKey";
+            lblKey.Size = new Size(26, 15);
+            lblKey.TabIndex = 6;
+            lblKey.Text = "Key";
             // 
             // numOctaveAbs
             // 
@@ -419,7 +407,7 @@ namespace Music.Generator
             // 
             rbChord.AutoSize = true;
             rbChord.ForeColor = Color.FromArgb(255, 128, 0);
-            rbChord.Location = new Point(27, 339);
+            rbChord.Location = new Point(27, 321);
             rbChord.Name = "rbChord";
             rbChord.Size = new Size(58, 19);
             rbChord.TabIndex = 5;
@@ -450,7 +438,7 @@ namespace Music.Generator
             // rbPitchKeyRelative
             // 
             rbPitchKeyRelative.AutoSize = true;
-            rbPitchKeyRelative.Location = new Point(27, 232);
+            rbPitchKeyRelative.Location = new Point(27, 222);
             rbPitchKeyRelative.Name = "rbPitchKeyRelative";
             rbPitchKeyRelative.Size = new Size(87, 19);
             rbPitchKeyRelative.TabIndex = 1;
@@ -462,12 +450,11 @@ namespace Music.Generator
             grpAbsolute.Controls.Add(cbStep);
             grpAbsolute.Controls.Add(lblAccidental);
             grpAbsolute.Controls.Add(cbAccidental);
-            grpAbsolute.Location = new Point(33, 154);
+            grpAbsolute.Location = new Point(33, 139);
             grpAbsolute.Name = "grpAbsolute";
             grpAbsolute.Size = new Size(369, 65);
             grpAbsolute.TabIndex = 2;
             grpAbsolute.TabStop = false;
-            grpAbsolute.Text = "Absolute";
             // 
             // lblStep
             // 
@@ -512,12 +499,11 @@ namespace Music.Generator
             grpKeyRelative.Controls.Add(lblDegree);
             grpKeyRelative.Controls.Add(numDegree);
             grpKeyRelative.Controls.Add(lblOctaveKR);
-            grpKeyRelative.Location = new Point(42, 258);
+            grpKeyRelative.Location = new Point(42, 236);
             grpKeyRelative.Name = "grpKeyRelative";
             grpKeyRelative.Size = new Size(360, 65);
             grpKeyRelative.TabIndex = 3;
             grpKeyRelative.TabStop = false;
-            grpKeyRelative.Text = "Key-relative";
             // 
             // lblDegree
             // 
@@ -759,6 +745,18 @@ namespace Music.Generator
             btnChordTest.UseVisualStyleBackColor = true;
             btnChordTest.Click += btnChordTest_Click;
             // 
+            // grpChord
+            // 
+            grpChord.Controls.Add(lblQuality);
+            grpChord.Controls.Add(label8);
+            grpChord.Controls.Add(lblKey);
+            grpChord.Controls.Add(lblDegree2);
+            grpChord.Location = new Point(43, 346);
+            grpChord.Name = "grpChord";
+            grpChord.Size = new Size(549, 80);
+            grpChord.TabIndex = 11;
+            grpChord.TabStop = false;
+            // 
             // GeneratorForm
             // 
             ClientSize = new Size(1266, 789);
@@ -797,6 +795,8 @@ namespace Music.Generator
             ((System.ComponentModel.ISupportInitialize)numDots).EndInit();
             ((System.ComponentModel.ISupportInitialize)numTupletCount).EndInit();
             ((System.ComponentModel.ISupportInitialize)numTupletOf).EndInit();
+            grpChord.ResumeLayout(false);
+            grpChord.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -830,10 +830,10 @@ namespace Music.Generator
         private RadioButton rbIsRest;
         private Button btnChordTest;
         private RadioButton rbChord;
-        private Label label7;
-        private Label label6;
-        private Label label5;
-        private Label label4;
+        private Label lblQuality;
+        private Label lblDegree2;
+        private Label lblKey;
         private Label label8;
+        private GroupBox grpChord;
     }
 }
