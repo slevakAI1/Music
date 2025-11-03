@@ -61,7 +61,6 @@ namespace Music.Generator
                 Accidental = cbAccidental?.SelectedItem?.ToString(),
                 OctaveAbsolute = (int?)(numOctaveAbs?.Value ?? 4),
                 DegreeKeyRelative = (int?)(numDegree?.Value ?? 0),
-                OctaveKeyRelative = (int?)(numOctaveKR?.Value ?? 4),
 
                 // Rhythm
                 NoteValue = cbNoteValue?.SelectedItem?.ToString(),
@@ -171,9 +170,6 @@ namespace Music.Generator
 
             if (data.DegreeKeyRelative.HasValue && numDegree != null)
                 numDegree.Value = LimitRange(numDegree, data.DegreeKeyRelative.Value);
-
-            if (data.OctaveKeyRelative.HasValue && numOctaveKR != null)
-                numOctaveKR.Value = LimitRange(numOctaveKR, data.OctaveKeyRelative.Value);
 
             // Rhythm
             if (data.NoteValue != null && cbNoteValue != null && cbNoteValue.Items.Contains(data.NoteValue))
