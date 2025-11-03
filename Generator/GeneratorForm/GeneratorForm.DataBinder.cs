@@ -62,6 +62,12 @@ namespace Music.Generator
                 OctaveAbsolute = (int?)(numOctaveAbs?.Value ?? 4),
                 DegreeKeyRelative = (int?)(numDegree?.Value ?? 0),
 
+                // Chord
+                ChordKey = cbChordKey?.SelectedItem?.ToString(),
+                ChordDegree = (int?)(numChordDegree?.Value ?? 1),
+                ChordQuality = cbChordQuality?.SelectedItem?.ToString(),
+                ChordBase = cbChordBase?.SelectedItem?.ToString(),
+
                 // Rhythm
                 NoteValue = cbNoteValue?.SelectedItem?.ToString(),
                 Dots = (int?)(numDots?.Value ?? 0),
@@ -195,6 +201,19 @@ namespace Music.Generator
 
             if (data.NumberOfNotes.HasValue && numNumberOfNotes != null)
                 numNumberOfNotes.Value = LimitRange(numNumberOfNotes, data.NumberOfNotes.Value);
+
+            // Chord
+            if (data.ChordKey != null && cbChordKey != null && cbChordKey.Items.Contains(data.ChordKey))
+                cbChordKey.SelectedItem = data.ChordKey;
+
+            if (data.ChordDegree.HasValue && numChordDegree != null)
+                numChordDegree.Value = LimitRange(numChordDegree, data.ChordDegree.Value);
+
+            if (data.ChordQuality != null && cbChordQuality != null && cbChordQuality.Items.Contains(data.ChordQuality))
+                cbChordQuality.SelectedItem = data.ChordQuality;
+
+            if (data.ChordBase != null && cbChordBase != null && cbChordBase.Items.Contains(data.ChordBase))
+                cbChordBase.SelectedItem = data.ChordBase;
         }
     }
 }

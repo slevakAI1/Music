@@ -36,6 +36,10 @@ namespace Music.Generator
         private string? _pattern;
         private string? _sectionsText;
         private bool? _isRest;
+        private string? _chordKey;
+        private int? _chordDegree;
+        private string? _chordQuality;
+        private string? _chordBase;
 
         // General / Pattern
         public string? Pattern
@@ -200,6 +204,31 @@ namespace Music.Generator
         {
             get => _numberOfNotes ?? 1;
             set => _numberOfNotes = value;
+        }
+
+        // Chord options
+        public string? ChordKey
+        {
+            get => _chordKey;
+            set => _chordKey = value;
+        }
+
+        public int? ChordDegree
+        {
+            get => _chordDegree ?? 1;
+            set => _chordDegree = value;
+        }
+
+        public string? ChordQuality
+        {
+            get => _chordQuality;
+            set => _chordQuality = value;
+        }
+
+        public string? ChordBase
+        {
+            get => _chordBase;
+            set => _chordBase = value;
         }
     }
 }
