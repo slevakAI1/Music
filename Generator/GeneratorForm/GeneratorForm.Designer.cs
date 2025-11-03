@@ -71,11 +71,16 @@ namespace Music.Generator
             numStartBar = new NumericUpDown();
             lblStartBar = new Label();
             grpPitch = new GroupBox();
-            label8 = new Label();
-            lblQuality = new Label();
-            lblDegree2 = new Label();
-            lblOctaveAbs = new Label();
+            grpChord = new GroupBox();
             lblKey = new Label();
+            cbChordKey = new ComboBox();
+            lblDegree2 = new Label();
+            numChordDegree = new NumericUpDown();
+            lblQuality = new Label();
+            cbChordQuality = new ComboBox();
+            label8 = new Label();
+            cbChordBase = new ComboBox();
+            lblOctaveAbs = new Label();
             numOctaveAbs = new NumericUpDown();
             rbChord = new RadioButton();
             rbIsRest = new RadioButton();
@@ -112,11 +117,6 @@ namespace Music.Generator
             btnNewScore = new Button();
             btnSetDesignTestScenarioD1 = new Button();
             btnChordTest = new Button();
-            grpChord = new GroupBox();
-            cbChordKey = new ComboBox();
-            numChordDegree = new NumericUpDown();
-            cbChordQuality = new ComboBox();
-            cbChordBase = new ComboBox();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numStaff).BeginInit();
@@ -124,6 +124,8 @@ namespace Music.Generator
             ((System.ComponentModel.ISupportInitialize)numEndBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numStartBar).BeginInit();
             grpPitch.SuspendLayout();
+            grpChord.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numChordDegree).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numOctaveAbs).BeginInit();
             grpAbsolute.SuspendLayout();
             grpKeyRelative.SuspendLayout();
@@ -133,8 +135,6 @@ namespace Music.Generator
             ((System.ComponentModel.ISupportInitialize)numDots).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numTupletCount).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numTupletOf).BeginInit();
-            grpChord.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)numChordDegree).BeginInit();
             SuspendLayout();
             // 
             // lblTitle
@@ -353,32 +353,94 @@ namespace Music.Generator
             grpPitch.TabStop = false;
             grpPitch.Text = "Pitch Options";
             // 
-            // label8
+            // grpChord
             // 
-            label8.AutoSize = true;
-            label8.Location = new Point(381, 24);
-            label8.Name = "label8";
-            label8.Size = new Size(31, 15);
-            label8.TabIndex = 10;
-            label8.Text = "Base";
+            grpChord.Controls.Add(lblKey);
+            grpChord.Controls.Add(cbChordKey);
+            grpChord.Controls.Add(lblDegree2);
+            grpChord.Controls.Add(numChordDegree);
+            grpChord.Controls.Add(lblQuality);
+            grpChord.Controls.Add(cbChordQuality);
+            grpChord.Controls.Add(label8);
+            grpChord.Controls.Add(cbChordBase);
+            grpChord.Location = new Point(43, 346);
+            grpChord.Name = "grpChord";
+            grpChord.Size = new Size(549, 80);
+            grpChord.TabIndex = 11;
+            grpChord.TabStop = false;
+            // 
+            // lblKey
+            // 
+            lblKey.AutoSize = true;
+            lblKey.Location = new Point(12, 24);
+            lblKey.Name = "lblKey";
+            lblKey.Size = new Size(26, 15);
+            lblKey.TabIndex = 6;
+            lblKey.Text = "Key";
+            // 
+            // cbChordKey
+            // 
+            cbChordKey.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbChordKey.Items.AddRange(new object[] { "C major", "G major", "D major", "A major", "E major", "B major", "F# major", "C# major", "F major", "Bb major", "Eb major", "Ab major", "Db major", "Gb major", "Cb major", "A minor", "E minor", "B minor", "F# minor", "C# minor", "G# minor", "D# minor", "A# minor", "D minor", "G minor", "C minor", "F minor", "Bb minor", "Eb minor", "Ab minor" });
+            cbChordKey.Location = new Point(44, 21);
+            cbChordKey.Name = "cbChordKey";
+            cbChordKey.Size = new Size(70, 23);
+            cbChordKey.TabIndex = 11;
+            // 
+            // lblDegree2
+            // 
+            lblDegree2.AutoSize = true;
+            lblDegree2.Location = new Point(124, 24);
+            lblDegree2.Name = "lblDegree2";
+            lblDegree2.Size = new Size(44, 15);
+            lblDegree2.TabIndex = 7;
+            lblDegree2.Text = "Degree";
+            // 
+            // numChordDegree
+            // 
+            numChordDegree.Location = new Point(174, 21);
+            numChordDegree.Maximum = new decimal(new int[] { 7, 0, 0, 0 });
+            numChordDegree.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numChordDegree.Name = "numChordDegree";
+            numChordDegree.Size = new Size(45, 23);
+            numChordDegree.TabIndex = 12;
+            numChordDegree.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // lblQuality
             // 
             lblQuality.AutoSize = true;
-            lblQuality.Location = new Point(194, 24);
+            lblQuality.Location = new Point(226, 24);
             lblQuality.Name = "lblQuality";
             lblQuality.Size = new Size(45, 15);
             lblQuality.TabIndex = 8;
             lblQuality.Text = "Quality";
             // 
-            // lblDegree2
+            // cbChordQuality
             // 
-            lblDegree2.AutoSize = true;
-            lblDegree2.Location = new Point(92, 24);
-            lblDegree2.Name = "lblDegree2";
-            lblDegree2.Size = new Size(44, 15);
-            lblDegree2.TabIndex = 7;
-            lblDegree2.Text = "Degree";
+            cbChordQuality.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbChordQuality.Items.AddRange(new object[] { "maj", "min", "dim", "aug", "sus2", "sus4", "5", "maj6", "min6", "6/9", "dom7", "maj7", "min7", "dim7", "hdim7", "minMaj7", "9", "maj9", "min9", "11", "13", "add9", "add11" });
+            cbChordQuality.Location = new Point(277, 21);
+            cbChordQuality.Name = "cbChordQuality";
+            cbChordQuality.Size = new Size(158, 23);
+            cbChordQuality.TabIndex = 13;
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(441, 24);
+            label8.Name = "label8";
+            label8.Size = new Size(31, 15);
+            label8.TabIndex = 10;
+            label8.Text = "Base";
+            // 
+            // cbChordBase
+            // 
+            cbChordBase.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbChordBase.Items.AddRange(new object[] { "root", "3rd", "5th", "7th", "9th", "11th", "13th" });
+            cbChordBase.Location = new Point(478, 21);
+            cbChordBase.Name = "cbChordBase";
+            cbChordBase.Size = new Size(46, 23);
+            cbChordBase.TabIndex = 14;
             // 
             // lblOctaveAbs
             // 
@@ -389,15 +451,6 @@ namespace Music.Generator
             lblOctaveAbs.Size = new Size(47, 15);
             lblOctaveAbs.TabIndex = 4;
             lblOctaveAbs.Text = "Octave:";
-            // 
-            // lblKey
-            // 
-            lblKey.AutoSize = true;
-            lblKey.Location = new Point(12, 24);
-            lblKey.Name = "lblKey";
-            lblKey.Size = new Size(26, 15);
-            lblKey.TabIndex = 6;
-            lblKey.Text = "Key";
             // 
             // numOctaveAbs
             // 
@@ -750,56 +803,6 @@ namespace Music.Generator
             btnChordTest.UseVisualStyleBackColor = true;
             btnChordTest.Click += btnChordTest_Click;
             // 
-            // grpChord
-            // 
-            grpChord.Controls.Add(lblKey);
-            grpChord.Controls.Add(cbChordKey);
-            grpChord.Controls.Add(lblDegree2);
-            grpChord.Controls.Add(numChordDegree);
-            grpChord.Controls.Add(lblQuality);
-            grpChord.Controls.Add(cbChordQuality);
-            grpChord.Controls.Add(label8);
-            grpChord.Controls.Add(cbChordBase);
-            grpChord.Location = new Point(43, 346);
-            grpChord.Name = "grpChord";
-            grpChord.Size = new Size(549, 80);
-            grpChord.TabIndex = 11;
-            grpChord.TabStop = false;
-            // 
-            // cbChordKey
-            // 
-            cbChordKey.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbChordKey.Location = new Point(44, 21);
-            cbChordKey.Name = "cbChordKey";
-            cbChordKey.Size = new Size(40, 23);
-            cbChordKey.TabIndex = 11;
-            // 
-            // numChordDegree
-            // 
-            numChordDegree.Location = new Point(142, 21);
-            numChordDegree.Maximum = new decimal(new int[] { 7, 0, 0, 0 });
-            numChordDegree.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            numChordDegree.Name = "numChordDegree";
-            numChordDegree.Size = new Size(45, 23);
-            numChordDegree.TabIndex = 12;
-            numChordDegree.Value = new decimal(new int[] { 1, 0, 0, 0 });
-            // 
-            // cbChordQuality
-            // 
-            cbChordQuality.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbChordQuality.Location = new Point(245, 21);
-            cbChordQuality.Name = "cbChordQuality";
-            cbChordQuality.Size = new Size(130, 23);
-            cbChordQuality.TabIndex = 13;
-            // 
-            // cbChordBase
-            // 
-            cbChordBase.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbChordBase.Location = new Point(418, 21);
-            cbChordBase.Name = "cbChordBase";
-            cbChordBase.Size = new Size(120, 23);
-            cbChordBase.TabIndex = 14;
-            // 
             // GeneratorForm
             // 
             ClientSize = new Size(1266, 789);
@@ -826,6 +829,9 @@ namespace Music.Generator
             ((System.ComponentModel.ISupportInitialize)numStartBar).EndInit();
             grpPitch.ResumeLayout(false);
             grpPitch.PerformLayout();
+            grpChord.ResumeLayout(false);
+            grpChord.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numChordDegree).EndInit();
             ((System.ComponentModel.ISupportInitialize)numOctaveAbs).EndInit();
             grpAbsolute.ResumeLayout(false);
             grpAbsolute.PerformLayout();
@@ -838,9 +844,6 @@ namespace Music.Generator
             ((System.ComponentModel.ISupportInitialize)numDots).EndInit();
             ((System.ComponentModel.ISupportInitialize)numTupletCount).EndInit();
             ((System.ComponentModel.ISupportInitialize)numTupletOf).EndInit();
-            grpChord.ResumeLayout(false);
-            grpChord.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)numChordDegree).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
