@@ -73,6 +73,7 @@ namespace Music.Generator
             lblEndBarTotal = new Label();
             chkOverwrite = new CheckBox();
             grpPitch = new GroupBox();
+            rbChord = new RadioButton();
             rbIsRest = new RadioButton();
             rbPitchAbsolute = new RadioButton();
             rbPitchKeyRelative = new RadioButton();
@@ -111,6 +112,11 @@ namespace Music.Generator
             btnNewScore = new Button();
             btnSetDesignTestScenarioD1 = new Button();
             btnChordTest = new Button();
+            label4 = new Label();
+            label5 = new Label();
+            label6 = new Label();
+            label7 = new Label();
+            label8 = new Label();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -331,23 +337,41 @@ namespace Music.Generator
             // 
             // grpPitch
             // 
+            grpPitch.Controls.Add(label8);
+            grpPitch.Controls.Add(label7);
+            grpPitch.Controls.Add(label6);
+            grpPitch.Controls.Add(label5);
+            grpPitch.Controls.Add(lblOctaveAbs);
+            grpPitch.Controls.Add(label4);
+            grpPitch.Controls.Add(numOctaveAbs);
+            grpPitch.Controls.Add(rbChord);
             grpPitch.Controls.Add(rbIsRest);
             grpPitch.Controls.Add(rbPitchAbsolute);
             grpPitch.Controls.Add(rbPitchKeyRelative);
             grpPitch.Controls.Add(grpAbsolute);
             grpPitch.Controls.Add(grpKeyRelative);
-            grpPitch.Location = new Point(20, 454);
+            grpPitch.Location = new Point(504, 312);
             grpPitch.Name = "grpPitch";
-            grpPitch.Size = new Size(442, 285);
+            grpPitch.Size = new Size(693, 450);
             grpPitch.TabIndex = 3;
             grpPitch.TabStop = false;
             grpPitch.Text = "Pitch Options";
+            // 
+            // rbChord
+            // 
+            rbChord.AutoSize = true;
+            rbChord.ForeColor = Color.FromArgb(0, 192, 0);
+            rbChord.Location = new Point(27, 339);
+            rbChord.Name = "rbChord";
+            rbChord.Size = new Size(58, 19);
+            rbChord.TabIndex = 5;
+            rbChord.Text = "Chord";
             // 
             // rbIsRest
             // 
             rbIsRest.AutoSize = true;
             rbIsRest.ForeColor = Color.FromArgb(0, 192, 0);
-            rbIsRest.Location = new Point(18, 216);
+            rbIsRest.Location = new Point(27, 33);
             rbIsRest.Name = "rbIsRest";
             rbIsRest.Size = new Size(58, 19);
             rbIsRest.TabIndex = 4;
@@ -358,17 +382,17 @@ namespace Music.Generator
             rbPitchAbsolute.AutoSize = true;
             rbPitchAbsolute.Checked = true;
             rbPitchAbsolute.ForeColor = Color.FromArgb(0, 192, 0);
-            rbPitchAbsolute.Location = new Point(18, 28);
+            rbPitchAbsolute.Location = new Point(27, 124);
             rbPitchAbsolute.Name = "rbPitchAbsolute";
-            rbPitchAbsolute.Size = new Size(209, 19);
+            rbPitchAbsolute.Size = new Size(72, 19);
             rbPitchAbsolute.TabIndex = 0;
             rbPitchAbsolute.TabStop = true;
-            rbPitchAbsolute.Text = "Absolute (Step/Accidental/Octave)";
+            rbPitchAbsolute.Text = "Absolute";
             // 
             // rbPitchKeyRelative
             // 
             rbPitchKeyRelative.AutoSize = true;
-            rbPitchKeyRelative.Location = new Point(18, 50);
+            rbPitchKeyRelative.Location = new Point(27, 232);
             rbPitchKeyRelative.Name = "rbPitchKeyRelative";
             rbPitchKeyRelative.Size = new Size(177, 19);
             rbPitchKeyRelative.TabIndex = 1;
@@ -380,9 +404,7 @@ namespace Music.Generator
             grpAbsolute.Controls.Add(cbStep);
             grpAbsolute.Controls.Add(lblAccidental);
             grpAbsolute.Controls.Add(cbAccidental);
-            grpAbsolute.Controls.Add(lblOctaveAbs);
-            grpAbsolute.Controls.Add(numOctaveAbs);
-            grpAbsolute.Location = new Point(18, 75);
+            grpAbsolute.Location = new Point(33, 154);
             grpAbsolute.Name = "grpAbsolute";
             grpAbsolute.Size = new Size(407, 65);
             grpAbsolute.TabIndex = 2;
@@ -431,7 +453,7 @@ namespace Music.Generator
             // 
             lblOctaveAbs.AutoSize = true;
             lblOctaveAbs.ForeColor = Color.FromArgb(0, 192, 0);
-            lblOctaveAbs.Location = new Point(284, 30);
+            lblOctaveAbs.Location = new Point(25, 89);
             lblOctaveAbs.Name = "lblOctaveAbs";
             lblOctaveAbs.Size = new Size(47, 15);
             lblOctaveAbs.TabIndex = 4;
@@ -439,7 +461,7 @@ namespace Music.Generator
             // 
             // numOctaveAbs
             // 
-            numOctaveAbs.Location = new Point(336, 26);
+            numOctaveAbs.Location = new Point(77, 85);
             numOctaveAbs.Maximum = new decimal(new int[] { 8, 0, 0, 0 });
             numOctaveAbs.Name = "numOctaveAbs";
             numOctaveAbs.Size = new Size(47, 23);
@@ -453,7 +475,7 @@ namespace Music.Generator
             grpKeyRelative.Controls.Add(numDegree);
             grpKeyRelative.Controls.Add(lblOctaveKR);
             grpKeyRelative.Controls.Add(numOctaveKR);
-            grpKeyRelative.Location = new Point(18, 145);
+            grpKeyRelative.Location = new Point(42, 258);
             grpKeyRelative.Name = "grpKeyRelative";
             grpKeyRelative.Size = new Size(360, 65);
             grpKeyRelative.TabIndex = 3;
@@ -539,9 +561,9 @@ namespace Music.Generator
             groupBox1.Controls.Add(numTupletOf);
             groupBox1.Controls.Add(chkTieAcross);
             groupBox1.Controls.Add(chkFermata);
-            groupBox1.Location = new Point(487, 342);
+            groupBox1.Location = new Point(20, 468);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(321, 235);
+            groupBox1.Size = new Size(433, 235);
             groupBox1.TabIndex = 6;
             groupBox1.TabStop = false;
             groupBox1.Text = "Rhythm options";
@@ -713,9 +735,54 @@ namespace Music.Generator
             btnChordTest.UseVisualStyleBackColor = true;
             btnChordTest.Click += btnChordTest_Click;
             // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new Point(49, 371);
+            label4.Name = "label4";
+            label4.Size = new Size(26, 15);
+            label4.TabIndex = 6;
+            label4.Text = "Key";
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new Point(132, 371);
+            label5.Name = "label5";
+            label5.Size = new Size(44, 15);
+            label5.TabIndex = 7;
+            label5.Text = "Degree";
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Location = new Point(232, 371);
+            label6.Name = "label6";
+            label6.Size = new Size(45, 15);
+            label6.TabIndex = 8;
+            label6.Text = "Quality";
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(208, 249);
+            label7.Name = "label7";
+            label7.Size = new Size(45, 15);
+            label7.TabIndex = 9;
+            label7.Text = "Quality";
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(401, 371);
+            label8.Name = "label8";
+            label8.Size = new Size(31, 15);
+            label8.TabIndex = 10;
+            label8.Text = "Base";
+            // 
             // GeneratorForm
             // 
-            ClientSize = new Size(832, 751);
+            ClientSize = new Size(1266, 789);
             Controls.Add(btnChordTest);
             Controls.Add(btnSetDesignTestScenarioD1);
             Controls.Add(btnNewScore);
@@ -784,5 +851,11 @@ namespace Music.Generator
         private Button btnSetDesignTestScenarioD1;
         private RadioButton rbIsRest;
         private Button btnChordTest;
+        private RadioButton rbChord;
+        private Label label7;
+        private Label label6;
+        private Label label5;
+        private Label label4;
+        private Label label8;
     }
 }

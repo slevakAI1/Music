@@ -1,4 +1,4 @@
-﻿using MusicTheory;
+﻿using MusicTheory;   // https://github.com/phmatray/MusicTheory
 using Music.Designer;
 
 /*
