@@ -431,9 +431,9 @@ namespace Music.Generator
             rbIsRest.ForeColor = Color.FromArgb(0, 192, 0);
             rbIsRest.Location = new Point(27, 33);
             rbIsRest.Name = "rbIsRest";
-            rbIsRest.Size = new Size(58, 19);
+            rbIsRest.Size = new Size(47, 19);
             rbIsRest.TabIndex = 4;
-            rbIsRest.Text = "Is Rest";
+            rbIsRest.Text = "Rest";
             // 
             // rbPitchAbsolute
             // 
@@ -452,9 +452,9 @@ namespace Music.Generator
             rbPitchKeyRelative.AutoSize = true;
             rbPitchKeyRelative.Location = new Point(27, 232);
             rbPitchKeyRelative.Name = "rbPitchKeyRelative";
-            rbPitchKeyRelative.Size = new Size(177, 19);
+            rbPitchKeyRelative.Size = new Size(87, 19);
             rbPitchKeyRelative.TabIndex = 1;
-            rbPitchKeyRelative.Text = "Key-relative (Degree/Octave)";
+            rbPitchKeyRelative.Text = "Key-relative";
             // 
             // grpAbsolute
             // 
