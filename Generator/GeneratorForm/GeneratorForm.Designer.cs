@@ -381,7 +381,7 @@ namespace Music.Generator
             // cbChordKey
             // 
             cbChordKey.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbChordKey.Items.AddRange(new object[] { "C", "C#", "D,", "D#", "E", "F", "F#", "G,", "G#", "A", "A#", "B" });
+            cbChordKey.Items.AddRange(new object[] { "C major", "G major", "D major", "A major", "E major", "B major", "F# major", "C# major", "F major", "Bb majo", "Eb major", "Ab major", "Db major", "Gb major", "Cb major", "A minor", "E minor", "B minor", "F# minor", "C# minor", "G# minor", "D# minor", "A# minor", "D minor", "G minor", "C minor ", "F minor ", "Bb minor", "Eb minor", "Ab minor" });
             cbChordKey.Location = new Point(44, 21);
             cbChordKey.Name = "cbChordKey";
             cbChordKey.Size = new Size(70, 23);
@@ -436,7 +436,7 @@ namespace Music.Generator
             // cbChordBase
             // 
             cbChordBase.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbChordBase.Items.AddRange(new object[] { "root", "3rd", "5th", "7th", "9th", "11th", "13th" });
+            cbChordBase.Items.AddRange(new object[] { "root", "3rd", "5th", "7th" });
             cbChordBase.Location = new Point(478, 21);
             cbChordBase.Name = "cbChordBase";
             cbChordBase.Size = new Size(46, 23);

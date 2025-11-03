@@ -1,24 +1,6 @@
 ﻿using MusicTheory;   // https://github.com/phmatray/MusicTheory
 using Music.Designer;
 
-/*
-Known Limitations and Unsupported Features
-Based on my analysis of the MusicTheory library and your requirements, here are the exceptions and unsupported features:
-✅ Fully Supported Qualities:
-•	Triads: maj, min, dim, aug, sus2, sus4, 5
-•	6ths: maj6, min6, 6/9
-•	7ths: dom7, maj7, min7, dim7, hdim7, minMaj7
-•	Extensions: 9, maj9, min9, 11, 13
-•	Adds: add9, add11
-❌ Unsupported/Partially Supported:
-1.	add13 - MusicTheory doesn't have a direct ChordType for this
-2.	minAdd9 - MusicTheory doesn't have a direct ChordType for this
-3.	Bass inversions 9th, 11th, 13th - MusicTheory's ChordInversion enum only supports up to Third (for 7th in bass). Higher inversions aren't directly supported, so these default to root position.
-🔧 Additional Limitations:
-4.	Double sharps/flats - Mapped to single sharp/flat in the output
-5.	All Keys Supported - The key parser handles all 30 keys you've listed (15 major + 15 minor)
- */
-
 namespace Music.Generator
 {
     /// <summary>
