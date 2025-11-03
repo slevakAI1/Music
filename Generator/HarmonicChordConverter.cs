@@ -161,41 +161,41 @@ namespace Music.Generator
         /// <summary>
         /// Maps quality strings from HarmonicEditorForm to MusicTheory ChordType.
         /// </summary>
-        private static ChordType MapQualityToChordType(string quality) => quality.ToLowerInvariant() switch
+        private static ChordType MapQualityToChordType(string quality) => quality switch
         {
             // Triads
-            "maj" => ChordType.Major,
-            "min" => ChordType.Minor,
-            "dim" => ChordType.Diminished,
-            "aug" => ChordType.Augmented,
-            "sus2" => ChordType.Sus2,
-            "sus4" => ChordType.Sus4,
-            "5" => ChordType.Power5,
-            
+            "Major" => ChordType.Major,
+            "Minor" => ChordType.Minor,
+            "Diminished" => ChordType.Diminished,
+            "Augmented" => ChordType.Augmented,
+            "Sus2" => ChordType.Sus2,
+            "Sus4" => ChordType.Sus4,
+            "Power5" => ChordType.Power5,
+
             // 6ths
-            "maj6" => ChordType.Major6,
-            "min6" => ChordType.Minor6,
-            "6/9" => ChordType.Major6Add9,
-            
+            "Major6" => ChordType.Major6,
+            "Minor6" => ChordType.Minor6,
+            "Major6Add9" => ChordType.Major6Add9,
+
             // 7ths
-            "dom7" => ChordType.Dominant7,
-            "maj7" => ChordType.Major7,
-            "min7" => ChordType.Minor7,
-            "dim7" => ChordType.Diminished7,
-            "hdim7" => ChordType.HalfDiminished7,
-            "minmaj7" => ChordType.MinorMajor7,
-            
+            "Dominant7" => ChordType.Dominant7,
+            "Major7" => ChordType.Major7,
+            "Minor7" => ChordType.Minor7,
+            "Diminished7" => ChordType.Diminished7,
+            "HalfDiminished7" => ChordType.HalfDiminished7,
+            "MinorMajor7" => ChordType.MinorMajor7,
+
             // Extensions
-            "9" => ChordType.Dominant9,
-            "maj9" => ChordType.Major9,
-            "min9" => ChordType.Minor9,
-            "11" => ChordType.Dominant11,
-            "13" => ChordType.Dominant13,
-            
+            "Dominant9" => ChordType.Dominant9,
+            "Major9" => ChordType.Major9,
+            "Minor9" => ChordType.Minor9,
+            "Dominant11" => ChordType.Dominant11,
+            "Dominant13" => ChordType.Dominant13,
+
             // Adds
-            "add9" => ChordType.MajorAdd9,
-            "add11" => ChordType.MajorAdd11,
-            
+            "MajorAdd9" => ChordType.MajorAdd9,
+            "MajorAdd11" => ChordType.MajorAdd11,
+
             _ => throw new NotSupportedException($"Chord quality '{quality}' is not supported")
         };
 

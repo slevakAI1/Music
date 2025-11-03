@@ -418,7 +418,7 @@ namespace Music.Generator
             // cbChordQuality
             // 
             cbChordQuality.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbChordQuality.Items.AddRange(new object[] { "maj", "min", "dim", "aug", "sus2", "sus4", "5", "maj6", "min6", "6/9", "dom7", "maj7", "min7", "dim7", "hdim7", "minMaj7", "9", "maj9", "min9", "11", "13", "add9", "add11" });
+            cbChordQuality.Items.AddRange(new object[] { "Major", "Minor", "Diminished", "Augmented", "Sus2", "Sus4", "Power5", "Major6", "Minor6", "Major6Add9", "Dominant7", "Major7", "Minor7", "Diminished7", "HalfDiminished7", "MinorMajor7", "Dominant9", "Major9", "Minor9", "Dominant11", "Dominant13", "MajorAdd9", "MajorAdd11" });
             cbChordQuality.Location = new Point(277, 21);
             cbChordQuality.Name = "cbChordQuality";
             cbChordQuality.Size = new Size(158, 23);
