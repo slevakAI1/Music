@@ -381,7 +381,7 @@ namespace Music.Generator
             // cbChordKey
             // 
             cbChordKey.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbChordKey.Items.AddRange(new object[] { "C major", "G major", "D major", "A major", "E major", "B major", "F# major", "C# major", "F major", "Bb major", "Eb major", "Ab major", "Db major", "Gb major", "Cb major", "A minor", "E minor", "B minor", "F# minor", "C# minor", "G# minor", "D# minor", "A# minor", "D minor", "G minor", "C minor", "F minor", "Bb minor", "Eb minor", "Ab minor" });
+            cbChordKey.Items.AddRange(new object[] { "C", "C#", "D,", "D#", "E", "F", "F#", "G,", "G#", "A", "A#", "B" });
             cbChordKey.Location = new Point(44, 21);
             cbChordKey.Name = "cbChordKey";
             cbChordKey.Size = new Size(70, 23);
