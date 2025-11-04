@@ -823,11 +823,11 @@ namespace Music.Generator
             lblNextThingToDo.AutoSize = true;
             lblNextThingToDo.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblNextThingToDo.ForeColor = Color.Fuchsia;
-            lblNextThingToDo.Location = new Point(802, 176);
+            lblNextThingToDo.Location = new Point(504, 20);
             lblNextThingToDo.Name = "lblNextThingToDo";
-            lblNextThingToDo.Size = new Size(289, 21);
+            lblNextThingToDo.Size = new Size(638, 21);
             lblNextThingToDo.TabIndex = 12;
-            lblNextThingToDo.Text = "Staff needs to test capture and apply";
+            lblNextThingToDo.Text = "ApplySetNotes needs to write to the 2 staffs now. how does this work in musicxml?";
             // 
             // GeneratorForm
             // 

@@ -64,8 +64,7 @@ namespace Music.Generator
         protected override void OnDeactivate(EventArgs e)
         {
             base.OnDeactivate(e);
-            Globals.GenerationData?.ApplyDesignDefaults(_design);
-            ApplyFormData(Globals.GenerationData);
+            Globals.GenerationData = CaptureFormData();
         }
 
         //===============================   E V E N T S   ==============================

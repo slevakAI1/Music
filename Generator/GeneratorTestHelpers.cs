@@ -37,9 +37,8 @@ namespace Music.Generator
 
             data.PartsState = partsState;
 
-            // Staffs default - check staff 1
-            var staffsState = new Dictionary<int, bool> { { 1, true } };
-            data.StaffsState = staffsState;
+            // Staffs default - select staff 1
+            data.SelectedStaffs = new List<int> { 1 };
 
             // End bar: default to design total bars when available
             var total = design?.SectionSet?.TotalBars ?? 0;
@@ -59,7 +58,7 @@ namespace Music.Generator
             data.NoteValue = "Quarter (1/4)";
 
             // Staff default
-            data.Staff = 1;
+            //data.Staff = 1;??
 
             return data;
         }

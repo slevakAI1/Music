@@ -23,15 +23,18 @@ namespace Music.Generator
                 }
             }
 
-            // Capture staffs checked state into a dictionary
-            var staffsState = new Dictionary<int, bool>();
+            // Capture staffs checked state into a list
+            var selectedStaffs = new List<int>();
             if (clbStaffs != null)
             {
                 for (int i = 0; i < clbStaffs.Items.Count; i++)
                 {
-                    var staffText = clbStaffs.Items[i]?.ToString() ?? string.Empty;
-                    if (int.TryParse(staffText, out int staffNum))
-                        staffsState[staffNum] = clbStaffs.GetItemChecked(i);
+                    if (clbStaffs.GetItemChecked(i))
+                    {
+                        var staffText = clbStaffs.Items[i]?.ToString() ?? string.Empty;
+                        if (int.TryParse(staffText, out int staffNum))
+                            selectedStaffs.Add(staffNum);
+                    }
                 }
             }
 
@@ -58,7 +61,7 @@ namespace Music.Generator
                 PartsState = partsState,
 
                 // Staff / sections / bars / beats
-                StaffsState = staffsState, // <-- add this line
+                SelectedStaffs = selectedStaffs,
                 SectionsText = txtSections?.Text,
                 StartBar = (int?)(numStartBar?.Value ?? 1),
                 EndBar = (int?)(numEndBar?.Value ?? 1),
@@ -131,6 +134,35 @@ namespace Music.Generator
                 finally
                 {
                     clbParts.EndUpdate();
+                }
+            }
+
+            // Staffs - set checked state for matching staff numbers
+            if (data.SelectedStaffs != null && data.SelectedStaffs.Count > 0 && clbStaffs != null)
+            {
+                clbStaffs.BeginUpdate();
+                try
+                {
+                    // First, uncheck all items
+                    for (int i = 0; i < clbStaffs.Items.Count; i++)
+                    {
+                        clbStaffs.SetItemChecked(i, false);
+                    }
+
+                    // Then check items that match selected staffs
+                    for (int i = 0; i < clbStaffs.Items.Count; i++)
+                    {
+                        var staffText = clbStaffs.Items[i]?.ToString() ?? string.Empty;
+                        if (int.TryParse(staffText, out int staffNum))
+                        {
+                            if (data.SelectedStaffs.Contains(staffNum))
+                                clbStaffs.SetItemChecked(i, true);
+                        }
+                    }
+                }
+                finally
+                {
+                    clbStaffs.EndUpdate();
                 }
             }
 

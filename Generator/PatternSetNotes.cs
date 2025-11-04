@@ -37,10 +37,14 @@ namespace Music.Generator
                 .Select(kv => kv.Key)
                 .ToList();
 
+            var selectedStaffs = (data.SelectedStaffs ?? new List<int>()).Any() 
+                ? data.SelectedStaffs 
+                : new List<int> { 1 }; // Default to staff 1 if none selected
+
             var config = new PatternConfiguration
             {
                 Parts = parts,
-                Staff = data.Staff.GetValueOrDefault(),
+                Staffs = selectedStaffs!,   
                 StartBar = data.StartBar.GetValueOrDefault(),
                 EndBar = data.EndBar.GetValueOrDefault(data.StartBar.GetValueOrDefault()),
                 Step = data.Step != '\0' ? data.Step : 'C',
@@ -196,18 +200,22 @@ namespace Music.Generator
         {
             for (int i = 0; i < config.NumberOfNotes; i++)
             {
-                if (config.IsChord && config.ChordNotes != null)
+                // Insert notes for each selected staff
+                foreach (var staff in config.Staffs)
                 {
-                    InsertChord(measure, config, noteDuration);
-                }
-                else
-                {
-                    InsertSingleNote(measure, config, noteDuration);
+                    if (config.IsChord && config.ChordNotes != null)
+                    {
+                        InsertChord(measure, config, noteDuration, staff);
+                    }
+                    else
+                    {
+                        InsertSingleNote(measure, config, noteDuration, staff);
+                    }
                 }
             }
         }
 
-        private static void InsertChord(Measure measure, PatternConfiguration config, int noteDuration)
+        private static void InsertChord(Measure measure, PatternConfiguration config, int noteDuration, int staff)
         {
             for (int j = 0; j < config.ChordNotes!.Count; j++)
             {
@@ -217,7 +225,7 @@ namespace Music.Generator
                     Type = DurationTypeString(config.NoteValue),
                     Duration = noteDuration,
                     Voice = 1,
-                    Staff = config.Staff,
+                    Staff = staff,
                     IsChordTone = j > 0,
                     IsRest = false,
                     Pitch = new Pitch
@@ -236,14 +244,14 @@ namespace Music.Generator
             }
         }
 
-        private static void InsertSingleNote(Measure measure, PatternConfiguration config, int noteDuration)
+        private static void InsertSingleNote(Measure measure, PatternConfiguration config, int noteDuration, int staff)
         {
             var note = new Note
             {
                 Type = DurationTypeString(config.NoteValue),
                 Duration = noteDuration,
                 Voice = 1,
-                Staff = config.Staff,
+                Staff = staff,
                 IsChordTone = false,
                 IsRest = config.IsRest,
                 Pitch = new Pitch
@@ -275,7 +283,7 @@ namespace Music.Generator
         private sealed class PatternConfiguration
         {
             public List<string> Parts { get; set; } = new();
-            public int Staff { get; set; }
+            public List<int> Staffs { get; set; } = new(); // Changed from int Staff
             public int StartBar { get; set; }
             public int EndBar { get; set; }
             public char Step { get; set; }
