@@ -36,6 +36,7 @@ namespace Music.Generator
         private string? _pattern;
         private string? _sectionsText;
         private bool? _isRest;
+        private bool? _isChord; // new backing field
         private string? _chordKey;
         private int? _chordDegree;
         private string? _chordQuality;
@@ -121,6 +122,13 @@ namespace Music.Generator
         {
             get => _isRest;
             set => _isRest = value;
+        }
+
+        // New: track whether Chord radio button is selected
+        public bool? IsChord
+        {
+            get => _isChord;
+            set => _isChord = value;
         }
 
         // Always return a non-null accidental string for consumers (default "Natural").

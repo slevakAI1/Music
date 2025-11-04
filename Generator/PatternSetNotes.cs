@@ -127,6 +127,10 @@ namespace Music.Generator
                         return;
                     }
 
+
+                    // THIS NEEDS TO BE MODIFIED TO ALSO SUPPORT CHORDS NOW. 
+                    //var a = Globals.GenerationData.rb
+
                     // Append notes after existing elements (per requirement)
                     for (int i = 0; i < numberOfNotes; i++)
                     {

@@ -27,6 +27,8 @@ namespace Music.Generator
             string? stepSelected = cbStep?.SelectedItem?.ToString();
             // Assume IsRest radiobutton exists; read its checked state directly.
             var isRest = rbIsRest.Checked;
+            // Capture chord radio button state
+            var isChord = rbChord.Checked;
 
             // Convert step string to char (use '\0' for Rest)
             char stepChar = '\0';
@@ -58,6 +60,7 @@ namespace Music.Generator
                 // Step is now char type; '\0' when Rest is selected
                 Step = stepChar,
                 IsRest = isRest,
+                IsChord = isChord,
                 Accidental = cbAccidental?.SelectedItem?.ToString(),
                 OctaveAbsolute = (int?)(numOctaveAbs?.Value ?? 4),
                 DegreeKeyRelative = (int?)(numDegree?.Value ?? 0),
@@ -151,6 +154,10 @@ namespace Music.Generator
             // Set IsRest radiobutton state from data
             if (data.IsRest.HasValue)
                 rbIsRest.Checked = data.IsRest.Value;
+
+            // Restore chord radiobutton state from data
+            if (data.IsChord.HasValue)
+                rbChord.Checked = data.IsChord.Value;
 
             // If IsRest is true (assume "Rest" exists in cbStep items), select it directly.
             // Otherwise, convert the char Step to string for selection.
