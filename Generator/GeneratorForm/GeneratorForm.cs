@@ -119,7 +119,12 @@ namespace Music.Generator
             List<HarmonicChordConverter.ChordNote> notes;
             try
             {
-                notes = HarmonicChordConverter.Convert(harmonicEvent, baseOctave: 4);
+                notes = HarmonicChordConverter.Convert(
+                    harmonicEvent.Key,
+                    harmonicEvent.Degree,
+                    harmonicEvent.Quality,
+                    harmonicEvent.Bass,
+                    baseOctave: 4);
             }
             catch (Exception ex)
             {

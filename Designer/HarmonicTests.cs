@@ -11,10 +11,10 @@ namespace Music.Designer
             // Common 4-chord loop: I – V – vi – IV, one chord per bar across 48 bars.
             var pattern = new (int degree, string quality)[]
             {
-                (1, "maj"),
-                (5, "dom7"),
-                (6, "min7"),
-                (4, "maj")
+                (1, "Major"),
+                (5, "Dominant7"),
+                (6, "Minor7"),
+                (4, "Major")
             };
 
             for (int bar = 1; bar <= DesignerTests.TotalBars; bar++)

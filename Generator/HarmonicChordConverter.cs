@@ -85,6 +85,78 @@ namespace Music.Generator
         }
 
         /// <summary>
+        /// Converts harmonic parameters to a list of notes representing the chord.
+        /// </summary>
+        /// <param name="key">The key (e.g., "C major", "F# minor").</param>
+        /// <param name="degree">The scale degree (1-7).</param>
+        /// <param name="quality">The chord quality (e.g., "Major", "Minor7").</param>
+        /// <param name="bass">The bass note option (e.g., "root", "3rd", "5th").</param>
+        /// <param name="baseOctave">The base octave for the root note (default: 4).</param>
+        /// <returns>A list of ChordNote objects representing the chord voicing.</returns>
+        /// <exception cref="ArgumentException">When parameters are invalid.</exception>
+        /// <exception cref="InvalidOperationException">When the chord cannot be constructed.</exception>
+        public static List<ChordNote> Convert(string key, int degree, string quality, string bass, int baseOctave = 4)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+                throw new ArgumentException("Key cannot be null or empty", nameof(key));
+            if (string.IsNullOrWhiteSpace(quality))
+                throw new ArgumentException("Quality cannot be null or empty", nameof(quality));
+            if (string.IsNullOrWhiteSpace(bass))
+                throw new ArgumentException("Bass cannot be null or empty", nameof(bass));
+
+            try
+            {
+                // Step 1: Parse the key to get the root note and scale
+                var (keyRoot, keyMode) = ParseKey(key);
+                
+                // Step 2: Build the scale for the key
+                var scaleType = keyMode.Equals("major", StringComparison.OrdinalIgnoreCase) 
+                    ? ScaleType.Major 
+                    : ScaleType.NaturalMinor;
+                var scale = new Scale(keyRoot, scaleType);
+                
+                // Step 3: Get the chord root note based on the degree (1-7)
+                var scaleNotes = scale.GetNotes().ToList();
+                if (degree < 1 || degree > 7)
+                    throw new InvalidOperationException($"Degree must be 1-7, got {degree}");
+                
+                var chordRoot = scaleNotes[degree - 1];
+                
+                // Step 4: Map quality string to ChordType
+                var chordType = MapQualityToChordType(quality);
+                
+                // Step 5: Create the chord
+                var chord = new Chord(chordRoot, chordType);
+                
+                // Step 6: Apply inversion based on bass
+                var invertedChord = ApplyBassInversion(chord, bass);
+                
+                // Step 7: Get the notes and convert to ChordNote format
+                var chordNotes = invertedChord.GetNotes().ToList();
+                var result = new List<ChordNote>();
+                
+                foreach (var note in chordNotes)
+                {
+                    result.Add(new ChordNote
+                    {
+                        Step = note.Name.ToString()[0],
+                        Accidental = MapAlteration(note.Alteration),
+                        Octave = note.Octave
+                    });
+                }
+                
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(
+                    $"Failed to convert harmonic parameters: Key={key}, " +
+                    $"Degree={degree}, Quality={quality}, " +
+                    $"Bass={bass}", ex);
+            }
+        }
+
+        /// <summary>
         /// Parses a key string like "C major" or "F# minor" into root note and mode.
         /// </summary>
         private static (Note root, string mode) ParseKey(string keyString)
