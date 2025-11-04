@@ -442,7 +442,7 @@ namespace Music.Generator
             // label8
             // 
             label8.AutoSize = true;
-            label8.ForeColor = Color.FromArgb(255, 128, 0);
+            label8.ForeColor = Color.FromArgb(0, 192, 0);
             label8.Location = new Point(442, 24);
             label8.Name = "label8";
             label8.Size = new Size(31, 15);
