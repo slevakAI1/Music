@@ -384,6 +384,7 @@ namespace Music.Generator
             // lblKey
             // 
             lblKey.AutoSize = true;
+            lblKey.ForeColor = Color.FromArgb(255, 128, 0);
             lblKey.Location = new Point(12, 24);
             lblKey.Name = "lblKey";
             lblKey.Size = new Size(26, 15);
@@ -398,11 +399,11 @@ namespace Music.Generator
             cbChordKey.Name = "cbChordKey";
             cbChordKey.Size = new Size(70, 23);
             cbChordKey.TabIndex = 11;
-            cbChordKey.SelectedIndex = 0;
             // 
             // lblDegree2
             // 
             lblDegree2.AutoSize = true;
+            lblDegree2.ForeColor = Color.FromArgb(255, 128, 0);
             lblDegree2.Location = new Point(124, 24);
             lblDegree2.Name = "lblDegree2";
             lblDegree2.Size = new Size(44, 15);
@@ -422,6 +423,7 @@ namespace Music.Generator
             // lblQuality
             // 
             lblQuality.AutoSize = true;
+            lblQuality.ForeColor = Color.FromArgb(0, 192, 0);
             lblQuality.Location = new Point(226, 24);
             lblQuality.Name = "lblQuality";
             lblQuality.Size = new Size(45, 15);
@@ -436,11 +438,11 @@ namespace Music.Generator
             cbChordQuality.Name = "cbChordQuality";
             cbChordQuality.Size = new Size(158, 23);
             cbChordQuality.TabIndex = 13;
-            cbChordQuality.SelectedIndex = 0;
             // 
             // label8
             // 
             label8.AutoSize = true;
+            label8.ForeColor = Color.FromArgb(255, 128, 0);
             label8.Location = new Point(441, 24);
             label8.Name = "label8";
             label8.Size = new Size(31, 15);
@@ -455,7 +457,6 @@ namespace Music.Generator
             cbChordBase.Name = "cbChordBase";
             cbChordBase.Size = new Size(46, 23);
             cbChordBase.TabIndex = 14;
-            cbChordBase.SelectedIndex = 0;
             // 
             // lblOctaveAbs
             // 
