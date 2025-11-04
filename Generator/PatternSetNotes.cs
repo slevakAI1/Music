@@ -1,9 +1,4 @@
-using Music;
-using Music.Designer;
 using MusicXml.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Music.Generator
 {
@@ -24,189 +19,246 @@ namespace Music.Generator
             if (score == null) throw new ArgumentNullException(nameof(score));
             if (data == null) throw new ArgumentNullException(nameof(data));
 
-            // Extract and transform data from GeneratorData DTO
+            var config = ExtractConfiguration(data);
+            ScorePartsHelper.EnsurePartsExist(score, config.Parts);
+
+            foreach (var scorePart in GetTargetParts(score, config.Parts))
+            {
+                ProcessPart(scorePart, config);
+            }
+            
+            MessageBoxHelper.ShowMessage("Pattern has been applied to the score.", "Apply Pattern Set Notes");
+        }
+
+        private static PatternConfiguration ExtractConfiguration(GeneratorData data)
+        {
             var parts = (data.PartsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase))
                 .Where(kv => kv.Value)
                 .Select(kv => kv.Key)
                 .ToList();
 
-            var staff = data.Staff.GetValueOrDefault();
-            var startBar = data.StartBar.GetValueOrDefault();
-            var endBar = data.EndBar.GetValueOrDefault(startBar);
-            
-            // Step is now char type - use directly, default to 'C' if '\0'
-            char step = data.Step != '\0' ? data.Step : 'C';
-            
-            // Map accidental to alter value (MusicXml uses -1, 0, 1)
-            string accidental = data.Accidental ?? "Natural";
-            int? alter = accidental switch
+            var config = new PatternConfiguration
             {
-                var s when s.Equals("Sharp", StringComparison.OrdinalIgnoreCase) => 1,
-                var s when s.Equals("Flat", StringComparison.OrdinalIgnoreCase) => -1,
-                var s when s.Equals("Natural", StringComparison.OrdinalIgnoreCase) => 0,
-                _ => 0
+                Parts = parts,
+                Staff = data.Staff.GetValueOrDefault(),
+                StartBar = data.StartBar.GetValueOrDefault(),
+                EndBar = data.EndBar.GetValueOrDefault(data.StartBar.GetValueOrDefault()),
+                Step = data.Step != '\0' ? data.Step : 'C',
+                Octave = data.Octave,
+                NoteValue = GetNoteValue(data.NoteValue),
+                NumberOfNotes = data.NumberOfNotes.GetValueOrDefault(),
+                IsChord = data.IsChord ?? false,
+                IsRest = data.IsRest ?? false,
+                Alter = GetAlter(data.Accidental)
             };
 
-            int octave = data.Octave;
-            
-            // Map NoteValue string to int denominator
-            int noteValue = 4; // default
-            if (data.NoteValue != null && Music.MusicConstants.NoteValueMap.TryGetValue(data.NoteValue, out var nv))
+            if (config.IsChord)
             {
-                noteValue = nv;
-            }
-            
-            var numberOfNotes = data.NumberOfNotes.GetValueOrDefault();
-
-            // Get chord notes if chord mode is selected
-            List<HarmonicChordConverter.ChordNote>? chordNotes = null;
-            if (data.IsChord == true)
-            {
-                chordNotes = HarmonicChordConverter.Convert(
+                config.ChordNotes = HarmonicChordConverter.Convert(
                     data.ChordKey,
                     (int)data.ChordDegree,
                     data.ChordQuality,
                     data.ChordBase,
-                    baseOctave: octave);
+                    baseOctave: config.Octave);
             }
 
-            // Ensure the Score has a Parts list and create missing Part entries for any selected names
-            ScorePartsHelper.EnsurePartsExist(score, parts);
+            return config;
+        }
 
-            // For each matching part, insert notes for each bar in the range
-            foreach (var scorePart in score.Parts ?? Enumerable.Empty<Part>())
+        private static int GetNoteValue(string? noteValueString)
+        {
+            if (noteValueString != null && Music.MusicConstants.NoteValueMap.TryGetValue(noteValueString, out var nv))
             {
-                if (scorePart?.Name == null) continue;
-                if (!parts.Contains(scorePart.Name)) continue;
+                return nv;
+            }
+            return 4; // default quarter note
+        }
 
-                // Ensure Measures collection exists
-                scorePart.Measures ??= new List<Measure>();
+        private static int GetAlter(string? accidental)
+        {
+            return (accidental ?? "Natural") switch
+            {
+                var s when s.Equals("Sharp", StringComparison.OrdinalIgnoreCase) => 1,
+                var s when s.Equals("Flat", StringComparison.OrdinalIgnoreCase) => -1,
+                _ => 0
+            };
+        }
 
-                // Ensure there are at least endBar measures (1-based)
-                while (scorePart.Measures.Count < endBar)
+        private static IEnumerable<Part> GetTargetParts(Score score, List<string> partNames)
+        {
+            return (score.Parts ?? Enumerable.Empty<Part>())
+                .Where(p => p?.Name != null && partNames.Contains(p.Name));
+        }
+
+        private static void ProcessPart(Part scorePart, PatternConfiguration config)
+        {
+            scorePart.Measures ??= new List<Measure>();
+            EnsureMeasureCount(scorePart, config.EndBar);
+
+            for (int bar = config.StartBar; bar <= config.EndBar; bar++)
+            {
+                ProcessMeasure(scorePart, bar, config);
+            }
+        }
+
+        private static void EnsureMeasureCount(Part part, int requiredCount)
+        {
+            while (part.Measures.Count < requiredCount)
+            {
+                part.Measures.Add(new Measure());
+            }
+        }
+
+        private static void ProcessMeasure(Part scorePart, int barNumber, PatternConfiguration config)
+        {
+            var measure = scorePart.Measures[barNumber - 1];
+            if (measure == null)
+            {
+                measure = new Measure();
+                scorePart.Measures[barNumber - 1] = measure;
+            }
+
+            measure.MeasureElements ??= new List<MeasureElement>();
+
+            var measureInfo = GetMeasureInfo(measure);
+            int noteDuration = CalculateNoteDuration(measureInfo.Divisions, config.NoteValue);
+            
+            if (!ValidateCapacity(measure, measureInfo, noteDuration, config, barNumber, scorePart.Name))
+            {
+                return;
+            }
+
+            InsertNotes(measure, config, noteDuration);
+        }
+
+        private static MeasureInfo GetMeasureInfo(Measure measure)
+        {
+            var divisions = Math.Max(1, measure.Attributes?.Divisions ?? 1);
+            var beatsPerBar = measure.Attributes?.Time?.Beats ?? 4;
+            var existingDuration = CalculateExistingDuration(measure);
+
+            return new MeasureInfo
+            {
+                Divisions = divisions,
+                BeatsPerBar = beatsPerBar,
+                BarLengthDivisions = divisions * beatsPerBar,
+                ExistingDuration = existingDuration
+            };
+        }
+
+        private static long CalculateExistingDuration(Measure measure)
+        {
+            long duration = 0;
+            foreach (var me in measure.MeasureElements ?? Enumerable.Empty<MeasureElement>())
+            {
+                if (me?.Type == MeasureElementType.Note && 
+                    me.Element is Note n && 
+                    n.Duration > 0 && 
+                    !n.IsChordTone)
                 {
-                    // NOTE: do not populate full Attributes here ? NewScore() is responsible for setting Divisions on all measures.
-                    scorePart.Measures.Add(new Measure());
-                }
-
-                // Now process each measure index in the requested range
-                for (int bar = startBar; bar <= endBar; bar++)
-                {
-                    var measure = scorePart.Measures[bar - 1];
-                    if (measure == null)
-                    {
-                        measure = new Measure();
-                        scorePart.Measures[bar - 1] = measure;
-                    }
-
-                    // Ensure MeasureElements list exists
-                    measure.MeasureElements ??= new List<MeasureElement>();
-
-                    // Determine the measure length in divisions:
-                    var divisions = Math.Max(1, measure.Attributes?.Divisions ?? 1);
-                    var beatsPerBar = (measure.Attributes?.Time?.Beats) ?? 4;
-                    var barLengthDivisions = divisions * beatsPerBar;
-
-                    // Sum durations of existing notes in this measure, excluding chord tones
-                    long existingDuration = 0;
-                    foreach (var me in measure.MeasureElements)
-                    {
-                        if (me == null) continue;
-
-                        // Only consider existing notes for occupancy calculation, excluding chord tones
-                        if (me.Type == MeasureElementType.Note && me.Element is Note n && n.Duration > 0 && !n.IsChordTone)
-                        {
-                            existingDuration += n.Duration;
-                        }
-                    }
-
-                    // Compute single inserted note duration in divisions.
-                    // Formula: durationDiv = (divisions * 4) / denom
-                    var denom = noteValue;
-                    var numerator = divisions * 4;
-                    if (numerator % denom != 0)
-                    {
-                        var msg = $"Cannot represent base duration '{denom}' with measure divisions={divisions}. Resulting duration would not be an integer number of divisions.";
-                        MessageBoxHelper.ShowError(msg, "Invalid Duration");
-                        return;
-                    }
-                    int noteDuration = numerator / denom;
-
-                    long totalNewDuration = (long)noteDuration * numberOfNotes;
-                    if (existingDuration + totalNewDuration > barLengthDivisions)
-                    {
-                        var msg = $"Insertion would overflow bar {bar} of part '{scorePart.Name}'. Bar capacity (in divisions): {barLengthDivisions}. Existing occupied: {existingDuration}. Attempting to add: {totalNewDuration}.";
-                        MessageBoxHelper.ShowError(msg, "Bar Overflow");
-                        return;
-                    }
-
-                    // Append notes or chords after existing elements
-                    for (int i = 0; i < numberOfNotes; i++)
-                    {
-                        if (data.IsChord == true && chordNotes != null)
-                        {
-                            // Insert chord: first note with IsChordTone=false, rest with IsChordTone=true
-                            for (int j = 0; j < chordNotes.Count; j++)
-                            {
-                                var chordNote = chordNotes[j];
-                                var note = new Note
-                                {
-                                    Type = DurationTypeString(denom),
-                                    Duration = noteDuration,
-                                    Voice = 1,
-                                    Staff = staff,
-                                    IsChordTone = j > 0,
-                                    IsRest = false,
-                                    Pitch = new Pitch
-                                    {
-                                        Step = char.ToUpper(chordNote.Step),
-                                        Octave = chordNote.Octave,
-                                        Alter = chordNote.Alter
-                                    }
-                                };
-
-                                var meNote = new MeasureElement
-                                {
-                                    Type = MeasureElementType.Note,
-                                    Element = note
-                                };
-
-                                measure.MeasureElements.Add(meNote);
-                            }
-                        }
-                        else
-                        {
-                            // Insert single note
-                            var note = new Note
-                            {
-                                Type = DurationTypeString(denom),
-                                Duration = noteDuration,
-                                Voice = 1,
-                                Staff = staff,
-                                IsChordTone = false,
-                                IsRest = data.IsRest ?? false,
-                                Pitch = new Pitch
-                                {
-                                    Step = char.ToUpper(step),
-                                    Octave = octave,
-                                    Alter = alter ?? 0
-                                }
-                            };
-
-                            var meNote = new MeasureElement
-                            {
-                                Type = MeasureElementType.Note,
-                                Element = note
-                            };
-
-                            measure.MeasureElements.Add(meNote);
-                        }
-                    }
+                    duration += n.Duration;
                 }
             }
-            
-            // Inform the user that pattern application is complete.
-            MessageBoxHelper.ShowMessage("Pattern has been applied to the score.", "Apply Pattern Set Notes");
+            return duration;
+        }
+
+        private static int CalculateNoteDuration(int divisions, int noteValue)
+        {
+            int numerator = divisions * 4;
+            if (numerator % noteValue != 0)
+            {
+                var msg = $"Cannot represent base duration '{noteValue}' with measure divisions={divisions}. Resulting duration would not be an integer number of divisions.";
+                MessageBoxHelper.ShowError(msg, "Invalid Duration");
+                return 0;
+            }
+            return numerator / noteValue;
+        }
+
+        private static bool ValidateCapacity(Measure measure, MeasureInfo info, int noteDuration, 
+            PatternConfiguration config, int barNumber, string? partName)
+        {
+            if (noteDuration == 0) return false;
+
+            long totalNewDuration = (long)noteDuration * config.NumberOfNotes;
+            if (info.ExistingDuration + totalNewDuration > info.BarLengthDivisions)
+            {
+                var msg = $"Insertion would overflow bar {barNumber} of part '{partName}'. " +
+                          $"Bar capacity (in divisions): {info.BarLengthDivisions}. " +
+                          $"Existing occupied: {info.ExistingDuration}. " +
+                          $"Attempting to add: {totalNewDuration}.";
+                MessageBoxHelper.ShowError(msg, "Bar Overflow");
+                return false;
+            }
+            return true;
+        }
+
+        private static void InsertNotes(Measure measure, PatternConfiguration config, int noteDuration)
+        {
+            for (int i = 0; i < config.NumberOfNotes; i++)
+            {
+                if (config.IsChord && config.ChordNotes != null)
+                {
+                    InsertChord(measure, config, noteDuration);
+                }
+                else
+                {
+                    InsertSingleNote(measure, config, noteDuration);
+                }
+            }
+        }
+
+        private static void InsertChord(Measure measure, PatternConfiguration config, int noteDuration)
+        {
+            for (int j = 0; j < config.ChordNotes!.Count; j++)
+            {
+                var chordNote = config.ChordNotes[j];
+                var note = new Note
+                {
+                    Type = DurationTypeString(config.NoteValue),
+                    Duration = noteDuration,
+                    Voice = 1,
+                    Staff = config.Staff,
+                    IsChordTone = j > 0,
+                    IsRest = false,
+                    Pitch = new Pitch
+                    {
+                        Step = char.ToUpper(chordNote.Step),
+                        Octave = chordNote.Octave,
+                        Alter = chordNote.Alter
+                    }
+                };
+
+                measure.MeasureElements.Add(new MeasureElement
+                {
+                    Type = MeasureElementType.Note,
+                    Element = note
+                });
+            }
+        }
+
+        private static void InsertSingleNote(Measure measure, PatternConfiguration config, int noteDuration)
+        {
+            var note = new Note
+            {
+                Type = DurationTypeString(config.NoteValue),
+                Duration = noteDuration,
+                Voice = 1,
+                Staff = config.Staff,
+                IsChordTone = false,
+                IsRest = config.IsRest,
+                Pitch = new Pitch
+                {
+                    Step = char.ToUpper(config.Step),
+                    Octave = config.Octave,
+                    Alter = config.Alter
+                }
+            };
+
+            measure.MeasureElements.Add(new MeasureElement
+            {
+                Type = MeasureElementType.Note,
+                Element = note
+            });
         }
 
         private static string DurationTypeString(int denom) => denom switch
@@ -218,6 +270,30 @@ namespace Music.Generator
             16 => "16th",
             _ => "quarter"
         };
+
+        private sealed class PatternConfiguration
+        {
+            public List<string> Parts { get; set; } = new();
+            public int Staff { get; set; }
+            public int StartBar { get; set; }
+            public int EndBar { get; set; }
+            public char Step { get; set; }
+            public int Octave { get; set; }
+            public int NoteValue { get; set; }
+            public int NumberOfNotes { get; set; }
+            public bool IsChord { get; set; }
+            public bool IsRest { get; set; }
+            public int Alter { get; set; }
+            public List<HarmonicChordConverter.ChordNote>? ChordNotes { get; set; }
+        }
+
+        private sealed class MeasureInfo
+        {
+            public int Divisions { get; set; }
+            public int BeatsPerBar { get; set; }
+            public int BarLengthDivisions { get; set; }
+            public long ExistingDuration { get; set; }
+        }
     }
 
     /// <summary>
