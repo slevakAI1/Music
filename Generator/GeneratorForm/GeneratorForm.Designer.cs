@@ -72,6 +72,7 @@ namespace Music.Generator
             lblStartBar = new Label();
             grpPitch = new GroupBox();
             grpChord = new GroupBox();
+            label1 = new Label();
             lblKey = new Label();
             cbChordKey = new ComboBox();
             lblDegree2 = new Label();
@@ -117,7 +118,7 @@ namespace Music.Generator
             btnNewScore = new Button();
             btnSetDesignTestScenarioD1 = new Button();
             btnChordTest = new Button();
-            label1 = new Label();
+            lblNextThingToDo = new Label();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numStaff).BeginInit();
@@ -371,6 +372,15 @@ namespace Music.Generator
             grpChord.TabIndex = 11;
             grpChord.TabStop = false;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(21, 64);
+            label1.Name = "label1";
+            label1.Size = new Size(43, 15);
+            label1.TabIndex = 15;
+            label1.Text = "Notes?";
+            // 
             // lblKey
             // 
             lblKey.AutoSize = true;
@@ -597,7 +607,7 @@ namespace Music.Generator
             // 
             btnApplySetNotes.Location = new Point(485, 207);
             btnApplySetNotes.Name = "btnApplySetNotes";
-            btnApplySetNotes.Size = new Size(176, 29);
+            btnApplySetNotes.Size = new Size(202, 29);
             btnApplySetNotes.TabIndex = 4;
             btnApplySetNotes.Text = "Appy Set Notes";
             btnApplySetNotes.Click += btnApplySetNotes_Click;
@@ -769,7 +779,7 @@ namespace Music.Generator
             // 
             btnSetGeneratorTestScenarioG1.Location = new Point(491, 121);
             btnSetGeneratorTestScenarioG1.Name = "btnSetGeneratorTestScenarioG1";
-            btnSetGeneratorTestScenarioG1.Size = new Size(170, 31);
+            btnSetGeneratorTestScenarioG1.Size = new Size(196, 31);
             btnSetGeneratorTestScenarioG1.TabIndex = 8;
             btnSetGeneratorTestScenarioG1.Text = "Set Generator - Test Scenario G1";
             btnSetGeneratorTestScenarioG1.UseVisualStyleBackColor = true;
@@ -779,7 +789,7 @@ namespace Music.Generator
             // 
             btnNewScore.Location = new Point(487, 162);
             btnNewScore.Name = "btnNewScore";
-            btnNewScore.Size = new Size(174, 32);
+            btnNewScore.Size = new Size(200, 32);
             btnNewScore.TabIndex = 9;
             btnNewScore.Text = "New Score From Design";
             btnNewScore.UseVisualStyleBackColor = true;
@@ -789,7 +799,7 @@ namespace Music.Generator
             // 
             btnSetDesignTestScenarioD1.Location = new Point(491, 84);
             btnSetDesignTestScenarioD1.Name = "btnSetDesignTestScenarioD1";
-            btnSetDesignTestScenarioD1.Size = new Size(170, 31);
+            btnSetDesignTestScenarioD1.Size = new Size(196, 31);
             btnSetDesignTestScenarioD1.TabIndex = 10;
             btnSetDesignTestScenarioD1.Text = "Set Design - Test Scenario D1";
             btnSetDesignTestScenarioD1.UseVisualStyleBackColor = true;
@@ -797,7 +807,7 @@ namespace Music.Generator
             // 
             // btnChordTest
             // 
-            btnChordTest.Location = new Point(698, 95);
+            btnChordTest.Location = new Point(773, 84);
             btnChordTest.Name = "btnChordTest";
             btnChordTest.Size = new Size(112, 23);
             btnChordTest.TabIndex = 11;
@@ -805,18 +815,21 @@ namespace Music.Generator
             btnChordTest.UseVisualStyleBackColor = true;
             btnChordTest.Click += btnChordTest_Click;
             // 
-            // label1
+            // lblNextThingToDo
             // 
-            label1.AutoSize = true;
-            label1.Location = new Point(21, 64);
-            label1.Name = "label1";
-            label1.Size = new Size(43, 15);
-            label1.TabIndex = 15;
-            label1.Text = "Notes?";
+            lblNextThingToDo.AutoSize = true;
+            lblNextThingToDo.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblNextThingToDo.ForeColor = Color.Fuchsia;
+            lblNextThingToDo.Location = new Point(802, 176);
+            lblNextThingToDo.Name = "lblNextThingToDo";
+            lblNextThingToDo.Size = new Size(373, 21);
+            lblNextThingToDo.TabIndex = 12;
+            lblNextThingToDo.Text = "Chord quality not working. minor output major.";
             // 
             // GeneratorForm
             // 
             ClientSize = new Size(1266, 789);
+            Controls.Add(lblNextThingToDo);
             Controls.Add(btnChordTest);
             Controls.Add(btnSetDesignTestScenarioD1);
             Controls.Add(btnNewScore);
@@ -898,5 +911,6 @@ namespace Music.Generator
         private ComboBox cbChordQuality;
         private ComboBox cbChordBase;
         private Label label1;
+        private Label lblNextThingToDo;
     }
 }
