@@ -403,7 +403,7 @@ namespace Music.Generator
             // lblDegree2
             // 
             lblDegree2.AutoSize = true;
-            lblDegree2.ForeColor = Color.FromArgb(255, 128, 0);
+            lblDegree2.ForeColor = Color.FromArgb(0, 192, 0);
             lblDegree2.Location = new Point(124, 24);
             lblDegree2.Name = "lblDegree2";
             lblDegree2.Size = new Size(44, 15);
