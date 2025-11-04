@@ -82,14 +82,16 @@ namespace Music.Generator
                 var chordRoot = new Note(degreeNote.Name, degreeNote.Alteration, baseOctave);
                 var chord = new Chord(chordRoot, chordType);
                 
-                // Step 6: Apply inversion based on bass
-                var invertedChord = ApplyBassInversion(chord, bass);
+                // Step 6: Get the notes in root position first
+                var chordNotes = chord.GetNotes().ToList();
                 
-                // Step 7: Get the notes and convert to ChordNote format
-                var chordNotes = invertedChord.GetNotes().ToList();
+                // Step 7: Apply inversion by rotating and adjusting octaves
+                var voicedNotes = ApplyVoicing(chordNotes, bass, baseOctave);
+                
+                // Step 8: Convert to ChordNote format
                 var result = new List<ChordNote>();
                 
-                foreach (var note in chordNotes)
+                foreach (var note in voicedNotes)
                 {
                     result.Add(new ChordNote
                     {
@@ -209,19 +211,59 @@ namespace Music.Generator
         };
 
         /// <summary>
-        /// Applies chord inversion based on bass option.
+        /// Applies chord voicing based on bass option by rotating notes and adjusting octaves.
         /// </summary>
-        private static Chord ApplyBassInversion(Chord chord, string bassOption) => bassOption.ToLowerInvariant() switch
+        /// <param name="notes">The chord notes in root position.</param>
+        /// <param name="bassOption">The desired bass note (root, 3rd, 5th, 7th, etc.).</param>
+        /// <param name="baseOctave">The base octave for proper voicing.</param>
+        /// <returns>A list of notes with proper octave adjustments for the inversion.</returns>
+        private static List<Note> ApplyVoicing(List<Note> notes, string bassOption, int baseOctave)
         {
-            "root" => chord,
-            "3rd" => chord.WithInversion(ChordInversion.First),
-            "5th" => chord.WithInversion(ChordInversion.Second),
-            "7th" => chord.WithInversion(ChordInversion.Third),
-            // For extensions beyond 7th, we can't directly invert via ChordInversion enum
-            // MusicTheory library doesn't support higher inversions directly
-            "9th" or "11th" or "13th" => chord, // Keep root position for now
-            _ => throw new NotSupportedException($"Bass option '{bassOption}' is not supported")
-        };
+            if (notes == null || notes.Count == 0)
+                return notes;
+
+            var bassIndex = bassOption.ToLowerInvariant() switch
+            {
+                "root" => 0,
+                "3rd" => 1,
+                "5th" => 2,
+                "7th" => 3,
+                "9th" => 4,
+                "11th" => 5,
+                "13th" => 6,
+                _ => throw new NotSupportedException($"Bass option '{bassOption}' is not supported")
+            };
+
+            // Validate index is within chord range
+            if (bassIndex >= notes.Count)
+            {
+                // For inversions beyond the chord tones available, just return root position
+                return notes;
+            }
+
+            if (bassIndex == 0)
+            {
+                // Root position - no changes needed
+                return notes;
+            }
+
+            // Create a new list with proper voicing
+            var voicedNotes = new List<Note>();
+            
+            // The bass note and all notes after it stay in the base octave
+            for (int i = bassIndex; i < notes.Count; i++)
+            {
+                voicedNotes.Add(new Note(notes[i].Name, notes[i].Alteration, baseOctave));
+            }
+            
+            // Notes before the bass note move up an octave
+            for (int i = 0; i < bassIndex; i++)
+            {
+                voicedNotes.Add(new Note(notes[i].Name, notes[i].Alteration, baseOctave + 1));
+            }
+
+            return voicedNotes;
+        }
 
         /// <summary>
         /// Maps MusicTheory Alteration to GeneratorData accidental string.
