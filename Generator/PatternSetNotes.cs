@@ -271,6 +271,7 @@ namespace Music.Generator
             _ => "quarter"
         };
 
+        // Configuration extracted from GeneratorData for easier processing
         private sealed class PatternConfiguration
         {
             public List<string> Parts { get; set; } = new();
