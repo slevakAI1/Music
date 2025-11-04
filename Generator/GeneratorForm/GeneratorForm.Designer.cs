@@ -117,6 +117,7 @@ namespace Music.Generator
             btnNewScore = new Button();
             btnSetDesignTestScenarioD1 = new Button();
             btnChordTest = new Button();
+            label1 = new Label();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numStaff).BeginInit();
@@ -355,6 +356,7 @@ namespace Music.Generator
             // 
             // grpChord
             // 
+            grpChord.Controls.Add(label1);
             grpChord.Controls.Add(lblKey);
             grpChord.Controls.Add(cbChordKey);
             grpChord.Controls.Add(lblDegree2);
@@ -365,7 +367,7 @@ namespace Music.Generator
             grpChord.Controls.Add(cbChordBase);
             grpChord.Location = new Point(43, 346);
             grpChord.Name = "grpChord";
-            grpChord.Size = new Size(549, 80);
+            grpChord.Size = new Size(549, 98);
             grpChord.TabIndex = 11;
             grpChord.TabStop = false;
             // 
@@ -803,6 +805,15 @@ namespace Music.Generator
             btnChordTest.UseVisualStyleBackColor = true;
             btnChordTest.Click += btnChordTest_Click;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(21, 64);
+            label1.Name = "label1";
+            label1.Size = new Size(43, 15);
+            label1.TabIndex = 15;
+            label1.Text = "Notes?";
+            // 
             // GeneratorForm
             // 
             ClientSize = new Size(1266, 789);
@@ -886,5 +897,6 @@ namespace Music.Generator
         private NumericUpDown numChordDegree;
         private ComboBox cbChordQuality;
         private ComboBox cbChordBase;
+        private Label label1;
     }
 }
