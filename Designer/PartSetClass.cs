@@ -20,7 +20,7 @@ namespace Music.Designer
         {
             //AddVoice("Guitar");
             //AddVoice("Flute");
-            AddVoice("Keyboard");
+            AddVoice("Piano");
             //AddVoice("Base Guitar"); // per requirement
             return Parts;
         }

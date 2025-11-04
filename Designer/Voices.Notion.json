@@ -1,6 +1,16 @@
 ﻿{
   "product": "Notion",
   "schemaVersion": 1,
+  "twoStaffVoices": [
+    "Piano",
+    "Harp",
+    "Celeste",
+    "Harpsichord",
+    "Electric Piano",
+    "Clavinet",
+    "Techno Synth",
+    "Organ Manuals"
+  ],
   "categories": [
     {
       "name": "Basic",
