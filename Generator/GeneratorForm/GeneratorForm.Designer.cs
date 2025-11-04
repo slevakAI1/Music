@@ -241,7 +241,7 @@ namespace Music.Generator
             // lblStaff
             // 
             lblStaff.AutoSize = true;
-            lblStaff.ForeColor = Color.Red;
+            lblStaff.ForeColor = Color.FromArgb(255, 128, 0);
             lblStaff.Location = new Point(15, 233);
             lblStaff.Name = "lblStaff";
             lblStaff.Size = new Size(34, 15);
@@ -825,9 +825,9 @@ namespace Music.Generator
             lblNextThingToDo.ForeColor = Color.Fuchsia;
             lblNextThingToDo.Location = new Point(802, 176);
             lblNextThingToDo.Name = "lblNextThingToDo";
-            lblNextThingToDo.Size = new Size(185, 21);
+            lblNextThingToDo.Size = new Size(289, 21);
             lblNextThingToDo.TabIndex = 12;
-            lblNextThingToDo.Text = "Staff and Sections next";
+            lblNextThingToDo.Text = "Staff needs to test capture and apply";
             // 
             // GeneratorForm
             // 
