@@ -17,8 +17,6 @@ namespace Music.Generator
             public char Step { get; init; }           // C, D, E, F, G, A, B
             public string Accidental { get; init; }   // "Natural", "Sharp", "Flat"
             public int Octave { get; init; }          // Scientific pitch notation
-
-            // THIS WAS ADDED TO STOP AN ERROR MESSAGE - it seems to be in the Score Pitch class
             public int Alter { get; init; }           // -2 (bb), -1 (b), 0 (natural), 1 (#), 2 (##)
         }
 
@@ -35,56 +33,7 @@ namespace Music.Generator
             if (harmonicEvent == null)
                 throw new ArgumentNullException(nameof(harmonicEvent));
 
-            try
-            {
-                // Step 1: Parse the key to get the root note and scale
-                var (keyRoot, keyMode) = ParseKey(harmonicEvent.Key);
-                
-                // Step 2: Build the scale for the key
-                var scaleType = keyMode.Equals("major", StringComparison.OrdinalIgnoreCase) 
-                    ? ScaleType.Major 
-                    : ScaleType.NaturalMinor;
-                var scale = new Scale(keyRoot, scaleType);
-                
-                // Step 3: Get the chord root note based on the degree (1-7)
-                var scaleNotes = scale.GetNotes().ToList();
-                if (harmonicEvent.Degree < 1 || harmonicEvent.Degree > 7)
-                    throw new InvalidOperationException($"Degree must be 1-7, got {harmonicEvent.Degree}");
-                
-                var chordRoot = scaleNotes[harmonicEvent.Degree - 1];
-                
-                // Step 4: Map quality string to ChordType
-                var chordType = MapQualityToChordType(harmonicEvent.Quality);
-                
-                // Step 5: Create the chord
-                var chord = new Chord(chordRoot, chordType);
-                
-                // Step 6: Apply inversion based on bass
-                var invertedChord = ApplyBassInversion(chord, harmonicEvent.Bass);
-                
-                // Step 7: Get the notes and convert to ChordNote format
-                var chordNotes = invertedChord.GetNotes().ToList();
-                var result = new List<ChordNote>();
-                
-                foreach (var note in chordNotes)
-                {
-                    result.Add(new ChordNote
-                    {
-                        Step = note.Name.ToString()[0],
-                        Accidental = MapAlteration(note.Alteration),
-                        Octave = note.Octave
-                    });
-                }
-                
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException(
-                    $"Failed to convert HarmonicEvent: Key={harmonicEvent.Key}, " +
-                    $"Degree={harmonicEvent.Degree}, Quality={harmonicEvent.Quality}, " +
-                    $"Bass={harmonicEvent.Bass}", ex);
-            }
+            return Convert(harmonicEvent.Key, harmonicEvent.Degree, harmonicEvent.Quality, harmonicEvent.Bass, baseOctave);
         }
 
         /// <summary>
@@ -123,12 +72,14 @@ namespace Music.Generator
                 if (degree < 1 || degree > 7)
                     throw new InvalidOperationException($"Degree must be 1-7, got {degree}");
                 
-                var chordRoot = scaleNotes[degree - 1];
+                var degreeNote = scaleNotes[degree - 1];
                 
                 // Step 4: Map quality string to ChordType
                 var chordType = MapQualityToChordType(quality);
                 
-                // Step 5: Create the chord
+                // Step 5: Create the chord using the degree note's pitch class with the specified quality
+                // We need to create a new Note with the same pitch class but at the base octave
+                var chordRoot = new Note(degreeNote.Name, degreeNote.Alteration, baseOctave);
                 var chord = new Chord(chordRoot, chordType);
                 
                 // Step 6: Apply inversion based on bass
@@ -144,7 +95,8 @@ namespace Music.Generator
                     {
                         Step = note.Name.ToString()[0],
                         Accidental = MapAlteration(note.Alteration),
-                        Octave = note.Octave
+                        Octave = note.Octave,
+                        Alter = MapAlterationToAlter(note.Alteration)
                     });
                 }
                 
@@ -282,6 +234,19 @@ namespace Music.Generator
             Alteration.DoubleSharp => "Sharp", // Map to single sharp
             Alteration.DoubleFlat => "Flat",   // Map to single flat
             _ => "Natural"
+        };
+
+        /// <summary>
+        /// Maps MusicTheory Alteration to MusicXML alter value.
+        /// </summary>
+        private static int MapAlterationToAlter(Alteration alteration) => alteration switch
+        {
+            Alteration.Natural => 0,
+            Alteration.Sharp => 1,
+            Alteration.Flat => -1,
+            Alteration.DoubleSharp => 2,
+            Alteration.DoubleFlat => -2,
+            _ => 0
         };
     }
 }

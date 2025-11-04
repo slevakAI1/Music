@@ -398,6 +398,7 @@ namespace Music.Generator
             cbChordKey.Name = "cbChordKey";
             cbChordKey.Size = new Size(70, 23);
             cbChordKey.TabIndex = 11;
+            cbChordKey.SelectedIndex = 0;
             // 
             // lblDegree2
             // 
@@ -435,6 +436,7 @@ namespace Music.Generator
             cbChordQuality.Name = "cbChordQuality";
             cbChordQuality.Size = new Size(158, 23);
             cbChordQuality.TabIndex = 13;
+            cbChordQuality.SelectedIndex = 0;
             // 
             // label8
             // 
@@ -453,6 +455,7 @@ namespace Music.Generator
             cbChordBase.Name = "cbChordBase";
             cbChordBase.Size = new Size(46, 23);
             cbChordBase.TabIndex = 14;
+            cbChordBase.SelectedIndex = 0;
             // 
             // lblOctaveAbs
             // 
