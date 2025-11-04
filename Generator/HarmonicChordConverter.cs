@@ -17,6 +17,9 @@ namespace Music.Generator
             public char Step { get; init; }           // C, D, E, F, G, A, B
             public string Accidental { get; init; }   // "Natural", "Sharp", "Flat"
             public int Octave { get; init; }          // Scientific pitch notation
+
+            // THIS WAS ADDED TO STOP AN ERROR MESSAGE - it seems to be in the Score Pitch class
+            public int Alter { get; init; }           // -2 (bb), -1 (b), 0 (natural), 1 (#), 2 (##)
         }
 
         /// <summary>

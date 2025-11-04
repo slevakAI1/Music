@@ -1,8 +1,9 @@
+using Music;
+using Music.Designer;
+using MusicXml.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Music;
-using MusicXml.Domain;
 
 namespace Music.Generator
 {
@@ -57,6 +58,18 @@ namespace Music.Generator
             
             var numberOfNotes = data.NumberOfNotes.GetValueOrDefault();
 
+            // Get chord notes if chord mode is selected
+            List<HarmonicChordConverter.ChordNote>? chordNotes = null;
+            if (data.IsChord == true)
+            {
+                chordNotes = HarmonicChordConverter.Convert(
+                    data.ChordKey,
+                    (int)data.ChordDegree,
+                    data.ChordQuality,
+                    data.ChordBase,
+                    baseOctave: octave);
+            }
+
             // Ensure the Score has a Parts list and create missing Part entries for any selected names
             ScorePartsHelper.EnsurePartsExist(score, parts);
 
@@ -94,14 +107,14 @@ namespace Music.Generator
                     var beatsPerBar = (measure.Attributes?.Time?.Beats) ?? 4;
                     var barLengthDivisions = divisions * beatsPerBar;
 
-                    // Sum durations of existing notes in this measure
+                    // Sum durations of existing notes in this measure, excluding chord tones
                     long existingDuration = 0;
                     foreach (var me in measure.MeasureElements)
                     {
                         if (me == null) continue;
 
-                        // Only consider existing notes for occupancy calculation.
-                        if (me.Type == MeasureElementType.Note && me.Element is Note n && n.Duration > 0)
+                        // Only consider existing notes for occupancy calculation, excluding chord tones
+                        if (me.Type == MeasureElementType.Note && me.Element is Note n && n.Duration > 0 && !n.IsChordTone)
                         {
                             existingDuration += n.Duration;
                         }
@@ -127,36 +140,67 @@ namespace Music.Generator
                         return;
                     }
 
-
-                    // THIS NEEDS TO BE MODIFIED TO ALSO SUPPORT CHORDS NOW. 
-                    //var a = Globals.GenerationData.rb
-
-                    // Append notes after existing elements (per requirement)
+                    // Append notes or chords after existing elements
                     for (int i = 0; i < numberOfNotes; i++)
                     {
-                        var note = new Note
+                        if (data.IsChord == true && chordNotes != null)
                         {
-                            Type = DurationTypeString(denom),
-                            Duration = noteDuration,
-                            Voice = 1,           // voice number unspecified by requirement; default to 1
-                            Staff = staff,
-                            IsChordTone = false,
-                            IsRest = data.IsRest ?? false,
-                            Pitch = new Pitch
+                            // Insert chord: first note with IsChordTone=false, rest with IsChordTone=true
+                            for (int j = 0; j < chordNotes.Count; j++)
                             {
-                                Step = char.ToUpper(step),
-                                Octave = octave,
-                                Alter = alter ?? 0
+                                var chordNote = chordNotes[j];
+                                var note = new Note
+                                {
+                                    Type = DurationTypeString(denom),
+                                    Duration = noteDuration,
+                                    Voice = 1,
+                                    Staff = staff,
+                                    IsChordTone = j > 0,
+                                    IsRest = false,
+                                    Pitch = new Pitch
+                                    {
+                                        Step = char.ToUpper(chordNote.Step),
+                                        Octave = chordNote.Octave,
+                                        Alter = chordNote.Alter
+                                    }
+                                };
+
+                                var meNote = new MeasureElement
+                                {
+                                    Type = MeasureElementType.Note,
+                                    Element = note
+                                };
+
+                                measure.MeasureElements.Add(meNote);
                             }
-                        };
-
-                        var meNote = new MeasureElement
+                        }
+                        else
                         {
-                            Type = MeasureElementType.Note,
-                            Element = note
-                        };
+                            // Insert single note
+                            var note = new Note
+                            {
+                                Type = DurationTypeString(denom),
+                                Duration = noteDuration,
+                                Voice = 1,
+                                Staff = staff,
+                                IsChordTone = false,
+                                IsRest = data.IsRest ?? false,
+                                Pitch = new Pitch
+                                {
+                                    Step = char.ToUpper(step),
+                                    Octave = octave,
+                                    Alter = alter ?? 0
+                                }
+                            };
 
-                        measure.MeasureElements.Add(meNote);
+                            var meNote = new MeasureElement
+                            {
+                                Type = MeasureElementType.Note,
+                                Element = note
+                            };
+
+                            measure.MeasureElements.Add(meNote);
+                        }
                     }
                 }
             }
