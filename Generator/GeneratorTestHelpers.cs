@@ -36,7 +36,11 @@ namespace Music.Generator
                 partsState[p] = true;
 
             data.PartsState = partsState;
- 
+
+            // Staffs default - check staff 1
+            var staffsState = new Dictionary<int, bool> { { 1, true } };
+            data.StaffsState = staffsState;
+
             // End bar: default to design total bars when available
             var total = design?.SectionSet?.TotalBars ?? 0;
             if (total > 0)

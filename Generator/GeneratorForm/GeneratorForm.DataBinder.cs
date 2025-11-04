@@ -23,6 +23,18 @@ namespace Music.Generator
                 }
             }
 
+            // Capture staffs checked state into a dictionary
+            var staffsState = new Dictionary<int, bool>();
+            if (clbStaffs != null)
+            {
+                for (int i = 0; i < clbStaffs.Items.Count; i++)
+                {
+                    var staffText = clbStaffs.Items[i]?.ToString() ?? string.Empty;
+                    if (int.TryParse(staffText, out int staffNum))
+                        staffsState[staffNum] = clbStaffs.GetItemChecked(i);
+                }
+            }
+
             // Determine step selection and Rest handling
             string? stepSelected = cbStep?.SelectedItem?.ToString();
             // Assume IsRest radiobutton exists; read its checked state directly.
@@ -46,7 +58,7 @@ namespace Music.Generator
                 PartsState = partsState,
 
                 // Staff / sections / bars / beats
-                Staff = (int?)(numStaff?.Value ?? 1),
+                StaffsState = staffsState, // <-- add this line
                 SectionsText = txtSections?.Text,
                 StartBar = (int?)(numStartBar?.Value ?? 1),
                 EndBar = (int?)(numEndBar?.Value ?? 1),
@@ -123,9 +135,6 @@ namespace Music.Generator
             }
 
             // Staff / sections / bars / beats
-            if (data.Staff.HasValue && numStaff != null)
-                numStaff.Value = LimitRange(numStaff, data.Staff.Value);
-
             if (data.SectionsText != null && txtSections != null)
                 txtSections.Text = data.SectionsText;
 

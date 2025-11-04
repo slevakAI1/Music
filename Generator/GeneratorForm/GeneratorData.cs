@@ -13,7 +13,7 @@ namespace Music.Generator
     {
         // Backing fields
         private Dictionary<string, bool>? _partsState;
-        private int? _staff;
+        private Dictionary<int, bool>? _staffsState; // Changed from int? _staff
         private int? _startBar;
         private int? _endBar;
         private int? _startBeat;
@@ -61,8 +61,23 @@ namespace Music.Generator
         // Provide sensible defaults in getters so callers need not repeat fallback code.
         public int? Staff
         {
-            get => _staff ?? 1;
-            set => _staff = value;
+            get => _staffsState?.Where(s => s.Value).Select(s => s.Key).FirstOrDefault() ?? 1;
+            set
+            {
+                if (value.HasValue)
+                {
+                    // Ensure the staff dictionary has an entry for the new staff
+                    if (_staffsState == null)
+                        _staffsState = new Dictionary<int, bool>();
+
+                    // Uncheck all other staffs
+                    foreach (var key in _staffsState.Keys.ToList())
+                        _staffsState[key] = false;
+
+                    // Check the selected staff
+                    _staffsState[value.Value] = true;
+                }
+            }
         }
 
         public string? SectionsText
@@ -237,6 +252,13 @@ namespace Music.Generator
         {
             get => _chordBase;
             set => _chordBase = value;
+        }
+
+        // Staff selection map (staff number -> checked)
+        public Dictionary<int, bool>? StaffsState
+        {
+            get => _staffsState ?? new Dictionary<int, bool>();
+            set => _staffsState = value;
         }
     }
 }

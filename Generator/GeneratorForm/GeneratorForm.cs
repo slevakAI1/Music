@@ -33,6 +33,10 @@ namespace Music.Generator
             cbChordBase.SelectedIndex = 0; // C
             cbChordQuality.SelectedIndex = 0; // Major
             cbChordKey.SelectedIndex = 0; // C
+
+            // Initialize staff selection - default to staff 1 checked
+            if (clbStaffs != null && clbStaffs.Items.Count > 0)
+                clbStaffs.SetItemChecked(0, true); // Check staff "1"
         }
 
         protected override void OnShown(EventArgs e)
