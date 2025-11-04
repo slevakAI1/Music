@@ -148,7 +148,7 @@ namespace Music.Generator
 
             var lines = new List<string>();
             foreach (var note in notes)
-                lines.Add($"{note.Step}{note.Accidental} {note.Octave}");
+                lines.Add($"{note.Step}{note.Accidental} {note.Octave}");   //  THIS IS PERFECT OUTPUT I NEED!
 
             var title = $"Chord: {harmonicEvent.Key} (Deg {harmonicEvent.Degree}, {harmonicEvent.Quality})";
             MessageBox.Show(this,
