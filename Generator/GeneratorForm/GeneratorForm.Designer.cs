@@ -384,7 +384,7 @@ namespace Music.Generator
             // lblKey
             // 
             lblKey.AutoSize = true;
-            lblKey.ForeColor = Color.FromArgb(255, 128, 0);
+            lblKey.ForeColor = Color.FromArgb(0, 192, 0);
             lblKey.Location = new Point(12, 24);
             lblKey.Name = "lblKey";
             lblKey.Size = new Size(26, 15);
@@ -480,7 +480,7 @@ namespace Music.Generator
             // rbChord
             // 
             rbChord.AutoSize = true;
-            rbChord.ForeColor = Color.FromArgb(255, 128, 0);
+            rbChord.ForeColor = Color.FromArgb(0, 192, 0);
             rbChord.Location = new Point(27, 321);
             rbChord.Name = "rbChord";
             rbChord.Size = new Size(58, 19);
@@ -826,9 +826,9 @@ namespace Music.Generator
             lblNextThingToDo.ForeColor = Color.Fuchsia;
             lblNextThingToDo.Location = new Point(802, 176);
             lblNextThingToDo.Name = "lblNextThingToDo";
-            lblNextThingToDo.Size = new Size(373, 21);
+            lblNextThingToDo.Size = new Size(185, 21);
             lblNextThingToDo.TabIndex = 12;
-            lblNextThingToDo.Text = "Chord quality not working. minor output major.";
+            lblNextThingToDo.Text = "Staff and Sections next";
             // 
             // GeneratorForm
             // 
