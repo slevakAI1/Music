@@ -443,7 +443,7 @@ namespace Music.Generator
             // 
             label8.AutoSize = true;
             label8.ForeColor = Color.FromArgb(255, 128, 0);
-            label8.Location = new Point(441, 24);
+            label8.Location = new Point(442, 24);
             label8.Name = "label8";
             label8.Size = new Size(31, 15);
             label8.TabIndex = 10;
@@ -453,7 +453,7 @@ namespace Music.Generator
             // 
             cbChordBase.DropDownStyle = ComboBoxStyle.DropDownList;
             cbChordBase.Items.AddRange(new object[] { "root", "3rd", "5th", "7th" });
-            cbChordBase.Location = new Point(478, 21);
+            cbChordBase.Location = new Point(479, 21);
             cbChordBase.Name = "cbChordBase";
             cbChordBase.Size = new Size(46, 23);
             cbChordBase.TabIndex = 14;

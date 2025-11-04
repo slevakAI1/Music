@@ -27,6 +27,12 @@ namespace Music.Generator
             // Capture form control values manually set in the form designer
             // This will only be done once, at form construction time.
             Globals.GenerationData ??= CaptureFormData();
+
+            // Initialize comboboxes - doesn't seem to be a way to set a default in the designer or form.
+            // The changes keep getting discarded. wtf?
+            cbChordBase.SelectedIndex = 0; // C
+            cbChordQuality.SelectedIndex = 0; // Major
+            cbChordKey.SelectedIndex = 0; // C
         }
 
         protected override void OnShown(EventArgs e)
