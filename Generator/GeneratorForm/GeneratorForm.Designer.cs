@@ -54,6 +54,7 @@ namespace Music.Generator
             lblTitle = new Label();
             cbPattern = new ComboBox();
             grpTarget = new GroupBox();
+            clbSections = new CheckedListBox();
             lblSections = new Label();
             lblStartBeat = new Label();
             lblPart = new Label();
@@ -118,7 +119,6 @@ namespace Music.Generator
             btnSetDesignTestScenarioD1 = new Button();
             btnChordTest = new Button();
             lblNextThingToDo = new Label();
-            clbSections = new CheckedListBox();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -181,6 +181,15 @@ namespace Music.Generator
             grpTarget.TabIndex = 2;
             grpTarget.TabStop = false;
             grpTarget.Text = "Target Scope";
+            // 
+            // clbSections
+            // 
+            clbSections.CheckOnClick = true;
+            clbSections.FormattingEnabled = true;
+            clbSections.Location = new Point(80, 288);
+            clbSections.Name = "clbSections";
+            clbSections.Size = new Size(220, 94);
+            clbSections.TabIndex = 20;
             // 
             // lblSections
             // 
@@ -817,18 +826,9 @@ namespace Music.Generator
             lblNextThingToDo.ForeColor = Color.Fuchsia;
             lblNextThingToDo.Location = new Point(504, 20);
             lblNextThingToDo.Name = "lblNextThingToDo";
-            lblNextThingToDo.Size = new Size(128, 21);
+            lblNextThingToDo.Size = new Size(393, 21);
             lblNextThingToDo.TabIndex = 12;
-            lblNextThingToDo.Text = "Sections is next";
-            // 
-            // clbSections
-            // 
-            clbSections.CheckOnClick = true;
-            clbSections.FormattingEnabled = true;
-            clbSections.Location = new Point(80, 288);
-            clbSections.Name = "clbSections";
-            clbSections.Size = new Size(220, 94);
-            clbSections.TabIndex = 20;
+            lblNextThingToDo.Text = "Next is Generator test G1 needs to set the sections.";
             // 
             // GeneratorForm
             // 

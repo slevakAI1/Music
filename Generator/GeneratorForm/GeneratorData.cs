@@ -13,6 +13,7 @@ namespace Music.Generator
     {
         // Backing fields
         private Dictionary<string, bool>? _partsState;
+        private Dictionary<string, bool>? _sectionsState;
         private List<int>? _selectedStaffs; // Changed from Dictionary<int, bool>? _staffsState
         private int? _startBar;
         private int? _endBar;
@@ -55,6 +56,14 @@ namespace Music.Generator
         {
             get => _partsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             set => _partsState = value;
+        }
+
+        // Sections / scope
+        // New: map of section name to checked state. Getter returns an empty dictionary when not set.
+        public Dictionary<string, bool>? SectionsState
+        {
+            get => _sectionsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            set => _sectionsState = value;
         }
 
         public string? SectionsText
