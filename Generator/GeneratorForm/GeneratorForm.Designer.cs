@@ -241,7 +241,7 @@ namespace Music.Generator
             // lblStaff
             // 
             lblStaff.AutoSize = true;
-            lblStaff.ForeColor = Color.FromArgb(255, 128, 0);
+            lblStaff.ForeColor = Color.FromArgb(0, 192, 0);
             lblStaff.Location = new Point(15, 233);
             lblStaff.Name = "lblStaff";
             lblStaff.Size = new Size(34, 15);
