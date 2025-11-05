@@ -62,7 +62,6 @@ namespace Music.Generator
 
                 // Staff / sections / bars / beats
                 SelectedStaffs = selectedStaffs,
-                SectionsText = txtSections?.Text,
                 StartBar = (int?)(numStartBar?.Value ?? 1),
                 EndBar = (int?)(numEndBar?.Value ?? 1),
                 StartBeat = (int?)(numStartBeat?.Value ?? 1),
@@ -167,9 +166,6 @@ namespace Music.Generator
             }
 
             // Staff / sections / bars / beats
-            if (data.SectionsText != null && txtSections != null)
-                txtSections.Text = data.SectionsText;
-
             if (data.StartBar.HasValue && numStartBar != null)
                 numStartBar.Value = LimitRange(numStartBar, data.StartBar.Value);
 
