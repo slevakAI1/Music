@@ -32,14 +32,14 @@ namespace Music.Designer
             sections.Reset();
 
             // Durations sum to 48 bars to align with default timelines
-            sections.Add(MusicConstants.eSectionType.Intro, 4);
-            sections.Add(MusicConstants.eSectionType.Verse, 8);
-            sections.Add(MusicConstants.eSectionType.Chorus, 8);
-            sections.Add(MusicConstants.eSectionType.Verse, 8);
-            sections.Add(MusicConstants.eSectionType.Chorus, 8);
-            sections.Add(MusicConstants.eSectionType.Bridge, 4);
-            sections.Add(MusicConstants.eSectionType.Chorus, 4);
-            sections.Add(MusicConstants.eSectionType.Outro, 4);
+            sections.Add(MusicConstants.eSectionType.Intro, 4, "Intro");
+            sections.Add(MusicConstants.eSectionType.Verse, 8, "Verse 1");
+            sections.Add(MusicConstants.eSectionType.Chorus, 8, "Chorus 1");
+            sections.Add(MusicConstants.eSectionType.Verse, 8, "Verse 2");
+            sections.Add(MusicConstants.eSectionType.Chorus, 8, "Chorus 2");
+            sections.Add(MusicConstants.eSectionType.Bridge, 4, "Bridge 1");
+            sections.Add(MusicConstants.eSectionType.Chorus, 4, "Chorus 3");
+            sections.Add(MusicConstants.eSectionType.Outro, 4, "Outro");
         }
     }
 }

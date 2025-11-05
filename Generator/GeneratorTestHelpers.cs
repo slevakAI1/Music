@@ -10,7 +10,9 @@ namespace Music.Generator
         {
             var data = new GeneratorData();
 
+            //===================================================================
             // Parts: select all named voices from the design
+
             var partNames = new List<string>();
             if (design?.PartSet?.Parts != null)
             {
@@ -28,6 +30,29 @@ namespace Music.Generator
                 partsState[p] = true;
 
             data.PartsState = partsState;
+
+            //===================================================================
+            // Populate SectionsState with all sections from design
+
+            var sectionNames = new List<string>();
+            if (design?.SectionSet?.Sections != null)
+            {
+                foreach (var s in design.SectionSet.Sections)
+                {
+                    var name = s?.Name;
+                    if (!string.IsNullOrWhiteSpace(name))
+                        sectionNames.Add(name!);
+                }
+            }
+
+            // Create SectionsState dictionary; default checked state is false (unchecked)
+            var sectionsState = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            foreach (var sec in sectionNames)
+                sectionsState[sec] = false;
+
+            data.SectionsState = sectionsState;
+
+            //===================================================================
 
             // Staffs default - select staff 1
             data.SelectedStaffs = new List<int> { 1 };
