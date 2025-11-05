@@ -12,11 +12,11 @@ namespace Music.Designer
     {
         public static void SaveDesign(Form owner)
         {
-            if (Globals.Design == null) return;
+            if (Globals.Designer == null) return;
 
             try
             {
-                var design = Globals.Design!;
+                var design = Globals.Designer!;
 
                 // Explicit snapshot to ensure TempoTimeline and TimeSignatureTimeline (and their Events) are serialized.
                 var snapshot = new
@@ -77,7 +77,7 @@ namespace Music.Designer
                 // Robust manual deserialization to rebuild computed fields
                 var loaded = DesignerSerialization.DeserializeDesign(json);
 
-                Globals.Design = loaded;
+                Globals.Designer = loaded;
 
                 MessageBoxHelper.Show(owner, $"Design loaded from:\n{ofd.FileName}", "Loaded",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);

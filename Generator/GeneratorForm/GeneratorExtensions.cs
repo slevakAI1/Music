@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using Music.Designer;
 using Music.Generator;
 
+/// <summary>
+///   THIS APPLIES DESIGN TO GENERATOR
+/// 
 namespace Music.Generator
 {
-    public static class GeneratorDataExtensions
+    public static class GeneratorExtensions
     {
         // Applies design-driven defaults into an existing GeneratorData instance.
         // Accept a nullable receiver so callers holding a `GeneratorData?` (e.g. Globals.GenerationData)
         // can call this extension directly without a null-forgiving operator.
-        public static void ApplyDesignDefaults(this GeneratorData? data, DesignerData? design)
+        public static void ApplyDesignDefaults(this Generator? data, Designer.Designer? design)
         {
             if (data == null) return;
 

@@ -6,13 +6,13 @@ namespace Music
 {
     public partial class DesignerForm
     {
-        public DesignerData CaptureFormData()
+        public Designer.Designer CaptureFormData()
         {
-            return Globals.Design ?? new DesignerData();
+            return Globals.Designer ?? new Designer.Designer();
         }
 
         // Apply DesignerData into form controls.
-        public void ApplyFormData(DesignerData? data)
+        public void ApplyFormData(Designer.Designer? data)
         {
             if (data == null) return;
             txtDesignerReport.Text = DesignerReport.CreateDesignerReport(data);

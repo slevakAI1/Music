@@ -8,7 +8,7 @@ namespace Music.Designer
     public static class DesignerReport
     {
         // Builds: VOICES + 2 newlines + SECTIONS + 2 newlines + HARMONIC TIMELINE + 2 newlines + ALIGNMENT + 2 newlines + TIME SIGNATURES + 2 newlines + TEMPO
-        public static string CreateDesignerReport(DesignerData design)
+        public static string CreateDesignerReport(Designer design)
         {
             var sb = new StringBuilder();
 

@@ -8,7 +8,7 @@ namespace Music.Designer
         public const int DefaultTempoBpm = 112;
 
         // Apply all defaults so the timelines end on the same beat
-        public static void SetTestDesignD1(DesignerData design)
+        public static void SetTestDesignD1(Designer design)
         {
             // 1) Sections: apply default/test structure
             var sectionTestData = new SectionTests();

@@ -7,14 +7,14 @@ namespace Music.Generator
     /// Method assumes the score has already been initialized with parts, measure, tempo, time signature.
     /// All parameters are expected to be pre-validated.
     /// </summary>
-    public static class PatternSetNotes
+    public static class SetNotes
     {
         /// <summary>
         /// Apply the "Set Notes" operation to the provided score.
         /// The score object is updated in-place.
         /// All parameters are expected to be pre-validated.
         /// </summary>
-        public static void Apply(Score score, GeneratorData data)
+        public static void Apply(Score score, Generator data)
         {
             if (score == null) throw new ArgumentNullException(nameof(score));
             if (data == null) throw new ArgumentNullException(nameof(data));
@@ -30,7 +30,7 @@ namespace Music.Generator
             MessageBoxHelper.ShowMessage("Pattern has been applied to the score.", "Apply Pattern Set Notes");
         }
 
-        private static PatternConfiguration ExtractConfiguration(GeneratorData data)
+        private static PatternConfiguration ExtractConfiguration(Generator data)
         {
             var parts = (data.PartsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase))
                 .Where(kv => kv.Value)
@@ -58,7 +58,7 @@ namespace Music.Generator
 
             if (config.IsChord)
             {
-                config.ChordNotes = HarmonicChordConverter.Convert(
+                config.ChordNotes = ChordConverter.Convert(
                     data.ChordKey,
                     (int)data.ChordDegree,
                     data.ChordQuality,
@@ -293,7 +293,7 @@ namespace Music.Generator
             public bool IsChord { get; set; }
             public bool IsRest { get; set; }
             public int Alter { get; set; }
-            public List<HarmonicChordConverter.ChordNote>? ChordNotes { get; set; }
+            public List<ChordConverter.ChordNote>? ChordNotes { get; set; }
         }
 
         private sealed class MeasureInfo

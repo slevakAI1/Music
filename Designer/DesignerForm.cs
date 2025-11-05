@@ -17,7 +17,7 @@ namespace Music
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.Manual;
-            Globals.Design ??= new DesignerData();
+            Globals.Designer ??= new Designer.Designer();
 
             InitializeComponent();
         }
@@ -34,21 +34,21 @@ namespace Music
         {
             base.OnActivated(e);
             // When entering the Designer form, apply the current design into the controls
-            ApplyFormData(Globals.Design);
+            ApplyFormData(Globals.Designer);
         }
 
         protected override void OnDeactivate(EventArgs e)
         {
             base.OnDeactivate(e);
             // When leaving the Designer form, persist any form-backed values into Globals.Design
-            Globals.Design = CaptureFormData();
+            Globals.Designer = CaptureFormData();
         }
 
         private void MusicForm_Load(object sender, EventArgs e)
         {
-            Globals.Design ??= new DesignerData();
+            Globals.Designer ??= new Designer.Designer();
             // Initialize controls from Globals.Design using the binder (parallel to GeneratorForm approach)
-            ApplyFormData(Globals.Design);
+            ApplyFormData(Globals.Designer);
 
             DesignerFormHandler.UpdateDesignerReport(this); // keep existing behavior that builds/refreshes other UI pieces
         }
@@ -106,7 +106,7 @@ namespace Music
         private void btnSetTestDesignD1_Click(object sender, EventArgs e)
         {
             // Ensure we have a design to work with
-            var design = Globals.Design ??= new DesignerData();
+            var design = Globals.Designer ??= new Designer.Designer();
             Music.Designer.DesignerTests.SetTestDesignD1(design);
             DesignerFormHandler.UpdateDesignerReport(this);
         }

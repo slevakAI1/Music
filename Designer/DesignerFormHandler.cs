@@ -13,7 +13,7 @@ namespace Music
         // Centralized check used by all edit actions.
         private static bool EnsureDesignOrNotify(Form owner)
         {
-            if (Globals.Design != null) return true;
+            if (Globals.Designer != null) return true;
 
             MessageBox.Show(owner,
                 "Create a new score design first.",
@@ -25,13 +25,13 @@ namespace Music
 
         public static void NewDesign(DesignerForm form)
         {
-            Globals.Design = new DesignerData();
+            Globals.Designer = new Designer.Designer();
             UpdateDesignerReport(form);
         }
 
         public static void SaveDesign(DesignerForm form)
         {
-            if (Globals.Design == null)
+            if (Globals.Designer == null)
             {
                 MessageBox.Show(form,
                     "Create a new score design first.",
@@ -74,7 +74,7 @@ namespace Music
             var txtDesignerReport = GetField<TextBox>("txtDesignerReport");
             if (txtDesignerReport != null)
             {
-                txtDesignerReport.Text = DesignerReport.CreateDesignerReport(Globals.Design);
+                txtDesignerReport.Text = DesignerReport.CreateDesignerReport(Globals.Designer);
             }
         }
 
@@ -82,11 +82,11 @@ namespace Music
         {
             if (!EnsureDesignOrNotify(form)) return;
 
-            using var dlg = new SectionEditorForm(Globals.Design!.SectionSet);
+            using var dlg = new SectionEditorForm(Globals.Designer!.SectionSet);
             if (dlg.ShowDialog(form) == DialogResult.OK)
             {
                 // Copy back into the existing Sections instance to preserve references
-                var target = Globals.Design!.SectionSet;
+                var target = Globals.Designer!.SectionSet;
                 target.Reset();
                 foreach (var s in dlg.ResultSections.Sections)
                 {
@@ -104,7 +104,7 @@ namespace Music
             using var dlg = new VoiceSelectorForm();
             if (dlg.ShowDialog(form) == DialogResult.OK)
             {
-                var score = Globals.Design!;
+                var score = Globals.Designer!;
                 var existing = new HashSet<string>(score.PartSet.Parts.Select(v => v.PartName),
                     StringComparer.OrdinalIgnoreCase);
 
@@ -125,11 +125,11 @@ namespace Music
         {
             if (!EnsureDesignOrNotify(form)) return;
 
-            var existing = Globals.Design!.HarmonicTimeline;
+            var existing = Globals.Designer!.HarmonicTimeline;
             using var dlg = new HarmonicEditorForm(existing);
             if (dlg.ShowDialog(form) == DialogResult.OK)
             {
-                Globals.Design!.HarmonicTimeline = dlg.ResultTimeline;
+                Globals.Designer!.HarmonicTimeline = dlg.ResultTimeline;
                 UpdateDesignerReport(form);
             }
         }
@@ -138,11 +138,11 @@ namespace Music
         {
             if (!EnsureDesignOrNotify(form)) return;
 
-            var existing = Globals.Design!.TimeSignatureTimeline;
+            var existing = Globals.Designer!.TimeSignatureTimeline;
             using var dlg = new TimeSignatureEditorForm(existing);
             if (dlg.ShowDialog(form) == DialogResult.OK)
             {
-                Globals.Design!.TimeSignatureTimeline = dlg.ResultTimeline;
+                Globals.Designer!.TimeSignatureTimeline = dlg.ResultTimeline;
                 UpdateDesignerReport(form);
             }
         }
@@ -151,11 +151,11 @@ namespace Music
         {
             if (!EnsureDesignOrNotify(form)) return;
 
-            var existing = Globals.Design!.TempoTimeline;
+            var existing = Globals.Designer!.TempoTimeline;
             using var dlg = new TempoEditorForm(existing);
             if (dlg.ShowDialog(form) == DialogResult.OK)
             {
-                Globals.Design!.TempoTimeline = dlg.ResultTimeline;
+                Globals.Designer!.TempoTimeline = dlg.ResultTimeline;
                 UpdateDesignerReport(form);
             }
         }

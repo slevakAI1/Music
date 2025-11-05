@@ -4,7 +4,7 @@ namespace Music.Designer
 {
     internal static class DesignerSerialization
     {
-        internal static DesignerData DeserializeDesign(string json)
+        internal static Designer DeserializeDesign(string json)
         {
             var dto = JsonSerializer.Deserialize<DesignDto>(json, new JsonSerializerOptions
             {
@@ -13,7 +13,7 @@ namespace Music.Designer
             if (dto == null)
                 throw new InvalidOperationException("Invalid design JSON.");
 
-            var design = new DesignerData(dto.DesignId);
+            var design = new Designer(dto.DesignId);
 
             // Voices (preserve order as given in JSON)
             design.PartSet.Reset();

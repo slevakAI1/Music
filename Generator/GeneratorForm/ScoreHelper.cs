@@ -11,7 +11,7 @@ namespace Music.Generator
     {
         public static Score? NewScore(
             Form owner,
-            DesignerData? design,
+            Designer.Designer? design,
             CheckedListBox cbPart,
             Label lblEndBarTotal)
         {
@@ -24,7 +24,7 @@ namespace Music.Generator
             };
 
             // Prefer the passed design, fall back to Globals if missing
-            var usedDesign = design ?? Globals.Design;
+            var usedDesign = design ?? Globals.Designer;
             if (usedDesign == null)
             {
                 MessageBox.Show(owner, "No design available. Create or set a design before creating a new score.", "No Design", MessageBoxButtons.OK, MessageBoxIcon.Information);

@@ -2,13 +2,13 @@
 
 namespace Music.Generator
 {
-    public class GeneratorTestHelpers
+    public class GeneratorTests
     {
         // ==================================   T E S T   H E L P E R S   ==================================
   
-        public static GeneratorData SetTestGeneratorG1(DesignerData? design)
+        public static Generator SetTestGeneratorG1(Designer.Designer? design)
         {
-            var data = new GeneratorData();
+            var data = new Generator();
 
             //===================================================================
             // Parts: select all named voices from the design

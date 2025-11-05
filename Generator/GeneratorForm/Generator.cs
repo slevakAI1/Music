@@ -9,7 +9,7 @@ namespace Music.Generator
     // - All properties are simple data types (strings, ints, bools, Dictionary<string,bool>)
     // - Value types remain nullable for compatibility, but getters now provide sensible defaults
     //   so callers can rely on the property value without repeating the same fallback logic.
-    public sealed class GeneratorData
+    public sealed class Generator
     {
         // Backing fields
         private Dictionary<string, bool>? _partsState;

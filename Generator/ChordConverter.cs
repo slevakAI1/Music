@@ -7,7 +7,7 @@ namespace Music.Generator
     /// Converts HarmonicEvent objects to lists of notes compatible with GeneratorData.
     /// Uses the MusicTheory library to generate chord voicings.
     /// </summary>
-    public static class HarmonicChordConverter
+    public static class ChordConverter
     {
         /// <summary>
         /// Represents a single note with pitch information for use in GeneratorData.

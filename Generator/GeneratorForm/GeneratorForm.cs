@@ -6,8 +6,8 @@ namespace Music.Generator
     public partial class GeneratorForm : Form
     {
         private Score? _score;
-        private DesignerData? _design;
-        private GeneratorData? _generatorData;
+        private Designer.Designer? _design;
+        private Generator? _generatorData;
 
         //===========================   I N I T I A L I Z A T I O N   ===========================
         public GeneratorForm()
@@ -23,7 +23,7 @@ namespace Music.Generator
             // Load current global score and design into form-local fields for later use
             // Constructor is the only place that reads Globals per requirement.
             _score = Globals.Score;
-            _design = Globals.Design;
+            _design = Globals.Designer;
 
             // Initialize comboboxes - doesn't seem to be a way to set a default in the designer or form.
             // The changes keep getting discarded. wtf?
@@ -60,17 +60,17 @@ namespace Music.Generator
 
             if (Globals.Score != null)
                 _score = Globals.Score;
-            if (Globals.Design != null)
-                _design = Globals.Design;
-            if (Globals.GenerationData != null)
-                _generatorData = Globals.GenerationData;
+            if (Globals.Designer != null)
+                _design = Globals.Designer;
+            if (Globals.Generator != null)
+                _generatorData = Globals.Generator;
 
 
            //=================================================================
             // TODO  THIS LOOKS BAD. IF IT CHANGED EXTERNALLY
             // Why wasn't this already done???
             // Merge in any design changes that may have happened while outside this form
-            Globals.GenerationData?.ApplyDesignDefaults(_design);
+            Globals.Generator?.ApplyDesignDefaults(_design);
             //================================================================
             // Update the form to take into account any changes to GenerateData
             ApplyFormData(_generatorData);
@@ -83,9 +83,9 @@ namespace Music.Generator
 
             // Save on the way out
             Globals.Score  = _score;
-            Globals.Design = _design;
-            _generatorData = Globals.GenerationData = CaptureFormData();
-            Globals.GenerationData = _generatorData;
+            Globals.Designer = _design;
+            _generatorData = Globals.Generator = CaptureFormData();
+            Globals.Generator = _generatorData;
         }
 
         //===============================   E V E N T S   ==============================
@@ -97,7 +97,7 @@ namespace Music.Generator
             _generatorData = CaptureFormData();
             if (_generatorData != null)
             {
-                PatternSetNotes.Apply(_score!, _generatorData);
+                SetNotes.Apply(_score!, _generatorData);
             }
         }
 
@@ -115,7 +115,7 @@ namespace Music.Generator
         private void btnSetDesignTestScenarioD1_Click(object sender, EventArgs e)
         {
             // Ensure design exists and apply design defaults
-            _design ??= new DesignerData();
+            _design ??= new Designer.Designer();
             DesignerTests.SetTestDesignD1(_design);
             MessageBox.Show("Test Design D1 has been applied to the current design.", "Design Test Scenario D1", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -126,7 +126,7 @@ namespace Music.Generator
         {
             // Merge in any design changes
             _generatorData?.ApplyDesignDefaults(_design);
-            _generatorData = GeneratorTestHelpers.SetTestGeneratorG1(_design);
+            _generatorData = GeneratorTests.SetTestGeneratorG1(_design);
             ApplyFormData(_generatorData);
             MessageBox.Show("Test Generator G1 has been applied to the current generator settings.", "Generator Test Scenario G1", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -145,10 +145,10 @@ namespace Music.Generator
 
             var harmonicEvent = _design.HarmonicTimeline.Events[1];
 
-            List<HarmonicChordConverter.ChordNote> notes;
+            List<ChordConverter.ChordNote> notes;
             try
             {
-                notes = HarmonicChordConverter.Convert(
+                notes = ChordConverter.Convert(
                     harmonicEvent.Key,
                     harmonicEvent.Degree,
                     harmonicEvent.Quality,

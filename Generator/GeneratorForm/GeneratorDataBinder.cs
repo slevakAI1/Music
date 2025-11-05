@@ -9,7 +9,7 @@ namespace Music.Generator
     {
         // Capture current control values into a class object.
         // No form parameter required because this is now a partial of GeneratorForm.
-        public GeneratorData CaptureFormData()
+        public Generator CaptureFormData()
         {
             // Capture parts items and their checked state into a dictionary
             var partsState = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -64,7 +64,7 @@ namespace Music.Generator
                 stepChar = stepSelected[0];
             }
 
-            var data = new GeneratorData
+            var data = new Generator
             {
                 // Pattern
                 Pattern = cbPattern?.SelectedItem?.ToString(),
@@ -114,7 +114,7 @@ namespace Music.Generator
 
         // Apply a GenerateFormData object back to the private form controls.
         // No form parameter required because this is a partial of GeneratorForm.
-        public void ApplyFormData(GeneratorData data)
+        public void ApplyFormData(Generator data)
         {
             if (data == null) return;
 
