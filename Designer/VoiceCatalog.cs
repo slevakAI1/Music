@@ -1,99 +1,54 @@
 using System.Text.Json;
-using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace Music.Designer
 {
-    // Loads voices from a Notion-style JSON file and exposes them grouped by category.
-    // Supports a few flexible JSON shapes:
-    // 1) Flat array:
-    //    [ { "category": "Strings", "name": "Violin" }, ... ]
-    // 2) Dictionary category -> voices:
-    //    { "Strings": ["Violin", "Cello"], "Brass": ["Trumpet"] }
-    // 3) Root with categories:
-    //    { "categories": [ { "name": "Strings", "voices": ["Violin","Cello"] }, ... ] }
+    // Loads voices from Voices.Notion.json and exposes them grouped by category.
     internal static class VoiceCatalog
     {
-        private sealed class FlatVoiceRecord
+        private sealed class VoiceData
         {
-            public string? Category { get; set; }
-            public string? Name { get; set; }
+            [JsonPropertyName("product")]
+            public string? Product { get; set; }
+
+            [JsonPropertyName("schemaVersion")]
+            public int? SchemaVersion { get; set; }
+
+            [JsonPropertyName("twoStaffVoices")]
+            public List<string>? TwoStaffVoices { get; set; }
+
+            [JsonPropertyName("categories")]
+            public List<CategoryEntry>? Categories { get; set; }
         }
 
         private sealed class CategoryEntry
         {
+            [JsonPropertyName("name")]
             public string? Name { get; set; }
+
+            [JsonPropertyName("voices")]
             public List<string>? Voices { get; set; }
         }
 
-        private sealed class CategoryRoot
-        {
-            public List<CategoryEntry>? Categories { get; set; }
-        }
+        private static VoiceData? _cachedData;
+        private static IReadOnlyDictionary<string, IReadOnlyList<string>>? _cachedCatalog;
+        private static string? _cachedSourcePath;
 
         public static IReadOnlyDictionary<string, IReadOnlyList<string>> Load(out string? sourcePath)
         {
-            sourcePath = null;
-            var baseDir = AppContext.BaseDirectory;
-            var probed = new List<string>();
-            string? foundPath = null;
-            string lastError = "unknown error";
-
-            const string fileName = "Voices.Notion.json";
-
-            // Probe 1: exact path in base directory
-            var p1 = Path.Combine(baseDir, fileName);
-            probed.Add(p1);
-            if (File.Exists(p1)) foundPath = p1;
-
-            // Probe 2: case-insensitive match in base directory
-            if (foundPath == null)
+            if (_cachedCatalog != null)
             {
-                var match = Directory.EnumerateFiles(baseDir, "*", SearchOption.TopDirectoryOnly)
-                    .FirstOrDefault(p => string.Equals(Path.GetFileName(p), fileName, StringComparison.OrdinalIgnoreCase));
-                if (match != null)
-                {
-                    probed.Add(match);
-                    foundPath = match;
-                }
+                sourcePath = _cachedSourcePath;
+                return _cachedCatalog;
             }
 
-            // Probe 3: Design subfolder under base (canonical source location)
-            if (foundPath == null)
-            {
-                var pDesign = Path.Combine(baseDir, "Design", fileName);
-                probed.Add(pDesign);
-                if (File.Exists(pDesign)) foundPath = pDesign;
-            }
-
-            // Probe 4: walk up parents (dev-time run) and look for Design/Voices.Notion.json,
-            //          and the file itself in the parent roots
-            if (foundPath == null)
-            {
-                var current = new DirectoryInfo(baseDir);
-                for (int i = 0; i < 5 && current?.Parent != null; i++)
-                {
-                    current = current.Parent;
-                    if (current == null) break;
-
-                    var candidateDesign = Path.Combine(current.FullName, "Design", fileName);
-                    probed.Add(candidateDesign);
-                    if (File.Exists(candidateDesign)) { foundPath = candidateDesign; break; }
-
-                    var candidateRoot = Path.Combine(current.FullName, fileName);
-                    probed.Add(candidateRoot);
-                    if (File.Exists(candidateRoot)) { foundPath = candidateRoot; break; }
-                }
-            }
-
-            if (foundPath == null)
-            {
-                lastError = $"Voices.Notion.json not found. Probed: {string.Join(" | ", probed)}";
-                return BuildErrorCatalog(lastError);
-            }
+            var filePath = Path.Combine(AppContext.BaseDirectory, MusicConstants.VoicesNotionJsonRelativePath);
+            _cachedSourcePath = filePath;
+            sourcePath = filePath;
 
             try
             {
-                var text = File.ReadAllText(foundPath);
+                var json = File.ReadAllText(filePath);
                 var options = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
@@ -101,35 +56,54 @@ namespace Music.Designer
                     AllowTrailingCommas = true
                 };
 
-                // Try 1: flat array of objects with Category/Name
-                if (TryParseFlat(text, options, out var flatDict))
+                _cachedData = JsonSerializer.Deserialize<VoiceData>(json, options);
+
+                if (_cachedData?.Categories == null)
                 {
-                    sourcePath = foundPath;
-                    return flatDict;
+                    _cachedCatalog = BuildErrorCatalog($"Failed to deserialize {filePath}: no categories found.");
+                    return _cachedCatalog;
                 }
 
-                // Try 2: dictionary<string, List<string>>
-                if (TryParseDict(text, options, out var dictDict))
+                var catalog = new Dictionary<string, IReadOnlyList<string>>(StringComparer.OrdinalIgnoreCase);
+                foreach (var category in _cachedData.Categories)
                 {
-                    sourcePath = foundPath;
-                    return dictDict;
+                    var name = category?.Name?.Trim();
+                    if (string.IsNullOrWhiteSpace(name) || category?.Voices == null)
+                        continue;
+
+                    var voices = category.Voices
+                        .Where(v => !string.IsNullOrWhiteSpace(v))
+                        .Select(v => v.Trim())
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .OrderBy(v => v, StringComparer.OrdinalIgnoreCase)
+                        .ToList();
+
+                    if (voices.Count > 0)
+                        catalog[name] = voices;
                 }
 
-                // Try 3: { "categories": [ { "name": "", "voices": [] } ] }
-                if (TryParseRoot(text, options, out var rootDict))
-                {
-                    sourcePath = foundPath;
-                    return rootDict;
-                }
-
-                lastError = $"Unrecognized JSON structure in {foundPath}. Expected flat array, dictionary, or {{ \"categories\": [...] }}.";
-                return BuildErrorCatalog(lastError);
+                _cachedCatalog = catalog;
+                return _cachedCatalog;
             }
             catch (Exception ex)
             {
-                lastError = $"Failed to load {foundPath}: {ex.Message}";
-                return BuildErrorCatalog(lastError);
+                _cachedCatalog = BuildErrorCatalog($"Error loading {filePath}: {ex.Message}");
+                return _cachedCatalog;
             }
+        }
+
+        /// <summary>
+        /// Returns the list of voice names that require two staves (e.g., Piano, Harp).
+        /// </summary>
+        public static IReadOnlyList<string> GetTwoStaffVoices()
+        {
+            // Ensure data is loaded
+            if (_cachedData == null)
+            {
+                Load(out _);
+            }
+
+            return _cachedData?.TwoStaffVoices ?? new List<string>();
         }
 
         private static IReadOnlyDictionary<string, IReadOnlyList<string>> BuildErrorCatalog(string message)
@@ -138,106 +112,6 @@ namespace Music.Designer
             {
                 ["error"] = new List<string> { message }
             };
-        }
-
-        private static bool TryParseFlat(string json, JsonSerializerOptions options, out IReadOnlyDictionary<string, IReadOnlyList<string>> result)
-        {
-            result = new Dictionary<string, IReadOnlyList<string>>();
-            try
-            {
-                var flat = JsonSerializer.Deserialize<List<FlatVoiceRecord>>(json, options);
-                if (flat == null) return false;
-
-                var map = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
-                foreach (var item in flat)
-                {
-                    var cat = (item?.Category ?? "").Trim();
-                    var name = (item?.Name ?? "").Trim();
-                    if (string.IsNullOrWhiteSpace(cat) || string.IsNullOrWhiteSpace(name)) continue;
-
-                    if (!map.TryGetValue(cat, out var set))
-                    {
-                        set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                        map[cat] = set;
-                    }
-                    set.Add(name);
-                }
-
-                result = map.ToDictionary(
-                    kvp => kvp.Key,
-                    kvp => (IReadOnlyList<string>)kvp.Value.OrderBy(s => s, StringComparer.OrdinalIgnoreCase).ToList(),
-                    StringComparer.OrdinalIgnoreCase);
-
-                return map.Count > 0;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        private static bool TryParseDict(string json, JsonSerializerOptions options, out IReadOnlyDictionary<string, IReadOnlyList<string>> result)
-        {
-            result = new Dictionary<string, IReadOnlyList<string>>();
-            try
-            {
-                var dict = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json, options);
-                if (dict == null) return false;
-
-                var normalized = new Dictionary<string, IReadOnlyList<string>>(StringComparer.OrdinalIgnoreCase);
-                foreach (var (k, v) in dict)
-                {
-                    if (string.IsNullOrWhiteSpace(k) || v == null) continue;
-                    var clean = v
-                        .Where(s => !string.IsNullOrWhiteSpace(s))
-                        .Select(s => s.Trim())
-                        .Distinct(StringComparer.OrdinalIgnoreCase)
-                        .OrderBy(s => s, StringComparer.OrdinalIgnoreCase)
-                        .ToList();
-                    if (clean.Count > 0)
-                        normalized[k.Trim()] = clean;
-                }
-
-                result = normalized;
-                return normalized.Count > 0;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        private static bool TryParseRoot(string json, JsonSerializerOptions options, out IReadOnlyDictionary<string, IReadOnlyList<string>> result)
-        {
-            result = new Dictionary<string, IReadOnlyList<string>>();
-            try
-            {
-                var root = JsonSerializer.Deserialize<CategoryRoot>(json, options);
-                if (root?.Categories == null) return false;
-
-                var normalized = new Dictionary<string, IReadOnlyList<string>>(StringComparer.OrdinalIgnoreCase);
-                foreach (var cat in root.Categories)
-                {
-                    var name = (cat?.Name ?? "").Trim();
-                    if (string.IsNullOrWhiteSpace(name) || cat?.Voices == null) continue;
-
-                    var clean = cat.Voices
-                        .Where(s => !string.IsNullOrWhiteSpace(s))
-                        .Select(s => s.Trim())
-                        .Distinct(StringComparer.OrdinalIgnoreCase)
-                        .OrderBy(s => s, StringComparer.OrdinalIgnoreCase)
-                        .ToList();
-                    if (clean.Count > 0)
-                        normalized[name] = clean;
-                }
-
-                result = normalized;
-                return normalized.Count > 0;
-            }
-            catch
-            {
-                return false;
-            }
         }
     }
 }

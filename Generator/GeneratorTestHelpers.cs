@@ -1,19 +1,11 @@
 ﻿using Music.Designer;
-using Music.Generator;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Music.Generator
 {
     public class GeneratorTestHelpers
     {
         // ==================================   T E S T   H E L P E R S   ==================================
-
-        // NOTE: This helper now builds and returns GenerationData instead of manipulating controls.
-        // The caller (form) should apply the returned GenerationData to controls via ApplyFormData(...)
+  
         public static GeneratorData SetTestGeneratorG1(DesignerData? design)
         {
             var data = new GeneratorData();

@@ -22,5 +22,8 @@ namespace Music
             ["32nd (1/32)"] = 32,  // Not Implemented yet
             ["64th (1/64)"] = 64   // Not Implemented yet
         };
+
+        // Relative path from AppContext.BaseDirectory to the Voices.Notion.json file
+        public const string VoicesNotionJsonRelativePath = "Designer\\Voices.Notion.json";
     }
 }
