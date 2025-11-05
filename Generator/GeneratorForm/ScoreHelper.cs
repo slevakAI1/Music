@@ -11,8 +11,7 @@ namespace Music.Generator
     {
         public static Score? NewScore(
             Form owner,
-            DesignerData?
-            design,
+            DesignerData? design,
             CheckedListBox cbPart,
             Label lblEndBarTotal)
         {
@@ -61,6 +60,9 @@ namespace Music.Generator
                 return null;
             }
 
+            // Load the two-staff voice catalog once
+            var twoStaffVoices = VoiceCatalog.GetTwoStaffVoices();
+
             // Determine how many measures to create from the design's section set
             var totalBars = usedDesign.SectionSet?.TotalBars ?? 0;
 
@@ -74,17 +76,17 @@ namespace Music.Generator
                 }
             }
 
-            // -- New: populate attributes for measures
-            // Set a full attributes snapshot on the first measure (divisions, key, time, clef).
-            // For every subsequent measure in the part set only an Attributes with Divisions is created
-            // so the serialized MusicXML shows <attributes><divisions>...</divisions></attributes> per measure.
+            // -- Populate attributes for measures
             if (score.Parts != null)
             {
                 foreach (var p in score.Parts)
                 {
                     if (p.Measures == null || p.Measures.Count == 0) continue;
 
-                    // Ensure first measure has full attributes (4/4, divisions=4)
+                    // Check if this voice requires two staves
+                    var needsTwoStaves = twoStaffVoices.Contains(p.Name, StringComparer.OrdinalIgnoreCase);
+
+                    // Ensure first measure has full attributes
                     var first = p.Measures[0];
                     first.Attributes ??= new MeasureAttributes();
                     first.Attributes.Divisions = 4;
@@ -92,7 +94,27 @@ namespace Music.Generator
                     first.Attributes.Time ??= new Time();
                     first.Attributes.Time.Beats = 4;
                     first.Attributes.Time.Mode = "4";
-                    first.Attributes.Clef ??= new Clef { Sign = "G", Line = 2 };
+
+                    if (needsTwoStaves)
+                    {
+                        // Two-staff instrument: set staff count and both clefs
+                        first.Attributes.Staves = 2;
+                        
+                        // Add two clefs: treble (staff 1) and bass (staff 2)
+                        first.Attributes.Clefs = new List<Clef>
+                        {
+                            new Clef { Sign = "G", Line = 2, Number = 1 },  // Treble clef, staff 1
+                            new Clef { Sign = "F", Line = 4, Number = 2 }   // Bass clef, staff 2
+                        };
+
+                        // Set legacy Clef property to first clef for backward compatibility
+                        first.Attributes.Clef = first.Attributes.Clefs[0];
+                    }
+                    else
+                    {
+                        // Single-staff instrument: treble clef only
+                        first.Attributes.Clef = new Clef { Sign = "G", Line = 2 };
+                    }
 
                     var divisions = first.Attributes.Divisions;
 

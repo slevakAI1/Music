@@ -77,6 +77,11 @@ namespace MusicXml
 								if (divisionsNode != null)
 									measure.Attributes.Divisions = Convert.ToInt32(divisionsNode.InnerText);
 
+								// Parse staves element (for multi-staff parts like Piano, Harp)
+								var stavesNode = attributesNode.SelectSingleNode("staves");
+								if (stavesNode != null && int.TryParse(stavesNode.InnerText, out int stavesCount))
+									measure.Attributes.Staves = stavesCount;
+
 								var keyNode = attributesNode.SelectSingleNode("key");
 
 								if (keyNode != null)
@@ -94,7 +99,39 @@ namespace MusicXml
 								
 								measure.Attributes.Time = GetTime(attributesNode);
 
-								measure.Attributes.Clef = GetClef(attributesNode);
+								// Parse clef(s) - can be multiple for multi-staff parts
+								var clefNodes = attributesNode.SelectNodes("clef");
+								if (clefNodes != null && clefNodes.Count > 0)
+								{
+									foreach (XmlNode clefNode in clefNodes)
+									{
+										var clef = new Clef();
+										
+										var signNode = clefNode.SelectSingleNode("sign");
+										if (signNode != null)
+											clef.Sign = signNode.InnerText;
+
+										var lineNode = clefNode.SelectSingleNode("line");
+										if (lineNode != null && int.TryParse(lineNode.InnerText, out int line))
+											clef.Line = line;
+
+										// Check for number attribute (multi-staff parts)
+										var numberAttr = clefNode.Attributes?["number"];
+										if (numberAttr != null && int.TryParse(numberAttr.Value, out int number))
+											clef.Number = number;
+
+										// Check for clef-octave-change element
+										var octaveChangeNode = clefNode.SelectSingleNode("clef-octave-change");
+										if (octaveChangeNode != null && int.TryParse(octaveChangeNode.InnerText, out int octaveChange))
+											clef.ClefOctaveChange = octaveChange;
+
+										measure.Attributes.Clefs.Add(clef);
+									}
+
+									// Maintain backward compatibility: set first clef as the legacy Clef property
+									if (measure.Attributes.Clefs.Count > 0)
+										measure.Attributes.Clef = measure.Attributes.Clefs[0];
+								}
 							}
 
 							var childNodes = measureNode.ChildNodes;
@@ -404,7 +441,7 @@ namespace MusicXml
 		private static XmlDocument GetXmlDocumentFromString(string str) 
 		{
 			var document = new XmlDocument();
-            document.XmlResolver = null;
+			document.XmlResolver = null;
 			document.LoadXml(str);
 			return document;
 		}
@@ -417,9 +454,9 @@ namespace MusicXml
 		}
 		private static XmlDocument GetXmlDocument(Stream stream)
 		{
-            var document = new XmlDocument();
-            document.XmlResolver = null;
-            document.Load(stream);
+			var document = new XmlDocument();
+			document.XmlResolver = null;
+			document.Load(stream);
 			return document;
 		}
 	}

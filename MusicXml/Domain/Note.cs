@@ -13,26 +13,31 @@ namespace MusicXml.Domain
 			IsChordTone = false;
 		}
 
-		public string Type { get; internal set; }
+		public string Type { get; set; }
 		
-		public int Voice { get; internal set; }
+		public int Voice { get; set; }
 
-		public int Duration { get; internal set; }
+		public int Duration { get; set; }
 
-		public Lyric Lyric { get; internal set; }
+		public Lyric? Lyric { get; set; }
 		
-		public Pitch Pitch { get; internal set; }
+		public Pitch? Pitch { get; set; }
 
-		public int Staff { get; internal set; }
+		/// <summary>
+		/// Staff number for multi-staff parts (1-based).
+		/// Indicates which staff this note appears on (e.g., 1 for treble, 2 for bass in piano).
+		/// A value of -1 or 0 indicates no specific staff assignment (single-staff part).
+		/// </summary>
+		public int Staff { get; set; }
 
-		public bool IsChordTone { get; internal set; }
+		public bool IsChordTone { get; set; }
 
-		public bool IsRest { get; internal set; }
+		public bool IsRest { get; set; }
 
-		public bool IsGrace { get; internal set; }
+		public bool IsGrace { get; set; }
 
-		public Tie Tie { get; internal set; }
+		public Tie Tie { get; set; }
 		
-        public string Accidental { get; internal set; }
-    }
+		public string? Accidental { get; set; }
+	}
 }

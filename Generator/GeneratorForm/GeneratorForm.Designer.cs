@@ -825,9 +825,9 @@ namespace Music.Generator
             lblNextThingToDo.ForeColor = Color.Fuchsia;
             lblNextThingToDo.Location = new Point(504, 20);
             lblNextThingToDo.Name = "lblNextThingToDo";
-            lblNextThingToDo.Size = new Size(638, 21);
+            lblNextThingToDo.Size = new Size(422, 21);
             lblNextThingToDo.TabIndex = 12;
-            lblNextThingToDo.Text = "ApplySetNotes needs to write to the 2 staffs now. how does this work in musicxml?";
+            lblNextThingToDo.Text = "Test end to end, should support 2 staves and clefs now";
             // 
             // GeneratorForm
             // 

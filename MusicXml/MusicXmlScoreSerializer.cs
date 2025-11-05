@@ -158,6 +158,12 @@ namespace MusicXml
                             if (attr.Divisions > 0)
                                 writer.WriteElementString("divisions", attr.Divisions.ToString());
 
+                            // Write staves (for multi-staff instruments like Piano, Harp)
+                            if (attr.Staves.HasValue && attr.Staves.Value > 1)
+                            {
+                                writer.WriteElementString("staves", attr.Staves.Value.ToString());
+                            }
+
                             if (attr.Key != null)
                             {
                                 writer.WriteStartElement("key");
@@ -182,13 +188,42 @@ namespace MusicXml
                                 writer.WriteEndElement(); // time
                             }
 
-                            if (attr.Clef != null)
+                            if (attr.Clefs != null && attr.Clefs.Count > 0)
                             {
+                                // New approach: write multiple clefs for multi-staff parts
+                                foreach (var clef in attr.Clefs)
+                                {
+                                    writer.WriteStartElement("clef");
+
+                                    // Add number attribute for multi-staff parts
+                                    if (clef.Number.HasValue)
+                                    {
+                                        writer.WriteAttributeString("number", clef.Number.Value.ToString());
+                                    }
+
+                                    if (!string.IsNullOrWhiteSpace(clef.Sign))
+                                        writer.WriteElementString("sign", clef.Sign);
+
+                                    if (clef.Line > 0)
+                                        writer.WriteElementString("line", clef.Line.ToString());
+
+                                    if (clef.ClefOctaveChange.HasValue)
+                                        writer.WriteElementString("clef-octave-change", clef.ClefOctaveChange.Value.ToString());
+
+                                    writer.WriteEndElement(); // clef
+                                }
+                            }
+                            else if (attr.Clef != null)
+                            {
+                                // Legacy single clef (backward compatibility for single-staff parts)
                                 writer.WriteStartElement("clef");
+
                                 if (!string.IsNullOrWhiteSpace(attr.Clef.Sign))
                                     writer.WriteElementString("sign", attr.Clef.Sign);
+
                                 if (attr.Clef.Line > 0)
                                     writer.WriteElementString("line", attr.Clef.Line.ToString());
+
                                 writer.WriteEndElement(); // clef
                             }
 
