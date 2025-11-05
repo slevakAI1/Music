@@ -54,7 +54,6 @@ namespace Music.Generator
             lblTitle = new Label();
             cbPattern = new ComboBox();
             grpTarget = new GroupBox();
-            txtSections = new TextBox();
             lblSections = new Label();
             lblStartBeat = new Label();
             lblPart = new Label();
@@ -119,6 +118,7 @@ namespace Music.Generator
             btnSetDesignTestScenarioD1 = new Button();
             btnChordTest = new Button();
             lblNextThingToDo = new Label();
+            clbSections = new CheckedListBox();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -159,7 +159,7 @@ namespace Music.Generator
             // 
             // grpTarget
             // 
-            grpTarget.Controls.Add(txtSections);
+            grpTarget.Controls.Add(clbSections);
             grpTarget.Controls.Add(lblSections);
             grpTarget.Controls.Add(lblStartBeat);
             grpTarget.Controls.Add(lblPart);
@@ -177,23 +177,15 @@ namespace Music.Generator
             grpTarget.Controls.Add(lblStartBar);
             grpTarget.Location = new Point(20, 100);
             grpTarget.Name = "grpTarget";
-            grpTarget.Size = new Size(442, 355);
+            grpTarget.Size = new Size(442, 552);
             grpTarget.TabIndex = 2;
             grpTarget.TabStop = false;
             grpTarget.Text = "Target Scope";
             // 
-            // txtSections
-            // 
-            txtSections.BorderStyle = BorderStyle.FixedSingle;
-            txtSections.Location = new Point(81, 284);
-            txtSections.Name = "txtSections";
-            txtSections.Size = new Size(297, 23);
-            txtSections.TabIndex = 17;
-            // 
             // lblSections
             // 
             lblSections.AutoSize = true;
-            lblSections.ForeColor = Color.Red;
+            lblSections.ForeColor = Color.FromArgb(255, 128, 0);
             lblSections.Location = new Point(15, 288);
             lblSections.Name = "lblSections";
             lblSections.Size = new Size(54, 15);
@@ -271,7 +263,7 @@ namespace Music.Generator
             // 
             chkOverwrite.AutoSize = true;
             chkOverwrite.ForeColor = Color.Red;
-            chkOverwrite.Location = new Point(18, 321);
+            chkOverwrite.Location = new Point(18, 510);
             chkOverwrite.Name = "chkOverwrite";
             chkOverwrite.Size = new Size(196, 19);
             chkOverwrite.TabIndex = 11;
@@ -639,7 +631,7 @@ namespace Music.Generator
             groupBox1.Controls.Add(numTupletOf);
             groupBox1.Controls.Add(chkTieAcross);
             groupBox1.Controls.Add(chkFermata);
-            groupBox1.Location = new Point(20, 469);
+            groupBox1.Location = new Point(800, 54);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(433, 294);
             groupBox1.TabIndex = 6;
@@ -810,7 +802,7 @@ namespace Music.Generator
             // 
             // btnChordTest
             // 
-            btnChordTest.Location = new Point(773, 84);
+            btnChordTest.Location = new Point(516, 44);
             btnChordTest.Name = "btnChordTest";
             btnChordTest.Size = new Size(112, 23);
             btnChordTest.TabIndex = 11;
@@ -825,9 +817,18 @@ namespace Music.Generator
             lblNextThingToDo.ForeColor = Color.Fuchsia;
             lblNextThingToDo.Location = new Point(504, 20);
             lblNextThingToDo.Name = "lblNextThingToDo";
-            lblNextThingToDo.Size = new Size(422, 21);
+            lblNextThingToDo.Size = new Size(128, 21);
             lblNextThingToDo.TabIndex = 12;
-            lblNextThingToDo.Text = "Test end to end, should support 2 staves and clefs now";
+            lblNextThingToDo.Text = "Sections is next";
+            // 
+            // clbSections
+            // 
+            clbSections.CheckOnClick = true;
+            clbSections.FormattingEnabled = true;
+            clbSections.Location = new Point(80, 288);
+            clbSections.Name = "clbSections";
+            clbSections.Size = new Size(220, 94);
+            clbSections.TabIndex = 20;
             // 
             // GeneratorForm
             // 
@@ -893,7 +894,6 @@ namespace Music.Generator
         private CheckBox chkTieAcross;
         private CheckBox chkFermata;
         private Label lblSections;
-        private TextBox txtSections;
         private Label label3;
         private NumericUpDown numNumberOfNotes;
         private Label label2;
@@ -914,5 +914,6 @@ namespace Music.Generator
         private ComboBox cbChordBase;
         private Label label1;
         private Label lblNextThingToDo;
+        private CheckedListBox clbSections;
     }
 }
