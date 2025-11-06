@@ -194,7 +194,7 @@ namespace Music.Generator
             // lblSections
             // 
             lblSections.AutoSize = true;
-            lblSections.ForeColor = Color.FromArgb(255, 128, 0);
+            lblSections.ForeColor = Color.FromArgb(0, 192, 0);
             lblSections.Location = new Point(15, 288);
             lblSections.Name = "lblSections";
             lblSections.Size = new Size(54, 15);

@@ -49,6 +49,38 @@ namespace Music.Designer
             return null;
         }
 
+        /// <summary>
+        /// Determines if a bar number falls within any of the selected sections.
+        /// If no section names are provided, returns true (no filtering).
+        /// </summary>
+        /// <param name="barNumber">The bar number to check (1-based).</param>
+        /// <param name="selectedSectionNames">List of section names to filter by.</param>
+        /// <returns>True if the bar is in a selected section or if no sections are selected.</returns>
+        public bool IsBarInSelectedSections(int barNumber, List<string> selectedSectionNames)
+        {
+            // If no sections selected, don't filter (process all bars)
+            if (selectedSectionNames == null || selectedSectionNames.Count == 0)
+                return true;
+
+            // If no sections defined, process all bars
+            if (Sections == null || Sections.Count == 0)
+                return true;
+
+            // Check if bar falls within any selected section
+            foreach (var sectionName in selectedSectionNames)
+            {
+                var section = Sections
+                    .FirstOrDefault(s => s?.Name?.Equals(sectionName, StringComparison.OrdinalIgnoreCase) == true);
+
+                if (section != null && section.ContainsBar(barNumber))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         // Recompute StartBar after external edits to BarCount or ordering
         public void RecalculateStarts()
         {
