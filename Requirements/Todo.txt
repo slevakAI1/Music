@@ -7,8 +7,10 @@ Next: Orange ones
 Note: don't just simulate parts, simulate the artists - style, personality, etc.
 
 
-
-
+Note: best Strategy to build music may be start with 32nd note rests filling all measures, then combine/replace
+as needed.
+Also sections do not really need to start on beat 1 of measure. Should be more fluid. Like start or 
+end beat can be off +/- 1 beat.
 
 ======================================================================================
 
