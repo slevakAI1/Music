@@ -65,18 +65,6 @@ namespace Music.Generator
             if (Globals.Generator != null)
                 _generatorData = Globals.Generator;
 
-
-
-
-
-            //================================================================
-            // THIS SHOULD NOT BE HERE. SHOULD BE ITS OWN BUTTON OR SOMETHING.
-            // Update the form to take into account any changes to GenerateData
-            Globals.Generator?.UpdateFromDesigner(_design);
-
-
-
-
             ApplyFormData(_generatorData);
         }
 
@@ -86,7 +74,7 @@ namespace Music.Generator
             base.OnDeactivate(e);
 
             // Save on the way out
-            Globals.Score  = _score;
+            Globals.Score = _score;
             Globals.Designer = _design;
             _generatorData = Globals.Generator = CaptureFormData();
             Globals.Generator = _generatorData;
@@ -130,7 +118,7 @@ namespace Music.Generator
         private void btnSetGeneratorTestScenarioG1_Click(object sender, EventArgs e)
         {
             // Merge in any design changes
-            _generatorData?.UpdateFromDesigner(_design);
+            //_generatorData?.UpdateFromDesigner(_design);
             _generatorData = GeneratorTests.SetTestGeneratorG1(_design);
             ApplyFormData(_generatorData);
             MessageBox.Show("Test Generator G1 has been applied to the current generator settings.", "Generator Test Scenario G1", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -190,6 +178,16 @@ namespace Music.Generator
                 title,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
+        }
+
+        private void btnUpdateFormFromDesigner_Click(object sender, EventArgs e)
+        {
+            //================================================================
+            // THIS SHOULD NOT BE HERE. SHOULD BE ITS OWN BUTTON OR SOMETHING.
+            // Update the form to take into account any changes to GenerateData
+            Globals.Generator?.UpdateFromDesigner(_design);
+
+            // Technical this can run upon activation too, but only in initialize phase, just that one time
         }
     }
 }

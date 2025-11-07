@@ -119,6 +119,7 @@ namespace Music.Generator
             btnSetDesignTestScenarioD1 = new Button();
             btnChordTest = new Button();
             lblNextThingToDo = new Label();
+            btnUpdateFormFromDesigner = new Button();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -813,7 +814,7 @@ namespace Music.Generator
             // 
             // btnChordTest
             // 
-            btnChordTest.Location = new Point(516, 44);
+            btnChordTest.Location = new Point(1142, 376);
             btnChordTest.Name = "btnChordTest";
             btnChordTest.Size = new Size(112, 23);
             btnChordTest.TabIndex = 11;
@@ -832,9 +833,20 @@ namespace Music.Generator
             lblNextThingToDo.TabIndex = 12;
             lblNextThingToDo.Text = "Sections should not be part of Generator object. Instead there should be a list of start points and endpoints (Bar & beat)";
             // 
+            // btnUpdateFormFromDesigner
+            // 
+            btnUpdateFormFromDesigner.Location = new Point(546, 43);
+            btnUpdateFormFromDesigner.Name = "btnUpdateFormFromDesigner";
+            btnUpdateFormFromDesigner.Size = new Size(155, 23);
+            btnUpdateFormFromDesigner.TabIndex = 13;
+            btnUpdateFormFromDesigner.Text = "Update From Designer";
+            btnUpdateFormFromDesigner.UseVisualStyleBackColor = true;
+            btnUpdateFormFromDesigner.Click += btnUpdateFormFromDesigner_Click;
+            // 
             // GeneratorForm
             // 
             ClientSize = new Size(1266, 789);
+            Controls.Add(btnUpdateFormFromDesigner);
             Controls.Add(lblNextThingToDo);
             Controls.Add(btnChordTest);
             Controls.Add(btnSetDesignTestScenarioD1);
@@ -917,5 +929,6 @@ namespace Music.Generator
         private Label label1;
         private Label lblNextThingToDo;
         private CheckedListBox clbSections;
+        private Button btnUpdateFormFromDesigner;
     }
 }
