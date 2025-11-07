@@ -91,6 +91,7 @@ namespace Music.Generator
             {
                 var config = _generatorData.ToPatternConfiguration();
                 SetNotes.Apply(_score!, config);
+                Globals.Score = _score;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
             }
         }
 
