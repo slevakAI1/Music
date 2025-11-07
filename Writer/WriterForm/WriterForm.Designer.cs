@@ -1,6 +1,6 @@
-namespace Music.Generator
+namespace Music.Writer
 {
-    partial class GeneratorForm
+    partial class WriterForm
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -114,7 +114,7 @@ namespace Music.Generator
             chkTieAcross = new CheckBox();
             chkFermata = new CheckBox();
             label2 = new Label();
-            btnSetGeneratorTestScenarioG1 = new Button();
+            btnSetWriterTestScenarioG1 = new Button();
             btnNewScore = new Button();
             btnSetDesignTestScenarioD1 = new Button();
             btnChordTest = new Button();
@@ -147,7 +147,7 @@ namespace Music.Generator
             lblTitle.Name = "lblTitle";
             lblTitle.Size = new Size(120, 32);
             lblTitle.TabIndex = 0;
-            lblTitle.Text = "Generator";
+            lblTitle.Text = "Writer";
             // 
             // cbPattern
             // 
@@ -784,13 +784,13 @@ namespace Music.Generator
             // 
             // btnSetGeneratorTestScenarioG1
             // 
-            btnSetGeneratorTestScenarioG1.Location = new Point(491, 121);
-            btnSetGeneratorTestScenarioG1.Name = "btnSetGeneratorTestScenarioG1";
-            btnSetGeneratorTestScenarioG1.Size = new Size(196, 31);
-            btnSetGeneratorTestScenarioG1.TabIndex = 8;
-            btnSetGeneratorTestScenarioG1.Text = "Set Generator - Test Scenario G1";
-            btnSetGeneratorTestScenarioG1.UseVisualStyleBackColor = true;
-            btnSetGeneratorTestScenarioG1.Click += btnSetGeneratorTestScenarioG1_Click;
+            btnSetWriterTestScenarioG1.Location = new Point(491, 121);
+            btnSetWriterTestScenarioG1.Name = "btnSetGeneratorTestScenarioG1";
+            btnSetWriterTestScenarioG1.Size = new Size(196, 31);
+            btnSetWriterTestScenarioG1.TabIndex = 8;
+            btnSetWriterTestScenarioG1.Text = "Set Generator - Test Scenario G1";
+            btnSetWriterTestScenarioG1.UseVisualStyleBackColor = true;
+            btnSetWriterTestScenarioG1.Click += btnSetWriterTestScenarioG1_Click;
             // 
             // btnNewScore
             // 
@@ -843,7 +843,7 @@ namespace Music.Generator
             btnUpdateFormFromDesigner.UseVisualStyleBackColor = true;
             btnUpdateFormFromDesigner.Click += btnUpdateFormFromDesigner_Click;
             // 
-            // GeneratorForm
+            // WriterForm
             // 
             ClientSize = new Size(1266, 789);
             Controls.Add(btnUpdateFormFromDesigner);
@@ -851,7 +851,7 @@ namespace Music.Generator
             Controls.Add(btnChordTest);
             Controls.Add(btnSetDesignTestScenarioD1);
             Controls.Add(btnNewScore);
-            Controls.Add(btnSetGeneratorTestScenarioG1);
+            Controls.Add(btnSetWriterTestScenarioG1);
             Controls.Add(label2);
             Controls.Add(groupBox1);
             Controls.Add(lblTitle);
@@ -860,8 +860,8 @@ namespace Music.Generator
             Controls.Add(grpPitch);
             Controls.Add(btnApplySetNotes);
             Controls.Add(lblStatus);
-            Name = "GeneratorForm";
-            Text = "Generate 2 (MusicXML)";
+            Name = "WriterForm";
+            Text = "Writer 2 (MusicXML)";
             grpTarget.ResumeLayout(false);
             grpTarget.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).EndInit();
@@ -911,7 +911,7 @@ namespace Music.Generator
         private Label label3;
         private NumericUpDown numNumberOfNotes;
         private Label label2;
-        private Button btnSetGeneratorTestScenarioG1;
+        private Button btnSetWriterTestScenarioG1;
         private Button btnNewScore;
         private Button btnSetDesignTestScenarioD1;
         private RadioButton rbIsRest;

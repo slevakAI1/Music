@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace Music.Generator
+namespace Music.Writer
 {
     internal static class MessageBoxHelper
     {

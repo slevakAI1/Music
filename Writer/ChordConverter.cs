@@ -1,16 +1,16 @@
 ﻿using MusicTheory;   // https://github.com/phmatray/MusicTheory
 using Music.Designer;
 
-namespace Music.Generator
+namespace Music.Writer
 {
     /// <summary>
-    /// Converts HarmonicEvent objects to lists of notes compatible with GeneratorData.
+    /// Converts HarmonicEvent objects to lists of notes compatible with Writer.
     /// Uses the MusicTheory library to generate chord voicings.
     /// </summary>
     public static class ChordConverter
     {
         /// <summary>
-        /// Represents a single note with pitch information for use in GeneratorData.
+        /// Represents a single note with pitch information for use in Writer.
         /// </summary>
         public sealed class ChordNote
         {
@@ -266,7 +266,7 @@ namespace Music.Generator
         }
 
         /// <summary>
-        /// Maps MusicTheory Alteration to GeneratorData accidental string.
+        /// Maps MusicTheory Alteration to Writer accidental string.
         /// </summary>
         private static string MapAlteration(Alteration alteration) => alteration switch
         {

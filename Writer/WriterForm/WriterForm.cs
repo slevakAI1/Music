@@ -1,16 +1,16 @@
 using Music.Designer;
 using MusicXml.Domain;
 
-namespace Music.Generator
+namespace Music.Writer
 {
-    public partial class GeneratorForm : Form
+    public partial class WriterForm : Form
     {
         private Score? _score;
-        private Designer.Designer? _design;
-        private Generator? _generatorData;
+        private Designer.Designer? _designer;
+        private Writer? _writer;
 
         //===========================   I N I T I A L I Z A T I O N   ===========================
-        public GeneratorForm()
+        public WriterForm()
         {
             InitializeComponent();
 
@@ -23,7 +23,7 @@ namespace Music.Generator
             // Load current global score and design into form-local fields for later use
             // Constructor is the only place that reads Globals per requirement.
             _score = Globals.Score;
-            _design = Globals.Designer;
+            _designer = Globals.Designer;
 
             // Initialize comboboxes - doesn't seem to be a way to set a default in the designer or form.
             // The changes keep getting discarded. wtf?
@@ -39,7 +39,7 @@ namespace Music.Generator
 
             // Capture form control values manually set in the form designer
             // This will only be done once, at form construction time.
-            _generatorData ??= CaptureFormData();
+            _writer ??= CaptureFormData();
         }
 
         protected override void OnShown(EventArgs e)
@@ -49,8 +49,8 @@ namespace Music.Generator
                 this.WindowState = FormWindowState.Maximized;
         }
 
-        // The Generator form is activated each time it gains focus.
-        // The initialization of controls is controlled entirely by the current Design and persisted GenerationData.
+        // The Writer form is activated each time it gains focus.
+        // The initialization of controls is controlled entirely by the current Design and persisted Writer.
         // It does not depend on the prior state of the controls.
         protected override void OnActivated(EventArgs e)
         {
@@ -61,11 +61,11 @@ namespace Music.Generator
             if (Globals.Score != null)
                 _score = Globals.Score;
             if (Globals.Designer != null)
-                _design = Globals.Designer;
-            if (Globals.Generator != null)
-                _generatorData = Globals.Generator;
+                _designer = Globals.Designer;
+            if (Globals.Writer != null)
+                _writer = Globals.Writer;
 
-            ApplyFormData(_generatorData);
+            ApplyFormData(_writer);
         }
 
         // Persist current control state whenever the form loses activation (user switches to another MDI child)
@@ -75,9 +75,9 @@ namespace Music.Generator
 
             // Save on the way out
             Globals.Score = _score;
-            Globals.Designer = _design;
-            _generatorData = Globals.Generator = CaptureFormData();
-            Globals.Generator = _generatorData;
+            Globals.Designer = _designer;
+            _writer = Globals.Writer = CaptureFormData();
+            Globals.Writer = _writer;
         }
 
         //===============================   E V E N T S   ==============================
@@ -85,11 +85,11 @@ namespace Music.Generator
         private void btnApplySetNotes_Click(object sender, EventArgs e)
         {
             // Persist current control state and pass the captured DTO to PatternSetNotes.
-            // All control-to-primitive mapping/logic is handled inside PatternSetNotes.Apply(Score, GenerationData).
-            _generatorData = CaptureFormData();
-            if (_generatorData != null)
+            // All control-to-primitive mapping/logic is handled inside PatternSetNotes.Apply(Score, Writer).
+            _writer = CaptureFormData();
+            if (_writer != null)
             {
-                var config = _generatorData.ToPatternConfiguration();
+                var config = _writer.ToPatternConfiguration();
                 SetNotes.Apply(_score!, config);
                 Globals.Score = _score;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
             }
@@ -97,7 +97,7 @@ namespace Music.Generator
 
         private void btnNewScore_Click(object sender, EventArgs e)
         {
-            _score = ScoreHelper.NewScore(this, _design, clbParts, lblEndBarTotal);
+            _score = ScoreHelper.NewScore(this, _designer, clbParts, lblEndBarTotal);
         }
 
 
@@ -109,25 +109,25 @@ namespace Music.Generator
         private void btnSetDesignTestScenarioD1_Click(object sender, EventArgs e)
         {
             // Ensure design exists and apply design defaults
-            _design ??= new Designer.Designer();
-            DesignerTests.SetTestDesignD1(_design);
+            _designer ??= new Designer.Designer();
+            DesignerTests.SetTestDesignD1(_designer);
             MessageBox.Show("Test Design D1 has been applied to the current design.", "Design Test Scenario D1", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        // This sets generator test scenario G1
-        // Description: Set generator test values using the current design 
-        private void btnSetGeneratorTestScenarioG1_Click(object sender, EventArgs e)
+        // This sets writer test scenario G1
+        // Description: Set writer test values using the current design 
+        private void btnSetWriterTestScenarioG1_Click(object sender, EventArgs e)
         {
             // Merge in any design changes
-            //_generatorData?.UpdateFromDesigner(_design);
-            _generatorData = GeneratorTests.SetTestGeneratorG1(_design);
-            ApplyFormData(_generatorData);
-            MessageBox.Show("Test Generator G1 has been applied to the current generator settings.", "Generator Test Scenario G1", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //_writer?.UpdateFromDesigner(_design);
+            _writer = WriterTests.SetTestWriterG1(_designer);
+            ApplyFormData(_writer);
+            MessageBox.Show("Test Writer G1 has been applied to the current generator settings.", "Generator Test Scenario G1", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void btnChordTest_Click(object sender, EventArgs e)
         {
-            if (_design?.HarmonicTimeline == null || _design.HarmonicTimeline.Events.Count == 0)
+            if (_designer?.HarmonicTimeline == null || _designer.HarmonicTimeline.Events.Count == 0)
             {
                 MessageBox.Show(this,
                     "No harmonic events available in the current design.",
@@ -137,7 +137,7 @@ namespace Music.Generator
                 return;
             }
 
-            var harmonicEvent = _design.HarmonicTimeline.Events[1];
+            var harmonicEvent = _designer.HarmonicTimeline.Events[1];
 
             List<ChordConverter.ChordNote> notes;
             try
@@ -184,7 +184,7 @@ namespace Music.Generator
         private void btnUpdateFormFromDesigner_Click(object sender, EventArgs e)
         {
             // Update the form to take into account any changes to Designer
-            Globals.Generator?.UpdateFromDesigner(_design);
+            Globals.Writer?.UpdateFromDesigner(_designer);
 
             // Technical this can run upon activation too, but only in initialize phase, just that one time
         }

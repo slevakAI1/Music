@@ -1,14 +1,14 @@
 ﻿using Music.Designer;
 
-namespace Music.Generator
+namespace Music.Writer
 {
-    public class GeneratorTests
+    public class WriterTests
     {
         // ==================================   T E S T   H E L P E R S   ==================================
   
-        public static Generator SetTestGeneratorG1(Designer.Designer? design)
+        public static Writer SetTestWriterG1(Designer.Designer? design)
         {
-            var data = new Generator();
+            var data = new Writer();
 
             //===================================================================
             // Parts: select all named voices from the design

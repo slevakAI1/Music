@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Windows.Forms;
 using Music;
 using Music.Designer;
-using Music.Generator;
+using Music.Writer;
 
 namespace Music.Designer
 {

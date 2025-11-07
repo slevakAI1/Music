@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using Music.Designer;
 using MusicXml.Domain;
 
-namespace Music.Generator
+namespace Music.Writer
 {
     internal static class ScoreHelper
     {

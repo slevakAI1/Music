@@ -2,24 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Music.Designer;
-using Music.Generator;
+using Music.Writer;
 
 /// <summary>
-///   THIS APPLIES DESIGN TO GENERATOR
+///   THIS APPLIES DESIGN TO Writer
 /// 
-namespace Music.Generator
+namespace Music.Writer
 {
-    public static class GeneratorExtensions
+    public static class WriterExtensions
     {
-        // Applies design-driven defaults into an existing GeneratorData instance.
-        // Accept a nullable receiver so callers holding a `GeneratorData?` (e.g. Globals.GenerationData)
+        // Applies design-driven defaults into an existing Writer instance.
+        // Accept a nullable receiver so callers holding a `Writer?` (e.g. Globals.GenerationData)
         // can call this extension directly without a null-forgiving operator.
-        public static void UpdateFromDesigner(this Generator? data, Designer.Designer? design)
+        public static void UpdateFromDesigner(this Writer? data, Designer.Designer? design)
         {
             if (data == null) return;
 
             // ========== PARTS SYNCHRONIZATION ==========
-            // Update the GeneratorData parts to be in sync with the Designer parts if there are differences.
+            // Update the Writer parts to be in sync with the Designer parts if there are differences.
             // Preserve existing checked states
 
             var availableParts = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -57,7 +57,7 @@ namespace Music.Generator
             data.PartsState = newPartsState;
 
             // ========== SECTIONS SYNCHRONIZATION ==========
-            // Update the GeneratorData sections to be in sync with the Designer sections if there are differences.
+            // Update the Writer sections to be in sync with the Designer sections if there are differences.
             // Preserve existing checked states
 
             var availableSections = new List<string>();
@@ -108,9 +108,9 @@ namespace Music.Generator
         }
 
         /// <summary>
-        /// Converts Generator data to a PatternConfiguration for use with SetNotes.
+        /// Converts Writer data to a PatternConfiguration for use with SetNotes.
         /// </summary>
-        public static PatternConfiguration ToPatternConfiguration(this Generator data)
+        public static PatternConfiguration ToPatternConfiguration(this Writer data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
 
@@ -172,7 +172,7 @@ namespace Music.Generator
     }
 
     /// <summary>
-    /// Configuration extracted from GeneratorData for easier processing by SetNotes.
+    /// Configuration extracted from Writer for easier processing by SetNotes.
     /// </summary>
     public sealed class PatternConfiguration
     {

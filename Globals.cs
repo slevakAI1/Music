@@ -1,6 +1,6 @@
 using Music.Designer;
 using MusicXml.Domain;
-using Music.Generator;
+using Music.Writer;
 
 namespace Music
 {
@@ -11,7 +11,7 @@ namespace Music
         // Holds the currently loaded MusicXML score for application-wide access
         public static Score? Score { get; set; }
 
-        // Persist GeneratorForm's data application-wide (refactor: moved from form instance to Globals)
-        public static Generator.Generator? Generator { get; set; }
+        // Persist WriterForm's data application-wide (refactor: moved from form instance to Globals)
+        public static Writer.Writer? Writer { get; set; }
     }
 }

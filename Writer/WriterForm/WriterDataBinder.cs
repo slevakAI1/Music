@@ -2,14 +2,14 @@
 using System.Linq;
 using static Music.Helpers;
 
-namespace Music.Generator
+namespace Music.Writer
 {
     // Converted helper into a partial class so it can access designer controls directly
-    public partial class GeneratorForm
+    public partial class WriterForm
     {
         // Capture current control values into a class object.
-        // No form parameter required because this is now a partial of GeneratorForm.
-        public Generator CaptureFormData()
+        // No form parameter required because this is now a partial of Writer.
+        public Writer CaptureFormData()
         {
             // Capture parts items and their checked state into a dictionary
             var partsState = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -64,7 +64,7 @@ namespace Music.Generator
                 stepChar = stepSelected[0];
             }
 
-            var data = new Generator
+            var data = new Writer
             {
                 // Pattern
                 Pattern = cbPattern?.SelectedItem?.ToString(),
@@ -112,9 +112,9 @@ namespace Music.Generator
             return data;
         }
 
-        // Apply a GenerateFormData object back to the private form controls.
-        // No form parameter required because this is a partial of GeneratorForm.
-        public void ApplyFormData(Generator data)
+        // Apply a WriterData object back to the private form controls.
+        // No form parameter required because this is a partial of Writer.
+        public void ApplyFormData(Writer data)
         {
             if (data == null) return;
 

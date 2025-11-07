@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <EmbeddedResource Remove="Designer\DesignerFrom.DataBinder.resx" />
-    <EmbeddedResource Remove="Generator\GeneratorForm\GeneratorForm.DataBinder.resx" />
+    <EmbeddedResource Remove="Writer\WriterForm\WriterForm.DataBinder.resx" />
   </ItemGroup>
 
   <ItemGroup>

@@ -227,7 +227,7 @@ namespace Music
                     ShowStatus($"Loaded {doc.FileName}");
 
                     // Refresh MusicForm if open
-                    var musicForm = this.MdiChildren.OfType<GenerateForm>().FirstOrDefault();
+                    var musicForm = this.MdiChildren.OfType<WriterForm>().FirstOrDefault();
                     musicForm?.RefreshFromState();
                 }
                 catch (Exception ex)

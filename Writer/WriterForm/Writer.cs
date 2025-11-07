@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Music.Generator
+namespace Music.Writer
 {
-    // Data holder object for GenerateForm user-editable values.
+    // Data holder object for WriterForm user-editable values.
     // - All properties are simple data types (strings, ints, bools, Dictionary<string,bool>)
     // - Value types remain nullable for compatibility, but getters now provide sensible defaults
     //   so callers can rely on the property value without repeating the same fallback logic.
-    public sealed class Generator
+    public sealed class Writer
     {
         // Backing fields
         private Dictionary<string, bool>? _partsState;

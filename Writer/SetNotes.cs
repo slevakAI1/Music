@@ -2,7 +2,7 @@ using MusicXml.Domain;
 using Music.Designer;
 using Music;
 
-namespace Music.Generator
+namespace Music.Writer
 {
     /// <summary>
     /// Inserts a set of notes based on user parameters.
