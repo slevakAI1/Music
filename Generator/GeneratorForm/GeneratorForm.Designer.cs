@@ -187,7 +187,7 @@ namespace Music.Generator
             // 
             clbSections.CheckOnClick = true;
             clbSections.FormattingEnabled = true;
-            clbSections.Location = new Point(80, 284);
+            clbSections.Location = new Point(101, 448);
             clbSections.Name = "clbSections";
             clbSections.Size = new Size(220, 94);
             clbSections.TabIndex = 20;
@@ -195,8 +195,8 @@ namespace Music.Generator
             // lblSections
             // 
             lblSections.AutoSize = true;
-            lblSections.ForeColor = Color.FromArgb(0, 192, 0);
-            lblSections.Location = new Point(15, 284);
+            lblSections.ForeColor = Color.Red;
+            lblSections.Location = new Point(36, 448);
             lblSections.Name = "lblSections";
             lblSections.Size = new Size(54, 15);
             lblSections.TabIndex = 16;
@@ -206,7 +206,7 @@ namespace Music.Generator
             // 
             lblStartBeat.AutoSize = true;
             lblStartBeat.ForeColor = Color.Red;
-            lblStartBeat.Location = new Point(15, 249);
+            lblStartBeat.Location = new Point(205, 239);
             lblStartBeat.Name = "lblStartBeat";
             lblStartBeat.Size = new Size(60, 15);
             lblStartBeat.TabIndex = 15;
@@ -233,7 +233,7 @@ namespace Music.Generator
             // 
             // numStartBeat
             // 
-            numStartBeat.Location = new Point(80, 246);
+            numStartBeat.Location = new Point(270, 236);
             numStartBeat.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numStartBeat.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numStartBeat.Name = "numStartBeat";
@@ -265,7 +265,7 @@ namespace Music.Generator
             // 
             lblEndBeat.AutoSize = true;
             lblEndBeat.ForeColor = Color.Red;
-            lblEndBeat.Location = new Point(203, 249);
+            lblEndBeat.Location = new Point(206, 274);
             lblEndBeat.Name = "lblEndBeat";
             lblEndBeat.Size = new Size(56, 15);
             lblEndBeat.TabIndex = 13;
@@ -275,7 +275,7 @@ namespace Music.Generator
             // 
             chkOverwrite.AutoSize = true;
             chkOverwrite.ForeColor = Color.Red;
-            chkOverwrite.Location = new Point(15, 413);
+            chkOverwrite.Location = new Point(18, 359);
             chkOverwrite.Name = "chkOverwrite";
             chkOverwrite.Size = new Size(196, 19);
             chkOverwrite.TabIndex = 11;
@@ -283,7 +283,7 @@ namespace Music.Generator
             // 
             // numericUpDown2
             // 
-            numericUpDown2.Location = new Point(262, 245);
+            numericUpDown2.Location = new Point(265, 270);
             numericUpDown2.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numericUpDown2.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numericUpDown2.Name = "numericUpDown2";
@@ -294,7 +294,7 @@ namespace Music.Generator
             // lblEndBarTotal
             // 
             lblEndBarTotal.AutoSize = true;
-            lblEndBarTotal.Location = new Point(392, 214);
+            lblEndBarTotal.Location = new Point(396, 239);
             lblEndBarTotal.Name = "lblEndBarTotal";
             lblEndBarTotal.Size = new Size(33, 15);
             lblEndBarTotal.TabIndex = 19;
@@ -302,7 +302,7 @@ namespace Music.Generator
             // 
             // numEndBar
             // 
-            numEndBar.Location = new Point(262, 210);
+            numEndBar.Location = new Point(71, 271);
             numEndBar.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numEndBar.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numEndBar.Name = "numEndBar";
@@ -314,7 +314,7 @@ namespace Music.Generator
             // 
             lblEndBar.AutoSize = true;
             lblEndBar.ForeColor = Color.FromArgb(0, 192, 0);
-            lblEndBar.Location = new Point(203, 214);
+            lblEndBar.Location = new Point(12, 275);
             lblEndBar.Name = "lblEndBar";
             lblEndBar.Size = new Size(50, 15);
             lblEndBar.TabIndex = 9;
@@ -322,7 +322,7 @@ namespace Music.Generator
             // 
             // numStartBar
             // 
-            numStartBar.Location = new Point(80, 211);
+            numStartBar.Location = new Point(74, 236);
             numStartBar.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numStartBar.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numStartBar.Name = "numStartBar";
@@ -334,7 +334,7 @@ namespace Music.Generator
             // 
             lblStartBar.AutoSize = true;
             lblStartBar.ForeColor = Color.FromArgb(0, 192, 0);
-            lblStartBar.Location = new Point(15, 214);
+            lblStartBar.Location = new Point(9, 239);
             lblStartBar.Name = "lblStartBar";
             lblStartBar.Size = new Size(54, 15);
             lblStartBar.TabIndex = 7;
