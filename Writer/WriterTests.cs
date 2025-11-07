@@ -6,7 +6,7 @@ namespace Music.Writer
     {
         // ==================================   T E S T   H E L P E R S   ==================================
   
-        public static Writer SetTestWriterG1(Designer.Designer? design)
+        public static Writer SetTestWriterG1(Designer.Designer? designer)
         {
             var data = new Writer();
 
@@ -14,9 +14,9 @@ namespace Music.Writer
             // Parts: select all named voices from the design
 
             var partNames = new List<string>();
-            if (design?.PartSet?.Parts != null)
+            if (designer?.PartSet?.Parts != null)
             {
-                foreach (var v in design.PartSet.Parts)
+                foreach (var v in designer.PartSet.Parts)
                 {
                     var name = v?.PartName;
                     if (!string.IsNullOrWhiteSpace(name))
@@ -35,9 +35,9 @@ namespace Music.Writer
             // Populate SectionsState with all sections from design
 
             var sectionNames = new List<string>();
-            if (design?.SectionSet?.Sections != null)
+            if (designer?.SectionSet?.Sections != null)
             {
-                foreach (var s in design.SectionSet.Sections)
+                foreach (var s in designer.SectionSet.Sections)
                 {
                     var name = s?.Name;
                     if (!string.IsNullOrWhiteSpace(name))
@@ -58,7 +58,7 @@ namespace Music.Writer
             data.SelectedStaffs = new List<int> { 1 };
 
             // End bar: default to design total bars when available
-            var total = design?.SectionSet?.TotalBars ?? 0;
+            var total = designer?.SectionSet?.TotalBars ?? 0;
             if (total > 0)
                 data.EndBar = total;
             else
