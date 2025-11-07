@@ -183,9 +183,7 @@ namespace Music.Generator
 
         private void btnUpdateFormFromDesigner_Click(object sender, EventArgs e)
         {
-            //================================================================
-            // THIS SHOULD NOT BE HERE. SHOULD BE ITS OWN BUTTON OR SOMETHING.
-            // Update the form to take into account any changes to GenerateData
+            // Update the form to take into account any changes to Designer
             Globals.Generator?.UpdateFromDesigner(_design);
 
             // Technical this can run upon activation too, but only in initialize phase, just that one time
