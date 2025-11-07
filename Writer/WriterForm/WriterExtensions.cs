@@ -176,17 +176,36 @@ namespace Music.Writer
     /// </summary>
     public sealed class PatternConfiguration
     {
+
+
+        // TARGETS ?????  
+
         public List<string> Parts { get; set; } = new();
         public List<int> Staffs { get; set; } = new();
         public int StartBar { get; set; }
-        public int EndBar { get; set; }
+        public int StartBeat { get; set; }
+
+        public int EndBar { get; set; }        //  << do these go away if we have a list of these also? I think that would make things easier!
+        public int EndBeat { get; set; }
+
+
+
+        // SEEMS LIKE THIS SHOULD ACCEPT A LIST OF THESE...
+
+
+
         public char Step { get; set; }
         public int Octave { get; set; }
         public int NoteValue { get; set; }
-        public int NumberOfNotes { get; set; }
+        public int NumberOfNotes { get; set; }    //  <--  this would then go away if we had a list of these
         public bool IsChord { get; set; }
         public bool IsRest { get; set; }
         public int Alter { get; set; }
         public List<ChordConverter.ChordNote>? ChordNotes { get; set; }
+
+
+
+
+
     }
 }

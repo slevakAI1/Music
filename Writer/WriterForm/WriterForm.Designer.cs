@@ -145,7 +145,7 @@ namespace Music.Writer
             lblTitle.Font = new Font("Segoe UI", 18F);
             lblTitle.Location = new Point(363, 9);
             lblTitle.Name = "lblTitle";
-            lblTitle.Size = new Size(120, 32);
+            lblTitle.Size = new Size(79, 32);
             lblTitle.TabIndex = 0;
             lblTitle.Text = "Writer";
             // 
@@ -782,13 +782,13 @@ namespace Music.Writer
             label2.TabIndex = 7;
             label2.Text = "Pattern";
             // 
-            // btnSetGeneratorTestScenarioG1
+            // btnSetWriterTestScenarioG1
             // 
             btnSetWriterTestScenarioG1.Location = new Point(491, 121);
-            btnSetWriterTestScenarioG1.Name = "btnSetGeneratorTestScenarioG1";
+            btnSetWriterTestScenarioG1.Name = "btnSetWriterTestScenarioG1";
             btnSetWriterTestScenarioG1.Size = new Size(196, 31);
             btnSetWriterTestScenarioG1.TabIndex = 8;
-            btnSetWriterTestScenarioG1.Text = "Set Generator - Test Scenario G1";
+            btnSetWriterTestScenarioG1.Text = "Set Writer - Test Scenario G1";
             btnSetWriterTestScenarioG1.UseVisualStyleBackColor = true;
             btnSetWriterTestScenarioG1.Click += btnSetWriterTestScenarioG1_Click;
             // 
