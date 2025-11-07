@@ -97,7 +97,7 @@ namespace Music.Generator
             _generatorData = CaptureFormData();
             if (_generatorData != null)
             {
-                SetNotes.Apply(_score!, _generatorData, _design);
+                SetNotes.Apply(_score!, _generatorData);
             }
         }
 

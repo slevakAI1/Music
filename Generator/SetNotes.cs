@@ -16,7 +16,7 @@ namespace Music.Generator
         /// The score object is updated in-place.
         /// All parameters are expected to be pre-validated.
         /// </summary>
-        public static void Apply(Score score, Generator data, Music.Designer.Designer designer)
+        public static void Apply(Score score, Generator data)
         {
             if (score == null) throw new ArgumentNullException(nameof(score));
             if (data == null) throw new ArgumentNullException(nameof(data));
@@ -26,7 +26,7 @@ namespace Music.Generator
 
             foreach (var scorePart in GetTargetParts(score, config.Parts))
             {
-                ProcessPart(scorePart, config, designer);
+                ProcessPart(scorePart, config);
             }
             
             MessageBoxHelper.ShowMessage("Pattern has been applied to the score.", "Apply Pattern Set Notes");
@@ -43,16 +43,10 @@ namespace Music.Generator
                 ? data.SelectedStaffs 
                 : new List<int> { 1 }; // Default to staff 1 if none selected
 
-            var selectedSections = (data.SectionsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase))
-                .Where(kv => kv.Value)
-                .Select(kv => kv.Key)
-                .ToList();
-
             var config = new PatternConfiguration
             {
                 Parts = parts,
                 Staffs = selectedStaffs!,
-                SelectedSections = selectedSections,
                 StartBar = data.StartBar.GetValueOrDefault(),
                 EndBar = data.EndBar.GetValueOrDefault(data.StartBar.GetValueOrDefault()),
                 Step = data.Step != '\0' ? data.Step : 'C',
@@ -102,26 +96,13 @@ namespace Music.Generator
                 .Where(p => p?.Name != null && partNames.Contains(p.Name));
         }
 
-        private static void ProcessPart(Part scorePart, PatternConfiguration config, Music.Designer.Designer designer)
+        private static void ProcessPart(Part scorePart, PatternConfiguration config)
         {
             scorePart.Measures ??= new List<Measure>();
             EnsureMeasureCount(scorePart, config.EndBar);
 
-            // If no sections selected, process all bars in range
-            bool filterBySections = config.SelectedSections.Count > 0;
-
-            // Get design's section set for filtering
-            var sectionSet = designer?.SectionSet;
-
             for (int bar = config.StartBar; bar <= config.EndBar; bar++)
             {
-                // Skip this bar if sections are selected and this bar is not in a selected section
-                if (filterBySections && sectionSet != null && 
-                    !sectionSet.IsBarInSelectedSections(bar, config.SelectedSections))
-                {
-                    continue;
-                }
-
                 ProcessMeasure(scorePart, bar, config);
             }
         }
@@ -304,8 +285,7 @@ namespace Music.Generator
         private sealed class PatternConfiguration
         {
             public List<string> Parts { get; set; } = new();
-            public List<int> Staffs { get; set; } = new(); // Changed from int Staff
-            public List<string> SelectedSections { get; set; } = new();
+            public List<int> Staffs { get; set; } = new();
             public int StartBar { get; set; }
             public int EndBar { get; set; }
             public char Step { get; set; }
