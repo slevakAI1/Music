@@ -66,13 +66,17 @@ namespace Music.Generator
                 _generatorData = Globals.Generator;
 
 
-           //=================================================================
-            // TODO  THIS LOOKS BAD. IF IT CHANGED EXTERNALLY
-            // Why wasn't this already done???
-            // Merge in any design changes that may have happened while outside this form
-            Globals.Generator?.ApplyDesignDefaults(_design);
+
+
+
             //================================================================
+            // THIS SHOULD NOT BE HERE. SHOULD BE ITS OWN BUTTON OR SOMETHING.
             // Update the form to take into account any changes to GenerateData
+            Globals.Generator?.UpdateFromDesigner(_design);
+
+
+
+
             ApplyFormData(_generatorData);
         }
 
@@ -97,7 +101,8 @@ namespace Music.Generator
             _generatorData = CaptureFormData();
             if (_generatorData != null)
             {
-                SetNotes.Apply(_score!, _generatorData);
+                var config = _generatorData.ToPatternConfiguration();
+                SetNotes.Apply(_score!, config);
             }
         }
 
@@ -125,7 +130,7 @@ namespace Music.Generator
         private void btnSetGeneratorTestScenarioG1_Click(object sender, EventArgs e)
         {
             // Merge in any design changes
-            _generatorData?.ApplyDesignDefaults(_design);
+            _generatorData?.UpdateFromDesigner(_design);
             _generatorData = GeneratorTests.SetTestGeneratorG1(_design);
             ApplyFormData(_generatorData);
             MessageBox.Show("Test Generator G1 has been applied to the current generator settings.", "Generator Test Scenario G1", MessageBoxButtons.OK, MessageBoxIcon.Information);

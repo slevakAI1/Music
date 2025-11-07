@@ -16,12 +16,11 @@ namespace Music.Generator
         /// The score object is updated in-place.
         /// All parameters are expected to be pre-validated.
         /// </summary>
-        public static void Apply(Score score, Generator data)
+        public static void Apply(Score score, PatternConfiguration config)
         {
             if (score == null) throw new ArgumentNullException(nameof(score));
-            if (data == null) throw new ArgumentNullException(nameof(data));
+            if (config == null) throw new ArgumentNullException(nameof(config));
 
-            var config = ExtractConfiguration(data);
             ScorePartsHelper.EnsurePartsExist(score, config.Parts);
 
             foreach (var scorePart in GetTargetParts(score, config.Parts))
@@ -30,64 +29,6 @@ namespace Music.Generator
             }
             
             MessageBoxHelper.ShowMessage("Pattern has been applied to the score.", "Apply Pattern Set Notes");
-        }
-
-        private static PatternConfiguration ExtractConfiguration(Generator data)
-        {
-            var parts = (data.PartsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase))
-                .Where(kv => kv.Value)
-                .Select(kv => kv.Key)
-                .ToList();
-
-            var selectedStaffs = (data.SelectedStaffs ?? new List<int>()).Any() 
-                ? data.SelectedStaffs 
-                : new List<int> { 1 }; // Default to staff 1 if none selected
-
-            var config = new PatternConfiguration
-            {
-                Parts = parts,
-                Staffs = selectedStaffs!,
-                StartBar = data.StartBar.GetValueOrDefault(),
-                EndBar = data.EndBar.GetValueOrDefault(data.StartBar.GetValueOrDefault()),
-                Step = data.Step != '\0' ? data.Step : 'C',
-                Octave = data.Octave,
-                NoteValue = GetNoteValue(data.NoteValue),
-                NumberOfNotes = data.NumberOfNotes.GetValueOrDefault(),
-                IsChord = data.IsChord ?? false,
-                IsRest = data.IsRest ?? false,
-                Alter = GetAlter(data.Accidental)
-            };
-
-            if (config.IsChord)
-            {
-                config.ChordNotes = ChordConverter.Convert(
-                    data.ChordKey,
-                    (int)data.ChordDegree,
-                    data.ChordQuality,
-                    data.ChordBase,
-                    baseOctave: config.Octave);
-            }
-
-            return config;
-        }
-
-        private static int GetNoteValue(string? noteValueString)
-        {
-            if (noteValueString != null && Music.MusicConstants.NoteValueMap.TryGetValue(noteValueString, out var nv))
-            {
-                return nv;
-            }
-            return 4; // default quarter note
-        }
-
-        private static int GetAlter(string? accidental)
-        {
-            return (accidental ?? "Natural") switch
-            {
-                var s when s.Equals("Sharp", StringComparison.OrdinalIgnoreCase) => 1,
-                var s when s.Equals("Flat", StringComparison.OrdinalIgnoreCase) => -1,
-                _ => 0
-            };
         }
 
         private static IEnumerable<Part> GetTargetParts(Score score, List<string> partNames)
@@ -280,23 +221,6 @@ namespace Music.Generator
             16 => "16th",
             _ => "quarter"
         };
-
-        // Configuration extracted from GeneratorData for easier processing
-        private sealed class PatternConfiguration
-        {
-            public List<string> Parts { get; set; } = new();
-            public List<int> Staffs { get; set; } = new();
-            public int StartBar { get; set; }
-            public int EndBar { get; set; }
-            public char Step { get; set; }
-            public int Octave { get; set; }
-            public int NoteValue { get; set; }
-            public int NumberOfNotes { get; set; }
-            public bool IsChord { get; set; }
-            public bool IsRest { get; set; }
-            public int Alter { get; set; }
-            public List<ChordConverter.ChordNote>? ChordNotes { get; set; }
-        }
 
         private sealed class MeasureInfo
         {

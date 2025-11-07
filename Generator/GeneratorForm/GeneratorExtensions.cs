@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Music.Designer;
 using Music.Generator;
 
@@ -13,7 +14,7 @@ namespace Music.Generator
         // Applies design-driven defaults into an existing GeneratorData instance.
         // Accept a nullable receiver so callers holding a `GeneratorData?` (e.g. Globals.GenerationData)
         // can call this extension directly without a null-forgiving operator.
-        public static void ApplyDesignDefaults(this Generator? data, Designer.Designer? design)
+        public static void UpdateFromDesigner(this Generator? data, Designer.Designer? design)
         {
             if (data == null) return;
 
@@ -105,5 +106,87 @@ namespace Music.Generator
                     data.EndBar = Math.Max(1, Math.Min(total, data.EndBar.Value));
             }
         }
+
+        /// <summary>
+        /// Converts Generator data to a PatternConfiguration for use with SetNotes.
+        /// </summary>
+        public static PatternConfiguration ToPatternConfiguration(this Generator data)
+        {
+            if (data == null) throw new ArgumentNullException(nameof(data));
+
+            var parts = (data.PartsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase))
+                .Where(kv => kv.Value)
+                .Select(kv => kv.Key)
+                .ToList();
+
+            var selectedStaffs = (data.SelectedStaffs ?? new List<int>()).Any() 
+                ? data.SelectedStaffs 
+                : new List<int> { 1 }; // Default to staff 1 if none selected
+
+            var config = new PatternConfiguration
+            {
+                Parts = parts,
+                Staffs = selectedStaffs!,
+                StartBar = data.StartBar.GetValueOrDefault(),
+                EndBar = data.EndBar.GetValueOrDefault(data.StartBar.GetValueOrDefault()),
+                Step = data.Step != '\0' ? data.Step : 'C',
+                Octave = data.Octave,
+                NoteValue = GetNoteValue(data.NoteValue),
+                NumberOfNotes = data.NumberOfNotes.GetValueOrDefault(),
+                IsChord = data.IsChord ?? false,
+                IsRest = data.IsRest ?? false,
+                Alter = GetAlter(data.Accidental)
+            };
+
+            if (config.IsChord)
+            {
+                config.ChordNotes = ChordConverter.Convert(
+                    data.ChordKey,
+                    (int)data.ChordDegree,
+                    data.ChordQuality,
+                    data.ChordBase,
+                    baseOctave: config.Octave);
+            }
+
+            return config;
+        }
+
+        private static int GetNoteValue(string? noteValueString)
+        {
+            if (noteValueString != null && Music.MusicConstants.NoteValueMap.TryGetValue(noteValueString, out var nv))
+            {
+                return nv;
+            }
+            return 4; // default quarter note
+        }
+
+        private static int GetAlter(string? accidental)
+        {
+            return (accidental ?? "Natural") switch
+            {
+                var s when s.Equals("Sharp", StringComparison.OrdinalIgnoreCase) => 1,
+                var s when s.Equals("Flat", StringComparison.OrdinalIgnoreCase) => -1,
+                _ => 0
+            };
+        }
+    }
+
+    /// <summary>
+    /// Configuration extracted from GeneratorData for easier processing by SetNotes.
+    /// </summary>
+    public sealed class PatternConfiguration
+    {
+        public List<string> Parts { get; set; } = new();
+        public List<int> Staffs { get; set; } = new();
+        public int StartBar { get; set; }
+        public int EndBar { get; set; }
+        public char Step { get; set; }
+        public int Octave { get; set; }
+        public int NoteValue { get; set; }
+        public int NumberOfNotes { get; set; }
+        public bool IsChord { get; set; }
+        public bool IsRest { get; set; }
+        public int Alter { get; set; }
+        public List<ChordConverter.ChordNote>? ChordNotes { get; set; }
     }
 }
