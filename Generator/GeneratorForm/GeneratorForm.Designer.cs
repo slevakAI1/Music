@@ -827,11 +827,11 @@ namespace Music.Generator
             lblNextThingToDo.AutoSize = true;
             lblNextThingToDo.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblNextThingToDo.ForeColor = Color.Fuchsia;
-            lblNextThingToDo.Location = new Point(133, -3);
+            lblNextThingToDo.Location = new Point(735, 20);
             lblNextThingToDo.Name = "lblNextThingToDo";
-            lblNextThingToDo.Size = new Size(904, 21);
+            lblNextThingToDo.Size = new Size(388, 21);
             lblNextThingToDo.TabIndex = 12;
-            lblNextThingToDo.Text = "Sections should not be part of Generator object. Instead there should be a list of start points and endpoints (Bar & beat)";
+            lblNextThingToDo.Text = "Next - Start and end beats & overwrite/insert mode";
             // 
             // btnUpdateFormFromDesigner
             // 
