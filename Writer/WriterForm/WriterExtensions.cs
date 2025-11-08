@@ -197,10 +197,14 @@ namespace Music.Writer
         public char Step { get; set; }
         public int Octave { get; set; }
         public int NoteValue { get; set; }
-        public int NumberOfNotes { get; set; }    //  <--  this would then go away if we had a list of these
+        public int NumberOfNotes { get; set; }    //  Keep this. Will stay in the list item with the other note properties.
         public bool IsChord { get; set; }
         public bool IsRest { get; set; }
         public int Alter { get; set; }
+
+
+        // TO DO  This is same as the list of notes...should get rid of this!
+
         public List<ChordConverter.ChordNote>? ChordNotes { get; set; }
 
 
