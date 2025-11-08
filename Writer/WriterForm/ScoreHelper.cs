@@ -173,6 +173,14 @@ namespace Music.Writer
                 // Swallow any exceptions from optional tempo application; don't block main operation.
             }
 
+
+            //=================================
+            // TODO : Populate the entire score with 16 note rests per measure per part by calling NoteWriter.Insert()
+
+
+
+            //=================================
+
             MessageBox.Show(owner, "New score created from design.", "New Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return score;
         }

@@ -90,7 +90,7 @@ namespace Music.Writer
             if (_writer != null)
             {
                 var config = _writer.ToPatternConfiguration();
-                SetNotes.Apply(_score!, config);
+                NoteWriter.Insert(_score!, config);
                 Globals.Score = _score;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
             }
         }

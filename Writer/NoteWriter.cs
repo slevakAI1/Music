@@ -9,14 +9,22 @@ namespace Music.Writer
     /// Method assumes the score has already been initialized with parts, measure, tempo, time signature.
     /// All parameters are expected to be pre-validated.
     /// </summary>
-    public static class SetNotes
+    public static class NoteWriter
     {
         /// <summary>
-        /// Apply the "Set Notes" operation to the provided score.
-        /// The score object is updated in-place.
+        /// Adds notes to the specified score based on the provided configuration.
         /// All parameters are expected to be pre-validated.
         /// </summary>
-        public static void Apply(Score score, PatternConfiguration config)
+        /// 
+
+        //         Seems like should decide on initial state of new Score object
+        //         if we fill with rests now, then everything is just overwrite mode and would just need to handle ties across measures
+
+        //         in this case would need to fix the 16th note limitation issue and resolve the red notes in Notion
+        //         think they overlap
+
+
+        public static void Insert(Score score, PatternConfiguration config)
         {
             if (score == null) throw new ArgumentNullException(nameof(score));
             if (config == null) throw new ArgumentNullException(nameof(config));
