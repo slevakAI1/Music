@@ -96,18 +96,21 @@ namespace Music.Writer
             }
         }
 
-        private void btnNewScore_Click(object sender, EventArgs e)
-        {
-            _score = ScoreHelper.NewScore(this, _designer, clbParts, lblEndBarTotal);
-        }
-
+        // Writes a list of notes at the specified start bar and beat. 
         private void btnSetNotesNew_Click(object sender, EventArgs e)
         {
             //Get current form data
             _writer = CaptureFormData();
             var config = _writer.ToPatternConfiguration();
-            NoteWriter.Insert(_score!, config);
+
+            //NoteWriter.???(_score!, config);              // TODO: Implement new method
+
             Globals.Score = _score;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
+        }
+
+        private void btnNewScore_Click(object sender, EventArgs e)
+        {
+            _score = ScoreHelper.NewScore(this, _designer, clbParts, lblEndBarTotal);
         }
 
         private void btnUpdateFormFromDesigner_Click(object sender, EventArgs e)
