@@ -618,7 +618,7 @@ namespace Music.Writer
             btnSetNotesOld.Size = new Size(143, 22);
             btnSetNotesOld.TabIndex = 4;
             btnSetNotesOld.Text = "Set Notes Old";
-            btnSetNotesOld.Click += btnApplySetNotes_Click;
+            btnSetNotesOld.Click += btnSetNotesOld_Click;
             // 
             // lblStatus
             // 

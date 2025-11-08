@@ -82,10 +82,11 @@ namespace Music.Writer
 
         //===============================   E V E N T S   ==============================
 
-        private void btnApplySetNotes_Click(object sender, EventArgs e)
+
+
+        // Inserts notes based on the "number of notes" parameter from the writer form
+        private void btnSetNotesOld_Click(object sender, EventArgs e)
         {
-            // Persist current control state and pass the captured DTO to PatternSetNotes.
-            // All control-to-primitive mapping/logic is handled inside PatternSetNotes.Apply(Score, Writer).
             _writer = CaptureFormData();
             if (_writer != null)
             {
@@ -100,6 +101,22 @@ namespace Music.Writer
             _score = ScoreHelper.NewScore(this, _designer, clbParts, lblEndBarTotal);
         }
 
+        private void btnSetNotesNew_Click(object sender, EventArgs e)
+        {
+            //Get current form data
+            _writer = CaptureFormData();
+            var config = _writer.ToPatternConfiguration();
+            NoteWriter.Insert(_score!, config);
+            Globals.Score = _score;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
+        }
+
+        private void btnUpdateFormFromDesigner_Click(object sender, EventArgs e)
+        {
+            // Update the form to take into account any changes to Designer
+            Globals.Writer?.UpdateFromDesigner(_designer);
+
+            // Technical this can run upon activation too, but only in initialize phase, just that one time
+        }
 
         //===========================================================================================
         //                      T E S T   S C E N A R I O   B U T T O N S
@@ -179,19 +196,6 @@ namespace Music.Writer
                 title,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
-        }
-
-        private void btnUpdateFormFromDesigner_Click(object sender, EventArgs e)
-        {
-            // Update the form to take into account any changes to Designer
-            Globals.Writer?.UpdateFromDesigner(_designer);
-
-            // Technical this can run upon activation too, but only in initialize phase, just that one time
-        }
-
-        private void btnSetNotesNew_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }
