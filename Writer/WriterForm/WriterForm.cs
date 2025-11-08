@@ -188,5 +188,10 @@ namespace Music.Writer
 
             // Technical this can run upon activation too, but only in initialize phase, just that one time
         }
+
+        private void btnSetNotesNew_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

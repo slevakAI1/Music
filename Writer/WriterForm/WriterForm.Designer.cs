@@ -36,7 +36,7 @@ namespace Music.Writer
         private System.Windows.Forms.NumericUpDown numDegree;
         private System.Windows.Forms.Label lblOctaveKR;
 
-        private System.Windows.Forms.Button btnApplySetNotes;
+        private System.Windows.Forms.Button btnSetNotesOld;
         private System.Windows.Forms.Label lblStatus;
 
         protected override void Dispose(bool disposing)
@@ -96,7 +96,7 @@ namespace Music.Writer
             lblDegree = new Label();
             numDegree = new NumericUpDown();
             lblOctaveKR = new Label();
-            btnApplySetNotes = new Button();
+            btnSetNotesOld = new Button();
             lblStatus = new Label();
             tt = new ToolTip(components);
             groupBox1 = new GroupBox();
@@ -120,6 +120,7 @@ namespace Music.Writer
             btnChordTest = new Button();
             lblNextThingToDo = new Label();
             btnUpdateFormFromDesigner = new Button();
+            btnSetNotesNew = new Button();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -610,19 +611,19 @@ namespace Music.Writer
             lblOctaveKR.TabIndex = 2;
             lblOctaveKR.Text = "Oct:";
             // 
-            // btnApplySetNotes
+            // btnSetNotesOld
             // 
-            btnApplySetNotes.Location = new Point(485, 207);
-            btnApplySetNotes.Name = "btnApplySetNotes";
-            btnApplySetNotes.Size = new Size(202, 29);
-            btnApplySetNotes.TabIndex = 4;
-            btnApplySetNotes.Text = "Appy Set Notes";
-            btnApplySetNotes.Click += btnApplySetNotes_Click;
+            btnSetNotesOld.Location = new Point(511, 228);
+            btnSetNotesOld.Name = "btnSetNotesOld";
+            btnSetNotesOld.Size = new Size(143, 22);
+            btnSetNotesOld.TabIndex = 4;
+            btnSetNotesOld.Text = "Set Notes Old";
+            btnSetNotesOld.Click += btnApplySetNotes_Click;
             // 
             // lblStatus
             // 
             lblStatus.AutoSize = true;
-            lblStatus.Location = new Point(537, 266);
+            lblStatus.Location = new Point(563, 266);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(42, 15);
             lblStatus.TabIndex = 5;
@@ -643,7 +644,7 @@ namespace Music.Writer
             groupBox1.Controls.Add(numTupletOf);
             groupBox1.Controls.Add(chkTieAcross);
             groupBox1.Controls.Add(chkFermata);
-            groupBox1.Location = new Point(800, 54);
+            groupBox1.Location = new Point(757, 12);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(433, 294);
             groupBox1.TabIndex = 6;
@@ -784,7 +785,7 @@ namespace Music.Writer
             // 
             // btnSetWriterTestScenarioG1
             // 
-            btnSetWriterTestScenarioG1.Location = new Point(491, 121);
+            btnSetWriterTestScenarioG1.Location = new Point(491, 89);
             btnSetWriterTestScenarioG1.Name = "btnSetWriterTestScenarioG1";
             btnSetWriterTestScenarioG1.Size = new Size(196, 31);
             btnSetWriterTestScenarioG1.TabIndex = 8;
@@ -794,7 +795,7 @@ namespace Music.Writer
             // 
             // btnNewScore
             // 
-            btnNewScore.Location = new Point(487, 162);
+            btnNewScore.Location = new Point(487, 126);
             btnNewScore.Name = "btnNewScore";
             btnNewScore.Size = new Size(200, 32);
             btnNewScore.TabIndex = 9;
@@ -804,7 +805,7 @@ namespace Music.Writer
             // 
             // btnSetDesignTestScenarioD1
             // 
-            btnSetDesignTestScenarioD1.Location = new Point(491, 84);
+            btnSetDesignTestScenarioD1.Location = new Point(491, 49);
             btnSetDesignTestScenarioD1.Name = "btnSetDesignTestScenarioD1";
             btnSetDesignTestScenarioD1.Size = new Size(196, 31);
             btnSetDesignTestScenarioD1.TabIndex = 10;
@@ -827,7 +828,7 @@ namespace Music.Writer
             lblNextThingToDo.AutoSize = true;
             lblNextThingToDo.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblNextThingToDo.ForeColor = Color.Fuchsia;
-            lblNextThingToDo.Location = new Point(735, 20);
+            lblNextThingToDo.Location = new Point(35, -12);
             lblNextThingToDo.Name = "lblNextThingToDo";
             lblNextThingToDo.Size = new Size(388, 21);
             lblNextThingToDo.TabIndex = 12;
@@ -835,7 +836,7 @@ namespace Music.Writer
             // 
             // btnUpdateFormFromDesigner
             // 
-            btnUpdateFormFromDesigner.Location = new Point(546, 43);
+            btnUpdateFormFromDesigner.Location = new Point(1142, 343);
             btnUpdateFormFromDesigner.Name = "btnUpdateFormFromDesigner";
             btnUpdateFormFromDesigner.Size = new Size(155, 23);
             btnUpdateFormFromDesigner.TabIndex = 13;
@@ -843,9 +844,20 @@ namespace Music.Writer
             btnUpdateFormFromDesigner.UseVisualStyleBackColor = true;
             btnUpdateFormFromDesigner.Click += btnUpdateFormFromDesigner_Click;
             // 
+            // btnSetNotesNew
+            // 
+            btnSetNotesNew.Location = new Point(513, 198);
+            btnSetNotesNew.Name = "btnSetNotesNew";
+            btnSetNotesNew.Size = new Size(141, 25);
+            btnSetNotesNew.TabIndex = 14;
+            btnSetNotesNew.Text = "Set Notes New";
+            btnSetNotesNew.UseVisualStyleBackColor = true;
+            btnSetNotesNew.Click += btnSetNotesNew_Click;
+            // 
             // WriterForm
             // 
-            ClientSize = new Size(1266, 789);
+            ClientSize = new Size(1436, 789);
+            Controls.Add(btnSetNotesNew);
             Controls.Add(btnUpdateFormFromDesigner);
             Controls.Add(lblNextThingToDo);
             Controls.Add(btnChordTest);
@@ -858,7 +870,7 @@ namespace Music.Writer
             Controls.Add(cbPattern);
             Controls.Add(grpTarget);
             Controls.Add(grpPitch);
-            Controls.Add(btnApplySetNotes);
+            Controls.Add(btnSetNotesOld);
             Controls.Add(lblStatus);
             Name = "WriterForm";
             Text = "Writer 2 (MusicXML)";
@@ -930,5 +942,6 @@ namespace Music.Writer
         private Label lblNextThingToDo;
         private CheckedListBox clbSections;
         private Button btnUpdateFormFromDesigner;
+        private Button btnSetNotesNew;
     }
 }
