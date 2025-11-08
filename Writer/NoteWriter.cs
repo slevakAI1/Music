@@ -75,10 +75,13 @@ namespace Music.Writer
 
             measure.MeasureElements ??= new List<MeasureElement>();
 
+            // Get note data from first item in list
+            if (config.Notes.Count == 0) return;
+
             var measureInfo = GetMeasureInfo(measure);
-            int noteDuration = CalculateNoteDuration(measureInfo.Divisions, config.NoteValue);
+            int noteDuration = CalculateNoteDuration(measureInfo.Divisions, config.Notes[0].NoteValue);
             
-            if (!ValidateCapacity(measure, measureInfo, noteDuration, config, barNumber, scorePart.Name))
+            if (!ValidateCapacity(measure, measureInfo, noteDuration, config.Notes[0].NumberOfNotes, barNumber, scorePart.Name))
             {
                 return;
             }
@@ -130,11 +133,11 @@ namespace Music.Writer
         }
 
         private static bool ValidateCapacity(Measure measure, MeasureInfo info, int noteDuration, 
-            PatternConfiguration config, int barNumber, string? partName)
+            int numberOfNotes, int barNumber, string? partName)
         {
             if (noteDuration == 0) return false;
 
-            long totalNewDuration = (long)noteDuration * config.NumberOfNotes;
+            long totalNewDuration = (long)noteDuration * numberOfNotes;
             if (info.ExistingDuration + totalNewDuration > info.BarLengthDivisions)
             {
                 var msg = $"Insertion would overflow bar {barNumber} of part '{partName}'. " +
@@ -149,31 +152,33 @@ namespace Music.Writer
 
         private static void InsertNotes(Measure measure, PatternConfiguration config, int noteDuration)
         {
-            for (int i = 0; i < config.NumberOfNotes; i++)
+            var writerNote = config.Notes[0];
+            
+            for (int i = 0; i < writerNote.NumberOfNotes; i++)
             {
                 // Insert notes for each selected staff
                 foreach (var staff in config.Staffs)
                 {
-                    if (config.IsChord && config.ChordNotes != null)
+                    if (writerNote.IsChord && writerNote.ChordNotes != null)
                     {
-                        InsertChord(measure, config, noteDuration, staff);
+                        InsertChord(measure, writerNote, noteDuration, staff);
                     }
                     else
                     {
-                        InsertSingleNote(measure, config, noteDuration, staff);
+                        InsertSingleNote(measure, writerNote, noteDuration, staff);
                     }
                 }
             }
         }
 
-        private static void InsertChord(Measure measure, PatternConfiguration config, int noteDuration, int staff)
+        private static void InsertChord(Measure measure, WriterNote writerNote, int noteDuration, int staff)
         {
-            for (int j = 0; j < config.ChordNotes!.Count; j++)
+            for (int j = 0; j < writerNote.ChordNotes!.Count; j++)
             {
-                var chordNote = config.ChordNotes[j];
+                var chordNote = writerNote.ChordNotes[j];
                 var note = new Note
                 {
-                    Type = DurationTypeString(config.NoteValue),
+                    Type = DurationTypeString(writerNote.NoteValue),
                     Duration = noteDuration,
                     Voice = 1,
                     Staff = staff,
@@ -195,21 +200,21 @@ namespace Music.Writer
             }
         }
 
-        private static void InsertSingleNote(Measure measure, PatternConfiguration config, int noteDuration, int staff)
+        private static void InsertSingleNote(Measure measure, WriterNote writerNote, int noteDuration, int staff)
         {
             var note = new Note
             {
-                Type = DurationTypeString(config.NoteValue),
+                Type = DurationTypeString(writerNote.NoteValue),
                 Duration = noteDuration,
                 Voice = 1,
                 Staff = staff,
                 IsChordTone = false,
-                IsRest = config.IsRest,
+                IsRest = writerNote.IsRest,
                 Pitch = new Pitch
                 {
-                    Step = char.ToUpper(config.Step),
-                    Octave = config.Octave,
-                    Alter = config.Alter
+                    Step = char.ToUpper(writerNote.Step),
+                    Octave = writerNote.Octave,
+                    Alter = writerNote.Alter
                 }
             };
 

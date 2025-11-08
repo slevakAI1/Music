@@ -123,12 +123,8 @@ namespace Music.Writer
                 ? data.SelectedStaffs 
                 : new List<int> { 1 }; // Default to staff 1 if none selected
 
-            var config = new PatternConfiguration
+            var writerNote = new WriterNote
             {
-                Parts = parts,
-                Staffs = selectedStaffs!,
-                StartBar = data.StartBar.GetValueOrDefault(),
-                EndBar = data.EndBar.GetValueOrDefault(data.StartBar.GetValueOrDefault()),
                 Step = data.Step != '\0' ? data.Step : 'C',
                 Octave = data.Octave,
                 NoteValue = GetNoteValue(data.NoteValue),
@@ -138,15 +134,24 @@ namespace Music.Writer
                 Alter = GetAlter(data.Accidental)
             };
 
-            if (config.IsChord)
+            if (writerNote.IsChord)
             {
-                config.ChordNotes = ChordConverter.Convert(
+                writerNote.ChordNotes = ChordConverter.Convert(
                     data.ChordKey,
                     (int)data.ChordDegree,
                     data.ChordQuality,
                     data.ChordBase,
-                    baseOctave: config.Octave);
+                    baseOctave: writerNote.Octave);
             }
+
+            var config = new PatternConfiguration
+            {
+                Parts = parts,
+                Staffs = selectedStaffs!,
+                StartBar = data.StartBar.GetValueOrDefault(),
+                EndBar = data.EndBar.GetValueOrDefault(data.StartBar.GetValueOrDefault()),
+                Notes = new List<WriterNote> { writerNote }
+            };
 
             return config;
         }
@@ -176,40 +181,15 @@ namespace Music.Writer
     /// </summary>
     public sealed class PatternConfiguration
     {
-
-
-        // TARGETS ?????  
-
+        // TARGETS
         public List<string> Parts { get; set; } = new();
         public List<int> Staffs { get; set; } = new();
         public int StartBar { get; set; }
         public int StartBeat { get; set; }
-
-        public int EndBar { get; set; }        //  << do these go away if we have a list of these also? I think that would make things easier!
+        public int EndBar { get; set; }
         public int EndBeat { get; set; }
 
-
-
-        // SEEMS LIKE THIS SHOULD ACCEPT A LIST OF THESE...
-
-
-
-        public char Step { get; set; }
-        public int Octave { get; set; }
-        public int NoteValue { get; set; }
-        public int NumberOfNotes { get; set; }    //  Keep this. Will stay in the list item with the other note properties.
-        public bool IsChord { get; set; }
-        public bool IsRest { get; set; }
-        public int Alter { get; set; }
-
-
-        // TO DO  This is same as the list of notes...should get rid of this!
-
-        public List<ChordConverter.ChordNote>? ChordNotes { get; set; }
-
-
-
-
-
+        // List of notes to insert
+        public List<WriterNote> Notes { get; set; } = new();
     }
 }
