@@ -172,7 +172,6 @@ namespace Music.Writer
             grpTarget.Controls.Add(lblEndBeat);
             grpTarget.Controls.Add(chkOverwrite);
             grpTarget.Controls.Add(numericUpDown2);
-            grpTarget.Controls.Add(lblEndBarTotal);
             grpTarget.Controls.Add(numEndBar);
             grpTarget.Controls.Add(lblEndBar);
             grpTarget.Controls.Add(numStartBar);
@@ -295,7 +294,7 @@ namespace Music.Writer
             // lblEndBarTotal
             // 
             lblEndBarTotal.AutoSize = true;
-            lblEndBarTotal.Location = new Point(396, 239);
+            lblEndBarTotal.Location = new Point(1142, 417);
             lblEndBarTotal.Name = "lblEndBarTotal";
             lblEndBarTotal.Size = new Size(33, 15);
             lblEndBarTotal.TabIndex = 19;
@@ -828,7 +827,7 @@ namespace Music.Writer
             lblNextThingToDo.AutoSize = true;
             lblNextThingToDo.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblNextThingToDo.ForeColor = Color.Fuchsia;
-            lblNextThingToDo.Location = new Point(35, -12);
+            lblNextThingToDo.Location = new Point(1000, 542);
             lblNextThingToDo.Name = "lblNextThingToDo";
             lblNextThingToDo.Size = new Size(388, 21);
             lblNextThingToDo.TabIndex = 12;
@@ -868,6 +867,7 @@ namespace Music.Writer
             Controls.Add(groupBox1);
             Controls.Add(lblTitle);
             Controls.Add(cbPattern);
+            Controls.Add(lblEndBarTotal);
             Controls.Add(grpTarget);
             Controls.Add(grpPitch);
             Controls.Add(btnSetNotesOld);
