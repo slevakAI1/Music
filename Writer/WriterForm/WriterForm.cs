@@ -7,7 +7,7 @@ namespace Music.Writer
     {
         private Score? _score;
         private Designer.Designer? _designer;
-        private Writer? _writer;
+        private WriterData? _writer;
 
         //===========================   I N I T I A L I Z A T I O N   ===========================
         public WriterForm()

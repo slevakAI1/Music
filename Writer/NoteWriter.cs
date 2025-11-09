@@ -15,7 +15,7 @@ namespace Music.Writer
         /// Adds notes to the specified score based on the provided configuration.
         /// All parameters are expected to be pre-validated.
         /// </summary>
-        public static void Insert(Score score, PatternConfiguration config)
+        public static void Insert(Score score, SetNotesConfig config)
         {
             if (score == null) throw new ArgumentNullException(nameof(score));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -36,26 +36,34 @@ namespace Music.Writer
                 .Where(p => p?.Name != null && partNames.Contains(p.Name));
         }
 
-        private static void ProcessPart(Part scorePart, PatternConfiguration config)
+        private static void ProcessPart(Part scorePart, SetNotesConfig config)
         {
             scorePart.Measures ??= new List<Measure>();
-            EnsureMeasureCount(scorePart, config.EndBar);
+            //EnsureMeasureCount(scorePart, config.EndBar);
 
-            for (int bar = config.StartBar; bar <= config.EndBar; bar++)
+
+
+            //               T O D O    !!  -     this should be placing notes down
+            // starting at start bar/beat until all notes in list are placed.
+            // There needs to be a mechanism to track last bar beat position?? - a method should do it
+
+            for (int bar = config.StartBar; bar <= config.EndBar; bar++)    
             {
                 ProcessMeasure(scorePart, bar, config);
             }
+
+
         }
 
-        private static void EnsureMeasureCount(Part part, int requiredCount)
-        {
-            while (part.Measures.Count < requiredCount)
-            {
-                part.Measures.Add(new Measure());
-            }
-        }
+        //private static void EnsureMeasureCount(Part part, int requiredCount)
+        //{
+        //    while (part.Measures.Count < requiredCount)
+        //    {
+        //        part.Measures.Add(new Measure());
+        //    }
+        //}
 
-        private static void ProcessMeasure(Part scorePart, int barNumber, PatternConfiguration config)
+        private static void ProcessMeasure(Part scorePart, int barNumber, SetNotesConfig config)
         {
             var measure = scorePart.Measures[barNumber - 1];
             if (measure == null)
@@ -141,7 +149,7 @@ namespace Music.Writer
             return true;
         }
 
-        private static void InsertNotes(Measure measure, PatternConfiguration config, int noteDuration)
+        private static void InsertNotes(Measure measure, SetNotesConfig config, int noteDuration)
         {
             var firstNote = config.Notes[0];
             

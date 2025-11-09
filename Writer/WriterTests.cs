@@ -6,9 +6,9 @@ namespace Music.Writer
     {
         // ==================================   T E S T   H E L P E R S   ==================================
   
-        public static Writer SetTestWriterG1(Designer.Designer? designer)
+        public static WriterData SetTestWriterG1(Designer.Designer? designer)
         {
-            var data = new Writer();
+            var data = new WriterData();
 
             //===================================================================
             // Parts: select all named voices from the design

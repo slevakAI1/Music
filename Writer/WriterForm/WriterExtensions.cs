@@ -14,7 +14,7 @@ namespace Music.Writer
         // Applies design-driven defaults into an existing Writer instance.
         // Accept a nullable receiver so callers holding a `Writer?` (e.g. Globals.GenerationData)
         // can call this extension directly without a null-forgiving operator.
-        public static void UpdateFromDesigner(this Writer? data, Designer.Designer? design)
+        public static void UpdateFromDesigner(this WriterData? data, Designer.Designer? design)
         {
             if (data == null) return;
 
@@ -110,7 +110,7 @@ namespace Music.Writer
         /// <summary>
         /// Converts Writer data to a PatternConfiguration for use with SetNotes.
         /// </summary>
-        public static PatternConfiguration ToPatternConfiguration(this Writer data)
+        public static SetNotesConfig ToPatternConfiguration(this WriterData data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
 
@@ -156,12 +156,11 @@ namespace Music.Writer
                 notes.Add(writerNote);
             }
 
-            var config = new PatternConfiguration
+            var config = new SetNotesConfig
             {
                 Parts = parts,
                 Staffs = selectedStaffs!,
                 StartBar = data.StartBar.GetValueOrDefault(),
-                EndBar = data.EndBar.GetValueOrDefault(data.StartBar.GetValueOrDefault()),
                 Notes = notes
             };
 
@@ -191,15 +190,13 @@ namespace Music.Writer
     /// <summary>
     /// Configuration extracted from Writer for easier processing by SetNotes.
     /// </summary>
-    public sealed class PatternConfiguration
+    public sealed class SetNotesConfig
     {
         // TARGETS
         public List<string> Parts { get; set; } = new();
         public List<int> Staffs { get; set; } = new();
         public int StartBar { get; set; }
         public int StartBeat { get; set; }
-        public int EndBar { get; set; }
-        public int EndBeat { get; set; }
 
         // List of notes to insert
         public List<WriterNote> Notes { get; set; } = new();

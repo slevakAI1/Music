@@ -9,7 +9,7 @@ namespace Music.Writer
     {
         // Capture current control values into a class object.
         // No form parameter required because this is now a partial of Writer.
-        public Writer CaptureFormData()
+        public WriterData CaptureFormData()
         {
             // Capture parts items and their checked state into a dictionary
             var partsState = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -64,7 +64,7 @@ namespace Music.Writer
                 stepChar = stepSelected[0];
             }
 
-            var data = new Writer
+            var data = new WriterData
             {
                 // Pattern
                 Pattern = cbPattern?.SelectedItem?.ToString(),
@@ -114,7 +114,7 @@ namespace Music.Writer
 
         // Apply a WriterData object back to the private form controls.
         // No form parameter required because this is a partial of Writer.
-        public void ApplyFormData(Writer data)
+        public void ApplyFormData(WriterData data)
         {
             if (data == null) return;
 

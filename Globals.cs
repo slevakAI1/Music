@@ -12,6 +12,6 @@ namespace Music
         public static Score? Score { get; set; }
 
         // Persist WriterForm's data application-wide (refactor: moved from form instance to Globals)
-        public static Writer.Writer? Writer { get; set; }
+        public static Writer.WriterData? Writer { get; set; }
     }
 }
