@@ -14,6 +14,6 @@ namespace Music.Writer
         public bool IsChord { get; set; }
         public bool IsRest { get; set; }
         public int Alter { get; set; }
-        public List<ChordConverter.ChordNote>? ChordNotes { get; set; }
+        public List<ChordConverter.ChordNote>? ChordNotes { get; set; }   //   <------ this is list of writer notes too! fix this next
     }
 }
