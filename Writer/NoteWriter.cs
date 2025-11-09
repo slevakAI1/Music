@@ -19,8 +19,7 @@ namespace Music.Writer
         {
             if (score == null) throw new ArgumentNullException(nameof(score));
             if (config == null) throw new ArgumentNullException(nameof(config));
-
-            ScorePartsHelper.EnsurePartsExist(score, config.Parts);
+            if (config.Notes == null || config.Notes.Count == 0) return;
 
             foreach (var scorePart in GetTargetParts(score, config.Parts))
             {
@@ -38,54 +37,153 @@ namespace Music.Writer
 
         private static void ProcessPart(Part scorePart, SetNotesConfig config)
         {
-            scorePart.Measures ??= new List<Measure>();
-            //EnsureMeasureCount(scorePart, config.EndBar);
+            if (scorePart.Measures == null || scorePart.Measures.Count == 0)
+                return;
 
+            int currentBar = config.StartBar;
+            long currentBeatPosition = 0; // Position within the current measure in divisions
 
-
-            //               T O D O    !!  -     this should be placing notes down
-            // starting at start bar/beat until all notes in list are placed.
-            // There needs to be a mechanism to track last bar beat position?? - a method should do it
-
-            for (int bar = config.StartBar; bar <= config.EndBar; bar++)    
+            // Get initial measure info to establish beat position
+            if (currentBar <= scorePart.Measures.Count)
             {
-                ProcessMeasure(scorePart, bar, config);
+                var startMeasure = scorePart.Measures[currentBar - 1];
+                var measureInfo = GetMeasureInfo(startMeasure);
+                
+                // Convert StartBeat to divisions offset
+                if (config.StartBeat > 1)
+                {
+                    currentBeatPosition = (config.StartBeat - 1) * measureInfo.Divisions;
+                }
             }
 
+            // Determine the number of repetitions (use the first note's NumberOfNotes)
+            int numberOfRepetitions = config.Notes[0].NumberOfNotes;
 
+            // Group notes into chord groups (consecutive notes where IsChord follows the pattern)
+            var chordGroups = GroupNotesIntoChords(config.Notes);
+
+            // Process each repetition
+            for (int repetition = 0; repetition < numberOfRepetitions; repetition++)
+            {
+                // Process each chord group in this repetition
+                foreach (var chordGroup in chordGroups)
+                {
+                    if (currentBar > scorePart.Measures.Count)
+                    {
+                        MessageBoxHelper.ShowMessage(
+                            $"Ran out of measures in part '{scorePart.Name}' at bar {currentBar}. " +
+                            "Not all notes were placed.",
+                            "Insufficient Measures");
+                        return;
+                    }
+
+                    var measure = scorePart.Measures[currentBar - 1];
+                    measure.MeasureElements ??= new List<MeasureElement>();
+
+                    var measureInfo = GetMeasureInfo(measure);
+                    int noteDuration = CalculateNoteDuration(measureInfo.Divisions, chordGroup[0].NoteValue);
+
+                    if (noteDuration == 0)
+                    {
+                        continue;
+                    }
+
+                    // Check if note fits in current measure
+                    long availableSpace = measureInfo.BarLengthDivisions - currentBeatPosition;
+
+                    if (availableSpace <= 0 || currentBeatPosition >= measureInfo.BarLengthDivisions)
+                    {
+                        // Move to next measure
+                        currentBar++;
+                        currentBeatPosition = 0;
+
+                        if (currentBar > scorePart.Measures.Count)
+                        {
+                            MessageBoxHelper.ShowMessage(
+                                $"Ran out of measures in part '{scorePart.Name}' at bar {currentBar}. " +
+                                "Not all notes were placed.",
+                                "Insufficient Measures");
+                            return;
+                        }
+
+                        measure = scorePart.Measures[currentBar - 1];
+                        measure.MeasureElements ??= new List<MeasureElement>();
+                        measureInfo = GetMeasureInfo(measure);
+                        availableSpace = measureInfo.BarLengthDivisions;
+                    }
+
+                    // Insert all notes in this chord group for each selected staff
+                    foreach (var staff in config.Staffs)
+                    {
+                        for (int noteIndex = 0; noteIndex < chordGroup.Count; noteIndex++)
+                        {
+                            var writerNote = chordGroup[noteIndex];
+
+                            // First note of the chord has no <chord/> tag, subsequent notes do
+                            bool isChordTone = noteIndex > 0;
+
+                            var note = new Note
+                            {
+                                Type = DurationTypeString(writerNote.NoteValue),
+                                Duration = noteDuration,
+                                Voice = 1,
+                                Staff = staff,
+                                IsChordTone = isChordTone,
+                                IsRest = writerNote.IsRest,
+                                Pitch = new Pitch
+                                {
+                                    Step = char.ToUpper(writerNote.Step),
+                                    Octave = writerNote.Octave,
+                                    Alter = writerNote.Alter
+                                }
+                            };
+
+                            measure.MeasureElements.Add(new MeasureElement
+                            {
+                                Type = MeasureElementType.Note,
+                                Element = note
+                            });
+                        }
+                    }
+
+                    // Advance position (only once per chord group, not per note in the chord)
+                    currentBeatPosition += noteDuration;
+
+                    // Check if we've filled the measure and need to move to next
+                    if (currentBeatPosition >= measureInfo.BarLengthDivisions)
+                    {
+                        currentBar++;
+                        currentBeatPosition = 0;
+                    }
+                }
+            }
         }
 
-        //private static void EnsureMeasureCount(Part part, int requiredCount)
-        //{
-        //    while (part.Measures.Count < requiredCount)
-        //    {
-        //        part.Measures.Add(new Measure());
-        //    }
-        //}
-
-        private static void ProcessMeasure(Part scorePart, int barNumber, SetNotesConfig config)
+        /// <summary>
+        /// Groups notes into chord groups. Each group starts with a note where IsChord=false
+        /// and includes all subsequent notes where IsChord=true.
+        /// </summary>
+        private static List<List<WriterNote>> GroupNotesIntoChords(List<WriterNote> notes)
         {
-            var measure = scorePart.Measures[barNumber - 1];
-            if (measure == null)
+            var groups = new List<List<WriterNote>>();
+            List<WriterNote>? currentGroup = null;
+
+            foreach (var note in notes)
             {
-                measure = new Measure();
-                scorePart.Measures[barNumber - 1] = measure;
+                if (!note.IsChord)
+                {
+                    // Start a new chord group
+                    currentGroup = new List<WriterNote> { note };
+                    groups.Add(currentGroup);
+                }
+                else if (currentGroup != null)
+                {
+                    // Add to current chord group
+                    currentGroup.Add(note);
+                }
             }
 
-            measure.MeasureElements ??= new List<MeasureElement>();
-
-            // Get note data from first item in list
-            if (config.Notes.Count == 0) return;
-
-            var measureInfo = GetMeasureInfo(measure);
-            int noteDuration = CalculateNoteDuration(measureInfo.Divisions, config.Notes[0].NoteValue);
-            
-            if (!ValidateCapacity(measure, measureInfo, noteDuration, config.Notes[0].NumberOfNotes, barNumber, scorePart.Name))
-            {
-                return;
-            }
-
-            InsertNotes(measure, config, noteDuration);
+            return groups;
         }
 
         private static MeasureInfo GetMeasureInfo(Measure measure)
@@ -131,62 +229,6 @@ namespace Music.Writer
             return numerator / noteValue;
         }
 
-        private static bool ValidateCapacity(Measure measure, MeasureInfo info, int noteDuration, 
-            int numberOfNotes, int barNumber, string? partName)
-        {
-            if (noteDuration == 0) return false;
-
-            long totalNewDuration = (long)noteDuration * numberOfNotes;
-            if (info.ExistingDuration + totalNewDuration > info.BarLengthDivisions)
-            {
-                var msg = $"Insertion would overflow bar {barNumber} of part '{partName}'. " +
-                          $"Bar capacity (in divisions): {info.BarLengthDivisions}. " +
-                          $"Existing occupied: {info.ExistingDuration}. " +
-                          $"Attempting to add: {totalNewDuration}.";
-                MessageBoxHelper.ShowError(msg, "Bar Overflow");
-                return false;
-            }
-            return true;
-        }
-
-        private static void InsertNotes(Measure measure, SetNotesConfig config, int noteDuration)
-        {
-            var firstNote = config.Notes[0];
-            
-            for (int i = 0; i < firstNote.NumberOfNotes; i++)
-            {
-                // Insert notes for each selected staff
-                foreach (var staff in config.Staffs)
-                {
-                    // Insert all notes from the list (single note or chord)
-                    foreach (var writerNote in config.Notes)
-                    {
-                        var note = new Note
-                        {
-                            Type = DurationTypeString(writerNote.NoteValue),
-                            Duration = noteDuration,
-                            Voice = 1,
-                            Staff = staff,
-                            IsChordTone = writerNote.IsChord,
-                            IsRest = writerNote.IsRest,
-                            Pitch = new Pitch
-                            {
-                                Step = char.ToUpper(writerNote.Step),
-                                Octave = writerNote.Octave,
-                                Alter = writerNote.Alter
-                            }
-                        };
-
-                        measure.MeasureElements.Add(new MeasureElement
-                        {
-                            Type = MeasureElementType.Note,
-                            Element = note
-                        });
-                    }
-                }
-            }
-        }
-
         private static string DurationTypeString(int denom) => denom switch
         {
             1 => "whole",
@@ -203,51 +245,6 @@ namespace Music.Writer
             public int BeatsPerBar { get; set; }
             public int BarLengthDivisions { get; set; }
             public long ExistingDuration { get; set; }
-        }
-    }
-
-    /// <summary>
-    /// Helper extracted from ApplySetNote.Apply to ensure score parts exist for the requested part names.
-    /// Callers may reuse this helper when parts need to be created before further modification.
-    /// </summary>
-    public static class ScorePartsHelper
-    {
-        public static void EnsurePartsExist(Score score, IEnumerable<string> designPartNames)
-        {
-            if (score == null) throw new ArgumentNullException(nameof(score));
-            if (designPartNames == null) throw new ArgumentNullException(nameof(designPartNames));
-
-            // TODO this is outside scope. Adding parts should be a separate operation.
-            if (designPartNames.Count() == 0)
-            {
-                throw new ArgumentException("At least one part must be selected.", nameof(designPartNames));
-            }
-
-            score.Parts ??= new List<Part>();
-
-            // Build a case-insensitive set of existing part names for quick lookup.
-            var scorePartNames = new HashSet<string>(
-                score.Parts.Where(p => !string.IsNullOrWhiteSpace(p?.Name)).Select(p => p.Name!),
-                StringComparer.OrdinalIgnoreCase);
-
-            int count = 0;
-            foreach (var partName in designPartNames)
-            {
-                count++;  // THIS ASSUMES that parts are added in sequence 1,2,3,...and some may not be affected
-                          // by this operation
-                if (scorePartNames.Contains(partName)) continue;
-                var newPart = new Part
-                {
-                    Id = count.ToString(),
-                    Name = partName,
-                    InstrumentName = partName,
-                    MidiChannel = count,
-                    Measures = new List<Measure>()
-                };
-
-                score.Parts.Add(newPart);
-                scorePartNames.Add(partName);
-            }
         }
     }
 }

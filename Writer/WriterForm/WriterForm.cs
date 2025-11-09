@@ -83,30 +83,16 @@ namespace Music.Writer
         //===============================   E V E N T S   ==============================
 
 
-
         // Inserts notes based on the "number of notes" parameter from the writer form
         private void btnSetNotesOld_Click(object sender, EventArgs e)
         {
             _writer = CaptureFormData();
-            if (_writer != null)
-            {
+
                 var config = _writer.ToPatternConfiguration();
                 NoteWriter.Insert(_score!, config);
                 Globals.Score = _score;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
-            }
-        }
+         }
 
-        // Writes a list of notes at the specified start bar and beat. 
-        private void btnSetNotesNew_Click(object sender, EventArgs e)
-        {
-            //Get current form data
-            _writer = CaptureFormData();
-            var config = _writer.ToPatternConfiguration();
-
-            //NoteWriter.???(_score!, config);              // TODO: Implement new method
-
-            Globals.Score = _score;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
-        }
 
         private void btnNewScore_Click(object sender, EventArgs e)
         {

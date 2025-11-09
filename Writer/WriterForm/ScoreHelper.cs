@@ -52,7 +52,7 @@ namespace Music.Writer
             // Ensure parts exist in the new score (this will add Part entries for each name)
             try
             {
-                ScorePartsHelper.EnsurePartsExist(score, partNames);
+                EnsurePartsExist(score, partNames);
             }
             catch (Exception ex)
             {
@@ -183,6 +183,48 @@ namespace Music.Writer
 
             MessageBox.Show(owner, "New score created from design.", "New Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return score;
+        }
+
+        /// <summary>
+        /// Ensures score parts exist for the requested part names.
+        /// Callers may reuse this helper when parts need to be created before further modification.
+        /// </summary>
+        public static void EnsurePartsExist(Score score, IEnumerable<string> designPartNames)
+        {
+            if (score == null) throw new ArgumentNullException(nameof(score));
+            if (designPartNames == null) throw new ArgumentNullException(nameof(designPartNames));
+
+            // TODO this is outside scope. Adding parts should be a separate operation.
+            if (designPartNames.Count() == 0)
+            {
+                throw new ArgumentException("At least one part must be selected.", nameof(designPartNames));
+            }
+
+            score.Parts ??= new List<Part>();
+
+            // Build a case-insensitive set of existing part names for quick lookup.
+            var scorePartNames = new HashSet<string>(
+                score.Parts.Where(p => !string.IsNullOrWhiteSpace(p?.Name)).Select(p => p.Name!),
+                StringComparer.OrdinalIgnoreCase);
+
+            int count = 0;
+            foreach (var partName in designPartNames)
+            {
+                count++;  // THIS ASSUMES that parts are added in sequence 1,2,3,...and some may not be affected
+                          // by this operation
+                if (scorePartNames.Contains(partName)) continue;
+                var newPart = new Part
+                {
+                    Id = count.ToString(),
+                    Name = partName,
+                    InstrumentName = partName,
+                    MidiChannel = count,
+                    Measures = new List<Measure>()
+                };
+
+                score.Parts.Add(newPart);
+                scorePartNames.Add(partName);
+            }
         }
     }
 }

@@ -36,7 +36,7 @@ namespace Music.Writer
         private System.Windows.Forms.NumericUpDown numDegree;
         private System.Windows.Forms.Label lblOctaveKR;
 
-        private System.Windows.Forms.Button btnSetNotesOld;
+        private System.Windows.Forms.Button btnSetNotes;
         private System.Windows.Forms.Label lblStatus;
 
         protected override void Dispose(bool disposing)
@@ -65,11 +65,11 @@ namespace Music.Writer
             lblEndBeat = new Label();
             chkOverwrite = new CheckBox();
             numericUpDown2 = new NumericUpDown();
-            lblEndBarTotal = new Label();
             numEndBar = new NumericUpDown();
             lblEndBar = new Label();
             numStartBar = new NumericUpDown();
             lblStartBar = new Label();
+            lblEndBarTotal = new Label();
             grpPitch = new GroupBox();
             grpChord = new GroupBox();
             label1 = new Label();
@@ -96,7 +96,7 @@ namespace Music.Writer
             lblDegree = new Label();
             numDegree = new NumericUpDown();
             lblOctaveKR = new Label();
-            btnSetNotesOld = new Button();
+            btnSetNotes = new Button();
             lblStatus = new Label();
             tt = new ToolTip(components);
             groupBox1 = new GroupBox();
@@ -120,7 +120,6 @@ namespace Music.Writer
             btnChordTest = new Button();
             lblNextThingToDo = new Label();
             btnUpdateFormFromDesigner = new Button();
-            btnSetNotesNew = new Button();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -291,15 +290,6 @@ namespace Music.Writer
             numericUpDown2.TabIndex = 14;
             numericUpDown2.Value = new decimal(new int[] { 4, 0, 0, 0 });
             // 
-            // lblEndBarTotal
-            // 
-            lblEndBarTotal.AutoSize = true;
-            lblEndBarTotal.Location = new Point(1142, 417);
-            lblEndBarTotal.Name = "lblEndBarTotal";
-            lblEndBarTotal.Size = new Size(33, 15);
-            lblEndBarTotal.TabIndex = 19;
-            lblEndBarTotal.Text = "Total";
-            // 
             // numEndBar
             // 
             numEndBar.Location = new Point(71, 271);
@@ -339,6 +329,15 @@ namespace Music.Writer
             lblStartBar.Size = new Size(54, 15);
             lblStartBar.TabIndex = 7;
             lblStartBar.Text = "Start Bar:";
+            // 
+            // lblEndBarTotal
+            // 
+            lblEndBarTotal.AutoSize = true;
+            lblEndBarTotal.Location = new Point(1142, 417);
+            lblEndBarTotal.Name = "lblEndBarTotal";
+            lblEndBarTotal.Size = new Size(33, 15);
+            lblEndBarTotal.TabIndex = 19;
+            lblEndBarTotal.Text = "Total";
             // 
             // grpPitch
             // 
@@ -610,14 +609,14 @@ namespace Music.Writer
             lblOctaveKR.TabIndex = 2;
             lblOctaveKR.Text = "Oct:";
             // 
-            // btnSetNotesOld
+            // btnSetNotes
             // 
-            btnSetNotesOld.Location = new Point(511, 228);
-            btnSetNotesOld.Name = "btnSetNotesOld";
-            btnSetNotesOld.Size = new Size(143, 22);
-            btnSetNotesOld.TabIndex = 4;
-            btnSetNotesOld.Text = "Set Notes Old";
-            btnSetNotesOld.Click += btnSetNotesOld_Click;
+            btnSetNotes.Location = new Point(504, 183);
+            btnSetNotes.Name = "btnSetNotes";
+            btnSetNotes.Size = new Size(143, 22);
+            btnSetNotes.TabIndex = 4;
+            btnSetNotes.Text = "Set Notes";
+            btnSetNotes.Click += btnSetNotesOld_Click;
             // 
             // lblStatus
             // 
@@ -843,20 +842,9 @@ namespace Music.Writer
             btnUpdateFormFromDesigner.UseVisualStyleBackColor = true;
             btnUpdateFormFromDesigner.Click += btnUpdateFormFromDesigner_Click;
             // 
-            // btnSetNotesNew
-            // 
-            btnSetNotesNew.Location = new Point(513, 198);
-            btnSetNotesNew.Name = "btnSetNotesNew";
-            btnSetNotesNew.Size = new Size(141, 25);
-            btnSetNotesNew.TabIndex = 14;
-            btnSetNotesNew.Text = "Set Notes New";
-            btnSetNotesNew.UseVisualStyleBackColor = true;
-            btnSetNotesNew.Click += btnSetNotesNew_Click;
-            // 
             // WriterForm
             // 
             ClientSize = new Size(1436, 789);
-            Controls.Add(btnSetNotesNew);
             Controls.Add(btnUpdateFormFromDesigner);
             Controls.Add(lblNextThingToDo);
             Controls.Add(btnChordTest);
@@ -870,7 +858,7 @@ namespace Music.Writer
             Controls.Add(lblEndBarTotal);
             Controls.Add(grpTarget);
             Controls.Add(grpPitch);
-            Controls.Add(btnSetNotesOld);
+            Controls.Add(btnSetNotes);
             Controls.Add(lblStatus);
             Name = "WriterForm";
             Text = "Writer 2 (MusicXML)";
@@ -942,6 +930,5 @@ namespace Music.Writer
         private Label lblNextThingToDo;
         private CheckedListBox clbSections;
         private Button btnUpdateFormFromDesigner;
-        private Button btnSetNotesNew;
     }
 }
