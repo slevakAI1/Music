@@ -120,6 +120,8 @@ namespace Music.Writer
             btnChordTest = new Button();
             lblNextThingToDo = new Label();
             btnUpdateFormFromDesigner = new Button();
+            lblDesignerReport = new Label();
+            txtDesignerReport = new TextBox();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -333,7 +335,7 @@ namespace Music.Writer
             // lblEndBarTotal
             // 
             lblEndBarTotal.AutoSize = true;
-            lblEndBarTotal.Location = new Point(1142, 417);
+            lblEndBarTotal.Location = new Point(1142, 655);
             lblEndBarTotal.Name = "lblEndBarTotal";
             lblEndBarTotal.Size = new Size(33, 15);
             lblEndBarTotal.TabIndex = 19;
@@ -642,9 +644,9 @@ namespace Music.Writer
             groupBox1.Controls.Add(numTupletOf);
             groupBox1.Controls.Add(chkTieAcross);
             groupBox1.Controls.Add(chkFermata);
-            groupBox1.Location = new Point(757, 12);
+            groupBox1.Location = new Point(711, 12);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(433, 294);
+            groupBox1.Size = new Size(315, 294);
             groupBox1.TabIndex = 6;
             groupBox1.TabStop = false;
             groupBox1.Text = "Rhythm options";
@@ -813,7 +815,7 @@ namespace Music.Writer
             // 
             // btnChordTest
             // 
-            btnChordTest.Location = new Point(1142, 376);
+            btnChordTest.Location = new Point(1142, 614);
             btnChordTest.Name = "btnChordTest";
             btnChordTest.Size = new Size(112, 23);
             btnChordTest.TabIndex = 11;
@@ -826,7 +828,7 @@ namespace Music.Writer
             lblNextThingToDo.AutoSize = true;
             lblNextThingToDo.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblNextThingToDo.ForeColor = Color.Fuchsia;
-            lblNextThingToDo.Location = new Point(1000, 542);
+            lblNextThingToDo.Location = new Point(74, 676);
             lblNextThingToDo.Name = "lblNextThingToDo";
             lblNextThingToDo.Size = new Size(388, 21);
             lblNextThingToDo.TabIndex = 12;
@@ -834,7 +836,7 @@ namespace Music.Writer
             // 
             // btnUpdateFormFromDesigner
             // 
-            btnUpdateFormFromDesigner.Location = new Point(1142, 343);
+            btnUpdateFormFromDesigner.Location = new Point(1142, 581);
             btnUpdateFormFromDesigner.Name = "btnUpdateFormFromDesigner";
             btnUpdateFormFromDesigner.Size = new Size(155, 23);
             btnUpdateFormFromDesigner.TabIndex = 13;
@@ -842,9 +844,30 @@ namespace Music.Writer
             btnUpdateFormFromDesigner.UseVisualStyleBackColor = true;
             btnUpdateFormFromDesigner.Click += btnUpdateFormFromDesigner_Click;
             // 
+            // lblDesignerReport
+            // 
+            lblDesignerReport.AutoSize = true;
+            lblDesignerReport.Font = new Font("Segoe UI", 15F);
+            lblDesignerReport.Location = new Point(1258, 22);
+            lblDesignerReport.Name = "lblDesignerReport";
+            lblDesignerReport.Size = new Size(153, 28);
+            lblDesignerReport.TabIndex = 27;
+            lblDesignerReport.Text = "Designer Report";
+            // 
+            // txtDesignerReport
+            // 
+            txtDesignerReport.Location = new Point(1152, 68);
+            txtDesignerReport.Multiline = true;
+            txtDesignerReport.Name = "txtDesignerReport";
+            txtDesignerReport.ScrollBars = ScrollBars.Vertical;
+            txtDesignerReport.Size = new Size(430, 352);
+            txtDesignerReport.TabIndex = 26;
+            // 
             // WriterForm
             // 
-            ClientSize = new Size(1436, 789);
+            ClientSize = new Size(1613, 789);
+            Controls.Add(lblDesignerReport);
+            Controls.Add(txtDesignerReport);
             Controls.Add(btnUpdateFormFromDesigner);
             Controls.Add(lblNextThingToDo);
             Controls.Add(btnChordTest);
@@ -930,5 +953,7 @@ namespace Music.Writer
         private Label lblNextThingToDo;
         private CheckedListBox clbSections;
         private Button btnUpdateFormFromDesigner;
+        private Label lblDesignerReport;
+        private TextBox txtDesignerReport;
     }
 }
