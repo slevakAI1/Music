@@ -159,7 +159,7 @@ namespace Music.Writer
 
             var harmonicEvent = _designer.HarmonicTimeline.Events[1];
 
-            List<ChordConverter.ChordNote> notes;
+            List<WriterNote> notes;
             try
             {
                 notes = ChordConverter.Convert(
@@ -191,7 +191,15 @@ namespace Music.Writer
 
             var lines = new List<string>();
             foreach (var note in notes)
-                lines.Add($"{note.Step}{note.Accidental} {note.Octave}");   //  THIS IS PERFECT OUTPUT I NEED!
+            {
+                var accidental = note.Alter switch
+                {
+                    1 => "#",
+                    -1 => "b",
+                    _ => ""
+                };
+                lines.Add($"{note.Step}{accidental} {note.Octave}");
+            }
 
             var title = $"Chord: {harmonicEvent.Key} (Deg {harmonicEvent.Degree}, {harmonicEvent.Quality})";
             MessageBox.Show(this,

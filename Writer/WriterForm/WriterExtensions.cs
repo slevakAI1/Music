@@ -123,25 +123,37 @@ namespace Music.Writer
                 ? data.SelectedStaffs 
                 : new List<int> { 1 }; // Default to staff 1 if none selected
 
-            var writerNote = new WriterNote
-            {
-                Step = data.Step != '\0' ? data.Step : 'C',
-                Octave = data.Octave,
-                NoteValue = GetNoteValue(data.NoteValue),
-                NumberOfNotes = data.NumberOfNotes.GetValueOrDefault(),
-                IsChord = data.IsChord ?? false,
-                IsRest = data.IsRest ?? false,
-                Alter = GetAlter(data.Accidental)
-            };
+            var notes = new List<WriterNote>();
 
-            if (writerNote.IsChord)
+            if (data.IsChord ?? false)
             {
-                writerNote.ChordNotes = ChordConverter.Convert(
+                // Convert chord to list of WriterNote
+                var chordNotes = ChordConverter.Convert(
                     data.ChordKey,
                     (int)data.ChordDegree,
                     data.ChordQuality,
                     data.ChordBase,
-                    baseOctave: writerNote.Octave);
+                    baseOctave: data.Octave,
+                    noteValue: GetNoteValue(data.NoteValue),
+                    numberOfNotes: data.NumberOfNotes.GetValueOrDefault());
+                
+                notes.AddRange(chordNotes);
+            }
+            else
+            {
+                // Single note or rest
+                var writerNote = new WriterNote
+                {
+                    Step = data.Step != '\0' ? data.Step : 'C',
+                    Octave = data.Octave,
+                    NoteValue = GetNoteValue(data.NoteValue),
+                    NumberOfNotes = data.NumberOfNotes.GetValueOrDefault(),
+                    IsChord = false,
+                    IsRest = data.IsRest ?? false,
+                    Alter = GetAlter(data.Accidental)
+                };
+                
+                notes.Add(writerNote);
             }
 
             var config = new PatternConfiguration
@@ -150,7 +162,7 @@ namespace Music.Writer
                 Staffs = selectedStaffs!,
                 StartBar = data.StartBar.GetValueOrDefault(),
                 EndBar = data.EndBar.GetValueOrDefault(data.StartBar.GetValueOrDefault()),
-                Notes = new List<WriterNote> { writerNote }
+                Notes = notes
             };
 
             return config;

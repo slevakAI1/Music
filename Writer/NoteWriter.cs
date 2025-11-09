@@ -15,15 +15,6 @@ namespace Music.Writer
         /// Adds notes to the specified score based on the provided configuration.
         /// All parameters are expected to be pre-validated.
         /// </summary>
-        /// 
-
-        //         Seems like should decide on initial state of new Score object
-        //         if we fill with rests now, then everything is just overwrite mode and would just need to handle ties across measures
-
-        //         in this case would need to fix the 16th note limitation issue and resolve the red notes in Notion
-        //         think they overlap
-
-
         public static void Insert(Score score, PatternConfiguration config)
         {
             if (score == null) throw new ArgumentNullException(nameof(score));
@@ -152,77 +143,40 @@ namespace Music.Writer
 
         private static void InsertNotes(Measure measure, PatternConfiguration config, int noteDuration)
         {
-            var writerNote = config.Notes[0];
+            var firstNote = config.Notes[0];
             
-            for (int i = 0; i < writerNote.NumberOfNotes; i++)
+            for (int i = 0; i < firstNote.NumberOfNotes; i++)
             {
                 // Insert notes for each selected staff
                 foreach (var staff in config.Staffs)
                 {
-                    if (writerNote.IsChord && writerNote.ChordNotes != null)
+                    // Insert all notes from the list (single note or chord)
+                    foreach (var writerNote in config.Notes)
                     {
-                        InsertChord(measure, writerNote, noteDuration, staff);
-                    }
-                    else
-                    {
-                        InsertSingleNote(measure, writerNote, noteDuration, staff);
+                        var note = new Note
+                        {
+                            Type = DurationTypeString(writerNote.NoteValue),
+                            Duration = noteDuration,
+                            Voice = 1,
+                            Staff = staff,
+                            IsChordTone = writerNote.IsChord,
+                            IsRest = writerNote.IsRest,
+                            Pitch = new Pitch
+                            {
+                                Step = char.ToUpper(writerNote.Step),
+                                Octave = writerNote.Octave,
+                                Alter = writerNote.Alter
+                            }
+                        };
+
+                        measure.MeasureElements.Add(new MeasureElement
+                        {
+                            Type = MeasureElementType.Note,
+                            Element = note
+                        });
                     }
                 }
             }
-        }
-
-        private static void InsertChord(Measure measure, WriterNote writerNote, int noteDuration, int staff)
-        {
-            for (int j = 0; j < writerNote.ChordNotes!.Count; j++)
-            {
-                var chordNote = writerNote.ChordNotes[j];
-                var note = new Note
-                {
-                    Type = DurationTypeString(writerNote.NoteValue),
-                    Duration = noteDuration,
-                    Voice = 1,
-                    Staff = staff,
-                    IsChordTone = j > 0,
-                    IsRest = false,
-                    Pitch = new Pitch
-                    {
-                        Step = char.ToUpper(chordNote.Step),
-                        Octave = chordNote.Octave,
-                        Alter = chordNote.Alter
-                    }
-                };
-
-                measure.MeasureElements.Add(new MeasureElement
-                {
-                    Type = MeasureElementType.Note,
-                    Element = note
-                });
-            }
-        }
-
-        private static void InsertSingleNote(Measure measure, WriterNote writerNote, int noteDuration, int staff)
-        {
-            var note = new Note
-            {
-                Type = DurationTypeString(writerNote.NoteValue),
-                Duration = noteDuration,
-                Voice = 1,
-                Staff = staff,
-                IsChordTone = false,
-                IsRest = writerNote.IsRest,
-                Pitch = new Pitch
-                {
-                    Step = char.ToUpper(writerNote.Step),
-                    Octave = writerNote.Octave,
-                    Alter = writerNote.Alter
-                }
-            };
-
-            measure.MeasureElements.Add(new MeasureElement
-            {
-                Type = MeasureElementType.Note,
-                Element = note
-            });
         }
 
         private static string DurationTypeString(int denom) => denom switch

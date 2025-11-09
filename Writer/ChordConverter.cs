@@ -4,36 +4,27 @@ using Music.Designer;
 namespace Music.Writer
 {
     /// <summary>
-    /// Converts HarmonicEvent objects to lists of notes compatible with Writer.
+    /// Converts HarmonicEvent objects to lists of WriterNote compatible with Writer.
     /// Uses the MusicTheory library to generate chord voicings.
     /// </summary>
     public static class ChordConverter
     {
         /// <summary>
-        /// Represents a single note with pitch information for use in Writer.
-        /// </summary>
-        public sealed class ChordNote
-        {
-            public char Step { get; init; }           // C, D, E, F, G, A, B
-            public string Accidental { get; init; }   // "Natural", "Sharp", "Flat"
-            public int Octave { get; init; }          // Scientific pitch notation
-            public int Alter { get; init; }           // -2 (bb), -1 (b), 0 (natural), 1 (#), 2 (##)
-        }
-
-        /// <summary>
         /// Converts a HarmonicEvent to a list of notes representing the chord.
         /// </summary>
         /// <param name="harmonicEvent">The harmonic event containing key, degree, quality, and bass.</param>
         /// <param name="baseOctave">The base octave for the root note (default: 4).</param>
-        /// <returns>A list of ChordNote objects representing the chord voicing.</returns>
+        /// <param name="noteValue">The note value (duration) for all notes in the chord.</param>
+        /// <param name="numberOfNotes">The number of times to repeat this chord pattern.</param>
+        /// <returns>A list of WriterNote objects representing the chord voicing.</returns>
         /// <exception cref="ArgumentNullException">When harmonicEvent is null.</exception>
         /// <exception cref="InvalidOperationException">When the chord cannot be constructed.</exception>
-        public static List<ChordNote> Convert(HarmonicEvent harmonicEvent, int baseOctave = 4)
+        public static List<WriterNote> Convert(HarmonicEvent harmonicEvent, int baseOctave = 4, int noteValue = 4, int numberOfNotes = 1)
         {
             if (harmonicEvent == null)
                 throw new ArgumentNullException(nameof(harmonicEvent));
 
-            return Convert(harmonicEvent.Key, harmonicEvent.Degree, harmonicEvent.Quality, harmonicEvent.Bass, baseOctave);
+            return Convert(harmonicEvent.Key, harmonicEvent.Degree, harmonicEvent.Quality, harmonicEvent.Bass, baseOctave, noteValue, numberOfNotes);
         }
 
         /// <summary>
@@ -44,10 +35,12 @@ namespace Music.Writer
         /// <param name="quality">The chord quality (e.g., "Major", "Minor7").</param>
         /// <param name="bass">The bass note option (e.g., "root", "3rd", "5th").</param>
         /// <param name="baseOctave">The base octave for the root note (default: 4).</param>
-        /// <returns>A list of ChordNote objects representing the chord voicing.</returns>
+        /// <param name="noteValue">The note value (duration) for all notes in the chord.</param>
+        /// <param name="numberOfNotes">The number of times to repeat this chord pattern.</param>
+        /// <returns>A list of WriterNote objects representing the chord voicing.</returns>
         /// <exception cref="ArgumentException">When parameters are invalid.</exception>
         /// <exception cref="InvalidOperationException">When the chord cannot be constructed.</exception>
-        public static List<ChordNote> Convert(string key, int degree, string quality, string bass, int baseOctave = 4)
+        public static List<WriterNote> Convert(string key, int degree, string quality, string bass, int baseOctave = 4, int noteValue = 4, int numberOfNotes = 1)
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException("Key cannot be null or empty", nameof(key));
@@ -88,17 +81,22 @@ namespace Music.Writer
                 // Step 7: Apply inversion by rotating and adjusting octaves
                 var voicedNotes = ApplyVoicing(chordNotes, bass, baseOctave);
                 
-                // Step 8: Convert to ChordNote format
-                var result = new List<ChordNote>();
+                // Step 8: Convert to WriterNote format
+                // First note has IsChord = false, all subsequent notes have IsChord = true
+                var result = new List<WriterNote>();
                 
-                foreach (var note in voicedNotes)
+                for (int i = 0; i < voicedNotes.Count; i++)
                 {
-                    result.Add(new ChordNote
+                    var note = voicedNotes[i];
+                    result.Add(new WriterNote
                     {
                         Step = note.Name.ToString()[0],
-                        Accidental = MapAlteration(note.Alteration),
                         Octave = note.Octave,
-                        Alter = MapAlterationToAlter(note.Alteration)
+                        Alter = MapAlterationToAlter(note.Alteration),
+                        IsChord = i > 0,  // First note is false, rest are true
+                        IsRest = false,
+                        NoteValue = noteValue,
+                        NumberOfNotes = numberOfNotes
                     });
                 }
                 
@@ -264,19 +262,6 @@ namespace Music.Writer
 
             return voicedNotes;
         }
-
-        /// <summary>
-        /// Maps MusicTheory Alteration to Writer accidental string.
-        /// </summary>
-        private static string MapAlteration(Alteration alteration) => alteration switch
-        {
-            Alteration.Natural => "Natural",
-            Alteration.Sharp => "Sharp",
-            Alteration.Flat => "Flat",
-            Alteration.DoubleSharp => "Sharp", // Map to single sharp
-            Alteration.DoubleFlat => "Flat",   // Map to single flat
-            _ => "Natural"
-        };
 
         /// <summary>
         /// Maps MusicTheory Alteration to MusicXML alter value.

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace Music.Writer
 {
     /// <summary>
-    /// Represents a single note or chord with all its musical properties.
+    /// Represents a single note. May or may not be part of a chord.
     /// </summary>
     public sealed class WriterNote
     {
@@ -14,6 +14,5 @@ namespace Music.Writer
         public bool IsChord { get; set; }
         public bool IsRest { get; set; }
         public int Alter { get; set; }
-        public List<ChordConverter.ChordNote>? ChordNotes { get; set; }   //   <------ this is list of writer notes too! fix this next
     }
 }
