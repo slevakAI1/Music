@@ -14,8 +14,6 @@ namespace Music.Writer
         private System.Windows.Forms.CheckedListBox clbStaffs; // Changed from NumericUpDown numStaff
         private System.Windows.Forms.Label lblStartBar;
         private System.Windows.Forms.NumericUpDown numStartBar;
-        private System.Windows.Forms.Label lblEndBar;
-        private System.Windows.Forms.NumericUpDown numEndBar;
         private System.Windows.Forms.Label lblEndBarTotal; // new: displays total bars near End Bar
         private System.Windows.Forms.CheckBox chkOverwrite;
 
@@ -62,11 +60,7 @@ namespace Music.Writer
             numStartBeat = new NumericUpDown();
             lblStaff = new Label();
             clbStaffs = new CheckedListBox();
-            lblEndBeat = new Label();
             chkOverwrite = new CheckBox();
-            numericUpDown2 = new NumericUpDown();
-            numEndBar = new NumericUpDown();
-            lblEndBar = new Label();
             numStartBar = new NumericUpDown();
             lblStartBar = new Label();
             lblEndBarTotal = new Label();
@@ -127,8 +121,6 @@ namespace Music.Writer
             btnExportToNotion = new Button();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)numEndBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numStartBar).BeginInit();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -173,11 +165,7 @@ namespace Music.Writer
             grpTarget.Controls.Add(numStartBeat);
             grpTarget.Controls.Add(lblStaff);
             grpTarget.Controls.Add(clbStaffs);
-            grpTarget.Controls.Add(lblEndBeat);
             grpTarget.Controls.Add(chkOverwrite);
-            grpTarget.Controls.Add(numericUpDown2);
-            grpTarget.Controls.Add(numEndBar);
-            grpTarget.Controls.Add(lblEndBar);
             grpTarget.Controls.Add(numStartBar);
             grpTarget.Controls.Add(lblStartBar);
             grpTarget.Location = new Point(20, 100);
@@ -265,16 +253,6 @@ namespace Music.Writer
             clbStaffs.Size = new Size(120, 40);
             clbStaffs.TabIndex = 6;
             // 
-            // lblEndBeat
-            // 
-            lblEndBeat.AutoSize = true;
-            lblEndBeat.ForeColor = Color.Red;
-            lblEndBeat.Location = new Point(206, 274);
-            lblEndBeat.Name = "lblEndBeat";
-            lblEndBeat.Size = new Size(56, 15);
-            lblEndBeat.TabIndex = 13;
-            lblEndBeat.Text = "End Beat:";
-            // 
             // chkOverwrite
             // 
             chkOverwrite.AutoSize = true;
@@ -284,36 +262,6 @@ namespace Music.Writer
             chkOverwrite.Size = new Size(196, 19);
             chkOverwrite.TabIndex = 11;
             chkOverwrite.Text = "Overwrite existing notes in voice";
-            // 
-            // numericUpDown2
-            // 
-            numericUpDown2.Location = new Point(265, 270);
-            numericUpDown2.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
-            numericUpDown2.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            numericUpDown2.Name = "numericUpDown2";
-            numericUpDown2.Size = new Size(120, 23);
-            numericUpDown2.TabIndex = 14;
-            numericUpDown2.Value = new decimal(new int[] { 4, 0, 0, 0 });
-            // 
-            // numEndBar
-            // 
-            numEndBar.Location = new Point(71, 271);
-            numEndBar.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
-            numEndBar.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            numEndBar.Name = "numEndBar";
-            numEndBar.Size = new Size(120, 23);
-            numEndBar.TabIndex = 10;
-            numEndBar.Value = new decimal(new int[] { 1, 0, 0, 0 });
-            // 
-            // lblEndBar
-            // 
-            lblEndBar.AutoSize = true;
-            lblEndBar.ForeColor = Color.FromArgb(0, 192, 0);
-            lblEndBar.Location = new Point(12, 275);
-            lblEndBar.Name = "lblEndBar";
-            lblEndBar.Size = new Size(50, 15);
-            lblEndBar.TabIndex = 9;
-            lblEndBar.Text = "End Bar:";
             // 
             // numStartBar
             // 
@@ -667,9 +615,12 @@ namespace Music.Writer
             // numNumberOfNotes
             // 
             numNumberOfNotes.Location = new Point(133, 99);
+            numNumberOfNotes.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            numNumberOfNotes.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numNumberOfNotes.Name = "numNumberOfNotes";
             numNumberOfNotes.Size = new Size(71, 23);
             numNumberOfNotes.TabIndex = 18;
+            numNumberOfNotes.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // lblNoteValue
             // 
@@ -924,8 +875,6 @@ namespace Music.Writer
             grpTarget.ResumeLayout(false);
             grpTarget.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).EndInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown2).EndInit();
-            ((System.ComponentModel.ISupportInitialize)numEndBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)numStartBar).EndInit();
             grpPitch.ResumeLayout(false);
             grpPitch.PerformLayout();
@@ -949,8 +898,6 @@ namespace Music.Writer
         }
         private Label lblStartBeat;
         private NumericUpDown numStartBeat;
-        private Label lblEndBeat;
-        private NumericUpDown numericUpDown2;
         private ToolTip tt;
         private GroupBox groupBox1;
 

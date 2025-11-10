@@ -76,9 +76,9 @@ namespace Music.Writer
                 // Staff / sections / bars / beats
                 SelectedStaffs = selectedStaffs,
                 StartBar = (int?)(numStartBar?.Value ?? 1),
-                EndBar = (int?)(numEndBar?.Value ?? 1),
+                EndBar = 48,    //  This is deprecated; kept for backward compatibility
                 StartBeat = (int?)(numStartBeat?.Value ?? 1),
-                EndBeat = (int?)(numericUpDown2?.Value ?? 1),
+                EndBeat = 4,  //  This is deprecated; kept for backward compatibility
 
                 OverwriteExisting = chkOverwrite?.Checked ?? false,
 
@@ -209,14 +209,8 @@ namespace Music.Writer
             if (data.StartBar.HasValue && numStartBar != null)
                 numStartBar.Value = LimitRange(numStartBar, data.StartBar.Value);
 
-            if (data.EndBar.HasValue && numEndBar != null)
-                numEndBar.Value = LimitRange(numEndBar, data.EndBar.Value);
-
             if (data.StartBeat.HasValue && numStartBeat != null)
                 numStartBeat.Value = LimitRange(numStartBeat, data.StartBeat.Value);
-
-            if (data.EndBeat.HasValue && numericUpDown2 != null)
-                numericUpDown2.Value = LimitRange(numericUpDown2, data.EndBeat.Value);
 
             if (data.OverwriteExisting.HasValue && chkOverwrite != null)
                 chkOverwrite.Checked = data.OverwriteExisting.Value;
