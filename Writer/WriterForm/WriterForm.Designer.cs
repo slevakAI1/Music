@@ -122,6 +122,8 @@ namespace Music.Writer
             btnUpdateFormFromDesigner = new Button();
             lblDesignerReport = new Label();
             txtDesignerReport = new TextBox();
+            lblScoreReport = new Label();
+            txtScoreReport = new TextBox();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -848,7 +850,8 @@ namespace Music.Writer
             // 
             lblDesignerReport.AutoSize = true;
             lblDesignerReport.Font = new Font("Segoe UI", 15F);
-            lblDesignerReport.Location = new Point(1258, 22);
+            lblDesignerReport.ForeColor = Color.FromArgb(0, 192, 0);
+            lblDesignerReport.Location = new Point(1240, 19);
             lblDesignerReport.Name = "lblDesignerReport";
             lblDesignerReport.Size = new Size(153, 28);
             lblDesignerReport.TabIndex = 27;
@@ -856,16 +859,39 @@ namespace Music.Writer
             // 
             // txtDesignerReport
             // 
-            txtDesignerReport.Location = new Point(1152, 68);
+            txtDesignerReport.Location = new Point(1134, 65);
             txtDesignerReport.Multiline = true;
             txtDesignerReport.Name = "txtDesignerReport";
             txtDesignerReport.ScrollBars = ScrollBars.Vertical;
-            txtDesignerReport.Size = new Size(430, 352);
+            txtDesignerReport.Size = new Size(430, 289);
             txtDesignerReport.TabIndex = 26;
+            // 
+            // lblScoreReport
+            // 
+            lblScoreReport.AutoSize = true;
+            lblScoreReport.Font = new Font("Segoe UI", 15F);
+            lblScoreReport.Location = new Point(1231, 372);
+            lblScoreReport.Name = "lblScoreReport";
+            lblScoreReport.Size = new Size(125, 28);
+            lblScoreReport.TabIndex = 29;
+            lblScoreReport.Text = "Score Report";
+            lblScoreReport.Click += this.label4_Click;
+            // 
+            // txtScoreReport
+            // 
+            txtScoreReport.Location = new Point(1125, 418);
+            txtScoreReport.Multiline = true;
+            txtScoreReport.Name = "txtScoreReport";
+            txtScoreReport.ScrollBars = ScrollBars.Vertical;
+            txtScoreReport.Size = new Size(430, 135);
+            txtScoreReport.TabIndex = 28;
+            txtScoreReport.TextChanged += textBox1_TextChanged;
             // 
             // WriterForm
             // 
             ClientSize = new Size(1613, 789);
+            Controls.Add(lblScoreReport);
+            Controls.Add(txtScoreReport);
             Controls.Add(lblDesignerReport);
             Controls.Add(txtDesignerReport);
             Controls.Add(btnUpdateFormFromDesigner);
@@ -955,5 +981,7 @@ namespace Music.Writer
         private Button btnUpdateFormFromDesigner;
         private Label lblDesignerReport;
         private TextBox txtDesignerReport;
+        private Label lblScoreReport;
+        private TextBox txtScoreReport;
     }
 }

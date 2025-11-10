@@ -23,7 +23,10 @@ namespace Music.Writer
             // Load current global score and design into form-local fields for later use
             // Constructor is the only place that reads Globals per requirement.
             _score = Globals.Score;
+
             _designer = Globals.Designer;
+            txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
+
 
             // Initialize comboboxes - doesn't seem to be a way to set a default in the designer or form.
             // The changes keep getting discarded. wtf?
@@ -59,9 +62,14 @@ namespace Music.Writer
             // Get from globals on the way in but not if null, would overwrite current state
 
             if (Globals.Score != null)
+            {
                 _score = Globals.Score;
+            }
             if (Globals.Designer != null)
+            {
                 _designer = Globals.Designer;
+                txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
+            }
             if (Globals.Writer != null)
                 _writer = Globals.Writer;
 
@@ -88,10 +96,10 @@ namespace Music.Writer
         {
             _writer = CaptureFormData();
 
-                var config = _writer.ToPatternConfiguration();
-                NoteWriter.Insert(_score!, config);
-                Globals.Score = _score;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
-         }
+            var config = _writer.ToPatternConfiguration();
+            NoteWriter.Insert(_score!, config);
+            Globals.Score = _score;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
+        }
 
 
         private void btnNewScore_Click(object sender, EventArgs e)
@@ -103,6 +111,7 @@ namespace Music.Writer
         {
             // Update the form to take into account any changes to Designer
             Globals.Writer?.UpdateFromDesigner(_designer);
+            txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
 
             // Technical this can run upon activation too, but only in initialize phase, just that one time
         }
@@ -117,6 +126,7 @@ namespace Music.Writer
             // Ensure design exists and apply design defaults
             _designer ??= new Designer.Designer();
             DesignerTests.SetTestDesignD1(_designer);
+            txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
             MessageBox.Show("Test Design D1 has been applied to the current design.", "Design Test Scenario D1", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -193,6 +203,11 @@ namespace Music.Writer
                 title,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

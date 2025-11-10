@@ -8,14 +8,17 @@ namespace Music.Designer
     public static class DesignerReport
     {
         // Builds: VOICES + 2 newlines + SECTIONS + 2 newlines + HARMONIC TIMELINE + 2 newlines + ALIGNMENT + 2 newlines + TIME SIGNATURES + 2 newlines + TEMPO
-        public static string CreateDesignerReport(Designer design)
+        public static string CreateDesignerReport(Designer designer)
         {
+            if (designer == null)
+                return "(no design loaded)";
+
             var sb = new StringBuilder();
 
             // VOICES
             sb.Append("VOICES:\r\n");
             var first = true;
-            foreach (var v in design.PartSet.Parts)
+            foreach (var v in designer.PartSet.Parts)
             {
                 if (!first) sb.Append("\r\n");
                 sb.Append(v?.PartName ?? string.Empty);
@@ -27,7 +30,7 @@ namespace Music.Designer
             // SECTIONS
             sb.Append("SECTIONS:\r\n");
             first = true;
-            foreach (var s in design.SectionSet.Sections)
+            foreach (var s in designer.SectionSet.Sections)
             {
                 if (!first) sb.Append("\r\n");
                 if (s == null)
@@ -50,7 +53,7 @@ namespace Music.Designer
             // HARMONIC TIMELINE
             sb.Append("HARMONIC TIMELINE:\r\n");
             first = true;
-            var timeline = design.HarmonicTimeline;
+            var timeline = designer.HarmonicTimeline;
             if (timeline != null)
             {
                 foreach (var he in timeline.Events)
@@ -71,7 +74,7 @@ namespace Music.Designer
             else
             {
                 int bpb = timeline.BeatsPerBar;
-                foreach (var s in design.SectionSet.Sections)
+                foreach (var s in designer.SectionSet.Sections)
                 {
                     if (s == null) continue;
 
@@ -126,7 +129,7 @@ namespace Music.Designer
             // TIME SIGNATURES
             sb.Append("\r\n\r\n");
             sb.Append("TIME SIGNATURES:\r\n");
-            var tsTimeline = design.TimeSignatureTimeline;
+            var tsTimeline = designer.TimeSignatureTimeline;
             if (tsTimeline == null || tsTimeline.Events.Count == 0)
             {
                 sb.Append("(no time signature timeline)");
@@ -146,7 +149,7 @@ namespace Music.Designer
             // TEMPO
             sb.Append("\r\n\r\n");
             sb.Append("TEMPO:\r\n");
-            var tempoTimeline = design.TempoTimeline;
+            var tempoTimeline = designer.TempoTimeline;
             if (tempoTimeline == null || tempoTimeline.Events.Count == 0)
             {
                 sb.Append("(no tempo timeline)");
