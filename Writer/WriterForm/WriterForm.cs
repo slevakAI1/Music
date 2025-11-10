@@ -112,6 +112,7 @@ namespace Music.Writer
         {
             _score = ScoreHelper.NewScore(this, _designer, clbParts);
             txtScoreReport.Text = ScoreReport.Run(_score);
+            // KEEP. MessageBox.Show(owner, "New score created from design.", "New Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void btnUpdateFormFromDesigner_Click(object sender, EventArgs e)
@@ -130,22 +131,19 @@ namespace Music.Writer
         // This sets design test scenario D1
         private void btnSetDesignTestScenarioD1_Click(object sender, EventArgs e)
         {
-            // Ensure design exists and apply design defaults
             _designer ??= new Designer.Designer();
             DesignerTests.SetTestDesignD1(_designer);
             txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
-            MessageBox.Show("Test Design D1 has been applied to the current design.", "Design Test Scenario D1", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // KEEP. MessageBox.Show("Test Design D1 has been applied to the current design.", "Design Test Scenario D1", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         // This sets writer test scenario G1
         // Description: Set writer test values using the current design 
         private void btnSetWriterTestScenarioG1_Click(object sender, EventArgs e)
         {
-            // Merge in any design changes
-            //_writer?.UpdateFromDesigner(_design);
             _writer = WriterTests.SetTestWriterG1(_designer);
             ApplyFormData(_writer);
-            MessageBox.Show("Test Writer G1 has been applied to the current generator settings.", "Generator Test Scenario G1", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // KEEP. MessageBox.Show("Test Writer G1 has been applied to the current generator settings.", "Generator Test Scenario G1", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void btnChordTest_Click(object sender, EventArgs e)

@@ -180,7 +180,6 @@ namespace Music.Writer
 
             //=================================
 
-            MessageBox.Show(owner, "New score created from design.", "New Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return score;
         }
 
