@@ -15,7 +15,7 @@ namespace Music.Writer
         /// Adds notes to the specified score based on the provided configuration.
         /// All parameters are expected to be pre-validated.
         /// </summary>
-        public static void Append(Score score, SetNotesConfig config)
+        public static void Append(Score score, AppendNotesParams config)
         {
             if (score == null) throw new ArgumentNullException(nameof(score));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -35,7 +35,7 @@ namespace Music.Writer
                 .Where(p => p?.Name != null && partNames.Contains(p.Name));
         }
 
-        private static void ProcessPart(Part scorePart, SetNotesConfig config)
+        private static void ProcessPart(Part scorePart, AppendNotesParams config)
         {
             if (scorePart.Measures == null || scorePart.Measures.Count == 0)
                 return;

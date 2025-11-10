@@ -108,9 +108,9 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Converts Writer data to a PatternConfiguration for use with SetNotes.
+        /// Converts Writer data to a AppendNotesParams for use with AppendNotes.
         /// </summary>
-        public static SetNotesConfig ToPatternConfiguration(this WriterData data)
+        public static AppendNotesParams ToAppendNotesParams(this WriterData data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
 
@@ -125,6 +125,11 @@ namespace Music.Writer
 
             var notes = new List<WriterNote>();
 
+            // Get tuplet settings from writer data
+            bool tupletEnabled = data.TupletEnabled ?? false;
+            int tupletActualNotes = tupletEnabled ? (data.TupletCount ?? 3) : 0;
+            int tupletNormalNotes = tupletEnabled ? (data.TupletOf ?? 2) : 0;
+
             if (data.IsChord ?? false)
             {
                 // Convert chord to list of WriterNote
@@ -137,26 +142,44 @@ namespace Music.Writer
                     noteValue: GetNoteValue(data.NoteValue),
                     numberOfNotes: data.NumberOfNotes.GetValueOrDefault());
                 
+                // Apply tuplet settings to all chord notes
+                foreach (var note in chordNotes)
+                {
+                    note.TupletEnabled = tupletEnabled;
+                    note.TupletActualNotes = tupletActualNotes;
+                    note.TupletNormalNotes = tupletNormalNotes;
+                }
+                
                 notes.AddRange(chordNotes);
             }
             else
             {
                 // Single note or rest
-                var writerNote = new WriterNote
-                {
-                    Step = data.Step != '\0' ? data.Step : 'C',
-                    Octave = data.Octave,
-                    NoteValue = GetNoteValue(data.NoteValue),
-                    NumberOfNotes = data.NumberOfNotes.GetValueOrDefault(),
-                    IsChord = false,
-                    IsRest = data.IsRest ?? false,
-                    Alter = GetAlter(data.Accidental)
-                };
+                // Handle case where NumberOfNotes > 1: create multiple WriterNote instances
+                // This handles Case 1 (e.g., 3 identical eighth notes forming a triplet)
+                int numberOfNotes = data.NumberOfNotes.GetValueOrDefault();
                 
-                notes.Add(writerNote);
+                for (int i = 0; i < numberOfNotes; i++)
+                {
+                    var writerNote = new WriterNote
+                    {
+                        Step = data.Step != '\0' ? data.Step : 'C',
+                        Octave = data.Octave,
+                        NoteValue = GetNoteValue(data.NoteValue),
+                        NumberOfNotes = 1, // Each instance represents a single note
+                        IsChord = false,
+                        IsRest = data.IsRest ?? false,
+                        Alter = GetAlter(data.Accidental),
+                        TupletEnabled = tupletEnabled,
+                        TupletActualNotes = tupletActualNotes,
+                        TupletNormalNotes = tupletNormalNotes
+                    };
+                    
+                    notes.Add(writerNote);
+                }
             }
 
-            var config = new SetNotesConfig
+            var config = new AppendNotesParams
             {
                 Parts = parts,
                 Staffs = selectedStaffs!,
@@ -190,7 +213,7 @@ namespace Music.Writer
     /// <summary>
     /// Configuration extracted from Writer for easier processing by SetNotes.
     /// </summary>
-    public sealed class SetNotesConfig
+    public sealed class AppendNotesParams
     {
         // TARGETS
         public List<string> Parts { get; set; } = new();
