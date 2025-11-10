@@ -15,7 +15,7 @@ namespace Music.Writer
         /// Adds notes to the specified score based on the provided configuration.
         /// All parameters are expected to be pre-validated.
         /// </summary>
-        public static void Insert(Score score, SetNotesConfig config)
+        public static void Append(Score score, SetNotesConfig config)
         {
             if (score == null) throw new ArgumentNullException(nameof(score));
             if (config == null) throw new ArgumentNullException(nameof(config));

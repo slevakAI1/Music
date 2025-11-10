@@ -97,12 +97,12 @@ namespace Music.Writer
 
 
         // Inserts notes based on the "number of notes" parameter from the writer form
-        private void btnSetNotes_Click(object sender, EventArgs e)
+        private void btnAppendNotes_Click(object sender, EventArgs e)
         {
             _writer = CaptureFormData();
 
             var config = _writer.ToPatternConfiguration();
-            NoteWriter.Insert(_score!, config);
+            NoteWriter.Append(_score!, config);
             txtScoreReport.Text = ScoreReport.Run(_score);
             Globals.Score = _score;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
         }

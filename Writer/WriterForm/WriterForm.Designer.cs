@@ -33,7 +33,7 @@ namespace Music.Writer
         private System.Windows.Forms.NumericUpDown numDegree;
         private System.Windows.Forms.Label lblOctaveKR;
 
-        private System.Windows.Forms.Button btnSetNotes;
+        private System.Windows.Forms.Button btnAppendNotes;
         private System.Windows.Forms.Label lblStatus;
 
         protected override void Dispose(bool disposing)
@@ -88,7 +88,7 @@ namespace Music.Writer
             lblDegree = new Label();
             numDegree = new NumericUpDown();
             lblOctaveKR = new Label();
-            btnSetNotes = new Button();
+            btnAppendNotes = new Button();
             lblStatus = new Label();
             tt = new ToolTip(components);
             groupBox1 = new GroupBox();
@@ -551,14 +551,14 @@ namespace Music.Writer
             lblOctaveKR.TabIndex = 2;
             lblOctaveKR.Text = "Oct:";
             // 
-            // btnSetNotes
+            // btnAppendNotes
             // 
-            btnSetNotes.Location = new Point(504, 177);
-            btnSetNotes.Name = "btnSetNotes";
-            btnSetNotes.Size = new Size(143, 22);
-            btnSetNotes.TabIndex = 4;
-            btnSetNotes.Text = "Set Notes";
-            btnSetNotes.Click += btnSetNotes_Click;
+            btnAppendNotes.Location = new Point(504, 177);
+            btnAppendNotes.Name = "btnAppendNotes";
+            btnAppendNotes.Size = new Size(143, 22);
+            btnAppendNotes.TabIndex = 4;
+            btnAppendNotes.Text = "Append Notes";
+            btnAppendNotes.Click += btnAppendNotes_Click;
             // 
             // lblStatus
             // 
@@ -856,7 +856,7 @@ namespace Music.Writer
             Controls.Add(cbPattern);
             Controls.Add(grpTarget);
             Controls.Add(grpPitch);
-            Controls.Add(btnSetNotes);
+            Controls.Add(btnAppendNotes);
             Controls.Add(lblStatus);
             Name = "WriterForm";
             Text = "Writer 2 (MusicXML)";
