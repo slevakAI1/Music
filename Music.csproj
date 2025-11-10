@@ -11,12 +11,15 @@
   <ItemGroup>
     <Compile Remove="Designer\MusicXmlFiles\**" />
     <Compile Remove="Archives\Prototypes\**" />
+    <Compile Remove="Files\OutputSamples\**" />
     <Compile Remove="Tests\InputSamples\**" />
     <EmbeddedResource Remove="Designer\MusicXmlFiles\**" />
     <EmbeddedResource Remove="Archives\Prototypes\**" />
+    <EmbeddedResource Remove="Files\OutputSamples\**" />
     <EmbeddedResource Remove="Tests\InputSamples\**" />
     <None Remove="Designer\MusicXmlFiles\**" />
     <None Remove="Archives\Prototypes\**" />
+    <None Remove="Files\OutputSamples\**" />
     <None Remove="Tests\InputSamples\**" />
   </ItemGroup>
 
@@ -49,7 +52,7 @@
 
   <ItemGroup>
     <Folder Include="Archives\Prototypes\" />
-    <Folder Include="Files\OutputSamples\" />
+    <Folder Include="Files\NotionExchange\" />
   </ItemGroup>
 
   <ItemGroup>

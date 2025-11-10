@@ -1,4 +1,5 @@
 using Music.Designer;
+using MusicXml;
 using MusicXml.Domain;
 
 namespace Music.Writer
@@ -209,6 +210,33 @@ namespace Music.Writer
                 title,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
+        }
+
+        private void btnExportToNotion_Click(object sender, EventArgs e)
+        {
+            if (_score == null)
+            {
+                MessageBox.Show(this, "No score to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            try
+            {
+                var path = Path.Combine("..", "..", "..", "Files", "NotionExchange", "Score.musicxml");
+                var fullPath = Path.GetFullPath(path);
+                var dir = Path.GetDirectoryName(fullPath);
+                if (!string.IsNullOrEmpty(dir))
+                    Directory.CreateDirectory(dir);
+
+                var xml = MusicXmlScoreSerializer.Serialize(_score);
+                File.WriteAllText(fullPath, xml, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+
+                MessageBox.Show(this, $"Exported to {fullPath}", "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, $"Error exporting MusicXML:\n{ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

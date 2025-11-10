@@ -124,6 +124,7 @@ namespace Music.Writer
             txtDesignerReport = new TextBox();
             lblScoreReport = new Label();
             txtScoreReport = new TextBox();
+            btnExportToNotion = new Button();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -615,7 +616,7 @@ namespace Music.Writer
             // 
             // btnSetNotes
             // 
-            btnSetNotes.Location = new Point(504, 183);
+            btnSetNotes.Location = new Point(504, 177);
             btnSetNotes.Name = "btnSetNotes";
             btnSetNotes.Size = new Size(143, 22);
             btnSetNotes.TabIndex = 4;
@@ -885,9 +886,20 @@ namespace Music.Writer
             txtScoreReport.Size = new Size(430, 135);
             txtScoreReport.TabIndex = 28;
             // 
+            // btnExportToNotion
+            // 
+            btnExportToNotion.Location = new Point(504, 218);
+            btnExportToNotion.Name = "btnExportToNotion";
+            btnExportToNotion.Size = new Size(143, 23);
+            btnExportToNotion.TabIndex = 30;
+            btnExportToNotion.Text = "Export to Notion";
+            btnExportToNotion.UseVisualStyleBackColor = true;
+            btnExportToNotion.Click += btnExportToNotion_Click;
+            // 
             // WriterForm
             // 
             ClientSize = new Size(1613, 789);
+            Controls.Add(btnExportToNotion);
             Controls.Add(lblScoreReport);
             Controls.Add(txtScoreReport);
             Controls.Add(lblDesignerReport);
@@ -981,5 +993,6 @@ namespace Music.Writer
         private TextBox txtDesignerReport;
         private Label lblScoreReport;
         private TextBox txtScoreReport;
+        private Button btnExportToNotion;
     }
 }

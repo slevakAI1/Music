@@ -1,3 +1,4 @@
+using Music.Writer;
 using MusicXml;
 
 namespace Music
@@ -68,8 +69,7 @@ namespace Music
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(
-                        owner,
+                    MessageBoxHelper.Show(
                         $"Error exporting MusicXML file:\n{ex.Message}\n\n{ex.InnerException?.Message}",
                         "Export Error",
                         MessageBoxButtons.OK,
