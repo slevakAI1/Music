@@ -18,7 +18,6 @@ namespace Music.Writer
         private int? _startBar;
         private int? _endBar;
         private int? _startBeat;
-        private int? _endBeat;
         private bool? _overwriteExisting;
         private bool? _pitchAbsolute;
         private char _step;
@@ -89,12 +88,6 @@ namespace Music.Writer
         {
             get => _startBeat ?? 1;
             set => _startBeat = value;
-        }
-
-        public int? EndBeat
-        {
-            get => _endBeat ?? StartBeat;
-            set => _endBeat = value;
         }
 
         // Overwrite existing notes

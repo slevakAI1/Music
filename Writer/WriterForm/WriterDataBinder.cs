@@ -78,7 +78,6 @@ namespace Music.Writer
                 StartBar = (int?)(numStartBar?.Value ?? 1),
                 EndBar = 48,    //  This is deprecated; kept for backward compatibility
                 StartBeat = (int?)(numStartBeat?.Value ?? 1),
-                EndBeat = 4,  //  This is deprecated; kept for backward compatibility
 
                 OverwriteExisting = chkOverwrite?.Checked ?? false,
 
