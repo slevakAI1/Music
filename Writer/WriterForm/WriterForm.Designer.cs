@@ -620,7 +620,7 @@ namespace Music.Writer
             btnSetNotes.Size = new Size(143, 22);
             btnSetNotes.TabIndex = 4;
             btnSetNotes.Text = "Set Notes";
-            btnSetNotes.Click += btnSetNotesOld_Click;
+            btnSetNotes.Click += btnSetNotes_Click;
             // 
             // lblStatus
             // 
@@ -875,7 +875,6 @@ namespace Music.Writer
             lblScoreReport.Size = new Size(125, 28);
             lblScoreReport.TabIndex = 29;
             lblScoreReport.Text = "Score Report";
-            lblScoreReport.Click += this.label4_Click;
             // 
             // txtScoreReport
             // 
@@ -885,7 +884,6 @@ namespace Music.Writer
             txtScoreReport.ScrollBars = ScrollBars.Vertical;
             txtScoreReport.Size = new Size(430, 135);
             txtScoreReport.TabIndex = 28;
-            txtScoreReport.TextChanged += textBox1_TextChanged;
             // 
             // WriterForm
             // 

@@ -23,6 +23,8 @@ namespace Music.Writer
             // Load current global score and design into form-local fields for later use
             // Constructor is the only place that reads Globals per requirement.
             _score = Globals.Score;
+            // Update score report display when we load the score
+            txtScoreReport.Text = ScoreReport.Run(_score);
 
             _designer = Globals.Designer;
             txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
@@ -64,6 +66,8 @@ namespace Music.Writer
             if (Globals.Score != null)
             {
                 _score = Globals.Score;
+                // Update score report display when score is refreshed from globals
+                txtScoreReport.Text = ScoreReport.Run(_score);
             }
             if (Globals.Designer != null)
             {
@@ -92,12 +96,13 @@ namespace Music.Writer
 
 
         // Inserts notes based on the "number of notes" parameter from the writer form
-        private void btnSetNotesOld_Click(object sender, EventArgs e)
+        private void btnSetNotes_Click(object sender, EventArgs e)
         {
             _writer = CaptureFormData();
 
             var config = _writer.ToPatternConfiguration();
             NoteWriter.Insert(_score!, config);
+            txtScoreReport.Text = ScoreReport.Run(_score);
             Globals.Score = _score;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
         }
 
@@ -105,6 +110,7 @@ namespace Music.Writer
         private void btnNewScore_Click(object sender, EventArgs e)
         {
             _score = ScoreHelper.NewScore(this, _designer, clbParts, lblEndBarTotal);
+            txtScoreReport.Text = ScoreReport.Run(_score);
         }
 
         private void btnUpdateFormFromDesigner_Click(object sender, EventArgs e)
@@ -203,11 +209,6 @@ namespace Music.Writer
                 title,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
-        }
-
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }
