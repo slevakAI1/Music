@@ -6,10 +6,10 @@ namespace Music.Tests
     {
         public static Score CreateSingleMeasureCChordKeyboardScore()
         {
-            // Measure attributes: C major, 4/4, treble clef, divisions=1 (whole note => duration 4)
+            // Measure attributes: C major, 4/4, treble clef, divisions=8 (supports up to 32nd notes)
             var attributes = new MeasureAttributes
             {
-                Divisions = 1,
+                Divisions = 8,  // Changed from 1 to 8
                 Key = new Key { Fifths = 0, Mode = "major" },
                 Time = new Time { Beats = 4, Mode = "4" },
                 Clef = new Clef { Sign = "G", Line = 2 }

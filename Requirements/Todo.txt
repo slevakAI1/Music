@@ -1,9 +1,10 @@
 ﻿
 
 
-Next: (1) add a button that writes the music xml direct to musicxmlscore file / one - click
-      (2) fix issue with 32nd notes
-      (3) figure out what tests we need and update the current ones
+Next: (1) fix issue with 32nd notes
+      (2) figure out what tests we need and update the current ones
+
+
 
 Note: don't just simulate parts, simulate the artists - style, personality, etc.
 

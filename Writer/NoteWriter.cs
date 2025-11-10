@@ -1,4 +1,4 @@
-using MusicXml.Domain;
+﻿using MusicXml.Domain;
 using Music.Designer;
 using Music;
 
@@ -222,7 +222,15 @@ namespace Music.Writer
             int numerator = divisions * 4;
             if (numerator % noteValue != 0)
             {
-                var msg = $"Cannot represent base duration '{noteValue}' with measure divisions={divisions}. Resulting duration would not be an integer number of divisions.";
+                // Calculate the minimum divisions needed for this note value
+                // For noteValue=32, need divisions≥8; for noteValue=64, need divisions≥16
+                int minDivisions = (noteValue + 3) / 4; // Round up: (32+3)/4=8, (64+3)/4=16
+                
+                var msg = $"Cannot represent note value '{noteValue}' (1/{noteValue} note) with divisions={divisions}.\n" +
+                          $"Minimum required divisions: {minDivisions}.\n\n" +
+                          $"To fix this:\n" +
+                          $"1. Create a new score (divisions will be set to 8)\n" +
+                          $"2. Or manually edit the score's divisions value";
                 MessageBoxHelper.ShowError(msg, "Invalid Duration");
                 return 0;
             }
@@ -236,6 +244,8 @@ namespace Music.Writer
             4 => "quarter",
             8 => "eighth",
             16 => "16th",
+            32 => "32nd",  // Added
+            64 => "64th",   // Added for future support
             _ => "quarter"
         };
 

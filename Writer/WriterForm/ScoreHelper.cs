@@ -89,7 +89,7 @@ namespace Music.Writer
                     // Ensure first measure has full attributes
                     var first = p.Measures[0];
                     first.Attributes ??= new MeasureAttributes();
-                    first.Attributes.Divisions = 4;
+                    first.Attributes.Divisions = 8;  // Changed from 4 to 8 to support 32nd notes
                     first.Attributes.Key ??= new Key { Fifths = 0, Mode = "major" };
                     first.Attributes.Time ??= new Time();
                     first.Attributes.Time.Beats = 4;

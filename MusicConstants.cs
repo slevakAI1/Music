@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Music
 {
@@ -10,8 +10,7 @@ namespace Music
 
         // Map of note value display strings to their corresponding denominator values
         // These values are loaded into the Note Value dropdown
-        // Map is here for backward compatibility with some code that references it
-        // TODO: Resolve this in future refactoring
+        // Note: Score must have divisions≥8 to support 32nd notes, divisions≥16 for 64th notes
         public static readonly Dictionary<string, int> NoteValueMap = new()
         {
             ["Whole (1)"] = 1,
@@ -19,8 +18,8 @@ namespace Music
             ["Quarter (1/4)"] = 4,
             ["Eighth (1/8)"] = 8,
             ["16th (1/16)"] = 16,
-            ["32nd (1/32)"] = 32,  // Not Implemented yet
-            ["64th (1/64)"] = 64   // Not Implemented yet
+            ["32nd (1/32)"] = 32,
+            ["64th (1/64)"] = 64   // Requires divisions≥16
         };
 
         // Relative path from AppContext.BaseDirectory to the Voices.Notion.json file
