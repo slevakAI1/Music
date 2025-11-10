@@ -196,7 +196,7 @@ namespace Music.Writer
             // 
             lblStartBeat.AutoSize = true;
             lblStartBeat.ForeColor = Color.Red;
-            lblStartBeat.Location = new Point(205, 239);
+            lblStartBeat.Location = new Point(200, 238);
             lblStartBeat.Name = "lblStartBeat";
             lblStartBeat.Size = new Size(60, 15);
             lblStartBeat.TabIndex = 15;
@@ -255,7 +255,7 @@ namespace Music.Writer
             // 
             chkOverwrite.AutoSize = true;
             chkOverwrite.ForeColor = Color.Red;
-            chkOverwrite.Location = new Point(18, 359);
+            chkOverwrite.Location = new Point(74, 211);
             chkOverwrite.Name = "chkOverwrite";
             chkOverwrite.Size = new Size(196, 19);
             chkOverwrite.TabIndex = 11;

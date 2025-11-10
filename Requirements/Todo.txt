@@ -1,7 +1,18 @@
 ﻿
 
 
-Next: (1) figure out what's next. Tests seems like maybe need to be updated? thats a maybe.
+Next: (1) figure out what's next. 
+
+    * Tuplets
+
+
+-- need a plan for this!!! agile stories?
+    Adding notes at current pointer to part's next open position:
+    * StartBar/Beat needs to track by part/stave
+       - Music can be generated one part at a time, several parts at once, etc. and in small chunks.
+       -  Overwrite/StartBeat/Replace/Full score of rests - this is all tied together
+
+    * Tests seems like maybe need to be updated? thats a maybe.
 
 
 
