@@ -14,7 +14,6 @@ namespace Music.Writer
         private System.Windows.Forms.CheckedListBox clbStaffs; // Changed from NumericUpDown numStaff
         private System.Windows.Forms.Label lblStartBar;
         private System.Windows.Forms.NumericUpDown numStartBar;
-        private System.Windows.Forms.Label lblEndBarTotal; // new: displays total bars near End Bar
         private System.Windows.Forms.CheckBox chkOverwrite;
 
         private System.Windows.Forms.GroupBox grpPitch;
@@ -63,7 +62,6 @@ namespace Music.Writer
             chkOverwrite = new CheckBox();
             numStartBar = new NumericUpDown();
             lblStartBar = new Label();
-            lblEndBarTotal = new Label();
             grpPitch = new GroupBox();
             grpChord = new GroupBox();
             label1 = new Label();
@@ -282,15 +280,6 @@ namespace Music.Writer
             lblStartBar.Size = new Size(54, 15);
             lblStartBar.TabIndex = 7;
             lblStartBar.Text = "Start Bar:";
-            // 
-            // lblEndBarTotal
-            // 
-            lblEndBarTotal.AutoSize = true;
-            lblEndBarTotal.Location = new Point(1142, 655);
-            lblEndBarTotal.Name = "lblEndBarTotal";
-            lblEndBarTotal.Size = new Size(33, 15);
-            lblEndBarTotal.TabIndex = 19;
-            lblEndBarTotal.Text = "Total";
             // 
             // grpPitch
             // 
@@ -865,7 +854,6 @@ namespace Music.Writer
             Controls.Add(groupBox1);
             Controls.Add(lblTitle);
             Controls.Add(cbPattern);
-            Controls.Add(lblEndBarTotal);
             Controls.Add(grpTarget);
             Controls.Add(grpPitch);
             Controls.Add(btnSetNotes);

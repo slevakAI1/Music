@@ -12,8 +12,7 @@ namespace Music.Writer
         public static Score? NewScore(
             Form owner,
             Designer.Designer? design,
-            CheckedListBox cbPart,
-            Label lblEndBarTotal)
+            CheckedListBox cbPart)
         {
             // Create a fresh Score instance and assign to the local cache (returned to caller)
             var score = new Score

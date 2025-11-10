@@ -110,7 +110,7 @@ namespace Music.Writer
 
         private void btnNewScore_Click(object sender, EventArgs e)
         {
-            _score = ScoreHelper.NewScore(this, _designer, clbParts, lblEndBarTotal);
+            _score = ScoreHelper.NewScore(this, _designer, clbParts);
             txtScoreReport.Text = ScoreReport.Run(_score);
         }
 
