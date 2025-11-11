@@ -1,4 +1,5 @@
-﻿using MusicXml.Domain;
+﻿using System.Text.Json;
+using MusicXml.Domain;
 using Music.Designer;
 using Music;
 
@@ -17,6 +18,8 @@ namespace Music.Writer
         /// </summary>
         public static void Append(Score score, AppendNotesParams config)
         {
+            var debugConfig = Helpers.DebugObject(config);
+
             if (score == null) throw new ArgumentNullException(nameof(score));
             if (config == null) throw new ArgumentNullException(nameof(config));
             if (config.Notes == null || config.Notes.Count == 0) return;

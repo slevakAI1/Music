@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Music
@@ -15,5 +16,7 @@ namespace Music
             var max = (int)control.Maximum;
             return (decimal)Math.Max(min, Math.Min(max, value));
         }
+
+        public static string DebugObject<T>(T obj) => JsonSerializer.Serialize(obj, new JsonSerializerOptions { WriteIndented = true });
     }
 }
