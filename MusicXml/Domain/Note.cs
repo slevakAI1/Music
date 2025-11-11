@@ -39,5 +39,15 @@ namespace MusicXml.Domain
 		public Tie Tie { get; set; }
 		
 		public string? Accidental { get; set; }
+
+		/// <summary>
+		/// Time modification for tuplets. If null, no tuplet modification is applied.
+		/// </summary>
+		public TimeModification? TimeModification { get; set; }
+
+		/// <summary>
+		/// Tuplet notation for visual bracket display.
+		/// </summary>
+		public TupletNotation? TupletNotation { get; set; }
 	}
 }
