@@ -65,6 +65,9 @@ namespace Music.Writer
             // Group notes into chord groups (consecutive notes where IsChord follows the pattern)
             var chordGroups = GroupNotesIntoChords(config.Notes);
 
+            // Sort staffs to ensure we process them in order (important for backup logic)
+            var sortedStaffs = config.Staffs.OrderBy(s => s).ToList();
+
             // Process each repetition
             for (int repetition = 0; repetition < numberOfRepetitions; repetition++)
             {
@@ -115,9 +118,12 @@ namespace Music.Writer
                         availableSpace = measureInfo.BarLengthDivisions;
                     }
 
-                    // Insert all notes in this chord group for each selected staff
-                    foreach (var staff in config.Staffs)
+                    // For multi-staff: write each staff's notes separately with backup between them
+                    for (int staffIndex = 0; staffIndex < sortedStaffs.Count; staffIndex++)
                     {
+                        var staff = sortedStaffs[staffIndex];
+                        
+                        // Insert all notes in this chord group for this staff
                         for (int noteIndex = 0; noteIndex < chordGroup.Count; noteIndex++)
                         {
                             var writerNote = chordGroup[noteIndex];
@@ -129,7 +135,7 @@ namespace Music.Writer
                             {
                                 Type = DurationTypeString(writerNote.NoteValue),
                                 Duration = noteDuration,
-                                Voice = 1,
+                                Voice = staffIndex == 0 ? 1 : 5, // Voice 1 for first staff, 5 for second (per reference)
                                 Staff = staff,
                                 IsChordTone = isChordTone,
                                 IsRest = writerNote.IsRest,
@@ -147,9 +153,19 @@ namespace Music.Writer
                                 Element = note
                             });
                         }
+
+                        // After writing notes for this staff (except the last staff), insert backup
+                        if (staffIndex < sortedStaffs.Count - 1)
+                        {
+                            measure.MeasureElements.Add(new MeasureElement
+                            {
+                                Type = MeasureElementType.Backup,
+                                Element = new Backup { Duration = noteDuration }
+                            });
+                        }
                     }
 
-                    // Advance position (only once per chord group, not per note in the chord)
+                    // Advance position (only once per chord group, regardless of number of staves)
                     currentBeatPosition += noteDuration;
 
                     // Check if we've filled the measure and need to move to next
@@ -247,8 +263,8 @@ namespace Music.Writer
             4 => "quarter",
             8 => "eighth",
             16 => "16th",
-            32 => "32nd",  // Added
-            64 => "64th",   // Added for future support
+            32 => "32nd",
+            64 => "64th",
             _ => "quarter"
         };
 
