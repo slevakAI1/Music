@@ -126,9 +126,9 @@ namespace Music.Writer
             var notes = new List<WriterNote>();
 
             // Get tuplet settings from writer data
-            bool isTuplet = data.IsTuplet ?? false;
-            int tupletActualNotes = isTuplet ? (data.TupletCount ?? 3) : 0;
-            int tupletNormalNotes = isTuplet ? (data.TupletOf ?? 2) : 0;
+            bool tupletId = data.TupletId ?? false;
+            int tupletActualNotes = tupletId ? (data.TupletCount ?? 3) : 0;
+            int tupletNormalNotes = tupletId ? (data.TupletOf ?? 2) : 0;
 
             if (data.IsChord ?? false)
             {
@@ -143,10 +143,10 @@ namespace Music.Writer
                     numberOfNotes: data.NumberOfNotes.GetValueOrDefault());
                 
                 // PER CHATGPT 5.0 Tuples start goes only on the Base Chord Note...guess will just use the first one for now.
-                // Apply tuplet settings to the first chord note only if isTuplet is true
-                if (isTuplet && chordNotes.Count > 0)
+                // Apply tuplet settings to the first chord note only if tupletId is true
+                if (tupletId && chordNotes.Count > 0)
                 {
-                    chordNotes[0].IsTuplet = true;
+                    chordNotes[0].TupletId = true;
                     chordNotes[0].TupletActualNotes = tupletActualNotes;
                     chordNotes[0].TupletNormalNotes = tupletNormalNotes;
                 }
@@ -173,7 +173,7 @@ namespace Music.Writer
                         Alter = GetAlter(data.Accidental),
 
                         // TO DO - This is not in the right place or the right logic yet
-                        IsTuplet = isTuplet,
+                        TupletId = tupletId,
                         TupletActualNotes = tupletActualNotes,
                         TupletNormalNotes = tupletNormalNotes
                     };
