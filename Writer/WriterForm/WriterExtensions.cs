@@ -171,6 +171,8 @@ namespace Music.Writer
                         IsChord = false,
                         IsRest = data.IsRest ?? false,
                         Alter = GetAlter(data.Accidental),
+
+                        // TO DO - This is not in the right place or the right logic yet
                         IsTuplet = isTuplet,
                         TupletActualNotes = tupletActualNotes,
                         TupletNormalNotes = tupletNormalNotes
