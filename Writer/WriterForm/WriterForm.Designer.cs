@@ -595,17 +595,16 @@ namespace Music.Writer
             // 
             // txtTupletNumber
             // 
-            txtTupletNumber.Location = new Point(158, 143);
+            txtTupletNumber.Location = new Point(158, 159);
             txtTupletNumber.Name = "txtTupletNumber";
             txtTupletNumber.Size = new Size(47, 23);
             txtTupletNumber.TabIndex = 21;
-            txtTupletNumber.Text = "1";
             // 
             // lblTupletNumber
             // 
             lblTupletNumber.AutoSize = true;
             lblTupletNumber.ForeColor = Color.FromArgb(255, 128, 0);
-            lblTupletNumber.Location = new Point(16, 146);
+            lblTupletNumber.Location = new Point(16, 162);
             lblTupletNumber.Name = "lblTupletNumber";
             lblTupletNumber.Size = new Size(131, 15);
             lblTupletNumber.TabIndex = 20;
