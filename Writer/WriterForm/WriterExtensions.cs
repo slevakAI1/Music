@@ -126,9 +126,11 @@ namespace Music.Writer
             var notes = new List<WriterNote>();
 
             // Get tuplet settings from writer data
-            bool tupletId = data.TupletId ?? false;
-            int tupletActualNotes = tupletId ? (data.TupletCount ?? 3) : 0;
-            int tupletNormalNotes = tupletId ? (data.TupletOf ?? 2) : 0;
+            // TupletNumber is now a string; check if it's populated
+            bool hasTuplet = !string.IsNullOrWhiteSpace(data.TupletNumber);
+            string? tupletNumber = hasTuplet ? data.TupletNumber : null;
+            int tupletActualNotes = hasTuplet ? (data.TupletCount ?? 3) : 0;
+            int tupletNormalNotes = hasTuplet ? (data.TupletOf ?? 2) : 0;
 
             if (data.IsChord ?? false)
             {
@@ -143,10 +145,10 @@ namespace Music.Writer
                     numberOfNotes: data.NumberOfNotes.GetValueOrDefault());
                 
                 // PER CHATGPT 5.0 Tuples start goes only on the Base Chord Note...guess will just use the first one for now.
-                // Apply tuplet settings to the first chord note only if tupletId is true
-                if (tupletId && chordNotes.Count > 0)
+                // Apply tuplet settings to the first chord note only if tuplet is specified
+                if (hasTuplet && chordNotes.Count > 0)
                 {
-                    chordNotes[0].TupletId = true;
+                    chordNotes[0].TupletNumber = tupletNumber;
                     chordNotes[0].TupletActualNotes = tupletActualNotes;
                     chordNotes[0].TupletNormalNotes = tupletNormalNotes;
                 }
@@ -172,8 +174,8 @@ namespace Music.Writer
                         IsRest = data.IsRest ?? false,
                         Alter = GetAlter(data.Accidental),
 
-                        // TO DO - This is not in the right place or the right logic yet
-                        TupletId = tupletId,
+                        // Apply tuplet settings to each note if tuplet is specified
+                        TupletNumber = hasTuplet ? tupletNumber : null,
                         TupletActualNotes = tupletActualNotes,
                         TupletNormalNotes = tupletNormalNotes
                     };

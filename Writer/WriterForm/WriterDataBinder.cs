@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing.Imaging;
 using System.Linq;
 using static Music.Helpers;
 
@@ -64,6 +65,11 @@ namespace Music.Writer
                 stepChar = stepSelected[0];
             }
 
+            // Capture tuplet number from textbox; map empty string to null
+            string? tupletNumber = txtTupletNumber?.Text;
+            if (string.IsNullOrWhiteSpace(tupletNumber))
+                tupletNumber = null;
+
             var data = new WriterData
             {
                 // Pattern
@@ -100,7 +106,7 @@ namespace Music.Writer
                 // Rhythm
                 NoteValue = cbNoteValue?.SelectedItem?.ToString(),
                 Dots = (int?)(numDots?.Value ?? 0),
-                TupletId = chkIsTuplet?.Checked ?? false,
+                TupletNumber = tupletNumber,
                 TupletCount = (int?)(numTupletCount?.Value ?? 0),
                 TupletOf = (int?)(numTupletOf?.Value ?? 0),
                 TieAcross = chkTieAcross?.Checked ?? false,
@@ -261,8 +267,8 @@ namespace Music.Writer
             if (data.Dots.HasValue && numDots != null)
                 numDots.Value = LimitRange(numDots, data.Dots.Value);
 
-            if (data.TupletId.HasValue && chkIsTuplet != null)
-                chkIsTuplet.Checked = data.TupletId.Value;
+            if (data.TupletNumber != null && txtTupletNumber != null)
+                txtTupletNumber.Text = data.TupletNumber;
 
             if (data.TupletCount.HasValue && numTupletCount != null)
                 numTupletCount.Value = LimitRange(numTupletCount, data.TupletCount.Value);

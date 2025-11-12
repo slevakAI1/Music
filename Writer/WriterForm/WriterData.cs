@@ -27,7 +27,7 @@ namespace Music.Writer
         private int? _octaveKeyRelative;
         private string? _noteValue;
         private int? _dots;
-        private bool? _tupletId;
+        private string? _tupletNumber;
         private int? _tupletCount;
         private int? _tupletOf;
         private bool? _tieAcross;
@@ -171,10 +171,10 @@ namespace Music.Writer
             set => _dots = value;
         }
 
-        public bool? TupletId
+        public string? TupletNumber
         {
-            get => _tupletId;
-            set => _tupletId = value;
+            get => _tupletNumber;
+            set => _tupletNumber = value;
         }
 
         public int? TupletCount
