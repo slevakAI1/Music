@@ -104,6 +104,7 @@ namespace Music.Writer
 
         /// <summary>
         /// Converts Writer data to a AppendNotesParams for use with AppendNotes.
+        /// Also adds notes per NumberOfNotes specified in writer data
         /// </summary>
         public static AppendNotesParams ToAppendNotesParams(this WriterData data)
         {
@@ -148,7 +149,12 @@ namespace Music.Writer
                     }
                 }
 
-                notes.AddRange(chordNotes);
+                // Run this next line NumberOfNotes times to create multiple chords if specified
+                for (int i = 0; i < (data.NumberOfNotes.GetValueOrDefault(1)); i++)
+                {
+                    notes.AddRange(chordNotes);
+                }
+
             }
             else
             {
@@ -172,7 +178,11 @@ namespace Music.Writer
                     writerNote.TupletNormalNotes = tupletNormalNotes;
                 }
 
-                notes.Add(writerNote);
+                // Run this next line NumberOfNotes times to create multiple chords if specified
+                for (int i = 0; i < (data.NumberOfNotes.GetValueOrDefault(1)); i++)
+                {
+                    notes.AddRange(writerNote);
+                }
             }
 
             var config = new AppendNotesParams

@@ -11,7 +11,11 @@ namespace Music.Writer
     //   so callers can rely on the property value without repeating the same fallback logic.
     public sealed class WriterData
     {
-        // Backing fields
+        // General / Pattern
+        private string? _pattern;
+        private string? _sectionsText;
+
+        // Target scope (Parts / Sections / Staff / Range)
         private Dictionary<string, bool>? _partsState;
         private Dictionary<string, bool>? _sectionsState;
         private List<int>? _selectedStaffs; // Changed from Dictionary<int, bool>? _staffsState
@@ -19,12 +23,22 @@ namespace Music.Writer
         private int? _endBar;
         private int? _startBeat;
         private bool? _overwriteExisting;
+
+        // Pitch & Chord options
         private bool? _pitchAbsolute;
         private char _step;
         private string? _accidental;
         private int? _octaveAbsolute;
         private int? _degreeKeyRelative;
         private int? _octaveKeyRelative;
+        private bool? _isRest;
+        private bool? _isChord; // new backing field
+        private string? _chordKey;
+        private int? _chordDegree;
+        private string? _chordQuality;
+        private string? _chordBase;
+
+        // Rhythm options
         private string? _noteValue;
         private int? _dots;
         private string? _tupletNumber;
@@ -33,14 +47,6 @@ namespace Music.Writer
         private bool? _tieAcross;
         private bool? _fermata;
         private int? _numberOfNotes;
-        private string? _pattern;
-        private string? _sectionsText;
-        private bool? _isRest;
-        private bool? _isChord; // new backing field
-        private string? _chordKey;
-        private int? _chordDegree;
-        private string? _chordQuality;
-        private string? _chordBase;
 
         // General / Pattern
         public string? Pattern
