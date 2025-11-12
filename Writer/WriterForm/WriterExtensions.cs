@@ -53,7 +53,7 @@ namespace Music.Writer
 
             // ========== SECTIONS SYNCHRONIZATION ==========
             // Update the Writer sections to be in sync with the Designer sections if there are differences.
-            // Preserve existing checked states
+            // Preserve existing checked states for sections
 
             var availableSections = new List<string>();
             if (design?.SectionSet?.Sections != null)
@@ -135,8 +135,7 @@ namespace Music.Writer
                     data.ChordQuality,
                     data.ChordBase,
                     baseOctave: data.Octave,
-                    noteValue: GetNoteValue(data.NoteValue),
-                    numberOfNotes: data.NumberOfNotes.GetValueOrDefault());
+                    noteValue: GetNoteValue(data.NoteValue));
 
                 // Apply tuplet settings to all chord notes if tuplet number is specified
                 if (isTuplet && chordNotes != null)
@@ -154,32 +153,26 @@ namespace Music.Writer
             else
             {
                 // Single note or rest
-                // Handle case where NumberOfNotes > 1: create multiple WriterNote instances
-                int numberOfNotes = data.NumberOfNotes.GetValueOrDefault();
-
-                for (int i = 0; i < numberOfNotes; i++)
+                // Create one WriterNote instance (NumberOfNotes removed)
+                var writerNote = new WriterNote
                 {
-                    var writerNote = new WriterNote
-                    {
-                        Step = data.Step != '\0' ? data.Step : 'C',
-                        Octave = data.Octave,
-                        NoteValue = GetNoteValue(data.NoteValue),
-                        NumberOfNotes = 1, // Each instance represents a single note
-                        IsChord = false,
-                        IsRest = data.IsRest ?? false,
-                        Alter = GetAlter(data.Accidental),
-                    };
+                    Step = data.Step != '\0' ? data.Step : 'C',
+                    Octave = data.Octave,
+                    NoteValue = GetNoteValue(data.NoteValue),
+                    IsChord = false,
+                    IsRest = data.IsRest ?? false,
+                    Alter = GetAlter(data.Accidental),
+                };
 
-                    // Add tuplet settings if specified
-                    if (isTuplet)
-                    {
-                        writerNote.TupletNumber = tupletNumber;
-                        writerNote.TupletActualNotes = tupletActualNotes;
-                        writerNote.TupletNormalNotes = tupletNormalNotes;
-                    }
-
-                    notes.Add(writerNote);
+                // Add tuplet settings if specified
+                if (isTuplet)
+                {
+                    writerNote.TupletNumber = tupletNumber;
+                    writerNote.TupletActualNotes = tupletActualNotes;
+                    writerNote.TupletNormalNotes = tupletNormalNotes;
                 }
+
+                notes.Add(writerNote);
             }
 
             var config = new AppendNotesParams

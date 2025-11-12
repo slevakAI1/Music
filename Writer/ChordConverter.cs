@@ -15,16 +15,15 @@ namespace Music.Writer
         /// <param name="harmonicEvent">The harmonic event containing key, degree, quality, and bass.</param>
         /// <param name="baseOctave">The base octave for the root note (default: 4).</param>
         /// <param name="noteValue">The note value (duration) for all notes in the chord.</param>
-        /// <param name="numberOfNotes">The number of times to repeat this chord pattern.</param>
         /// <returns>A list of WriterNote objects representing the chord voicing.</returns>
         /// <exception cref="ArgumentNullException">When harmonicEvent is null.</exception>
         /// <exception cref="InvalidOperationException">When the chord cannot be constructed.</exception>
-        public static List<WriterNote> Convert(HarmonicEvent harmonicEvent, int baseOctave = 4, int noteValue = 4, int numberOfNotes = 1)
+        public static List<WriterNote> Convert(HarmonicEvent harmonicEvent, int baseOctave = 4, int noteValue = 4)
         {
             if (harmonicEvent == null)
                 throw new ArgumentNullException(nameof(harmonicEvent));
 
-            return Convert(harmonicEvent.Key, harmonicEvent.Degree, harmonicEvent.Quality, harmonicEvent.Bass, baseOctave, noteValue, numberOfNotes);
+            return Convert(harmonicEvent.Key, harmonicEvent.Degree, harmonicEvent.Quality, harmonicEvent.Bass, baseOctave, noteValue);
         }
 
         /// <summary>
@@ -36,11 +35,10 @@ namespace Music.Writer
         /// <param name="bass">The bass note option (e.g., "root", "3rd", "5th").</param>
         /// <param name="baseOctave">The base octave for the root note (default: 4).</param>
         /// <param name="noteValue">The note value (duration) for all notes in the chord.</param>
-        /// <param name="numberOfNotes">The number of times to repeat this chord pattern.</param>
         /// <returns>A list of WriterNote objects representing the chord voicing.</returns>
         /// <exception cref="ArgumentException">When parameters are invalid.</exception>
         /// <exception cref="InvalidOperationException">When the chord cannot be constructed.</exception>
-        public static List<WriterNote> Convert(string key, int degree, string quality, string bass, int baseOctave = 4, int noteValue = 4, int numberOfNotes = 1)
+        public static List<WriterNote> Convert(string key, int degree, string quality, string bass, int baseOctave = 4, int noteValue = 4)
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException("Key cannot be null or empty", nameof(key));
@@ -95,8 +93,7 @@ namespace Music.Writer
                         Alter = MapAlterationToAlter(note.Alteration),
                         IsChord = i > 0,  // First note is false, rest are true
                         IsRest = false,
-                        NoteValue = noteValue,
-                        NumberOfNotes = numberOfNotes
+                        NoteValue = noteValue
                     });
                 }
                 

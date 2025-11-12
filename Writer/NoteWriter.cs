@@ -59,21 +59,44 @@ namespace Music.Writer
                 }
             }
 
-            // Determine the number of repetitions (use the first note's NumberOfNotes)
-            int numberOfRepetitions = config.Notes[0].NumberOfNotes;
-
             // Group notes into chord groups (consecutive notes where IsChord follows the pattern)
             var chordGroups = GroupNotesIntoChords(config.Notes);
 
             // Sort staffs to ensure we process them in order (important for backup logic)
             var sortedStaffs = config.Staffs.OrderBy(s => s).ToList();
 
-            // Process each repetition
-            for (int repetition = 0; repetition < numberOfRepetitions; repetition++)
+            // Process each chord group (single pass — NumberOfNotes removed)
+            foreach (var chordGroup in chordGroups)
             {
-                // Process each chord group in this repetition
-                foreach (var chordGroup in chordGroups)
+                if (currentBar > scorePart.Measures.Count)
                 {
+                    MessageBoxHelper.ShowMessage(
+                        $"Ran out of measures in part '{scorePart.Name}' at bar {currentBar}. " +
+                        "Not all notes were placed.",
+                        "Insufficient Measures");
+                    return;
+                }
+
+                var measure = scorePart.Measures[currentBar - 1];
+                measure.MeasureElements ??= new List<MeasureElement>();
+
+                var measureInfo = GetMeasureInfo(measure);
+                int noteDuration = CalculateNoteDuration(measureInfo.Divisions, chordGroup[0].NoteValue);
+
+                if (noteDuration == 0)
+                {
+                    continue;
+                }
+
+                // Check if note fits in current measure
+                long availableSpace = measureInfo.BarLengthDivisions - currentBeatPosition;
+
+                if (availableSpace <= 0 || currentBeatPosition >= measureInfo.BarLengthDivisions)
+                {
+                    // Move to next measure
+                    currentBar++;
+                    currentBeatPosition = 0;
+
                     if (currentBar > scorePart.Measures.Count)
                     {
                         MessageBoxHelper.ShowMessage(
@@ -83,97 +106,67 @@ namespace Music.Writer
                         return;
                     }
 
-                    var measure = scorePart.Measures[currentBar - 1];
+                    measure = scorePart.Measures[currentBar - 1];
                     measure.MeasureElements ??= new List<MeasureElement>();
+                    measureInfo = GetMeasureInfo(measure);
+                    availableSpace = measureInfo.BarLengthDivisions;
+                }
 
-                    var measureInfo = GetMeasureInfo(measure);
-                    int noteDuration = CalculateNoteDuration(measureInfo.Divisions, chordGroup[0].NoteValue);
-
-                    if (noteDuration == 0)
+                // For multi-staff: write each staff's notes separately with backup between them
+                for (int staffIndex = 0; staffIndex < sortedStaffs.Count; staffIndex++)
+                {
+                    var staff = sortedStaffs[staffIndex];
+                    
+                    // Insert all notes in this chord group for this staff
+                    for (int noteIndex = 0; noteIndex < chordGroup.Count; noteIndex++)
                     {
-                        continue;
-                    }
+                        var writerNote = chordGroup[noteIndex];
 
-                    // Check if note fits in current measure
-                    long availableSpace = measureInfo.BarLengthDivisions - currentBeatPosition;
+                        // First note of the chord has no <chord/> tag, subsequent notes do
+                        bool isChordTone = noteIndex > 0;
 
-                    if (availableSpace <= 0 || currentBeatPosition >= measureInfo.BarLengthDivisions)
-                    {
-                        // Move to next measure
-                        currentBar++;
-                        currentBeatPosition = 0;
-
-                        if (currentBar > scorePart.Measures.Count)
+                        var note = new Note
                         {
-                            MessageBoxHelper.ShowMessage(
-                                $"Ran out of measures in part '{scorePart.Name}' at bar {currentBar}. " +
-                                "Not all notes were placed.",
-                                "Insufficient Measures");
-                            return;
-                        }
+                            Type = DurationTypeString(writerNote.NoteValue),
+                            Duration = noteDuration,
+                            Voice = staffIndex == 0 ? 1 : 5, // Voice 1 for first staff, 5 for second (per reference)
+                            Staff = staff,
+                            IsChordTone = isChordTone,
+                            IsRest = writerNote.IsRest,
+                            Pitch = new Pitch
+                            {
+                                Step = char.ToUpper(writerNote.Step),
+                                Octave = writerNote.Octave,
+                                Alter = writerNote.Alter
+                            }
+                        };
 
-                        measure = scorePart.Measures[currentBar - 1];
-                        measure.MeasureElements ??= new List<MeasureElement>();
-                        measureInfo = GetMeasureInfo(measure);
-                        availableSpace = measureInfo.BarLengthDivisions;
-                    }
-
-                    // For multi-staff: write each staff's notes separately with backup between them
-                    for (int staffIndex = 0; staffIndex < sortedStaffs.Count; staffIndex++)
-                    {
-                        var staff = sortedStaffs[staffIndex];
-                        
-                        // Insert all notes in this chord group for this staff
-                        for (int noteIndex = 0; noteIndex < chordGroup.Count; noteIndex++)
+                        measure.MeasureElements.Add(new MeasureElement
                         {
-                            var writerNote = chordGroup[noteIndex];
-
-                            // First note of the chord has no <chord/> tag, subsequent notes do
-                            bool isChordTone = noteIndex > 0;
-
-                            var note = new Note
-                            {
-                                Type = DurationTypeString(writerNote.NoteValue),
-                                Duration = noteDuration,
-                                Voice = staffIndex == 0 ? 1 : 5, // Voice 1 for first staff, 5 for second (per reference)
-                                Staff = staff,
-                                IsChordTone = isChordTone,
-                                IsRest = writerNote.IsRest,
-                                Pitch = new Pitch
-                                {
-                                    Step = char.ToUpper(writerNote.Step),
-                                    Octave = writerNote.Octave,
-                                    Alter = writerNote.Alter
-                                }
-                            };
-
-                            measure.MeasureElements.Add(new MeasureElement
-                            {
-                                Type = MeasureElementType.Note,
-                                Element = note
-                            });
-                        }
-
-                        // After writing notes for this staff (except the last staff), insert backup
-                        if (staffIndex < sortedStaffs.Count - 1)
-                        {
-                            measure.MeasureElements.Add(new MeasureElement
-                            {
-                                Type = MeasureElementType.Backup,
-                                Element = new Backup { Duration = noteDuration }
-                            });
-                        }
+                            Type = MeasureElementType.Note,
+                            Element = note
+                        });
                     }
 
-                    // Advance position (only once per chord group, regardless of number of staves)
-                    currentBeatPosition += noteDuration;
-
-                    // Check if we've filled the measure and need to move to next
-                    if (currentBeatPosition >= measureInfo.BarLengthDivisions)
+                    // After writing notes for this staff (except the last staff), insert backup
+                    if (staffIndex < sortedStaffs.Count - 1)
                     {
-                        currentBar++;
-                        currentBeatPosition = 0;
+                        measure.MeasureElements.Add(new MeasureElement
+                        {
+                            Type = MeasureElementType.Backup,
+                            Element = new Backup { Duration = noteDuration }
+                        });
                     }
+                }
+
+                // Advance position (only once per chord group, regardless of number of staves)
+                currentBeatPosition += noteDuration;
+
+                // Check if we've filled the measure and need to move to next
+                if (currentBeatPosition >= measureInfo.BarLengthDivisions)
+                {
+                    currentBar++;
+                    currentBeatPosition = 0;
                 }
             }
         }

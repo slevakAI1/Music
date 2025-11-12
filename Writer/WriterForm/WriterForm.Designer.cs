@@ -782,9 +782,9 @@ namespace Music.Writer
             lblNextThingToDo.ForeColor = Color.Fuchsia;
             lblNextThingToDo.Location = new Point(74, 676);
             lblNextThingToDo.Name = "lblNextThingToDo";
-            lblNextThingToDo.Size = new Size(335, 21);
+            lblNextThingToDo.Size = new Size(363, 21);
             lblNextThingToDo.TabIndex = 12;
-            lblNextThingToDo.Text = "Next - Test tupletnumber flow to Append()";
+            lblNextThingToDo.Text = "Next - Take numberofnotes out of WriterNote!";
             // 
             // btnUpdateFormFromDesigner
             // 

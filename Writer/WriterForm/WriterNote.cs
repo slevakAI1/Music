@@ -10,7 +10,6 @@ namespace Music.Writer
         public char Step { get; set; }
         public int Octave { get; set; }
         public int NoteValue { get; set; }
-        public int NumberOfNotes { get; set; }
         public bool IsChord { get; set; }
         public bool IsRest { get; set; }
         public int Alter { get; set; }
