@@ -142,12 +142,13 @@ namespace Music.Writer
                     noteValue: GetNoteValue(data.NoteValue),
                     numberOfNotes: data.NumberOfNotes.GetValueOrDefault());
                 
-                // Apply tuplet settings to all chord notes
-                foreach (var note in chordNotes)
+                // PER CHATGPT 5.0 Tuples start goes only on the Base Chord Note...guess will just use the first one for now.
+                // Apply tuplet settings to the first chord note only if isTuplet is true
+                if (isTuplet && chordNotes.Count > 0)
                 {
-                    note.IsTuplet = isTuplet;
-                    note.TupletActualNotes = tupletActualNotes;
-                    note.TupletNormalNotes = tupletNormalNotes;
+                    chordNotes[0].IsTuplet = true;
+                    chordNotes[0].TupletActualNotes = tupletActualNotes;
+                    chordNotes[0].TupletNormalNotes = tupletNormalNotes;
                 }
                 
                 notes.AddRange(chordNotes);
