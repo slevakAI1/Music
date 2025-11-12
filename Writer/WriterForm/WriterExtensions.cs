@@ -126,9 +126,9 @@ namespace Music.Writer
             var notes = new List<WriterNote>();
 
             // Get tuplet settings from writer data
-            bool tupletEnabled = data.TupletEnabled ?? false;
-            int tupletActualNotes = tupletEnabled ? (data.TupletCount ?? 3) : 0;
-            int tupletNormalNotes = tupletEnabled ? (data.TupletOf ?? 2) : 0;
+            bool isTuplet = data.IsTuplet ?? false;
+            int tupletActualNotes = isTuplet ? (data.TupletCount ?? 3) : 0;
+            int tupletNormalNotes = isTuplet ? (data.TupletOf ?? 2) : 0;
 
             if (data.IsChord ?? false)
             {
@@ -145,7 +145,7 @@ namespace Music.Writer
                 // Apply tuplet settings to all chord notes
                 foreach (var note in chordNotes)
                 {
-                    note.TupletEnabled = tupletEnabled;
+                    note.IsTuplet = isTuplet;
                     note.TupletActualNotes = tupletActualNotes;
                     note.TupletNormalNotes = tupletNormalNotes;
                 }
@@ -170,7 +170,7 @@ namespace Music.Writer
                         IsChord = false,
                         IsRest = data.IsRest ?? false,
                         Alter = GetAlter(data.Accidental),
-                        TupletEnabled = tupletEnabled,
+                        IsTuplet = isTuplet,
                         TupletActualNotes = tupletActualNotes,
                         TupletNormalNotes = tupletNormalNotes
                     };

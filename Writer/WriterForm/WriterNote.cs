@@ -16,7 +16,7 @@ namespace Music.Writer
         public int Alter { get; set; }
 
         // Tuplet properties
-        public bool TupletEnabled { get; set; }
+        public bool IsTuplet { get; set; }
         public int TupletActualNotes { get; set; }  // The 'm' in m:n (e.g., 3 in a triplet)
         public int TupletNormalNotes { get; set; }  // The 'n' in m:n (e.g., 2 in a triplet)
     }
