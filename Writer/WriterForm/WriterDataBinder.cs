@@ -100,7 +100,7 @@ namespace Music.Writer
                 // Rhythm
                 NoteValue = cbNoteValue?.SelectedItem?.ToString(),
                 Dots = (int?)(numDots?.Value ?? 0),
-                IsTuplet = chkTupletEnabled?.Checked ?? false,
+                IsTuplet = chkIsTuplet?.Checked ?? false,
                 TupletCount = (int?)(numTupletCount?.Value ?? 0),
                 TupletOf = (int?)(numTupletOf?.Value ?? 0),
                 TieAcross = chkTieAcross?.Checked ?? false,
@@ -261,8 +261,8 @@ namespace Music.Writer
             if (data.Dots.HasValue && numDots != null)
                 numDots.Value = LimitRange(numDots, data.Dots.Value);
 
-            if (data.IsTuplet.HasValue && chkTupletEnabled != null)
-                chkTupletEnabled.Checked = data.IsTuplet.Value;
+            if (data.IsTuplet.HasValue && chkIsTuplet != null)
+                chkIsTuplet.Checked = data.IsTuplet.Value;
 
             if (data.TupletCount.HasValue && numTupletCount != null)
                 numTupletCount.Value = LimitRange(numTupletCount, data.TupletCount.Value);
