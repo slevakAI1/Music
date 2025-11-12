@@ -1,12 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Music.Designer;
-using Music.Writer;
 
-/// <summary>
-///   THIS APPLIES DESIGN TO Writer
-/// 
 namespace Music.Writer
 {
     public static class WriterExtensions
@@ -126,11 +121,10 @@ namespace Music.Writer
             var notes = new List<WriterNote>();
 
             // Get tuplet settings from writer data
-            // TupletNumber is now a string; check if it's populated
-            bool hasTuplet = !string.IsNullOrWhiteSpace(data.TupletNumber);
-            string? tupletNumber = hasTuplet ? data.TupletNumber : null;
-            int tupletActualNotes = hasTuplet ? (data.TupletCount ?? 3) : 0;
-            int tupletNormalNotes = hasTuplet ? (data.TupletOf ?? 2) : 0;
+            bool isTuplet = !string.IsNullOrWhiteSpace(data.TupletNumber);
+            string? tupletNumber = isTuplet ? data.TupletNumber : null;
+            int tupletActualNotes = isTuplet ? (data.TupletCount ?? 3) : 0;
+            int tupletNormalNotes = isTuplet ? (data.TupletOf ?? 2) : 0;
 
             if (data.IsChord ?? false)
             {
@@ -143,25 +137,26 @@ namespace Music.Writer
                     baseOctave: data.Octave,
                     noteValue: GetNoteValue(data.NoteValue),
                     numberOfNotes: data.NumberOfNotes.GetValueOrDefault());
-                
-                // PER CHATGPT 5.0 Tuples start goes only on the Base Chord Note...guess will just use the first one for now.
-                // Apply tuplet settings to the first chord note only if tuplet is specified
-                if (hasTuplet && chordNotes.Count > 0)
+
+                // Apply tuplet settings to all chord notes if tuplet number is specified
+                if (isTuplet && chordNotes != null)
                 {
-                    chordNotes[0].TupletNumber = tupletNumber;
-                    chordNotes[0].TupletActualNotes = tupletActualNotes;
-                    chordNotes[0].TupletNormalNotes = tupletNormalNotes;
+                    foreach (var cn in chordNotes)
+                    {
+                        cn.TupletNumber = tupletNumber;
+                        cn.TupletActualNotes = tupletActualNotes;
+                        cn.TupletNormalNotes = tupletNormalNotes;
+                    }
                 }
-                
+
                 notes.AddRange(chordNotes);
             }
             else
             {
                 // Single note or rest
                 // Handle case where NumberOfNotes > 1: create multiple WriterNote instances
-                // This handles Case 1 (e.g., 3 identical eighth notes forming a triplet)
                 int numberOfNotes = data.NumberOfNotes.GetValueOrDefault();
-                
+
                 for (int i = 0; i < numberOfNotes; i++)
                 {
                     var writerNote = new WriterNote
@@ -173,13 +168,16 @@ namespace Music.Writer
                         IsChord = false,
                         IsRest = data.IsRest ?? false,
                         Alter = GetAlter(data.Accidental),
-
-                        // Apply tuplet settings to each note if tuplet is specified
-                        TupletNumber = hasTuplet ? tupletNumber : null,
-                        TupletActualNotes = tupletActualNotes,
-                        TupletNormalNotes = tupletNormalNotes
                     };
-                    
+
+                    // Add tuplet settings if specified
+                    if (isTuplet)
+                    {
+                        writerNote.TupletNumber = tupletNumber;
+                        writerNote.TupletActualNotes = tupletActualNotes;
+                        writerNote.TupletNormalNotes = tupletNormalNotes;
+                    }
+
                     notes.Add(writerNote);
                 }
             }
