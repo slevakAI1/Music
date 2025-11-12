@@ -92,6 +92,7 @@ namespace Music.Writer
             lblStatus = new Label();
             tt = new ToolTip(components);
             groupBox1 = new GroupBox();
+            txtTupletNumber = new TextBox();
             lblTupletNumber = new Label();
             label3 = new Label();
             numNumberOfNotes = new NumericUpDown();
@@ -99,7 +100,6 @@ namespace Music.Writer
             cbNoteValue = new ComboBox();
             lblDots = new Label();
             numDots = new NumericUpDown();
-            chkIsTuplet = new CheckBox();
             lblTupletCount = new Label();
             numTupletCount = new NumericUpDown();
             lblTupletOf = new Label();
@@ -118,7 +118,6 @@ namespace Music.Writer
             lblScoreReport = new Label();
             txtScoreReport = new TextBox();
             btnExportToNotion = new Button();
-            txtTupletNumber = new TextBox();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numStartBar).BeginInit();
@@ -581,7 +580,6 @@ namespace Music.Writer
             groupBox1.Controls.Add(cbNoteValue);
             groupBox1.Controls.Add(lblDots);
             groupBox1.Controls.Add(numDots);
-            groupBox1.Controls.Add(chkIsTuplet);
             groupBox1.Controls.Add(lblTupletCount);
             groupBox1.Controls.Add(numTupletCount);
             groupBox1.Controls.Add(lblTupletOf);
@@ -595,21 +593,29 @@ namespace Music.Writer
             groupBox1.TabStop = false;
             groupBox1.Text = "Rhythm options";
             // 
+            // txtTupletNumber
+            // 
+            txtTupletNumber.Location = new Point(158, 143);
+            txtTupletNumber.Name = "txtTupletNumber";
+            txtTupletNumber.Size = new Size(47, 23);
+            txtTupletNumber.TabIndex = 21;
+            txtTupletNumber.Text = "1";
+            // 
             // lblTupletNumber
             // 
             lblTupletNumber.AutoSize = true;
             lblTupletNumber.ForeColor = Color.FromArgb(255, 128, 0);
-            lblTupletNumber.Location = new Point(31, 182);
+            lblTupletNumber.Location = new Point(16, 146);
             lblTupletNumber.Name = "lblTupletNumber";
-            lblTupletNumber.Size = new Size(72, 15);
+            lblTupletNumber.Size = new Size(131, 15);
             lblTupletNumber.TabIndex = 20;
-            lblTupletNumber.Text = "Tuplet # (Id)";
+            lblTupletNumber.Text = "Tuplet Number (Tag Id)";
             // 
             // label3
             // 
             label3.AutoSize = true;
             label3.ForeColor = Color.FromArgb(0, 192, 0);
-            label3.Location = new Point(18, 101);
+            label3.Location = new Point(16, 102);
             label3.Name = "label3";
             label3.Size = new Size(99, 15);
             label3.TabIndex = 19;
@@ -629,7 +635,7 @@ namespace Music.Writer
             // 
             lblNoteValue.AutoSize = true;
             lblNoteValue.ForeColor = Color.FromArgb(0, 192, 0);
-            lblNoteValue.Location = new Point(15, 40);
+            lblNoteValue.Location = new Point(16, 41);
             lblNoteValue.Name = "lblNoteValue";
             lblNoteValue.Size = new Size(112, 15);
             lblNoteValue.TabIndex = 7;
@@ -647,7 +653,7 @@ namespace Music.Writer
             // lblDots
             // 
             lblDots.AutoSize = true;
-            lblDots.Location = new Point(18, 68);
+            lblDots.Location = new Point(17, 70);
             lblDots.Name = "lblDots";
             lblDots.Size = new Size(34, 15);
             lblDots.TabIndex = 9;
@@ -661,21 +667,11 @@ namespace Music.Writer
             numDots.Size = new Size(60, 23);
             numDots.TabIndex = 10;
             // 
-            // chkIsTuplet
-            // 
-            chkIsTuplet.AutoSize = true;
-            chkIsTuplet.ForeColor = Color.Red;
-            chkIsTuplet.Location = new Point(15, 155);
-            chkIsTuplet.Name = "chkIsTuplet";
-            chkIsTuplet.Size = new Size(195, 19);
-            chkIsTuplet.TabIndex = 11;
-            chkIsTuplet.Text = "Is Tuplet - not needed anymore!";
-            // 
             // lblTupletCount
             // 
             lblTupletCount.AutoSize = true;
             lblTupletCount.ForeColor = Color.FromArgb(255, 128, 0);
-            lblTupletCount.Location = new Point(30, 221);
+            lblTupletCount.Location = new Point(17, 192);
             lblTupletCount.Name = "lblTupletCount";
             lblTupletCount.Size = new Size(65, 15);
             lblTupletCount.TabIndex = 12;
@@ -683,7 +679,7 @@ namespace Music.Writer
             // 
             // numTupletCount
             // 
-            numTupletCount.Location = new Point(100, 217);
+            numTupletCount.Location = new Point(90, 188);
             numTupletCount.Maximum = new decimal(new int[] { 64, 0, 0, 0 });
             numTupletCount.Minimum = new decimal(new int[] { 2, 0, 0, 0 });
             numTupletCount.Name = "numTupletCount";
@@ -695,7 +691,7 @@ namespace Music.Writer
             // 
             lblTupletOf.AutoSize = true;
             lblTupletOf.ForeColor = Color.FromArgb(255, 128, 0);
-            lblTupletOf.Location = new Point(166, 221);
+            lblTupletOf.Location = new Point(158, 192);
             lblTupletOf.Name = "lblTupletOf";
             lblTupletOf.Size = new Size(41, 15);
             lblTupletOf.TabIndex = 14;
@@ -703,7 +699,7 @@ namespace Music.Writer
             // 
             // numTupletOf
             // 
-            numTupletOf.Location = new Point(210, 217);
+            numTupletOf.Location = new Point(203, 188);
             numTupletOf.Maximum = new decimal(new int[] { 64, 0, 0, 0 });
             numTupletOf.Minimum = new decimal(new int[] { 2, 0, 0, 0 });
             numTupletOf.Name = "numTupletOf";
@@ -787,9 +783,9 @@ namespace Music.Writer
             lblNextThingToDo.ForeColor = Color.Fuchsia;
             lblNextThingToDo.Location = new Point(74, 676);
             lblNextThingToDo.Name = "lblNextThingToDo";
-            lblNextThingToDo.Size = new Size(388, 21);
+            lblNextThingToDo.Size = new Size(335, 21);
             lblNextThingToDo.TabIndex = 12;
-            lblNextThingToDo.Text = "Next - Start and end beats & overwrite/insert mode";
+            lblNextThingToDo.Text = "Next - Test tupletnumber flow to Append()";
             // 
             // btnUpdateFormFromDesigner
             // 
@@ -850,14 +846,6 @@ namespace Music.Writer
             btnExportToNotion.UseVisualStyleBackColor = true;
             btnExportToNotion.Click += btnExportToNotion_Click;
             // 
-            // txtTupletNumber
-            // 
-            txtTupletNumber.Location = new Point(113, 179);
-            txtTupletNumber.Name = "txtTupletNumber";
-            txtTupletNumber.Size = new Size(47, 23);
-            txtTupletNumber.TabIndex = 21;
-            txtTupletNumber.Text = "1";
-            // 
             // WriterForm
             // 
             ClientSize = new Size(1613, 789);
@@ -916,7 +904,6 @@ namespace Music.Writer
         private ComboBox cbNoteValue;
         private Label lblDots;
         private NumericUpDown numDots;
-        private CheckBox chkIsTuplet;
         private Label lblTupletCount;
         private NumericUpDown numTupletCount;
         private Label lblTupletOf;
