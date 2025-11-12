@@ -664,12 +664,12 @@ namespace Music.Writer
             // chkIsTuplet
             // 
             chkIsTuplet.AutoSize = true;
-            chkIsTuplet.ForeColor = Color.FromArgb(0, 192, 0);
+            chkIsTuplet.ForeColor = Color.Red;
             chkIsTuplet.Location = new Point(15, 155);
             chkIsTuplet.Name = "chkIsTuplet";
-            chkIsTuplet.Size = new Size(71, 19);
+            chkIsTuplet.Size = new Size(195, 19);
             chkIsTuplet.TabIndex = 11;
-            chkIsTuplet.Text = "Is Tuplet";
+            chkIsTuplet.Text = "Is Tuplet - not needed anymore!";
             // 
             // lblTupletCount
             // 
