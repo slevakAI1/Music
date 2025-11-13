@@ -139,7 +139,7 @@ namespace Music.Writer
             // 
             lblTitle.AutoSize = true;
             lblTitle.Font = new Font("Segoe UI", 18F);
-            lblTitle.Location = new Point(363, 9);
+            lblTitle.Location = new Point(38, 7);
             lblTitle.Name = "lblTitle";
             lblTitle.Size = new Size(79, 32);
             lblTitle.TabIndex = 0;
@@ -603,7 +603,7 @@ namespace Music.Writer
             // lblTupletNumber
             // 
             lblTupletNumber.AutoSize = true;
-            lblTupletNumber.ForeColor = Color.FromArgb(255, 128, 0);
+            lblTupletNumber.ForeColor = Color.FromArgb(0, 192, 0);
             lblTupletNumber.Location = new Point(16, 162);
             lblTupletNumber.Name = "lblTupletNumber";
             lblTupletNumber.Size = new Size(131, 15);
@@ -669,7 +669,7 @@ namespace Music.Writer
             // lblTupletCount
             // 
             lblTupletCount.AutoSize = true;
-            lblTupletCount.ForeColor = Color.FromArgb(255, 128, 0);
+            lblTupletCount.ForeColor = Color.FromArgb(0, 192, 0);
             lblTupletCount.Location = new Point(17, 192);
             lblTupletCount.Name = "lblTupletCount";
             lblTupletCount.Size = new Size(65, 15);
@@ -689,7 +689,7 @@ namespace Music.Writer
             // lblTupletOf
             // 
             lblTupletOf.AutoSize = true;
-            lblTupletOf.ForeColor = Color.FromArgb(255, 128, 0);
+            lblTupletOf.ForeColor = Color.FromArgb(0, 192, 0);
             lblTupletOf.Location = new Point(158, 192);
             lblTupletOf.Name = "lblTupletOf";
             lblTupletOf.Size = new Size(41, 15);
@@ -780,11 +780,11 @@ namespace Music.Writer
             lblNextThingToDo.AutoSize = true;
             lblNextThingToDo.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblNextThingToDo.ForeColor = Color.Fuchsia;
-            lblNextThingToDo.Location = new Point(74, 676);
+            lblNextThingToDo.Location = new Point(149, 16);
             lblNextThingToDo.Name = "lblNextThingToDo";
-            lblNextThingToDo.Size = new Size(363, 21);
+            lblNextThingToDo.Size = new Size(111, 21);
             lblNextThingToDo.TabIndex = 12;
-            lblNextThingToDo.Text = "Next - Take numberofnotes out of WriterNote!";
+            lblNextThingToDo.Text = "Dots are next";
             // 
             // btnUpdateFormFromDesigner
             // 
