@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 using MusicXml.Domain;
 using Music.Designer;
 using Music;
@@ -86,6 +87,16 @@ namespace Music.Writer
 
                     // Calculate divisions for the note's duration based on the current measure's divisions.
                     var noteDurationInMeasure = CalculateNoteDurationInMeasure(measureInfo.Divisions, writerNote.Duration);
+
+                    // Adjust duration when the note is part of a tuplet:
+                    // duration = baseDuration * (normal / actual) (rounded to nearest int)
+                    if (noteDurationInMeasure > 0
+                        && writerNote.TupletActualNotes > 0
+                        && writerNote.TupletNormalNotes > 0)
+                    {
+                        noteDurationInMeasure = (int)Math.Round(
+                            (double)noteDurationInMeasure * writerNote.TupletNormalNotes / writerNote.TupletActualNotes);
+                    }
 
                     // current measure exactly full, advance to the start of the next measure
                     if (writerNote.IsChord)

@@ -353,8 +353,32 @@ namespace MusicXml
             if (!string.IsNullOrWhiteSpace(note.Accidental))
                 writer.WriteElementString("accidental", note.Accidental);
 
+            // Emit time-modification for tuplets (affects timing/playback)
+            if (note.TimeModification != null)
+            {
+                writer.WriteStartElement("time-modification");
+                writer.WriteElementString("actual-notes", note.TimeModification.ActualNotes.ToString());
+                writer.WriteElementString("normal-notes", note.TimeModification.NormalNotes.ToString());
+                if (!string.IsNullOrWhiteSpace(note.TimeModification.NormalType))
+                    writer.WriteElementString("normal-type", note.TimeModification.NormalType);
+                writer.WriteEndElement();
+            }
+
+            // Write staff before notations (MusicXML ordering expects staff prior to notations)
             if (note.Staff > 0)
                 writer.WriteElementString("staff", note.Staff.ToString());
+
+            // Emit tuplet notation (start/stop) inside <notations>
+            // moved after <staff> to match reference MusicXML order
+            if (note.TupletNotation != null && !string.IsNullOrWhiteSpace(note.TupletNotation.Type))
+            {
+                writer.WriteStartElement("notations");
+                writer.WriteStartElement("tuplet");
+                writer.WriteAttributeString("type", note.TupletNotation.Type);
+                writer.WriteAttributeString("number", note.TupletNotation.Number.ToString());
+                writer.WriteEndElement(); // tuplet
+                writer.WriteEndElement(); // notations
+            }
 
             // lyric
             if (note.Lyric != null &&
