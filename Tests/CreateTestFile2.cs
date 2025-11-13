@@ -1,19 +1,18 @@
+using System.Collections.Generic;
 using MusicXml.Domain;
+using Music;
 
 namespace Music.Tests
 {
-
     // This one has the part named "Violins I" to match Notion sample
-
-
     public static class CreateTestFile2
     {
         public static Score CreateSingleMeasureCChordKeyboardScore()
         {
-            // Measure attributes: C major, 4/4, treble clef, divisions=8 (supports up to 32nd notes)
+            // Measure attributes: C major, 4/4, treble clef, divisions=480 (fixed default)
             var attributes = new MeasureAttributes
             {
-                Divisions = 8,  // Changed from 1 to 8
+                Divisions = Music.MusicConstants.DefaultDivisions,  // use centralized constant
                 Key = new Key { Fifths = 0, Mode = "major" },
                 Time = new Time { Beats = 4, Mode = "4" },
                 Clef = new Clef { Sign = "G", Line = 2 }

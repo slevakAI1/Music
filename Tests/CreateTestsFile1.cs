@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using MusicXml.Domain;
+using Music;
 
 namespace Music.Tests
 {
@@ -6,10 +8,10 @@ namespace Music.Tests
     {
         public static Score CreateSingleMeasureCChordKeyboardScore()
         {
-            // Measure attributes: C major, 4/4, treble clef, divisions=1 (whole note => duration 4)
+            // Measure attributes: C major, 4/4, treble clef, divisions=480 (fixed default)
             var attributes = new MeasureAttributes
             {
-                Divisions = 1,
+                Divisions = Music.MusicConstants.DefaultDivisions,
                 Key = new Key { Fifths = 0, Mode = "major" },
                 Time = new Time { Beats = 4, Mode = "4" },
                 Clef = new Clef { Sign = "G", Line = 2 }

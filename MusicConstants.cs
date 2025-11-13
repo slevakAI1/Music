@@ -8,6 +8,10 @@ namespace Music
         public enum Step { A, B, C, D, E, F, G }
         public enum eSectionType { Intro, Verse, Chorus, Solo, Bridge, Outro, Custom }
 
+        // Fixed divisions value (ticks per quarter note). Use this everywhere instead of literals.
+        // Typical value: 480 (quarter note = 480 ticks)
+        public const int DefaultDivisions = 480;
+
         // Map of note value display strings to their corresponding denominator values
         // These values are loaded into the Note Value dropdown
         // Note: Score must have divisions≥8 to support 32nd notes, divisions≥16 for 64th notes

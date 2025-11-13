@@ -261,7 +261,7 @@ namespace Music.Writer
 
         private static MeasureInfo GetMeasureInfo(Measure measure)
         {
-            var divisions = Math.Max(1, measure.Attributes?.Divisions ?? 1);
+            var divisions = Math.Max(1, measure.Attributes?.Divisions ?? MusicConstants.DefaultDivisions);
             var beatsPerBar = measure.Attributes?.Time?.Beats ?? 4;
             var existingDuration = CalculateExistingDuration(measure);
 
@@ -302,7 +302,7 @@ namespace Music.Writer
                 var msg = $"Cannot represent note value '{noteValue}' (1/{noteValue} note) with divisions={divisions}.\n" +
                           $"Minimum required divisions: {minDivisions}.\n\n" +
                           $"To fix this:\n" +
-                          $"1. Create a new score (divisions will be set to 8)\n" +
+                          $"1. Create a new score (divisions will be set to {MusicConstants.DefaultDivisions})\n" +
                           $"2. Or manually edit the score's divisions value";
                 MessageBoxHelper.ShowError(msg, "Invalid Duration");
                 return 0;
