@@ -157,7 +157,7 @@ namespace Music.Writer
                     }
                 }
 
-                // Insert backup elements per measure (if there is a following staff)
+                // Update all of the stave 1 measures to include a backup tag if 2 staves targeted
                 if (staffIndex < targetStaffs.Count - 1)
                 {
                     foreach (var measureEntry in durationPerMeasure.OrderBy(kvp => kvp.Key))
