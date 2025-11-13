@@ -13,7 +13,7 @@ namespace MusicXml.Domain
 		public decimal Width { get; internal set; }
 		
 		// This can be any musicXML element in the measure tag, i.e. note, backup, etc
-		public List<MeasureElement> MeasureElements { get; internal set; }
+		public List<MeasureElement> MeasureElements { get; internal set; } = new List<MeasureElement>();
 		
 		public MeasureAttributes Attributes { get; internal set; }
 

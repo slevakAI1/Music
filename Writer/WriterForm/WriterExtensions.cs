@@ -164,7 +164,7 @@ namespace Music.Writer
                 {
                     Step = data.Step != '\0' ? data.Step : 'C',
                     Octave = data.Octave,
-                    NoteValue = GetNoteValue(data.NoteValue),
+                    Duration = GetNoteValue(data.NoteValue),
                     IsChord = false,
                     IsRest = data.IsRest ?? false,
                     Alter = GetAlter(data.Accidental),

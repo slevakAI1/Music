@@ -93,7 +93,7 @@ namespace Music.Writer
                         Alter = MapAlterationToAlter(note.Alteration),
                         IsChord = i > 0,  // First note is false, rest are true
                         IsRest = false,
-                        NoteValue = noteValue
+                        Duration = noteValue
                     });
                 }
                 
