@@ -67,9 +67,8 @@ namespace Music.Writer
                 int currentBar = config.StartBar;
                 long currentBeatPosition = 0;
 
-                // Sum of durations (divisions) written for non-chord notes on this staff (used for backup)
-                long totalDurationWritten = 0;
-
+                // Track duration written per measure for backup calculation
+                var durationPerMeasure = new Dictionary<int, long>();
 
                 foreach (var writerNote in config.Notes)
                 {
@@ -146,30 +145,37 @@ namespace Music.Writer
                         Element = note
                     });
 
-                    // Update position tracking for non-chord notes
+                    // Update position tracking
                     if (!writerNote.IsChord)
                     {
                         currentBeatPosition += noteDurationInMeasure;
-                        totalDurationWritten += noteDurationInMeasure;
+                        
+                        // Track duration per measure
+                        if (!durationPerMeasure.ContainsKey(currentBar))
+                            durationPerMeasure[currentBar] = 0;
+                        durationPerMeasure[currentBar] += noteDurationInMeasure;
                     }
                 }
 
-                // Insert backup (if there is a following staff) using totalDurationWritten.
-                if (staffIndex < targetStaffs.Count - 1 && totalDurationWritten > 0)
+                // Insert backup elements per measure (if there is a following staff)
+                if (staffIndex < targetStaffs.Count - 1)
                 {
-                    // Determine which measure to insert the backup into:
-                    // If currentBeatPosition == 0 then the next insertion point is at the start of currentBar,
-                    // so the last written content is in currentBar - 1. Otherwise it's currentBar.
-                    int backupBar = currentBeatPosition == 0 ? currentBar - 1 : currentBar;
-                    backupBar = Math.Clamp(backupBar, 1, scorePart.Measures.Count);
-
-                    var backupMeasure = scorePart.Measures[backupBar - 1];
-                    backupMeasure.MeasureElements ??= new List<MeasureElement>();
-                    backupMeasure.MeasureElements.Add(new MeasureElement
+                    foreach (var measureEntry in durationPerMeasure.OrderBy(kvp => kvp.Key))
                     {
-                        Type = MeasureElementType.Backup,
-                        Element = new Backup { Duration = (int)totalDurationWritten }
-                    });
+                        int measureNumber = measureEntry.Key;
+                        long durationWritten = measureEntry.Value;
+
+                        if (durationWritten > 0 && measureNumber <= scorePart.Measures.Count)
+                        {
+                            var measure = scorePart.Measures[measureNumber - 1];
+                            measure.MeasureElements ??= new List<MeasureElement>();
+                            measure.MeasureElements.Add(new MeasureElement
+                            {
+                                Type = MeasureElementType.Backup,
+                                Element = new Backup { Duration = (int)durationWritten }
+                            });
+                        }
+                    }
                 }
             }
         }
