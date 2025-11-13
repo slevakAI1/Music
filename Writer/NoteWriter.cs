@@ -70,6 +70,9 @@ namespace Music.Writer
                 // Track duration written per measure for backup calculation
                 var durationPerMeasure = new Dictionary<int, long>();
 
+                // Tuplet tracking for this staff pass: key = WriterNote.TupletNumber (string)
+                var tupletStates = new Dictionary<string, TupletState>(StringComparer.OrdinalIgnoreCase);
+
                 foreach (var writerNote in config.Notes)
                 {
                     //============================================================
@@ -136,6 +139,71 @@ namespace Music.Writer
                             Octave = writerNote.Octave,
                             Alter = writerNote.Alter
                         };
+                    }
+
+                    // ===========================
+                    // Tuplet handling: set TimeModification on every note in the tuplet,
+                    // and apply TupletNotation 'start' on the first base note and 'stop' on the last base note.
+                    // We treat TupletNumber (string) as the tuplet id within this staff pass.
+                    if (!string.IsNullOrWhiteSpace(writerNote.TupletNumber)
+                        && writerNote.TupletActualNotes > 0
+                        && writerNote.TupletNormalNotes > 0)
+                    {
+                        var key = writerNote.TupletNumber!;
+                        if (!tupletStates.TryGetValue(key, out var ts))
+                        {
+                            // initialize new tuplet state
+                            int parsedNum = 1;
+                            int.TryParse(key, out parsedNum);
+                            ts = new TupletState
+                            {
+                                Actual = writerNote.TupletActualNotes,
+                                Normal = writerNote.TupletNormalNotes,
+                                Remaining = writerNote.TupletActualNotes,
+                                Number = parsedNum,
+                                IsStarted = false
+                            };
+                            tupletStates[key] = ts;
+                        }
+
+                        // Set time modification on the note (affects playback/timing)
+                        note.TimeModification = new TimeModification
+                        {
+                            ActualNotes = ts.Actual,
+                            NormalNotes = ts.Normal,
+                            // set NormalType to the printed type (e.g., "eighth", "quarter")
+                            NormalType = DurationTypeString(writerNote.Duration)
+                        };
+
+                        // If this is the first base note encountered for the tuplet, mark start
+                        if (!ts.IsStarted)
+                        {
+                            note.TupletNotation = new TupletNotation
+                            {
+                                Type = "start",
+                                Number = ts.Number
+                            };
+                            ts.IsStarted = true;
+                        }
+
+                        // Decrement tuplet remaining only when this is the base (non-chord) note
+                        if (!writerNote.IsChord)
+                        {
+                            ts.Remaining--;
+                            if (ts.Remaining <= 0)
+                            {
+                                // Last base note of the tuplet -> mark stop on this note
+                                // (overwrites 'start' if the tuplet length was 1)
+                                note.TupletNotation = new TupletNotation
+                                {
+                                    Type = "stop",
+                                    Number = ts.Number
+                                };
+
+                                // remove the state so the same id may be reused later
+                                tupletStates.Remove(key);
+                            }
+                        }
                     }
 
                     // Add note to the current measure (currentBar)
@@ -249,6 +317,16 @@ namespace Music.Writer
             public int BeatsPerBar { get; set; }
             public int BarLengthDivisions { get; set; }
             public long ExistingDuration { get; set; }
+        }
+
+        // Local helper to track tuplet lifecycle for a given tuplet id within a staff pass.
+        private sealed class TupletState
+        {
+            public int Actual { get; set; }
+            public int Normal { get; set; }
+            public int Remaining { get; set; }
+            public int Number { get; set; }
+            public bool IsStarted { get; set; }
         }
     }
 }
