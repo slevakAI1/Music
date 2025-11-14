@@ -326,7 +326,7 @@ namespace MusicXml
                 writer.WriteEndElement(); // pitch
             }
 
-            // Tie as direct child (parser reads single <tie type="..."/>)
+            // Tie as direct child (controls playback - whether note should be held)
             if (note.Tie == Tie.Start)
             {
                 writer.WriteStartElement("tie");
@@ -350,6 +350,12 @@ namespace MusicXml
             if (!string.IsNullOrWhiteSpace(note.Type))
                 writer.WriteElementString("type", note.Type);
 
+            // Emit dots
+            for (int i = 0; i < note.Dots; i++)
+            {
+                writer.WriteElementString("dot", string.Empty);
+            }
+
             if (!string.IsNullOrWhiteSpace(note.Accidental))
                 writer.WriteElementString("accidental", note.Accidental);
 
@@ -368,15 +374,37 @@ namespace MusicXml
             if (note.Staff > 0)
                 writer.WriteElementString("staff", note.Staff.ToString());
 
-            // Emit tuplet notation (start/stop) inside <notations>
-            // moved after <staff> to match reference MusicXML order
-            if (note.TupletNotation != null && !string.IsNullOrWhiteSpace(note.TupletNotation.Type))
+            // Build notations section if needed (for tied visual rendering and/or tuplet brackets)
+            bool hasTiedNotation = note.Tie == Tie.Start || note.Tie == Tie.Stop;
+            bool hasTupletNotation = note.TupletNotation != null && !string.IsNullOrWhiteSpace(note.TupletNotation.Type);
+
+            if (hasTiedNotation || hasTupletNotation)
             {
                 writer.WriteStartElement("notations");
-                writer.WriteStartElement("tuplet");
-                writer.WriteAttributeString("type", note.TupletNotation.Type);
-                writer.WriteAttributeString("number", note.TupletNotation.Number.ToString());
-                writer.WriteEndElement(); // tuplet
+
+                // Emit tied notation for visual tie curve rendering (matches the <tie> element above)
+                if (note.Tie == Tie.Start)
+                {
+                    writer.WriteStartElement("tied");
+                    writer.WriteAttributeString("type", "start");
+                    writer.WriteEndElement();
+                }
+                else if (note.Tie == Tie.Stop)
+                {
+                    writer.WriteStartElement("tied");
+                    writer.WriteAttributeString("type", "stop");
+                    writer.WriteEndElement();
+                }
+
+                // Emit tuplet notation (bracket display)
+                if (hasTupletNotation)
+                {
+                    writer.WriteStartElement("tuplet");
+                    writer.WriteAttributeString("type", note.TupletNotation!.Type);
+                    writer.WriteAttributeString("number", note.TupletNotation.Number.ToString());
+                    writer.WriteEndElement(); // tuplet
+                }
+
                 writer.WriteEndElement(); // notations
             }
 

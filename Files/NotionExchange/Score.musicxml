@@ -48,9 +48,10 @@
           <step>C</step>
           <octave>4</octave>
         </pitch>
-        <duration>720</duration>
+        <duration>1440</duration>
         <voice>1</voice>
-        <type>quarter</type>
+        <type>half</type>
+        <dot />
         <staff>1</staff>
       </note>
       <note>
@@ -58,21 +59,78 @@
           <step>C</step>
           <octave>4</octave>
         </pitch>
-        <duration>720</duration>
+        <tie type="start" />
+        <duration>480</duration>
         <voice>1</voice>
         <type>quarter</type>
         <staff>1</staff>
+        <notations>
+          <tied type="start" />
+        </notations>
       </note>
     </measure>
     <measure number="2">
       <attributes>
         <divisions>480</divisions>
       </attributes>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <tie type="stop" />
+        <duration>960</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <staff>1</staff>
+        <notations>
+          <tied type="stop" />
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <tie type="start" />
+        <duration>960</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <staff>1</staff>
+        <notations>
+          <tied type="start" />
+        </notations>
+      </note>
     </measure>
     <measure number="3">
       <attributes>
         <divisions>480</divisions>
       </attributes>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <tie type="stop" />
+        <duration>480</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <staff>1</staff>
+        <notations>
+          <tied type="stop" />
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1440</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <dot />
+        <staff>1</staff>
+      </note>
     </measure>
     <measure number="4">
       <attributes>

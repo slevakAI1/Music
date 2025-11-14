@@ -87,8 +87,19 @@ namespace Music.Writer
                     var measure = scorePart.Measures[currentBar - 1];
                     var measureInfo = GetMeasureInfo(measure);
 
-                    // Calculate divisions for the note's duration based on the current measure's divisions.
-                    var noteDurationInMeasure = CalculateNoteDurationInMeasure(measureInfo.Divisions, writerNote.Duration);
+                    // Calculate base duration for the note
+                    var baseDuration = CalculateNoteDurationInMeasure(measureInfo.Divisions, writerNote.Duration);
+                    
+                    // Calculate total duration including dots
+                    var noteDurationInMeasure = baseDuration;
+                    if (writerNote.Dots == 1)
+                    {
+                        noteDurationInMeasure = baseDuration + (baseDuration / 2);
+                    }
+                    else if (writerNote.Dots == 2)
+                    {
+                        noteDurationInMeasure = baseDuration + (baseDuration / 2) + (baseDuration / 4);
+                    }
 
                     // Adjust duration when the note is part of a tuplet:
                     // duration = baseDuration * (normal / actual) (rounded to nearest int)
@@ -110,9 +121,100 @@ namespace Music.Writer
                         currentBar++;
                         currentBeatPosition = 0;
                     }
+
+                    // ==================   T I E S   A C R O S S   M E A S U R E S   ==================
+
                     else if (currentBeatPosition + noteDurationInMeasure > measureInfo.BarLengthDivisions)
                     {
-                        // This needs a tie between measures - Future enhancement - TBD
+                        // Calculate how much fits in current measure and how much spills over
+                        long durationInCurrentMeasure = measureInfo.BarLengthDivisions - currentBeatPosition;
+                        long durationInNextMeasure = noteDurationInMeasure - durationInCurrentMeasure;
+
+                        // 1A. Place the first part of the tied note in the current measure
+                        var firstNote = new MusicXml.Domain.Note
+                        {
+                            Type = DurationTypeForTiedNote(durationInCurrentMeasure, measureInfo.Divisions),
+                            Duration = (int)durationInCurrentMeasure,
+                            Voice = staff == 1 ? 1 : 5,
+                            Staff = staff,
+                            IsChordTone = writerNote.IsChord,
+                            IsRest = writerNote.IsRest,
+                            Tie = writerNote.IsRest ? Tie.NotTied : Tie.Start,
+                            Dots = 0  // Tied notes across measures typically don't use dots
+                        };
+
+                        if (!writerNote.IsRest)
+                        {
+                            firstNote.Pitch = new Pitch
+                            {
+                                Step = char.ToUpper(writerNote.Step),
+                                Octave = writerNote.Octave,
+                                Alter = writerNote.Alter
+                            };
+                        }
+
+                        measure.MeasureElements.Add(new MeasureElement
+                        {
+                            Type = MeasureElementType.Note,
+                            Element = firstNote
+                        });
+
+                        // 1B. Update durationPerMeasure for current bar
+                        if (!durationPerMeasure.ContainsKey(currentBar))
+                            durationPerMeasure[currentBar] = 0;
+                        durationPerMeasure[currentBar] += durationInCurrentMeasure;
+
+                        // 2A. Advance to next measure and place the second part of the tied note
+                        currentBar++;
+                        currentBeatPosition = 0;
+
+                        // Check if next measure exists before placing the second note
+                        if (currentBar > scorePart.Measures.Count)
+                        {
+                            MessageBoxHelper.ShowMessage(
+                                 $"Ran out of measures in part '{scorePart.Name}' at bar {currentBar}. Not all notes were placed.",
+                                 "Insufficient Measures");
+                            return;
+                        }
+
+                        var nextMeasure = scorePart.Measures[currentBar - 1];
+                        
+                        var secondNote = new MusicXml.Domain.Note
+                        {
+                            Type = DurationTypeForTiedNote(durationInNextMeasure, measureInfo.Divisions),
+                            Duration = (int)durationInNextMeasure,
+                            Voice = staff == 1 ? 1 : 5,
+                            Staff = staff,
+                            IsChordTone = writerNote.IsChord,
+                            IsRest = writerNote.IsRest,
+                            Tie = writerNote.IsRest ? Tie.NotTied : Tie.Stop,
+                            Dots = 0  // Tied notes across measures typically don't use dots
+                        };
+
+                        if (!writerNote.IsRest)
+                        {
+                            secondNote.Pitch = new Pitch
+                            {
+                                Step = char.ToUpper(writerNote.Step),
+                                Octave = writerNote.Octave,
+                                Alter = writerNote.Alter
+                            };
+                        }
+
+                        nextMeasure.MeasureElements.Add(new MeasureElement
+                        {
+                            Type = MeasureElementType.Note,
+                            Element = secondNote
+                        });
+
+                        // 2B. Update currentBar, currentBeatPosition, and durationPerMeasure
+                        currentBeatPosition = durationInNextMeasure;
+                        if (!durationPerMeasure.ContainsKey(currentBar))
+                            durationPerMeasure[currentBar] = 0;
+                        durationPerMeasure[currentBar] += durationInNextMeasure;
+
+                        // Skip the normal note composition logic below (continue to next writerNote)
+                        continue;
                     }
 
                     // There is no next measure
@@ -128,41 +230,29 @@ namespace Music.Writer
                     measure = scorePart.Measures[currentBar - 1];
                     measureInfo = GetMeasureInfo(measure);
 
-                    // NOTE: This drop thru logic is not the best
-
-
                     //============================================================
 
-                    // Compose Note element (duration property always set to real duration)
+                    // Compose Note element (duration includes dots)
                     var note = new MusicXml.Domain.Note
                     {
                         Type = DurationTypeString(writerNote.Duration),
                         Duration = noteDurationInMeasure,
-                        Voice = staff == 1 ? 1 : 5,  // TODO this is probably bs
+                        Voice = staff == 1 ? 1 : 5,
                         Staff = staff,
                         IsChordTone = writerNote.IsChord,
                         IsRest = writerNote.IsRest,
                         Dots = writerNote.Dots
                     };
 
-                    if (writerNote.Dots == 1)
-                    {
-                        note.Duration += note.Duration / 2;
-                    }
-                    else if (writerNote.Dots == 2)
-                    {
-                        note.Duration += (note.Duration / 2 + note.Duration / 4);
-                    }
-
                     if (!writerNote.IsRest)
-                            {
-                                note.Pitch = new Pitch
-                                {
-                                    Step = char.ToUpper(writerNote.Step),
-                                    Octave = writerNote.Octave,
-                                    Alter = writerNote.Alter
-                                };
-                            }
+                    {
+                        note.Pitch = new Pitch
+                        {
+                            Step = char.ToUpper(writerNote.Step),
+                            Octave = writerNote.Octave,
+                            Alter = writerNote.Alter
+                        };
+                    }
 
                     // ===========================
                     // Tuplet handling: set TimeModification on every note in the tuplet,
@@ -333,6 +423,27 @@ namespace Music.Writer
             64 => "64th",
             _ => "quarter"
         };
+
+        /// <summary>
+        /// Determines the best note type for a tied note fragment based on its duration.
+        /// </summary>
+        private static string DurationTypeForTiedNote(long duration, int divisions)
+        {
+            // Common durations in terms of divisions
+            var wholeDuration = divisions * 4;
+            var halfDuration = divisions * 2;
+            var quarterDuration = divisions;
+            var eighthDuration = divisions / 2;
+            var sixteenthDuration = divisions / 4;
+
+            if (duration >= wholeDuration) return "whole";
+            if (duration >= halfDuration) return "half";
+            if (duration >= quarterDuration) return "quarter";
+            if (duration >= eighthDuration) return "eighth";
+            if (duration >= sixteenthDuration) return "16th";
+            
+            return "quarter"; // fallback
+        }
 
         public sealed class MeasureInfo
         {
