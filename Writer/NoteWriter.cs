@@ -1,10 +1,5 @@
-﻿using Music;
-using Music.Designer;
-using MusicTheory;
+﻿using Music.Designer;
 using MusicXml.Domain;
-using System;
-using System.Diagnostics.Eventing.Reader;
-using System.Text.Json;
 
 namespace Music.Writer
 {
