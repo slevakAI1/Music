@@ -1,3 +1,4 @@
+using Melanchall.DryWetMidi.Interaction;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -146,6 +147,7 @@ namespace Music.Writer
                         cn.TupletNumber = tupletNumber;
                         cn.TupletActualNotes = tupletActualNotes;
                         cn.TupletNormalNotes = tupletNormalNotes;
+                        cn.Dots = data.Dots;
                     }
                 }
 
@@ -168,6 +170,7 @@ namespace Music.Writer
                     IsChord = false,
                     IsRest = data.IsRest ?? false,
                     Alter = GetAlter(data.Accidental),
+                    Dots = data.Dots
                 };
 
                 // Add tuplet settings if specified

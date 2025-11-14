@@ -105,7 +105,7 @@ namespace Music.Writer
 
                 // Rhythm
                 NoteValue = cbNoteValue?.SelectedItem?.ToString(),
-                Dots = (int?)(numDots?.Value ?? 0),
+                Dots = (int)numDots.Value,
                 TupletNumber = tupletNumber,
                 TupletCount = (int?)(numTupletCount?.Value ?? 0),
                 TupletOf = (int?)(numTupletOf?.Value ?? 0),
@@ -264,8 +264,7 @@ namespace Music.Writer
             if (data.NoteValue != null && cbNoteValue != null && cbNoteValue.Items.Contains(data.NoteValue))
                 cbNoteValue.SelectedItem = data.NoteValue;
 
-            if (data.Dots.HasValue && numDots != null)
-                numDots.Value = LimitRange(numDots, data.Dots.Value);
+            numDots.Value = LimitRange(numDots, data.Dots);
 
             if (data.TupletNumber != null && txtTupletNumber != null)
                 txtTupletNumber.Text = data.TupletNumber;

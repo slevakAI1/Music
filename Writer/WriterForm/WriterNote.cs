@@ -13,6 +13,7 @@ namespace Music.Writer
         public bool IsChord { get; set; }
         public bool IsRest { get; set; }
         public int Alter { get; set; }
+        public int Dots { get; set; }
 
         // Tuplet properties
         public string? TupletNumber { get; set; }

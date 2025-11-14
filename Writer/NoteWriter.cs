@@ -1,8 +1,10 @@
-﻿using System;
-using System.Text.Json;
-using MusicXml.Domain;
+﻿using Music;
 using Music.Designer;
-using Music;
+using MusicTheory;
+using MusicXml.Domain;
+using System;
+using System.Diagnostics.Eventing.Reader;
+using System.Text.Json;
 
 namespace Music.Writer
 {
@@ -132,25 +134,35 @@ namespace Music.Writer
                     //============================================================
 
                     // Compose Note element (duration property always set to real duration)
-                    var note = new Note
+                    var note = new MusicXml.Domain.Note
                     {
                         Type = DurationTypeString(writerNote.Duration),
                         Duration = noteDurationInMeasure,
                         Voice = staff == 1 ? 1 : 5,  // TODO this is probably bs
                         Staff = staff,
                         IsChordTone = writerNote.IsChord,
-                        IsRest = writerNote.IsRest
+                        IsRest = writerNote.IsRest,
+                        Dots = writerNote.Dots
                     };
 
-                    if (!writerNote.IsRest)
+                    if (writerNote.Dots == 1)
                     {
-                        note.Pitch = new Pitch
-                        {
-                            Step = char.ToUpper(writerNote.Step),
-                            Octave = writerNote.Octave,
-                            Alter = writerNote.Alter
-                        };
+                        note.Duration += note.Duration / 2;
                     }
+                    else if (writerNote.Dots == 2)
+                    {
+                        note.Duration += (note.Duration / 2 + note.Duration / 4);
+                    }
+
+                    if (!writerNote.IsRest)
+                            {
+                                note.Pitch = new Pitch
+                                {
+                                    Step = char.ToUpper(writerNote.Step),
+                                    Octave = writerNote.Octave,
+                                    Alter = writerNote.Alter
+                                };
+                            }
 
                     // ===========================
                     // Tuplet handling: set TimeModification on every note in the tuplet,
@@ -280,7 +292,7 @@ namespace Music.Writer
             foreach (var me in measure.MeasureElements ?? Enumerable.Empty<MeasureElement>())
             {
                 if (me?.Type == MeasureElementType.Note &&
-                    me.Element is Note n &&
+                    me.Element is MusicXml.Domain.Note n &&
                     n.Duration > 0 &&
                     !n.IsChordTone)
                 {

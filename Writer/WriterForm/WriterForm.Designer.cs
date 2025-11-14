@@ -652,6 +652,7 @@ namespace Music.Writer
             // lblDots
             // 
             lblDots.AutoSize = true;
+            lblDots.ForeColor = Color.FromArgb(0, 192, 0);
             lblDots.Location = new Point(17, 70);
             lblDots.Name = "lblDots";
             lblDots.Size = new Size(34, 15);
@@ -782,9 +783,9 @@ namespace Music.Writer
             lblNextThingToDo.ForeColor = Color.Fuchsia;
             lblNextThingToDo.Location = new Point(149, 16);
             lblNextThingToDo.Name = "lblNextThingToDo";
-            lblNextThingToDo.Size = new Size(111, 21);
+            lblNextThingToDo.Size = new Size(223, 21);
             lblNextThingToDo.TabIndex = 12;
-            lblNextThingToDo.Text = "Dots are next";
+            lblNextThingToDo.Text = "remove the two checkboxes";
             // 
             // btnUpdateFormFromDesigner
             // 

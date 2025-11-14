@@ -40,7 +40,7 @@ namespace Music.Writer
 
         // Rhythm options
         private string? _noteValue;
-        private int? _dots;
+        private int _dots;
         private string? _tupletNumber;
         private int? _tupletCount;
         private int? _tupletOf;
@@ -171,9 +171,9 @@ namespace Music.Writer
             set => _noteValue = value;
         } // selected key from cbNoteValue
 
-        public int? Dots
+        public int Dots
         {
-            get => _dots ?? 0;
+            get => _dots;
             set => _dots = value;
         }
 

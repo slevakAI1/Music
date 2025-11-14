@@ -50,6 +50,6 @@ namespace MusicXml.Domain
 		/// </summary>
 		public TupletNotation? TupletNotation { get; set; }
 
-		public int? dots { get; set; }   // values are null, 1, or 2
+		public int Dots { get; set; }   // values are null, 1, or 2
 	}
 }
