@@ -661,7 +661,7 @@ namespace Music.Writer
             // numDots
             // 
             numDots.Location = new Point(133, 68);
-            numDots.Maximum = new decimal(new int[] { 3, 0, 0, 0 });
+            numDots.Maximum = new decimal(new int[] { 2, 0, 0, 0 });
             numDots.Name = "numDots";
             numDots.Size = new Size(60, 23);
             numDots.TabIndex = 10;

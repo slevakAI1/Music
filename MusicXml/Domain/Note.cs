@@ -49,5 +49,7 @@ namespace MusicXml.Domain
 		/// Tuplet notation for visual bracket display.
 		/// </summary>
 		public TupletNotation? TupletNotation { get; set; }
+
+		public int? dots { get; set; }   // values are null, 1, or 2
 	}
 }
