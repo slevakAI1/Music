@@ -46,317 +46,378 @@ namespace Music.Writer
             if (scorePart.Measures == null || scorePart.Measures.Count == 0)
                 return;
 
-            //============================================================
-            // Check if this part allows two staves
+            ValidateStaffSupport(scorePart, config.Staffs);
+
+            var targetStaffs = config.Staffs.OrderBy(s => s).ToList();
+
+            for (int staffIndex = 0; staffIndex < targetStaffs.Count; staffIndex++)
+            {
+                var staff = targetStaffs[staffIndex];
+                var context = new StaffProcessingContext
+                {
+                    Staff = staff,
+                    CurrentBar = config.StartBar,
+                    CurrentBeatPosition = 0,
+                    DurationPerMeasure = new Dictionary<int, long>(),
+                    TupletStates = new Dictionary<string, TupletState>(StringComparer.OrdinalIgnoreCase)
+                };
+
+                ProcessNotesForStaff(scorePart, config, context);
+
+                AddBackupElementsIfNeeded(scorePart, staffIndex, targetStaffs.Count, context.DurationPerMeasure);
+            }
+        }
+
+        private static void ValidateStaffSupport(Part scorePart, List<int> staffs)
+        {
             var twoStaffVoices = VoiceCatalog.GetTwoStaffVoices();
             bool allowsTwoStaves = twoStaffVoices.Contains(scorePart.Name, StringComparer.OrdinalIgnoreCase);
 
-            // Validate staff selections
-            var targetStaffs = config.Staffs.OrderBy(s => s).ToList();
-            if (targetStaffs.Any(s => s == 2) && !allowsTwoStaves)
+            if (staffs.Any(s => s == 2) && !allowsTwoStaves)
             {
                 throw new InvalidOperationException(
                     $"Part '{scorePart.Name}' does not support a second staff. " +
                     $"Only these voices support two staves: {string.Join(", ", twoStaffVoices)}");
             }
+        }
 
-            //============================================================
-            // Process each target staff
-            for (int staffIndex = 0; staffIndex < targetStaffs.Count; staffIndex++)
+        private static void ProcessNotesForStaff(Part scorePart, AppendNotesParams config, StaffProcessingContext context)
+        {
+            foreach (var writerNote in config.Notes)
             {
-                var staff = targetStaffs[staffIndex];
+                if (!EnsureMeasureAvailable(scorePart, context.CurrentBar, scorePart.Name))
+                    return;
 
-                // initial position
-                int currentBar = config.StartBar;
-                long currentBeatPosition = 0;
+                var measure = scorePart.Measures[context.CurrentBar - 1];
+                var measureInfo = GetMeasureInfo(measure);
 
-                // Track duration written per measure for backup calculation
-                var durationPerMeasure = new Dictionary<int, long>();
+                var noteDuration = CalculateTotalNoteDuration(measureInfo.Divisions, writerNote);
 
-                // Tuplet tracking for this staff pass: key = WriterNote.TupletNumber (string)
-                var tupletStates = new Dictionary<string, TupletState>(StringComparer.OrdinalIgnoreCase);
-
-                foreach (var writerNote in config.Notes)
+                // Handle measure advancement for chord tones and full measures
+                if (!writerNote.IsChord)
                 {
-                    //============================================================
-                    // Prepare current measure/info for this note
-
-                    // When a measure fills up, the next note writes to the next measure
-
-                    // Get Measure info for the current bar
-                    var measure = scorePart.Measures[currentBar - 1];
-                    var measureInfo = GetMeasureInfo(measure);
-
-                    // Calculate base duration for the note
-                    var baseDuration = CalculateNoteDurationInMeasure(measureInfo.Divisions, writerNote.Duration);
-                    
-                    // Calculate total duration including dots
-                    var noteDurationInMeasure = baseDuration;
-                    if (writerNote.Dots == 1)
+                    if (context.CurrentBeatPosition == measureInfo.BarLengthDivisions)
                     {
-                        noteDurationInMeasure = baseDuration + (baseDuration / 2);
-                    }
-                    else if (writerNote.Dots == 2)
-                    {
-                        noteDurationInMeasure = baseDuration + (baseDuration / 2) + (baseDuration / 4);
-                    }
-
-                    // Adjust duration when the note is part of a tuplet:
-                    // duration = baseDuration * (normal / actual) (rounded to nearest int)
-                    if (noteDurationInMeasure > 0
-                        && writerNote.TupletActualNotes > 0
-                        && writerNote.TupletNormalNotes > 0)
-                    {
-                        noteDurationInMeasure = (int)Math.Round(
-                            (double)noteDurationInMeasure * writerNote.TupletNormalNotes / writerNote.TupletActualNotes);
-                    }
-
-                    // current measure exactly full, advance to the start of the next measure
-                    if (writerNote.IsChord)
-                    {
-                        // do nothing for measure advancement on chord tones
-                    }
-                    else if (currentBeatPosition == measureInfo.BarLengthDivisions)
-                    {
-                        currentBar++;
-                        currentBeatPosition = 0;
-                    }
-
-                    // ==================   T I E S   A C R O S S   M E A S U R E S   ==================
-
-                    else if (currentBeatPosition + noteDurationInMeasure > measureInfo.BarLengthDivisions)
-                    {
-                        // Calculate how much fits in current measure and how much spills over
-                        long durationInCurrentMeasure = measureInfo.BarLengthDivisions - currentBeatPosition;
-                        long durationInNextMeasure = noteDurationInMeasure - durationInCurrentMeasure;
-
-                        // 1A. Place the first part of the tied note in the current measure
-                        var firstNote = new MusicXml.Domain.Note
-                        {
-                            Type = DurationTypeForTiedNote(durationInCurrentMeasure, measureInfo.Divisions),
-                            Duration = (int)durationInCurrentMeasure,
-                            Voice = staff == 1 ? 1 : 5,
-                            Staff = staff,
-                            IsChordTone = writerNote.IsChord,
-                            IsRest = writerNote.IsRest,
-                            Tie = writerNote.IsRest ? Tie.NotTied : Tie.Start,
-                            Dots = 0  // Tied notes across measures typically don't use dots
-                        };
-
-                        if (!writerNote.IsRest)
-                        {
-                            firstNote.Pitch = new Pitch
-                            {
-                                Step = char.ToUpper(writerNote.Step),
-                                Octave = writerNote.Octave,
-                                Alter = writerNote.Alter
-                            };
-                        }
-
-                        measure.MeasureElements.Add(new MeasureElement
-                        {
-                            Type = MeasureElementType.Note,
-                            Element = firstNote
-                        });
-
-                        // 1B. Update durationPerMeasure for current bar
-                        if (!durationPerMeasure.ContainsKey(currentBar))
-                            durationPerMeasure[currentBar] = 0;
-                        durationPerMeasure[currentBar] += durationInCurrentMeasure;
-
-                        // 2A. Advance to next measure and place the second part of the tied note
-                        currentBar++;
-                        currentBeatPosition = 0;
-
-                        // Check if next measure exists before placing the second note
-                        if (currentBar > scorePart.Measures.Count)
-                        {
-                            MessageBoxHelper.ShowMessage(
-                                 $"Ran out of measures in part '{scorePart.Name}' at bar {currentBar}. Not all notes were placed.",
-                                 "Insufficient Measures");
-                            return;
-                        }
-
-                        var nextMeasure = scorePart.Measures[currentBar - 1];
-                        
-                        var secondNote = new MusicXml.Domain.Note
-                        {
-                            Type = DurationTypeForTiedNote(durationInNextMeasure, measureInfo.Divisions),
-                            Duration = (int)durationInNextMeasure,
-                            Voice = staff == 1 ? 1 : 5,
-                            Staff = staff,
-                            IsChordTone = writerNote.IsChord,
-                            IsRest = writerNote.IsRest,
-                            Tie = writerNote.IsRest ? Tie.NotTied : Tie.Stop,
-                            Dots = 0  // Tied notes across measures typically don't use dots
-                        };
-
-                        if (!writerNote.IsRest)
-                        {
-                            secondNote.Pitch = new Pitch
-                            {
-                                Step = char.ToUpper(writerNote.Step),
-                                Octave = writerNote.Octave,
-                                Alter = writerNote.Alter
-                            };
-                        }
-
-                        nextMeasure.MeasureElements.Add(new MeasureElement
-                        {
-                            Type = MeasureElementType.Note,
-                            Element = secondNote
-                        });
-
-                        // 2B. Update currentBar, currentBeatPosition, and durationPerMeasure
-                        currentBeatPosition = durationInNextMeasure;
-                        if (!durationPerMeasure.ContainsKey(currentBar))
-                            durationPerMeasure[currentBar] = 0;
-                        durationPerMeasure[currentBar] += durationInNextMeasure;
-
-                        // Skip the normal note composition logic below (continue to next writerNote)
-                        continue;
-                    }
-
-                    // There is no next measure
-                    if (currentBar > scorePart.Measures.Count)
-                    {
-                        MessageBoxHelper.ShowMessage(
-                             $"Ran out of measures in part '{scorePart.Name}' at bar {currentBar}. Not all notes were placed.",
-                             "Insufficient Measures");
-                        return;
-                    }
-
-                    // Get the current measure info in case it advanced to next bar
-                    measure = scorePart.Measures[currentBar - 1];
-                    measureInfo = GetMeasureInfo(measure);
-
-                    //============================================================
-
-                    // Compose Note element (duration includes dots)
-                    var note = new MusicXml.Domain.Note
-                    {
-                        Type = DurationTypeString(writerNote.Duration),
-                        Duration = noteDurationInMeasure,
-                        Voice = staff == 1 ? 1 : 5,
-                        Staff = staff,
-                        IsChordTone = writerNote.IsChord,
-                        IsRest = writerNote.IsRest,
-                        Dots = writerNote.Dots
-                    };
-
-                    if (!writerNote.IsRest)
-                    {
-                        note.Pitch = new Pitch
-                        {
-                            Step = char.ToUpper(writerNote.Step),
-                            Octave = writerNote.Octave,
-                            Alter = writerNote.Alter
-                        };
-                    }
-
-                    // ===========================
-                    // Tuplet handling: set TimeModification on every note in the tuplet,
-                    // and apply TupletNotation 'start' on the first base note and 'stop' on the last base note.
-                    // We treat TupletNumber (string) as the tuplet id within this staff pass.
-                    if (!string.IsNullOrWhiteSpace(writerNote.TupletNumber)
-                        && writerNote.TupletActualNotes > 0
-                        && writerNote.TupletNormalNotes > 0)
-                    {
-                        var key = writerNote.TupletNumber!;
-                        if (!tupletStates.TryGetValue(key, out var ts))
-                        {
-                            // initialize new tuplet state
-                            int parsedNum = 1;
-                            int.TryParse(key, out parsedNum);
-                            ts = new TupletState
-                            {
-                                Actual = writerNote.TupletActualNotes,
-                                Normal = writerNote.TupletNormalNotes,
-                                Remaining = writerNote.TupletActualNotes,
-                                Number = parsedNum,
-                                IsStarted = false
-                            };
-                            tupletStates[key] = ts;
-                        }
-
-                        // Set time modification on the note (affects playback/timing)
-                        note.TimeModification = new TimeModification
-                        {
-                            ActualNotes = ts.Actual,
-                            NormalNotes = ts.Normal,
-                            // set NormalType to the printed type (e.g., "eighth", "quarter")
-                            NormalType = DurationTypeString(writerNote.Duration)
-                        };
-
-                        // If this is the first base note encountered for the tuplet, mark start
-                        if (!ts.IsStarted)
-                        {
-                            note.TupletNotation = new TupletNotation
-                            {
-                                Type = "start",
-                                Number = ts.Number
-                            };
-                            ts.IsStarted = true;
-                        }
-
-                        // Decrement tuplet remaining only when this is the base (non-chord) note
-                        if (!writerNote.IsChord)
-                        {
-                            ts.Remaining--;
-                            if (ts.Remaining <= 0)
-                            {
-                                // Last base note of the tuplet -> mark stop on this note
-                                // (overwrites 'start' if the tuplet length was 1)
-                                note.TupletNotation = new TupletNotation
-                                {
-                                    Type = "stop",
-                                    Number = ts.Number
-                                };
-
-                                // remove the state so the same id may be reused later
-                                tupletStates.Remove(key);
-                            }
-                        }
-                    }
-
-                    // Add note to the current measure (currentBar)
-                    measure.MeasureElements.Add(new MeasureElement
-                    {
-                        Type = MeasureElementType.Note,
-                        Element = note
-                    });
-
-                    // Update position tracking
-                    if (!writerNote.IsChord)
-                    {
-                        currentBeatPosition += noteDurationInMeasure;
-                        
-                        // Track duration per measure
-                        if (!durationPerMeasure.ContainsKey(currentBar))
-                            durationPerMeasure[currentBar] = 0;
-                        durationPerMeasure[currentBar] += noteDurationInMeasure;
+                        context.CurrentBar++;
+                        context.CurrentBeatPosition = 0;
                     }
                 }
 
-                // Update all of the stave 1 measures to include a backup tag if 2 staves targeted
-                if (staffIndex < targetStaffs.Count - 1)
+                // Handle ties across measures if needed
+                if (!writerNote.IsChord && 
+                    context.CurrentBeatPosition + noteDuration > measureInfo.BarLengthDivisions)
                 {
-                    foreach (var measureEntry in durationPerMeasure.OrderBy(kvp => kvp.Key))
-                    {
-                        int measureNumber = measureEntry.Key;
-                        long durationWritten = measureEntry.Value;
+                    bool success = HandleTiedNoteAcrossMeasures(
+                        scorePart, writerNote, context, measureInfo, noteDuration);
+                    
+                    if (!success)
+                        return;
 
-                        if (durationWritten > 0 && measureNumber <= scorePart.Measures.Count)
-                        {
-                            var measure = scorePart.Measures[measureNumber - 1];
-                            measure.MeasureElements ??= new List<MeasureElement>();
-                            measure.MeasureElements.Add(new MeasureElement
-                            {
-                                Type = MeasureElementType.Backup,
-                                Element = new Backup { Duration = (int)durationWritten }
-                            });
-                        }
-                    }
+                    continue; // Skip normal note composition
+                }
+
+                // Verify measure is still available after potential advancement
+                if (!EnsureMeasureAvailable(scorePart, context.CurrentBar, scorePart.Name))
+                    return;
+
+                // Refresh measure reference in case we advanced
+                measure = scorePart.Measures[context.CurrentBar - 1];
+                measureInfo = GetMeasureInfo(measure);
+
+                // Compose and add the note
+                var note = ComposeNote(writerNote, noteDuration, context.Staff);
+                ApplyTupletSettings(note, writerNote, context.TupletStates);
+
+                measure.MeasureElements.Add(new MeasureElement
+                {
+                    Type = MeasureElementType.Note,
+                    Element = note
+                });
+
+                UpdatePositionTracking(context, writerNote, noteDuration);
+            }
+        }
+
+        private static bool EnsureMeasureAvailable(Part scorePart, int currentBar, string partName)
+        {
+            if (currentBar > scorePart.Measures.Count)
+            {
+                MessageBoxHelper.ShowMessage(
+                     $"Ran out of measures in part '{partName}' at bar {currentBar}. Not all notes were placed.",
+                     "Insufficient Measures");
+                return false;
+            }
+            return true;
+        }
+
+        private static int CalculateTotalNoteDuration(int divisions, WriterNote writerNote)
+        {
+            var baseDuration = CalculateNoteDurationInMeasure(divisions, writerNote.Duration);
+            
+            // Calculate total duration including dots
+            var noteDurationInMeasure = baseDuration;
+            if (writerNote.Dots == 1)
+            {
+                noteDurationInMeasure = baseDuration + (baseDuration / 2);
+            }
+            else if (writerNote.Dots == 2)
+            {
+                noteDurationInMeasure = baseDuration + (baseDuration / 2) + (baseDuration / 4);
+            }
+
+            // Adjust duration when the note is part of a tuplet
+            if (noteDurationInMeasure > 0
+                && writerNote.TupletActualNotes > 0
+                && writerNote.TupletNormalNotes > 0)
+            {
+                noteDurationInMeasure = (int)Math.Round(
+                    (double)noteDurationInMeasure * writerNote.TupletNormalNotes / writerNote.TupletActualNotes);
+            }
+
+            return noteDurationInMeasure;
+        }
+
+        private static bool HandleTiedNoteAcrossMeasures(
+            Part scorePart, 
+            WriterNote writerNote, 
+            StaffProcessingContext context,
+            MeasureInfo measureInfo,
+            int noteDuration)
+        {
+            long durationInCurrentMeasure = measureInfo.BarLengthDivisions - context.CurrentBeatPosition;
+            long durationInNextMeasure = noteDuration - durationInCurrentMeasure;
+
+            // Place first part of tied note in current measure
+            var measure = scorePart.Measures[context.CurrentBar - 1];
+            var firstNote = CreateTiedNote(
+                writerNote, 
+                (int)durationInCurrentMeasure, 
+                measureInfo.Divisions, 
+                context.Staff, 
+                isFirstPart: true);
+
+            measure.MeasureElements.Add(new MeasureElement
+            {
+                Type = MeasureElementType.Note,
+                Element = firstNote
+            });
+
+            UpdateDurationTracking(context.DurationPerMeasure, context.CurrentBar, durationInCurrentMeasure);
+
+            // Advance to next measure
+            context.CurrentBar++;
+            context.CurrentBeatPosition = 0;
+
+            // Check if next measure exists
+            if (context.CurrentBar > scorePart.Measures.Count)
+            {
+                MessageBoxHelper.ShowMessage(
+                     $"Ran out of measures in part '{scorePart.Name}' at bar {context.CurrentBar}. Not all notes were placed.",
+                     "Insufficient Measures");
+                return false;
+            }
+
+            // Place second part of tied note in next measure
+            var nextMeasure = scorePart.Measures[context.CurrentBar - 1];
+            var secondNote = CreateTiedNote(
+                writerNote, 
+                (int)durationInNextMeasure, 
+                measureInfo.Divisions, 
+                context.Staff, 
+                isFirstPart: false);
+
+            nextMeasure.MeasureElements.Add(new MeasureElement
+            {
+                Type = MeasureElementType.Note,
+                Element = secondNote
+            });
+
+            context.CurrentBeatPosition = durationInNextMeasure;
+            UpdateDurationTracking(context.DurationPerMeasure, context.CurrentBar, durationInNextMeasure);
+
+            return true;
+        }
+
+        private static MusicXml.Domain.Note CreateTiedNote(
+            WriterNote writerNote, 
+            int duration, 
+            int divisions, 
+            int staff, 
+            bool isFirstPart)
+        {
+            var note = new MusicXml.Domain.Note
+            {
+                Type = DurationTypeForTiedNote(duration, divisions),
+                Duration = duration,
+                Voice = staff == 1 ? 1 : 5,
+                Staff = staff,
+                IsChordTone = writerNote.IsChord,
+                IsRest = writerNote.IsRest,
+                Tie = writerNote.IsRest ? Tie.NotTied : (isFirstPart ? Tie.Start : Tie.Stop),
+                Dots = 0  // Tied notes across measures typically don't use dots
+            };
+
+            if (!writerNote.IsRest)
+            {
+                note.Pitch = new Pitch
+                {
+                    Step = char.ToUpper(writerNote.Step),
+                    Octave = writerNote.Octave,
+                    Alter = writerNote.Alter
+                };
+            }
+
+            return note;
+        }
+
+        private static MusicXml.Domain.Note ComposeNote(WriterNote writerNote, int duration, int staff)
+        {
+            var note = new MusicXml.Domain.Note
+            {
+                Type = DurationTypeString(writerNote.Duration),
+                Duration = duration,
+                Voice = staff == 1 ? 1 : 5,
+                Staff = staff,
+                IsChordTone = writerNote.IsChord,
+                IsRest = writerNote.IsRest,
+                Dots = writerNote.Dots
+            };
+
+            if (!writerNote.IsRest)
+            {
+                note.Pitch = new Pitch
+                {
+                    Step = char.ToUpper(writerNote.Step),
+                    Octave = writerNote.Octave,
+                    Alter = writerNote.Alter
+                };
+            }
+
+            return note;
+        }
+
+        private static void ApplyTupletSettings(
+            MusicXml.Domain.Note note, 
+            WriterNote writerNote, 
+            Dictionary<string, TupletState> tupletStates)
+        {
+            if (string.IsNullOrWhiteSpace(writerNote.TupletNumber)
+                || writerNote.TupletActualNotes <= 0
+                || writerNote.TupletNormalNotes <= 0)
+            {
+                return;
+            }
+
+            var key = writerNote.TupletNumber!;
+            if (!tupletStates.TryGetValue(key, out var ts))
+            {
+                ts = InitializeTupletState(key, writerNote);
+                tupletStates[key] = ts;
+            }
+
+            // Set time modification on the note
+            note.TimeModification = new TimeModification
+            {
+                ActualNotes = ts.Actual,
+                NormalNotes = ts.Normal,
+                NormalType = DurationTypeString(writerNote.Duration)
+            };
+
+            // Handle tuplet notation (start/stop markers)
+            ApplyTupletNotation(note, writerNote, ts, tupletStates, key);
+        }
+
+        private static TupletState InitializeTupletState(string key, WriterNote writerNote)
+        {
+            int parsedNum = 1;
+            int.TryParse(key, out parsedNum);
+            
+            return new TupletState
+            {
+                Actual = writerNote.TupletActualNotes,
+                Normal = writerNote.TupletNormalNotes,
+                Remaining = writerNote.TupletActualNotes,
+                Number = parsedNum,
+                IsStarted = false
+            };
+        }
+
+        private static void ApplyTupletNotation(
+            MusicXml.Domain.Note note, 
+            WriterNote writerNote, 
+            TupletState ts, 
+            Dictionary<string, TupletState> tupletStates, 
+            string key)
+        {
+            // Mark start on first base note
+            if (!ts.IsStarted)
+            {
+                note.TupletNotation = new TupletNotation
+                {
+                    Type = "start",
+                    Number = ts.Number
+                };
+                ts.IsStarted = true;
+            }
+
+            // Decrement and mark stop on last base note
+            if (!writerNote.IsChord)
+            {
+                ts.Remaining--;
+                if (ts.Remaining <= 0)
+                {
+                    note.TupletNotation = new TupletNotation
+                    {
+                        Type = "stop",
+                        Number = ts.Number
+                    };
+                    tupletStates.Remove(key);
+                }
+            }
+        }
+
+        private static void UpdatePositionTracking(
+            StaffProcessingContext context, 
+            WriterNote writerNote, 
+            int noteDuration)
+        {
+            if (!writerNote.IsChord)
+            {
+                context.CurrentBeatPosition += noteDuration;
+                UpdateDurationTracking(context.DurationPerMeasure, context.CurrentBar, noteDuration);
+            }
+        }
+
+        private static void UpdateDurationTracking(Dictionary<int, long> durationPerMeasure, int currentBar, long duration)
+        {
+            if (!durationPerMeasure.ContainsKey(currentBar))
+                durationPerMeasure[currentBar] = 0;
+            durationPerMeasure[currentBar] += duration;
+        }
+
+        private static void AddBackupElementsIfNeeded(
+            Part scorePart, 
+            int staffIndex, 
+            int totalStaffs, 
+            Dictionary<int, long> durationPerMeasure)
+        {
+            if (staffIndex >= totalStaffs - 1)
+                return;
+
+            foreach (var measureEntry in durationPerMeasure.OrderBy(kvp => kvp.Key))
+            {
+                int measureNumber = measureEntry.Key;
+                long durationWritten = measureEntry.Value;
+
+                if (durationWritten > 0 && measureNumber <= scorePart.Measures.Count)
+                {
+                    var measure = scorePart.Measures[measureNumber - 1];
+                    measure.MeasureElements ??= new List<MeasureElement>();
+                    measure.MeasureElements.Add(new MeasureElement
+                    {
+                        Type = MeasureElementType.Backup,
+                        Element = new Backup { Duration = (int)durationWritten }
+                    });
                 }
             }
         }
@@ -461,6 +522,16 @@ namespace Music.Writer
             public int Remaining { get; set; }
             public int Number { get; set; }
             public bool IsStarted { get; set; }
+        }
+
+        // Helper class to track state during staff processing
+        private sealed class StaffProcessingContext
+        {
+            public int Staff { get; set; }
+            public int CurrentBar { get; set; }
+            public long CurrentBeatPosition { get; set; }
+            public Dictionary<int, long> DurationPerMeasure { get; set; } = new();
+            public Dictionary<string, TupletState> TupletStates { get; set; } = new();
         }
     }
 }
