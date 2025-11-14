@@ -109,8 +109,6 @@ namespace Music.Writer
                 TupletNumber = tupletNumber,
                 TupletCount = (int?)(numTupletCount?.Value ?? 0),
                 TupletOf = (int?)(numTupletOf?.Value ?? 0),
-                TieAcross = chkTieAcross?.Checked ?? false,
-                Fermata = chkFermata?.Checked ?? false,
                 NumberOfNotes = (int?)(numNumberOfNotes?.Value ?? 1)
             };
 
@@ -275,11 +273,6 @@ namespace Music.Writer
             if (data.TupletOf.HasValue && numTupletOf != null)
                 numTupletOf.Value = LimitRange(numTupletOf, data.TupletOf.Value);
 
-            if (data.TieAcross.HasValue && chkTieAcross != null)
-                chkTieAcross.Checked = data.TieAcross.Value;
-
-            if (data.Fermata.HasValue && chkFermata != null)
-                chkFermata.Checked = data.Fermata.Value;
 
             if (data.NumberOfNotes.HasValue && numNumberOfNotes != null)
                 numNumberOfNotes.Value = LimitRange(numNumberOfNotes, data.NumberOfNotes.Value);

@@ -104,8 +104,6 @@ namespace Music.Writer
             numTupletCount = new NumericUpDown();
             lblTupletOf = new Label();
             numTupletOf = new NumericUpDown();
-            chkTieAcross = new CheckBox();
-            chkFermata = new CheckBox();
             label2 = new Label();
             btnSetWriterTestScenarioG1 = new Button();
             btnNewScore = new Button();
@@ -584,8 +582,6 @@ namespace Music.Writer
             groupBox1.Controls.Add(numTupletCount);
             groupBox1.Controls.Add(lblTupletOf);
             groupBox1.Controls.Add(numTupletOf);
-            groupBox1.Controls.Add(chkTieAcross);
-            groupBox1.Controls.Add(chkFermata);
             groupBox1.Location = new Point(711, 12);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(315, 294);
@@ -707,26 +703,6 @@ namespace Music.Writer
             numTupletOf.TabIndex = 15;
             numTupletOf.Value = new decimal(new int[] { 2, 0, 0, 0 });
             // 
-            // chkTieAcross
-            // 
-            chkTieAcross.AutoSize = true;
-            chkTieAcross.ForeColor = Color.Red;
-            chkTieAcross.Location = new Point(15, 258);
-            chkTieAcross.Name = "chkTieAcross";
-            chkTieAcross.Size = new Size(113, 19);
-            chkTieAcross.TabIndex = 16;
-            chkTieAcross.Text = "Allow ties across";
-            // 
-            // chkFermata
-            // 
-            chkFermata.AutoSize = true;
-            chkFermata.ForeColor = Color.Red;
-            chkFermata.Location = new Point(135, 258);
-            chkFermata.Name = "chkFermata";
-            chkFermata.Size = new Size(69, 19);
-            chkFermata.TabIndex = 17;
-            chkFermata.Text = "Fermata";
-            // 
             // label2
             // 
             label2.AutoSize = true;
@@ -783,9 +759,9 @@ namespace Music.Writer
             lblNextThingToDo.ForeColor = Color.Fuchsia;
             lblNextThingToDo.Location = new Point(149, 16);
             lblNextThingToDo.Name = "lblNextThingToDo";
-            lblNextThingToDo.Size = new Size(223, 21);
+            lblNextThingToDo.Size = new Size(103, 21);
             lblNextThingToDo.TabIndex = 12;
-            lblNextThingToDo.Text = "remove the two checkboxes";
+            lblNextThingToDo.Text = "ties are next";
             // 
             // btnUpdateFormFromDesigner
             // 
@@ -908,8 +884,6 @@ namespace Music.Writer
         private NumericUpDown numTupletCount;
         private Label lblTupletOf;
         private NumericUpDown numTupletOf;
-        private CheckBox chkTieAcross;
-        private CheckBox chkFermata;
         private Label lblSections;
         private Label label3;
         private NumericUpDown numNumberOfNotes;
