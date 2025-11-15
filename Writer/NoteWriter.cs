@@ -78,6 +78,8 @@ namespace Music.Writer
 
         private static void ProcessNotesForStaff(Part scorePart, AppendNotesParams config, StaffProcessingContext context)
         {
+            var pendingChordNotes = new List<WriterNote>();
+
             foreach (var writerNote in config.Notes)
             {
                 if (!EnsureMeasureAvailable(scorePart, context.CurrentBar, scorePart.Name))
@@ -88,26 +90,30 @@ namespace Music.Writer
 
                 var noteDuration = CalculateTotalNoteDuration(measureInfo.Divisions, writerNote);
 
-                // Handle measure advancement for chord tones and full measures
-                if (!writerNote.IsChord)
+                // Collect secondary chord notes
+                if (writerNote.IsChord)
                 {
-                    if (context.CurrentBeatPosition == measureInfo.BarLengthDivisions)
-                    {
-                        context.CurrentBar++;
-                        context.CurrentBeatPosition = 0;
-                    }
+                    pendingChordNotes.Add(writerNote);
+                    continue;
+                }
+
+                // Handle measure advancement for primary notes and full measures
+                if (context.CurrentBeatPosition == measureInfo.BarLengthDivisions)
+                {
+                    context.CurrentBar++;
+                    context.CurrentBeatPosition = 0;
                 }
 
                 // Handle ties across measures if needed
-                if (!writerNote.IsChord && 
-                    context.CurrentBeatPosition + noteDuration > measureInfo.BarLengthDivisions)
+                if (context.CurrentBeatPosition + noteDuration > measureInfo.BarLengthDivisions)
                 {
                     bool success = HandleTiedNoteAcrossMeasures(
-                        scorePart, writerNote, context, measureInfo, noteDuration);
+                        scorePart, writerNote, pendingChordNotes, context, measureInfo, noteDuration);
                     
                     if (!success)
                         return;
 
+                    pendingChordNotes.Clear();
                     continue; // Skip normal note composition
                 }
 
@@ -119,7 +125,7 @@ namespace Music.Writer
                 measure = scorePart.Measures[context.CurrentBar - 1];
                 measureInfo = GetMeasureInfo(measure);
 
-                // Compose and add the note
+                // Compose and add the primary note
                 var note = ComposeNote(writerNote, noteDuration, context.Staff);
                 ApplyTupletSettings(note, writerNote, context.TupletStates);
 
@@ -129,6 +135,22 @@ namespace Music.Writer
                     Element = note
                 });
 
+                // Add any pending secondary chord notes with same tie status
+                foreach (var chordNote in pendingChordNotes)
+                {
+                    var chordNoteDuration = CalculateTotalNoteDuration(measureInfo.Divisions, chordNote);
+                    var secondaryNote = ComposeNote(chordNote, chordNoteDuration, context.Staff);
+                    secondaryNote.Tie = note.Tie; // Copy tie status from primary note
+                    ApplyTupletSettings(secondaryNote, chordNote, context.TupletStates);
+
+                    measure.MeasureElements.Add(new MeasureElement
+                    {
+                        Type = MeasureElementType.Note,
+                        Element = secondaryNote
+                    });
+                }
+
+                pendingChordNotes.Clear();
                 UpdatePositionTracking(context, writerNote, noteDuration);
             }
         }
@@ -174,7 +196,8 @@ namespace Music.Writer
 
         private static bool HandleTiedNoteAcrossMeasures(
             Part scorePart, 
-            WriterNote writerNote, 
+            WriterNote writerNote,
+            List<WriterNote> pendingChordNotes,
             StaffProcessingContext context,
             MeasureInfo measureInfo,
             int noteDuration)
@@ -196,6 +219,23 @@ namespace Music.Writer
                 Type = MeasureElementType.Note,
                 Element = firstNote
             });
+
+            // Add tied secondary chord notes in current measure
+            foreach (var chordNote in pendingChordNotes)
+            {
+                var firstChordNote = CreateTiedNote(
+                    chordNote,
+                    (int)durationInCurrentMeasure,
+                    measureInfo.Divisions,
+                    context.Staff,
+                    isFirstPart: true);
+
+                measure.MeasureElements.Add(new MeasureElement
+                {
+                    Type = MeasureElementType.Note,
+                    Element = firstChordNote
+                });
+            }
 
             UpdateDurationTracking(context.DurationPerMeasure, context.CurrentBar, durationInCurrentMeasure);
 
@@ -226,6 +266,23 @@ namespace Music.Writer
                 Type = MeasureElementType.Note,
                 Element = secondNote
             });
+
+            // Add tied secondary chord notes in next measure
+            foreach (var chordNote in pendingChordNotes)
+            {
+                var secondChordNote = CreateTiedNote(
+                    chordNote,
+                    (int)durationInNextMeasure,
+                    measureInfo.Divisions,
+                    context.Staff,
+                    isFirstPart: false);
+
+                nextMeasure.MeasureElements.Add(new MeasureElement
+                {
+                    Type = MeasureElementType.Note,
+                    Element = secondChordNote
+                });
+            }
 
             context.CurrentBeatPosition = durationInNextMeasure;
             UpdateDurationTracking(context.DurationPerMeasure, context.CurrentBar, durationInNextMeasure);

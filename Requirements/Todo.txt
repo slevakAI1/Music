@@ -1,9 +1,15 @@
 ﻿
 
+Regression tests:
 
-Next: (1) figure out what's next. 
+    16 1/8 notes 1 staves - 1 voice
 
-    * Tuplets
+    12 dotted quarter notes - 1 stave 1 voice
+
+    18 1/4 note triplets 2 staves - 4 voices
+
+
+Next: Code clean up, then percussion
 
 
 -- need a plan for this!!! agile stories?
