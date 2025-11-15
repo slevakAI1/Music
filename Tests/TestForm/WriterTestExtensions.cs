@@ -120,7 +120,7 @@ namespace Music.Writer
                 ? data.SelectedStaffs 
                 : new List<int> { 1 }; // Default to staff 1 if none selected
 
-            var notes = new List<WriterNote>();
+            var notes = new List<PitchEvent>();
 
             // Get tuplet settings from writer data
             bool isTuplet = !string.IsNullOrWhiteSpace(data.TupletNumber);
@@ -179,7 +179,7 @@ namespace Music.Writer
             {
                 // Single note or rest
                 // Create one WriterNote instance (NumberOfNotes removed)
-                var writerNote = new WriterNote
+                var writerNote = new PitchEvent
                 {
                     Step = data.Step != '\0' ? data.Step : 'C',
                     Octave = data.Octave,

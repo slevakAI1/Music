@@ -78,7 +78,7 @@ namespace Music.Writer
 
         private static void ProcessNotesForStaff(Part scorePart, AppendNotesConfig config, StaffProcessingContext context)
         {
-            var pendingChordNotes = new List<WriterNote>();
+            var pendingChordNotes = new List<PitchEvent>();
 
             foreach (var writerNote in config.Notes)
             {
@@ -167,7 +167,7 @@ namespace Music.Writer
             return true;
         }
 
-        private static int CalculateTotalNoteDuration(int divisions, WriterNote writerNote)
+        private static int CalculateTotalNoteDuration(int divisions, PitchEvent writerNote)
         {
             var baseDuration = CalculateNoteDurationInMeasure(divisions, writerNote.Duration);
             
@@ -196,8 +196,8 @@ namespace Music.Writer
 
         private static bool HandleTiedNoteAcrossMeasures(
             Part scorePart, 
-            WriterNote writerNote,
-            List<WriterNote> pendingChordNotes,
+            PitchEvent writerNote,
+            List<PitchEvent> pendingChordNotes,
             StaffProcessingContext context,
             MeasureInfo measureInfo,
             int noteDuration)
@@ -291,7 +291,7 @@ namespace Music.Writer
         }
 
         private static MusicXml.Domain.Note CreateTiedNote(
-            WriterNote writerNote, 
+            PitchEvent writerNote, 
             int duration, 
             int divisions, 
             int staff, 
@@ -322,7 +322,7 @@ namespace Music.Writer
             return note;
         }
 
-        private static MusicXml.Domain.Note ComposeNote(WriterNote writerNote, int duration, int staff)
+        private static MusicXml.Domain.Note ComposeNote(PitchEvent writerNote, int duration, int staff)
         {
             var note = new MusicXml.Domain.Note
             {
@@ -350,7 +350,7 @@ namespace Music.Writer
 
         private static void ApplyTupletSettings(
             MusicXml.Domain.Note note, 
-            WriterNote writerNote, 
+            PitchEvent writerNote, 
             Dictionary<string, TupletState> tupletStates)
         {
             if (string.IsNullOrWhiteSpace(writerNote.TupletNumber)
@@ -379,7 +379,7 @@ namespace Music.Writer
             ApplyTupletNotation(note, writerNote, ts, tupletStates, key);
         }
 
-        private static TupletState InitializeTupletState(string key, WriterNote writerNote)
+        private static TupletState InitializeTupletState(string key, PitchEvent writerNote)
         {
             int parsedNum = 1;
             int.TryParse(key, out parsedNum);
@@ -396,7 +396,7 @@ namespace Music.Writer
 
         private static void ApplyTupletNotation(
             MusicXml.Domain.Note note, 
-            WriterNote writerNote, 
+            PitchEvent writerNote, 
             TupletState ts, 
             Dictionary<string, TupletState> tupletStates, 
             string key)
@@ -430,7 +430,7 @@ namespace Music.Writer
 
         private static void UpdatePositionTracking(
             StaffProcessingContext context, 
-            WriterNote writerNote, 
+            PitchEvent writerNote, 
             int noteDuration)
         {
             if (!writerNote.IsChord)

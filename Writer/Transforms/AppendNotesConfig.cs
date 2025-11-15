@@ -12,6 +12,6 @@
         public int StartBeat { get; set; }
 
         // List of notes to insert
-        public List<WriterNote> Notes { get; set; } = new();
+        public List<PitchEvent> Notes { get; set; } = new();
     }
 }
