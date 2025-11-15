@@ -102,7 +102,7 @@ namespace Music.Writer
             _writer = CaptureFormData();
 
             var config = _writer.ToAppendNotesParams();
-            NoteWriter.Append(_score!, config);
+            AppendNotes.Execute(_score!, config);
             txtScoreReport.Text = ScoreReport.Run(_score);
             Globals.Score = _score;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
         }

@@ -8,13 +8,13 @@ namespace Music.Writer
     /// Method assumes the score has already been initialized with parts, measure, tempo, time signature.
     /// All parameters are expected to be pre-validated.
     /// </summary>
-    public static class NoteWriter
+    public static class AppendNotes
     {
         /// <summary>
         /// Adds notes to the specified score based on the provided configuration.
         /// All parameters are expected to be pre-validated.
         /// </summary>
-        public static void Append(Score score, AppendNotesParams config)
+        public static void Execute(Score score, AppendNotesConfig config)
         {
             var debugConfig = Helpers.DebugObject(config);
 
@@ -36,7 +36,7 @@ namespace Music.Writer
                 .Where(p => p?.Name != null && partNames.Contains(p.Name));
         }
 
-        private static void ProcessPart(Part scorePart, AppendNotesParams config)
+        private static void ProcessPart(Part scorePart, AppendNotesConfig config)
         {
             if (scorePart.Measures == null || scorePart.Measures.Count == 0)
                 return;
@@ -76,7 +76,7 @@ namespace Music.Writer
             }
         }
 
-        private static void ProcessNotesForStaff(Part scorePart, AppendNotesParams config, StaffProcessingContext context)
+        private static void ProcessNotesForStaff(Part scorePart, AppendNotesConfig config, StaffProcessingContext context)
         {
             var pendingChordNotes = new List<WriterNote>();
 

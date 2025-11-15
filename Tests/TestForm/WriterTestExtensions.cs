@@ -107,7 +107,7 @@ namespace Music.Writer
         /// Converts Writer data to a AppendNotesParams for use with AppendNotes.
         /// Also adds notes per NumberOfNotes specified in writer data
         /// </summary>
-        public static AppendNotesParams ToAppendNotesParams(this WriterTestData data)
+        public static AppendNotesConfig ToAppendNotesParams(this WriterTestData data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
 
@@ -195,7 +195,7 @@ namespace Music.Writer
                 }
             }
 
-            var config = new AppendNotesParams
+            var config = new AppendNotesConfig
             {
                 Parts = parts,
                 Staffs = selectedStaffs!,
@@ -224,20 +224,5 @@ namespace Music.Writer
                 _ => 0
             };
         }
-    }
-
-    /// <summary>
-    /// Configuration extracted from Writer for easier processing by SetNotes.
-    /// </summary>
-    public sealed class AppendNotesParams
-    {
-        // TARGETS
-        public List<string> Parts { get; set; } = new();
-        public List<int> Staffs { get; set; } = new();
-        public int StartBar { get; set; }
-        public int StartBeat { get; set; }
-
-        // List of notes to insert
-        public List<WriterNote> Notes { get; set; } = new();
     }
 }
