@@ -128,7 +128,7 @@ namespace Music.Writer
             int tupletActualNotes = isTuplet ? (data.TupletCount ?? 3) : 0;
             int tupletNormalNotes = isTuplet ? (data.TupletOf ?? 2) : 0;
 
-            if (data.IsChord ?? false)
+            if (data.IsChord ?? false)  // null = false
             {
                 // Convert chord to list of WriterNote
                 var chordNotes = ChordConverter.Convert(
@@ -139,8 +139,15 @@ namespace Music.Writer
                     baseOctave: data.Octave,
                     noteValue: GetNoteValue(data.NoteValue));
 
+
+                // Apply dots to chord notes
+                foreach (var cn in chordNotes)
+                {
+                    cn.Dots = data.Dots;
+                }
+
                 // Apply tuplet settings to all chord notes if tuplet number is specified
-                if (isTuplet && chordNotes != null)
+                if (isTuplet)
                 {
                     foreach (var cn in chordNotes)
                     {
