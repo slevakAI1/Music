@@ -1,6 +1,6 @@
 namespace Music.Writer
 {
-    partial class WriterForm
+    partial class WriterTestForm
     {
         private System.ComponentModel.IContainer components = null;
 

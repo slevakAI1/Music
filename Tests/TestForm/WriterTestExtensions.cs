@@ -5,12 +5,12 @@ using System.Linq;
 
 namespace Music.Writer
 {
-    public static class WriterExtensions
+    public static class WriterTestExtensions
     {
         // Applies design-driven defaults into an existing Writer instance.
         // Accept a nullable receiver so callers holding a `Writer?` (e.g. Globals.GenerationData)
         // can call this extension directly without a null-forgiving operator.
-        public static void UpdateFromDesigner(this WriterData? data, Designer.Designer? design)
+        public static void UpdateFromDesigner(this WriterTestData? data, Designer.Designer? design)
         {
             if (data == null) return;
 
@@ -107,7 +107,7 @@ namespace Music.Writer
         /// Converts Writer data to a AppendNotesParams for use with AppendNotes.
         /// Also adds notes per NumberOfNotes specified in writer data
         /// </summary>
-        public static AppendNotesParams ToAppendNotesParams(this WriterData data)
+        public static AppendNotesParams ToAppendNotesParams(this WriterTestData data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
 

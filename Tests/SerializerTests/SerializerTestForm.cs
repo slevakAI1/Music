@@ -11,9 +11,9 @@ using System.Windows.Forms;
 
 namespace Music
 {
-    public partial class TestForm : Form
+    public partial class SerializerTestForm : Form
     {
-        public TestForm()
+        public SerializerTestForm()
         {
             InitializeComponent();
 

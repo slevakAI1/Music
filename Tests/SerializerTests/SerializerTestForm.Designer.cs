@@ -1,6 +1,6 @@
 ﻿namespace Music
 {
-    partial class TestForm
+    partial class SerializerTestForm
     {
         /// <summary>
         /// Required designer variable.

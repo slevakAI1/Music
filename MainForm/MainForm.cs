@@ -20,7 +20,7 @@ namespace Music
             // D E F A U L T   F O R M   O N   S T A R T U P
 
             // Show WriterForm on startup, filling the MDI parent
-            ShowChildForm(typeof(Music.Writer.WriterForm));
+            ShowChildForm(typeof(Music.Writer.WriterTestForm));
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -73,7 +73,7 @@ namespace Music
         private void generateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Launch the new Writer form.
-            ShowChildForm(typeof(Music.Writer.WriterForm));
+            ShowChildForm(typeof(Music.Writer.WriterTestForm));
 
             // Previous behavior: launch the original Writer form.
             // Commented out per request — do not remove.
@@ -84,7 +84,7 @@ namespace Music
 
         private void testToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ShowChildForm(typeof(TestForm));
+            ShowChildForm(typeof(SerializerTestForm));
         }
 
         private void viewMusicXmlToolStripMenuItem_Click(object sender, EventArgs e)

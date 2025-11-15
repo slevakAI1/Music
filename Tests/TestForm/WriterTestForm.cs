@@ -4,14 +4,14 @@ using MusicXml.Domain;
 
 namespace Music.Writer
 {
-    public partial class WriterForm : Form
+    public partial class WriterTestForm : Form
     {
         private Score? _score;
         private Designer.Designer? _designer;
-        private WriterData? _writer;
+        private WriterTestData? _writer;
 
         //===========================   I N I T I A L I Z A T I O N   ===========================
-        public WriterForm()
+        public WriterTestForm()
         {
             InitializeComponent();
 
