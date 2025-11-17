@@ -130,7 +130,7 @@ namespace Music.Writer
 
 
             //========================================================================
-
+            //   MOVE THIS THIS CODE BLOCK INTO AppendNote.EXECUTE
 
             if (data.IsChord ?? false)  // null = false
             {
@@ -142,19 +142,11 @@ namespace Music.Writer
                     data.ChordBase,
                     baseOctave: data.Octave,
                     noteValue: GetNoteValue(data.NoteValue));
-
-
-
                 // Apply dots to chord notes
                 foreach (var cn in chordNotes)
                 {
                     cn.Dots = data.Dots;
                 }
-
-
-                //========================================================================
-
-
 
                 // Apply tuplet settings to all chord notes if tuplet number is specified
                 if (isTuplet)
@@ -167,6 +159,17 @@ namespace Music.Writer
                         cn.Dots = data.Dots;
                     }
                 }
+
+                //========================================================================
+                // Write the chord into into List<PitchEvent>
+
+
+
+
+
+
+
+
 
                 // Run this next line NumberOfNotes times to create multiple chords if specified
                 for (int i = 0; i < (data.NumberOfNotes.GetValueOrDefault(1)); i++)
