@@ -1,4 +1,7 @@
 using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -173,38 +176,128 @@ namespace Music
         }
 
         /// <summary>
-        /// Builds a user-friendly error message from an exception.
-        /// Can be enhanced to provide more context, logging, etc.
+        /// Builds a user-friendly error message from an exception, including source location details.
         /// </summary>
         private static string BuildErrorMessage(Exception exception)
         {
             if (exception == null)
                 return "An unknown error occurred.";
 
+            var message = new System.Text.StringBuilder();
+
             // For aggregate exceptions (from tasks), show all inner exceptions
             if (exception is AggregateException aggEx)
             {
-                var messages = new System.Text.StringBuilder();
-                messages.AppendLine("Multiple errors occurred:");
-                messages.AppendLine();
+                message.AppendLine("Multiple errors occurred:");
+                message.AppendLine();
 
                 foreach (var innerEx in aggEx.InnerExceptions)
                 {
-                    messages.AppendLine($"• {innerEx.Message}");
+                    message.AppendLine($"• {innerEx.Message}");
+                    AppendExceptionSource(message, innerEx);
                 }
-
-                return messages.ToString();
             }
-
-            // For single exceptions, show the message and inner exception if present
-            string message = exception.Message;
-
-            if (exception.InnerException != null)
+            else
             {
-                message += $"\n\nDetails: {exception.InnerException.Message}";
+                // Single exception
+                message.AppendLine(exception.Message);
+                AppendExceptionSource(message, exception);
+
+                // Include inner exception if present
+                if (exception.InnerException != null)
+                {
+                    message.AppendLine();
+                    message.AppendLine("Details:");
+                    message.AppendLine(exception.InnerException.Message);
+                    AppendExceptionSource(message, exception.InnerException);
+                }
             }
 
-            return message;
+            return message.ToString();
+        }
+
+        /// <summary>
+        /// Appends source location information (file, class, method, line number) to the message.
+        /// </summary>
+        private static void AppendExceptionSource(System.Text.StringBuilder message, Exception exception)
+        {
+            try
+            {
+                var sourceInfo = GetExceptionSourceInfo(exception);
+                if (sourceInfo != null)
+                {
+                    message.AppendLine();
+
+                    if (!string.IsNullOrEmpty(sourceInfo.FileName))
+                    {
+                        message.AppendLine($"File: {sourceInfo.FileName}");
+                    }
+
+                    if (!string.IsNullOrEmpty(sourceInfo.ClassName))
+                    {
+                        message.AppendLine($"Class: {sourceInfo.ClassName}");
+                    }
+
+                    if (!string.IsNullOrEmpty(sourceInfo.MethodName))
+                    {
+                        message.AppendLine($"Method: {sourceInfo.MethodName}");
+                    }
+
+                    if (sourceInfo.LineNumber > 0)
+                    {
+                        message.AppendLine($"Line: {sourceInfo.LineNumber}");
+                    }
+                }
+            }
+            catch
+            {
+                // If we can't get source info, just skip it rather than failing
+            }
+        }
+
+        /// <summary>
+        /// Extracts source location information from an exception's stack trace.
+        /// </summary>
+        private static ExceptionSourceInfo? GetExceptionSourceInfo(Exception exception)
+        {
+            try
+            {
+                var stackTrace = new StackTrace(exception, true);
+                
+                // Get the first frame that has file information (this is where the exception was thrown)
+                var frame = stackTrace.GetFrames()?.FirstOrDefault(f => 
+                    f.GetFileName() != null || f.GetMethod() != null);
+
+                if (frame == null)
+                    return null;
+
+                var method = frame.GetMethod();
+                var fileName = frame.GetFileName();
+                var lineNumber = frame.GetFileLineNumber();
+
+                return new ExceptionSourceInfo
+                {
+                    FileName = !string.IsNullOrEmpty(fileName) ? System.IO.Path.GetFileName(fileName) : null,
+                    ClassName = method?.DeclaringType?.Name,
+                    MethodName = method?.Name,
+                    LineNumber = lineNumber
+                };
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Contains information about where an exception occurred.
+        /// </summary>
+        private sealed class ExceptionSourceInfo
+        {
+            public string? FileName { get; set; }
+            public string? ClassName { get; set; }
+            public string? MethodName { get; set; }
+            public int LineNumber { get; set; }
         }
     }
 }
