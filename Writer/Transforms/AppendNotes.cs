@@ -26,8 +26,6 @@ namespace Music.Writer
             {
                 ProcessPart(scorePart, config);
             }
-
-            MessageBoxHelper.ShowMessage("Pattern has been applied to the score.", "Apply Pattern Set Notes");
         }
 
         private static IEnumerable<Part> GetTargetParts(Score score, List<string> partNames)

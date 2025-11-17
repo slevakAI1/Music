@@ -109,7 +109,6 @@ namespace Music.Writer
             btnNewScore = new Button();
             btnSetDesignTestScenarioD1 = new Button();
             btnChordTest = new Button();
-            lblNextThingToDo = new Label();
             btnUpdateFormFromDesigner = new Button();
             lblDesignerReport = new Label();
             txtDesignerReport = new TextBox();
@@ -752,17 +751,6 @@ namespace Music.Writer
             btnChordTest.UseVisualStyleBackColor = true;
             btnChordTest.Click += btnChordTest_Click;
             // 
-            // lblNextThingToDo
-            // 
-            lblNextThingToDo.AutoSize = true;
-            lblNextThingToDo.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lblNextThingToDo.ForeColor = Color.Fuchsia;
-            lblNextThingToDo.Location = new Point(149, 16);
-            lblNextThingToDo.Name = "lblNextThingToDo";
-            lblNextThingToDo.Size = new Size(103, 21);
-            lblNextThingToDo.TabIndex = 12;
-            lblNextThingToDo.Text = "ties are next";
-            // 
             // btnUpdateFormFromDesigner
             // 
             btnUpdateFormFromDesigner.Location = new Point(1142, 581);
@@ -822,7 +810,7 @@ namespace Music.Writer
             btnExportToNotion.UseVisualStyleBackColor = true;
             btnExportToNotion.Click += btnExportToNotion_Click;
             // 
-            // WriterForm
+            // WriterTestForm
             // 
             ClientSize = new Size(1613, 789);
             Controls.Add(btnExportToNotion);
@@ -831,7 +819,6 @@ namespace Music.Writer
             Controls.Add(lblDesignerReport);
             Controls.Add(txtDesignerReport);
             Controls.Add(btnUpdateFormFromDesigner);
-            Controls.Add(lblNextThingToDo);
             Controls.Add(btnChordTest);
             Controls.Add(btnSetDesignTestScenarioD1);
             Controls.Add(btnNewScore);
@@ -844,7 +831,7 @@ namespace Music.Writer
             Controls.Add(grpPitch);
             Controls.Add(btnAppendNotes);
             Controls.Add(lblStatus);
-            Name = "WriterForm";
+            Name = "WriterTestForm";
             Text = "Writer 2 (MusicXML)";
             grpTarget.ResumeLayout(false);
             grpTarget.PerformLayout();
@@ -904,7 +891,6 @@ namespace Music.Writer
         private ComboBox cbChordQuality;
         private ComboBox cbChordBase;
         private Label label1;
-        private Label lblNextThingToDo;
         private CheckedListBox clbSections;
         private Button btnUpdateFormFromDesigner;
         private Label lblDesignerReport;

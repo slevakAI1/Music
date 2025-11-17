@@ -105,6 +105,7 @@ namespace Music.Writer
             AppendNotes.Execute(_score!, config);
             txtScoreReport.Text = ScoreReport.Run(_score);
             Globals.Score = _score;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
+            //MessageBoxHelper.ShowMessage("Pattern has been applied to the score.", "Apply Pattern Set Notes");
         }
 
 
