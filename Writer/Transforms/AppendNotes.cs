@@ -78,114 +78,164 @@ namespace Music.Writer
 
         private static void ProcessNotesForStaff(Part scorePart, AppendNotesParams config, StaffProcessingContext context)
         {
-
-            /*
-             *                 // Convert chord to list of WriterNote
-                var chordNotes = ChordConverter.Convert(
-                    data.ChordKey,
-                    (int)data.ChordDegree,
-                    data.ChordQuality,
-                    data.ChordBase,
-                    baseOctave: data.Octave,
-                    noteValue: GetNoteValue(data.NoteValue));
-                // Apply dots to chord notes
-                foreach (var cn in chordNotes)
-                {
-                    cn.Dots = data.Dots;
-                }
-
-                // Apply tuplet settings to all chord notes if tuplet number is specified
-                if (isTuplet)
-                {
-                    foreach (var cn in chordNotes)
-                    {
-                        cn.TupletNumber = tupletNumber;
-                        cn.TupletActualNotes = tupletActualNotes;
-                        cn.TupletNormalNotes = tupletNormalNotes;
-                        cn.Dots = data.Dots;
-                    }
-                }
-
-             * 
-             */
-
-
-
-            var pendingChordNotes = new List<PitchEvent>();
-
             foreach (var writerNote in config.Notes)
             {
                 if (!EnsureMeasureAvailable(scorePart, context.CurrentBar, scorePart.Name))
                     return;
 
-                var measure = scorePart.Measures[context.CurrentBar - 1];
-                var measureInfo = GetMeasureInfo(measure);
-
-                var noteDuration = CalculateTotalNoteDuration(measureInfo.Divisions, writerNote);
-
-                // Collect secondary chord notes
+                // Dispatch to chord or single-note processing
                 if (writerNote.IsChord)
                 {
-                    pendingChordNotes.Add(writerNote);
-                    continue;
+                    ProcessChord(scorePart, writerNote, config, context);
                 }
-
-                // Handle measure advancement for primary notes and full measures
-                if (context.CurrentBeatPosition == measureInfo.BarLengthDivisions)
+                else
                 {
-                    context.CurrentBar++;
-                    context.CurrentBeatPosition = 0;
+                    ProcessSingleNote(scorePart, writerNote, config, context);
                 }
+            }
+        }
 
-                // Handle ties across measures if needed
-                if (context.CurrentBeatPosition + noteDuration > measureInfo.BarLengthDivisions)
-                {
-                    bool success = HandleTiedNoteAcrossMeasures(
-                        scorePart, writerNote, pendingChordNotes, context, measureInfo, noteDuration);
-                    
-                    if (!success)
-                        return;
+        private static void ProcessSingleNote(Part scorePart, PitchEvent writerNote, AppendNotesParams config, StaffProcessingContext context)
+        {
+            var measure = scorePart.Measures[context.CurrentBar - 1];
+            var measureInfo = GetMeasureInfo(measure);
 
-                    pendingChordNotes.Clear();
-                    continue; // Skip normal note composition
-                }
+            var noteDuration = CalculateTotalNoteDuration(measureInfo.Divisions, writerNote);
 
-                // Verify measure is still available after potential advancement
-                if (!EnsureMeasureAvailable(scorePart, context.CurrentBar, scorePart.Name))
+            // Handle measure advancement for primary notes and full measures
+            if (context.CurrentBeatPosition == measureInfo.BarLengthDivisions)
+            {
+                context.CurrentBar++;
+                context.CurrentBeatPosition = 0;
+            }
+
+            // Handle ties across measures if needed
+            if (context.CurrentBeatPosition + noteDuration > measureInfo.BarLengthDivisions)
+            {
+                bool success = HandleTiedNoteAcrossMeasures(
+                    scorePart, writerNote, context, measureInfo, noteDuration);
+
+                if (!success)
                     return;
 
-                // Refresh measure reference in case we advanced
-                measure = scorePart.Measures[context.CurrentBar - 1];
-                measureInfo = GetMeasureInfo(measure);
+                // Skip normal note composition
+                return;
+            }
 
-                // Compose and add the primary note
-                var note = ComposeNote(writerNote, noteDuration, context.Staff);
-                ApplyTupletSettings(note, writerNote, context.TupletStates);
+            // Verify measure is still available after potential advancement
+            if (!EnsureMeasureAvailable(scorePart, context.CurrentBar, scorePart.Name))
+                return;
+
+            // Refresh measure reference in case we advanced
+            measure = scorePart.Measures[context.CurrentBar - 1];
+            measureInfo = GetMeasureInfo(measure);
+
+            // Compose and add the primary note
+            var note = ComposeNote(writerNote, noteDuration, context.Staff);
+            ApplyTupletSettings(note, writerNote, context.TupletStates);
+
+            measure.MeasureElements.Add(new MeasureElement
+            {
+                Type = MeasureElementType.Note,
+                Element = note
+            });
+
+            // Update tracking for the written note
+            UpdatePositionTracking(context, writerNote, noteDuration);
+        }
+
+        private static void ProcessChord(Part scorePart, PitchEvent writerNote, AppendNotesParams config, StaffProcessingContext context)
+        {
+            // Convert chord to individual pitch events
+            var chordNotes = ChordConverter.Convert(
+                writerNote.ChordKey,
+                (int)writerNote.ChordDegree!,
+                writerNote.ChordQuality,
+                writerNote.ChordBase,
+                baseOctave: writerNote.Octave,
+                noteValue: writerNote.Duration);
+
+            // Apply dots and tuplet settings to chord notes
+            foreach (var cn in chordNotes)
+            {
+                cn.Dots = writerNote.Dots;
+            }
+
+            if (!string.IsNullOrWhiteSpace(writerNote.TupletNumber))
+            {
+                foreach (var cn in chordNotes)
+                {
+                    cn.TupletNumber = writerNote.TupletNumber;
+                    cn.TupletActualNotes = writerNote.TupletActualNotes;
+                    cn.TupletNormalNotes = writerNote.TupletNormalNotes;
+                    cn.Dots = writerNote.Dots;
+                }
+            }
+
+            if (!EnsureMeasureAvailable(scorePart, context.CurrentBar, scorePart.Name))
+                return;
+
+            var measure = scorePart.Measures[context.CurrentBar - 1];
+            var measureInfo = GetMeasureInfo(measure);
+
+            var noteDuration = CalculateTotalNoteDuration(measureInfo.Divisions, chordNotes[0]);
+
+            // Handle measure advancement
+            if (context.CurrentBeatPosition == measureInfo.BarLengthDivisions)
+            {
+                context.CurrentBar++;
+                context.CurrentBeatPosition = 0;
+            }
+
+            // Handle ties across measures for chord
+            if (context.CurrentBeatPosition + noteDuration > measureInfo.BarLengthDivisions)
+            {
+                bool success = HandleTiedChordAcrossMeasures(scorePart, chordNotes, context, measureInfo, noteDuration);
+                if (!success)
+                    return;
+
+                // Chord fully handled by tie-split logic
+                return;
+            }
+
+            // Verify measure is still available after potential advancement
+            if (!EnsureMeasureAvailable(scorePart, context.CurrentBar, scorePart.Name))
+                return;
+
+            // Refresh measure reference in case we advanced
+            measure = scorePart.Measures[context.CurrentBar - 1];
+            measureInfo = GetMeasureInfo(measure);
+
+            // Compose and add primary chord note
+            var primary = chordNotes[0];
+            var primaryNote = ComposeNote(primary, noteDuration, context.Staff);
+            ApplyTupletSettings(primaryNote, primary, context.TupletStates);
+
+            measure.MeasureElements.Add(new MeasureElement
+            {
+                Type = MeasureElementType.Note,
+                Element = primaryNote
+            });
+
+            // Add the remaining chord tones
+            foreach (var chordNote in chordNotes.Skip(1))
+            {
+                var chordNoteDuration = CalculateTotalNoteDuration(measureInfo.Divisions, chordNote);
+                var secondaryNote = ComposeNote(chordNote, chordNoteDuration, context.Staff);
+                // Copy tie status from primary note
+                secondaryNote.Tie = primaryNote.Tie;
+                ApplyTupletSettings(secondaryNote, chordNote, context.TupletStates);
 
                 measure.MeasureElements.Add(new MeasureElement
                 {
                     Type = MeasureElementType.Note,
-                    Element = note
+                    Element = secondaryNote
                 });
-
-                // Add any pending secondary chord notes with same tie status
-                foreach (var chordNote in pendingChordNotes)
-                {
-                    var chordNoteDuration = CalculateTotalNoteDuration(measureInfo.Divisions, chordNote);
-                    var secondaryNote = ComposeNote(chordNote, chordNoteDuration, context.Staff);
-                    secondaryNote.Tie = note.Tie; // Copy tie status from primary note
-                    ApplyTupletSettings(secondaryNote, chordNote, context.TupletStates);
-
-                    measure.MeasureElements.Add(new MeasureElement
-                    {
-                        Type = MeasureElementType.Note,
-                        Element = secondaryNote
-                    });
-                }
-
-                pendingChordNotes.Clear();
-                UpdatePositionTracking(context, writerNote, noteDuration);
             }
+
+            // Advance position for the chord (advance once per chord)
+            context.CurrentBeatPosition += noteDuration;
+            UpdateDurationTracking(context.DurationPerMeasure, context.CurrentBar, noteDuration);
         }
 
         private static bool EnsureMeasureAvailable(Part scorePart, int currentBar, string partName)
@@ -230,7 +280,6 @@ namespace Music.Writer
         private static bool HandleTiedNoteAcrossMeasures(
             Part scorePart, 
             PitchEvent writerNote,
-            List<PitchEvent> pendingChordNotes,
             StaffProcessingContext context,
             MeasureInfo measureInfo,
             int noteDuration)
@@ -252,23 +301,6 @@ namespace Music.Writer
                 Type = MeasureElementType.Note,
                 Element = firstNote
             });
-
-            // Add tied secondary chord notes in current measure
-            foreach (var chordNote in pendingChordNotes)
-            {
-                var firstChordNote = CreateTiedNote(
-                    chordNote,
-                    (int)durationInCurrentMeasure,
-                    measureInfo.Divisions,
-                    context.Staff,
-                    isFirstPart: true);
-
-                measure.MeasureElements.Add(new MeasureElement
-                {
-                    Type = MeasureElementType.Note,
-                    Element = firstChordNote
-                });
-            }
 
             UpdateDurationTracking(context.DurationPerMeasure, context.CurrentBar, durationInCurrentMeasure);
 
@@ -300,8 +332,60 @@ namespace Music.Writer
                 Element = secondNote
             });
 
-            // Add tied secondary chord notes in next measure
-            foreach (var chordNote in pendingChordNotes)
+            context.CurrentBeatPosition = durationInNextMeasure;
+            UpdateDurationTracking(context.DurationPerMeasure, context.CurrentBar, durationInNextMeasure);
+
+            return true;
+        }
+
+        private static bool HandleTiedChordAcrossMeasures(
+            Part scorePart,
+            List<PitchEvent> chordNotes,
+            StaffProcessingContext context,
+            MeasureInfo measureInfo,
+            int noteDuration)
+        {
+            long durationInCurrentMeasure = measureInfo.BarLengthDivisions - context.CurrentBeatPosition;
+            long durationInNextMeasure = noteDuration - durationInCurrentMeasure;
+
+            // Place first part of tied chord notes in current measure
+            var measure = scorePart.Measures[context.CurrentBar - 1];
+
+            foreach (var chordNote in chordNotes)
+            {
+                var firstChordNote = CreateTiedNote(
+                    chordNote,
+                    (int)durationInCurrentMeasure,
+                    measureInfo.Divisions,
+                    context.Staff,
+                    isFirstPart: true);
+
+                measure.MeasureElements.Add(new MeasureElement
+                {
+                    Type = MeasureElementType.Note,
+                    Element = firstChordNote
+                });
+            }
+
+            UpdateDurationTracking(context.DurationPerMeasure, context.CurrentBar, durationInCurrentMeasure);
+
+            // Advance to next measure
+            context.CurrentBar++;
+            context.CurrentBeatPosition = 0;
+
+            // Check if next measure exists
+            if (context.CurrentBar > scorePart.Measures.Count)
+            {
+                MessageBoxHelper.ShowMessage(
+                     $"Ran out of measures in part '{scorePart.Name}' at bar {context.CurrentBar}. Not all notes were placed.",
+                     "Insufficient Measures");
+                return false;
+            }
+
+            // Place second part of tied chord notes in next measure
+            var nextMeasure = scorePart.Measures[context.CurrentBar - 1];
+
+            foreach (var chordNote in chordNotes)
             {
                 var secondChordNote = CreateTiedNote(
                     chordNote,
