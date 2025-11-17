@@ -1,3 +1,6 @@
+using System;
+using System.Windows.Forms;
+
 namespace Music
 {
     internal static class Program
@@ -8,6 +11,9 @@ namespace Music
         [STAThread]
         static void Main()
         {
+            // Configure global exception handling BEFORE any UI initialization
+            GlobalExceptionHandler.Configure();
+
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
