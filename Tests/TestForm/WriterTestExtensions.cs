@@ -107,7 +107,7 @@ namespace Music.Writer
         /// Converts Writer data to a AppendNotesParams for use with AppendNotes.
         /// Also adds notes per NumberOfNotes specified in writer data
         /// </summary>
-        public static AppendNotesConfig ToAppendNotesParams(this WriterTestData data)
+        public static AppendNotesParams ToAppendNotesParams(this WriterTestData data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
 
@@ -120,7 +120,7 @@ namespace Music.Writer
                 ? data.SelectedStaffs 
                 : new List<int> { 1 }; // Default to staff 1 if none selected
 
-            var notes = new List<PitchEvent>();
+            var pitchEvents = new List<PitchEvent>();
 
             // Get tuplet settings from writer data
             bool isTuplet = !string.IsNullOrWhiteSpace(data.TupletNumber);
@@ -132,59 +132,35 @@ namespace Music.Writer
             //========================================================================
             //   MOVE THIS THIS CODE BLOCK INTO AppendNote.EXECUTE
 
+            var pitchEvent = new PitchEvent();
+
             if (data.IsChord ?? false)  // null = false
             {
-                // Convert chord to list of WriterNote
-                var chordNotes = ChordConverter.Convert(
-                    data.ChordKey,
-                    (int)data.ChordDegree,
-                    data.ChordQuality,
-                    data.ChordBase,
-                    baseOctave: data.Octave,
-                    noteValue: GetNoteValue(data.NoteValue));
-                // Apply dots to chord notes
-                foreach (var cn in chordNotes)
-                {
-                    cn.Dots = data.Dots;
-                }
-
-                // Apply tuplet settings to all chord notes if tuplet number is specified
-                if (isTuplet)
-                {
-                    foreach (var cn in chordNotes)
-                    {
-                        cn.TupletNumber = tupletNumber;
-                        cn.TupletActualNotes = tupletActualNotes;
-                        cn.TupletNormalNotes = tupletNormalNotes;
-                        cn.Dots = data.Dots;
-                    }
-                }
 
                 //========================================================================
-                // Write the chord into into List<PitchEvent>
+                // Create Chord pitch event
+                // Chords will be resolved into their component notes byn AppendNotes.Execute()
 
-
-
-
-
-
-
-
-
-                // Run this next line NumberOfNotes times to create multiple chords if specified
-                for (int i = 0; i < (data.NumberOfNotes.GetValueOrDefault(1)); i++)
+                pitchEvent = new PitchEvent
                 {
-                    notes.AddRange(chordNotes);
-                }
+                    IsChord = true,
+                    ChordKey = data.ChordKey,
+                    ChordDegree = (int)data.ChordDegree,
+                    ChordQuality = data.ChordQuality,
+                    ChordBase = data.ChordBase,
+                    Octave = data.Octave,
 
+                    Duration = GetNoteValue(data.NoteValue),
+                    IsRest = data.IsRest ?? false,
+                    Dots = data.Dots
+                };
             }
             else
             {
                 // Single note or rest
-                // Create one WriterNote instance (NumberOfNotes removed)
-                var writerNote = new PitchEvent
+                pitchEvent = new PitchEvent
                 {
-                    Step = data.Step != '\0' ? data.Step : 'C',
+                    Step = data.Step,
                     Octave = data.Octave,
                     Duration = GetNoteValue(data.NoteValue),
                     IsChord = false,
@@ -192,31 +168,31 @@ namespace Music.Writer
                     Alter = GetAlter(data.Accidental),
                     Dots = data.Dots
                 };
+           }
 
-                // Add tuplet settings if specified
-                if (isTuplet)
-                {
-                    writerNote.TupletNumber = tupletNumber;
-                    writerNote.TupletActualNotes = tupletActualNotes;
-                    writerNote.TupletNormalNotes = tupletNormalNotes;
-                }
-
-                // Run this next line NumberOfNotes times to create multiple chords if specified
-                for (int i = 0; i < (data.NumberOfNotes.GetValueOrDefault(1)); i++)
-                {
-                    notes.AddRange(writerNote);
-                }
+            // Add tuplet settings if specified
+            if (isTuplet)
+            {
+                pitchEvent.TupletNumber = tupletNumber;
+                pitchEvent.TupletActualNotes = tupletActualNotes;
+                pitchEvent.TupletNormalNotes = tupletNormalNotes;
             }
 
-            var config = new AppendNotesConfig
+            // Create specified number of test Pitch Events
+            for (int i = 0; i < (data.NumberOfNotes.GetValueOrDefault(1)); i++)
+            {
+                pitchEvents.AddRange(pitchEvent);
+            }
+
+            var appendNotesParams = new AppendNotesParams
             {
                 Parts = parts,
                 Staffs = selectedStaffs!,
                 StartBar = data.StartBar.GetValueOrDefault(),
-                Notes = notes
+                Notes = pitchEvents
             };
 
-            return config;
+            return appendNotesParams;
         }
 
         private static int GetNoteValue(string? noteValueString)

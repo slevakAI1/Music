@@ -3,7 +3,7 @@
     /// <summary>
     /// Configuration extracted from Writer for easier processing by SetNotes.
     /// </summary>
-    public sealed class AppendNotesConfig
+    public sealed class AppendNotesParams
     {
         // TARGETS
         public List<string> Parts { get; set; } = new();

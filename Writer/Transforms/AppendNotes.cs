@@ -14,7 +14,7 @@ namespace Music.Writer
         /// Adds notes to the specified score based on the provided configuration.
         /// All parameters are expected to be pre-validated.
         /// </summary>
-        public static void Execute(Score score, AppendNotesConfig config)
+        public static void Execute(Score score, AppendNotesParams config)
         {
             var debugConfig = Helpers.DebugObject(config);
 
@@ -36,7 +36,7 @@ namespace Music.Writer
                 .Where(p => p?.Name != null && partNames.Contains(p.Name));
         }
 
-        private static void ProcessPart(Part scorePart, AppendNotesConfig config)
+        private static void ProcessPart(Part scorePart, AppendNotesParams config)
         {
             if (scorePart.Measures == null || scorePart.Measures.Count == 0)
                 return;
@@ -76,8 +76,41 @@ namespace Music.Writer
             }
         }
 
-        private static void ProcessNotesForStaff(Part scorePart, AppendNotesConfig config, StaffProcessingContext context)
+        private static void ProcessNotesForStaff(Part scorePart, AppendNotesParams config, StaffProcessingContext context)
         {
+
+            /*
+             *                 // Convert chord to list of WriterNote
+                var chordNotes = ChordConverter.Convert(
+                    data.ChordKey,
+                    (int)data.ChordDegree,
+                    data.ChordQuality,
+                    data.ChordBase,
+                    baseOctave: data.Octave,
+                    noteValue: GetNoteValue(data.NoteValue));
+                // Apply dots to chord notes
+                foreach (var cn in chordNotes)
+                {
+                    cn.Dots = data.Dots;
+                }
+
+                // Apply tuplet settings to all chord notes if tuplet number is specified
+                if (isTuplet)
+                {
+                    foreach (var cn in chordNotes)
+                    {
+                        cn.TupletNumber = tupletNumber;
+                        cn.TupletActualNotes = tupletActualNotes;
+                        cn.TupletNormalNotes = tupletNormalNotes;
+                        cn.Dots = data.Dots;
+                    }
+                }
+
+             * 
+             */
+
+
+
             var pendingChordNotes = new List<PitchEvent>();
 
             foreach (var writerNote in config.Notes)
