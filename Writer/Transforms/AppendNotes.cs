@@ -14,7 +14,7 @@ namespace Music.Writer
         /// Adds notes to the specified score based on the provided configuration.
         /// All parameters are expected to be pre-validated.
         /// </summary>
-        public static void Execute(Score score, AppendNotesParams config)
+        public static void Execute(Score score, AppendPitchEventsParams config)
         {
             var debugConfig = Helpers.DebugObject(config);
 
@@ -36,7 +36,7 @@ namespace Music.Writer
                 .Where(p => p?.Name != null && partNames.Contains(p.Name));
         }
 
-        private static void ProcessPart(Part scorePart, AppendNotesParams config)
+        private static void ProcessPart(Part scorePart, AppendPitchEventsParams config)
         {
             if (scorePart.Measures == null || scorePart.Measures.Count == 0)
                 return;
@@ -76,9 +76,9 @@ namespace Music.Writer
             }
         }
 
-        private static void ProcessNotesForStaff(Part scorePart, AppendNotesParams config, StaffProcessingContext context)
+        private static void ProcessNotesForStaff(Part scorePart, AppendPitchEventsParams appendPitchEventsParams, StaffProcessingContext context)
         {
-            foreach (var pitchEvent in config.PitchEvents)
+            foreach (var pitchEvent in appendPitchEventsParams.PitchEvents)
             {
                 if (!AppendNotesHelper.EnsureMeasureAvailable(scorePart, context.CurrentBar, scorePart.Name))
                     return;
@@ -86,16 +86,16 @@ namespace Music.Writer
                 // Dispatch to chord or single-note processing
                 if (pitchEvent.IsChord)
                 {
-                    ProcessChord(scorePart, pitchEvent, config, context);
+                    ProcessChord(scorePart, pitchEvent, appendPitchEventsParams, context);
                 }
                 else
                 {
-                    ProcessSingleNote(scorePart, pitchEvent, config, context);
+                    ProcessSingleNote(scorePart, pitchEvent, appendPitchEventsParams, context);
                 }
             }
         }
 
-        private static void ProcessSingleNote(Part scorePart, PitchEvent pitchEvent, AppendNotesParams config, StaffProcessingContext context)
+        private static void ProcessSingleNote(Part scorePart, PitchEvent pitchEvent, AppendPitchEventsParams config, StaffProcessingContext context)
         {
             var measure = scorePart.Measures[context.CurrentBar - 1];
             var measureInfo = AppendNotesHelper.GetMeasureInfo(measure);
@@ -144,7 +144,7 @@ namespace Music.Writer
             AppendNotesHelper.UpdatePositionTracking(context, pitchEvent, noteDuration);
         }
 
-        private static void ProcessChord(Part scorePart, PitchEvent pitchEvent, AppendNotesParams config, StaffProcessingContext context)
+        private static void ProcessChord(Part scorePart, PitchEvent pitchEvent, AppendPitchEventsParams config, StaffProcessingContext context)
         {
 
             // TO DO - This probably doesnt need note value... that property should be applied here if not already applied!

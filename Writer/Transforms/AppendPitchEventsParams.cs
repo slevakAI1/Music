@@ -3,7 +3,7 @@
     /// <summary>
     /// Configuration extracted from Writer for easier processing by SetNotes.
     /// </summary>
-    public sealed class AppendNotesParams
+    public sealed class AppendPitchEventsParams
     {
         // TARGETS
         public List<string> Parts { get; set; } = new();

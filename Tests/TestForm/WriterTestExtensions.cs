@@ -107,7 +107,7 @@ namespace Music.Writer
         /// Converts Writer data to a AppendNotesParams for use with AppendNotes.
         /// Also adds notes per NumberOfNotes specified in writer data
         /// </summary>
-        public static AppendNotesParams ToAppendNotesParams(this WriterTestData data)
+        public static AppendPitchEventsParams ToAppendPitchEventsParams(this WriterTestData data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
 
@@ -184,7 +184,7 @@ namespace Music.Writer
                 pitchEvents.AddRange(pitchEvent);
             }
 
-            var appendNotesParams = new AppendNotesParams
+            var appendNotesParams = new AppendPitchEventsParams
             {
                 Parts = parts,
                 Staffs = selectedStaffs!,
