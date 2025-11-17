@@ -189,7 +189,7 @@ namespace Music.Writer
                 Parts = parts,
                 Staffs = selectedStaffs!,
                 StartBar = data.StartBar.GetValueOrDefault(),
-                Notes = pitchEvents
+                PitchEvents = pitchEvents
             };
 
             return appendNotesParams;
