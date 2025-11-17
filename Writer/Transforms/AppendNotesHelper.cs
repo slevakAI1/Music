@@ -9,12 +9,12 @@ namespace Music.Writer
             Part scorePart, 
             int staffIndex, 
             int totalStaffs, 
-            Dictionary<int, long> durationPerMeasure)
+            Dictionary<int, long> usedDivisionsPerMeasure)
         {
             if (staffIndex >= totalStaffs - 1)
                 return;
 
-            foreach (var measureEntry in durationPerMeasure.OrderBy(kvp => kvp.Key))
+            foreach (var measureEntry in usedDivisionsPerMeasure.OrderBy(kvp => kvp.Key))
             {
                 int measureNumber = measureEntry.Key;
                 long durationWritten = measureEntry.Value;
@@ -115,7 +115,7 @@ namespace Music.Writer
 
         private static int CalculateNoteDurationInMeasure(int divisions, int noteValue)
         {
-            int numerator = divisions * 4;
+            int numerator = divisions * 4;  // TO DO why is this x 4?
             if (numerator % noteValue != 0)
             {
                 // Calculate the minimum divisions needed for this note value
@@ -304,7 +304,7 @@ namespace Music.Writer
                 });
             }
 
-            UpdateDurationTracking(context.DurationPerMeasure, context.CurrentBar, durationInCurrentMeasure);
+            UpdateUsedDivisionsPerMeasure(context.UsedDivisionsPerMeasure, context.CurrentBar, durationInCurrentMeasure);
 
             // Advance to next measure
             context.CurrentBar++;
@@ -339,7 +339,7 @@ namespace Music.Writer
             }
 
             context.CurrentBeatPosition = durationInNextMeasure;
-            UpdateDurationTracking(context.DurationPerMeasure, context.CurrentBar, durationInNextMeasure);
+            UpdateUsedDivisionsPerMeasure(context.UsedDivisionsPerMeasure, context.CurrentBar, durationInNextMeasure);
 
             return true;
         }
@@ -369,7 +369,7 @@ namespace Music.Writer
                 Element = firstNote
             });
 
-            UpdateDurationTracking(context.DurationPerMeasure, context.CurrentBar, durationInCurrentMeasure);
+            UpdateUsedDivisionsPerMeasure(context.UsedDivisionsPerMeasure, context.CurrentBar, durationInCurrentMeasure);
 
             // Advance to next measure
             context.CurrentBar++;
@@ -400,7 +400,7 @@ namespace Music.Writer
             });
 
             context.CurrentBeatPosition = durationInNextMeasure;
-            UpdateDurationTracking(context.DurationPerMeasure, context.CurrentBar, durationInNextMeasure);
+            UpdateUsedDivisionsPerMeasure(context.UsedDivisionsPerMeasure, context.CurrentBar, durationInNextMeasure);
 
             return true;
         }
@@ -420,11 +420,11 @@ namespace Music.Writer
             };
         }
 
-        public static void UpdateDurationTracking(Dictionary<int, long> durationPerMeasure, int currentBar, long duration)
+        public static void UpdateUsedDivisionsPerMeasure(Dictionary<int, long> usedDivisionsPerMeasure, int currentBar, long duration)
         {
-            if (!durationPerMeasure.ContainsKey(currentBar))
-                durationPerMeasure[currentBar] = 0;
-            durationPerMeasure[currentBar] += duration;
+            if (!usedDivisionsPerMeasure.ContainsKey(currentBar))
+                usedDivisionsPerMeasure[currentBar] = 0;
+            usedDivisionsPerMeasure[currentBar] += duration;
         }
 
         public static void UpdatePositionTracking(
@@ -435,7 +435,7 @@ namespace Music.Writer
             if (!pitchEvent.IsChord)
             {
                 context.CurrentBeatPosition += noteDuration;
-                UpdateDurationTracking(context.DurationPerMeasure, context.CurrentBar, noteDuration);
+                UpdateUsedDivisionsPerMeasure(context.UsedDivisionsPerMeasure, context.CurrentBar, noteDuration);
             }
         }
     }

@@ -45,19 +45,29 @@ namespace Music.Writer
 
             for (int staffIndex = 0; staffIndex < targetStaffs.Count; staffIndex++)
             {
+
+                // TODO - change UsedDivisionsPerMeasure to be per staff per part and persist
+
+
                 var staff = targetStaffs[staffIndex];
                 var context = new StaffProcessingContext
                 {
                     Staff = staff,
                     CurrentBar = config.StartBar,
                     CurrentBeatPosition = 0,
-                    DurationPerMeasure = new Dictionary<int, long>(),
+
+                    UsedDivisionsPerMeasure = new Dictionary<int, long>(),  // <--- starts new per part per staff. does not persist.
+
                     TupletStates = new Dictionary<string, TupletState>(StringComparer.OrdinalIgnoreCase)
                 };
 
+
+
+
+
                 ProcessNotesForStaff(scorePart, config, context);
 
-                AppendNotesHelper.AddBackupElementsIfNeeded(scorePart, staffIndex, targetStaffs.Count, context.DurationPerMeasure);
+                AppendNotesHelper.AddBackupElementsIfNeeded(scorePart, staffIndex, targetStaffs.Count, context.UsedDivisionsPerMeasure);
             }
         }
 
@@ -236,7 +246,7 @@ namespace Music.Writer
 
             // Advance position for the chord (advance once per chord)
             context.CurrentBeatPosition += noteDuration;
-            AppendNotesHelper.UpdateDurationTracking(context.DurationPerMeasure, context.CurrentBar, noteDuration);
+            AppendNotesHelper.UpdateUsedDivisionsPerMeasure(context.UsedDivisionsPerMeasure, context.CurrentBar, noteDuration);
         }
 
         public sealed class MeasureInfo
@@ -263,7 +273,7 @@ namespace Music.Writer
             public int Staff { get; set; }
             public int CurrentBar { get; set; }
             public long CurrentBeatPosition { get; set; }
-            public Dictionary<int, long> DurationPerMeasure { get; set; } = new();
+            public Dictionary<int, long> UsedDivisionsPerMeasure { get; set; } = new();
             public Dictionary<string, TupletState> TupletStates { get; set; } = new();
         }
     }
