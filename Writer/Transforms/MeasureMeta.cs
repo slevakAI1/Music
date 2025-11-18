@@ -4,11 +4,11 @@ namespace Music.Writer
     /// Tracks the duration used in each measure per part and staff.
     /// Internally uses a composite key format: "PartName|Staff|Measure"
     /// </summary>
-    public sealed class UsedDivisionsPerMeasure
+    public sealed class MeasureMeta
     {
         private readonly Dictionary<string, long> _data;
 
-        public UsedDivisionsPerMeasure()
+        public MeasureMeta()
         {
             _data = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
         }
@@ -21,7 +21,7 @@ namespace Music.Writer
         /// <param name="staff">The staff number</param>
         /// <param name="measureNumber">The measure number</param>
         /// <returns>The total duration used in divisions</returns>
-        public long GetMeasureData(string partName, int staff, int measureNumber)
+        public long GetDivisionsUsed(string partName, int staff, int measureNumber)
         {
             var key = CreateKey(partName, staff, measureNumber);
             return _data.TryGetValue(key, out var value) ? value : 0;
@@ -34,7 +34,7 @@ namespace Music.Writer
         /// <param name="staff">The staff number</param>
         /// <param name="measureNumber">The measure number</param>
         /// <param name="duration">The duration to set</param>
-        public void SetMeasureData(string partName, int staff, int measureNumber, long duration)
+        public void SetDivisionsUsed(string partName, int staff, int measureNumber, long duration)
         {
             var key = CreateKey(partName, staff, measureNumber);
             _data[key] = duration;
@@ -48,7 +48,7 @@ namespace Music.Writer
         /// <param name="staff">The staff number</param>
         /// <param name="measureNumber">The measure number</param>
         /// <param name="duration">The duration to add</param>
-        public void AddMeasureData(string partName, int staff, int measureNumber, long duration)
+        public void AddDivisionsUsed(string partName, int staff, int measureNumber, long duration)
         {
             var key = CreateKey(partName, staff, measureNumber);
             if (!_data.ContainsKey(key))
@@ -63,7 +63,7 @@ namespace Music.Writer
         /// <param name="partName">The name of the part</param>
         /// <param name="staff">The staff number</param>
         /// <returns>List of tuples containing (measureNumber, duration)</returns>
-        public List<(int measureNumber, long duration)> GetEntriesForPartAndStaff(string partName, int staff)
+        public List<(int measureNumber, long duration)> GetDivisionsUsedForPartAndStaff(string partName, int staff)
         {
             var prefix = $"{partName}|{staff}|";
             var results = new List<(int measureNumber, long duration)>();

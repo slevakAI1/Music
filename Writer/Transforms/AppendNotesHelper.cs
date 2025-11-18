@@ -9,7 +9,7 @@ namespace Music.Writer
             Part scorePart, 
             int staffIndex, 
             int totalStaffs, 
-            UsedDivisionsPerMeasure usedDivisionsPerMeasure)
+            MeasureMeta usedDivisionsPerMeasure)
         {
             if (staffIndex >= totalStaffs - 1)
                 return;
@@ -17,7 +17,7 @@ namespace Music.Writer
             var staffNumber = scorePart != null ? staffIndex + 1 : 1; // Convert index to staff number
 
             // Get entries for this specific part and staff
-            var relevantEntries = usedDivisionsPerMeasure.GetEntriesForPartAndStaff(scorePart.Name, staffNumber);
+            var relevantEntries = usedDivisionsPerMeasure.GetDivisionsUsedForPartAndStaff(scorePart.Name, staffNumber);
 
             foreach (var (measureNumber, durationWritten) in relevantEntries)
             {
@@ -283,7 +283,7 @@ namespace Music.Writer
             AppendNotes.StaffProcessingContext context,
             AppendNotes.MeasureInfo measureInfo,
             int noteDuration,
-            UsedDivisionsPerMeasure usedDivisionsPerMeasure)
+            MeasureMeta usedDivisionsPerMeasure)
         {
             long durationInCurrentMeasure = measureInfo.BarLengthDivisions - context.CurrentBeatPosition;
             long durationInNextMeasure = noteDuration - durationInCurrentMeasure;
@@ -307,7 +307,7 @@ namespace Music.Writer
                 });
             }
 
-            usedDivisionsPerMeasure.AddMeasureData(scorePart.Name, context.Staff, context.CurrentBar, durationInCurrentMeasure);
+            usedDivisionsPerMeasure.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInCurrentMeasure);
 
             // Advance to next measure
             context.CurrentBar++;
@@ -342,7 +342,7 @@ namespace Music.Writer
             }
 
             context.CurrentBeatPosition = durationInNextMeasure;
-            usedDivisionsPerMeasure.AddMeasureData(scorePart.Name, context.Staff, context.CurrentBar, durationInNextMeasure);
+            usedDivisionsPerMeasure.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInNextMeasure);
 
             return true;
         }
@@ -353,7 +353,7 @@ namespace Music.Writer
             AppendNotes.StaffProcessingContext context,
             AppendNotes.MeasureInfo measureInfo,
             int noteDuration,
-            UsedDivisionsPerMeasure usedDivisionsPerMeasure)
+            MeasureMeta usedDivisionsPerMeasure)
         {
             long durationInCurrentMeasure = measureInfo.BarLengthDivisions - context.CurrentBeatPosition;
             long durationInNextMeasure = noteDuration - durationInCurrentMeasure;
@@ -373,7 +373,7 @@ namespace Music.Writer
                 Element = firstNote
             });
 
-            usedDivisionsPerMeasure.AddMeasureData(scorePart.Name, context.Staff, context.CurrentBar, durationInCurrentMeasure);
+            usedDivisionsPerMeasure.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInCurrentMeasure);
 
             // Advance to next measure
             context.CurrentBar++;
@@ -404,7 +404,7 @@ namespace Music.Writer
             });
 
             context.CurrentBeatPosition = durationInNextMeasure;
-            usedDivisionsPerMeasure.AddMeasureData(scorePart.Name, context.Staff, context.CurrentBar, durationInNextMeasure);
+            usedDivisionsPerMeasure.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInNextMeasure);
 
             return true;
         }
@@ -444,12 +444,12 @@ namespace Music.Writer
             PitchEvent pitchEvent, 
             int noteDuration,
             string partName,
-            UsedDivisionsPerMeasure usedDivisionsPerMeasure)
+            MeasureMeta usedDivisionsPerMeasure)
         {
             if (!pitchEvent.IsChord)
             {
                 context.CurrentBeatPosition += noteDuration;
-                usedDivisionsPerMeasure.AddMeasureData(partName, context.Staff, context.CurrentBar, noteDuration);
+                usedDivisionsPerMeasure.AddDivisionsUsed(partName, context.Staff, context.CurrentBar, noteDuration);
             }
         }
     }

@@ -9,7 +9,7 @@ namespace Music.Writer
         private Score? _score;
         private Designer.Designer? _designer;
         private WriterTestData? _writer;
-        private UsedDivisionsPerMeasure _usedDivisionsPerMeasure;
+        private MeasureMeta _usedDivisionsPerMeasure;
 
         //===========================   I N I T I A L I Z A T I O N   ===========================
         public WriterTestForm()
@@ -17,7 +17,7 @@ namespace Music.Writer
             InitializeComponent();
 
             // Initialize UsedDivisionsPerMeasure tracking object
-            _usedDivisionsPerMeasure = new UsedDivisionsPerMeasure();
+            _usedDivisionsPerMeasure = new MeasureMeta();
 
             // Window behavior similar to other forms
             this.FormBorderStyle = FormBorderStyle.Sizable;

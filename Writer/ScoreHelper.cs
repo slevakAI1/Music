@@ -14,7 +14,7 @@ namespace Music.Writer
             Form owner,
             Designer.Designer? design,
             CheckedListBox cbPart,
-            UsedDivisionsPerMeasure usedDivisionsPerMeasure)
+            MeasureMeta usedDivisionsPerMeasure)
         {
             // Clear the UsedDivisionsPerMeasure since this is a new score with no notes
             usedDivisionsPerMeasure.Clear();

@@ -14,7 +14,7 @@ namespace Music.Writer
         /// Adds notes to the specified score based on the provided configuration.
         /// All parameters are expected to be pre-validated.
         /// </summary>
-        public static void Execute(Score score, AppendPitchEventsParams config, UsedDivisionsPerMeasure usedDivisionsPerMeasure)
+        public static void Execute(Score score, AppendPitchEventsParams config, MeasureMeta usedDivisionsPerMeasure)
         {
             var debugConfig = Helpers.DebugObject(config);
 
@@ -34,7 +34,7 @@ namespace Music.Writer
                 .Where(p => p?.Name != null && partNames.Contains(p.Name));
         }
 
-        private static void ProcessPart(Part scorePart, AppendPitchEventsParams config, UsedDivisionsPerMeasure usedDivisionsPerMeasure)
+        private static void ProcessPart(Part scorePart, AppendPitchEventsParams config, MeasureMeta usedDivisionsPerMeasure)
         {
             if (scorePart.Measures == null || scorePart.Measures.Count == 0)
                 return;
@@ -74,7 +74,7 @@ namespace Music.Writer
             }
         }
 
-        private static void ProcessNotesForStaff(Part scorePart, AppendPitchEventsParams appendPitchEventsParams, StaffProcessingContext context, UsedDivisionsPerMeasure usedDivisionsPerMeasure)
+        private static void ProcessNotesForStaff(Part scorePart, AppendPitchEventsParams appendPitchEventsParams, StaffProcessingContext context, MeasureMeta usedDivisionsPerMeasure)
         {
             foreach (var pitchEvent in appendPitchEventsParams.PitchEvents)
             {
@@ -93,7 +93,7 @@ namespace Music.Writer
             }
         }
 
-        private static void ProcessSingleNote(Part scorePart, PitchEvent pitchEvent, AppendPitchEventsParams config, StaffProcessingContext context, UsedDivisionsPerMeasure usedDivisionsPerMeasure)
+        private static void ProcessSingleNote(Part scorePart, PitchEvent pitchEvent, AppendPitchEventsParams config, StaffProcessingContext context, MeasureMeta usedDivisionsPerMeasure)
         {
             var measure = scorePart.Measures[context.CurrentBar - 1];
             var measureInfo = AppendNotesHelper.GetMeasureInfo(measure);
@@ -142,7 +142,7 @@ namespace Music.Writer
             AppendNotesHelper.UpdatePositionTracking(context, pitchEvent, noteDuration, scorePart.Name, usedDivisionsPerMeasure);
         }
 
-        private static void ProcessChord(Part scorePart, PitchEvent pitchEvent, AppendPitchEventsParams config, StaffProcessingContext context, UsedDivisionsPerMeasure usedDivisionsPerMeasure)
+        private static void ProcessChord(Part scorePart, PitchEvent pitchEvent, AppendPitchEventsParams config, StaffProcessingContext context, MeasureMeta usedDivisionsPerMeasure)
         {
             // TO DO - This probably doesnt need note value... that property should be applied here if not already applied!
 
@@ -235,7 +235,7 @@ namespace Music.Writer
 
             // Advance position for the chord (advance once per chord)
             context.CurrentBeatPosition += noteDuration;
-            usedDivisionsPerMeasure.AddMeasureData(scorePart.Name, context.Staff, context.CurrentBar, noteDuration);
+            usedDivisionsPerMeasure.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, noteDuration);
         }
 
         public sealed class MeasureInfo
