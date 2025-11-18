@@ -46,12 +46,18 @@ namespace Music.Writer
             for (int staffIndex = 0; staffIndex < targetStaffs.Count; staffIndex++)
             {
                 var staff = targetStaffs[staffIndex];
+                
+                // Find where to start appending for this part and staff
+                var (startMeasure, startPosition) = AppendNotesHelper.FindAppendStartPosition(
+                    scorePart,
+                    staff,
+                    usedDivisionsPerMeasure);
+
                 var context = new StaffProcessingContext
                 {
                     Staff = staff,
-                    CurrentBar = config.StartBar,
-                    CurrentBeatPosition = 0,
-
+                    CurrentBar = startMeasure,
+                    CurrentBeatPosition = startPosition,
                     TupletStates = new Dictionary<string, TupletState>(StringComparer.OrdinalIgnoreCase)
                 };
 
@@ -243,7 +249,6 @@ namespace Music.Writer
             public int Divisions { get; set; }
             public int BeatsPerBar { get; set; }
             public int BarLengthDivisions { get; set; }
-            public long ExistingDuration { get; set; }
         }
 
         // Local helper to track tuplet lifecycle for a given tuplet id within a staff pass.

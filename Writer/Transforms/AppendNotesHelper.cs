@@ -99,22 +99,6 @@ namespace Music.Writer
             ApplyTupletNotation(note, pitchEvent, ts, tupletStates, key);
         }
 
-        private static long CalculateExistingDuration(Measure measure)
-        {
-            long duration = 0;
-            foreach (var me in measure.MeasureElements ?? Enumerable.Empty<MeasureElement>())
-            {
-                if (me?.Type == MeasureElementType.Note &&
-                    me.Element is MusicXml.Domain.Note n &&
-                    n.Duration > 0 &&
-                    !n.IsChordTone)
-                {
-                    duration += n.Duration;
-                }
-            }
-            return duration;
-        }
-
         private static int CalculateNoteDurationInMeasure(int divisions, int noteValue)
         {
             int numerator = divisions * 4;  // TO DO why is this x 4?
@@ -266,14 +250,12 @@ namespace Music.Writer
         {
             var divisions = Math.Max(1, measure.Attributes?.Divisions ?? MusicConstants.DefaultDivisions);
             var beatsPerBar = measure.Attributes?.Time?.Beats ?? 4;
-            var existingDuration = CalculateExistingDuration(measure);
 
             return new AppendNotes.MeasureInfo
             {
                 Divisions = divisions,
                 BeatsPerBar = beatsPerBar,
-                BarLengthDivisions = divisions * beatsPerBar,
-                ExistingDuration = existingDuration
+                BarLengthDivisions = divisions * beatsPerBar
             };
         }
 
@@ -451,6 +433,54 @@ namespace Music.Writer
                 context.CurrentBeatPosition += noteDuration;
                 usedDivisionsPerMeasure.AddDivisionsUsed(partName, context.Staff, context.CurrentBar, noteDuration);
             }
+        }
+
+        /// <summary>
+        /// Finds the first measure and beat position where notes can be appended for a given part and staff.
+        /// Returns (measureNumber, beatPosition) based on MeasureMeta tracking.
+        /// </summary>
+        public static (int measureNumber, long beatPosition) FindAppendStartPosition(
+            Part scorePart,
+            int staff,
+            MeasureMeta usedDivisionsPerMeasure)
+        {
+            if (scorePart?.Measures == null || scorePart.Measures.Count == 0)
+                return (1, 0);
+
+            // Query all divisions used for this part and staff
+            var allDivisions = usedDivisionsPerMeasure.GetDivisionsUsedForPartAndStaff(scorePart.Name, staff);
+
+            // If no data exists, start at measure 1, position 0
+            if (allDivisions.Count == 0)
+                return (1, 0);
+
+            // Find the highest measure number with divisions > 0
+            var lastUsedMeasure = allDivisions
+                .Where(x => x.duration > 0)
+                .OrderByDescending(x => x.measureNumber)
+                .FirstOrDefault();
+
+            // If no measure has any divisions used, start at measure 1
+            if (lastUsedMeasure.measureNumber == 0)
+                return (1, 0);
+
+            // Get the measure to check its capacity
+            int measureIndex = lastUsedMeasure.measureNumber - 1;
+            if (measureIndex < 0 || measureIndex >= scorePart.Measures.Count)
+                return (1, 0);
+
+            var measure = scorePart.Measures[measureIndex];
+            var measureInfo = GetMeasureInfo(measure);
+
+            // If measure is full, start at the next measure
+            if (lastUsedMeasure.duration >= measureInfo.BarLengthDivisions)
+            {
+                int nextMeasure = lastUsedMeasure.measureNumber + 1;
+                return (nextMeasure, 0);
+            }
+
+            // Measure has space; return current measure with used divisions as position
+            return (lastUsedMeasure.measureNumber, lastUsedMeasure.duration);
         }
     }
 }
