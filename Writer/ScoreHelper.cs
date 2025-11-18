@@ -14,10 +14,10 @@ namespace Music.Writer
             Form owner,
             Designer.Designer? design,
             CheckedListBox cbPart,
-            ref Dictionary<string, long> usedDivisionsPerMeasure)
+            UsedDivisionsPerMeasure usedDivisionsPerMeasure)
         {
             // Clear the UsedDivisionsPerMeasure since this is a new score with no notes
-            usedDivisionsPerMeasure = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+            usedDivisionsPerMeasure.Clear();
 
             // Create a fresh Score instance and assign to the local cache (returned to caller)
             var score = new Score

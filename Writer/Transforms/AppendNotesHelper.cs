@@ -9,36 +9,27 @@ namespace Music.Writer
             Part scorePart, 
             int staffIndex, 
             int totalStaffs, 
-            ref Dictionary<string, long> usedDivisionsPerMeasure)
+            UsedDivisionsPerMeasure usedDivisionsPerMeasure)
         {
             if (staffIndex >= totalStaffs - 1)
                 return;
 
             var staffNumber = scorePart != null ? staffIndex + 1 : 1; // Convert index to staff number
 
-            // Filter entries for this specific part and staff
-            var relevantEntries = usedDivisionsPerMeasure
-                .Where(kvp => kvp.Key.StartsWith($"{scorePart.Name}|{staffNumber}|", StringComparison.OrdinalIgnoreCase))
-                .ToList();
+            // Get entries for this specific part and staff
+            var relevantEntries = usedDivisionsPerMeasure.GetEntriesForPartAndStaff(scorePart.Name, staffNumber);
 
-            foreach (var entry in relevantEntries)
+            foreach (var (measureNumber, durationWritten) in relevantEntries)
             {
-                // Extract measure number from composite key "PartName|Staff|Measure"
-                var parts = entry.Key.Split('|');
-                if (parts.Length == 3 && int.TryParse(parts[2], out int measureNumber))
+                if (durationWritten > 0 && measureNumber <= scorePart.Measures.Count)
                 {
-                    long durationWritten = entry.Value;
-
-                    if (durationWritten > 0 && measureNumber <= scorePart.Measures.Count)
+                    var measure = scorePart.Measures[measureNumber - 1];
+                    measure.MeasureElements ??= new List<MeasureElement>();
+                    measure.MeasureElements.Add(new MeasureElement
                     {
-                        var measure = scorePart.Measures[measureNumber - 1];
-                        measure.MeasureElements ??= new List<MeasureElement>();
-                        measure.MeasureElements.Add(new MeasureElement
-                        {
-                            Type = MeasureElementType.Backup,
-                            Element = new Backup { Duration = (int)durationWritten }
-                        });
-                    }
+                        Type = MeasureElementType.Backup,
+                        Element = new Backup { Duration = (int)durationWritten }
+                    });
                 }
             }
         }
@@ -292,7 +283,7 @@ namespace Music.Writer
             AppendNotes.StaffProcessingContext context,
             AppendNotes.MeasureInfo measureInfo,
             int noteDuration,
-            ref Dictionary<string, long> usedDivisionsPerMeasure)
+            UsedDivisionsPerMeasure usedDivisionsPerMeasure)
         {
             long durationInCurrentMeasure = measureInfo.BarLengthDivisions - context.CurrentBeatPosition;
             long durationInNextMeasure = noteDuration - durationInCurrentMeasure;
@@ -316,7 +307,7 @@ namespace Music.Writer
                 });
             }
 
-            UpdateUsedDivisionsPerMeasure(ref usedDivisionsPerMeasure, scorePart.Name, context.Staff, context.CurrentBar, durationInCurrentMeasure);
+            usedDivisionsPerMeasure.AddMeasureData(scorePart.Name, context.Staff, context.CurrentBar, durationInCurrentMeasure);
 
             // Advance to next measure
             context.CurrentBar++;
@@ -351,7 +342,7 @@ namespace Music.Writer
             }
 
             context.CurrentBeatPosition = durationInNextMeasure;
-            UpdateUsedDivisionsPerMeasure(ref usedDivisionsPerMeasure, scorePart.Name, context.Staff, context.CurrentBar, durationInNextMeasure);
+            usedDivisionsPerMeasure.AddMeasureData(scorePart.Name, context.Staff, context.CurrentBar, durationInNextMeasure);
 
             return true;
         }
@@ -362,7 +353,7 @@ namespace Music.Writer
             AppendNotes.StaffProcessingContext context,
             AppendNotes.MeasureInfo measureInfo,
             int noteDuration,
-            ref Dictionary<string, long> usedDivisionsPerMeasure)
+            UsedDivisionsPerMeasure usedDivisionsPerMeasure)
         {
             long durationInCurrentMeasure = measureInfo.BarLengthDivisions - context.CurrentBeatPosition;
             long durationInNextMeasure = noteDuration - durationInCurrentMeasure;
@@ -382,7 +373,7 @@ namespace Music.Writer
                 Element = firstNote
             });
 
-            UpdateUsedDivisionsPerMeasure(ref usedDivisionsPerMeasure, scorePart.Name, context.Staff, context.CurrentBar, durationInCurrentMeasure);
+            usedDivisionsPerMeasure.AddMeasureData(scorePart.Name, context.Staff, context.CurrentBar, durationInCurrentMeasure);
 
             // Advance to next measure
             context.CurrentBar++;
@@ -413,7 +404,7 @@ namespace Music.Writer
             });
 
             context.CurrentBeatPosition = durationInNextMeasure;
-            UpdateUsedDivisionsPerMeasure(ref usedDivisionsPerMeasure, scorePart.Name, context.Staff, context.CurrentBar, durationInNextMeasure);
+            usedDivisionsPerMeasure.AddMeasureData(scorePart.Name, context.Staff, context.CurrentBar, durationInNextMeasure);
 
             return true;
         }
@@ -453,12 +444,12 @@ namespace Music.Writer
             PitchEvent pitchEvent, 
             int noteDuration,
             string partName,
-            ref Dictionary<string, long> usedDivisionsPerMeasure)
+            UsedDivisionsPerMeasure usedDivisionsPerMeasure)
         {
             if (!pitchEvent.IsChord)
             {
                 context.CurrentBeatPosition += noteDuration;
-                UpdateUsedDivisionsPerMeasure(ref usedDivisionsPerMeasure, partName, context.Staff, context.CurrentBar, noteDuration);
+                usedDivisionsPerMeasure.AddMeasureData(partName, context.Staff, context.CurrentBar, noteDuration);
             }
         }
     }
