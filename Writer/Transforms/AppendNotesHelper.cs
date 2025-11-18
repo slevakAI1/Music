@@ -5,33 +5,112 @@ namespace Music.Writer
 {
     internal static class AppendNotesHelper
     {
-        public static void AddBackupElementsIfNeeded(
-            Part scorePart, 
-            int staffIndex, 
-            int totalStaffs, 
-            MeasureMeta usedDivisionsPerMeasure)
+        /// <summary>
+        /// Post-processes all measures in the score to add required backup elements.
+        /// This should be called after all notes have been inserted.
+        /// A backup is needed when a measure has notes on multiple staves.
+        /// </summary>
+        public static void AddAllRequiredBackupElements(Score score, List<string> partNames, MeasureMeta usedDivisionsPerMeasure)
         {
-            if (staffIndex >= totalStaffs - 1)
-                return;
-
-            var staffNumber = scorePart != null ? staffIndex + 1 : 1; // Convert index to staff number
-
-            // Get entries for this specific part and staff
-            var relevantEntries = usedDivisionsPerMeasure.GetDivisionsUsedForPartAndStaff(scorePart.Name, staffNumber);
-
-            foreach (var (measureNumber, durationWritten) in relevantEntries)
+            foreach (var part in score.Parts.Where(p => partNames.Contains(p.Name)))
             {
-                if (durationWritten > 0 && measureNumber <= scorePart.Measures.Count)
+                if (part.Measures == null) continue;
+                
+                for (int measureIndex = 0; measureIndex < part.Measures.Count; measureIndex++)
                 {
-                    var measure = scorePart.Measures[measureNumber - 1];
-                    measure.MeasureElements ??= new List<MeasureElement>();
-                    measure.MeasureElements.Add(new MeasureElement
-                    {
-                        Type = MeasureElementType.Backup,
-                        Element = new Backup { Duration = (int)durationWritten }
-                    });
+                    int measureNumber = measureIndex + 1;
+                    ProcessMeasureForBackups(part.Name, part.Measures[measureIndex], measureNumber, usedDivisionsPerMeasure);
                 }
             }
+        }
+
+        /// <summary>
+        /// Processes a single measure to add backup elements where needed.
+        /// A backup is needed after notes on each staff (except the last) when multiple staves have notes.
+        /// </summary>
+        private static void ProcessMeasureForBackups(string partName, Measure measure, int measureNumber, MeasureMeta usedDivisionsPerMeasure)
+        {
+            if (measure?.MeasureElements == null || measure.MeasureElements.Count == 0)
+                return;
+
+            // Find all unique staves that have notes in this measure
+            var stavesWithNotes = measure.MeasureElements
+                .Where(e => e.Type == MeasureElementType.Note && e.Element is MusicXml.Domain.Note)
+                .Select(e => ((MusicXml.Domain.Note)e.Element).Staff)
+                .Where(staff => staff > 0)
+                .Distinct()
+                .OrderBy(s => s)
+                .ToList();
+
+            // If only one staff (or no staves), no backup needed
+            if (stavesWithNotes.Count <= 1)
+                return;
+
+            // Process each staff except the last one (last staff doesn't need backup)
+            for (int i = 0; i < stavesWithNotes.Count - 1; i++)
+            {
+                int staffNumber = stavesWithNotes[i];
+                
+                // Get the duration used by this staff in this measure
+                long durationUsed = usedDivisionsPerMeasure.GetDivisionsUsed(partName, staffNumber, measureNumber);
+                
+                if (durationUsed > 0)
+                {
+                    // Find the last note for this staff
+                    int lastNotePosition = FindLastNotePositionForStaff(measure, staffNumber);
+                    
+                    if (lastNotePosition >= 0 && !HasBackupAtPosition(measure, lastNotePosition))
+                    {
+                        // Insert backup element right after the last note of this staff
+                        measure.MeasureElements.Insert(lastNotePosition + 1, new MeasureElement
+                        {
+                            Type = MeasureElementType.Backup,
+                            Element = new Backup { Duration = (int)durationUsed }
+                        });
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Finds the index of the last note element for a specific staff in a measure.
+        /// Returns -1 if no notes found for that staff.
+        /// </summary>
+        private static int FindLastNotePositionForStaff(Measure measure, int staffNumber)
+        {
+            int lastPosition = -1;
+            
+            if (measure?.MeasureElements == null)
+                return lastPosition;
+            
+            for (int i = 0; i < measure.MeasureElements.Count; i++)
+            {
+                var element = measure.MeasureElements[i];
+                if (element?.Type == MeasureElementType.Note && 
+                    element.Element is MusicXml.Domain.Note note &&
+                    note.Staff == staffNumber)
+                {
+                    lastPosition = i;
+                }
+            }
+            
+            return lastPosition;
+        }
+
+        /// <summary>
+        /// Checks if a backup element already exists at the specified position.
+        /// </summary>
+        private static bool HasBackupAtPosition(Measure measure, int afterNotePosition)
+        {
+            if (measure?.MeasureElements == null || 
+                afterNotePosition < 0 || 
+                afterNotePosition >= measure.MeasureElements.Count - 1)
+                return false;
+            
+            // Check the element right after the specified position
+            var nextElement = measure.MeasureElements[afterNotePosition + 1];
+            return nextElement?.Type == MeasureElementType.Backup && 
+                   nextElement.Element is Backup;
         }
 
         private static void ApplyTupletNotation(

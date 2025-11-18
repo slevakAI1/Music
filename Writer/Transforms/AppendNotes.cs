@@ -26,6 +26,9 @@ namespace Music.Writer
             {
                 ProcessPart(scorePart, config, usedDivisionsPerMeasure);
             }
+            
+            // Post-process: Add all required backup elements after all notes are inserted
+            AppendNotesHelper.AddAllRequiredBackupElements(score, config.Parts, usedDivisionsPerMeasure);
         }
 
         private static IEnumerable<Part> GetTargetParts(Score score, List<string> partNames)
@@ -62,8 +65,6 @@ namespace Music.Writer
                 };
 
                 ProcessNotesForStaff(scorePart, config, context, usedDivisionsPerMeasure);
-
-                AppendNotesHelper.AddBackupElementsIfNeeded(scorePart, staffIndex, targetStaffs.Count, usedDivisionsPerMeasure);
             }
         }
 
