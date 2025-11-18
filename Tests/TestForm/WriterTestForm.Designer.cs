@@ -47,7 +47,6 @@ namespace Music.Writer
 
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
             lblTitle = new Label();
             cbPattern = new ComboBox();
             grpTarget = new GroupBox();
@@ -90,7 +89,6 @@ namespace Music.Writer
             lblOctaveKR = new Label();
             btnAppendNotes = new Button();
             lblStatus = new Label();
-            tt = new ToolTip(components);
             groupBox1 = new GroupBox();
             txtTupletNumber = new TextBox();
             lblTupletNumber = new Label();
@@ -859,7 +857,6 @@ namespace Music.Writer
         }
         private Label lblStartBeat;
         private NumericUpDown numStartBeat;
-        private ToolTip tt;
         private GroupBox groupBox1;
 
         // New time/duration control fields
