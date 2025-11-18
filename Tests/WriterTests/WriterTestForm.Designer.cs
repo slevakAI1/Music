@@ -33,7 +33,6 @@ namespace Music.Writer
         private System.Windows.Forms.Label lblOctaveKR;
 
         private System.Windows.Forms.Button btnAppendNotes;
-        private System.Windows.Forms.Label lblStatus;
 
         protected override void Dispose(bool disposing)
         {
@@ -49,6 +48,7 @@ namespace Music.Writer
             lblTitle = new Label();
             cbPattern = new ComboBox();
             grpTarget = new GroupBox();
+            label4 = new Label();
             clbSections = new CheckedListBox();
             lblSections = new Label();
             lblStartBeat = new Label();
@@ -86,7 +86,6 @@ namespace Music.Writer
             numDegree = new NumericUpDown();
             lblOctaveKR = new Label();
             btnAppendNotes = new Button();
-            lblStatus = new Label();
             groupBox1 = new GroupBox();
             txtTupletNumber = new TextBox();
             lblTupletNumber = new Label();
@@ -111,7 +110,6 @@ namespace Music.Writer
             lblScoreReport = new Label();
             txtScoreReport = new TextBox();
             btnExportToNotion = new Button();
-            label4 = new Label();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numStartBar).BeginInit();
@@ -133,7 +131,7 @@ namespace Music.Writer
             // 
             lblTitle.AutoSize = true;
             lblTitle.Font = new Font("Segoe UI", 18F);
-            lblTitle.Location = new Point(38, 7);
+            lblTitle.Location = new Point(485, 9);
             lblTitle.Name = "lblTitle";
             lblTitle.Size = new Size(79, 32);
             lblTitle.TabIndex = 0;
@@ -142,7 +140,7 @@ namespace Music.Writer
             // cbPattern
             // 
             cbPattern.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbPattern.Items.AddRange(new object[] { "Set Note" });
+            cbPattern.Items.AddRange(new object[] { "Append Pitch Events" });
             cbPattern.Location = new Point(100, 65);
             cbPattern.Name = "cbPattern";
             cbPattern.Size = new Size(250, 23);
@@ -161,18 +159,28 @@ namespace Music.Writer
             grpTarget.Controls.Add(clbStaffs);
             grpTarget.Controls.Add(numStartBar);
             grpTarget.Controls.Add(lblStartBar);
-            grpTarget.Location = new Point(20, 100);
+            grpTarget.Location = new Point(20, 140);
             grpTarget.Name = "grpTarget";
             grpTarget.Size = new Size(442, 432);
             grpTarget.TabIndex = 2;
             grpTarget.TabStop = false;
             grpTarget.Text = "Target Scope";
             // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.ForeColor = Color.Red;
+            label4.Location = new Point(14, 181);
+            label4.Name = "label4";
+            label4.Size = new Size(72, 15);
+            label4.TabIndex = 21;
+            label4.Text = "For Splicing:";
+            // 
             // clbSections
             // 
             clbSections.CheckOnClick = true;
             clbSections.FormattingEnabled = true;
-            clbSections.Location = new Point(85, 304);
+            clbSections.Location = new Point(85, 232);
             clbSections.Name = "clbSections";
             clbSections.Size = new Size(220, 94);
             clbSections.TabIndex = 20;
@@ -181,7 +189,7 @@ namespace Music.Writer
             // 
             lblSections.AutoSize = true;
             lblSections.ForeColor = Color.Red;
-            lblSections.Location = new Point(20, 304);
+            lblSections.Location = new Point(20, 232);
             lblSections.Name = "lblSections";
             lblSections.Size = new Size(54, 15);
             lblSections.TabIndex = 16;
@@ -191,7 +199,7 @@ namespace Music.Writer
             // 
             lblStartBeat.AutoSize = true;
             lblStartBeat.ForeColor = Color.Red;
-            lblStartBeat.Location = new Point(210, 270);
+            lblStartBeat.Location = new Point(206, 201);
             lblStartBeat.Name = "lblStartBeat";
             lblStartBeat.Size = new Size(60, 15);
             lblStartBeat.TabIndex = 15;
@@ -201,7 +209,7 @@ namespace Music.Writer
             // 
             lblPart.AutoSize = true;
             lblPart.ForeColor = Color.FromArgb(0, 192, 0);
-            lblPart.Location = new Point(15, 30);
+            lblPart.Location = new Point(15, 27);
             lblPart.Name = "lblPart";
             lblPart.Size = new Size(70, 15);
             lblPart.TabIndex = 0;
@@ -211,14 +219,14 @@ namespace Music.Writer
             // 
             clbParts.CheckOnClick = true;
             clbParts.FormattingEnabled = true;
-            clbParts.Location = new Point(85, 28);
+            clbParts.Location = new Point(85, 25);
             clbParts.Name = "clbParts";
             clbParts.Size = new Size(220, 94);
             clbParts.TabIndex = 1;
             // 
             // numStartBeat
             // 
-            numStartBeat.Location = new Point(280, 268);
+            numStartBeat.Location = new Point(276, 199);
             numStartBeat.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numStartBeat.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numStartBeat.Name = "numStartBeat";
@@ -230,7 +238,7 @@ namespace Music.Writer
             // 
             lblStaff.AutoSize = true;
             lblStaff.ForeColor = Color.FromArgb(0, 192, 0);
-            lblStaff.Location = new Point(15, 135);
+            lblStaff.Location = new Point(15, 132);
             lblStaff.Name = "lblStaff";
             lblStaff.Size = new Size(34, 15);
             lblStaff.TabIndex = 5;
@@ -241,14 +249,14 @@ namespace Music.Writer
             clbStaffs.CheckOnClick = true;
             clbStaffs.FormattingEnabled = true;
             clbStaffs.Items.AddRange(new object[] { "1", "2" });
-            clbStaffs.Location = new Point(85, 131);
+            clbStaffs.Location = new Point(85, 125);
             clbStaffs.Name = "clbStaffs";
             clbStaffs.Size = new Size(120, 40);
             clbStaffs.TabIndex = 6;
             // 
             // numStartBar
             // 
-            numStartBar.Location = new Point(84, 268);
+            numStartBar.Location = new Point(80, 199);
             numStartBar.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numStartBar.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numStartBar.Name = "numStartBar";
@@ -260,7 +268,7 @@ namespace Music.Writer
             // 
             lblStartBar.AutoSize = true;
             lblStartBar.ForeColor = Color.Red;
-            lblStartBar.Location = new Point(19, 271);
+            lblStartBar.Location = new Point(15, 202);
             lblStartBar.Name = "lblStartBar";
             lblStartBar.Size = new Size(54, 15);
             lblStartBar.TabIndex = 7;
@@ -277,9 +285,9 @@ namespace Music.Writer
             grpPitch.Controls.Add(rbPitchKeyRelative);
             grpPitch.Controls.Add(grpAbsolute);
             grpPitch.Controls.Add(grpKeyRelative);
-            grpPitch.Location = new Point(504, 312);
+            grpPitch.Location = new Point(497, 254);
             grpPitch.Name = "grpPitch";
-            grpPitch.Size = new Size(615, 450);
+            grpPitch.Size = new Size(615, 374);
             grpPitch.TabIndex = 3;
             grpPitch.TabStop = false;
             grpPitch.Text = "Pitch Options";
@@ -295,7 +303,7 @@ namespace Music.Writer
             grpChord.Controls.Add(cbChordQuality);
             grpChord.Controls.Add(label8);
             grpChord.Controls.Add(cbChordBase);
-            grpChord.Location = new Point(43, 346);
+            grpChord.Location = new Point(43, 259);
             grpChord.Name = "grpChord";
             grpChord.Size = new Size(549, 98);
             grpChord.TabIndex = 11;
@@ -391,7 +399,7 @@ namespace Music.Writer
             // 
             lblOctaveAbs.AutoSize = true;
             lblOctaveAbs.ForeColor = Color.FromArgb(0, 192, 0);
-            lblOctaveAbs.Location = new Point(25, 89);
+            lblOctaveAbs.Location = new Point(25, 57);
             lblOctaveAbs.Name = "lblOctaveAbs";
             lblOctaveAbs.Size = new Size(47, 15);
             lblOctaveAbs.TabIndex = 4;
@@ -399,7 +407,7 @@ namespace Music.Writer
             // 
             // numOctaveAbs
             // 
-            numOctaveAbs.Location = new Point(77, 85);
+            numOctaveAbs.Location = new Point(77, 53);
             numOctaveAbs.Maximum = new decimal(new int[] { 8, 0, 0, 0 });
             numOctaveAbs.Name = "numOctaveAbs";
             numOctaveAbs.Size = new Size(47, 23);
@@ -410,7 +418,7 @@ namespace Music.Writer
             // 
             rbChord.AutoSize = true;
             rbChord.ForeColor = Color.FromArgb(0, 192, 0);
-            rbChord.Location = new Point(27, 321);
+            rbChord.Location = new Point(27, 230);
             rbChord.Name = "rbChord";
             rbChord.Size = new Size(58, 19);
             rbChord.TabIndex = 5;
@@ -420,7 +428,7 @@ namespace Music.Writer
             // 
             rbIsRest.AutoSize = true;
             rbIsRest.ForeColor = Color.FromArgb(0, 192, 0);
-            rbIsRest.Location = new Point(27, 33);
+            rbIsRest.Location = new Point(27, 27);
             rbIsRest.Name = "rbIsRest";
             rbIsRest.Size = new Size(47, 19);
             rbIsRest.TabIndex = 4;
@@ -431,7 +439,7 @@ namespace Music.Writer
             rbPitchAbsolute.AutoSize = true;
             rbPitchAbsolute.Checked = true;
             rbPitchAbsolute.ForeColor = Color.FromArgb(0, 192, 0);
-            rbPitchAbsolute.Location = new Point(27, 124);
+            rbPitchAbsolute.Location = new Point(27, 86);
             rbPitchAbsolute.Name = "rbPitchAbsolute";
             rbPitchAbsolute.Size = new Size(72, 19);
             rbPitchAbsolute.TabIndex = 0;
@@ -441,7 +449,7 @@ namespace Music.Writer
             // rbPitchKeyRelative
             // 
             rbPitchKeyRelative.AutoSize = true;
-            rbPitchKeyRelative.Location = new Point(27, 222);
+            rbPitchKeyRelative.Location = new Point(27, 159);
             rbPitchKeyRelative.Name = "rbPitchKeyRelative";
             rbPitchKeyRelative.Size = new Size(87, 19);
             rbPitchKeyRelative.TabIndex = 1;
@@ -453,9 +461,9 @@ namespace Music.Writer
             grpAbsolute.Controls.Add(cbStep);
             grpAbsolute.Controls.Add(lblAccidental);
             grpAbsolute.Controls.Add(cbAccidental);
-            grpAbsolute.Location = new Point(33, 139);
+            grpAbsolute.Location = new Point(33, 101);
             grpAbsolute.Name = "grpAbsolute";
-            grpAbsolute.Size = new Size(369, 65);
+            grpAbsolute.Size = new Size(369, 46);
             grpAbsolute.TabIndex = 2;
             grpAbsolute.TabStop = false;
             // 
@@ -463,7 +471,7 @@ namespace Music.Writer
             // 
             lblStep.AutoSize = true;
             lblStep.ForeColor = Color.FromArgb(0, 192, 0);
-            lblStep.Location = new Point(10, 30);
+            lblStep.Location = new Point(10, 20);
             lblStep.Name = "lblStep";
             lblStep.Size = new Size(33, 15);
             lblStep.TabIndex = 0;
@@ -473,7 +481,7 @@ namespace Music.Writer
             // 
             cbStep.DropDownStyle = ComboBoxStyle.DropDownList;
             cbStep.Items.AddRange(new object[] { "C", "D", "E", "F", "G", "A", "B" });
-            cbStep.Location = new Point(50, 26);
+            cbStep.Location = new Point(50, 16);
             cbStep.Name = "cbStep";
             cbStep.Size = new Size(60, 23);
             cbStep.TabIndex = 1;
@@ -482,7 +490,7 @@ namespace Music.Writer
             // 
             lblAccidental.AutoSize = true;
             lblAccidental.ForeColor = Color.FromArgb(0, 192, 0);
-            lblAccidental.Location = new Point(120, 30);
+            lblAccidental.Location = new Point(120, 20);
             lblAccidental.Name = "lblAccidental";
             lblAccidental.Size = new Size(66, 15);
             lblAccidental.TabIndex = 2;
@@ -492,7 +500,7 @@ namespace Music.Writer
             // 
             cbAccidental.DropDownStyle = ComboBoxStyle.DropDownList;
             cbAccidental.Items.AddRange(new object[] { "Natural", "Sharp", "Flat" });
-            cbAccidental.Location = new Point(194, 26);
+            cbAccidental.Location = new Point(194, 16);
             cbAccidental.Name = "cbAccidental";
             cbAccidental.Size = new Size(80, 23);
             cbAccidental.TabIndex = 3;
@@ -502,16 +510,16 @@ namespace Music.Writer
             grpKeyRelative.Controls.Add(lblDegree);
             grpKeyRelative.Controls.Add(numDegree);
             grpKeyRelative.Controls.Add(lblOctaveKR);
-            grpKeyRelative.Location = new Point(42, 236);
+            grpKeyRelative.Location = new Point(42, 173);
             grpKeyRelative.Name = "grpKeyRelative";
-            grpKeyRelative.Size = new Size(360, 65);
+            grpKeyRelative.Size = new Size(360, 47);
             grpKeyRelative.TabIndex = 3;
             grpKeyRelative.TabStop = false;
             // 
             // lblDegree
             // 
             lblDegree.AutoSize = true;
-            lblDegree.Location = new Point(10, 30);
+            lblDegree.Location = new Point(10, 19);
             lblDegree.Name = "lblDegree";
             lblDegree.Size = new Size(47, 15);
             lblDegree.TabIndex = 0;
@@ -519,7 +527,7 @@ namespace Music.Writer
             // 
             // numDegree
             // 
-            numDegree.Location = new Point(65, 26);
+            numDegree.Location = new Point(65, 15);
             numDegree.Maximum = new decimal(new int[] { 7, 0, 0, 0 });
             numDegree.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numDegree.Name = "numDegree";
@@ -530,7 +538,7 @@ namespace Music.Writer
             // lblOctaveKR
             // 
             lblOctaveKR.AutoSize = true;
-            lblOctaveKR.Location = new Point(140, 30);
+            lblOctaveKR.Location = new Point(140, 19);
             lblOctaveKR.Name = "lblOctaveKR";
             lblOctaveKR.Size = new Size(29, 15);
             lblOctaveKR.TabIndex = 2;
@@ -538,21 +546,12 @@ namespace Music.Writer
             // 
             // btnAppendNotes
             // 
-            btnAppendNotes.Location = new Point(504, 177);
+            btnAppendNotes.Location = new Point(100, 94);
             btnAppendNotes.Name = "btnAppendNotes";
-            btnAppendNotes.Size = new Size(143, 22);
+            btnAppendNotes.Size = new Size(77, 22);
             btnAppendNotes.TabIndex = 4;
-            btnAppendNotes.Text = "Append Notes";
+            btnAppendNotes.Text = "Execute";
             btnAppendNotes.Click += btnAppendNotes_Click;
-            // 
-            // lblStatus
-            // 
-            lblStatus.AutoSize = true;
-            lblStatus.Location = new Point(563, 266);
-            lblStatus.Name = "lblStatus";
-            lblStatus.Size = new Size(42, 15);
-            lblStatus.TabIndex = 5;
-            lblStatus.Text = "Ready.";
             // 
             // groupBox1
             // 
@@ -568,16 +567,16 @@ namespace Music.Writer
             groupBox1.Controls.Add(numTupletCount);
             groupBox1.Controls.Add(lblTupletOf);
             groupBox1.Controls.Add(numTupletOf);
-            groupBox1.Location = new Point(711, 12);
+            groupBox1.Location = new Point(497, 62);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(315, 294);
+            groupBox1.Size = new Size(315, 174);
             groupBox1.TabIndex = 6;
             groupBox1.TabStop = false;
             groupBox1.Text = "Rhythm options";
             // 
             // txtTupletNumber
             // 
-            txtTupletNumber.Location = new Point(158, 159);
+            txtTupletNumber.Location = new Point(158, 109);
             txtTupletNumber.Name = "txtTupletNumber";
             txtTupletNumber.Size = new Size(47, 23);
             txtTupletNumber.TabIndex = 21;
@@ -586,7 +585,7 @@ namespace Music.Writer
             // 
             lblTupletNumber.AutoSize = true;
             lblTupletNumber.ForeColor = Color.FromArgb(0, 192, 0);
-            lblTupletNumber.Location = new Point(16, 162);
+            lblTupletNumber.Location = new Point(16, 112);
             lblTupletNumber.Name = "lblTupletNumber";
             lblTupletNumber.Size = new Size(131, 15);
             lblTupletNumber.TabIndex = 20;
@@ -596,7 +595,7 @@ namespace Music.Writer
             // 
             label3.AutoSize = true;
             label3.ForeColor = Color.FromArgb(0, 192, 0);
-            label3.Location = new Point(16, 102);
+            label3.Location = new Point(16, 81);
             label3.Name = "label3";
             label3.Size = new Size(99, 15);
             label3.TabIndex = 19;
@@ -604,7 +603,7 @@ namespace Music.Writer
             // 
             // numNumberOfNotes
             // 
-            numNumberOfNotes.Location = new Point(133, 99);
+            numNumberOfNotes.Location = new Point(133, 78);
             numNumberOfNotes.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numNumberOfNotes.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numNumberOfNotes.Name = "numNumberOfNotes";
@@ -616,7 +615,7 @@ namespace Music.Writer
             // 
             lblNoteValue.AutoSize = true;
             lblNoteValue.ForeColor = Color.FromArgb(0, 192, 0);
-            lblNoteValue.Location = new Point(16, 41);
+            lblNoteValue.Location = new Point(16, 21);
             lblNoteValue.Name = "lblNoteValue";
             lblNoteValue.Size = new Size(112, 15);
             lblNoteValue.TabIndex = 7;
@@ -626,7 +625,7 @@ namespace Music.Writer
             // 
             cbNoteValue.DropDownStyle = ComboBoxStyle.DropDownList;
             cbNoteValue.Items.AddRange(new object[] { "Whole (1)", "Half (1/2)", "Quarter (1/4)", "Eighth (1/8)", "16th (1/16)", "32nd (1/32)" });
-            cbNoteValue.Location = new Point(133, 38);
+            cbNoteValue.Location = new Point(133, 18);
             cbNoteValue.Name = "cbNoteValue";
             cbNoteValue.Size = new Size(175, 23);
             cbNoteValue.TabIndex = 8;
@@ -635,7 +634,7 @@ namespace Music.Writer
             // 
             lblDots.AutoSize = true;
             lblDots.ForeColor = Color.FromArgb(0, 192, 0);
-            lblDots.Location = new Point(17, 70);
+            lblDots.Location = new Point(17, 50);
             lblDots.Name = "lblDots";
             lblDots.Size = new Size(34, 15);
             lblDots.TabIndex = 9;
@@ -643,7 +642,7 @@ namespace Music.Writer
             // 
             // numDots
             // 
-            numDots.Location = new Point(133, 68);
+            numDots.Location = new Point(133, 48);
             numDots.Maximum = new decimal(new int[] { 2, 0, 0, 0 });
             numDots.Name = "numDots";
             numDots.Size = new Size(60, 23);
@@ -653,7 +652,7 @@ namespace Music.Writer
             // 
             lblTupletCount.AutoSize = true;
             lblTupletCount.ForeColor = Color.FromArgb(0, 192, 0);
-            lblTupletCount.Location = new Point(17, 192);
+            lblTupletCount.Location = new Point(17, 142);
             lblTupletCount.Name = "lblTupletCount";
             lblTupletCount.Size = new Size(65, 15);
             lblTupletCount.TabIndex = 12;
@@ -661,7 +660,7 @@ namespace Music.Writer
             // 
             // numTupletCount
             // 
-            numTupletCount.Location = new Point(90, 188);
+            numTupletCount.Location = new Point(90, 138);
             numTupletCount.Maximum = new decimal(new int[] { 64, 0, 0, 0 });
             numTupletCount.Minimum = new decimal(new int[] { 2, 0, 0, 0 });
             numTupletCount.Name = "numTupletCount";
@@ -673,7 +672,7 @@ namespace Music.Writer
             // 
             lblTupletOf.AutoSize = true;
             lblTupletOf.ForeColor = Color.FromArgb(0, 192, 0);
-            lblTupletOf.Location = new Point(158, 192);
+            lblTupletOf.Location = new Point(158, 142);
             lblTupletOf.Name = "lblTupletOf";
             lblTupletOf.Size = new Size(41, 15);
             lblTupletOf.TabIndex = 14;
@@ -681,7 +680,7 @@ namespace Music.Writer
             // 
             // numTupletOf
             // 
-            numTupletOf.Location = new Point(203, 188);
+            numTupletOf.Location = new Point(203, 138);
             numTupletOf.Maximum = new decimal(new int[] { 64, 0, 0, 0 });
             numTupletOf.Minimum = new decimal(new int[] { 2, 0, 0, 0 });
             numTupletOf.Name = "numTupletOf";
@@ -700,7 +699,7 @@ namespace Music.Writer
             // 
             // btnSetWriterTestScenarioG1
             // 
-            btnSetWriterTestScenarioG1.Location = new Point(491, 89);
+            btnSetWriterTestScenarioG1.Location = new Point(869, 126);
             btnSetWriterTestScenarioG1.Name = "btnSetWriterTestScenarioG1";
             btnSetWriterTestScenarioG1.Size = new Size(196, 31);
             btnSetWriterTestScenarioG1.TabIndex = 8;
@@ -710,9 +709,9 @@ namespace Music.Writer
             // 
             // btnNewScore
             // 
-            btnNewScore.Location = new Point(487, 126);
+            btnNewScore.Location = new Point(100, 39);
             btnNewScore.Name = "btnNewScore";
-            btnNewScore.Size = new Size(200, 32);
+            btnNewScore.Size = new Size(155, 20);
             btnNewScore.TabIndex = 9;
             btnNewScore.Text = "New Score From Design";
             btnNewScore.UseVisualStyleBackColor = true;
@@ -720,7 +719,7 @@ namespace Music.Writer
             // 
             // btnSetDesignTestScenarioD1
             // 
-            btnSetDesignTestScenarioD1.Location = new Point(491, 49);
+            btnSetDesignTestScenarioD1.Location = new Point(869, 86);
             btnSetDesignTestScenarioD1.Name = "btnSetDesignTestScenarioD1";
             btnSetDesignTestScenarioD1.Size = new Size(196, 31);
             btnSetDesignTestScenarioD1.TabIndex = 10;
@@ -730,9 +729,9 @@ namespace Music.Writer
             // 
             // btnChordTest
             // 
-            btnChordTest.Location = new Point(1142, 614);
+            btnChordTest.Location = new Point(869, 192);
             btnChordTest.Name = "btnChordTest";
-            btnChordTest.Size = new Size(112, 23);
+            btnChordTest.Size = new Size(196, 23);
             btnChordTest.TabIndex = 11;
             btnChordTest.Text = "Chord Test";
             btnChordTest.UseVisualStyleBackColor = true;
@@ -740,9 +739,9 @@ namespace Music.Writer
             // 
             // btnUpdateFormFromDesigner
             // 
-            btnUpdateFormFromDesigner.Location = new Point(1142, 581);
+            btnUpdateFormFromDesigner.Location = new Point(869, 163);
             btnUpdateFormFromDesigner.Name = "btnUpdateFormFromDesigner";
-            btnUpdateFormFromDesigner.Size = new Size(155, 23);
+            btnUpdateFormFromDesigner.Size = new Size(196, 23);
             btnUpdateFormFromDesigner.TabIndex = 13;
             btnUpdateFormFromDesigner.Text = "Update From Designer";
             btnUpdateFormFromDesigner.UseVisualStyleBackColor = true;
@@ -753,7 +752,7 @@ namespace Music.Writer
             lblDesignerReport.AutoSize = true;
             lblDesignerReport.Font = new Font("Segoe UI", 15F);
             lblDesignerReport.ForeColor = Color.FromArgb(0, 192, 0);
-            lblDesignerReport.Location = new Point(1240, 19);
+            lblDesignerReport.Location = new Point(1240, 12);
             lblDesignerReport.Name = "lblDesignerReport";
             lblDesignerReport.Size = new Size(153, 28);
             lblDesignerReport.TabIndex = 27;
@@ -761,18 +760,19 @@ namespace Music.Writer
             // 
             // txtDesignerReport
             // 
-            txtDesignerReport.Location = new Point(1134, 65);
+            txtDesignerReport.Location = new Point(1134, 47);
             txtDesignerReport.Multiline = true;
             txtDesignerReport.Name = "txtDesignerReport";
             txtDesignerReport.ScrollBars = ScrollBars.Vertical;
-            txtDesignerReport.Size = new Size(430, 289);
+            txtDesignerReport.Size = new Size(430, 336);
             txtDesignerReport.TabIndex = 26;
             // 
             // lblScoreReport
             // 
             lblScoreReport.AutoSize = true;
             lblScoreReport.Font = new Font("Segoe UI", 15F);
-            lblScoreReport.Location = new Point(1231, 372);
+            lblScoreReport.ForeColor = Color.FromArgb(255, 128, 0);
+            lblScoreReport.Location = new Point(1649, 13);
             lblScoreReport.Name = "lblScoreReport";
             lblScoreReport.Size = new Size(125, 28);
             lblScoreReport.TabIndex = 29;
@@ -780,36 +780,26 @@ namespace Music.Writer
             // 
             // txtScoreReport
             // 
-            txtScoreReport.Location = new Point(1125, 418);
+            txtScoreReport.Location = new Point(1583, 47);
             txtScoreReport.Multiline = true;
             txtScoreReport.Name = "txtScoreReport";
             txtScoreReport.ScrollBars = ScrollBars.Vertical;
-            txtScoreReport.Size = new Size(430, 135);
+            txtScoreReport.Size = new Size(274, 336);
             txtScoreReport.TabIndex = 28;
             // 
             // btnExportToNotion
             // 
-            btnExportToNotion.Location = new Point(504, 218);
+            btnExportToNotion.Location = new Point(182, 94);
             btnExportToNotion.Name = "btnExportToNotion";
-            btnExportToNotion.Size = new Size(143, 23);
+            btnExportToNotion.Size = new Size(114, 23);
             btnExportToNotion.TabIndex = 30;
             btnExportToNotion.Text = "Export to Notion";
             btnExportToNotion.UseVisualStyleBackColor = true;
             btnExportToNotion.Click += btnExportToNotion_Click;
             // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.ForeColor = Color.Red;
-            label4.Location = new Point(22, 239);
-            label4.Name = "label4";
-            label4.Size = new Size(72, 15);
-            label4.TabIndex = 21;
-            label4.Text = "For Splicing:";
-            // 
             // WriterTestForm
             // 
-            ClientSize = new Size(1613, 789);
+            ClientSize = new Size(1918, 878);
             Controls.Add(btnExportToNotion);
             Controls.Add(lblScoreReport);
             Controls.Add(txtScoreReport);
@@ -827,7 +817,6 @@ namespace Music.Writer
             Controls.Add(grpTarget);
             Controls.Add(grpPitch);
             Controls.Add(btnAppendNotes);
-            Controls.Add(lblStatus);
             Name = "WriterTestForm";
             Text = "Writer 2 (MusicXML)";
             grpTarget.ResumeLayout(false);
