@@ -85,8 +85,6 @@ namespace Music.Writer
                 EndBar = 48,    //  This is deprecated; kept for backward compatibility
                 StartBeat = (int?)(numStartBeat?.Value ?? 1),
 
-                OverwriteExisting = chkOverwrite?.Checked ?? false,
-
                 // Pitch
                 PitchAbsolute = rbPitchAbsolute?.Checked ?? true,
                 // Step is now char type; '\0' when Rest is selected
@@ -214,9 +212,6 @@ namespace Music.Writer
 
             if (data.StartBeat.HasValue && numStartBeat != null)
                 numStartBeat.Value = LimitRange(numStartBeat, data.StartBeat.Value);
-
-            if (data.OverwriteExisting.HasValue && chkOverwrite != null)
-                chkOverwrite.Checked = data.OverwriteExisting.Value;
 
             // Pitch
             if (data.PitchAbsolute.HasValue && rbPitchAbsolute != null && rbPitchKeyRelative != null)
