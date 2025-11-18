@@ -14,7 +14,6 @@ namespace Music.Writer
         private System.Windows.Forms.CheckedListBox clbStaffs; // Changed from NumericUpDown numStaff
         private System.Windows.Forms.Label lblStartBar;
         private System.Windows.Forms.NumericUpDown numStartBar;
-        private System.Windows.Forms.CheckBox chkOverwrite;
 
         private System.Windows.Forms.GroupBox grpPitch;
         private System.Windows.Forms.RadioButton rbPitchAbsolute;
@@ -58,7 +57,6 @@ namespace Music.Writer
             numStartBeat = new NumericUpDown();
             lblStaff = new Label();
             clbStaffs = new CheckedListBox();
-            chkOverwrite = new CheckBox();
             numStartBar = new NumericUpDown();
             lblStartBar = new Label();
             grpPitch = new GroupBox();
@@ -113,6 +111,7 @@ namespace Music.Writer
             lblScoreReport = new Label();
             txtScoreReport = new TextBox();
             btnExportToNotion = new Button();
+            label4 = new Label();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numStartBar).BeginInit();
@@ -151,6 +150,7 @@ namespace Music.Writer
             // 
             // grpTarget
             // 
+            grpTarget.Controls.Add(label4);
             grpTarget.Controls.Add(clbSections);
             grpTarget.Controls.Add(lblSections);
             grpTarget.Controls.Add(lblStartBeat);
@@ -159,12 +159,11 @@ namespace Music.Writer
             grpTarget.Controls.Add(numStartBeat);
             grpTarget.Controls.Add(lblStaff);
             grpTarget.Controls.Add(clbStaffs);
-            grpTarget.Controls.Add(chkOverwrite);
             grpTarget.Controls.Add(numStartBar);
             grpTarget.Controls.Add(lblStartBar);
             grpTarget.Location = new Point(20, 100);
             grpTarget.Name = "grpTarget";
-            grpTarget.Size = new Size(442, 552);
+            grpTarget.Size = new Size(442, 432);
             grpTarget.TabIndex = 2;
             grpTarget.TabStop = false;
             grpTarget.Text = "Target Scope";
@@ -173,7 +172,7 @@ namespace Music.Writer
             // 
             clbSections.CheckOnClick = true;
             clbSections.FormattingEnabled = true;
-            clbSections.Location = new Point(101, 448);
+            clbSections.Location = new Point(85, 304);
             clbSections.Name = "clbSections";
             clbSections.Size = new Size(220, 94);
             clbSections.TabIndex = 20;
@@ -182,7 +181,7 @@ namespace Music.Writer
             // 
             lblSections.AutoSize = true;
             lblSections.ForeColor = Color.Red;
-            lblSections.Location = new Point(36, 448);
+            lblSections.Location = new Point(20, 304);
             lblSections.Name = "lblSections";
             lblSections.Size = new Size(54, 15);
             lblSections.TabIndex = 16;
@@ -192,7 +191,7 @@ namespace Music.Writer
             // 
             lblStartBeat.AutoSize = true;
             lblStartBeat.ForeColor = Color.Red;
-            lblStartBeat.Location = new Point(200, 238);
+            lblStartBeat.Location = new Point(210, 270);
             lblStartBeat.Name = "lblStartBeat";
             lblStartBeat.Size = new Size(60, 15);
             lblStartBeat.TabIndex = 15;
@@ -219,7 +218,7 @@ namespace Music.Writer
             // 
             // numStartBeat
             // 
-            numStartBeat.Location = new Point(270, 236);
+            numStartBeat.Location = new Point(280, 268);
             numStartBeat.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numStartBeat.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numStartBeat.Name = "numStartBeat";
@@ -247,19 +246,9 @@ namespace Music.Writer
             clbStaffs.Size = new Size(120, 40);
             clbStaffs.TabIndex = 6;
             // 
-            // chkOverwrite
-            // 
-            chkOverwrite.AutoSize = true;
-            chkOverwrite.ForeColor = Color.Red;
-            chkOverwrite.Location = new Point(74, 211);
-            chkOverwrite.Name = "chkOverwrite";
-            chkOverwrite.Size = new Size(196, 19);
-            chkOverwrite.TabIndex = 11;
-            chkOverwrite.Text = "Overwrite existing notes in voice";
-            // 
             // numStartBar
             // 
-            numStartBar.Location = new Point(74, 236);
+            numStartBar.Location = new Point(84, 268);
             numStartBar.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             numStartBar.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numStartBar.Name = "numStartBar";
@@ -270,8 +259,8 @@ namespace Music.Writer
             // lblStartBar
             // 
             lblStartBar.AutoSize = true;
-            lblStartBar.ForeColor = Color.FromArgb(0, 192, 0);
-            lblStartBar.Location = new Point(9, 239);
+            lblStartBar.ForeColor = Color.Red;
+            lblStartBar.Location = new Point(19, 271);
             lblStartBar.Name = "lblStartBar";
             lblStartBar.Size = new Size(54, 15);
             lblStartBar.TabIndex = 7;
@@ -808,6 +797,16 @@ namespace Music.Writer
             btnExportToNotion.UseVisualStyleBackColor = true;
             btnExportToNotion.Click += btnExportToNotion_Click;
             // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.ForeColor = Color.Red;
+            label4.Location = new Point(22, 239);
+            label4.Name = "label4";
+            label4.Size = new Size(72, 15);
+            label4.TabIndex = 21;
+            label4.Text = "For Splicing:";
+            // 
             // WriterTestForm
             // 
             ClientSize = new Size(1613, 789);
@@ -897,5 +896,6 @@ namespace Music.Writer
         private Button btnExportToNotion;
         private Label lblTupletNumber;
         private TextBox txtTupletNumber;
+        private Label label4;
     }
 }
