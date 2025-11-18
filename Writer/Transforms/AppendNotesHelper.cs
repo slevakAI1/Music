@@ -6,6 +6,28 @@ namespace Music.Writer
     internal static class AppendNotesHelper
     {
         /// <summary>
+        /// Removes all backup elements from all measures in the specified parts.
+        /// This should be called at the start of Execute to ensure a clean slate before post-processing.
+        /// </summary>
+        public static void RemoveAllBackupElements(Score score, List<string> partNames)
+        {
+            foreach (var part in score.Parts.Where(p => partNames.Contains(p.Name)))
+            {
+                if (part.Measures == null) continue;
+                
+                foreach (var measure in part.Measures)
+                {
+                    if (measure?.MeasureElements == null) continue;
+                    
+                    // Remove all backup elements from the measure
+                    measure.MeasureElements.RemoveAll(e => 
+                        e?.Type == MeasureElementType.Backup && 
+                        e.Element is Backup);
+                }
+            }
+        }
+
+        /// <summary>
         /// Post-processes all measures in the score to add required backup elements.
         /// This should be called after all notes have been inserted.
         /// A backup is needed when a measure has notes on multiple staves.

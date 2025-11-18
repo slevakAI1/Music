@@ -14,8 +14,11 @@ namespace Music.Writer
         /// Adds notes to the specified score based on the provided configuration.
         /// All parameters are expected to be pre-validated.
         /// </summary>
-        public static void Execute(Score score, AppendPitchEventsParams config, MeasureMeta usedDivisionsPerMeasure)
+        public static void Execute(Score score, AppendPitchEventsParams config, MeasureMeta measureMeta)
         {
+            // Pre-process: remove all backup elements before appending notes.
+            AppendNotesHelper.RemoveAllBackupElements(score, config.Parts);
+
             var debugConfig = Helpers.DebugObject(config);
 
             if (score == null) throw new ArgumentNullException(nameof(score));
@@ -24,11 +27,11 @@ namespace Music.Writer
 
             foreach (var scorePart in GetTargetParts(score, config.Parts))
             {
-                ProcessPart(scorePart, config, usedDivisionsPerMeasure);
+                ProcessPart(scorePart, config, measureMeta);
             }
             
             // Post-process: Add all required backup elements after all notes are inserted
-            AppendNotesHelper.AddAllRequiredBackupElements(score, config.Parts, usedDivisionsPerMeasure);
+            AppendNotesHelper.AddAllRequiredBackupElements(score, config.Parts, measureMeta);
         }
 
         private static IEnumerable<Part> GetTargetParts(Score score, List<string> partNames)
