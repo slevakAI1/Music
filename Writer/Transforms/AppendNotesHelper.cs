@@ -101,7 +101,7 @@ namespace Music.Writer
 
         private static int CalculateNoteDurationInMeasure(int divisions, int noteValue)
         {
-            int numerator = divisions * 4;  // TO DO why is this x 4?
+            int numerator = divisions * 4;  // TO DO   this is the 4 beats (quarter note = 1 beat) per measure
             if (numerator % noteValue != 0)
             {
                 // Calculate the minimum divisions needed for this note value
