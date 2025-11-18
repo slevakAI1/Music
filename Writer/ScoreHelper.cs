@@ -13,8 +13,12 @@ namespace Music.Writer
         public static Score? NewScore(
             Form owner,
             Designer.Designer? design,
-            CheckedListBox cbPart)
+            CheckedListBox cbPart,
+            ref Dictionary<string, long> usedDivisionsPerMeasure)
         {
+            // Clear the UsedDivisionsPerMeasure since this is a new score with no notes
+            usedDivisionsPerMeasure = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+
             // Create a fresh Score instance and assign to the local cache (returned to caller)
             var score = new Score
             {

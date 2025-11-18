@@ -9,11 +9,15 @@ namespace Music.Writer
         private Score? _score;
         private Designer.Designer? _designer;
         private WriterTestData? _writer;
+        private Dictionary<string, long> _usedDivisionsPerMeasure;
 
         //===========================   I N I T I A L I Z A T I O N   ===========================
         public WriterTestForm()
         {
             InitializeComponent();
+
+            // Initialize UsedDivisionsPerMeasure tracking dictionary
+            _usedDivisionsPerMeasure = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
 
             // Window behavior similar to other forms
             this.FormBorderStyle = FormBorderStyle.Sizable;
@@ -102,7 +106,7 @@ namespace Music.Writer
             _writer = CaptureFormData();
 
             var config = _writer.ToAppendPitchEventsParams();
-            AppendNotes.Execute(_score!, config);
+            AppendNotes.Execute(_score!, config, ref _usedDivisionsPerMeasure);
             txtScoreReport.Text = ScoreReport.Run(_score);
             Globals.Score = _score;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
             //MessageBoxHelper.ShowMessage("Pattern has been applied to the score.", "Apply Pattern Set Notes");
@@ -111,7 +115,7 @@ namespace Music.Writer
 
         private void btnNewScore_Click(object sender, EventArgs e)
         {
-            _score = ScoreHelper.NewScore(this, _designer, clbParts);
+            _score = ScoreHelper.NewScore(this, _designer, clbParts, ref _usedDivisionsPerMeasure);
             txtScoreReport.Text = ScoreReport.Run(_score);
             // KEEP. MessageBox.Show(owner, "New score created from design.", "New Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }

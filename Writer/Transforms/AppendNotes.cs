@@ -14,7 +14,7 @@ namespace Music.Writer
         /// Adds notes to the specified score based on the provided configuration.
         /// All parameters are expected to be pre-validated.
         /// </summary>
-        public static void Execute(Score score, AppendPitchEventsParams config)
+        public static void Execute(Score score, AppendPitchEventsParams config, ref Dictionary<string, long> usedDivisionsPerMeasure)
         {
             var debugConfig = Helpers.DebugObject(config);
 
@@ -24,7 +24,7 @@ namespace Music.Writer
 
             foreach (var scorePart in GetTargetParts(score, config.Parts))
             {
-                ProcessPart(scorePart, config);
+                ProcessPart(scorePart, config, ref usedDivisionsPerMeasure);
             }
         }
 
@@ -34,7 +34,7 @@ namespace Music.Writer
                 .Where(p => p?.Name != null && partNames.Contains(p.Name));
         }
 
-        private static void ProcessPart(Part scorePart, AppendPitchEventsParams config)
+        private static void ProcessPart(Part scorePart, AppendPitchEventsParams config, ref Dictionary<string, long> usedDivisionsPerMeasure)
         {
             if (scorePart.Measures == null || scorePart.Measures.Count == 0)
                 return;
@@ -45,10 +45,6 @@ namespace Music.Writer
 
             for (int staffIndex = 0; staffIndex < targetStaffs.Count; staffIndex++)
             {
-
-                // TODO - change UsedDivisionsPerMeasure to be per staff per part and persist
-
-
                 var staff = targetStaffs[staffIndex];
                 var context = new StaffProcessingContext
                 {
@@ -56,18 +52,12 @@ namespace Music.Writer
                     CurrentBar = config.StartBar,
                     CurrentBeatPosition = 0,
 
-                    UsedDivisionsPerMeasure = new Dictionary<int, long>(),  // <--- starts new per part per staff. does not persist.
-
                     TupletStates = new Dictionary<string, TupletState>(StringComparer.OrdinalIgnoreCase)
                 };
 
+                ProcessNotesForStaff(scorePart, config, context, ref usedDivisionsPerMeasure);
 
-
-
-
-                ProcessNotesForStaff(scorePart, config, context);
-
-                AppendNotesHelper.AddBackupElementsIfNeeded(scorePart, staffIndex, targetStaffs.Count, context.UsedDivisionsPerMeasure);
+                AppendNotesHelper.AddBackupElementsIfNeeded(scorePart, staffIndex, targetStaffs.Count, ref usedDivisionsPerMeasure);
             }
         }
 
@@ -84,7 +74,7 @@ namespace Music.Writer
             }
         }
 
-        private static void ProcessNotesForStaff(Part scorePart, AppendPitchEventsParams appendPitchEventsParams, StaffProcessingContext context)
+        private static void ProcessNotesForStaff(Part scorePart, AppendPitchEventsParams appendPitchEventsParams, StaffProcessingContext context, ref Dictionary<string, long> usedDivisionsPerMeasure)
         {
             foreach (var pitchEvent in appendPitchEventsParams.PitchEvents)
             {
@@ -94,16 +84,16 @@ namespace Music.Writer
                 // Dispatch to chord or single-note processing
                 if (pitchEvent.IsChord)
                 {
-                    ProcessChord(scorePart, pitchEvent, appendPitchEventsParams, context);
+                    ProcessChord(scorePart, pitchEvent, appendPitchEventsParams, context, ref usedDivisionsPerMeasure);
                 }
                 else
                 {
-                    ProcessSingleNote(scorePart, pitchEvent, appendPitchEventsParams, context);
+                    ProcessSingleNote(scorePart, pitchEvent, appendPitchEventsParams, context, ref usedDivisionsPerMeasure);
                 }
             }
         }
 
-        private static void ProcessSingleNote(Part scorePart, PitchEvent pitchEvent, AppendPitchEventsParams config, StaffProcessingContext context)
+        private static void ProcessSingleNote(Part scorePart, PitchEvent pitchEvent, AppendPitchEventsParams config, StaffProcessingContext context, ref Dictionary<string, long> usedDivisionsPerMeasure)
         {
             var measure = scorePart.Measures[context.CurrentBar - 1];
             var measureInfo = AppendNotesHelper.GetMeasureInfo(measure);
@@ -121,7 +111,7 @@ namespace Music.Writer
             if (context.CurrentBeatPosition + noteDuration > measureInfo.BarLengthDivisions)
             {
                 bool success = AppendNotesHelper.HandleTiedNoteAcrossMeasures(
-                    scorePart, pitchEvent, context, measureInfo, noteDuration);
+                    scorePart, pitchEvent, context, measureInfo, noteDuration, ref usedDivisionsPerMeasure);
 
                 if (!success)
                     return;
@@ -149,12 +139,11 @@ namespace Music.Writer
             });
 
             // Update tracking for the written note
-            AppendNotesHelper.UpdatePositionTracking(context, pitchEvent, noteDuration);
+            AppendNotesHelper.UpdatePositionTracking(context, pitchEvent, noteDuration, scorePart.Name, ref usedDivisionsPerMeasure);
         }
 
-        private static void ProcessChord(Part scorePart, PitchEvent pitchEvent, AppendPitchEventsParams config, StaffProcessingContext context)
+        private static void ProcessChord(Part scorePart, PitchEvent pitchEvent, AppendPitchEventsParams config, StaffProcessingContext context, ref Dictionary<string, long> usedDivisionsPerMeasure)
         {
-
             // TO DO - This probably doesnt need note value... that property should be applied here if not already applied!
 
             // Convert chord to individual pitch events
@@ -201,7 +190,7 @@ namespace Music.Writer
             // Handle ties across measures for chord
             if (context.CurrentBeatPosition + noteDuration > measureInfo.BarLengthDivisions)
             {
-                bool success = AppendNotesHelper.HandleTiedChordAcrossMeasures(scorePart, chordNotes, context, measureInfo, noteDuration);
+                bool success = AppendNotesHelper.HandleTiedChordAcrossMeasures(scorePart, chordNotes, context, measureInfo, noteDuration, ref usedDivisionsPerMeasure);
                 if (!success)
                     return;
 
@@ -246,7 +235,7 @@ namespace Music.Writer
 
             // Advance position for the chord (advance once per chord)
             context.CurrentBeatPosition += noteDuration;
-            AppendNotesHelper.UpdateUsedDivisionsPerMeasure(context.UsedDivisionsPerMeasure, context.CurrentBar, noteDuration);
+            AppendNotesHelper.UpdateUsedDivisionsPerMeasure(ref usedDivisionsPerMeasure, scorePart.Name, context.Staff, context.CurrentBar, noteDuration);
         }
 
         public sealed class MeasureInfo
@@ -273,7 +262,6 @@ namespace Music.Writer
             public int Staff { get; set; }
             public int CurrentBar { get; set; }
             public long CurrentBeatPosition { get; set; }
-            public Dictionary<int, long> UsedDivisionsPerMeasure { get; set; } = new();
             public Dictionary<string, TupletState> TupletStates { get; set; } = new();
         }
     }
