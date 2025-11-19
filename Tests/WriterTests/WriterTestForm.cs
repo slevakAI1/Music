@@ -46,6 +46,8 @@ namespace Music.Writer
             if (clbStaffs != null && clbStaffs.Items.Count > 0)
                 clbStaffs.SetItemChecked(0, true); // Check staff "1"
 
+            cbPattern.SelectedIndex = 0;
+
             // ====================   T H I S   H A S   T O   B E   L A S T  !   =================
 
             // Capture form control values manually set in the form designer
@@ -139,7 +141,10 @@ namespace Music.Writer
 
                 txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
             }
-            // KEEP. MessageBox.Show(owner, "New score created from design.", "New Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            // Default movement title to date and time, format something like this: Sunday, Mar 3, 2025 3:05.34 PM
+            var now = System.DateTime.Now;
+            txtMovementTitle.Text = now.ToString("dddd, MMM d, yyyy h:mm'.'ss tt");
         }
 
         private void btnUpdateFormFromDesigner_Click(object sender, EventArgs e)

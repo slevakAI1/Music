@@ -140,7 +140,7 @@ namespace Music.Writer
             btnDeleteScore = new Button();
             btnSaveScore = new Button();
             lstScores = new ListBox();
-            textBox1 = new TextBox();
+            txtMovementTitle = new TextBox();
             label14 = new Label();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numericUpDown3).BeginInit();
@@ -1006,7 +1006,7 @@ namespace Music.Writer
             // grpScoreList
             // 
             grpScoreList.Controls.Add(label14);
-            grpScoreList.Controls.Add(textBox1);
+            grpScoreList.Controls.Add(txtMovementTitle);
             grpScoreList.Controls.Add(btnUpdateScore);
             grpScoreList.Controls.Add(btnLoadScore);
             grpScoreList.Controls.Add(btnDeleteScore);
@@ -1069,12 +1069,12 @@ namespace Music.Writer
             lstScores.Size = new Size(245, 319);
             lstScores.TabIndex = 0;
             // 
-            // textBox1
+            // txtMovementTitle
             // 
-            textBox1.Location = new Point(61, 482);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(182, 23);
-            textBox1.TabIndex = 10;
+            txtMovementTitle.Location = new Point(61, 482);
+            txtMovementTitle.Name = "txtMovementTitle";
+            txtMovementTitle.Size = new Size(182, 23);
+            txtMovementTitle.TabIndex = 10;
             // 
             // label14
             // 
@@ -1197,7 +1197,7 @@ namespace Music.Writer
         private ComboBox comboBox2;
         private Label label13;
         private ComboBox comboBox1;
-        private TextBox textBox1;
+        private TextBox txtMovementTitle;
         private Label label14;
     }
 }
