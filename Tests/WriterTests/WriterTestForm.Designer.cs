@@ -34,6 +34,14 @@ namespace Music.Writer
 
         private System.Windows.Forms.Button btnAppendNotes;
 
+        // ScoreList management controls
+        private System.Windows.Forms.GroupBox grpScoreList;
+        private System.Windows.Forms.ListBox lstScores;
+        private System.Windows.Forms.Button btnSaveScore;
+        private System.Windows.Forms.Button btnDeleteScore;
+        private System.Windows.Forms.Button btnLoadScore;
+        private System.Windows.Forms.Button btnUpdateScore;
+
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -110,6 +118,12 @@ namespace Music.Writer
             lblScoreReport = new Label();
             txtScoreReport = new TextBox();
             btnExportToNotion = new Button();
+            grpScoreList = new GroupBox();
+            btnUpdateScore = new Button();
+            btnLoadScore = new Button();
+            btnDeleteScore = new Button();
+            btnSaveScore = new Button();
+            lstScores = new ListBox();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numStartBar).BeginInit();
@@ -125,6 +139,7 @@ namespace Music.Writer
             ((System.ComponentModel.ISupportInitialize)numDots).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numTupletCount).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numTupletOf).BeginInit();
+            grpScoreList.SuspendLayout();
             SuspendLayout();
             // 
             // lblTitle
@@ -750,17 +765,17 @@ namespace Music.Writer
             // lblDesignerReport
             // 
             lblDesignerReport.AutoSize = true;
-            lblDesignerReport.Font = new Font("Segoe UI", 15F);
+            lblDesignerReport.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             lblDesignerReport.ForeColor = Color.FromArgb(0, 192, 0);
-            lblDesignerReport.Location = new Point(1240, 12);
+            lblDesignerReport.Location = new Point(1381, 491);
             lblDesignerReport.Name = "lblDesignerReport";
-            lblDesignerReport.Size = new Size(153, 28);
+            lblDesignerReport.Size = new Size(104, 17);
             lblDesignerReport.TabIndex = 27;
             lblDesignerReport.Text = "Designer Report";
             // 
             // txtDesignerReport
             // 
-            txtDesignerReport.Location = new Point(1134, 47);
+            txtDesignerReport.Location = new Point(1235, 513);
             txtDesignerReport.Multiline = true;
             txtDesignerReport.Name = "txtDesignerReport";
             txtDesignerReport.ScrollBars = ScrollBars.Vertical;
@@ -770,21 +785,21 @@ namespace Music.Writer
             // lblScoreReport
             // 
             lblScoreReport.AutoSize = true;
-            lblScoreReport.Font = new Font("Segoe UI", 15F);
+            lblScoreReport.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             lblScoreReport.ForeColor = Color.FromArgb(255, 128, 0);
-            lblScoreReport.Location = new Point(1649, 13);
+            lblScoreReport.Location = new Point(1502, 29);
             lblScoreReport.Name = "lblScoreReport";
-            lblScoreReport.Size = new Size(125, 28);
+            lblScoreReport.Size = new Size(85, 17);
             lblScoreReport.TabIndex = 29;
             lblScoreReport.Text = "Score Report";
             // 
             // txtScoreReport
             // 
-            txtScoreReport.Location = new Point(1583, 47);
+            txtScoreReport.Location = new Point(1436, 53);
             txtScoreReport.Multiline = true;
             txtScoreReport.Name = "txtScoreReport";
             txtScoreReport.ScrollBars = ScrollBars.Vertical;
-            txtScoreReport.Size = new Size(274, 336);
+            txtScoreReport.Size = new Size(274, 319);
             txtScoreReport.TabIndex = 28;
             // 
             // btnExportToNotion
@@ -797,9 +812,68 @@ namespace Music.Writer
             btnExportToNotion.UseVisualStyleBackColor = true;
             btnExportToNotion.Click += btnExportToNotion_Click;
             // 
+            // grpScoreList
+            // 
+            grpScoreList.Controls.Add(btnUpdateScore);
+            grpScoreList.Controls.Add(btnLoadScore);
+            grpScoreList.Controls.Add(btnDeleteScore);
+            grpScoreList.Controls.Add(btnSaveScore);
+            grpScoreList.Controls.Add(lstScores);
+            grpScoreList.Location = new Point(1140, 28);
+            grpScoreList.Name = "grpScoreList";
+            grpScoreList.Size = new Size(274, 450);
+            grpScoreList.TabIndex = 31;
+            grpScoreList.TabStop = false;
+            grpScoreList.Text = "Saved Scores";
+            // 
+            // btnUpdateScore
+            // 
+            btnUpdateScore.Location = new Point(145, 395);
+            btnUpdateScore.Name = "btnUpdateScore";
+            btnUpdateScore.Size = new Size(115, 30);
+            btnUpdateScore.TabIndex = 4;
+            btnUpdateScore.Text = "Update";
+            btnUpdateScore.UseVisualStyleBackColor = true;
+            // 
+            // btnLoadScore
+            // 
+            btnLoadScore.Location = new Point(15, 395);
+            btnLoadScore.Name = "btnLoadScore";
+            btnLoadScore.Size = new Size(115, 30);
+            btnLoadScore.TabIndex = 3;
+            btnLoadScore.Text = "Load";
+            btnLoadScore.UseVisualStyleBackColor = true;
+            // 
+            // btnDeleteScore
+            // 
+            btnDeleteScore.Location = new Point(145, 355);
+            btnDeleteScore.Name = "btnDeleteScore";
+            btnDeleteScore.Size = new Size(115, 30);
+            btnDeleteScore.TabIndex = 2;
+            btnDeleteScore.Text = "Delete";
+            btnDeleteScore.UseVisualStyleBackColor = true;
+            // 
+            // btnSaveScore
+            // 
+            btnSaveScore.Location = new Point(15, 355);
+            btnSaveScore.Name = "btnSaveScore";
+            btnSaveScore.Size = new Size(115, 30);
+            btnSaveScore.TabIndex = 1;
+            btnSaveScore.Text = "Save Current";
+            btnSaveScore.UseVisualStyleBackColor = true;
+            // 
+            // lstScores
+            // 
+            lstScores.FormattingEnabled = true;
+            lstScores.Location = new Point(15, 25);
+            lstScores.Name = "lstScores";
+            lstScores.Size = new Size(245, 319);
+            lstScores.TabIndex = 0;
+            // 
             // WriterTestForm
             // 
             ClientSize = new Size(1918, 878);
+            Controls.Add(grpScoreList);
             Controls.Add(btnExportToNotion);
             Controls.Add(lblScoreReport);
             Controls.Add(txtScoreReport);
@@ -840,6 +914,7 @@ namespace Music.Writer
             ((System.ComponentModel.ISupportInitialize)numDots).EndInit();
             ((System.ComponentModel.ISupportInitialize)numTupletCount).EndInit();
             ((System.ComponentModel.ISupportInitialize)numTupletOf).EndInit();
+            grpScoreList.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
