@@ -27,10 +27,12 @@ namespace Music
                     if (string.IsNullOrWhiteSpace(ofd.FileName) || !File.Exists(ofd.FileName))
                         throw new FileNotFoundException("MusicXML file not found.", ofd.FileName);
 
-                    Globals.Score = MusicXmlParser.GetScore(ofd.FileName);
+                    var score = MusicXmlParser.GetScore(ofd.FileName);
+                    Globals.ScoreList.Clear();
+                    Globals.ScoreList.Add(score);
                     _lastImportedPath = ofd.FileName;
 
-                    var movement = Globals.Score?.MovementTitle ?? "Unknown";
+                    var movement = score?.MovementTitle ?? "Unknown";
                     _showStatus?.Invoke($"Loaded MusicXML: {Path.GetFileName(ofd.FileName)} (Movement: {movement})");
                 }
                 catch (Exception ex)
@@ -47,7 +49,7 @@ namespace Music
 
         public void ExportMusicXml(IWin32Window owner)
         {
-            if (Globals.Score == null)
+            if (Globals.ScoreList.Count == 0 || Globals.ScoreList[0] == null)
             {
                 MessageBox.Show(owner, "No MusicXML score loaded.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -63,7 +65,7 @@ namespace Music
             {
                 try
                 {
-                    var xml = MusicXmlScoreSerializer.Serialize(Globals.Score);
+                    var xml = MusicXmlScoreSerializer.Serialize(Globals.ScoreList[0]);
                     File.WriteAllText(sfd.FileName, xml, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
                     _showStatus?.Invoke($"Exported to {Path.GetFileName(sfd.FileName)}");
                 }

@@ -6,7 +6,7 @@ namespace Music.Writer
 {
     public partial class WriterTestForm : Form
     {
-        private Score? _score;
+        private List<Score>? _scoreList;
         private Designer.Designer? _designer;
         private WriterTestData? _writer;
         private MeasureMeta _usedDivisionsPerMeasure;
@@ -25,11 +25,12 @@ namespace Music.Writer
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.Manual;
 
-            // Load current global score and design into form-local fields for later use
+            // Load current global score list and design into form-local fields for later use
             // Constructor is the only place that reads Globals per requirement.
-            _score = Globals.Score;
+            _scoreList = Globals.ScoreList;
             // Update score report display when we load the score
-            txtScoreReport.Text = ScoreReport.Run(_score);
+            if (_scoreList != null && _scoreList.Count > 0)
+                txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
 
             _designer = Globals.Designer;
             txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
@@ -68,11 +69,11 @@ namespace Music.Writer
 
             // Get from globals on the way in but not if null, would overwrite current state
 
-            if (Globals.Score != null)
+            if (Globals.ScoreList != null && Globals.ScoreList.Count > 0)
             {
-                _score = Globals.Score;
+                _scoreList = Globals.ScoreList;
                 // Update score report display when score is refreshed from globals
-                txtScoreReport.Text = ScoreReport.Run(_score);
+                txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
             }
             if (Globals.Designer != null)
             {
@@ -91,7 +92,7 @@ namespace Music.Writer
             base.OnDeactivate(e);
 
             // Save on the way out
-            Globals.Score = _score;
+            Globals.ScoreList = _scoreList;
             Globals.Designer = _designer;
             _writer = Globals.Writer = CaptureFormData();
             Globals.Writer = _writer;
@@ -105,18 +106,39 @@ namespace Music.Writer
         {
             _writer = CaptureFormData();
 
+            // Ensure score list exists and has at least one score
+            if (_scoreList == null || _scoreList.Count == 0)
+            {
+                MessageBox.Show(this, "No score available. Please create a new score first.", 
+                    "No Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
             var config = _writer.ToAppendPitchEventsParams();
-            AppendNotes.Execute(_score!, config, _usedDivisionsPerMeasure);
-            txtScoreReport.Text = ScoreReport.Run(_score);
-            Globals.Score = _score;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
+            AppendNotes.Execute(_scoreList[0], config, _usedDivisionsPerMeasure);
+            txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
+            Globals.ScoreList = _scoreList;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
             //MessageBoxHelper.ShowMessage("Pattern has been applied to the score.", "Apply Pattern Set Notes");
         }
 
 
         private void btnNewScore_Click(object sender, EventArgs e)
         {
-            _score = ScoreHelper.NewScore(this, _designer, clbParts, _usedDivisionsPerMeasure);
-            txtScoreReport.Text = ScoreReport.Run(_score);
+            var newScore = ScoreHelper.NewScore(this, _designer, clbParts, _usedDivisionsPerMeasure);
+            if (newScore != null)
+            {
+                // Initialize score list if null
+                if (_scoreList == null)
+                    _scoreList = new List<Score>();
+                
+                // Replace score at index 0 or add if list is empty
+                if (_scoreList.Count > 0)
+                    _scoreList[0] = newScore;
+                else
+                    _scoreList.Add(newScore);
+                
+                txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
+            }
             // KEEP. MessageBox.Show(owner, "New score created from design.", "New Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -217,7 +239,8 @@ namespace Music.Writer
 
         private void btnExportToNotion_Click(object sender, EventArgs e)
         {
-            if (_score == null)
+            // Ensure score list exists and has at least one score
+            if (_scoreList == null || _scoreList.Count == 0)
             {
                 MessageBox.Show(this, "No score to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -231,7 +254,7 @@ namespace Music.Writer
                 if (!string.IsNullOrEmpty(dir))
                     Directory.CreateDirectory(dir);
 
-                var xml = MusicXmlScoreSerializer.Serialize(_score);
+                var xml = MusicXmlScoreSerializer.Serialize(_scoreList[0]);
                 File.WriteAllText(fullPath, xml, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
 
                 MessageBox.Show(this, $"Exported to {fullPath}", "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
