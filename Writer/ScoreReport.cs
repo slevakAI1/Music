@@ -22,6 +22,11 @@ namespace Music.Writer
                 return "(no parts in score)";
 
             var sb = new StringBuilder();
+
+            // Display movement title at the top of the report
+            var title = !string.IsNullOrWhiteSpace(score.MovementTitle) ? score.MovementTitle : "(untitled)";
+            sb.Append($"{title}\r\n\r\n");
+
             bool firstPart = true;
 
             foreach (var part in score.Parts)

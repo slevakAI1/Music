@@ -1071,7 +1071,7 @@ namespace Music.Writer
             // 
             // btnSaveScore
             // 
-            btnSaveScore.ForeColor = Color.Red;
+            btnSaveScore.ForeColor = Color.FromArgb(0, 192, 0);
             btnSaveScore.Location = new Point(15, 355);
             btnSaveScore.Name = "btnSaveScore";
             btnSaveScore.Size = new Size(115, 30);

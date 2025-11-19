@@ -6,7 +6,7 @@ namespace Music.Writer
 {
     public partial class WriterTestForm : Form
     {
-        private List<Score>? _scoreList;
+        private List<Score> _scoreList;
         private Designer.Designer? _designer;
         private WriterTestData? _writer;
         private MeasureMeta _usedDivisionsPerMeasure;
@@ -135,21 +135,15 @@ namespace Music.Writer
                 _usedDivisionsPerMeasure,
                 txtMovementTitle.Text);
 
-
-
-            // TODO this covers appending case and setting current case ??? what to do???
-
-            // Replace score at index 0 or add if list is empty
-            if (_scoreList.Count > 0)
-                _scoreList[0] = newScore;
-            else
-                _scoreList.Add(newScore);
-
-
-
-
-            txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
-
+            // Reset current Score
+            if (newScore != null)
+            {
+                if (_scoreList.Count > 0)
+                    _scoreList[0] = newScore;
+                else
+                    _scoreList.Add(newScore);
+                txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
+            }
         }
 
         private void btnUpdateFormFromDesigner_Click(object sender, EventArgs e)
@@ -277,7 +271,35 @@ namespace Music.Writer
 
         private void btnSaveScore_Click(object sender, EventArgs e)
         {
+            // Ensure there is a current score to save
+            if (_scoreList == null || _scoreList.Count == 0)
+            {
+                MessageBox.Show(this, "No score to save. Create or load a score first.", "Save Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
 
+            var score = _scoreList[0];
+            var title = score?.MovementTitle ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(title))
+            {
+                MessageBox.Show(this, "Movement title is empty. Set a movement title before saving.", "Save Score", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Prevent duplicate names (case-insensitive)
+            for (int i = 0; i < lstScores.Items.Count; i++)
+            {
+                if (string.Equals(lstScores.Items[i]?.ToString(), title, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    MessageBox.Show(this, $"A score named \"{title}\" already exists in the list. Skipping insert.", "Duplicate Score", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+
+            // Insert at index 0, pushing other entries down
+            lstScores.Items.Insert(0, title);
+            lstScores.SelectedIndex = 0;
         }
     }
 }

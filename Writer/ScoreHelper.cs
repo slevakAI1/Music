@@ -28,6 +28,8 @@ namespace Music.Writer
                 Parts = new List<Part>()
             };
 
+            // TODO check this logic
+
             // Prefer the passed design, fall back to Globals if missing
             var usedDesign = design ?? Globals.Designer;
             if (usedDesign == null)
