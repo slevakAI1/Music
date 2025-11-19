@@ -25,11 +25,9 @@ namespace Music.Writer
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.Manual;
 
-            // Load current global score list and design into form-local fields for later use
-            // Constructor is the only place that reads Globals per requirement.
+            // Load current global score list
             _scoreList = Globals.ScoreList;
-            // Update score report display when we load the score
-            if (_scoreList != null && _scoreList.Count > 0)
+            if (_scoreList.Count > 0)
                 txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
 
             _designer = Globals.Designer;
@@ -126,25 +124,32 @@ namespace Music.Writer
 
         private void btnNewScore_Click(object sender, EventArgs e)
         {
-            var newScore = ScoreHelper.NewScore(this, _designer, clbParts, _usedDivisionsPerMeasure);
-            if (newScore != null)
-            {
-                // Initialize score list if null
-                if (_scoreList == null)
-                    _scoreList = new List<Score>();
-
-                // Replace score at index 0 or add if list is empty
-                if (_scoreList.Count > 0)
-                    _scoreList[0] = newScore;
-                else
-                    _scoreList.Add(newScore);
-
-                txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
-            }
-
             // Default movement title to date and time, format something like this: Sunday, Mar 3, 2025 3:05.34 PM
             var now = System.DateTime.Now;
             txtMovementTitle.Text = now.ToString("dddd, MMM d, yyyy h:mm'.'ss tt");
+
+            var newScore = ScoreHelper.NewScore(
+                this,
+                _designer,
+                clbParts,
+                _usedDivisionsPerMeasure,
+                txtMovementTitle.Text);
+
+
+
+            // TODO this covers appending case and setting current case ??? what to do???
+
+            // Replace score at index 0 or add if list is empty
+            if (_scoreList.Count > 0)
+                _scoreList[0] = newScore;
+            else
+                _scoreList.Add(newScore);
+
+
+
+
+            txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
+
         }
 
         private void btnUpdateFormFromDesigner_Click(object sender, EventArgs e)

@@ -135,13 +135,13 @@ namespace Music.Writer
             txtScoreReport = new TextBox();
             btnExportToNotion = new Button();
             grpScoreList = new GroupBox();
+            label14 = new Label();
+            txtMovementTitle = new TextBox();
             btnUpdateScore = new Button();
             btnLoadScore = new Button();
             btnDeleteScore = new Button();
             btnSaveScore = new Button();
             lstScores = new ListBox();
-            txtMovementTitle = new TextBox();
-            label14 = new Label();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numericUpDown3).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown4).BeginInit();
@@ -935,6 +935,7 @@ namespace Music.Writer
             // 
             // btnChordTest
             // 
+            btnChordTest.Enabled = false;
             btnChordTest.Location = new Point(869, 192);
             btnChordTest.Name = "btnChordTest";
             btnChordTest.Size = new Size(196, 23);
@@ -945,6 +946,7 @@ namespace Music.Writer
             // 
             // btnUpdateFormFromDesigner
             // 
+            btnUpdateFormFromDesigner.Enabled = false;
             btnUpdateFormFromDesigner.Location = new Point(869, 163);
             btnUpdateFormFromDesigner.Name = "btnUpdateFormFromDesigner";
             btnUpdateFormFromDesigner.Size = new Size(196, 23);
@@ -1020,6 +1022,23 @@ namespace Music.Writer
             grpScoreList.TabStop = false;
             grpScoreList.Text = "Saved Scores";
             // 
+            // label14
+            // 
+            label14.AutoSize = true;
+            label14.ForeColor = Color.Red;
+            label14.Location = new Point(20, 484);
+            label14.Name = "label14";
+            label14.Size = new Size(33, 15);
+            label14.TabIndex = 11;
+            label14.Text = "Title:";
+            // 
+            // txtMovementTitle
+            // 
+            txtMovementTitle.Location = new Point(61, 482);
+            txtMovementTitle.Name = "txtMovementTitle";
+            txtMovementTitle.Size = new Size(182, 23);
+            txtMovementTitle.TabIndex = 10;
+            // 
             // btnUpdateScore
             // 
             btnUpdateScore.ForeColor = Color.Red;
@@ -1068,23 +1087,6 @@ namespace Music.Writer
             lstScores.Name = "lstScores";
             lstScores.Size = new Size(245, 319);
             lstScores.TabIndex = 0;
-            // 
-            // txtMovementTitle
-            // 
-            txtMovementTitle.Location = new Point(61, 482);
-            txtMovementTitle.Name = "txtMovementTitle";
-            txtMovementTitle.Size = new Size(182, 23);
-            txtMovementTitle.TabIndex = 10;
-            // 
-            // label14
-            // 
-            label14.AutoSize = true;
-            label14.ForeColor = Color.Red;
-            label14.Location = new Point(20, 484);
-            label14.Name = "label14";
-            label14.Size = new Size(33, 15);
-            label14.TabIndex = 11;
-            label14.Text = "Title:";
             // 
             // WriterTestForm
             // 

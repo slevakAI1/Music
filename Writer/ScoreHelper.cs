@@ -14,7 +14,8 @@ namespace Music.Writer
             Form owner,
             Designer.Designer? design,
             CheckedListBox cbPart,
-            MeasureMeta usedDivisionsPerMeasure)
+            MeasureMeta usedDivisionsPerMeasure,
+            string movementTitle)
         {
             // Clear the UsedDivisionsPerMeasure since this is a new score with no notes
             usedDivisionsPerMeasure.Clear();
@@ -22,7 +23,7 @@ namespace Music.Writer
             // Create a fresh Score instance and assign to the local cache (returned to caller)
             var score = new Score
             {
-                MovementTitle = string.Empty,
+                MovementTitle = movementTitle,
                 Identification = new Identification(),
                 Parts = new List<Part>()
             };
