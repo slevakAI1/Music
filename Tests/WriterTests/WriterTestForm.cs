@@ -109,7 +109,7 @@ namespace Music.Writer
             // Ensure score list exists and has at least one score
             if (_scoreList == null || _scoreList.Count == 0)
             {
-                MessageBox.Show(this, "No score available. Please create a new score first.", 
+                MessageBox.Show(this, "No score available. Please create a new score first.",
                     "No Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
@@ -130,13 +130,13 @@ namespace Music.Writer
                 // Initialize score list if null
                 if (_scoreList == null)
                     _scoreList = new List<Score>();
-                
+
                 // Replace score at index 0 or add if list is empty
                 if (_scoreList.Count > 0)
                     _scoreList[0] = newScore;
                 else
                     _scoreList.Add(newScore);
-                
+
                 txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
             }
             // KEEP. MessageBox.Show(owner, "New score created from design.", "New Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -263,6 +263,11 @@ namespace Music.Writer
             {
                 MessageBox.Show(this, $"Error exporting MusicXML:\n{ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void btnSaveScore_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
