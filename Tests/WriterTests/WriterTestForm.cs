@@ -278,8 +278,8 @@ namespace Music.Writer
                 return;
             }
 
-            var score = _scoreList[0];
-            var title = score?.MovementTitle ?? string.Empty;
+            var currentScore = _scoreList[0];
+            var title = currentScore?.MovementTitle ?? string.Empty;
 
             if (string.IsNullOrWhiteSpace(title))
             {
@@ -287,19 +287,28 @@ namespace Music.Writer
                 return;
             }
 
-            // Prevent duplicate names (case-insensitive)
+            // Prevent duplicate names (case-insensitive) in the list control
             for (int i = 0; i < lstScores.Items.Count; i++)
             {
-                if (string.Equals(lstScores.Items[i]?.ToString(), title, System.StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(lstScores.Items[i]?.ToString(), title, StringComparison.OrdinalIgnoreCase))
                 {
                     MessageBox.Show(this, $"A score named \"{title}\" already exists in the list. Skipping insert.", "Duplicate Score", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
             }
-
-            // Insert at index 0, pushing other entries down
             lstScores.Items.Insert(0, title);
             lstScores.SelectedIndex = 0;
+
+            // Insert the current score into the in-memory score list at index 1,
+            // pushing existing items down while leaving _scoreList[0] (current) intact.
+            int modelInsertIndex = 1;
+            if (modelInsertIndex > _scoreList.Count)
+                _scoreList.Add(currentScore);
+            else
+                _scoreList.Insert(modelInsertIndex, currentScore);
+
+            // Persist into globals so other forms see the updated list
+            Globals.ScoreList = _scoreList;
         }
     }
 }
