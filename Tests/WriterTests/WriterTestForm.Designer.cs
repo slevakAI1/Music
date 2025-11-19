@@ -156,7 +156,7 @@ namespace Music.Writer
             // 
             cbPattern.DropDownStyle = ComboBoxStyle.DropDownList;
             cbPattern.Items.AddRange(new object[] { "Append Pitch Events" });
-            cbPattern.Location = new Point(100, 65);
+            cbPattern.Location = new Point(90, 54);
             cbPattern.Name = "cbPattern";
             cbPattern.Size = new Size(250, 23);
             cbPattern.TabIndex = 1;
@@ -561,7 +561,7 @@ namespace Music.Writer
             // 
             // btnAppendNotes
             // 
-            btnAppendNotes.Location = new Point(100, 94);
+            btnAppendNotes.Location = new Point(90, 83);
             btnAppendNotes.Name = "btnAppendNotes";
             btnAppendNotes.Size = new Size(77, 22);
             btnAppendNotes.TabIndex = 4;
@@ -706,7 +706,7 @@ namespace Music.Writer
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(38, 68);
+            label2.Location = new Point(28, 57);
             label2.Name = "label2";
             label2.Size = new Size(45, 15);
             label2.TabIndex = 7;
@@ -724,7 +724,7 @@ namespace Music.Writer
             // 
             // btnNewScore
             // 
-            btnNewScore.Location = new Point(100, 39);
+            btnNewScore.Location = new Point(56, 426);
             btnNewScore.Name = "btnNewScore";
             btnNewScore.Size = new Size(155, 20);
             btnNewScore.TabIndex = 9;
@@ -804,7 +804,7 @@ namespace Music.Writer
             // 
             // btnExportToNotion
             // 
-            btnExportToNotion.Location = new Point(182, 94);
+            btnExportToNotion.Location = new Point(172, 83);
             btnExportToNotion.Name = "btnExportToNotion";
             btnExportToNotion.Size = new Size(114, 23);
             btnExportToNotion.TabIndex = 30;
@@ -819,6 +819,7 @@ namespace Music.Writer
             grpScoreList.Controls.Add(btnDeleteScore);
             grpScoreList.Controls.Add(btnSaveScore);
             grpScoreList.Controls.Add(lstScores);
+            grpScoreList.Controls.Add(btnNewScore);
             grpScoreList.Location = new Point(1140, 28);
             grpScoreList.Name = "grpScoreList";
             grpScoreList.Size = new Size(274, 450);
@@ -882,7 +883,6 @@ namespace Music.Writer
             Controls.Add(btnUpdateFormFromDesigner);
             Controls.Add(btnChordTest);
             Controls.Add(btnSetDesignTestScenarioD1);
-            Controls.Add(btnNewScore);
             Controls.Add(btnSetWriterTestScenarioG1);
             Controls.Add(label2);
             Controls.Add(groupBox1);
