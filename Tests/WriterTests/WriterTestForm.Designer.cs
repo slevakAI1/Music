@@ -936,6 +936,7 @@ namespace Music.Writer
             // btnChordTest
             // 
             btnChordTest.Enabled = false;
+            btnChordTest.ForeColor = Color.Red;
             btnChordTest.Location = new Point(869, 192);
             btnChordTest.Name = "btnChordTest";
             btnChordTest.Size = new Size(196, 23);
@@ -947,6 +948,7 @@ namespace Music.Writer
             // btnUpdateFormFromDesigner
             // 
             btnUpdateFormFromDesigner.Enabled = false;
+            btnUpdateFormFromDesigner.ForeColor = Color.Red;
             btnUpdateFormFromDesigner.Location = new Point(869, 163);
             btnUpdateFormFromDesigner.Name = "btnUpdateFormFromDesigner";
             btnUpdateFormFromDesigner.Size = new Size(196, 23);
