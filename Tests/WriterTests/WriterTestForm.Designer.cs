@@ -139,6 +139,7 @@ namespace Music.Writer
             numericUpDown2 = new NumericUpDown();
             groupBox3 = new GroupBox();
             grbCurrentDesign = new GroupBox();
+            label2 = new Label();
             grpTarget.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -168,11 +169,11 @@ namespace Music.Writer
             // 
             lblTitle.AutoSize = true;
             lblTitle.Font = new Font("Segoe UI", 18F);
-            lblTitle.Location = new Point(485, 9);
+            lblTitle.Location = new Point(1229, 721);
             lblTitle.Name = "lblTitle";
-            lblTitle.Size = new Size(190, 32);
+            lblTitle.Size = new Size(100, 32);
             lblTitle.TabIndex = 0;
-            lblTitle.Text = "Writer Test Form";
+            lblTitle.Text = "Console";
             // 
             // cbPattern
             // 
@@ -191,7 +192,7 @@ namespace Music.Writer
             grpTarget.Controls.Add(lblStaff);
             grpTarget.Controls.Add(clbStaffs);
             grpTarget.ForeColor = Color.White;
-            grpTarget.Location = new Point(20, 117);
+            grpTarget.Location = new Point(20, 121);
             grpTarget.Name = "grpTarget";
             grpTarget.Size = new Size(442, 174);
             grpTarget.TabIndex = 2;
@@ -239,6 +240,7 @@ namespace Music.Writer
             // 
             // grpPitch
             // 
+            grpPitch.BackColor = Color.Black;
             grpPitch.Controls.Add(grpChord);
             grpPitch.Controls.Add(lblOctaveAbs);
             grpPitch.Controls.Add(numOctaveAbs);
@@ -248,6 +250,7 @@ namespace Music.Writer
             grpPitch.Controls.Add(rbPitchKeyRelative);
             grpPitch.Controls.Add(grpAbsolute);
             grpPitch.Controls.Add(grpKeyRelative);
+            grpPitch.ForeColor = Color.White;
             grpPitch.Location = new Point(497, 254);
             grpPitch.Name = "grpPitch";
             grpPitch.Size = new Size(592, 374);
@@ -509,6 +512,7 @@ namespace Music.Writer
             // 
             // btnExecute
             // 
+            btnExecute.ForeColor = Color.FromArgb(255, 128, 0);
             btnExecute.Location = new Point(269, 22);
             btnExecute.Name = "btnExecute";
             btnExecute.Size = new Size(77, 22);
@@ -519,6 +523,7 @@ namespace Music.Writer
             // 
             // groupBox1
             // 
+            groupBox1.BackColor = Color.Black;
             groupBox1.Controls.Add(txtTupletNumber);
             groupBox1.Controls.Add(lblTupletNumber);
             groupBox1.Controls.Add(label3);
@@ -531,6 +536,7 @@ namespace Music.Writer
             groupBox1.Controls.Add(numTupletCount);
             groupBox1.Controls.Add(lblTupletOf);
             groupBox1.Controls.Add(numTupletOf);
+            groupBox1.ForeColor = Color.White;
             groupBox1.Location = new Point(497, 62);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(315, 174);
@@ -654,6 +660,7 @@ namespace Music.Writer
             // 
             // btnSetWriterTestScenarioG1
             // 
+            btnSetWriterTestScenarioG1.ForeColor = Color.FromArgb(0, 192, 0);
             btnSetWriterTestScenarioG1.Location = new Point(150, 51);
             btnSetWriterTestScenarioG1.Name = "btnSetWriterTestScenarioG1";
             btnSetWriterTestScenarioG1.Size = new Size(196, 23);
@@ -675,6 +682,7 @@ namespace Music.Writer
             // 
             // btnSetDesignTestScenarioD1
             // 
+            btnSetDesignTestScenarioD1.ForeColor = Color.FromArgb(0, 192, 0);
             btnSetDesignTestScenarioD1.Location = new Point(181, 138);
             btnSetDesignTestScenarioD1.Name = "btnSetDesignTestScenarioD1";
             btnSetDesignTestScenarioD1.Size = new Size(179, 23);
@@ -738,6 +746,7 @@ namespace Music.Writer
             // 
             // btnExportToNotion
             // 
+            btnExportToNotion.ForeColor = Color.FromArgb(0, 192, 0);
             btnExportToNotion.Location = new Point(13, 51);
             btnExportToNotion.Name = "btnExportToNotion";
             btnExportToNotion.Size = new Size(114, 23);
@@ -748,6 +757,8 @@ namespace Music.Writer
             // 
             // grpScoreList
             // 
+            grpScoreList.BackColor = Color.Black;
+            grpScoreList.Controls.Add(label2);
             grpScoreList.Controls.Add(txtMovementTitle);
             grpScoreList.Controls.Add(lblScoreReport);
             grpScoreList.Controls.Add(btnUpdateScore);
@@ -757,15 +768,17 @@ namespace Music.Writer
             grpScoreList.Controls.Add(btnAddScore);
             grpScoreList.Controls.Add(lstScores);
             grpScoreList.Controls.Add(btnNewScore);
+            grpScoreList.ForeColor = Color.White;
             grpScoreList.Location = new Point(1108, 28);
             grpScoreList.Name = "grpScoreList";
             grpScoreList.Size = new Size(595, 414);
             grpScoreList.TabIndex = 31;
             grpScoreList.TabStop = false;
-            grpScoreList.Text = "Score List";
+            grpScoreList.Text = "Score Manager";
             // 
             // txtMovementTitle
             // 
+            txtMovementTitle.ForeColor = Color.FromArgb(0, 192, 0);
             txtMovementTitle.Location = new Point(121, 375);
             txtMovementTitle.Name = "txtMovementTitle";
             txtMovementTitle.Size = new Size(154, 23);
@@ -825,6 +838,7 @@ namespace Music.Writer
             // 
             // groupBox2
             // 
+            groupBox2.BackColor = Color.Black;
             groupBox2.Controls.Add(label13);
             groupBox2.Controls.Add(comboBox1);
             groupBox2.Controls.Add(comboBox4);
@@ -847,6 +861,7 @@ namespace Music.Writer
             groupBox2.Controls.Add(numericUpDown1);
             groupBox2.Controls.Add(label10);
             groupBox2.Controls.Add(numericUpDown2);
+            groupBox2.ForeColor = Color.White;
             groupBox2.Location = new Point(20, 303);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new Size(442, 385);
@@ -1073,23 +1088,36 @@ namespace Music.Writer
             groupBox3.Controls.Add(btnExportToNotion);
             groupBox3.Controls.Add(btnSetWriterTestScenarioG1);
             groupBox3.ForeColor = Color.White;
-            groupBox3.Location = new Point(29, 12);
+            groupBox3.Location = new Point(20, 12);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(433, 100);
+            groupBox3.Size = new Size(442, 100);
             groupBox3.TabIndex = 33;
             groupBox3.TabStop = false;
             groupBox3.Text = "Command";
             // 
             // grbCurrentDesign
             // 
+            grbCurrentDesign.BackColor = Color.Black;
             grbCurrentDesign.Controls.Add(txtDesignerReport);
             grbCurrentDesign.Controls.Add(btnSetDesignTestScenarioD1);
+            grbCurrentDesign.ForeColor = Color.White;
             grbCurrentDesign.Location = new Point(1109, 459);
             grbCurrentDesign.Name = "grbCurrentDesign";
             grbCurrentDesign.Size = new Size(594, 167);
             grbCurrentDesign.TabIndex = 34;
             grbCurrentDesign.TabStop = false;
             grbCurrentDesign.Text = "Current Design";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label2.ForeColor = Color.FromArgb(0, 192, 0);
+            label2.Location = new Point(418, 22);
+            label2.Name = "label2";
+            label2.Size = new Size(43, 17);
+            label2.TabIndex = 30;
+            label2.Text = "Saved";
             // 
             // WriterTestForm
             // 
@@ -1203,5 +1231,6 @@ namespace Music.Writer
         private NumericUpDown numericUpDown2;
         private GroupBox groupBox3;
         private GroupBox grbCurrentDesign;
+        private Label label2;
     }
 }
