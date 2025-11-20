@@ -356,5 +356,109 @@ namespace Music.Writer
                 lstScores.SelectedIndex = newSelection;
             }
         }
+
+        private void btnUpdateScore_Click(object sender, EventArgs e)
+        {
+            // Ensure there is a current score to update from
+            if (_scoreList == null || _scoreList.Count == 0)
+            {
+                MessageBox.Show(this, "No current score available. Create or load a score first.", "Update Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Ensure a score is selected in the list control
+            if (lstScores.SelectedIndex < 0)
+            {
+                MessageBox.Show(this, "No score selected. Select a score from the list to update.", "Update Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            int controlIndex = lstScores.SelectedIndex;
+            string? selectedTitle = lstScores.Items[controlIndex]?.ToString();
+            var currentScore = _scoreList[0];
+
+            // Confirm update
+            var result = MessageBox.Show(this,
+                $"Are you sure you want to overwrite the score \"{selectedTitle}\" with the current score?",
+                "Confirm Update",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result != DialogResult.Yes)
+                return;
+
+            // Calculate the corresponding index in _scoreList
+            // Control index 0 maps to _scoreList[1], control index 1 maps to _scoreList[2], etc.
+            int scoreListIndex = controlIndex + 1;
+
+            // Update only the Parts of the selected score, preserving its MovementTitle
+            if (scoreListIndex >= 0 && scoreListIndex < _scoreList.Count)
+            {
+                var targetScore = _scoreList[scoreListIndex];
+
+                // Copy only the Parts from current score to target score
+                // Keep the target's original MovementTitle
+                targetScore.Parts = currentScore.Parts;
+            }
+
+            // The list control item text remains unchanged (original MovementTitle preserved)
+
+            // Persist changes to globals
+            Globals.ScoreList = _scoreList;
+
+            // Keep the same item selected
+            lstScores.SelectedIndex = controlIndex;
+        }
+
+        private void btnLoadScore_Click(object sender, EventArgs e)
+        {
+            // Ensure score list exists and has at least one score
+            if (_scoreList == null || _scoreList.Count == 0)
+            {
+                MessageBox.Show(this, "No current score available. Create a score first.", "Load Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Ensure a score is selected in the list control
+            if (lstScores.SelectedIndex < 0)
+            {
+                MessageBox.Show(this, "No score selected. Select a score from the list to load.", "Load Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            int controlIndex = lstScores.SelectedIndex;
+            string? selectedTitle = lstScores.Items[controlIndex]?.ToString();
+
+            // Confirm load
+            var result = MessageBox.Show(this,
+                $"Are you sure you want to load the score \"{selectedTitle}\" into the current score?",
+                "Confirm Load",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result != DialogResult.Yes)
+                return;
+
+            // Calculate the corresponding index in _scoreList
+            // Control index 0 maps to _scoreList[1], control index 1 maps to _scoreList[2], etc.
+            int scoreListIndex = controlIndex + 1;
+
+            // Copy only the Parts from the selected score to the current score
+            if (scoreListIndex >= 0 && scoreListIndex < _scoreList.Count)
+            {
+                var sourceScore = _scoreList[scoreListIndex];
+                var currentScore = _scoreList[0];
+
+                // Copy Parts from selected score to current score
+                // Keep the current score's MovementTitle
+                currentScore.Parts = sourceScore.Parts;
+
+                // Update the score report to show the loaded score
+                txtScoreReport.Text = ScoreReport.Run(currentScore);
+
+                // Persist changes to globals
+                Globals.ScoreList = _scoreList;
+            }
+        }
     }
 }

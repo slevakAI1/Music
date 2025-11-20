@@ -170,9 +170,9 @@ namespace Music.Writer
             lblTitle.Font = new Font("Segoe UI", 18F);
             lblTitle.Location = new Point(485, 9);
             lblTitle.Name = "lblTitle";
-            lblTitle.Size = new Size(79, 32);
+            lblTitle.Size = new Size(190, 32);
             lblTitle.TabIndex = 0;
-            lblTitle.Text = "Writer";
+            lblTitle.Text = "Writer Test Form";
             // 
             // cbPattern
             // 
@@ -1025,7 +1025,7 @@ namespace Music.Writer
             // label14
             // 
             label14.AutoSize = true;
-            label14.ForeColor = Color.Red;
+            label14.ForeColor = Color.FromArgb(255, 128, 0);
             label14.Location = new Point(20, 484);
             label14.Name = "label14";
             label14.Size = new Size(33, 15);
@@ -1041,23 +1041,25 @@ namespace Music.Writer
             // 
             // btnUpdateScore
             // 
-            btnUpdateScore.ForeColor = Color.Red;
+            btnUpdateScore.ForeColor = Color.FromArgb(0, 192, 0);
             btnUpdateScore.Location = new Point(145, 395);
             btnUpdateScore.Name = "btnUpdateScore";
             btnUpdateScore.Size = new Size(115, 30);
             btnUpdateScore.TabIndex = 4;
             btnUpdateScore.Text = "Update";
             btnUpdateScore.UseVisualStyleBackColor = true;
+            btnUpdateScore.Click += btnUpdateScore_Click;
             // 
             // btnLoadScore
             // 
-            btnLoadScore.ForeColor = Color.Red;
+            btnLoadScore.ForeColor = Color.FromArgb(0, 192, 0);
             btnLoadScore.Location = new Point(15, 395);
             btnLoadScore.Name = "btnLoadScore";
             btnLoadScore.Size = new Size(115, 30);
             btnLoadScore.TabIndex = 3;
             btnLoadScore.Text = "Load";
             btnLoadScore.UseVisualStyleBackColor = true;
+            btnLoadScore.Click += btnLoadScore_Click;
             // 
             // btnDeleteScore
             // 
