@@ -272,7 +272,7 @@ namespace Music.Writer
             }
         }
 
-        private void btnSaveScore_Click(object sender, EventArgs e)
+        private void btnAddScore_Click(object sender, EventArgs e)
         {
             // Ensure there is a current score to save
             if (_scoreList == null || _scoreList.Count == 0)
@@ -282,13 +282,17 @@ namespace Music.Writer
             }
 
             var currentScore = _scoreList[0];
-            var title = currentScore?.MovementTitle ?? string.Empty;
-
+            
+            // Get title from textbox if present, otherwise generate default timestamp title
+            var title = txtMovementTitle.Text;
             if (string.IsNullOrWhiteSpace(title))
             {
-                MessageBox.Show(this, "Movement title is empty. Set a movement title before saving.", "Save Score", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                var now = System.DateTime.Now;
+                title = now.ToString("dddd, MMM d, yyyy h:mm'.'ss tt");
             }
+
+            // Update the current score's MovementTitle to match
+            currentScore.MovementTitle = title;
 
             // Prevent duplicate names (case-insensitive) in the list control
             for (int i = 0; i < lstScores.Items.Count; i++)
@@ -299,6 +303,8 @@ namespace Music.Writer
                     return;
                 }
             }
+
+            // Add to list control at index 0
             lstScores.Items.Insert(0, title);
             lstScores.SelectedIndex = 0;
 
@@ -312,6 +318,9 @@ namespace Music.Writer
 
             // Persist into globals so other forms see the updated list
             Globals.ScoreList = _scoreList;
+
+            // Clear the movement title textbox after successful add
+            txtMovementTitle.Text = "";
         }
 
         private void btnDeleteScore_Click(object sender, EventArgs e)

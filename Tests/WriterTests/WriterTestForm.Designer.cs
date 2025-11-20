@@ -37,7 +37,7 @@ namespace Music.Writer
         // ScoreList management controls
         private System.Windows.Forms.GroupBox grpScoreList;
         private System.Windows.Forms.ListBox lstScores;
-        private System.Windows.Forms.Button btnSaveScore;
+        private System.Windows.Forms.Button btnAddScore;
         private System.Windows.Forms.Button btnDeleteScore;
         private System.Windows.Forms.Button btnLoadScore;
         private System.Windows.Forms.Button btnUpdateScore;
@@ -140,7 +140,7 @@ namespace Music.Writer
             btnUpdateScore = new Button();
             btnLoadScore = new Button();
             btnDeleteScore = new Button();
-            btnSaveScore = new Button();
+            btnAddScore = new Button();
             lstScores = new ListBox();
             grpTarget.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numericUpDown3).BeginInit();
@@ -914,7 +914,7 @@ namespace Music.Writer
             // 
             // btnNewScore
             // 
-            btnNewScore.ForeColor = Color.FromArgb(255, 128, 0);
+            btnNewScore.ForeColor = Color.FromArgb(0, 192, 0);
             btnNewScore.Location = new Point(53, 455);
             btnNewScore.Name = "btnNewScore";
             btnNewScore.Size = new Size(155, 20);
@@ -1012,7 +1012,7 @@ namespace Music.Writer
             grpScoreList.Controls.Add(btnUpdateScore);
             grpScoreList.Controls.Add(btnLoadScore);
             grpScoreList.Controls.Add(btnDeleteScore);
-            grpScoreList.Controls.Add(btnSaveScore);
+            grpScoreList.Controls.Add(btnAddScore);
             grpScoreList.Controls.Add(lstScores);
             grpScoreList.Controls.Add(btnNewScore);
             grpScoreList.Location = new Point(1140, 28);
@@ -1020,7 +1020,7 @@ namespace Music.Writer
             grpScoreList.Size = new Size(274, 564);
             grpScoreList.TabIndex = 31;
             grpScoreList.TabStop = false;
-            grpScoreList.Text = "Saved Scores";
+            grpScoreList.Text = "Score List";
             // 
             // label14
             // 
@@ -1072,16 +1072,16 @@ namespace Music.Writer
             btnDeleteScore.UseVisualStyleBackColor = true;
             btnDeleteScore.Click += btnDeleteScore_Click;
             // 
-            // btnSaveScore
+            // btnAddScore
             // 
-            btnSaveScore.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSaveScore.Location = new Point(15, 355);
-            btnSaveScore.Name = "btnSaveScore";
-            btnSaveScore.Size = new Size(115, 30);
-            btnSaveScore.TabIndex = 1;
-            btnSaveScore.Text = "Save Current";
-            btnSaveScore.UseVisualStyleBackColor = true;
-            btnSaveScore.Click += btnSaveScore_Click;
+            btnAddScore.ForeColor = Color.FromArgb(0, 192, 0);
+            btnAddScore.Location = new Point(15, 355);
+            btnAddScore.Name = "btnAddScore";
+            btnAddScore.Size = new Size(115, 30);
+            btnAddScore.TabIndex = 1;
+            btnAddScore.Text = "Add";
+            btnAddScore.UseVisualStyleBackColor = true;
+            btnAddScore.Click += btnAddScore_Click;
             // 
             // lstScores
             // 
