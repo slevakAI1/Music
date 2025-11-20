@@ -133,7 +133,6 @@ namespace Music.Writer
 
             // TO DO - this should not be passing entire controls like "this" or clbParts
             var newScore = ScoreHelper.NewScore(
-                this,
                 _designer,
                 clbParts,
                 _usedDivisionsPerMeasure,

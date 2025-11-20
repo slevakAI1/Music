@@ -11,7 +11,6 @@ namespace Music.Writer
     internal static class ScoreHelper
     {
         public static Score? NewScore(
-            Form owner,
             Designer.Designer? design,
             CheckedListBox cbPart,
             MeasureMeta usedDivisionsPerMeasure,
@@ -34,7 +33,7 @@ namespace Music.Writer
             var usedDesign = design ?? Globals.Designer;
             if (usedDesign == null)
             {
-                MessageBox.Show(owner, "No design available. Create or set a design before creating a new score.", "No Design", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show("No design available. Create or set a design before creating a new score.", "No Design", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return null;
             }
 
@@ -52,7 +51,7 @@ namespace Music.Writer
 
             if (partNames.Count == 0)
             {
-                MessageBox.Show(owner, "Design contains no voices to create parts from.", "No Parts", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show("Design contains no voices to create parts from.", "No Parts", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return null;
             }
 
@@ -63,7 +62,7 @@ namespace Music.Writer
             }
             catch (Exception ex)
             {
-                MessageBox.Show(owner, $"Error creating parts: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error creating parts: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
             }
 
