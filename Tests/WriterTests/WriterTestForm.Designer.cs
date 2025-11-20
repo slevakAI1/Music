@@ -1070,7 +1070,7 @@ namespace Music.Writer
             groupBox3.Controls.Add(btnSetWriterTestScenarioG1);
             groupBox3.Location = new Point(29, 12);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(419, 100);
+            groupBox3.Size = new Size(433, 100);
             groupBox3.TabIndex = 33;
             groupBox3.TabStop = false;
             groupBox3.Text = "Command";
