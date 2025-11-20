@@ -248,7 +248,7 @@ namespace Music.Writer
             grpPitch.Controls.Add(grpKeyRelative);
             grpPitch.Location = new Point(497, 254);
             grpPitch.Name = "grpPitch";
-            grpPitch.Size = new Size(615, 374);
+            grpPitch.Size = new Size(592, 374);
             grpPitch.TabIndex = 3;
             grpPitch.TabStop = false;
             grpPitch.Text = "Pitch Options";
@@ -264,7 +264,7 @@ namespace Music.Writer
             grpChord.Controls.Add(cbChordQuality);
             grpChord.Controls.Add(label8);
             grpChord.Controls.Add(cbChordBase);
-            grpChord.Location = new Point(43, 259);
+            grpChord.Location = new Point(31, 259);
             grpChord.Name = "grpChord";
             grpChord.Size = new Size(549, 98);
             grpChord.TabIndex = 11;
@@ -360,7 +360,7 @@ namespace Music.Writer
             // 
             lblOctaveAbs.AutoSize = true;
             lblOctaveAbs.ForeColor = Color.FromArgb(0, 192, 0);
-            lblOctaveAbs.Location = new Point(25, 57);
+            lblOctaveAbs.Location = new Point(13, 57);
             lblOctaveAbs.Name = "lblOctaveAbs";
             lblOctaveAbs.Size = new Size(47, 15);
             lblOctaveAbs.TabIndex = 4;
@@ -368,7 +368,7 @@ namespace Music.Writer
             // 
             // numOctaveAbs
             // 
-            numOctaveAbs.Location = new Point(77, 53);
+            numOctaveAbs.Location = new Point(65, 53);
             numOctaveAbs.Maximum = new decimal(new int[] { 8, 0, 0, 0 });
             numOctaveAbs.Name = "numOctaveAbs";
             numOctaveAbs.Size = new Size(47, 23);
@@ -379,7 +379,7 @@ namespace Music.Writer
             // 
             rbChord.AutoSize = true;
             rbChord.ForeColor = Color.FromArgb(0, 192, 0);
-            rbChord.Location = new Point(27, 230);
+            rbChord.Location = new Point(15, 230);
             rbChord.Name = "rbChord";
             rbChord.Size = new Size(58, 19);
             rbChord.TabIndex = 5;
@@ -389,7 +389,7 @@ namespace Music.Writer
             // 
             rbIsRest.AutoSize = true;
             rbIsRest.ForeColor = Color.FromArgb(0, 192, 0);
-            rbIsRest.Location = new Point(27, 27);
+            rbIsRest.Location = new Point(15, 27);
             rbIsRest.Name = "rbIsRest";
             rbIsRest.Size = new Size(47, 19);
             rbIsRest.TabIndex = 4;
@@ -400,7 +400,7 @@ namespace Music.Writer
             rbPitchAbsolute.AutoSize = true;
             rbPitchAbsolute.Checked = true;
             rbPitchAbsolute.ForeColor = Color.FromArgb(0, 192, 0);
-            rbPitchAbsolute.Location = new Point(27, 86);
+            rbPitchAbsolute.Location = new Point(15, 86);
             rbPitchAbsolute.Name = "rbPitchAbsolute";
             rbPitchAbsolute.Size = new Size(72, 19);
             rbPitchAbsolute.TabIndex = 0;
@@ -410,7 +410,7 @@ namespace Music.Writer
             // rbPitchKeyRelative
             // 
             rbPitchKeyRelative.AutoSize = true;
-            rbPitchKeyRelative.Location = new Point(27, 159);
+            rbPitchKeyRelative.Location = new Point(15, 159);
             rbPitchKeyRelative.Name = "rbPitchKeyRelative";
             rbPitchKeyRelative.Size = new Size(87, 19);
             rbPitchKeyRelative.TabIndex = 1;
@@ -422,7 +422,7 @@ namespace Music.Writer
             grpAbsolute.Controls.Add(cbStep);
             grpAbsolute.Controls.Add(lblAccidental);
             grpAbsolute.Controls.Add(cbAccidental);
-            grpAbsolute.Location = new Point(33, 101);
+            grpAbsolute.Location = new Point(21, 101);
             grpAbsolute.Name = "grpAbsolute";
             grpAbsolute.Size = new Size(369, 46);
             grpAbsolute.TabIndex = 2;
@@ -471,7 +471,7 @@ namespace Music.Writer
             grpKeyRelative.Controls.Add(lblDegree);
             grpKeyRelative.Controls.Add(numDegree);
             grpKeyRelative.Controls.Add(lblOctaveKR);
-            grpKeyRelative.Location = new Point(42, 173);
+            grpKeyRelative.Location = new Point(30, 173);
             grpKeyRelative.Name = "grpKeyRelative";
             grpKeyRelative.Size = new Size(360, 47);
             grpKeyRelative.TabIndex = 3;
@@ -754,7 +754,7 @@ namespace Music.Writer
             grpScoreList.Controls.Add(btnAddScore);
             grpScoreList.Controls.Add(lstScores);
             grpScoreList.Controls.Add(btnNewScore);
-            grpScoreList.Location = new Point(1140, 28);
+            grpScoreList.Location = new Point(1108, 28);
             grpScoreList.Name = "grpScoreList";
             grpScoreList.Size = new Size(595, 414);
             grpScoreList.TabIndex = 31;
@@ -1079,7 +1079,7 @@ namespace Music.Writer
             // 
             grbCurrentDesign.Controls.Add(txtDesignerReport);
             grbCurrentDesign.Controls.Add(btnSetDesignTestScenarioD1);
-            grbCurrentDesign.Location = new Point(1141, 459);
+            grbCurrentDesign.Location = new Point(1109, 459);
             grbCurrentDesign.Name = "grbCurrentDesign";
             grbCurrentDesign.Size = new Size(594, 167);
             grbCurrentDesign.TabIndex = 34;
