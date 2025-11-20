@@ -118,26 +118,25 @@ namespace Music.Writer
             AppendNotes.Execute(_scoreList[0], config, _measureMeta);
             txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
             Globals.ScoreList = _scoreList;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
-            //MessageBoxHelper.ShowMessage("Pattern has been applied to the score.", "Apply Pattern Set Notes");
         }
 
 
         private void btnNewScore_Click(object sender, EventArgs e)
         {
-            // Default for movement title to date and time
-            if (txtMovementTitle.Text == "")
+            // Resolve Movement Title to use for the new score
+            var movementTitle = txtMovementTitle.Text;
+            if (movementTitle == "")
             {
                 var now = System.DateTime.Now;
-                txtMovementTitle.Text = now.ToString("dddd, MMM d, yyyy h:mm'.'ss tt");
+                movementTitle = now.ToString("dddd, MMM d, yyyy h:mm'.'ss tt");
             }
 
-            // TO DO - this should not be passing entire controls like "this" or clbParts
-            var newScore = ScoreHelper.NewScore(
+            var newScore = ScoreHelper.CreateNewScore(
                 _designer,
-                _measureMeta,
-                txtMovementTitle.Text);
+                ref _measureMeta,
+                movementTitle);
 
-            // Reset current Score
+            // Set current score to newly created score and update 
             if (newScore != null)
             {
                 if (_scoreList.Count > 0)
@@ -146,6 +145,8 @@ namespace Music.Writer
                     _scoreList.Add(newScore);
                 txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
             }
+
+            // Clear the movement title textbox
             txtMovementTitle.Text = "";
         }
 
@@ -274,38 +275,20 @@ namespace Music.Writer
 
         private void btnAddScore_Click(object sender, EventArgs e)
         {
-            // Ensure there is a current score to save
-            if (_scoreList == null || _scoreList.Count == 0)
-            {
-                MessageBox.Show(this, "No score to save. Create or load a score first.", "Save Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
             var currentScore = _scoreList[0];
-            
-            // Get title from textbox if present, otherwise generate default timestamp title
-            var title = txtMovementTitle.Text;
-            if (string.IsNullOrWhiteSpace(title))
-            {
-                var now = System.DateTime.Now;
-                title = now.ToString("dddd, MMM d, yyyy h:mm'.'ss tt");
-            }
-
-            // Update the current score's MovementTitle to match
-            currentScore.MovementTitle = title;
 
             // Prevent duplicate names (case-insensitive) in the list control
             for (int i = 0; i < lstScores.Items.Count; i++)
             {
-                if (string.Equals(lstScores.Items[i]?.ToString(), title, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(lstScores.Items[i]?.ToString(), currentScore.MovementTitle, StringComparison.OrdinalIgnoreCase))
                 {
-                    MessageBox.Show(this, $"A score named \"{title}\" already exists in the list. Skipping insert.", "Duplicate Score", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(this, $"A score named \"{currentScore.MovementTitle}\" already exists in the list. Skipping insert.", "Duplicate Score", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
             }
 
             // Add to list control at index 0
-            lstScores.Items.Insert(0, title);
+            lstScores.Items.Insert(0, currentScore.MovementTitle);
             lstScores.SelectedIndex = 0;
 
             // Add the score to the score list using the helper method
@@ -313,9 +296,6 @@ namespace Music.Writer
 
             // Persist into globals so other forms see the updated list
             Globals.ScoreList = _scoreList;
-
-            // Clear the movement title textbox after successful add
-            txtMovementTitle.Text = "";
         }
 
         private void btnDeleteScore_Click(object sender, EventArgs e)

@@ -974,19 +974,19 @@ namespace Music.Writer
             txtDesignerReport.Multiline = true;
             txtDesignerReport.Name = "txtDesignerReport";
             txtDesignerReport.ScrollBars = ScrollBars.Vertical;
-            txtDesignerReport.Size = new Size(430, 336);
+            txtDesignerReport.Size = new Size(430, 215);
             txtDesignerReport.TabIndex = 26;
             // 
             // lblScoreReport
             // 
             lblScoreReport.AutoSize = true;
             lblScoreReport.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblScoreReport.ForeColor = Color.FromArgb(255, 128, 0);
+            lblScoreReport.ForeColor = Color.FromArgb(0, 192, 0);
             lblScoreReport.Location = new Point(1502, 29);
             lblScoreReport.Name = "lblScoreReport";
-            lblScoreReport.Size = new Size(85, 17);
+            lblScoreReport.Size = new Size(88, 17);
             lblScoreReport.TabIndex = 29;
-            lblScoreReport.Text = "Score Report";
+            lblScoreReport.Text = "Current Score";
             // 
             // txtScoreReport
             // 
@@ -1019,7 +1019,7 @@ namespace Music.Writer
             grpScoreList.Controls.Add(btnNewScore);
             grpScoreList.Location = new Point(1140, 28);
             grpScoreList.Name = "grpScoreList";
-            grpScoreList.Size = new Size(274, 564);
+            grpScoreList.Size = new Size(274, 600);
             grpScoreList.TabIndex = 31;
             grpScoreList.TabStop = false;
             grpScoreList.Text = "Score List";

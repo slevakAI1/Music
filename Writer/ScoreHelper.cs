@@ -10,13 +10,13 @@ namespace Music.Writer
 {
     internal static class ScoreHelper
     {
-        public static Score? NewScore(
+        public static Score? CreateNewScore(
             Designer.Designer? design,
-            MeasureMeta usedDivisionsPerMeasure,
+            ref MeasureMeta measureMeta,
             string movementTitle)
         {
             // Clear the UsedDivisionsPerMeasure since this is a new score with no notes
-            usedDivisionsPerMeasure.Clear();
+            measureMeta = new MeasureMeta();
 
             // Create a fresh Score instance and assign to the local cache (returned to caller)
             var score = new Score

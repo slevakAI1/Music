@@ -32,7 +32,7 @@ namespace Music.Writer
         /// This should be called after all notes have been inserted.
         /// A backup is needed when a measure has notes on multiple staves.
         /// </summary>
-        public static void AddAllRequiredBackupElements(Score score, List<string> partNames, MeasureMeta usedDivisionsPerMeasure)
+        public static void AddAllRequiredBackupElements(Score score, List<string> partNames, MeasureMeta measureMeta)
         {
             foreach (var part in score.Parts.Where(p => partNames.Contains(p.Name)))
             {
@@ -41,7 +41,7 @@ namespace Music.Writer
                 for (int measureIndex = 0; measureIndex < part.Measures.Count; measureIndex++)
                 {
                     int measureNumber = measureIndex + 1;
-                    ProcessMeasureForBackups(part.Name, part.Measures[measureIndex], measureNumber, usedDivisionsPerMeasure);
+                    ProcessMeasureForBackups(part.Name, part.Measures[measureIndex], measureNumber, measureMeta);
                 }
             }
         }
@@ -50,7 +50,7 @@ namespace Music.Writer
         /// Processes a single measure to add backup elements where needed.
         /// A backup is needed after notes on each staff (except the last) when multiple staves have notes.
         /// </summary>
-        private static void ProcessMeasureForBackups(string partName, Measure measure, int measureNumber, MeasureMeta usedDivisionsPerMeasure)
+        private static void ProcessMeasureForBackups(string partName, Measure measure, int measureNumber, MeasureMeta measureMeta)
         {
             if (measure?.MeasureElements == null || measure.MeasureElements.Count == 0)
                 return;
@@ -74,7 +74,7 @@ namespace Music.Writer
                 int staffNumber = stavesWithNotes[i];
                 
                 // Get the duration used by this staff in this measure
-                long durationUsed = usedDivisionsPerMeasure.GetDivisionsUsed(partName, staffNumber, measureNumber);
+                long durationUsed = measureMeta.GetDivisionsUsed(partName, staffNumber, measureNumber);
                 
                 if (durationUsed > 0)
                 {
@@ -366,7 +366,7 @@ namespace Music.Writer
             AppendNotes.StaffProcessingContext context,
             AppendNotes.MeasureInfo measureInfo,
             int noteDuration,
-            MeasureMeta usedDivisionsPerMeasure)
+            MeasureMeta measureMeta)
         {
             long durationInCurrentMeasure = measureInfo.BarLengthDivisions - context.CurrentBeatPosition;
             long durationInNextMeasure = noteDuration - durationInCurrentMeasure;
@@ -390,7 +390,7 @@ namespace Music.Writer
                 });
             }
 
-            usedDivisionsPerMeasure.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInCurrentMeasure);
+            measureMeta.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInCurrentMeasure);
 
             // Advance to next measure
             context.CurrentBar++;
@@ -425,7 +425,7 @@ namespace Music.Writer
             }
 
             context.CurrentBeatPosition = durationInNextMeasure;
-            usedDivisionsPerMeasure.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInNextMeasure);
+            measureMeta.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInNextMeasure);
 
             return true;
         }
@@ -436,7 +436,7 @@ namespace Music.Writer
             AppendNotes.StaffProcessingContext context,
             AppendNotes.MeasureInfo measureInfo,
             int noteDuration,
-            MeasureMeta usedDivisionsPerMeasure)
+            MeasureMeta measureMeta)
         {
             long durationInCurrentMeasure = measureInfo.BarLengthDivisions - context.CurrentBeatPosition;
             long durationInNextMeasure = noteDuration - durationInCurrentMeasure;
@@ -456,7 +456,7 @@ namespace Music.Writer
                 Element = firstNote
             });
 
-            usedDivisionsPerMeasure.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInCurrentMeasure);
+            measureMeta.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInCurrentMeasure);
 
             // Advance to next measure
             context.CurrentBar++;
@@ -487,7 +487,7 @@ namespace Music.Writer
             });
 
             context.CurrentBeatPosition = durationInNextMeasure;
-            usedDivisionsPerMeasure.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInNextMeasure);
+            measureMeta.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInNextMeasure);
 
             return true;
         }
@@ -527,12 +527,12 @@ namespace Music.Writer
             PitchEvent pitchEvent, 
             int noteDuration,
             string partName,
-            MeasureMeta usedDivisionsPerMeasure)
+            MeasureMeta measureMeta)
         {
             if (!pitchEvent.IsChord)
             {
                 context.CurrentBeatPosition += noteDuration;
-                usedDivisionsPerMeasure.AddDivisionsUsed(partName, context.Staff, context.CurrentBar, noteDuration);
+                measureMeta.AddDivisionsUsed(partName, context.Staff, context.CurrentBar, noteDuration);
             }
         }
 
@@ -543,13 +543,13 @@ namespace Music.Writer
         public static (int measureNumber, long beatPosition) FindAppendStartPosition(
             Part scorePart,
             int staff,
-            MeasureMeta usedDivisionsPerMeasure)
+            MeasureMeta measureMeta)
         {
             if (scorePart?.Measures == null || scorePart.Measures.Count == 0)
                 return (1, 0);
 
             // Query all divisions used for this part and staff
-            var allDivisions = usedDivisionsPerMeasure.GetDivisionsUsedForPartAndStaff(scorePart.Name, staff);
+            var allDivisions = measureMeta.GetDivisionsUsedForPartAndStaff(scorePart.Name, staff);
 
             // If no data exists, start at measure 1, position 0
             if (allDivisions.Count == 0)
