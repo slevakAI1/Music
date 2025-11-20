@@ -6,11 +6,11 @@ using static Music.Helpers;
 namespace Music.Writer
 {
     // Converted helper into a partial class so it can access designer controls directly
-    public partial class WriterTestForm
+    public partial class ConsoleForm
     {
         // Capture current control values into a class object.
         // No form parameter required because this is now a partial of Writer.
-        public WriterTestData CaptureFormData()
+        public ConsoleData CaptureFormData()
         {
             // Capture parts items and their checked state into a dictionary
             var partsState = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -70,7 +70,7 @@ namespace Music.Writer
             if (string.IsNullOrWhiteSpace(tupletNumber))
                 tupletNumber = null;
 
-            var data = new WriterTestData
+            var data = new ConsoleData
             {
                 // Pattern
                 Pattern = cbPattern?.SelectedItem?.ToString(),
@@ -115,7 +115,7 @@ namespace Music.Writer
 
         // Apply a WriterData object back to the private form controls.
         // No form parameter required because this is a partial of Writer.
-        public void ApplyFormData(WriterTestData data)
+        public void ApplyFormData(ConsoleData data)
         {
             if (data == null) return;
 

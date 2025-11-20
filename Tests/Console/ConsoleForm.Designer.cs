@@ -1,10 +1,8 @@
 namespace Music.Writer
 {
-    partial class WriterTestForm
+    partial class ConsoleForm
     {
         private System.ComponentModel.IContainer components = null;
-
-        private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.ComboBox cbPattern;
 
         private System.Windows.Forms.GroupBox grpTarget;
@@ -51,7 +49,6 @@ namespace Music.Writer
 
         private void InitializeComponent()
         {
-            lblTitle = new Label();
             cbPattern = new ComboBox();
             grpTarget = new GroupBox();
             lblPart = new Label();
@@ -108,6 +105,7 @@ namespace Music.Writer
             txtScoreReport = new TextBox();
             btnExportToNotion = new Button();
             grpScoreList = new GroupBox();
+            label2 = new Label();
             txtMovementTitle = new TextBox();
             btnUpdateScore = new Button();
             btnLoadScore = new Button();
@@ -139,7 +137,6 @@ namespace Music.Writer
             numericUpDown2 = new NumericUpDown();
             groupBox3 = new GroupBox();
             grbCurrentDesign = new GroupBox();
-            label2 = new Label();
             grpTarget.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -164,16 +161,6 @@ namespace Music.Writer
             groupBox3.SuspendLayout();
             grbCurrentDesign.SuspendLayout();
             SuspendLayout();
-            // 
-            // lblTitle
-            // 
-            lblTitle.AutoSize = true;
-            lblTitle.Font = new Font("Segoe UI", 18F);
-            lblTitle.Location = new Point(1229, 721);
-            lblTitle.Name = "lblTitle";
-            lblTitle.Size = new Size(100, 32);
-            lblTitle.TabIndex = 0;
-            lblTitle.Text = "Console";
             // 
             // cbPattern
             // 
@@ -776,6 +763,17 @@ namespace Music.Writer
             grpScoreList.TabStop = false;
             grpScoreList.Text = "Score Manager";
             // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label2.ForeColor = Color.FromArgb(0, 192, 0);
+            label2.Location = new Point(418, 22);
+            label2.Name = "label2";
+            label2.Size = new Size(43, 17);
+            label2.TabIndex = 30;
+            label2.Text = "Saved";
+            // 
             // txtMovementTitle
             // 
             txtMovementTitle.ForeColor = Color.FromArgb(0, 192, 0);
@@ -1108,17 +1106,6 @@ namespace Music.Writer
             grbCurrentDesign.TabStop = false;
             grbCurrentDesign.Text = "Current Design";
             // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label2.ForeColor = Color.FromArgb(0, 192, 0);
-            label2.Location = new Point(418, 22);
-            label2.Name = "label2";
-            label2.Size = new Size(43, 17);
-            label2.TabIndex = 30;
-            label2.Text = "Saved";
-            // 
             // WriterTestForm
             // 
             ClientSize = new Size(1918, 878);
@@ -1128,7 +1115,6 @@ namespace Music.Writer
             Controls.Add(btnUpdateFormFromDesigner);
             Controls.Add(btnChordTest);
             Controls.Add(groupBox1);
-            Controls.Add(lblTitle);
             Controls.Add(grpTarget);
             Controls.Add(grpPitch);
             Controls.Add(groupBox3);
@@ -1167,7 +1153,6 @@ namespace Music.Writer
             grbCurrentDesign.ResumeLayout(false);
             grbCurrentDesign.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
         private GroupBox groupBox1;
 

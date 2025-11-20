@@ -2,13 +2,13 @@
 
 namespace Music.Writer
 {
-    public class WriterTests
+    public class ConsoleTests
     {
         // ==================================   T E S T   H E L P E R S   ==================================
   
-        public static WriterTestData SetTestWriterG1(Designer.Designer? designer)
+        public static ConsoleData SetTestWriterG1(Designer.Designer? designer)
         {
-            var data = new WriterTestData();
+            var data = new ConsoleData();
 
             //===================================================================
             // Parts: select all named voices from the design
