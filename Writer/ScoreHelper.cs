@@ -217,6 +217,30 @@ namespace Music.Writer
         }
 
         /// <summary>
+        /// Deletes a score from the score list at the specified index.
+        /// Index 0 (current working score) cannot be deleted.
+        /// </summary>
+        /// <param name="scoreListIndex">The index in the score list to delete (must be >= 1).</param>
+        /// <param name="scoreList">The target score list. Must not be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown when scoreList is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when scoreListIndex is invalid.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when attempting to delete the current score at index 0.</exception>
+        public static void DeleteScoreFromScoreList(int scoreListIndex, List<Score> scoreList)
+        {
+            if (scoreList == null)
+                throw new ArgumentNullException(nameof(scoreList), "Score list cannot be null.");
+
+            if (scoreListIndex < 0 || scoreListIndex >= scoreList.Count)
+                throw new ArgumentOutOfRangeException(nameof(scoreListIndex), 
+                    $"Score list index {scoreListIndex} is out of range. Valid range is 1 to {scoreList.Count - 1}.");
+
+            if (scoreListIndex == 0)
+                throw new InvalidOperationException("Cannot delete the current working score at index 0.");
+
+            scoreList.RemoveAt(scoreListIndex);
+        }
+
+        /// <summary>
         /// Ensures score parts exist for the requested part names.
         /// Callers may reuse this helper when parts need to be created before further modification.
         /// </summary>

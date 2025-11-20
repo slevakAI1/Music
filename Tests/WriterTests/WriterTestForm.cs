@@ -327,11 +327,7 @@ namespace Music.Writer
             // Remove from the list control
             lstScores.Items.RemoveAt(controlIndex);
 
-            // Remove from the in-memory score list (if index is valid)
-            if (scoreListIndex >= 0 && scoreListIndex < _scoreList.Count)
-            {
-                _scoreList.RemoveAt(scoreListIndex);
-            }
+            ScoreHelper.DeleteScoreFromScoreList(scoreListIndex, _scoreList);
 
             // Persist changes to globals
             Globals.ScoreList = _scoreList;
@@ -446,6 +442,11 @@ namespace Music.Writer
                 // Persist changes to globals
                 Globals.ScoreList = _scoreList;
             }
+        }
+
+        private void WriterTestForm_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
