@@ -313,7 +313,48 @@ namespace Music.Writer
 
         private void btnDeleteScore_Click(object sender, EventArgs e)
         {
+            // Ensure a score is selected in the list control
+            if (lstScores.SelectedIndex < 0)
+            {
+                MessageBox.Show(this, "No score selected. Select a score from the list to delete.", "Delete Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
 
+            int controlIndex = lstScores.SelectedIndex;
+            string? selectedTitle = lstScores.Items[controlIndex]?.ToString();
+
+            // Confirm deletion
+            var result = MessageBox.Show(this,
+                $"Are you sure you want to delete the score \"{selectedTitle}\"?",
+                "Confirm Delete",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result != DialogResult.Yes)
+                return;
+
+            // Calculate the corresponding index in _scoreList
+            // Control index 0 maps to _scoreList[1], control index 1 maps to _scoreList[2], etc.
+            int scoreListIndex = controlIndex + 1;
+
+            // Remove from the list control
+            lstScores.Items.RemoveAt(controlIndex);
+
+            // Remove from the in-memory score list (if index is valid)
+            if (scoreListIndex >= 0 && scoreListIndex < _scoreList.Count)
+            {
+                _scoreList.RemoveAt(scoreListIndex);
+            }
+
+            // Persist changes to globals
+            Globals.ScoreList = _scoreList;
+
+            // Select the next item in the control if available, otherwise select the previous
+            if (lstScores.Items.Count > 0)
+            {
+                int newSelection = Math.Min(controlIndex, lstScores.Items.Count - 1);
+                lstScores.SelectedIndex = newSelection;
+            }
         }
     }
 }

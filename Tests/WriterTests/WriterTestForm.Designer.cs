@@ -1061,7 +1061,7 @@ namespace Music.Writer
             // 
             // btnDeleteScore
             // 
-            btnDeleteScore.ForeColor = Color.Red;
+            btnDeleteScore.ForeColor = Color.FromArgb(0, 192, 0);
             btnDeleteScore.Location = new Point(145, 355);
             btnDeleteScore.Name = "btnDeleteScore";
             btnDeleteScore.Size = new Size(115, 30);
