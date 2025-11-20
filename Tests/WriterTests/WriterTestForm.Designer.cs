@@ -185,10 +185,12 @@ namespace Music.Writer
             // 
             // grpTarget
             // 
+            grpTarget.BackColor = Color.Black;
             grpTarget.Controls.Add(lblPart);
             grpTarget.Controls.Add(clbParts);
             grpTarget.Controls.Add(lblStaff);
             grpTarget.Controls.Add(clbStaffs);
+            grpTarget.ForeColor = Color.White;
             grpTarget.Location = new Point(20, 117);
             grpTarget.Name = "grpTarget";
             grpTarget.Size = new Size(442, 174);
@@ -1070,6 +1072,7 @@ namespace Music.Writer
             groupBox3.Controls.Add(btnExecute);
             groupBox3.Controls.Add(btnExportToNotion);
             groupBox3.Controls.Add(btnSetWriterTestScenarioG1);
+            groupBox3.ForeColor = Color.White;
             groupBox3.Location = new Point(29, 12);
             groupBox3.Name = "groupBox3";
             groupBox3.Size = new Size(433, 100);
