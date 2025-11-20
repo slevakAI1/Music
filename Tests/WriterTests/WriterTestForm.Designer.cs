@@ -30,7 +30,7 @@ namespace Music.Writer
         private System.Windows.Forms.NumericUpDown numDegree;
         private System.Windows.Forms.Label lblOctaveKR;
 
-        private System.Windows.Forms.Button btnAppendNotes;
+        private System.Windows.Forms.Button btnExecute;
 
         // ScoreList management controls
         private System.Windows.Forms.GroupBox grpScoreList;
@@ -84,7 +84,7 @@ namespace Music.Writer
             lblDegree = new Label();
             numDegree = new NumericUpDown();
             lblOctaveKR = new Label();
-            btnAppendNotes = new Button();
+            btnExecute = new Button();
             groupBox1 = new GroupBox();
             txtTupletNumber = new TextBox();
             lblTupletNumber = new Label();
@@ -505,14 +505,15 @@ namespace Music.Writer
             lblOctaveKR.TabIndex = 2;
             lblOctaveKR.Text = "Oct:";
             // 
-            // btnAppendNotes
+            // btnExecute
             // 
-            btnAppendNotes.Location = new Point(269, 22);
-            btnAppendNotes.Name = "btnAppendNotes";
-            btnAppendNotes.Size = new Size(77, 22);
-            btnAppendNotes.TabIndex = 4;
-            btnAppendNotes.Text = "Execute";
-            btnAppendNotes.Click += btnAppendNotes_Click;
+            btnExecute.Location = new Point(269, 22);
+            btnExecute.Name = "btnExecute";
+            btnExecute.Size = new Size(77, 22);
+            btnExecute.TabIndex = 4;
+            btnExecute.Text = "Execute";
+            btnExecute.UseVisualStyleBackColor = true;
+            btnExecute.Click += btnAppendNotes_Click;
             // 
             // groupBox1
             // 
@@ -1064,8 +1065,9 @@ namespace Music.Writer
             // 
             // groupBox3
             // 
+            groupBox3.BackColor = SystemColors.ActiveCaptionText;
             groupBox3.Controls.Add(cbPattern);
-            groupBox3.Controls.Add(btnAppendNotes);
+            groupBox3.Controls.Add(btnExecute);
             groupBox3.Controls.Add(btnExportToNotion);
             groupBox3.Controls.Add(btnSetWriterTestScenarioG1);
             groupBox3.Location = new Point(29, 12);
