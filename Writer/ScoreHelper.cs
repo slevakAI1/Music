@@ -12,7 +12,6 @@ namespace Music.Writer
     {
         public static Score? NewScore(
             Designer.Designer? design,
-            CheckedListBox cbPart,
             MeasureMeta usedDivisionsPerMeasure,
             string movementTitle)
         {

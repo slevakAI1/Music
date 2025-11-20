@@ -9,15 +9,15 @@ namespace Music.Writer
         private List<Score> _scoreList;
         private Designer.Designer? _designer;
         private WriterTestData? _writer;
-        private MeasureMeta _usedDivisionsPerMeasure;
+        private MeasureMeta _measureMeta;
 
         //===========================   I N I T I A L I Z A T I O N   ===========================
         public WriterTestForm()
         {
             InitializeComponent();
 
-            // Initialize UsedDivisionsPerMeasure tracking object
-            _usedDivisionsPerMeasure = new MeasureMeta();
+            // Initialize MeasureMeta tracking object
+            _measureMeta = new MeasureMeta();
 
             // Window behavior similar to other forms
             this.FormBorderStyle = FormBorderStyle.Sizable;
@@ -115,7 +115,7 @@ namespace Music.Writer
             }
 
             var config = _writer.ToAppendPitchEventsParams();
-            AppendNotes.Execute(_scoreList[0], config, _usedDivisionsPerMeasure);
+            AppendNotes.Execute(_scoreList[0], config, _measureMeta);
             txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
             Globals.ScoreList = _scoreList;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
             //MessageBoxHelper.ShowMessage("Pattern has been applied to the score.", "Apply Pattern Set Notes");
@@ -134,8 +134,7 @@ namespace Music.Writer
             // TO DO - this should not be passing entire controls like "this" or clbParts
             var newScore = ScoreHelper.NewScore(
                 _designer,
-                clbParts,
-                _usedDivisionsPerMeasure,
+                _measureMeta,
                 txtMovementTitle.Text);
 
             // Reset current Score
