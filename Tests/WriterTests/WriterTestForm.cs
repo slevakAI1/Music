@@ -124,10 +124,14 @@ namespace Music.Writer
 
         private void btnNewScore_Click(object sender, EventArgs e)
         {
-            // Default movement title to date and time, format something like this: Sunday, Mar 3, 2025 3:05.34 PM
-            var now = System.DateTime.Now;
-            txtMovementTitle.Text = now.ToString("dddd, MMM d, yyyy h:mm'.'ss tt");
+            // Default for movement title to date and time
+            if (txtMovementTitle.Text == "")
+            {
+                var now = System.DateTime.Now;
+                txtMovementTitle.Text = now.ToString("dddd, MMM d, yyyy h:mm'.'ss tt");
+            }
 
+            // TO DO - this should not be passing entire controls like "this" or clbParts
             var newScore = ScoreHelper.NewScore(
                 this,
                 _designer,
@@ -144,6 +148,7 @@ namespace Music.Writer
                     _scoreList.Add(newScore);
                 txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
             }
+            txtMovementTitle.Text = "";
         }
 
         private void btnUpdateFormFromDesigner_Click(object sender, EventArgs e)
