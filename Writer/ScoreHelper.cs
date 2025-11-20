@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using MusicXml.Domain; // adjust if necessary
+using MusicXml.Domain;
 using Music;
 using Music.Designer;
 
@@ -184,10 +184,36 @@ namespace Music.Writer
             // TODO : Populate the entire score with 16 note rests per measure per part by calling NoteWriter.Insert()
 
 
-
             //=================================
 
             return score;
+        }
+
+        /// <summary>
+        /// Adds a score to the score list at index 1, pushing existing items down.
+        /// Index 0 is always reserved for the current working score.
+        /// </summary>
+        /// <param name="score">The score to add. Must not be null and must have a non-empty MovementTitle.</param>
+        /// <param name="scoreList">The target score list. Must not be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown when score or scoreList is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when score.MovementTitle is null or empty.</exception>
+        public static void AddScoreToScoreList(Score score, List<Score> scoreList)
+        {
+            if (score == null)
+                throw new ArgumentNullException(nameof(score), "Score cannot be null.");
+
+            if (scoreList == null)
+                throw new ArgumentNullException(nameof(scoreList), "Score list cannot be null.");
+
+            if (string.IsNullOrWhiteSpace(score.MovementTitle))
+                throw new ArgumentException("Score MovementTitle cannot be empty.", nameof(score));
+
+            // Insert at index 1, pushing existing items down while leaving scoreList[0] (current) intact
+            const int insertIndex = 1;
+            if (insertIndex > scoreList.Count)
+                scoreList.Add(score);
+            else
+                scoreList.Insert(insertIndex, score);
         }
 
         /// <summary>

@@ -308,13 +308,8 @@ namespace Music.Writer
             lstScores.Items.Insert(0, title);
             lstScores.SelectedIndex = 0;
 
-            // Insert the current score into the in-memory score list at index 1,
-            // pushing existing items down while leaving _scoreList[0] (current) intact.
-            int modelInsertIndex = 1;
-            if (modelInsertIndex > _scoreList.Count)
-                _scoreList.Add(currentScore);
-            else
-                _scoreList.Insert(modelInsertIndex, currentScore);
+            // Add the score to the score list using the helper method
+            ScoreHelper.AddScoreToScoreList(currentScore, _scoreList);
 
             // Persist into globals so other forms see the updated list
             Globals.ScoreList = _scoreList;
