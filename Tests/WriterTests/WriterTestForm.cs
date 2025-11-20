@@ -310,5 +310,10 @@ namespace Music.Writer
             // Persist into globals so other forms see the updated list
             Globals.ScoreList = _scoreList;
         }
+
+        private void btnDeleteScore_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

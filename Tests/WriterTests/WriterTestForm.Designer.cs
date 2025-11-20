@@ -1068,6 +1068,7 @@ namespace Music.Writer
             btnDeleteScore.TabIndex = 2;
             btnDeleteScore.Text = "Delete";
             btnDeleteScore.UseVisualStyleBackColor = true;
+            btnDeleteScore.Click += btnDeleteScore_Click;
             // 
             // btnSaveScore
             // 
