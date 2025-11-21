@@ -1,3 +1,4 @@
+using Music.Writer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -90,6 +91,11 @@ namespace Music
         private void viewMusicXmlToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // TODO: Implement MusicXML viewer form
+        }
+
+        private void arrangerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowChildForm(typeof(ArrangerForm));
         }
     }
 }

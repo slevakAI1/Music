@@ -135,14 +135,6 @@ namespace Music.Writer
             txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
         }
 
-        // This sets writer test scenario G1
-        // Description: Set writer test values using the current design 
-        private void btnSetWriterTestScenarioG1_Click(object sender, EventArgs e)
-        {
-            _writer = ConsoleTests.SetTestWriterG1(_designer);
-            // ApplyFormData(_writer);
-        }
-
         private void btnExportToNotion_Click(object sender, EventArgs e)
         {
             // Ensure score list exists and has at least one score

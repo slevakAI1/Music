@@ -14,7 +14,6 @@ namespace Music.Writer
         private Button btnUpdateFormFromDesigner;
 
         private Button btnSetDesignTestScenarioD1;
-        private Button btnSetWriterTestScenarioG1;
 
         private Button btnExportToNotion;
 
@@ -45,7 +44,6 @@ namespace Music.Writer
             btnNewScore = new Button();
             btnUpdateFormFromDesigner = new Button();
             btnSetDesignTestScenarioD1 = new Button();
-            btnSetWriterTestScenarioG1 = new Button();
             btnExportToNotion = new Button();
             btnAddScore = new Button();
             btnDeleteScore = new Button();
@@ -54,11 +52,15 @@ namespace Music.Writer
             lstScores = new ListBox();
             lblScoreReport = new Label();
             lblSavedScores = new Label();
+            groupBox1 = new GroupBox();
+            groupBox2 = new GroupBox();
+            groupBox1.SuspendLayout();
+            groupBox2.SuspendLayout();
             SuspendLayout();
             // 
             // txtScoreReport
             // 
-            txtScoreReport.Location = new Point(12, 35);
+            txtScoreReport.Location = new Point(25, 48);
             txtScoreReport.Multiline = true;
             txtScoreReport.Name = "txtScoreReport";
             txtScoreReport.ReadOnly = true;
@@ -69,19 +71,19 @@ namespace Music.Writer
             // 
             // txtDesignerReport
             // 
-            txtDesignerReport.Location = new Point(12, 490);
+            txtDesignerReport.Location = new Point(17, 26);
             txtDesignerReport.Multiline = true;
             txtDesignerReport.Name = "txtDesignerReport";
             txtDesignerReport.ReadOnly = true;
             txtDesignerReport.ScrollBars = ScrollBars.Vertical;
-            txtDesignerReport.Size = new Size(658, 180);
+            txtDesignerReport.Size = new Size(652, 178);
             txtDesignerReport.TabIndex = 10;
             txtDesignerReport.WordWrap = false;
             // 
             // txtMovementTitle
             // 
             txtMovementTitle.ForeColor = Color.FromArgb(0, 192, 0);
-            txtMovementTitle.Location = new Point(12, 445);
+            txtMovementTitle.Location = new Point(25, 458);
             txtMovementTitle.Name = "txtMovementTitle";
             txtMovementTitle.PlaceholderText = "Movement Title";
             txtMovementTitle.Size = new Size(250, 23);
@@ -90,7 +92,7 @@ namespace Music.Writer
             // btnNewScore
             // 
             btnNewScore.ForeColor = Color.FromArgb(0, 192, 0);
-            btnNewScore.Location = new Point(270, 445);
+            btnNewScore.Location = new Point(283, 458);
             btnNewScore.Name = "btnNewScore";
             btnNewScore.Size = new Size(92, 23);
             btnNewScore.TabIndex = 3;
@@ -100,9 +102,9 @@ namespace Music.Writer
             // btnUpdateFormFromDesigner
             // 
             btnUpdateFormFromDesigner.ForeColor = Color.FromArgb(0, 192, 0);
-            btnUpdateFormFromDesigner.Location = new Point(690, 35);
+            btnUpdateFormFromDesigner.Location = new Point(390, 210);
             btnUpdateFormFromDesigner.Name = "btnUpdateFormFromDesigner";
-            btnUpdateFormFromDesigner.Size = new Size(200, 30);
+            btnUpdateFormFromDesigner.Size = new Size(151, 30);
             btnUpdateFormFromDesigner.TabIndex = 11;
             btnUpdateFormFromDesigner.Text = "Update From Designer";
             btnUpdateFormFromDesigner.Click += btnUpdateFormFromDesigner_Click;
@@ -110,27 +112,17 @@ namespace Music.Writer
             // btnSetDesignTestScenarioD1
             // 
             btnSetDesignTestScenarioD1.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSetDesignTestScenarioD1.Location = new Point(690, 75);
+            btnSetDesignTestScenarioD1.Location = new Point(219, 210);
             btnSetDesignTestScenarioD1.Name = "btnSetDesignTestScenarioD1";
-            btnSetDesignTestScenarioD1.Size = new Size(200, 30);
+            btnSetDesignTestScenarioD1.Size = new Size(151, 30);
             btnSetDesignTestScenarioD1.TabIndex = 12;
             btnSetDesignTestScenarioD1.Text = "Design Test D1";
             btnSetDesignTestScenarioD1.Click += btnSetDesignTestScenarioD1_Click;
             // 
-            // btnSetWriterTestScenarioG1
-            // 
-            btnSetWriterTestScenarioG1.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSetWriterTestScenarioG1.Location = new Point(690, 115);
-            btnSetWriterTestScenarioG1.Name = "btnSetWriterTestScenarioG1";
-            btnSetWriterTestScenarioG1.Size = new Size(200, 30);
-            btnSetWriterTestScenarioG1.TabIndex = 13;
-            btnSetWriterTestScenarioG1.Text = "Writer Test G1";
-            btnSetWriterTestScenarioG1.Click += btnSetWriterTestScenarioG1_Click;
-            // 
             // btnExportToNotion
             // 
             btnExportToNotion.ForeColor = Color.FromArgb(0, 192, 0);
-            btnExportToNotion.Location = new Point(690, 155);
+            btnExportToNotion.Location = new Point(971, 55);
             btnExportToNotion.Name = "btnExportToNotion";
             btnExportToNotion.Size = new Size(200, 30);
             btnExportToNotion.TabIndex = 14;
@@ -140,7 +132,7 @@ namespace Music.Writer
             // btnAddScore
             // 
             btnAddScore.ForeColor = Color.FromArgb(0, 192, 0);
-            btnAddScore.Location = new Point(390, 385);
+            btnAddScore.Location = new Point(403, 398);
             btnAddScore.Name = "btnAddScore";
             btnAddScore.Size = new Size(130, 30);
             btnAddScore.TabIndex = 6;
@@ -150,7 +142,7 @@ namespace Music.Writer
             // btnDeleteScore
             // 
             btnDeleteScore.ForeColor = Color.FromArgb(0, 192, 0);
-            btnDeleteScore.Location = new Point(540, 385);
+            btnDeleteScore.Location = new Point(553, 398);
             btnDeleteScore.Name = "btnDeleteScore";
             btnDeleteScore.Size = new Size(130, 30);
             btnDeleteScore.TabIndex = 7;
@@ -160,7 +152,7 @@ namespace Music.Writer
             // btnUpdateScore
             // 
             btnUpdateScore.ForeColor = Color.FromArgb(0, 192, 0);
-            btnUpdateScore.Location = new Point(540, 425);
+            btnUpdateScore.Location = new Point(553, 438);
             btnUpdateScore.Name = "btnUpdateScore";
             btnUpdateScore.Size = new Size(130, 30);
             btnUpdateScore.TabIndex = 9;
@@ -170,7 +162,7 @@ namespace Music.Writer
             // btnLoadScore
             // 
             btnLoadScore.ForeColor = Color.FromArgb(0, 192, 0);
-            btnLoadScore.Location = new Point(390, 425);
+            btnLoadScore.Location = new Point(403, 438);
             btnLoadScore.Name = "btnLoadScore";
             btnLoadScore.Size = new Size(130, 30);
             btnLoadScore.TabIndex = 8;
@@ -180,7 +172,7 @@ namespace Music.Writer
             // lstScores
             // 
             lstScores.FormattingEnabled = true;
-            lstScores.Location = new Point(390, 35);
+            lstScores.Location = new Point(403, 48);
             lstScores.Name = "lstScores";
             lstScores.Size = new Size(280, 334);
             lstScores.TabIndex = 5;
@@ -190,7 +182,7 @@ namespace Music.Writer
             lblScoreReport.AutoSize = true;
             lblScoreReport.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             lblScoreReport.ForeColor = Color.FromArgb(0, 192, 0);
-            lblScoreReport.Location = new Point(12, 12);
+            lblScoreReport.Location = new Point(25, 25);
             lblScoreReport.Name = "lblScoreReport";
             lblScoreReport.Size = new Size(51, 17);
             lblScoreReport.TabIndex = 0;
@@ -201,38 +193,62 @@ namespace Music.Writer
             lblSavedScores.AutoSize = true;
             lblSavedScores.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             lblSavedScores.ForeColor = Color.FromArgb(0, 192, 0);
-            lblSavedScores.Location = new Point(390, 12);
+            lblSavedScores.Location = new Point(403, 25);
             lblSavedScores.Name = "lblSavedScores";
             lblSavedScores.Size = new Size(43, 17);
             lblSavedScores.TabIndex = 4;
             lblSavedScores.Text = "Saved";
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(lstScores);
+            groupBox1.Controls.Add(lblScoreReport);
+            groupBox1.Controls.Add(btnUpdateScore);
+            groupBox1.Controls.Add(txtScoreReport);
+            groupBox1.Controls.Add(btnLoadScore);
+            groupBox1.Controls.Add(txtMovementTitle);
+            groupBox1.Controls.Add(btnDeleteScore);
+            groupBox1.Controls.Add(btnNewScore);
+            groupBox1.Controls.Add(btnAddScore);
+            groupBox1.Controls.Add(lblSavedScores);
+            groupBox1.Location = new Point(12, 12);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(707, 500);
+            groupBox1.TabIndex = 15;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "groupBox1";
+            // 
+            // groupBox2
+            // 
+            groupBox2.Controls.Add(txtDesignerReport);
+            groupBox2.Controls.Add(btnSetDesignTestScenarioD1);
+            groupBox2.Controls.Add(btnUpdateFormFromDesigner);
+            groupBox2.Location = new Point(12, 529);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(714, 265);
+            groupBox2.TabIndex = 16;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "groupBox2";
             // 
             // ArrangerForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Control;
-            ClientSize = new Size(1200, 700);
-            Controls.Add(lblScoreReport);
-            Controls.Add(txtScoreReport);
-            Controls.Add(txtMovementTitle);
-            Controls.Add(btnNewScore);
-            Controls.Add(lblSavedScores);
-            Controls.Add(lstScores);
-            Controls.Add(btnAddScore);
-            Controls.Add(btnDeleteScore);
-            Controls.Add(btnLoadScore);
-            Controls.Add(btnUpdateScore);
-            Controls.Add(txtDesignerReport);
-            Controls.Add(btnUpdateFormFromDesigner);
-            Controls.Add(btnSetDesignTestScenarioD1);
-            Controls.Add(btnSetWriterTestScenarioG1);
+            ClientSize = new Size(1733, 796);
+            Controls.Add(groupBox2);
+            Controls.Add(groupBox1);
             Controls.Add(btnExportToNotion);
             ForeColor = Color.White;
             Name = "ArrangerForm";
             Text = "Arranger";
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
+            groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
+        private GroupBox groupBox1;
+        private GroupBox groupBox2;
     }
 }
