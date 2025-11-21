@@ -5,7 +5,7 @@ namespace Music.Writer
         private System.ComponentModel.IContainer components = null;
         private System.Windows.Forms.ComboBox cbPattern;
 
-        private System.Windows.Forms.GroupBox grpTarget;
+        private System.Windows.Forms.GroupBox grbParts;
         private System.Windows.Forms.CheckedListBox clbParts;
         private System.Windows.Forms.Label lblPart;
         private System.Windows.Forms.Label lblStaff;
@@ -50,7 +50,7 @@ namespace Music.Writer
         private void InitializeComponent()
         {
             cbPattern = new ComboBox();
-            grpTarget = new GroupBox();
+            grbParts = new GroupBox();
             lblPart = new Label();
             btnAppend = new Button();
             clbParts = new CheckedListBox();
@@ -142,7 +142,7 @@ namespace Music.Writer
             colName = new DataGridViewTextBoxColumn();
             colEvents = new DataGridViewTextBoxColumn();
             groupBox4 = new GroupBox();
-            grpTarget.SuspendLayout();
+            grbParts.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numChordDegree).BeginInit();
@@ -177,21 +177,21 @@ namespace Music.Writer
             cbPattern.Size = new Size(250, 23);
             cbPattern.TabIndex = 1;
             // 
-            // grpTarget
+            // grbParts
             // 
-            grpTarget.BackColor = Color.Black;
-            grpTarget.Controls.Add(lblPart);
-            grpTarget.Controls.Add(btnAppend);
-            grpTarget.Controls.Add(clbParts);
-            grpTarget.Controls.Add(lblStaff);
-            grpTarget.Controls.Add(clbStaffs);
-            grpTarget.ForeColor = Color.White;
-            grpTarget.Location = new Point(20, 121);
-            grpTarget.Name = "grpTarget";
-            grpTarget.Size = new Size(442, 174);
-            grpTarget.TabIndex = 2;
-            grpTarget.TabStop = false;
-            grpTarget.Text = "Part";
+            grbParts.BackColor = Color.Black;
+            grbParts.Controls.Add(lblPart);
+            grbParts.Controls.Add(btnAppend);
+            grbParts.Controls.Add(clbParts);
+            grbParts.Controls.Add(lblStaff);
+            grbParts.Controls.Add(clbStaffs);
+            grbParts.ForeColor = Color.White;
+            grbParts.Location = new Point(20, 121);
+            grbParts.Name = "grbParts";
+            grbParts.Size = new Size(442, 174);
+            grbParts.TabIndex = 2;
+            grbParts.TabStop = false;
+            grbParts.Text = "Part";
             // 
             // lblPart
             // 
@@ -1165,14 +1165,14 @@ namespace Music.Writer
             Controls.Add(btnUpdateFormFromDesigner);
             Controls.Add(btnChordTest);
             Controls.Add(groupBox1);
-            Controls.Add(grpTarget);
+            Controls.Add(grbParts);
             Controls.Add(grpPitch);
             Controls.Add(groupBox3);
             Controls.Add(groupBox4);
             Name = "ConsoleForm";
             Text = "Console";
-            grpTarget.ResumeLayout(false);
-            grpTarget.PerformLayout();
+            grbParts.ResumeLayout(false);
+            grbParts.PerformLayout();
             grpPitch.ResumeLayout(false);
             grpPitch.PerformLayout();
             grpChord.ResumeLayout(false);

@@ -27,6 +27,13 @@ namespace Music.Writer
         private Label lblScoreReport;
         private Label lblSavedScores;
 
+        // Parts controls
+        private GroupBox grbParts;
+        private CheckedListBox clbParts;
+        private Label lblPart;
+        private Label lblStaff;
+        private CheckedListBox clbStaffs;
+
         // Splice controls
         private GroupBox groupBox2;
         private Button btnSplice;
@@ -79,6 +86,11 @@ namespace Music.Writer
             lblScoreReport = new Label();
             lblSavedScores = new Label();
             groupBox1 = new GroupBox();
+            grbParts = new GroupBox();
+            lblPart = new Label();
+            clbParts = new CheckedListBox();
+            lblStaff = new Label();
+            clbStaffs = new CheckedListBox();
             groupBox2 = new GroupBox();
             btnSplice = new Button();
             label13 = new Label();
@@ -105,6 +117,7 @@ namespace Music.Writer
             numericUpDown2 = new NumericUpDown();
             groupBox3 = new GroupBox();
             groupBox1.SuspendLayout();
+            grbParts.SuspendLayout();
             groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
@@ -270,12 +283,66 @@ namespace Music.Writer
             groupBox1.Controls.Add(btnAddScore);
             groupBox1.Controls.Add(lblSavedScores);
             groupBox1.ForeColor = Color.White;
-            groupBox1.Location = new Point(12, 12);
+            groupBox1.Location = new Point(117, 9);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(707, 500);
             groupBox1.TabIndex = 15;
             groupBox1.TabStop = false;
             groupBox1.Text = "Score Manager";
+            // 
+            // grbParts
+            // 
+            grbParts.BackColor = Color.Black;
+            grbParts.Controls.Add(lblPart);
+            grbParts.Controls.Add(clbParts);
+            grbParts.Controls.Add(lblStaff);
+            grbParts.Controls.Add(clbStaffs);
+            grbParts.ForeColor = Color.White;
+            grbParts.Location = new Point(939, 71);
+            grbParts.Name = "grbParts";
+            grbParts.Size = new Size(442, 174);
+            grbParts.TabIndex = 16;
+            grbParts.TabStop = false;
+            grbParts.Text = "Part";
+            // 
+            // lblPart
+            // 
+            lblPart.AutoSize = true;
+            lblPart.ForeColor = Color.FromArgb(0, 192, 0);
+            lblPart.Location = new Point(15, 27);
+            lblPart.Name = "lblPart";
+            lblPart.Size = new Size(70, 15);
+            lblPart.TabIndex = 0;
+            lblPart.Text = "Part (Voice):";
+            // 
+            // clbParts
+            // 
+            clbParts.CheckOnClick = true;
+            clbParts.FormattingEnabled = true;
+            clbParts.Location = new Point(85, 25);
+            clbParts.Name = "clbParts";
+            clbParts.Size = new Size(220, 94);
+            clbParts.TabIndex = 1;
+            // 
+            // lblStaff
+            // 
+            lblStaff.AutoSize = true;
+            lblStaff.ForeColor = Color.FromArgb(0, 192, 0);
+            lblStaff.Location = new Point(15, 132);
+            lblStaff.Name = "lblStaff";
+            lblStaff.Size = new Size(34, 15);
+            lblStaff.TabIndex = 5;
+            lblStaff.Text = "Staff:";
+            // 
+            // clbStaffs
+            // 
+            clbStaffs.CheckOnClick = true;
+            clbStaffs.FormattingEnabled = true;
+            clbStaffs.Items.AddRange(new object[] { "1", "2" });
+            clbStaffs.Location = new Point(85, 125);
+            clbStaffs.Name = "clbStaffs";
+            clbStaffs.Size = new Size(120, 40);
+            clbStaffs.TabIndex = 6;
             // 
             // groupBox2
             // 
@@ -304,9 +371,9 @@ namespace Music.Writer
             groupBox2.Controls.Add(label10);
             groupBox2.Controls.Add(numericUpDown2);
             groupBox2.ForeColor = Color.White;
-            groupBox2.Location = new Point(742, 12);
+            groupBox2.Location = new Point(939, 251);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(442, 476);
+            groupBox2.Size = new Size(442, 468);
             groupBox2.TabIndex = 32;
             groupBox2.TabStop = false;
             groupBox2.Text = "Splice";
@@ -539,7 +606,7 @@ namespace Music.Writer
             groupBox3.Controls.Add(btnSetDesignTestScenarioD1);
             groupBox3.Controls.Add(btnUpdateFormFromDesigner);
             groupBox3.ForeColor = Color.White;
-            groupBox3.Location = new Point(12, 529);
+            groupBox3.Location = new Point(117, 526);
             groupBox3.Name = "groupBox3";
             groupBox3.Size = new Size(714, 265);
             groupBox3.TabIndex = 16;
@@ -552,6 +619,7 @@ namespace Music.Writer
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Control;
             ClientSize = new Size(1733, 796);
+            Controls.Add(grbParts);
             Controls.Add(groupBox3);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
@@ -561,6 +629,8 @@ namespace Music.Writer
             Text = "Arranger";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
+            grbParts.ResumeLayout(false);
+            grbParts.PerformLayout();
             groupBox2.ResumeLayout(false);
             groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)numStartBar).EndInit();

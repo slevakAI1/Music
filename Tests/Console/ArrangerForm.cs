@@ -36,6 +36,10 @@ namespace Music.Writer
             _designer = Globals.Designer;
             txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
 
+            // Initialize staff selection - default to staff 1 checked
+            if (clbStaffs != null && clbStaffs.Items.Count > 0)
+                clbStaffs.SetItemChecked(0, true); // Check staff "1"
+
             // ====================   T H I S   H A S   T O   B E   L A S T  !   =================
 
             // Capture form control values manually set in the form designer
