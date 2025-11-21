@@ -1,53 +1,127 @@
 ﻿
 
-Regression tests:
-
-    16 1/8 notes 1 staves - 1 voice
-
-    12 dotted quarter notes - 1 stave 1 voice
-
-    18 1/4 note triplets 2 staves - 4 voices
-
-
-Next: Code clean up, then percussion
-
-
--- need a plan for this!!! agile stories?
-    Adding notes at current pointer to part's next open position:
-    * StartBar/Beat needs to track by part/stave
-       - Music can be generated one part at a time, several parts at once, etc. and in small chunks.
-       -  Overwrite/StartBeat/Replace/Full score of rests - this is all tied together
-
-    * Tests seems like maybe need to be updated? thats a maybe.
+NEXT:
+    
 
 
 
-Note: don't just simulate parts, simulate the artists - style, personality, etc.
+==========================================================
 
 
-Note: best Strategy to build music may be start with 32nd note rests filling all measures, then combine/replace
-as needed.
-Also sections do not really need to start on beat 1 of measure. Should be more fluid. Like start or 
-end beat can be off +/- 1 beat.
+Testing:
+    Auto Regression:    16 1/8 notes 1 staves - 1 voice
+                        12 dotted quarter notes - 1 stave 1 voice
+                        18 1/4 note triplets 2 staves - 4 voices
+    Tests seems like maybe need to be updated? thats a maybe.
 
-======================================================================================
+Voice:
+    Percussion
 
-(Pattern Specific) ParameterDefinitions - control type, data type, range, (dependencies later)
+Generate:
+       Music can be generated one part at a time, several parts at once, etc. and in small chunks.
+        best Strategy to build music may be start with 32nd note rests filling all measures, then combine/replace
+        as needed.
 
-Pattern - this will be pattern name + the config of the pattern specific parameters - just list of parameters
-Patterns - this is the collection of all available patterns?
+        Also sections do not really need to start on beat 1 of measure. Should be more fluid. Like start or 
+        end beat can be off +/- 1 beat.
+    (Pattern Specific) ParameterDefinitions - control type, data type, range, (dependencies later)
 
-Pattern(Instances) - this will be the instance of a pattern with the standard and
+    Pattern - this will be pattern name + the config of the pattern specific parameters - just list of parameters
+    Patterns - this is the collection of all available patterns?
+
+    Pattern(Instances) - this will be the instance of a pattern with the standard and
     pattern specific parameter values
-PatternManager - this will manage the loading and saving of patterns and instances
+    PatternManager - this will manage the loading and saving of patterns and instances
 
-On the form -- list of available patterns in drop down
-on form  - list of avaiable patterns instances in drop down
+    On the form -- list of available patterns in drop down
+    on form  - list of avaiable patterns instances in drop down
 
-Pattern instances and targets may be separate - so you 
+    Pattern instances and targets may be separate - so you 
     can apply the same pattern instance to different targets?
 
-to apply - select pattern instance, then targets, then apply
+Style:
+    don't just simulate parts, simulate the artists - style, personality, etc.
+
+
+===================================================================================================================
+
+AI recommended enhancements:
+(1) Recommended section names
+Top group (currently Target Scope): Suggested primary: Part & Staff Target Other concise options (pick one):
+•	Event Target (Part & Staff)
+•	Append Target Selection
+•	Part / Staff Selector
+•	Voice & Staff Target
+•	Destination Part/Staff
+Bottom group (currently Splice): Suggested primary: Segment Splice Configuration Other concise options:
+•	Score Segment Splicer
+•	Splice Builder
+•	Segment Merge / Splice
+•	Source & Destination Segments
+•	Score Range Composer
+Rationale: Top describes where new events will be appended (the destination scope). Bottom configures source score ranges and destination for structural operations (splicing/merging). “Segment” clarifies you are operating on partial score ranges (bars/beats).
+(2) Potential gaps for complex score authoring / manipulation
+Coverage now: You can select parts, staffs, choose bar/beat ranges for two source scores, and a destination score. Missing granularity, musical domains, and safety features common in advanced editors.
+Key missing parameters / use cases:
+Score/Part targeting:
+•	Voice/layer within a staff (e.g., multiple simultaneous voices).
+•	Clef choice per staff segment (when splicing cross-clef material).
+•	Transposing instrument handling (automatic key / octave adjustment when merging parts).
+Temporal precision:
+•	Sub-beat resolution (ticks, divisions) for splicing mid-beat.
+•	Pickup (anacrusis) and incomplete measure handling.
+•	Time signature change boundaries; currently only bars & beats (no validation against measure capacity).
+•	Tempo change regions (merging segments should reconcile conflicting tempo maps).
+Pitch / key context:
+•	Local key changes within the selected segment.
+•	Automatic enharmonic normalization when combining segments from different keys.
+•	Optional transposition offset (interval / semitone) on splice.
+Rhythm / notation integrity:
+•	Tie/slur continuation across splice boundaries.
+•	Beam group recalculation (to avoid broken beaming after insertion).
+•	Tuplet reconciliation (tuplet in source continuing across destination boundary).
+•	Grace notes and cue notes preservation.
+Structural / navigation aids:
+•	Selection by labeled Section/Rehearsal Mark instead of manual bar/beat entry.
+•	Multi-segment batch splices (list of ranges rather than only one per source).
+•	Preview diff (what measures will be affected) before committing splice.
+Content domains not represented:
+•	Dynamics (p, mf, cresc) merging rules.
+•	Articulations (staccato, accents) integrity across splice.
+•	Ornaments (trills, mordents), technical markings (fingering, bowing).
+•	Lyrics alignment (syllable shifting if rhythm differs).
+•	Chord symbols / harmonic timeline alignment when splicing melody-only or harmony-only materials.
+•	Expression / MIDI controller data (if performance layer exists).
+Conflict resolution options:
+•	Overwrite vs overlay vs skip empty measures.
+•	Gap fill (insert rests to match destination time span).
+•	Quantize on import (optional rhythmic normalization).
+•	Collision policy for existing events (merge, replace, keep both in separate voices).
+Validation / feedback:
+•	Pre-flight validation (bar length consistency, tuplets balanced, time signature match).
+•	Undo/Redo of splice operations.
+•	Dry run / simulate splice (show summary in a report textbox).
+Usability enhancements:
+•	Checkbox to “Apply to all checked staffs” (multi-staff parts like piano).
+•	Recent ranges memory (quick reapply).
+•	Named range presets (Intro, Verse, Bridge etc.).
+•	Color-coded indicator of selected segment validity.
+Performance / scalability:
+•	Bulk operations (concatenate multiple source scores sequentially).
+•	Background processing with progress for large scores.
+Data integrity:
+•	Key signature and time signature reapplication if destination span empties them.
+•	Automatic measure renumbering or retention option.
+•	Consistent unique IDs for events after splice (avoid collisions).
+Potential new controls:
+•	Voice selector: ComboBox (Voice 1..n)
+•	Sub-beat selector: NumericUpDown for tick offset
+•	Transpose interval: ComboBox (e.g., +2 (M2), -12 (Octave down))
+•	Section pickers instead of free-form comboBoxes (bind to existing structural markers)
+•	Checkboxes: Preserve Dynamics, Preserve Articulations, Recalculate Beams, Normalize Tuplets
+•	Conflict policy: RadioButtons (Overwrite / Merge / Skip)
+•	Preview / Validate buttons
+Summary: Current design addresses basic part/staff targeting and coarse segment splicing. It lacks finer rhythmic resolution, multi-domain musical symbol handling, structural selection abstractions, conflict policies, and validation—features needed for robust manipulation of complex, professionally notated scores.
 
 
 
