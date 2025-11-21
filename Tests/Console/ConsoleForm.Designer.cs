@@ -238,7 +238,7 @@ namespace Music.Writer
             grpPitch.Controls.Add(grpAbsolute);
             grpPitch.Controls.Add(grpKeyRelative);
             grpPitch.ForeColor = Color.White;
-            grpPitch.Location = new Point(497, 254);
+            grpPitch.Location = new Point(474, 198);
             grpPitch.Name = "grpPitch";
             grpPitch.Size = new Size(592, 374);
             grpPitch.TabIndex = 3;
@@ -524,9 +524,9 @@ namespace Music.Writer
             groupBox1.Controls.Add(lblTupletOf);
             groupBox1.Controls.Add(numTupletOf);
             groupBox1.ForeColor = Color.White;
-            groupBox1.Location = new Point(497, 62);
+            groupBox1.Location = new Point(474, 13);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(315, 174);
+            groupBox1.Size = new Size(592, 174);
             groupBox1.TabIndex = 6;
             groupBox1.TabStop = false;
             groupBox1.Text = "Rhythm options";
@@ -756,7 +756,7 @@ namespace Music.Writer
             grpScoreList.Controls.Add(lstScores);
             grpScoreList.Controls.Add(btnNewScore);
             grpScoreList.ForeColor = Color.White;
-            grpScoreList.Location = new Point(1108, 28);
+            grpScoreList.Location = new Point(1078, 14);
             grpScoreList.Name = "grpScoreList";
             grpScoreList.Size = new Size(595, 414);
             grpScoreList.TabIndex = 31;
@@ -1099,16 +1099,16 @@ namespace Music.Writer
             grbCurrentDesign.Controls.Add(txtDesignerReport);
             grbCurrentDesign.Controls.Add(btnSetDesignTestScenarioD1);
             grbCurrentDesign.ForeColor = Color.White;
-            grbCurrentDesign.Location = new Point(1109, 459);
+            grbCurrentDesign.Location = new Point(1079, 445);
             grbCurrentDesign.Name = "grbCurrentDesign";
             grbCurrentDesign.Size = new Size(594, 167);
             grbCurrentDesign.TabIndex = 34;
             grbCurrentDesign.TabStop = false;
             grbCurrentDesign.Text = "Current Design";
             // 
-            // WriterTestForm
+            // ConsoleForm
             // 
-            ClientSize = new Size(1918, 878);
+            ClientSize = new Size(1918, 905);
             Controls.Add(grbCurrentDesign);
             Controls.Add(groupBox2);
             Controls.Add(grpScoreList);
@@ -1118,7 +1118,7 @@ namespace Music.Writer
             Controls.Add(grpTarget);
             Controls.Add(grpPitch);
             Controls.Add(groupBox3);
-            Name = "WriterTestForm";
+            Name = "ConsoleForm";
             Text = "Writer 2 (MusicXML)";
             grpTarget.ResumeLayout(false);
             grpTarget.PerformLayout();
