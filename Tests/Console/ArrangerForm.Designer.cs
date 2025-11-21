@@ -122,7 +122,7 @@ namespace Music.Writer
             // btnExportToNotion
             // 
             btnExportToNotion.ForeColor = Color.FromArgb(0, 192, 0);
-            btnExportToNotion.Location = new Point(971, 55);
+            btnExportToNotion.Location = new Point(1489, 31);
             btnExportToNotion.Name = "btnExportToNotion";
             btnExportToNotion.Size = new Size(200, 30);
             btnExportToNotion.TabIndex = 14;
@@ -201,6 +201,7 @@ namespace Music.Writer
             // 
             // groupBox1
             // 
+            groupBox1.BackColor = Color.FromArgb(64, 64, 64);
             groupBox1.Controls.Add(lstScores);
             groupBox1.Controls.Add(lblScoreReport);
             groupBox1.Controls.Add(btnUpdateScore);
@@ -220,6 +221,7 @@ namespace Music.Writer
             // 
             // groupBox2
             // 
+            groupBox2.BackColor = Color.Black;
             groupBox2.Controls.Add(txtDesignerReport);
             groupBox2.Controls.Add(btnSetDesignTestScenarioD1);
             groupBox2.Controls.Add(btnUpdateFormFromDesigner);
