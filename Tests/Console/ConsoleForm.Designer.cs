@@ -137,6 +137,9 @@ namespace Music.Writer
             numericUpDown2 = new NumericUpDown();
             groupBox3 = new GroupBox();
             grbCurrentDesign = new GroupBox();
+            dataGridView1 = new DataGridView();
+            colName = new DataGridViewTextBoxColumn();
+            colEvents = new DataGridViewTextBoxColumn();
             grpTarget.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -160,6 +163,7 @@ namespace Music.Writer
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
             groupBox3.SuspendLayout();
             grbCurrentDesign.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
             // cbPattern
@@ -240,7 +244,7 @@ namespace Music.Writer
             grpPitch.ForeColor = Color.White;
             grpPitch.Location = new Point(474, 198);
             grpPitch.Name = "grpPitch";
-            grpPitch.Size = new Size(592, 374);
+            grpPitch.Size = new Size(592, 418);
             grpPitch.TabIndex = 3;
             grpPitch.TabStop = false;
             grpPitch.Text = "Pitch Options";
@@ -862,7 +866,7 @@ namespace Music.Writer
             groupBox2.ForeColor = Color.White;
             groupBox2.Location = new Point(20, 303);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(442, 385);
+            groupBox2.Size = new Size(442, 476);
             groupBox2.TabIndex = 32;
             groupBox2.TabStop = false;
             groupBox2.Text = "Splice";
@@ -1106,9 +1110,31 @@ namespace Music.Writer
             grbCurrentDesign.TabStop = false;
             grbCurrentDesign.Text = "Current Design";
             // 
+            // dataGridView1
+            // 
+            dataGridView1.AllowUserToOrderColumns = true;
+            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { colName, colEvents });
+            dataGridView1.Location = new Point(487, 644);
+            dataGridView1.Name = "dataGridView1";
+            dataGridView1.Size = new Size(1186, 115);
+            dataGridView1.TabIndex = 35;
+            // 
+            // colName
+            // 
+            colName.HeaderText = "Name";
+            colName.Name = "Name";
+            colName.ReadOnly = true;
+            // 
+            // colEvents
+            // 
+            colEvents.HeaderText = "Events";
+            colEvents.Name = "Events";
+            // 
             // ConsoleForm
             // 
             ClientSize = new Size(1918, 905);
+            Controls.Add(dataGridView1);
             Controls.Add(grbCurrentDesign);
             Controls.Add(groupBox2);
             Controls.Add(grpScoreList);
@@ -1152,6 +1178,7 @@ namespace Music.Writer
             groupBox3.ResumeLayout(false);
             grbCurrentDesign.ResumeLayout(false);
             grbCurrentDesign.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
         }
         private GroupBox groupBox1;
@@ -1217,5 +1244,8 @@ namespace Music.Writer
         private GroupBox groupBox3;
         private GroupBox grbCurrentDesign;
         private Label label2;
+        private DataGridView dataGridView1;
+        private DataGridViewTextBoxColumn colName;
+        private DataGridViewTextBoxColumn colEvents;
     }
 }
