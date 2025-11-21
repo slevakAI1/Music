@@ -32,11 +32,6 @@ namespace Music.Writer
 
         // ScoreList management controls
         private System.Windows.Forms.GroupBox grpScoreList;
-        private System.Windows.Forms.ListBox lstScores;
-        private System.Windows.Forms.Button btnAddScore;
-        private System.Windows.Forms.Button btnDeleteScore;
-        private System.Windows.Forms.Button btnLoadScore;
-        private System.Windows.Forms.Button btnUpdateScore;
 
         protected override void Dispose(bool disposing)
         {
@@ -96,7 +91,6 @@ namespace Music.Writer
             lblTupletOf = new Label();
             numTupletOf = new NumericUpDown();
             btnSetWriterTestScenarioG1 = new Button();
-            btnNewScore = new Button();
             btnSetDesignTestScenarioD1 = new Button();
             btnChordTest = new Button();
             btnUpdateFormFromDesigner = new Button();
@@ -105,37 +99,6 @@ namespace Music.Writer
             txtScoreReport = new TextBox();
             btnExportToNotion = new Button();
             grpScoreList = new GroupBox();
-            label2 = new Label();
-            txtMovementTitle = new TextBox();
-            btnUpdateScore = new Button();
-            btnLoadScore = new Button();
-            btnDeleteScore = new Button();
-            btnAddScore = new Button();
-            lstScores = new ListBox();
-            groupBox2 = new GroupBox();
-            btnSplice = new Button();
-            label13 = new Label();
-            comboBox1 = new ComboBox();
-            comboBox4 = new ComboBox();
-            lblStartBar = new Label();
-            comboBox3 = new ComboBox();
-            numStartBar = new NumericUpDown();
-            comboBox2 = new ComboBox();
-            numStartBeat = new NumericUpDown();
-            label11 = new Label();
-            lblStartBeat = new Label();
-            numericUpDown3 = new NumericUpDown();
-            lblSections = new Label();
-            numericUpDown4 = new NumericUpDown();
-            label12 = new Label();
-            label5 = new Label();
-            label9 = new Label();
-            label6 = new Label();
-            clbSections = new CheckedListBox();
-            label7 = new Label();
-            numericUpDown1 = new NumericUpDown();
-            label10 = new Label();
-            numericUpDown2 = new NumericUpDown();
             groupBox3 = new GroupBox();
             grbCurrentDesign = new GroupBox();
             dataGridView1 = new DataGridView();
@@ -156,13 +119,6 @@ namespace Music.Writer
             ((System.ComponentModel.ISupportInitialize)numTupletCount).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numTupletOf).BeginInit();
             grpScoreList.SuspendLayout();
-            groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)numStartBar).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)numStartBeat).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown3).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown4).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
             groupBox3.SuspendLayout();
             grbCurrentDesign.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
@@ -181,7 +137,6 @@ namespace Music.Writer
             // 
             grbParts.BackColor = Color.Black;
             grbParts.Controls.Add(lblPart);
-            grbParts.Controls.Add(btnAppend);
             grbParts.Controls.Add(clbParts);
             grbParts.Controls.Add(lblStaff);
             grbParts.Controls.Add(clbStaffs);
@@ -206,7 +161,7 @@ namespace Music.Writer
             // btnAppend
             // 
             btnAppend.ForeColor = Color.FromArgb(255, 128, 0);
-            btnAppend.Location = new Point(305, 134);
+            btnAppend.Location = new Point(385, 645);
             btnAppend.Name = "btnAppend";
             btnAppend.Size = new Size(77, 22);
             btnAppend.TabIndex = 4;
@@ -663,17 +618,6 @@ namespace Music.Writer
             btnSetWriterTestScenarioG1.UseVisualStyleBackColor = true;
             btnSetWriterTestScenarioG1.Click += btnSetWriterTestScenarioG1_Click;
             // 
-            // btnNewScore
-            // 
-            btnNewScore.ForeColor = Color.FromArgb(0, 192, 0);
-            btnNewScore.Location = new Point(17, 379);
-            btnNewScore.Name = "btnNewScore";
-            btnNewScore.Size = new Size(91, 20);
-            btnNewScore.TabIndex = 9;
-            btnNewScore.Text = "New Score";
-            btnNewScore.UseVisualStyleBackColor = true;
-            btnNewScore.Click += btnNewScore_Click;
-            // 
             // btnSetDesignTestScenarioD1
             // 
             btnSetDesignTestScenarioD1.ForeColor = Color.FromArgb(0, 192, 0);
@@ -731,7 +675,7 @@ namespace Music.Writer
             // 
             // txtScoreReport
             // 
-            txtScoreReport.Location = new Point(16, 46);
+            txtScoreReport.Location = new Point(16, 26);
             txtScoreReport.Multiline = true;
             txtScoreReport.Name = "txtScoreReport";
             txtScoreReport.ScrollBars = ScrollBars.Vertical;
@@ -752,349 +696,15 @@ namespace Music.Writer
             // grpScoreList
             // 
             grpScoreList.BackColor = Color.Black;
-            grpScoreList.Controls.Add(label2);
-            grpScoreList.Controls.Add(txtMovementTitle);
             grpScoreList.Controls.Add(lblScoreReport);
-            grpScoreList.Controls.Add(btnUpdateScore);
             grpScoreList.Controls.Add(txtScoreReport);
-            grpScoreList.Controls.Add(btnLoadScore);
-            grpScoreList.Controls.Add(btnDeleteScore);
-            grpScoreList.Controls.Add(btnAddScore);
-            grpScoreList.Controls.Add(lstScores);
-            grpScoreList.Controls.Add(btnNewScore);
             grpScoreList.ForeColor = Color.White;
             grpScoreList.Location = new Point(1078, 14);
             grpScoreList.Name = "grpScoreList";
             grpScoreList.Size = new Size(595, 414);
             grpScoreList.TabIndex = 31;
             grpScoreList.TabStop = false;
-            grpScoreList.Text = "Score Manager";
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label2.ForeColor = Color.FromArgb(0, 192, 0);
-            label2.Location = new Point(418, 22);
-            label2.Name = "label2";
-            label2.Size = new Size(43, 17);
-            label2.TabIndex = 30;
-            label2.Text = "Saved";
-            // 
-            // txtMovementTitle
-            // 
-            txtMovementTitle.ForeColor = Color.FromArgb(0, 192, 0);
-            txtMovementTitle.Location = new Point(121, 375);
-            txtMovementTitle.Name = "txtMovementTitle";
-            txtMovementTitle.Size = new Size(154, 23);
-            txtMovementTitle.TabIndex = 10;
-            // 
-            // btnUpdateScore
-            // 
-            btnUpdateScore.ForeColor = Color.FromArgb(0, 192, 0);
-            btnUpdateScore.Location = new Point(458, 364);
-            btnUpdateScore.Name = "btnUpdateScore";
-            btnUpdateScore.Size = new Size(115, 30);
-            btnUpdateScore.TabIndex = 4;
-            btnUpdateScore.Text = "Update";
-            btnUpdateScore.UseVisualStyleBackColor = true;
-            btnUpdateScore.Click += btnUpdateScore_Click;
-            // 
-            // btnLoadScore
-            // 
-            btnLoadScore.ForeColor = Color.FromArgb(0, 192, 0);
-            btnLoadScore.Location = new Point(328, 364);
-            btnLoadScore.Name = "btnLoadScore";
-            btnLoadScore.Size = new Size(115, 30);
-            btnLoadScore.TabIndex = 3;
-            btnLoadScore.Text = "Load";
-            btnLoadScore.UseVisualStyleBackColor = true;
-            btnLoadScore.Click += btnLoadScore_Click;
-            // 
-            // btnDeleteScore
-            // 
-            btnDeleteScore.ForeColor = Color.FromArgb(0, 192, 0);
-            btnDeleteScore.Location = new Point(458, 330);
-            btnDeleteScore.Name = "btnDeleteScore";
-            btnDeleteScore.Size = new Size(115, 30);
-            btnDeleteScore.TabIndex = 2;
-            btnDeleteScore.Text = "Delete";
-            btnDeleteScore.UseVisualStyleBackColor = true;
-            btnDeleteScore.Click += btnDeleteScore_Click;
-            // 
-            // btnAddScore
-            // 
-            btnAddScore.ForeColor = Color.FromArgb(0, 192, 0);
-            btnAddScore.Location = new Point(328, 330);
-            btnAddScore.Name = "btnAddScore";
-            btnAddScore.Size = new Size(115, 30);
-            btnAddScore.TabIndex = 1;
-            btnAddScore.Text = "Add";
-            btnAddScore.UseVisualStyleBackColor = true;
-            btnAddScore.Click += btnAddScore_Click;
-            // 
-            // lstScores
-            // 
-            lstScores.FormattingEnabled = true;
-            lstScores.Location = new Point(328, 47);
-            lstScores.Name = "lstScores";
-            lstScores.Size = new Size(245, 274);
-            lstScores.TabIndex = 0;
-            // 
-            // groupBox2
-            // 
-            groupBox2.BackColor = Color.Black;
-            groupBox2.Controls.Add(btnSplice);
-            groupBox2.Controls.Add(label13);
-            groupBox2.Controls.Add(comboBox1);
-            groupBox2.Controls.Add(comboBox4);
-            groupBox2.Controls.Add(lblStartBar);
-            groupBox2.Controls.Add(comboBox3);
-            groupBox2.Controls.Add(numStartBar);
-            groupBox2.Controls.Add(comboBox2);
-            groupBox2.Controls.Add(numStartBeat);
-            groupBox2.Controls.Add(label11);
-            groupBox2.Controls.Add(lblStartBeat);
-            groupBox2.Controls.Add(numericUpDown3);
-            groupBox2.Controls.Add(lblSections);
-            groupBox2.Controls.Add(numericUpDown4);
-            groupBox2.Controls.Add(label12);
-            groupBox2.Controls.Add(label5);
-            groupBox2.Controls.Add(label9);
-            groupBox2.Controls.Add(label6);
-            groupBox2.Controls.Add(clbSections);
-            groupBox2.Controls.Add(label7);
-            groupBox2.Controls.Add(numericUpDown1);
-            groupBox2.Controls.Add(label10);
-            groupBox2.Controls.Add(numericUpDown2);
-            groupBox2.ForeColor = Color.White;
-            groupBox2.Location = new Point(20, 303);
-            groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(442, 476);
-            groupBox2.TabIndex = 32;
-            groupBox2.TabStop = false;
-            groupBox2.Text = "Splice";
-            // 
-            // btnSplice
-            // 
-            btnSplice.ForeColor = Color.FromArgb(255, 128, 0);
-            btnSplice.Location = new Point(308, 342);
-            btnSplice.Name = "btnSplice";
-            btnSplice.Size = new Size(77, 22);
-            btnSplice.TabIndex = 7;
-            btnSplice.Text = "Splice";
-            btnSplice.UseVisualStyleBackColor = true;
-            // 
-            // label13
-            // 
-            label13.AutoSize = true;
-            label13.ForeColor = Color.Red;
-            label13.Location = new Point(3, 382);
-            label13.Name = "label13";
-            label13.Size = new Size(139, 15);
-            label13.TabIndex = 37;
-            label13.Text = "For future pattern targets";
-            // 
-            // comboBox1
-            // 
-            comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(109, 56);
-            comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(121, 23);
-            comboBox1.TabIndex = 25;
-            // 
-            // comboBox4
-            // 
-            comboBox4.FormattingEnabled = true;
-            comboBox4.Location = new Point(119, 241);
-            comboBox4.Name = "comboBox4";
-            comboBox4.Size = new Size(121, 23);
-            comboBox4.TabIndex = 36;
-            // 
-            // lblStartBar
-            // 
-            lblStartBar.AutoSize = true;
-            lblStartBar.ForeColor = Color.Red;
-            lblStartBar.Location = new Point(17, 88);
-            lblStartBar.Name = "lblStartBar";
-            lblStartBar.Size = new Size(54, 15);
-            lblStartBar.TabIndex = 7;
-            lblStartBar.Text = "Start Bar:";
-            // 
-            // comboBox3
-            // 
-            comboBox3.FormattingEnabled = true;
-            comboBox3.Location = new Point(108, 22);
-            comboBox3.Name = "comboBox3";
-            comboBox3.Size = new Size(121, 23);
-            comboBox3.TabIndex = 35;
-            // 
-            // numStartBar
-            // 
-            numStartBar.Location = new Point(109, 85);
-            numStartBar.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
-            numStartBar.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            numStartBar.Name = "numStartBar";
-            numStartBar.Size = new Size(120, 23);
-            numStartBar.TabIndex = 8;
-            numStartBar.Value = new decimal(new int[] { 1, 0, 0, 0 });
-            // 
-            // comboBox2
-            // 
-            comboBox2.FormattingEnabled = true;
-            comboBox2.Location = new Point(111, 155);
-            comboBox2.Name = "comboBox2";
-            comboBox2.Size = new Size(121, 23);
-            comboBox2.TabIndex = 34;
-            // 
-            // numStartBeat
-            // 
-            numStartBeat.Location = new Point(305, 85);
-            numStartBeat.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
-            numStartBeat.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            numStartBeat.Name = "numStartBeat";
-            numStartBeat.Size = new Size(120, 23);
-            numStartBeat.TabIndex = 12;
-            numStartBeat.Value = new decimal(new int[] { 1, 0, 0, 0 });
-            // 
-            // label11
-            // 
-            label11.AutoSize = true;
-            label11.ForeColor = Color.Red;
-            label11.Location = new Point(235, 118);
-            label11.Name = "label11";
-            label11.Size = new Size(56, 15);
-            label11.TabIndex = 33;
-            label11.Text = "End Beat:";
-            // 
-            // lblStartBeat
-            // 
-            lblStartBeat.AutoSize = true;
-            lblStartBeat.ForeColor = Color.Red;
-            lblStartBeat.Location = new Point(235, 87);
-            lblStartBeat.Name = "lblStartBeat";
-            lblStartBeat.Size = new Size(60, 15);
-            lblStartBeat.TabIndex = 15;
-            lblStartBeat.Text = "Start Beat:";
-            // 
-            // numericUpDown3
-            // 
-            numericUpDown3.Location = new Point(305, 116);
-            numericUpDown3.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
-            numericUpDown3.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            numericUpDown3.Name = "numericUpDown3";
-            numericUpDown3.Size = new Size(120, 23);
-            numericUpDown3.TabIndex = 32;
-            numericUpDown3.Value = new decimal(new int[] { 1, 0, 0, 0 });
-            // 
-            // lblSections
-            // 
-            lblSections.AutoSize = true;
-            lblSections.ForeColor = Color.Red;
-            lblSections.Location = new Point(18, 52);
-            lblSections.Name = "lblSections";
-            lblSections.Size = new Size(49, 15);
-            lblSections.TabIndex = 16;
-            lblSections.Text = "Section:";
-            // 
-            // numericUpDown4
-            // 
-            numericUpDown4.Location = new Point(109, 116);
-            numericUpDown4.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
-            numericUpDown4.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            numericUpDown4.Name = "numericUpDown4";
-            numericUpDown4.Size = new Size(120, 23);
-            numericUpDown4.TabIndex = 31;
-            numericUpDown4.Value = new decimal(new int[] { 1, 0, 0, 0 });
-            // 
-            // label12
-            // 
-            label12.AutoSize = true;
-            label12.ForeColor = Color.Red;
-            label12.Location = new Point(17, 119);
-            label12.Name = "label12";
-            label12.Size = new Size(50, 15);
-            label12.TabIndex = 30;
-            label12.Text = "End Bar:";
-            // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.ForeColor = Color.Red;
-            label5.Location = new Point(17, 25);
-            label5.Name = "label5";
-            label5.Size = new Size(84, 15);
-            label5.TabIndex = 22;
-            label5.Text = "Score Source 1";
-            // 
-            // label9
-            // 
-            label9.AutoSize = true;
-            label9.ForeColor = Color.Red;
-            label9.Location = new Point(238, 191);
-            label9.Name = "label9";
-            label9.Size = new Size(60, 15);
-            label9.TabIndex = 29;
-            label9.Text = "Start Beat:";
-            // 
-            // label6
-            // 
-            label6.AutoSize = true;
-            label6.ForeColor = Color.Red;
-            label6.Location = new Point(16, 160);
-            label6.Name = "label6";
-            label6.Size = new Size(84, 15);
-            label6.TabIndex = 23;
-            label6.Text = "Score Source 2";
-            // 
-            // clbSections
-            // 
-            clbSections.CheckOnClick = true;
-            clbSections.FormattingEnabled = true;
-            clbSections.Location = new Point(21, 417);
-            clbSections.Name = "clbSections";
-            clbSections.Size = new Size(106, 40);
-            clbSections.TabIndex = 20;
-            // 
-            // label7
-            // 
-            label7.AutoSize = true;
-            label7.ForeColor = Color.Red;
-            label7.Location = new Point(17, 243);
-            label7.Name = "label7";
-            label7.Size = new Size(99, 15);
-            label7.TabIndex = 24;
-            label7.Text = "Score Destination";
-            // 
-            // numericUpDown1
-            // 
-            numericUpDown1.Location = new Point(308, 189);
-            numericUpDown1.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
-            numericUpDown1.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            numericUpDown1.Name = "numericUpDown1";
-            numericUpDown1.Size = new Size(120, 23);
-            numericUpDown1.TabIndex = 28;
-            numericUpDown1.Value = new decimal(new int[] { 1, 0, 0, 0 });
-            // 
-            // label10
-            // 
-            label10.AutoSize = true;
-            label10.ForeColor = Color.Red;
-            label10.Location = new Point(17, 192);
-            label10.Name = "label10";
-            label10.Size = new Size(54, 15);
-            label10.TabIndex = 26;
-            label10.Text = "Start Bar:";
-            // 
-            // numericUpDown2
-            // 
-            numericUpDown2.Location = new Point(112, 189);
-            numericUpDown2.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
-            numericUpDown2.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            numericUpDown2.Name = "numericUpDown2";
-            numericUpDown2.Size = new Size(120, 23);
-            numericUpDown2.TabIndex = 27;
-            numericUpDown2.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            grpScoreList.Text = "Overview";
             // 
             // groupBox3
             // 
@@ -1159,8 +769,8 @@ namespace Music.Writer
             // 
             ClientSize = new Size(1918, 905);
             Controls.Add(dataGridView1);
+            Controls.Add(btnAppend);
             Controls.Add(grbCurrentDesign);
-            Controls.Add(groupBox2);
             Controls.Add(grpScoreList);
             Controls.Add(btnUpdateFormFromDesigner);
             Controls.Add(btnChordTest);
@@ -1192,14 +802,6 @@ namespace Music.Writer
             ((System.ComponentModel.ISupportInitialize)numTupletOf).EndInit();
             grpScoreList.ResumeLayout(false);
             grpScoreList.PerformLayout();
-            groupBox2.ResumeLayout(false);
-            groupBox2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)numStartBar).EndInit();
-            ((System.ComponentModel.ISupportInitialize)numStartBeat).EndInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown3).EndInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown4).EndInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown2).EndInit();
             groupBox3.ResumeLayout(false);
             grbCurrentDesign.ResumeLayout(false);
             grbCurrentDesign.PerformLayout();
@@ -1220,7 +822,6 @@ namespace Music.Writer
         private Label label3;
         private NumericUpDown numNumberOfNotes;
         private Button btnSetWriterTestScenarioG1;
-        private Button btnNewScore;
         private Button btnSetDesignTestScenarioD1;
         private RadioButton rbIsRest;
         private Button btnChordTest;
@@ -1242,37 +843,11 @@ namespace Music.Writer
         private Button btnExportToNotion;
         private Label lblTupletNumber;
         private TextBox txtTupletNumber;
-        private TextBox txtMovementTitle;
-        private GroupBox groupBox2;
-        private Label label13;
-        private ComboBox comboBox1;
-        private ComboBox comboBox4;
-        private Label lblStartBar;
-        private ComboBox comboBox3;
-        private NumericUpDown numStartBar;
-        private ComboBox comboBox2;
-        private NumericUpDown numStartBeat;
-        private Label label11;
-        private Label lblStartBeat;
-        private NumericUpDown numericUpDown3;
-        private Label lblSections;
-        private NumericUpDown numericUpDown4;
-        private Label label12;
-        private Label label5;
-        private Label label9;
-        private Label label6;
-        private CheckedListBox clbSections;
-        private Label label7;
-        private NumericUpDown numericUpDown1;
-        private Label label10;
-        private NumericUpDown numericUpDown2;
         private GroupBox groupBox3;
         private GroupBox grbCurrentDesign;
-        private Label label2;
         private DataGridView dataGridView1;
         private DataGridViewTextBoxColumn colName;
         private DataGridViewTextBoxColumn colEvents;
         private GroupBox groupBox4;
-        private Button btnSplice;
     }
 }

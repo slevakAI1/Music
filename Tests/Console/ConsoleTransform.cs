@@ -24,18 +24,6 @@ namespace Music.Writer
                 }
             }
 
-            // Capture sections items and their checked state into a dictionary
-            var sectionsState = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            if (clbSections != null)
-            {
-                for (int i = 0; i < clbSections.Items.Count; i++)
-                {
-                    var name = clbSections.Items[i]?.ToString() ?? string.Empty;
-                    if (!string.IsNullOrWhiteSpace(name))
-                        sectionsState[name] = clbSections.GetItemChecked(i);
-                }
-            }
-
             // Capture staffs checked state into a list
             var selectedStaffs = new List<int>();
             if (clbStaffs != null)
@@ -77,13 +65,10 @@ namespace Music.Writer
 
                 // New: store the full items -> checked state map
                 PartsState = partsState,
-                SectionsState = sectionsState,
 
                 // Staff / sections / bars / beats
                 SelectedStaffs = selectedStaffs,
-                StartBar = (int?)(numStartBar?.Value ?? 1),
                 EndBar = 48,    //  This is deprecated; kept for backward compatibility
-                StartBeat = (int?)(numStartBeat?.Value ?? 1),
 
                 // Pitch
                 PitchAbsolute = rbPitchAbsolute?.Checked ?? true,
@@ -150,33 +135,6 @@ namespace Music.Writer
                 }
             }
 
-            // Sections - if provided, set checked state for matching items
-            if (data.SectionsState != null && data.SectionsState.Count > 0 && clbSections != null)
-            {
-                // Use case-insensitive lookup
-                var map = new Dictionary<string, bool>(data.SectionsState, StringComparer.OrdinalIgnoreCase);
-
-                // Clear existing items and populate from the map so control contains exactly the map entries
-                clbSections.BeginUpdate();
-                try
-                {
-                    clbSections.Items.Clear();
-                    foreach (var kv in map)
-                    {
-                        var name = kv.Key ?? string.Empty;
-                        if (string.IsNullOrWhiteSpace(name))
-                            continue;
-
-                        var idx = clbSections.Items.Add(name);
-                        clbSections.SetItemChecked(idx, kv.Value);
-                    }
-                }
-                finally
-                {
-                    clbSections.EndUpdate();
-                }
-            }
-
             // Staffs - set checked state for matching staff numbers
             if (data.SelectedStaffs != null && data.SelectedStaffs.Count > 0 && clbStaffs != null)
             {
@@ -205,13 +163,6 @@ namespace Music.Writer
                     clbStaffs.EndUpdate();
                 }
             }
-
-            // Staff / sections / bars / beats
-            if (data.StartBar.HasValue && numStartBar != null)
-                numStartBar.Value = LimitRange(numStartBar, data.StartBar.Value);
-
-            if (data.StartBeat.HasValue && numStartBeat != null)
-                numStartBeat.Value = LimitRange(numStartBeat, data.StartBeat.Value);
 
             // Pitch
             if (data.PitchAbsolute.HasValue && rbPitchAbsolute != null && rbPitchKeyRelative != null)
