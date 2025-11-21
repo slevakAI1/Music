@@ -53,7 +53,6 @@ namespace Music.Writer
             clbStaffs = new CheckedListBox();
             grpPitch = new GroupBox();
             grpChord = new GroupBox();
-            label1 = new Label();
             lblKey = new Label();
             cbChordKey = new ComboBox();
             lblDegree2 = new Label();
@@ -143,7 +142,7 @@ namespace Music.Writer
             grbParts.ForeColor = Color.White;
             grbParts.Location = new Point(20, 121);
             grbParts.Name = "grbParts";
-            grbParts.Size = new Size(442, 174);
+            grbParts.Size = new Size(322, 174);
             grbParts.TabIndex = 2;
             grbParts.TabStop = false;
             grbParts.Text = "Part";
@@ -213,14 +212,13 @@ namespace Music.Writer
             grpPitch.ForeColor = Color.White;
             grpPitch.Location = new Point(474, 198);
             grpPitch.Name = "grpPitch";
-            grpPitch.Size = new Size(592, 418);
+            grpPitch.Size = new Size(325, 393);
             grpPitch.TabIndex = 3;
             grpPitch.TabStop = false;
             grpPitch.Text = "Pitch Options";
             // 
             // grpChord
             // 
-            grpChord.Controls.Add(label1);
             grpChord.Controls.Add(lblKey);
             grpChord.Controls.Add(cbChordKey);
             grpChord.Controls.Add(lblDegree2);
@@ -229,26 +227,17 @@ namespace Music.Writer
             grpChord.Controls.Add(cbChordQuality);
             grpChord.Controls.Add(label8);
             grpChord.Controls.Add(cbChordBase);
-            grpChord.Location = new Point(31, 259);
+            grpChord.Location = new Point(8, 245);
             grpChord.Name = "grpChord";
-            grpChord.Size = new Size(549, 98);
+            grpChord.Size = new Size(299, 132);
             grpChord.TabIndex = 11;
             grpChord.TabStop = false;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(21, 64);
-            label1.Name = "label1";
-            label1.Size = new Size(43, 15);
-            label1.TabIndex = 15;
-            label1.Text = "Notes?";
             // 
             // lblKey
             // 
             lblKey.AutoSize = true;
             lblKey.ForeColor = Color.FromArgb(0, 192, 0);
-            lblKey.Location = new Point(12, 24);
+            lblKey.Location = new Point(8, 24);
             lblKey.Name = "lblKey";
             lblKey.Size = new Size(26, 15);
             lblKey.TabIndex = 6;
@@ -258,7 +247,7 @@ namespace Music.Writer
             // 
             cbChordKey.DropDownStyle = ComboBoxStyle.DropDownList;
             cbChordKey.Items.AddRange(new object[] { "C major", "G major", "D major", "A major", "E major", "B major", "F# major", "C# major", "F major", "Bb majo", "Eb major", "Ab major", "Db major", "Gb major", "Cb major", "A minor", "E minor", "B minor", "F# minor", "C# minor", "G# minor", "D# minor", "A# minor", "D minor", "G minor", "C minor ", "F minor ", "Bb minor", "Eb minor", "Ab minor" });
-            cbChordKey.Location = new Point(44, 21);
+            cbChordKey.Location = new Point(36, 21);
             cbChordKey.Name = "cbChordKey";
             cbChordKey.Size = new Size(70, 23);
             cbChordKey.TabIndex = 11;
@@ -267,7 +256,7 @@ namespace Music.Writer
             // 
             lblDegree2.AutoSize = true;
             lblDegree2.ForeColor = Color.FromArgb(0, 192, 0);
-            lblDegree2.Location = new Point(124, 24);
+            lblDegree2.Location = new Point(109, 24);
             lblDegree2.Name = "lblDegree2";
             lblDegree2.Size = new Size(44, 15);
             lblDegree2.TabIndex = 7;
@@ -275,7 +264,7 @@ namespace Music.Writer
             // 
             // numChordDegree
             // 
-            numChordDegree.Location = new Point(174, 21);
+            numChordDegree.Location = new Point(155, 21);
             numChordDegree.Maximum = new decimal(new int[] { 7, 0, 0, 0 });
             numChordDegree.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numChordDegree.Name = "numChordDegree";
@@ -287,7 +276,7 @@ namespace Music.Writer
             // 
             lblQuality.AutoSize = true;
             lblQuality.ForeColor = Color.FromArgb(0, 192, 0);
-            lblQuality.Location = new Point(226, 24);
+            lblQuality.Location = new Point(7, 62);
             lblQuality.Name = "lblQuality";
             lblQuality.Size = new Size(45, 15);
             lblQuality.TabIndex = 8;
@@ -297,7 +286,7 @@ namespace Music.Writer
             // 
             cbChordQuality.DropDownStyle = ComboBoxStyle.DropDownList;
             cbChordQuality.Items.AddRange(new object[] { "Major", "Minor", "Diminished", "Augmented", "Sus2", "Sus4", "Power5", "Major6", "Minor6", "Major6Add9", "Dominant7", "Major7", "Minor7", "Diminished7", "HalfDiminished7", "MinorMajor7", "Dominant9", "Major9", "Minor9", "Dominant11", "Dominant13", "MajorAdd9", "MajorAdd11" });
-            cbChordQuality.Location = new Point(277, 21);
+            cbChordQuality.Location = new Point(52, 59);
             cbChordQuality.Name = "cbChordQuality";
             cbChordQuality.Size = new Size(158, 23);
             cbChordQuality.TabIndex = 13;
@@ -306,7 +295,7 @@ namespace Music.Writer
             // 
             label8.AutoSize = true;
             label8.ForeColor = Color.FromArgb(0, 192, 0);
-            label8.Location = new Point(442, 24);
+            label8.Location = new Point(214, 62);
             label8.Name = "label8";
             label8.Size = new Size(31, 15);
             label8.TabIndex = 10;
@@ -316,7 +305,7 @@ namespace Music.Writer
             // 
             cbChordBase.DropDownStyle = ComboBoxStyle.DropDownList;
             cbChordBase.Items.AddRange(new object[] { "root", "3rd", "5th", "7th" });
-            cbChordBase.Location = new Point(479, 21);
+            cbChordBase.Location = new Point(247, 59);
             cbChordBase.Name = "cbChordBase";
             cbChordBase.Size = new Size(46, 23);
             cbChordBase.TabIndex = 14;
@@ -325,7 +314,7 @@ namespace Music.Writer
             // 
             lblOctaveAbs.AutoSize = true;
             lblOctaveAbs.ForeColor = Color.FromArgb(0, 192, 0);
-            lblOctaveAbs.Location = new Point(13, 57);
+            lblOctaveAbs.Location = new Point(12, 51);
             lblOctaveAbs.Name = "lblOctaveAbs";
             lblOctaveAbs.Size = new Size(47, 15);
             lblOctaveAbs.TabIndex = 4;
@@ -333,7 +322,7 @@ namespace Music.Writer
             // 
             // numOctaveAbs
             // 
-            numOctaveAbs.Location = new Point(65, 53);
+            numOctaveAbs.Location = new Point(64, 47);
             numOctaveAbs.Maximum = new decimal(new int[] { 8, 0, 0, 0 });
             numOctaveAbs.Name = "numOctaveAbs";
             numOctaveAbs.Size = new Size(47, 23);
@@ -344,7 +333,7 @@ namespace Music.Writer
             // 
             rbChord.AutoSize = true;
             rbChord.ForeColor = Color.FromArgb(0, 192, 0);
-            rbChord.Location = new Point(15, 230);
+            rbChord.Location = new Point(14, 224);
             rbChord.Name = "rbChord";
             rbChord.Size = new Size(58, 19);
             rbChord.TabIndex = 5;
@@ -354,7 +343,7 @@ namespace Music.Writer
             // 
             rbIsRest.AutoSize = true;
             rbIsRest.ForeColor = Color.FromArgb(0, 192, 0);
-            rbIsRest.Location = new Point(15, 27);
+            rbIsRest.Location = new Point(14, 21);
             rbIsRest.Name = "rbIsRest";
             rbIsRest.Size = new Size(47, 19);
             rbIsRest.TabIndex = 4;
@@ -365,7 +354,7 @@ namespace Music.Writer
             rbPitchAbsolute.AutoSize = true;
             rbPitchAbsolute.Checked = true;
             rbPitchAbsolute.ForeColor = Color.FromArgb(0, 192, 0);
-            rbPitchAbsolute.Location = new Point(15, 86);
+            rbPitchAbsolute.Location = new Point(14, 80);
             rbPitchAbsolute.Name = "rbPitchAbsolute";
             rbPitchAbsolute.Size = new Size(72, 19);
             rbPitchAbsolute.TabIndex = 0;
@@ -375,7 +364,7 @@ namespace Music.Writer
             // rbPitchKeyRelative
             // 
             rbPitchKeyRelative.AutoSize = true;
-            rbPitchKeyRelative.Location = new Point(15, 159);
+            rbPitchKeyRelative.Location = new Point(14, 153);
             rbPitchKeyRelative.Name = "rbPitchKeyRelative";
             rbPitchKeyRelative.Size = new Size(87, 19);
             rbPitchKeyRelative.TabIndex = 1;
@@ -387,9 +376,9 @@ namespace Music.Writer
             grpAbsolute.Controls.Add(cbStep);
             grpAbsolute.Controls.Add(lblAccidental);
             grpAbsolute.Controls.Add(cbAccidental);
-            grpAbsolute.Location = new Point(21, 101);
+            grpAbsolute.Location = new Point(5, 95);
             grpAbsolute.Name = "grpAbsolute";
-            grpAbsolute.Size = new Size(369, 46);
+            grpAbsolute.Size = new Size(288, 46);
             grpAbsolute.TabIndex = 2;
             grpAbsolute.TabStop = false;
             // 
@@ -416,7 +405,7 @@ namespace Music.Writer
             // 
             lblAccidental.AutoSize = true;
             lblAccidental.ForeColor = Color.FromArgb(0, 192, 0);
-            lblAccidental.Location = new Point(120, 20);
+            lblAccidental.Location = new Point(118, 20);
             lblAccidental.Name = "lblAccidental";
             lblAccidental.Size = new Size(66, 15);
             lblAccidental.TabIndex = 2;
@@ -436,9 +425,9 @@ namespace Music.Writer
             grpKeyRelative.Controls.Add(lblDegree);
             grpKeyRelative.Controls.Add(numDegree);
             grpKeyRelative.Controls.Add(lblOctaveKR);
-            grpKeyRelative.Location = new Point(30, 173);
+            grpKeyRelative.Location = new Point(6, 167);
             grpKeyRelative.Name = "grpKeyRelative";
-            grpKeyRelative.Size = new Size(360, 47);
+            grpKeyRelative.Size = new Size(198, 47);
             grpKeyRelative.TabIndex = 3;
             grpKeyRelative.TabStop = false;
             // 
@@ -488,7 +477,7 @@ namespace Music.Writer
             groupBox1.ForeColor = Color.White;
             groupBox1.Location = new Point(474, 13);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(592, 174);
+            groupBox1.Size = new Size(325, 174);
             groupBox1.TabIndex = 6;
             groupBox1.TabStop = false;
             groupBox1.Text = "Rhythm options";
@@ -701,7 +690,7 @@ namespace Music.Writer
             grpScoreList.ForeColor = Color.White;
             grpScoreList.Location = new Point(1078, 14);
             grpScoreList.Name = "grpScoreList";
-            grpScoreList.Size = new Size(595, 414);
+            grpScoreList.Size = new Size(306, 362);
             grpScoreList.TabIndex = 31;
             grpScoreList.TabStop = false;
             grpScoreList.Text = "Overview";
@@ -715,7 +704,7 @@ namespace Music.Writer
             groupBox3.ForeColor = Color.White;
             groupBox3.Location = new Point(20, 12);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(442, 100);
+            groupBox3.Size = new Size(360, 100);
             groupBox3.TabIndex = 33;
             groupBox3.TabStop = false;
             groupBox3.Text = "Command";
@@ -726,7 +715,7 @@ namespace Music.Writer
             grbCurrentDesign.Controls.Add(txtDesignerReport);
             grbCurrentDesign.Controls.Add(btnSetDesignTestScenarioD1);
             grbCurrentDesign.ForeColor = Color.White;
-            grbCurrentDesign.Location = new Point(1079, 445);
+            grbCurrentDesign.Location = new Point(1031, 423);
             grbCurrentDesign.Name = "grbCurrentDesign";
             grbCurrentDesign.Size = new Size(594, 167);
             grbCurrentDesign.TabIndex = 34;
@@ -835,7 +824,6 @@ namespace Music.Writer
         private NumericUpDown numChordDegree;
         private ComboBox cbChordQuality;
         private ComboBox cbChordBase;
-        private Label label1;
         private Button btnUpdateFormFromDesigner;
         private TextBox txtDesignerReport;
         private Label lblScoreReport;

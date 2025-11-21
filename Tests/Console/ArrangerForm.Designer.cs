@@ -300,7 +300,7 @@ namespace Music.Writer
             grbParts.ForeColor = Color.White;
             grbParts.Location = new Point(939, 71);
             grbParts.Name = "grbParts";
-            grbParts.Size = new Size(442, 174);
+            grbParts.Size = new Size(324, 174);
             grbParts.TabIndex = 16;
             grbParts.TabStop = false;
             grbParts.Text = "Part";
@@ -373,7 +373,7 @@ namespace Music.Writer
             groupBox2.ForeColor = Color.White;
             groupBox2.Location = new Point(939, 251);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(442, 468);
+            groupBox2.Size = new Size(442, 400);
             groupBox2.TabIndex = 32;
             groupBox2.TabStop = false;
             groupBox2.Text = "Splice";
@@ -381,7 +381,7 @@ namespace Music.Writer
             // btnSplice
             // 
             btnSplice.ForeColor = Color.FromArgb(255, 128, 0);
-            btnSplice.Location = new Point(308, 342);
+            btnSplice.Location = new Point(195, 290);
             btnSplice.Name = "btnSplice";
             btnSplice.Size = new Size(77, 22);
             btnSplice.TabIndex = 7;
@@ -392,7 +392,7 @@ namespace Music.Writer
             // 
             label13.AutoSize = true;
             label13.ForeColor = Color.Red;
-            label13.Location = new Point(3, 382);
+            label13.Location = new Point(18, 314);
             label13.Name = "label13";
             label13.Size = new Size(139, 15);
             label13.TabIndex = 37;
@@ -554,7 +554,7 @@ namespace Music.Writer
             // 
             clbSections.CheckOnClick = true;
             clbSections.FormattingEnabled = true;
-            clbSections.Location = new Point(21, 417);
+            clbSections.Location = new Point(36, 349);
             clbSections.Name = "clbSections";
             clbSections.Size = new Size(106, 40);
             clbSections.TabIndex = 20;
@@ -606,9 +606,9 @@ namespace Music.Writer
             groupBox3.Controls.Add(btnSetDesignTestScenarioD1);
             groupBox3.Controls.Add(btnUpdateFormFromDesigner);
             groupBox3.ForeColor = Color.White;
-            groupBox3.Location = new Point(117, 526);
+            groupBox3.Location = new Point(119, 521);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(714, 265);
+            groupBox3.Size = new Size(714, 250);
             groupBox3.TabIndex = 16;
             groupBox3.TabStop = false;
             groupBox3.Text = "Current Design";
