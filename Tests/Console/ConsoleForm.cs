@@ -1,6 +1,7 @@
 using Music.Designer;
 using MusicXml;
 using MusicXml.Domain;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Music.Writer
 {
@@ -254,7 +255,22 @@ namespace Music.Writer
 
         private void btnExecute_Click(object sender, EventArgs e)
         {
+            var pattern = cbPattern?.Text?.Trim() ?? string.Empty;
+            if (string.IsNullOrEmpty(pattern))
+                return;
 
+            switch (pattern)
+            {
+                case "Repeat Note/Chord/Rest":
+                    // Then call MyFunction() - not defined yet leave as comment
+                    // TODO: call MyFunction(); when implemented
+                    break;
+
+                // Add additional cases for other patterns as needed
+                default:
+                    // No-op for unrecognized patterns
+                    break;
+            }
         }
     }
 }

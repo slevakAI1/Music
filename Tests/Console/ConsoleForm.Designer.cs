@@ -128,7 +128,7 @@ namespace Music.Writer
             // cbPattern
             // 
             cbPattern.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbPattern.Items.AddRange(new object[] { "Repeat Note/Chord" });
+            cbPattern.Items.AddRange(new object[] { "Repeat Note/Chord/Rest" });
             cbPattern.Location = new Point(13, 22);
             cbPattern.Name = "cbPattern";
             cbPattern.Size = new Size(250, 23);
