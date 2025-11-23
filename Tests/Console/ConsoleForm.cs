@@ -114,7 +114,16 @@ namespace Music.Writer
                 return;
             }
 
+
+
+            // THIS SHOULD NOW BE "CREATE PITCH EVENT" and and SHOW IN THE NEW CONTROL 
+
             var config = _writer.ToAppendPitchEventsParams();
+
+
+            // THIS SHOULD APPEND FROM WHATS SELECTED IN THE PITCH EVENTS CONTROL
+
+
             AppendNotes.Execute(_scoreList[0], config, _measureMeta);
             txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
             Globals.ScoreList = _scoreList;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
@@ -241,6 +250,11 @@ namespace Music.Writer
             {
                 MessageBox.Show(this, $"Error exporting MusicXML:\n{ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void btnExecute_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

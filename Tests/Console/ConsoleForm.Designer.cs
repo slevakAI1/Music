@@ -47,10 +47,10 @@ namespace Music.Writer
             cbPattern = new ComboBox();
             grbParts = new GroupBox();
             lblPart = new Label();
-            btnAppend = new Button();
             clbParts = new CheckedListBox();
             lblStaff = new Label();
             clbStaffs = new CheckedListBox();
+            btnAppend = new Button();
             grpPitch = new GroupBox();
             grpChord = new GroupBox();
             lblKey = new Label();
@@ -99,6 +99,7 @@ namespace Music.Writer
             btnExportToNotion = new Button();
             grpScoreList = new GroupBox();
             groupBox3 = new GroupBox();
+            btnExecute = new Button();
             grbCurrentDesign = new GroupBox();
             dataGridView1 = new DataGridView();
             colName = new DataGridViewTextBoxColumn();
@@ -121,12 +122,13 @@ namespace Music.Writer
             groupBox3.SuspendLayout();
             grbCurrentDesign.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
+            groupBox4.SuspendLayout();
             SuspendLayout();
             // 
             // cbPattern
             // 
             cbPattern.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbPattern.Items.AddRange(new object[] { "Append Pitch Events" });
+            cbPattern.Items.AddRange(new object[] { "Repeat Note/Chord" });
             cbPattern.Location = new Point(13, 22);
             cbPattern.Name = "cbPattern";
             cbPattern.Size = new Size(250, 23);
@@ -140,7 +142,7 @@ namespace Music.Writer
             grbParts.Controls.Add(lblStaff);
             grbParts.Controls.Add(clbStaffs);
             grbParts.ForeColor = Color.White;
-            grbParts.Location = new Point(20, 121);
+            grbParts.Location = new Point(1369, 428);
             grbParts.Name = "grbParts";
             grbParts.Size = new Size(322, 174);
             grbParts.TabIndex = 2;
@@ -156,17 +158,6 @@ namespace Music.Writer
             lblPart.Size = new Size(70, 15);
             lblPart.TabIndex = 0;
             lblPart.Text = "Part (Voice):";
-            // 
-            // btnAppend
-            // 
-            btnAppend.ForeColor = Color.FromArgb(255, 128, 0);
-            btnAppend.Location = new Point(385, 645);
-            btnAppend.Name = "btnAppend";
-            btnAppend.Size = new Size(77, 22);
-            btnAppend.TabIndex = 4;
-            btnAppend.Text = "Append";
-            btnAppend.UseVisualStyleBackColor = true;
-            btnAppend.Click += btnAppendNotes_Click;
             // 
             // clbParts
             // 
@@ -197,6 +188,17 @@ namespace Music.Writer
             clbStaffs.Size = new Size(120, 40);
             clbStaffs.TabIndex = 6;
             // 
+            // btnAppend
+            // 
+            btnAppend.ForeColor = Color.Red;
+            btnAppend.Location = new Point(1064, 434);
+            btnAppend.Name = "btnAppend";
+            btnAppend.Size = new Size(270, 22);
+            btnAppend.TabIndex = 4;
+            btnAppend.Text = "Append Selected Pitch Events to Score";
+            btnAppend.UseVisualStyleBackColor = true;
+            btnAppend.Click += btnAppendNotes_Click;
+            // 
             // grpPitch
             // 
             grpPitch.BackColor = Color.Black;
@@ -210,7 +212,7 @@ namespace Music.Writer
             grpPitch.Controls.Add(grpAbsolute);
             grpPitch.Controls.Add(grpKeyRelative);
             grpPitch.ForeColor = Color.White;
-            grpPitch.Location = new Point(474, 198);
+            grpPitch.Location = new Point(12, 301);
             grpPitch.Name = "grpPitch";
             grpPitch.Size = new Size(325, 393);
             grpPitch.TabIndex = 3;
@@ -475,7 +477,7 @@ namespace Music.Writer
             groupBox1.Controls.Add(lblTupletOf);
             groupBox1.Controls.Add(numTupletOf);
             groupBox1.ForeColor = Color.White;
-            groupBox1.Location = new Point(474, 13);
+            groupBox1.Location = new Point(12, 121);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(325, 174);
             groupBox1.TabIndex = 6;
@@ -610,7 +612,7 @@ namespace Music.Writer
             // btnSetDesignTestScenarioD1
             // 
             btnSetDesignTestScenarioD1.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSetDesignTestScenarioD1.Location = new Point(181, 138);
+            btnSetDesignTestScenarioD1.Location = new Point(75, 138);
             btnSetDesignTestScenarioD1.Name = "btnSetDesignTestScenarioD1";
             btnSetDesignTestScenarioD1.Size = new Size(179, 23);
             btnSetDesignTestScenarioD1.TabIndex = 10;
@@ -648,7 +650,7 @@ namespace Music.Writer
             txtDesignerReport.Multiline = true;
             txtDesignerReport.Name = "txtDesignerReport";
             txtDesignerReport.ScrollBars = ScrollBars.Vertical;
-            txtDesignerReport.Size = new Size(557, 109);
+            txtDesignerReport.Size = new Size(325, 109);
             txtDesignerReport.TabIndex = 26;
             // 
             // lblScoreReport
@@ -688,7 +690,7 @@ namespace Music.Writer
             grpScoreList.Controls.Add(lblScoreReport);
             grpScoreList.Controls.Add(txtScoreReport);
             grpScoreList.ForeColor = Color.White;
-            grpScoreList.Location = new Point(1078, 14);
+            grpScoreList.Location = new Point(386, 434);
             grpScoreList.Name = "grpScoreList";
             grpScoreList.Size = new Size(306, 362);
             grpScoreList.TabIndex = 31;
@@ -698,16 +700,28 @@ namespace Music.Writer
             // groupBox3
             // 
             groupBox3.BackColor = SystemColors.ActiveCaptionText;
+            groupBox3.Controls.Add(btnExecute);
             groupBox3.Controls.Add(cbPattern);
             groupBox3.Controls.Add(btnExportToNotion);
             groupBox3.Controls.Add(btnSetWriterTestScenarioG1);
             groupBox3.ForeColor = Color.White;
-            groupBox3.Location = new Point(20, 12);
+            groupBox3.Location = new Point(12, 12);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(360, 100);
+            groupBox3.Size = new Size(516, 100);
             groupBox3.TabIndex = 33;
             groupBox3.TabStop = false;
             groupBox3.Text = "Command";
+            // 
+            // btnExecute
+            // 
+            btnExecute.ForeColor = Color.Red;
+            btnExecute.Location = new Point(284, 21);
+            btnExecute.Name = "btnExecute";
+            btnExecute.Size = new Size(114, 23);
+            btnExecute.TabIndex = 31;
+            btnExecute.Text = "Execute";
+            btnExecute.UseVisualStyleBackColor = true;
+            btnExecute.Click += btnExecute_Click;
             // 
             // grbCurrentDesign
             // 
@@ -715,9 +729,9 @@ namespace Music.Writer
             grbCurrentDesign.Controls.Add(txtDesignerReport);
             grbCurrentDesign.Controls.Add(btnSetDesignTestScenarioD1);
             grbCurrentDesign.ForeColor = Color.White;
-            grbCurrentDesign.Location = new Point(1031, 423);
+            grbCurrentDesign.Location = new Point(698, 435);
             grbCurrentDesign.Name = "grbCurrentDesign";
-            grbCurrentDesign.Size = new Size(594, 167);
+            grbCurrentDesign.Size = new Size(351, 167);
             grbCurrentDesign.TabIndex = 34;
             grbCurrentDesign.TabStop = false;
             grbCurrentDesign.Text = "Current Design";
@@ -727,9 +741,9 @@ namespace Music.Writer
             dataGridView1.AllowUserToOrderColumns = true;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridView1.Columns.AddRange(new DataGridViewColumn[] { colName, colEvents });
-            dataGridView1.Location = new Point(487, 645);
+            dataGridView1.Location = new Point(18, 14);
             dataGridView1.Name = "dataGridView1";
-            dataGridView1.Size = new Size(1164, 115);
+            dataGridView1.Size = new Size(1074, 382);
             dataGridView1.TabIndex = 35;
             // 
             // colName
@@ -746,10 +760,11 @@ namespace Music.Writer
             // groupBox4
             // 
             groupBox4.BackColor = Color.Black;
+            groupBox4.Controls.Add(dataGridView1);
             groupBox4.ForeColor = Color.White;
-            groupBox4.Location = new Point(474, 630);
+            groupBox4.Location = new Point(711, 14);
             groupBox4.Name = "groupBox4";
-            groupBox4.Size = new Size(1199, 149);
+            groupBox4.Size = new Size(1104, 406);
             groupBox4.TabIndex = 36;
             groupBox4.TabStop = false;
             groupBox4.Text = "Pitch Events";
@@ -757,7 +772,6 @@ namespace Music.Writer
             // ConsoleForm
             // 
             ClientSize = new Size(1918, 905);
-            Controls.Add(dataGridView1);
             Controls.Add(btnAppend);
             Controls.Add(grbCurrentDesign);
             Controls.Add(grpScoreList);
@@ -795,6 +809,7 @@ namespace Music.Writer
             grbCurrentDesign.ResumeLayout(false);
             grbCurrentDesign.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
+            groupBox4.ResumeLayout(false);
             ResumeLayout(false);
         }
         private GroupBox groupBox1;
@@ -837,5 +852,6 @@ namespace Music.Writer
         private DataGridViewTextBoxColumn colName;
         private DataGridViewTextBoxColumn colEvents;
         private GroupBox groupBox4;
+        private Button btnExecute;
     }
 }
