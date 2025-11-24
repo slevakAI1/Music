@@ -158,7 +158,7 @@ namespace Music.Writer
             var pitchEventName = pitchEventNumber.ToString();
 
             // Add new row with explicit cell values
-            int newRowIndex = dgvPhrase.Rows.Add(pitchEventName, phrase);
+            int newRowIndex = dgvPhrase.Rows.Add(phrase, pitchEventName, "tbd");
         }
 
         /// <summary>
@@ -358,6 +358,36 @@ namespace Music.Writer
                 default:
                     // No-op for unrecognized patterns
                     break;
+            }
+        }
+
+        private async void btnPlay_Click(object sender, EventArgs e)
+        {
+            // Check if there are any rows in the grid
+            if (dgvPhrase.Rows.Count == 0)
+            {
+                MessageBox.Show(this, "No pitch events to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Get the AppendPitchEventsParams from the first row, first column (index 0)
+            var firstRow = dgvPhrase.Rows[0];
+            var cellValue = firstRow.Cells[0].Value;
+
+            if (cellValue is AppendPitchEventsParams config)
+            {
+                try
+                {
+                    await PlayMidiFromPitchEventsAsync(config);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this, $"Error playing MIDI: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show(this, "Invalid data in the first row.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
     }

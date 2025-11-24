@@ -102,12 +102,13 @@ namespace Music.Writer
             btnExecute = new Button();
             grbCurrentDesign = new GroupBox();
             groupBox4 = new GroupBox();
+            button3 = new Button();
+            button2 = new Button();
+            btnPlay = new Button();
             dgvPhrase = new DataGridView();
             col1 = new DataGridViewTextBoxColumn();
             col2 = new DataGridViewTextBoxColumn();
-            button1 = new Button();
-            button2 = new Button();
-            button3 = new Button();
+            col3 = new DataGridViewTextBoxColumn();
             grbParts.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -745,7 +746,7 @@ namespace Music.Writer
             groupBox4.BackColor = Color.Black;
             groupBox4.Controls.Add(button3);
             groupBox4.Controls.Add(button2);
-            groupBox4.Controls.Add(button1);
+            groupBox4.Controls.Add(btnPlay);
             groupBox4.Controls.Add(dgvPhrase);
             groupBox4.ForeColor = Color.White;
             groupBox4.Location = new Point(711, 14);
@@ -755,38 +756,15 @@ namespace Music.Writer
             groupBox4.TabStop = false;
             groupBox4.Text = "Pitch Events";
             // 
-            // dgvPhrase
+            // button3
             // 
-            dgvPhrase.AllowUserToAddRows = false;
-            dgvPhrase.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
-            dgvPhrase.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvPhrase.Columns.AddRange(new DataGridViewColumn[] { col1, col2 });
-            dgvPhrase.Location = new Point(15, 19);
-            dgvPhrase.Name = "dgvPhrase";
-            dgvPhrase.Size = new Size(483, 334);
-            dgvPhrase.TabIndex = 37;
-            // 
-            // col1
-            // 
-            col1.HeaderText = "Column1";
-            col1.Name = "col1";
-            col1.Width = 81;
-            // 
-            // col2
-            // 
-            col2.HeaderText = "Column2";
-            col2.Name = "col2";
-            col2.Width = 81;
-            // 
-            // button1
-            // 
-            button1.ForeColor = Color.Red;
-            button1.Location = new Point(15, 367);
-            button1.Name = "button1";
-            button1.Size = new Size(72, 23);
-            button1.TabIndex = 32;
-            button1.Text = "Play";
-            button1.UseVisualStyleBackColor = true;
+            button3.ForeColor = Color.Red;
+            button3.Location = new Point(193, 365);
+            button3.Name = "button3";
+            button3.Size = new Size(72, 23);
+            button3.TabIndex = 39;
+            button3.Text = "Delete";
+            button3.UseVisualStyleBackColor = true;
             // 
             // button2
             // 
@@ -798,15 +776,52 @@ namespace Music.Writer
             button2.Text = "Clear";
             button2.UseVisualStyleBackColor = true;
             // 
-            // button3
+            // btnPlay
             // 
-            button3.ForeColor = Color.Red;
-            button3.Location = new Point(193, 365);
-            button3.Name = "button3";
-            button3.Size = new Size(72, 23);
-            button3.TabIndex = 39;
-            button3.Text = "Delete";
-            button3.UseVisualStyleBackColor = true;
+            btnPlay.ForeColor = Color.Red;
+            btnPlay.Location = new Point(15, 367);
+            btnPlay.Name = "btnPlay";
+            btnPlay.Size = new Size(72, 23);
+            btnPlay.TabIndex = 32;
+            btnPlay.Text = "Play";
+            btnPlay.UseVisualStyleBackColor = true;
+            btnPlay.Click += btnPlay_Click;
+            // 
+            // dgvPhrase
+            // 
+            dgvPhrase.AllowUserToAddRows = false;
+            dgvPhrase.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvPhrase.Columns.AddRange(new DataGridViewColumn[] { col1, col2, col3 });
+            dgvPhrase.Location = new Point(15, 19);
+            dgvPhrase.Name = "dgvPhrase";
+            dgvPhrase.ReadOnly = true;
+            dgvPhrase.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvPhrase.Size = new Size(554, 334);
+            dgvPhrase.TabIndex = 37;
+            // 
+            // col1
+            // 
+            col1.HeaderText = "#";
+            col1.MaxInputLength = 1000000;
+            col1.Name = "col1";
+            col1.ReadOnly = true;
+            col1.Visible = false;
+            col1.Width = 10;
+            // 
+            // col2
+            // 
+            col2.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            col2.FillWeight = 10F;
+            col2.HeaderText = "Description";
+            col2.Name = "col2";
+            col2.ReadOnly = true;
+            // 
+            // col3
+            // 
+            col3.HeaderText = "Phrase";
+            col3.Name = "col3";
+            col3.ReadOnly = true;
+            col3.Width = 300;
             // 
             // ConsoleForm
             // 
@@ -890,10 +905,11 @@ namespace Music.Writer
         private GroupBox groupBox4;
         private Button btnExecute;
         private DataGridView dgvPhrase;
-        private DataGridViewTextBoxColumn col1;
-        private DataGridViewTextBoxColumn col2;
-        private Button button1;
+        private Button btnPlay;
         private Button button3;
         private Button button2;
+        private DataGridViewTextBoxColumn col1;
+        private DataGridViewTextBoxColumn col2;
+        private DataGridViewTextBoxColumn col3;
     }
 }
