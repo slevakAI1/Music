@@ -101,10 +101,10 @@ namespace Music.Writer
             groupBox3 = new GroupBox();
             btnExecute = new Button();
             grbCurrentDesign = new GroupBox();
-            dataGridView1 = new DataGridView();
-            colName = new DataGridViewTextBoxColumn();
-            colEvents = new DataGridViewTextBoxColumn();
             groupBox4 = new GroupBox();
+            dgvPhrase = new DataGridView();
+            col1 = new DataGridViewTextBoxColumn();
+            col2 = new DataGridViewTextBoxColumn();
             grbParts.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -121,8 +121,8 @@ namespace Music.Writer
             grpScoreList.SuspendLayout();
             groupBox3.SuspendLayout();
             grbCurrentDesign.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             groupBox4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvPhrase).BeginInit();
             SuspendLayout();
             // 
             // cbPattern
@@ -736,31 +736,10 @@ namespace Music.Writer
             grbCurrentDesign.TabStop = false;
             grbCurrentDesign.Text = "Current Design";
             // 
-            // dataGridView1
-            // 
-            dataGridView1.AllowUserToOrderColumns = true;
-            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { colName, colEvents });
-            dataGridView1.Location = new Point(18, 14);
-            dataGridView1.Name = "dataGridView1";
-            dataGridView1.Size = new Size(1074, 382);
-            dataGridView1.TabIndex = 35;
-            // 
-            // colName
-            // 
-            colName.HeaderText = "Name";
-            colName.Name = "colName";
-            colName.ReadOnly = true;
-            // 
-            // colEvents
-            // 
-            colEvents.HeaderText = "Events";
-            colEvents.Name = "colEvents";
-            // 
             // groupBox4
             // 
             groupBox4.BackColor = Color.Black;
-            groupBox4.Controls.Add(dataGridView1);
+            groupBox4.Controls.Add(dgvPhrase);
             groupBox4.ForeColor = Color.White;
             groupBox4.Location = new Point(711, 14);
             groupBox4.Name = "groupBox4";
@@ -768,6 +747,26 @@ namespace Music.Writer
             groupBox4.TabIndex = 36;
             groupBox4.TabStop = false;
             groupBox4.Text = "Pitch Events";
+            // 
+            // dgvPhrase
+            // 
+            dgvPhrase.AllowUserToAddRows = false;
+            dgvPhrase.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvPhrase.Columns.AddRange(new DataGridViewColumn[] { col1, col2 });
+            dgvPhrase.Location = new Point(32, 149);
+            dgvPhrase.Name = "dgvPhrase";
+            dgvPhrase.Size = new Size(483, 115);
+            dgvPhrase.TabIndex = 37;
+            // 
+            // col1
+            // 
+            col1.HeaderText = "Column1";
+            col1.Name = "col1";
+            // 
+            // col2
+            // 
+            col2.HeaderText = "Column2";
+            col2.Name = "col2";
             // 
             // ConsoleForm
             // 
@@ -808,8 +807,8 @@ namespace Music.Writer
             groupBox3.ResumeLayout(false);
             grbCurrentDesign.ResumeLayout(false);
             grbCurrentDesign.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             groupBox4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgvPhrase).EndInit();
             ResumeLayout(false);
         }
         private GroupBox groupBox1;
@@ -848,10 +847,10 @@ namespace Music.Writer
         private TextBox txtTupletNumber;
         private GroupBox groupBox3;
         private GroupBox grbCurrentDesign;
-        private DataGridView dataGridView1;
-        private DataGridViewTextBoxColumn colName;
-        private DataGridViewTextBoxColumn colEvents;
         private GroupBox groupBox4;
         private Button btnExecute;
+        private DataGridView dgvPhrase;
+        private DataGridViewTextBoxColumn col1;
+        private DataGridViewTextBoxColumn col2;
     }
 }

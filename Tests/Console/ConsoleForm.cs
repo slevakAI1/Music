@@ -2,6 +2,7 @@ using Music.Designer;
 using MusicXml;
 using MusicXml.Domain;
 using System.Diagnostics.CodeAnalysis;
+using System.Windows.Forms;
 
 namespace Music.Writer
 {
@@ -11,6 +12,8 @@ namespace Music.Writer
         private Designer.Designer? _designer;
         private ConsoleData? _writer;
         private MeasureMeta _measureMeta;
+
+        private int pitchEventNumber = 0;
 
         //===========================   I N I T I A L I Z A T I O N   ===========================
         public ConsoleForm()
@@ -46,6 +49,9 @@ namespace Music.Writer
                 clbStaffs.SetItemChecked(0, true); // Check staff "1"
 
             cbPattern.SelectedIndex = 0;
+
+            // Configure dgvPhrases: disable placeholder row so programmatic adds are visible immediately
+            dgvPhrase.AllowUserToAddRows = false;
 
             // ====================   T H I S   H A S   T O   B E   L A S T  !   =================
 
@@ -115,20 +121,41 @@ namespace Music.Writer
                 return;
             }
 
-
-
             // THIS SHOULD NOW BE "CREATE PITCH EVENT" and and SHOW IN THE NEW CONTROL 
 
             var config = _writer.ToAppendPitchEventsParams();
 
-
-            // THIS SHOULD APPEND FROM WHATS SELECTED IN THE PITCH EVENTS CONTROL
-
+            // THIS SHOULD APPEND FROM WHATS SELECTED IN THE PHRASE  CONTROL
 
             AppendNotes.Execute(_scoreList[0], config, _measureMeta);
+
             txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
             Globals.ScoreList = _scoreList;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
         }
+
+        // THIS SHOULD CREATE PITCH EVENT and add to THE pitchevent datagridview CONTROL 
+        private void ExecuteCommandRepeatNoteChordRest()
+        {
+
+
+            dgvPhrase.DefaultCellStyle.ForeColor = Color.Black;
+            dgvPhrase.DefaultCellStyle.BackColor = Color.White;
+
+
+            // Get params for this command
+            _writer = CaptureFormData();
+            var phrase = _writer.ToAppendPitchEventsParams();
+
+            // Set phrase name/number
+            pitchEventNumber++;
+            var pitchEventName = pitchEventNumber.ToString();
+
+            // Add new row with explicit cell values
+            int newRowIndex = dgvPhrase.Rows.Add(pitchEventName, phrase);
+
+            //dgvPhrase.Refresh();
+        }
+
 
         private void btnUpdateFormFromDesigner_Click(object sender, EventArgs e)
         {
@@ -262,8 +289,7 @@ namespace Music.Writer
             switch (pattern)
             {
                 case "Repeat Note/Chord/Rest":
-                    // Then call MyFunction() - not defined yet leave as comment
-                    // TODO: call MyFunction(); when implemented
+                    ExecuteCommandRepeatNoteChordRest();
                     break;
 
                 // Add additional cases for other patterns as needed

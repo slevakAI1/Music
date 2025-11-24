@@ -103,6 +103,13 @@ namespace Music.Writer
             }
         }
 
+
+
+
+
+
+
+
         /// <summary>
         /// Converts Writer data to a AppendNotesParams for use with AppendNotes.
         /// Also adds notes per NumberOfNotes specified in writer data
