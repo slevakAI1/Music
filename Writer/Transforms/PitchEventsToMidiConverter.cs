@@ -11,7 +11,7 @@ namespace Music.Writer
     public static class PitchEventsToMidiConverter
     {
         /// <summary>
-        /// Converts pitch events to a MIDI document with default settings:
+        /// Converts a single pitch event config to a MIDI document with default settings:
         /// - Time signature: 4/4
         /// - Treble clef (not stored in MIDI, implied)
         /// - Tempo: 112 BPM
@@ -22,34 +22,82 @@ namespace Music.Writer
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
 
-            var midiFile = new MidiFile();
-            var trackChunk = new TrackChunk();
+            return Convert(new List<AppendPitchEventsParams> { config });
+        }
 
+        /// <summary>
+        /// Converts multiple pitch event configs to a MIDI document with separate tracks.
+        /// Each AppendPitchEventsParams becomes its own MIDI track.
+        /// Assumes:
+        /// - Only one staff is selected per config (either staff 1 or staff 2, not both)
+        /// - Only one part per config
+        /// Default settings:
+        /// - Time signature: 4/4
+        /// - Tempo: 112 BPM
+        /// </summary>
+        public static MidiSongDocument Convert(List<AppendPitchEventsParams> configs)
+        {
+            if (configs == null)
+                throw new ArgumentNullException(nameof(configs));
+
+            var midiFile = new MidiFile();
+            var ticksPerQuarterNote = (midiFile.TimeDivision as TicksPerQuarterNoteTimeDivision 
+                ?? new TicksPerQuarterNoteTimeDivision(480)).TicksPerQuarterNote;
+
+            // Set tempo and time signature globally (tempo track)
+            var tempoTrack = new TrackChunk();
+            
             // Set tempo: 112 BPM
-            // Tempo is in microseconds per quarter note: 60,000,000 / BPM
             var microsecondsPerQuarterNote = 60_000_000 / 112;
-            trackChunk.Events.Add(new SetTempoEvent(microsecondsPerQuarterNote));
+            tempoTrack.Events.Add(new SetTempoEvent(microsecondsPerQuarterNote));
 
             // Set time signature: 4/4
-            trackChunk.Events.Add(new TimeSignatureEvent(4, 4));
+            tempoTrack.Events.Add(new TimeSignatureEvent(4, 4));
 
-            // Set track name
-            trackChunk.Events.Add(new SequenceTrackNameEvent("Piano - Right Hand"));
+            midiFile.Chunks.Add(tempoTrack);
+
+            // Create a track for each config
+            int trackNumber = 1;
+            foreach (var config in configs)
+            {
+                var trackChunk = CreateTrackFromConfig(config, trackNumber, ticksPerQuarterNote);
+                midiFile.Chunks.Add(trackChunk);
+                trackNumber++;
+            }
+
+            return new MidiSongDocument(midiFile);
+        }
+
+        /// <summary>
+        /// Creates a single MIDI track from an AppendPitchEventsParams configuration.
+        /// </summary>
+        private static TrackChunk CreateTrackFromConfig(
+            AppendPitchEventsParams config, 
+            int trackNumber, 
+            short ticksPerQuarterNote)
+        {
+            var trackChunk = new TrackChunk();
+
+            // Determine track name from part and staff
+            var partName = config.Parts?.FirstOrDefault() ?? "Unknown";
+            var staffNumber = config.Staffs?.FirstOrDefault() ?? 1;
+            var trackName = $"{partName} - Staff {staffNumber}";
+            
+            trackChunk.Events.Add(new SequenceTrackNameEvent(trackName));
 
             // Set program change for piano (MIDI program 0)
+            // Could be customized based on part name in the future
             trackChunk.Events.Add(new ProgramChangeEvent((SevenBitNumber)0));
 
             // Convert pitch events to MIDI notes
             long currentTime = 0;
-            var ticksPerQuarterNote = midiFile.TimeDivision as TicksPerQuarterNoteTimeDivision 
-                ?? new TicksPerQuarterNoteTimeDivision(480);
 
             foreach (var pitchEvent in config.PitchEvents ?? Enumerable.Empty<PitchEvent>())
             {
                 if (pitchEvent.IsRest)
                 {
                     // For rests, just advance time without adding notes
-                    currentTime += CalculateDuration(pitchEvent, ticksPerQuarterNote.TicksPerQuarterNote);
+                    currentTime += CalculateDuration(pitchEvent, ticksPerQuarterNote);
                 }
                 else
                 {
@@ -59,7 +107,7 @@ namespace Music.Writer
                         pitchEvent.Alter, 
                         pitchEvent.Octave);
 
-                    var duration = CalculateDuration(pitchEvent, ticksPerQuarterNote.TicksPerQuarterNote);
+                    var duration = CalculateDuration(pitchEvent, ticksPerQuarterNote);
 
                     // Add Note On event
                     trackChunk.Events.Add(new NoteOnEvent(
@@ -77,9 +125,7 @@ namespace Music.Writer
                 }
             }
 
-            midiFile.Chunks.Add(trackChunk);
-
-            return new MidiSongDocument(midiFile);
+            return trackChunk;
         }
 
         /// <summary>
