@@ -1,8 +1,10 @@
 using Music.Designer;
 using MusicXml;
 using MusicXml.Domain;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Music.Tests;
 
@@ -157,10 +159,30 @@ namespace Music.Writer
 
             // Add new row with explicit cell values
             int newRowIndex = dgvPhrase.Rows.Add(pitchEventName, phrase);
+        }
 
-            var midiDoc = PitchEventsToMidiConverter.Convert(phrase);
+        /// <summary>
+        /// Converts the provided AppendPitchEventsParams to MIDI and plays it back.
+        /// Stops playback after the duration completes and releases the MIDI device.
+        /// This method is currently unreferenced.
+        /// </summary>
+        private async Task PlayMidiFromPitchEventsAsync(AppendPitchEventsParams config)
+        {
+            if (config == null) throw new ArgumentNullException(nameof(config));
 
-            // Play the generated MIDI document using the playback service.
+            // Convert to MIDI
+            var midiDoc = PitchEventsToMidiConverter.Convert(config);
+
+            // Stop any prior playback before starting new one
+            try
+            {
+                _midiPlaybackService.Stop();
+            }
+            catch
+            {
+                // Ignore errors from stopping - we'll still attempt to play
+            }
+
             try
             {
                 // Select first available output device if any
@@ -169,10 +191,30 @@ namespace Music.Writer
                     _midiPlaybackService.SelectOutput(devices[0]);
 
                 _midiPlaybackService.Play(midiDoc);
+
+                // Wait for the playback duration then stop to release the device
+                var duration = midiDoc?.Duration ?? TimeSpan.Zero;
+                var bufferMs = 250;
+                var delayMs = (long)Math.Min(int.MaxValue, Math.Max(0, duration.TotalMilliseconds) + bufferMs);
+
+                if (delayMs > 0)
+                    await Task.Delay((int)delayMs);
             }
             catch (Exception ex)
             {
                 MessageBox.Show(this, $"MIDI playback failed: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // Always attempt to stop and release resources when finished
+                try
+                {
+                    _midiPlaybackService.Stop();
+                }
+                catch (Exception exStop)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Warning stopping MIDI playback: {exStop.Message}");
+                }
             }
         }
 
