@@ -102,13 +102,14 @@ namespace Music.Writer
             btnExecute = new Button();
             grbCurrentDesign = new GroupBox();
             groupBox4 = new GroupBox();
-            button3 = new Button();
-            button2 = new Button();
-            btnPlay = new Button();
+            btnDeletePhrases = new Button();
+            btnClearPhrases = new Button();
+            btnPlayPhrases = new Button();
             dgvPhrase = new DataGridView();
             col1 = new DataGridViewTextBoxColumn();
             col2 = new DataGridViewTextBoxColumn();
             col3 = new DataGridViewTextBoxColumn();
+            btnAddPhrase = new Button();
             grbParts.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -744,9 +745,10 @@ namespace Music.Writer
             // groupBox4
             // 
             groupBox4.BackColor = Color.Black;
-            groupBox4.Controls.Add(button3);
-            groupBox4.Controls.Add(button2);
-            groupBox4.Controls.Add(btnPlay);
+            groupBox4.Controls.Add(btnAddPhrase);
+            groupBox4.Controls.Add(btnDeletePhrases);
+            groupBox4.Controls.Add(btnClearPhrases);
+            groupBox4.Controls.Add(btnPlayPhrases);
             groupBox4.Controls.Add(dgvPhrase);
             groupBox4.ForeColor = Color.White;
             groupBox4.Location = new Point(711, 14);
@@ -754,38 +756,38 @@ namespace Music.Writer
             groupBox4.Size = new Size(1104, 406);
             groupBox4.TabIndex = 36;
             groupBox4.TabStop = false;
-            groupBox4.Text = "Pitch Events";
+            groupBox4.Text = "Phrases";
             // 
-            // button3
+            // btnDeletePhrases
             // 
-            button3.ForeColor = Color.Red;
-            button3.Location = new Point(193, 365);
-            button3.Name = "button3";
-            button3.Size = new Size(72, 23);
-            button3.TabIndex = 39;
-            button3.Text = "Delete";
-            button3.UseVisualStyleBackColor = true;
+            btnDeletePhrases.ForeColor = Color.Red;
+            btnDeletePhrases.Location = new Point(281, 363);
+            btnDeletePhrases.Name = "btnDeletePhrases";
+            btnDeletePhrases.Size = new Size(72, 23);
+            btnDeletePhrases.TabIndex = 39;
+            btnDeletePhrases.Text = "Delete";
+            btnDeletePhrases.UseVisualStyleBackColor = true;
             // 
-            // button2
+            // btnClearPhrases
             // 
-            button2.ForeColor = Color.Red;
-            button2.Location = new Point(105, 365);
-            button2.Name = "button2";
-            button2.Size = new Size(72, 23);
-            button2.TabIndex = 38;
-            button2.Text = "Clear";
-            button2.UseVisualStyleBackColor = true;
+            btnClearPhrases.ForeColor = Color.Red;
+            btnClearPhrases.Location = new Point(193, 363);
+            btnClearPhrases.Name = "btnClearPhrases";
+            btnClearPhrases.Size = new Size(72, 23);
+            btnClearPhrases.TabIndex = 38;
+            btnClearPhrases.Text = "Clear";
+            btnClearPhrases.UseVisualStyleBackColor = true;
             // 
-            // btnPlay
+            // btnPlayPhrases
             // 
-            btnPlay.ForeColor = Color.Red;
-            btnPlay.Location = new Point(15, 367);
-            btnPlay.Name = "btnPlay";
-            btnPlay.Size = new Size(72, 23);
-            btnPlay.TabIndex = 32;
-            btnPlay.Text = "Play";
-            btnPlay.UseVisualStyleBackColor = true;
-            btnPlay.Click += btnPlay_Click;
+            btnPlayPhrases.ForeColor = Color.Red;
+            btnPlayPhrases.Location = new Point(103, 365);
+            btnPlayPhrases.Name = "btnPlayPhrases";
+            btnPlayPhrases.Size = new Size(72, 23);
+            btnPlayPhrases.TabIndex = 32;
+            btnPlayPhrases.Text = "Play";
+            btnPlayPhrases.UseVisualStyleBackColor = true;
+            btnPlayPhrases.Click += btnPlay_Click;
             // 
             // dgvPhrase
             // 
@@ -822,6 +824,16 @@ namespace Music.Writer
             col3.Name = "col3";
             col3.ReadOnly = true;
             col3.Width = 300;
+            // 
+            // btnAddPhrase
+            // 
+            btnAddPhrase.ForeColor = Color.Red;
+            btnAddPhrase.Location = new Point(15, 365);
+            btnAddPhrase.Name = "btnAddPhrase";
+            btnAddPhrase.Size = new Size(72, 23);
+            btnAddPhrase.TabIndex = 40;
+            btnAddPhrase.Text = "Add";
+            btnAddPhrase.UseVisualStyleBackColor = true;
             // 
             // ConsoleForm
             // 
@@ -905,11 +917,12 @@ namespace Music.Writer
         private GroupBox groupBox4;
         private Button btnExecute;
         private DataGridView dgvPhrase;
-        private Button btnPlay;
-        private Button button3;
-        private Button button2;
+        private Button btnPlayPhrases;
+        private Button btnDeletePhrases;
+        private Button btnClearPhrases;
         private DataGridViewTextBoxColumn col1;
         private DataGridViewTextBoxColumn col2;
         private DataGridViewTextBoxColumn col3;
+        private Button btnAddPhrase;
     }
 }
