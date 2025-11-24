@@ -2,7 +2,9 @@ using Music.Designer;
 using MusicXml;
 using MusicXml.Domain;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Windows.Forms;
+using Music.Tests;
 
 namespace Music.Writer
 {
@@ -13,6 +15,9 @@ namespace Music.Writer
         private ConsoleData? _writer;
         private MeasureMeta _measureMeta;
 
+        // playback service (reused for multiple play calls)
+        private IMidiPlaybackService _midiPlaybackService;
+
         private int pitchEventNumber = 0;
 
         //===========================   I N I T I A L I Z A T I O N   ===========================
@@ -22,6 +27,9 @@ namespace Music.Writer
 
             // Initialize MeasureMeta tracking object
             _measureMeta = new MeasureMeta();
+
+            // create playback service
+            _midiPlaybackService = new MidiPlaybackService();
 
             // Window behavior similar to other forms
             this.FormBorderStyle = FormBorderStyle.Sizable;
@@ -136,11 +144,8 @@ namespace Music.Writer
         // THIS SHOULD CREATE PITCH EVENT and add to THE pitchevent datagridview CONTROL 
         private void ExecuteCommandRepeatNoteChordRest()
         {
-
-
             dgvPhrase.DefaultCellStyle.ForeColor = Color.Black;
             dgvPhrase.DefaultCellStyle.BackColor = Color.White;
-
 
             // Get params for this command
             _writer = CaptureFormData();
@@ -154,10 +159,21 @@ namespace Music.Writer
             int newRowIndex = dgvPhrase.Rows.Add(pitchEventName, phrase);
 
             var midiDoc = PitchEventsToMidiConverter.Convert(phrase);
-            
-            // play here
 
+            // Play the generated MIDI document using the playback service.
+            try
+            {
+                // Select first available output device if any
+                var devices = _midiPlaybackService.EnumerateOutputDevices().ToList();
+                if (devices.Count > 0)
+                    _midiPlaybackService.SelectOutput(devices[0]);
 
+                _midiPlaybackService.Play(midiDoc);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, $"MIDI playback failed: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
 
