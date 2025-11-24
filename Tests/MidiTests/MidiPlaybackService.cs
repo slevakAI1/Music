@@ -14,18 +14,23 @@ namespace Music.Tests
 
         public void SelectOutput(string name)
         {
+            _outputDevice?.Dispose();
             _outputDevice = OutputDevice.GetAll().FirstOrDefault(d => d.Name == name);
         }
 
         public void Play(MidiSongDocument doc)
         {
-            // Use default output device (first available)
-            _outputDevice ??= OutputDevice.GetAll().FirstOrDefault();
+            // Stop any existing playback first
+            Stop();
+
+            // Get or create output device
+            if (_outputDevice == null)
+            {
+                _outputDevice = OutputDevice.GetAll().FirstOrDefault();
+            }
+
             if (_outputDevice == null)
                 return;
-
-            _playback?.Stop();
-            _playback?.Dispose();
 
             _playback = doc.Raw.GetPlayback(_outputDevice);
             _playback.Start();
@@ -36,6 +41,9 @@ namespace Music.Tests
             _playback?.Stop();
             _playback?.Dispose();
             _playback = null;
+
+            _outputDevice?.Dispose();
+            _outputDevice = null;
         }
     }
 }

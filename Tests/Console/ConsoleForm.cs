@@ -163,59 +163,38 @@ namespace Music.Writer
 
         /// <summary>
         /// Converts the provided AppendPitchEventsParams to MIDI and plays it back.
-        /// Stops playback after the duration completes and releases the MIDI device.
-        /// This method is currently unreferenced.
+        /// Stops and releases the MIDI device after playback completes.
         /// </summary>
         private async Task PlayMidiFromPitchEventsAsync(AppendPitchEventsParams config)
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
+            // Always stop any existing playback first
+            _midiPlaybackService.Stop();
+
             // Convert to MIDI
             var midiDoc = PitchEventsToMidiConverter.Convert(config);
 
-            // Stop any prior playback before starting new one
-            try
+            // Select first available output device
+            var devices = _midiPlaybackService.EnumerateOutputDevices().ToList();
+            if (devices.Count == 0)
             {
-                _midiPlaybackService.Stop();
-            }
-            catch
-            {
-                // Ignore errors from stopping - we'll still attempt to play
+                MessageBox.Show(this, "No MIDI output device found.", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
-            try
-            {
-                // Select first available output device if any
-                var devices = _midiPlaybackService.EnumerateOutputDevices().ToList();
-                if (devices.Count > 0)
-                    _midiPlaybackService.SelectOutput(devices[0]);
+            _midiPlaybackService.SelectOutput(devices[0]);
+            _midiPlaybackService.Play(midiDoc);
 
-                _midiPlaybackService.Play(midiDoc);
+            // Wait for playback duration plus buffer
+            var duration = midiDoc?.Duration ?? TimeSpan.Zero;
+            var totalDelay = duration.TotalMilliseconds + 250;
+            
+            if (totalDelay > 0)
+                await Task.Delay((int)Math.Min(totalDelay, int.MaxValue));
 
-                // Wait for the playback duration then stop to release the device
-                var duration = midiDoc?.Duration ?? TimeSpan.Zero;
-                var bufferMs = 250;
-                var delayMs = (long)Math.Min(int.MaxValue, Math.Max(0, duration.TotalMilliseconds) + bufferMs);
-
-                if (delayMs > 0)
-                    await Task.Delay((int)delayMs);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(this, $"MIDI playback failed: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                // Always attempt to stop and release resources when finished
-                try
-                {
-                    _midiPlaybackService.Stop();
-                }
-                catch (Exception exStop)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Warning stopping MIDI playback: {exStop.Message}");
-                }
-            }
+            // Always stop to release resources
+            _midiPlaybackService.Stop();
         }
 
 
@@ -370,24 +349,30 @@ namespace Music.Writer
                 return;
             }
 
-            // Get the AppendPitchEventsParams from the first row, first column (index 0)
-            var firstRow = dgvPhrase.Rows[0];
-            var cellValue = firstRow.Cells[0].Value;
-
-            if (cellValue is AppendPitchEventsParams config)
+            // Check if a row is selected
+            if (dgvPhrase.SelectedRows.Count == 0)
             {
-                try
-                {
-                    await PlayMidiFromPitchEventsAsync(config);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(this, $"Error playing MIDI: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                MessageBox.Show(this, "Please select a pitch event to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
             }
-            else
+
+            // Get the AppendPitchEventsParams from the selected row, first column (index 0)
+            var selectedRow = dgvPhrase.SelectedRows[0];
+            var cellValue = selectedRow.Cells[0].Value;
+
+            if (cellValue is not AppendPitchEventsParams config)
             {
-                MessageBox.Show(this, "Invalid data in the first row.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(this, "Invalid data in the selected row.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                await PlayMidiFromPitchEventsAsync(config);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, $"Error playing MIDI: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
