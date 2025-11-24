@@ -142,7 +142,7 @@ namespace Music.Writer
             grbParts.Controls.Add(lblStaff);
             grbParts.Controls.Add(clbStaffs);
             grbParts.ForeColor = Color.White;
-            grbParts.Location = new Point(1369, 428);
+            grbParts.Location = new Point(1354, 719);
             grbParts.Name = "grbParts";
             grbParts.Size = new Size(322, 174);
             grbParts.TabIndex = 2;
@@ -191,9 +191,9 @@ namespace Music.Writer
             // btnAppend
             // 
             btnAppend.ForeColor = Color.Red;
-            btnAppend.Location = new Point(1064, 434);
+            btnAppend.Location = new Point(737, 437);
             btnAppend.Name = "btnAppend";
-            btnAppend.Size = new Size(270, 22);
+            btnAppend.Size = new Size(236, 22);
             btnAppend.TabIndex = 4;
             btnAppend.Text = "Append Selected Pitch Events to Score";
             btnAppend.UseVisualStyleBackColor = true;
@@ -690,7 +690,7 @@ namespace Music.Writer
             grpScoreList.Controls.Add(lblScoreReport);
             grpScoreList.Controls.Add(txtScoreReport);
             grpScoreList.ForeColor = Color.White;
-            grpScoreList.Location = new Point(386, 434);
+            grpScoreList.Location = new Point(386, 527);
             grpScoreList.Name = "grpScoreList";
             grpScoreList.Size = new Size(306, 362);
             grpScoreList.TabIndex = 31;
@@ -729,7 +729,7 @@ namespace Music.Writer
             grbCurrentDesign.Controls.Add(txtDesignerReport);
             grbCurrentDesign.Controls.Add(btnSetDesignTestScenarioD1);
             grbCurrentDesign.ForeColor = Color.White;
-            grbCurrentDesign.Location = new Point(698, 435);
+            grbCurrentDesign.Location = new Point(698, 528);
             grbCurrentDesign.Name = "grbCurrentDesign";
             grbCurrentDesign.Size = new Size(351, 167);
             grbCurrentDesign.TabIndex = 34;
