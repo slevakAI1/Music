@@ -108,6 +108,7 @@ namespace Music.Writer
             btnPlayPhrases = new Button();
             dgvPhrase = new DataGridView();
             col1 = new DataGridViewTextBoxColumn();
+            colPart = new DataGridViewTextBoxColumn();
             col2 = new DataGridViewTextBoxColumn();
             col3 = new DataGridViewTextBoxColumn();
             grbParts.SuspendLayout();
@@ -804,7 +805,7 @@ namespace Music.Writer
             dgvPhrase.AllowUserToAddRows = false;
             dgvPhrase.AllowUserToResizeColumns = true;
             dgvPhrase.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvPhrase.Columns.AddRange(new DataGridViewColumn[] { col1, col2, col3 });
+            dgvPhrase.Columns.AddRange(new DataGridViewColumn[] { col1, colPart, col2, col3 });
             dgvPhrase.Location = new Point(15, 19);
             dgvPhrase.Name = "dgvPhrase";
             dgvPhrase.ReadOnly = true;
@@ -821,6 +822,14 @@ namespace Music.Writer
             col1.ReadOnly = true;
             col1.Visible = false;
             col1.Width = 39;
+            // 
+            // colPart
+            // 
+            colPart.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colPart.HeaderText = "Part";
+            colPart.Name = "colPart";
+            colPart.ReadOnly = true;
+            colPart.Width = 100;
             // 
             // col2
             // 
@@ -926,6 +935,7 @@ namespace Music.Writer
         private Button btnClearPhrases;
         private Button btnAddPhrase;
         private DataGridViewTextBoxColumn col1;
+        private DataGridViewTextBoxColumn colPart;
         private DataGridViewTextBoxColumn col2;
         private DataGridViewTextBoxColumn col3;
     }

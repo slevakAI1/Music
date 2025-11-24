@@ -157,8 +157,12 @@ namespace Music.Writer
             pitchEventNumber++;
             var pitchEventName = pitchEventNumber.ToString();
 
+            // Get part name from the phrase (assuming first part)
+            var partName = phrase.Parts?.FirstOrDefault() ?? "Unknown";
+
             // Add new row with explicit cell values
-            int newRowIndex = dgvPhrase.Rows.Add(phrase, pitchEventName, "tbd");
+            // Column order: col1 (phrase data), colPart (part name), col2 (description), col3 (phrase text)
+            int newRowIndex = dgvPhrase.Rows.Add(phrase, partName, pitchEventName, "tbd");
         }
 
         /// <summary>
