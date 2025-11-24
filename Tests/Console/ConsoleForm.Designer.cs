@@ -102,6 +102,7 @@ namespace Music.Writer
             btnExecute = new Button();
             grbCurrentDesign = new GroupBox();
             groupBox4 = new GroupBox();
+            btnAddPhrase = new Button();
             btnDeletePhrases = new Button();
             btnClearPhrases = new Button();
             btnPlayPhrases = new Button();
@@ -109,7 +110,6 @@ namespace Music.Writer
             col1 = new DataGridViewTextBoxColumn();
             col2 = new DataGridViewTextBoxColumn();
             col3 = new DataGridViewTextBoxColumn();
-            btnAddPhrase = new Button();
             grbParts.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -217,7 +217,7 @@ namespace Music.Writer
             grpPitch.Controls.Add(grpAbsolute);
             grpPitch.Controls.Add(grpKeyRelative);
             grpPitch.ForeColor = Color.White;
-            grpPitch.Location = new Point(12, 301);
+            grpPitch.Location = new Point(432, 480);
             grpPitch.Name = "grpPitch";
             grpPitch.Size = new Size(325, 393);
             grpPitch.TabIndex = 3;
@@ -482,7 +482,7 @@ namespace Music.Writer
             groupBox1.Controls.Add(lblTupletOf);
             groupBox1.Controls.Add(numTupletOf);
             groupBox1.ForeColor = Color.White;
-            groupBox1.Location = new Point(12, 121);
+            groupBox1.Location = new Point(60, 677);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(325, 174);
             groupBox1.TabIndex = 6;
@@ -696,7 +696,7 @@ namespace Music.Writer
             grpScoreList.Controls.Add(lblScoreReport);
             grpScoreList.Controls.Add(txtScoreReport);
             grpScoreList.ForeColor = Color.White;
-            grpScoreList.Location = new Point(508, 527);
+            grpScoreList.Location = new Point(992, 527);
             grpScoreList.Name = "grpScoreList";
             grpScoreList.Size = new Size(306, 362);
             grpScoreList.TabIndex = 31;
@@ -711,9 +711,9 @@ namespace Music.Writer
             groupBox3.Controls.Add(btnExportToNotion);
             groupBox3.Controls.Add(btnSetWriterTestScenarioG1);
             groupBox3.ForeColor = Color.White;
-            groupBox3.Location = new Point(12, 12);
+            groupBox3.Location = new Point(12, 561);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(516, 100);
+            groupBox3.Size = new Size(403, 100);
             groupBox3.TabIndex = 33;
             groupBox3.TabStop = false;
             groupBox3.Text = "Command";
@@ -735,7 +735,7 @@ namespace Music.Writer
             grbCurrentDesign.Controls.Add(txtDesignerReport);
             grbCurrentDesign.Controls.Add(btnSetDesignTestScenarioD1);
             grbCurrentDesign.ForeColor = Color.White;
-            grbCurrentDesign.Location = new Point(954, 594);
+            grbCurrentDesign.Location = new Point(1340, 538);
             grbCurrentDesign.Name = "grbCurrentDesign";
             grbCurrentDesign.Size = new Size(351, 167);
             grbCurrentDesign.TabIndex = 34;
@@ -751,12 +751,22 @@ namespace Music.Writer
             groupBox4.Controls.Add(btnPlayPhrases);
             groupBox4.Controls.Add(dgvPhrase);
             groupBox4.ForeColor = Color.White;
-            groupBox4.Location = new Point(711, 14);
+            groupBox4.Location = new Point(12, 12);
             groupBox4.Name = "groupBox4";
-            groupBox4.Size = new Size(1104, 406);
+            groupBox4.Size = new Size(1582, 406);
             groupBox4.TabIndex = 36;
             groupBox4.TabStop = false;
             groupBox4.Text = "Phrases";
+            // 
+            // btnAddPhrase
+            // 
+            btnAddPhrase.ForeColor = Color.Red;
+            btnAddPhrase.Location = new Point(15, 365);
+            btnAddPhrase.Name = "btnAddPhrase";
+            btnAddPhrase.Size = new Size(72, 23);
+            btnAddPhrase.TabIndex = 40;
+            btnAddPhrase.Text = "Add";
+            btnAddPhrase.UseVisualStyleBackColor = true;
             // 
             // btnDeletePhrases
             // 
@@ -792,48 +802,42 @@ namespace Music.Writer
             // dgvPhrase
             // 
             dgvPhrase.AllowUserToAddRows = false;
+            dgvPhrase.AllowUserToResizeColumns = true;
             dgvPhrase.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvPhrase.Columns.AddRange(new DataGridViewColumn[] { col1, col2, col3 });
             dgvPhrase.Location = new Point(15, 19);
             dgvPhrase.Name = "dgvPhrase";
             dgvPhrase.ReadOnly = true;
             dgvPhrase.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvPhrase.Size = new Size(554, 334);
+            dgvPhrase.Size = new Size(1532, 334);
             dgvPhrase.TabIndex = 37;
             // 
             // col1
             // 
+            col1.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             col1.HeaderText = "#";
             col1.MaxInputLength = 1000000;
             col1.Name = "col1";
             col1.ReadOnly = true;
             col1.Visible = false;
-            col1.Width = 10;
+            col1.Width = 39;
             // 
             // col2
             // 
-            col2.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            col2.FillWeight = 10F;
+            col2.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            col2.FillWeight = 33.33F;
             col2.HeaderText = "Description";
             col2.Name = "col2";
             col2.ReadOnly = true;
+            col2.Width = 200;
             // 
             // col3
             // 
+            col3.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            col3.FillWeight = 66.67F;
             col3.HeaderText = "Phrase";
             col3.Name = "col3";
             col3.ReadOnly = true;
-            col3.Width = 300;
-            // 
-            // btnAddPhrase
-            // 
-            btnAddPhrase.ForeColor = Color.Red;
-            btnAddPhrase.Location = new Point(15, 365);
-            btnAddPhrase.Name = "btnAddPhrase";
-            btnAddPhrase.Size = new Size(72, 23);
-            btnAddPhrase.TabIndex = 40;
-            btnAddPhrase.Text = "Add";
-            btnAddPhrase.UseVisualStyleBackColor = true;
             // 
             // ConsoleForm
             // 
@@ -920,9 +924,9 @@ namespace Music.Writer
         private Button btnPlayPhrases;
         private Button btnDeletePhrases;
         private Button btnClearPhrases;
+        private Button btnAddPhrase;
         private DataGridViewTextBoxColumn col1;
         private DataGridViewTextBoxColumn col2;
         private DataGridViewTextBoxColumn col3;
-        private Button btnAddPhrase;
     }
 }
