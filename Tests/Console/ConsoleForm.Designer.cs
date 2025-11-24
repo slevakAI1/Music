@@ -751,9 +751,10 @@ namespace Music.Writer
             // dgvPhrase
             // 
             dgvPhrase.AllowUserToAddRows = false;
+            dgvPhrase.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
             dgvPhrase.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvPhrase.Columns.AddRange(new DataGridViewColumn[] { col1, col2 });
-            dgvPhrase.Location = new Point(32, 149);
+            dgvPhrase.Location = new Point(15, 19);
             dgvPhrase.Name = "dgvPhrase";
             dgvPhrase.Size = new Size(483, 115);
             dgvPhrase.TabIndex = 37;
@@ -762,11 +763,13 @@ namespace Music.Writer
             // 
             col1.HeaderText = "Column1";
             col1.Name = "col1";
+            col1.Width = 81;
             // 
             // col2
             // 
             col2.HeaderText = "Column2";
             col2.Name = "col2";
+            col2.Width = 81;
             // 
             // ConsoleForm
             // 

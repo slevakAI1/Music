@@ -153,7 +153,11 @@ namespace Music.Writer
             // Add new row with explicit cell values
             int newRowIndex = dgvPhrase.Rows.Add(pitchEventName, phrase);
 
-            //dgvPhrase.Refresh();
+            var midiDoc = PitchEventsToMidiConverter.Convert(phrase);
+            
+            // play here
+
+
         }
 
 
