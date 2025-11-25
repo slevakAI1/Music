@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Music.Tests;
+using Music.Domain;
 
 namespace Music.Writer
 {
@@ -22,6 +23,9 @@ namespace Music.Writer
 
         private int pitchEventNumber = 0;
 
+        // MIDI instrument list for dropdown
+        private List<MidiInstrument> _midiInstruments;
+
         //===========================   I N I T I A L I Z A T I O N   ===========================
         public ConsoleForm()
         {
@@ -32,6 +36,9 @@ namespace Music.Writer
 
             // create playback service
             _midiPlaybackService = new MidiPlaybackService();
+
+            // Initialize MIDI instruments list
+            _midiInstruments = MidiInstrument.GetGeneralMidiInstruments();
 
             // Window behavior similar to other forms
             this.FormBorderStyle = FormBorderStyle.Sizable;
@@ -60,14 +67,82 @@ namespace Music.Writer
 
             cbPattern.SelectedIndex = 0;
 
-            // Configure dgvPhrases: disable placeholder row so programmatic adds are visible immediately
-            dgvPhrase.AllowUserToAddRows = false;
+            // Configure dgvPhrases with MIDI instrument dropdown
+            ConfigurePhraseDataGridView();
 
             // ====================   T H I S   H A S   T O   B E   L A S T  !   =================
 
             // Capture form control values manually set in the form designer
             // This will only be done once, at form construction time.
             _writer ??= CaptureFormData();
+        }
+
+        /// <summary>
+        /// Configures the dgvPhrase DataGridView with proper columns including MIDI instrument dropdown.
+        /// </summary>
+        private void ConfigurePhraseDataGridView()
+        {
+            dgvPhrase.AllowUserToAddRows = false;
+            dgvPhrase.AllowUserToResizeColumns = true;
+            dgvPhrase.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvPhrase.MultiSelect = false;
+            dgvPhrase.ReadOnly = false; // Allow editing the combo box column
+            dgvPhrase.Columns.Clear();
+
+            // Column 0: Hidden column containing the AppendPitchEventsParams object
+            var colData = new DataGridViewTextBoxColumn
+            {
+                Name = "colData",
+                HeaderText = "Data",
+                Visible = false,
+                ReadOnly = true
+            };
+            dgvPhrase.Columns.Add(colData);
+
+            // Column 1: MIDI Instrument dropdown (editable)
+            var colInstrument = new DataGridViewComboBoxColumn
+            {
+                Name = "colInstrument",
+                HeaderText = "Instrument",
+                Width = 200,
+                DataSource = new List<MidiInstrument>(_midiInstruments),
+                DisplayMember = "Name",
+                ValueMember = "ProgramNumber",
+                DisplayStyle = DataGridViewComboBoxDisplayStyle.Nothing,
+                FlatStyle = FlatStyle.Flat,
+                ReadOnly = false
+            };
+            dgvPhrase.Columns.Add(colInstrument);
+
+            // Column 2: Event number (read-only)
+            var colEventNumber = new DataGridViewTextBoxColumn
+            {
+                Name = "colEventNumber",
+                HeaderText = "#",
+                Width = 50,
+                ReadOnly = true
+            };
+            dgvPhrase.Columns.Add(colEventNumber);
+
+            // Column 3: Description (read-only for now)
+            var colDescription = new DataGridViewTextBoxColumn
+            {
+                Name = "colDescription",
+                HeaderText = "Description",
+                Width = 300,
+                ReadOnly = true
+            };
+            dgvPhrase.Columns.Add(colDescription);
+
+            // Column 4: Phrase details (fills remaining space)
+            var colPhrase = new DataGridViewTextBoxColumn
+            {
+                Name = "colPhrase",
+                HeaderText = "Phrase",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                ReadOnly = true
+            };
+            dgvPhrase.Columns.Add(colPhrase);
         }
 
         protected override void OnShown(EventArgs e)
@@ -160,9 +235,24 @@ namespace Music.Writer
             // Get part name from the phrase (assuming first part)
             var partName = phrase.Parts?.FirstOrDefault() ?? "Unknown";
 
-            // Add new row with explicit cell values
-            // Column order: col1 (phrase data), colPart (part name), col2 (description), col3 (phrase text)
-            int newRowIndex = dgvPhrase.Rows.Add(phrase, partName, pitchEventName, "tbd");
+            // Add new row
+            int newRowIndex = dgvPhrase.Rows.Add();
+            var row = dgvPhrase.Rows[newRowIndex];
+
+            // Column 0: Hidden data (AppendPitchEventsParams object)
+            row.Cells["colData"].Value = phrase;
+
+            // Column 1: MIDI Instrument dropdown - leave null for "Select Instrument" prompt
+            row.Cells["colInstrument"].Value = null;
+
+            // Column 2: Event number
+            row.Cells["colEventNumber"].Value = pitchEventName;
+
+            // Column 3: Description
+            row.Cells["colDescription"].Value = $"Part: {partName}";
+
+            // Column 4: Phrase details (placeholder)
+            row.Cells["colPhrase"].Value = "tbd";
         }
 
         /// <summary>
@@ -360,9 +450,9 @@ namespace Music.Writer
                 return;
             }
 
-            // Get the AppendPitchEventsParams from the selected row, first column (index 0)
+            // Get the AppendPitchEventsParams from the selected row, first column (colData)
             var selectedRow = dgvPhrase.SelectedRows[0];
-            var cellValue = selectedRow.Cells[0].Value;
+            var cellValue = selectedRow.Cells["colData"].Value;
 
             if (cellValue is not AppendPitchEventsParams config)
             {
@@ -378,6 +468,35 @@ namespace Music.Writer
             {
                 MessageBox.Show(this, $"Error playing MIDI: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        /// <summary>
+        /// Gets the selected MIDI instrument program number for a given row.
+        /// Returns null if no valid selection exists.
+        /// </summary>
+        private byte? GetSelectedMidiProgram(int rowIndex)
+        {
+            if (rowIndex < 0 || rowIndex >= dgvPhrase.Rows.Count)
+                return null;
+
+            var cell = dgvPhrase.Rows[rowIndex].Cells["colInstrument"];
+            if (cell.Value is byte programNumber)
+                return programNumber;
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the selected MIDI instrument for a given row.
+        /// Returns null if no valid selection exists.
+        /// </summary>
+        private MidiInstrument? GetSelectedMidiInstrument(int rowIndex)
+        {
+            var programNumber = GetSelectedMidiProgram(rowIndex);
+            if (programNumber == null)
+                return null;
+
+            return _midiInstruments.FirstOrDefault(i => i.ProgramNumber == programNumber.Value);
         }
     }
 }
