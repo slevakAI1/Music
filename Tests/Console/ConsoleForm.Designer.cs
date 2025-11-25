@@ -3,7 +3,7 @@ namespace Music.Writer
     partial class ConsoleForm
     {
         private System.ComponentModel.IContainer components = null;
-        private System.Windows.Forms.ComboBox cbPattern;
+        private System.Windows.Forms.ComboBox cbCommand;
 
         private System.Windows.Forms.GroupBox grbParts;
         private System.Windows.Forms.CheckedListBox clbParts;
@@ -44,7 +44,7 @@ namespace Music.Writer
 
         private void InitializeComponent()
         {
-            cbPattern = new ComboBox();
+            cbCommand = new ComboBox();
             grbParts = new GroupBox();
             lblPart = new Label();
             clbParts = new CheckedListBox();
@@ -133,12 +133,12 @@ namespace Music.Writer
             // 
             // cbPattern
             // 
-            cbPattern.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbPattern.Items.AddRange(new object[] { "Repeat Note/Chord/Rest" });
-            cbPattern.Location = new Point(13, 22);
-            cbPattern.Name = "cbPattern";
-            cbPattern.Size = new Size(250, 23);
-            cbPattern.TabIndex = 1;
+            cbCommand.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbCommand.Items.AddRange(new object[] { "Repeat Note/Chord/Rest" });
+            cbCommand.Location = new Point(13, 22);
+            cbCommand.Name = "cbPattern";
+            cbCommand.Size = new Size(250, 23);
+            cbCommand.TabIndex = 1;
             // 
             // grbParts
             // 
@@ -147,8 +147,8 @@ namespace Music.Writer
             grbParts.Controls.Add(clbParts);
             grbParts.Controls.Add(lblStaff);
             grbParts.Controls.Add(clbStaffs);
-            grbParts.ForeColor = Color.White;
-            grbParts.Location = new Point(1580, 821);
+            grbParts.ForeColor = Color.FromArgb(255, 128, 0);
+            grbParts.Location = new Point(1580, 751);
             grbParts.Name = "grbParts";
             grbParts.Size = new Size(322, 174);
             grbParts.TabIndex = 2;
@@ -158,7 +158,7 @@ namespace Music.Writer
             // lblPart
             // 
             lblPart.AutoSize = true;
-            lblPart.ForeColor = Color.FromArgb(0, 192, 0);
+            lblPart.ForeColor = Color.FromArgb(255, 128, 0);
             lblPart.Location = new Point(15, 27);
             lblPart.Name = "lblPart";
             lblPart.Size = new Size(70, 15);
@@ -177,7 +177,7 @@ namespace Music.Writer
             // lblStaff
             // 
             lblStaff.AutoSize = true;
-            lblStaff.ForeColor = Color.FromArgb(0, 192, 0);
+            lblStaff.ForeColor = Color.FromArgb(255, 128, 0);
             lblStaff.Location = new Point(15, 132);
             lblStaff.Name = "lblStaff";
             lblStaff.Size = new Size(34, 15);
@@ -630,7 +630,7 @@ namespace Music.Writer
             // 
             btnChordTest.Enabled = false;
             btnChordTest.ForeColor = Color.Red;
-            btnChordTest.Location = new Point(1706, 789);
+            btnChordTest.Location = new Point(1706, 719);
             btnChordTest.Name = "btnChordTest";
             btnChordTest.Size = new Size(196, 23);
             btnChordTest.TabIndex = 11;
@@ -642,7 +642,7 @@ namespace Music.Writer
             // 
             btnUpdateFormFromDesigner.Enabled = false;
             btnUpdateFormFromDesigner.ForeColor = Color.Red;
-            btnUpdateFormFromDesigner.Location = new Point(1706, 760);
+            btnUpdateFormFromDesigner.Location = new Point(1706, 690);
             btnUpdateFormFromDesigner.Name = "btnUpdateFormFromDesigner";
             btnUpdateFormFromDesigner.Size = new Size(196, 23);
             btnUpdateFormFromDesigner.TabIndex = 13;
@@ -682,7 +682,7 @@ namespace Music.Writer
             // btnExportToNotion
             // 
             btnExportToNotion.ForeColor = Color.FromArgb(0, 192, 0);
-            btnExportToNotion.Location = new Point(1706, 692);
+            btnExportToNotion.Location = new Point(1706, 661);
             btnExportToNotion.Name = "btnExportToNotion";
             btnExportToNotion.Size = new Size(114, 23);
             btnExportToNotion.TabIndex = 30;
@@ -697,7 +697,7 @@ namespace Music.Writer
             grpScoreList.Controls.Add(lblScoreReport);
             grpScoreList.Controls.Add(txtScoreReport);
             grpScoreList.ForeColor = Color.White;
-            grpScoreList.Location = new Point(1014, 695);
+            grpScoreList.Location = new Point(1014, 661);
             grpScoreList.Name = "grpScoreList";
             grpScoreList.Size = new Size(351, 267);
             grpScoreList.TabIndex = 31;
@@ -708,7 +708,7 @@ namespace Music.Writer
             // 
             groupBox3.BackColor = SystemColors.ActiveCaptionText;
             groupBox3.Controls.Add(btnExecute);
-            groupBox3.Controls.Add(cbPattern);
+            groupBox3.Controls.Add(cbCommand);
             groupBox3.ForeColor = Color.White;
             groupBox3.Location = new Point(12, 431);
             groupBox3.Name = "groupBox3";
@@ -733,7 +733,7 @@ namespace Music.Writer
             grbCurrentDesign.BackColor = Color.Black;
             grbCurrentDesign.Controls.Add(txtDesignerReport);
             grbCurrentDesign.ForeColor = Color.White;
-            grbCurrentDesign.Location = new Point(1014, 508);
+            grbCurrentDesign.Location = new Point(1014, 474);
             grbCurrentDesign.Name = "grbCurrentDesign";
             grbCurrentDesign.Size = new Size(351, 167);
             grbCurrentDesign.TabIndex = 34;

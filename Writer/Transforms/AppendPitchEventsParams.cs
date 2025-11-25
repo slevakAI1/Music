@@ -14,4 +14,18 @@
         // List of notes to insert
         public List<PitchEvent> PitchEvents { get; set; } = new();
     }
+
+    /// <summary>
+    /// Configuration extracted from Writer for easier processing by SetNotes.
+    /// </summary>
+    public sealed class Phrase
+    {
+        // TARGETS
+        public string Parts { get; set; }
+        public string midiProgramNumber { get; set; }
+        public List<PitchEvent> PitchEvents { get; set; } = new();
+    }
 }
+
+
+

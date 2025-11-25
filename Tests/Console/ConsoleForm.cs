@@ -1,13 +1,8 @@
 using Music.Designer;
+using Music.Domain;
+using Music.Tests;
 using MusicXml;
 using MusicXml.Domain;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Music.Tests;
-using Music.Domain;
 
 namespace Music.Writer
 {
@@ -54,6 +49,9 @@ namespace Music.Writer
             _designer = Globals.Designer;
             txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
 
+            dgvPhrase.DefaultCellStyle.ForeColor = Color.Black; // had trouble setting this in the forms designer
+            dgvPhrase.DefaultCellStyle.BackColor = Color.White;
+
 
             // Initialize comboboxes - doesn't seem to be a way to set a default in the designer or form.
             // The changes keep getting discarded. wtf?
@@ -65,7 +63,7 @@ namespace Music.Writer
             if (clbStaffs != null && clbStaffs.Items.Count > 0)
                 clbStaffs.SetItemChecked(0, true); // Check staff "1"
 
-            cbPattern.SelectedIndex = 0;
+            cbCommand.SelectedIndex = 0;
 
             // Configure dgvPhrases with MIDI instrument dropdown
             ConfigurePhraseDataGridView();
@@ -218,15 +216,18 @@ namespace Music.Writer
             Globals.ScoreList = _scoreList;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
         }
 
-        // THIS SHOULD CREATE PITCH EVENT and add to THE pitchevent datagridview CONTROL 
+        //  Adds to THE dgvPhrase datagridview CONTROL 
         private void ExecuteCommandRepeatNoteChordRest()
         {
-            dgvPhrase.DefaultCellStyle.ForeColor = Color.Black;
-            dgvPhrase.DefaultCellStyle.BackColor = Color.White;
-
             // Get params for this command
             _writer = CaptureFormData();
+
+
+            // THIS NEEDS TO BE TOPHRASE. KEEP THE CURRENT ONE FOR XML MAY BE NEEDED
             var phrase = _writer.ToAppendPitchEventsParams();
+
+
+
 
             // Set phrase name/number
             pitchEventNumber++;
@@ -417,9 +418,10 @@ namespace Music.Writer
             }
         }
 
+        // Branch on Command
         private void btnExecute_Click(object sender, EventArgs e)
         {
-            var pattern = cbPattern?.Text?.Trim() ?? string.Empty;
+            var pattern = cbCommand?.Text?.Trim() ?? string.Empty;
             if (string.IsNullOrEmpty(pattern))
                 return;
 

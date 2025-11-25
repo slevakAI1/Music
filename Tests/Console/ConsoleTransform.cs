@@ -61,7 +61,7 @@ namespace Music.Writer
             var data = new ConsoleData
             {
                 // Pattern
-                Pattern = cbPattern?.SelectedItem?.ToString(),
+                Pattern = cbCommand?.SelectedItem?.ToString(),
 
                 // New: store the full items -> checked state map
                 PartsState = partsState,
@@ -105,8 +105,8 @@ namespace Music.Writer
             if (data == null) return;
 
             // Pattern
-            if (data.Pattern != null && cbPattern != null && cbPattern.Items.Contains(data.Pattern))
-                cbPattern.SelectedItem = data.Pattern;
+            if (data.Pattern != null && cbCommand != null && cbCommand.Items.Contains(data.Pattern))
+                cbCommand.SelectedItem = data.Pattern;
 
             // Parts - if provided, set checked state for matching items
             if (data.PartsState != null && data.PartsState.Count > 0 && clbParts != null)
