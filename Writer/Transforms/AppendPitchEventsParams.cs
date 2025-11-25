@@ -21,8 +21,9 @@
     public sealed class Phrase
     {
         // TARGETS
-        public string Parts { get; set; }
-        public string midiProgramNumber { get; set; }
+        public string MidiPartName { get; set; }
+        public string NotionPartName { get; set; }
+        public string MidiProgramNumber { get; set; }
         public List<PitchEvent> PitchEvents { get; set; } = new();
     }
 }
