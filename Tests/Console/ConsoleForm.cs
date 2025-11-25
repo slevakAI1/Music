@@ -451,13 +451,23 @@ namespace Music.Writer
                 return;
             }
 
+
+
+
+
+
+            //=======================================================================================================
+
+
+
             // Get the AppendPitchEventsParams from the selected row, first column (colData)
             var selectedRow = dgvPhrase.SelectedRows[0];
             var cellValue = selectedRow.Cells["colData"].Value;
 
             // Get the selected MIDI program number (byte) and instrument name
-            var selectedProgramNumber = (byte)dgvPhrase.SelectedRows[0].Cells["colInstrument"].Value;
+            //var selectedProgramNumber = (byte)dgvPhrase.SelectedRows[0].Cells["colInstrument"].Value;
             var selectedInstrumentName = dgvPhrase.SelectedRows[0].Cells["colInstrument"].FormattedValue?.ToString() ?? "Acoustic Grand Piano";
+
 
             if (cellValue is not AppendPitchEventsParams config)
             {
@@ -468,6 +478,17 @@ namespace Music.Writer
             // Update the part name with the selected instrument name
             config.Parts.Clear();
             config.Parts.Add(selectedInstrumentName); // this is Part][0] for now
+
+
+
+            //=======================================================================================================
+
+
+
+
+
+
+
 
             try
             {
