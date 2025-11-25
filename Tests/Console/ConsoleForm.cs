@@ -16,7 +16,7 @@ namespace Music.Writer
         // playback service (reused for multiple play calls)
         private IMidiPlaybackService _midiPlaybackService;
 
-        private int pitchEventNumber = 0;
+        private int phraseNumber = 0;
 
         // MIDI instrument list for dropdown
         private List<MidiInstrument> _midiInstruments;
@@ -87,7 +87,7 @@ namespace Music.Writer
             dgvPhrase.ReadOnly = false; // Allow editing the combo box column
             dgvPhrase.Columns.Clear();
 
-            // Column 0: Hidden column containing the AppendPitchEventsParams object
+            // Column 0: Hidden column containing the AppendNoteEventsToScoreParams object
             var colData = new DataGridViewTextBoxColumn
             {
                 Name = "colData",
@@ -206,7 +206,7 @@ namespace Music.Writer
 
             // THIS SHOULD NOW BE "CREATE PITCH EVENT" and and SHOW IN THE NEW CONTROL 
 
-            var config = _writer.ToAppendPitchEventsParams();
+            var config = _writer.ToAppendNoteEventsParams();
 
             // THIS SHOULD APPEND FROM WHATS SELECTED IN THE PHRASE  CONTROL
 
@@ -224,14 +224,14 @@ namespace Music.Writer
 
 
             // THIS NEEDS TO BE TOPHRASE. KEEP THE CURRENT ONE FOR XML MAY BE NEEDED
-            var phrase = _writer.ToAppendPitchEventsParams();
+            var phrase = _writer.ToAppendNoteEventsParams();
 
 
 
 
             // Set phrase name/number
-            pitchEventNumber++;
-            var pitchEventName = pitchEventNumber.ToString();
+            phraseNumber++;
+            var phraseName = phraseNumber.ToString();
 
             // Get part name from the phrase (assuming first part)
             var partName = phrase.Parts?.FirstOrDefault() ?? "Unknown";
@@ -240,7 +240,7 @@ namespace Music.Writer
             int newRowIndex = dgvPhrase.Rows.Add();
             var row = dgvPhrase.Rows[newRowIndex];
 
-            // Column 0: Hidden data (AppendPitchEventsParams object)
+            // Column 0: Hidden data (AppendNoteEventsToScoreParams object)
             row.Cells["colData"].Value = phrase;
 
             // Column 1: MIDI Instrument dropdown - set to first instrument (Acoustic Grand Piano) as default
@@ -248,7 +248,7 @@ namespace Music.Writer
             row.Cells["colInstrument"].Value = _midiInstruments[0].ProgramNumber;
 
             // Column 2: Event number
-            row.Cells["colEventNumber"].Value = pitchEventName;
+            row.Cells["colEventNumber"].Value = phraseName;
 
             // Column 3: Description
             row.Cells["colDescription"].Value = $"Part: {partName}";
@@ -258,10 +258,10 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Converts the provided list of AppendPitchEventsParams to MIDI and plays it back.
+        /// Converts the provided list of AppendNoteEventsToScoreParams to MIDI and plays it back.
         /// Stops and releases the MIDI device after playback completes.
         /// </summary>
-        private async Task PlayMidiFromPitchEventsAsync(List<AppendPitchEventsParams> configs)
+        private async Task PlayMidiFromPhrasesAsync(List<AppendNoteEventsToScoreParams> configs)
         {
             if (configs == null || configs.Count == 0) 
                 throw new ArgumentNullException(nameof(configs));
@@ -270,7 +270,7 @@ namespace Music.Writer
             _midiPlaybackService.Stop();
 
             // Convert to MIDI (using the list overload that creates multiple tracks)
-            var midiDoc = PitchEventsToMidiConverter.Convert(configs);
+            var midiDoc = NoteEventsToMidiConverter.Convert(configs);
 
             // Select first available output device
             var devices = _midiPlaybackService.EnumerateOutputDevices().ToList();
@@ -454,14 +454,14 @@ namespace Music.Writer
                 return;
             }
 
-            // Build list of AppendPitchEventsParams from all selected rows
-            var configList = new List<AppendPitchEventsParams>();
+            // Build list of AppendNoteEventsToScoreParams from all selected rows
+            var configList = new List<AppendNoteEventsToScoreParams>();
 
             foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
             {
                 var cellValue = selectedRow.Cells["colData"].Value;
 
-                if (cellValue is not AppendPitchEventsParams config)
+                if (cellValue is not AppendNoteEventsToScoreParams config)
                 {
                     MessageBox.Show(this, $"Invalid data in row {selectedRow.Index}.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
@@ -479,7 +479,7 @@ namespace Music.Writer
 
             try
             {
-                await PlayMidiFromPitchEventsAsync(configList);
+                await PlayMidiFromPhrasesAsync(configList);
             }
             catch (Exception ex)
             {

@@ -3,7 +3,7 @@
     /// <summary>
     /// Configuration extracted from Writer for easier processing by SetNotes.
     /// </summary>
-    public sealed class AppendPitchEventsParams
+    public sealed class AppendNoteEventsToScoreParams
     {
         // TARGETS
         public List<string> Parts { get; set; } = new();
@@ -12,7 +12,7 @@
         public int StartBeat { get; set; }
 
         // List of notes to insert
-        public List<NoteEvent> PitchEvents { get; set; } = new();
+        public List<NoteEvent> NoteEvents { get; set; } = new();
     }
 
     /// <summary>
@@ -20,11 +20,11 @@
     /// </summary>
     public sealed class Phrase
     {
-        // TARGETS
+        // These should be resolved up front!
         public string MidiPartName { get; set; }
         public string NotionPartName { get; set; }
         public string MidiProgramNumber { get; set; }
-        public List<NoteEvent> PitchEvents { get; set; } = new();
+        public List<NoteEvent> NoteEvents { get; set; } = new();
     }
 }
 

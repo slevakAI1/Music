@@ -14,7 +14,7 @@ namespace Music.Writer
         /// Adds notes to the specified score based on the provided configuration.
         /// All parameters are expected to be pre-validated.
         /// </summary>
-        public static void Execute(Score score, AppendPitchEventsParams config, MeasureMeta measureMeta)
+        public static void Execute(Score score, AppendNoteEventsToScoreParams config, MeasureMeta measureMeta)
         {
             // Pre-process: remove all backup elements before appending notes.
             AppendNotesHelper.RemoveAllBackupElements(score, config.Parts);
@@ -23,7 +23,7 @@ namespace Music.Writer
 
             if (score == null) throw new ArgumentNullException(nameof(score));
             if (config == null) throw new ArgumentNullException(nameof(config));
-            if (config.PitchEvents == null || config.PitchEvents.Count == 0) return;
+            if (config.NoteEvents == null || config.NoteEvents.Count == 0) return;
 
             foreach (var scorePart in GetTargetParts(score, config.Parts))
             {
@@ -40,7 +40,7 @@ namespace Music.Writer
                 .Where(p => p?.Name != null && partNames.Contains(p.Name));
         }
 
-        private static void ProcessPart(Part scorePart, AppendPitchEventsParams config, MeasureMeta measureMeta)
+        private static void ProcessPart(Part scorePart, AppendNoteEventsToScoreParams config, MeasureMeta measureMeta)
         {
             if (scorePart.Measures == null || scorePart.Measures.Count == 0)
                 return;
@@ -86,33 +86,33 @@ namespace Music.Writer
 
         private static void ProcessNotesForStaff(
             Part scorePart, 
-            AppendPitchEventsParams appendPitchEventsParams, 
+            AppendNoteEventsToScoreParams appendNoteEventsParams, 
             StaffProcessingContext context, 
             MeasureMeta measureMeta)
         {
-            foreach (var pitchEvent in appendPitchEventsParams.PitchEvents)
+            foreach (var NoteEvent in appendNoteEventsParams.NoteEvents)
             {
                 if (!AppendNotesHelper.EnsureMeasureAvailable(scorePart, context.CurrentBar, scorePart.Name))
                     return;
 
                 // Dispatch to chord or single-note processing
-                if (pitchEvent.IsChord)
+                if (NoteEvent.IsChord)
                 {
-                    ProcessChord(scorePart, pitchEvent, appendPitchEventsParams, context, measureMeta);
+                    ProcessChord(scorePart, NoteEvent, appendNoteEventsParams, context, measureMeta);
                 }
                 else
                 {
-                    ProcessSingleNote(scorePart, pitchEvent, appendPitchEventsParams, context, measureMeta);
+                    ProcessSingleNote(scorePart, NoteEvent, appendNoteEventsParams, context, measureMeta);
                 }
             }
         }
 
-        private static void ProcessSingleNote(Part scorePart, NoteEvent pitchEvent, AppendPitchEventsParams config, StaffProcessingContext context, MeasureMeta measureMeta)
+        private static void ProcessSingleNote(Part scorePart, NoteEvent noteEvent, AppendNoteEventsToScoreParams config, StaffProcessingContext context, MeasureMeta measureMeta)
         {
             var measure = scorePart.Measures[context.CurrentBar - 1];
             var measureInfo = AppendNotesHelper.GetMeasureInfo(measure);
 
-            var noteDuration = AppendNotesHelper.CalculateTotalNoteDuration(measureInfo.Divisions, pitchEvent);
+            var noteDuration = AppendNotesHelper.CalculateTotalNoteDuration(measureInfo.Divisions, noteEvent);
 
             // Handle measure advancement for primary notes and full measures
             if (context.CurrentBeatPosition == measureInfo.BarLengthDivisions)
@@ -125,7 +125,7 @@ namespace Music.Writer
             if (context.CurrentBeatPosition + noteDuration > measureInfo.BarLengthDivisions)
             {
                 bool success = AppendNotesHelper.HandleTiedNoteAcrossMeasures(
-                    scorePart, pitchEvent, context, measureInfo, noteDuration, measureMeta);
+                    scorePart, noteEvent, context, measureInfo, noteDuration, measureMeta);
 
                 if (!success)
                     return;
@@ -143,8 +143,8 @@ namespace Music.Writer
             measureInfo = AppendNotesHelper.GetMeasureInfo(measure);
 
             // Compose and add the primary note
-            var note = AppendNotesHelper.ComposeNote(pitchEvent, noteDuration, context.Staff);
-            AppendNotesHelper.ApplyTupletSettings(note, pitchEvent, context.TupletStates);
+            var note = AppendNotesHelper.ComposeNote(noteEvent, noteDuration, context.Staff);
+            AppendNotesHelper.ApplyTupletSettings(note, noteEvent, context.TupletStates);
 
             measure.MeasureElements.Add(new MeasureElement
             {
@@ -153,10 +153,10 @@ namespace Music.Writer
             });
 
             // Update tracking for the written note
-            AppendNotesHelper.UpdatePositionTracking(context, pitchEvent, noteDuration, scorePart.Name, measureMeta);
+            AppendNotesHelper.UpdatePositionTracking(context, noteEvent, noteDuration, scorePart.Name, measureMeta);
         }
 
-        private static void ProcessChord(Part scorePart, NoteEvent pitchEvent, AppendPitchEventsParams config, StaffProcessingContext context, MeasureMeta measureMeta)
+        private static void ProcessChord(Part scorePart, NoteEvent pitchEvent, AppendNoteEventsToScoreParams config, StaffProcessingContext context, MeasureMeta measureMeta)
         {
             // TO DO - This probably doesnt need note value... that property should be applied here if not already applied!
 

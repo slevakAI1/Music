@@ -7,9 +7,9 @@ using Music.Domain;
 namespace Music.Writer
 {
     /// <summary>
-    /// Converts AppendPitchEventsParams to a MIDI file (MidiSongDocument).
+    /// Converts AppendNoteEventsToScoreParams to a MIDI file (MidiSongDocument).
     /// </summary>
-    public static class PitchEventsToMidiConverter
+    public static class NoteEventsToMidiConverter
     {
         /// <summary>
         /// Converts a single pitch event config to a MIDI document with default settings:
@@ -18,17 +18,17 @@ namespace Music.Writer
         /// - Tempo: 112 BPM
         /// - Part: Uses instrument from Parts[0] or defaults to Piano
         /// </summary>
-        public static MidiSongDocument Convert(AppendPitchEventsParams config)
+        public static MidiSongDocument Convert(AppendNoteEventsToScoreParams config)
         {
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
 
-            return Convert(new List<AppendPitchEventsParams> { config });
+            return Convert(new List<AppendNoteEventsToScoreParams> { config });
         }
 
         /// <summary>
         /// Converts multiple pitch event configs to a MIDI document with separate tracks.
-        /// Each AppendPitchEventsParams becomes its own MIDI track.
+        /// Each AppendNoteEventsToScoreParams becomes its own MIDI track.
         /// Assumes:
         /// - Only one staff is selected per config (either staff 1 or staff 2, not both)
         /// - Only one part per config
@@ -36,7 +36,7 @@ namespace Music.Writer
         /// - Time signature: 4/4
         /// - Tempo: 112 BPM
         /// </summary>
-        public static MidiSongDocument Convert(List<AppendPitchEventsParams> configs)
+        public static MidiSongDocument Convert(List<AppendNoteEventsToScoreParams> configs)
         {
             if (configs == null)
                 throw new ArgumentNullException(nameof(configs));
@@ -70,10 +70,10 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Creates a single MIDI track from an AppendPitchEventsParams configuration.
+        /// Creates a single MIDI track from an AppendNoteEventsToScoreParams configuration.
         /// </summary>
         private static TrackChunk CreateTrackFromConfig(
-            AppendPitchEventsParams config, 
+            AppendNoteEventsToScoreParams config, 
             int trackNumber, 
             short ticksPerQuarterNote)
         {
@@ -95,7 +95,7 @@ namespace Music.Writer
             // Convert pitch events to MIDI notes
             long currentTime = 0;
 
-            foreach (var pitchEvent in config.PitchEvents ?? Enumerable.Empty<NoteEvent>())
+            foreach (var pitchEvent in config.NoteEvents ?? Enumerable.Empty<NoteEvent>())
             {
                 if (pitchEvent.IsRest)
                 {
