@@ -141,6 +141,50 @@ namespace Music.Writer
                 ReadOnly = true
             };
             dgvPhrase.Columns.Add(colPhrase);
+
+            // Wire up event handlers
+            dgvPhrase.CellValueChanged += DgvPhrase_CellValueChanged;
+            dgvPhrase.CurrentCellDirtyStateChanged += DgvPhrase_CurrentCellDirtyStateChanged;
+        }
+
+        /// <summary>
+        /// Commits the combo box edit immediately so CellValueChanged fires.
+        /// </summary>
+        private void DgvPhrase_CurrentCellDirtyStateChanged(object? sender, EventArgs e)
+        {
+            if (dgvPhrase.IsCurrentCellDirty && dgvPhrase.CurrentCell is DataGridViewComboBoxCell)
+            {
+                dgvPhrase.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            }
+        }
+
+        /// <summary>
+        /// Updates the Phrase object's MidiPartName when the user changes the instrument selection.
+        /// </summary>
+        private void DgvPhrase_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
+        {
+            // Only handle changes to the instrument column
+            if (e.RowIndex < 0 || e.ColumnIndex != dgvPhrase.Columns["colInstrument"]?.Index)
+                return;
+
+            var row = dgvPhrase.Rows[e.RowIndex];
+            var cellValue = row.Cells["colData"].Value;
+
+            // Check if the hidden data cell contains a Phrase object
+            if (cellValue is Phrase phrase)
+            {
+                // Get the selected instrument name
+                var selectedInstrumentName = row.Cells["colInstrument"].FormattedValue?.ToString();
+                
+                if (!string.IsNullOrEmpty(selectedInstrumentName))
+                {
+                    // Update the Phrase object's MidiPartName property
+                    phrase.MidiPartName = selectedInstrumentName;
+                    
+                    // Optionally update the description column to reflect the change
+                    row.Cells["colDescription"].Value = $"Part: {selectedInstrumentName}";
+                }
+            }
         }
 
         protected override void OnShown(EventArgs e)
@@ -433,6 +477,18 @@ namespace Music.Writer
 
         private async void btnPlay_Click(object sender, EventArgs e)
         {
+
+
+
+
+            // Resolve MIDI Program Numbers here and write back into the phrase property which will 
+            // be uninitialized. They are not needed anywhere elsr!!!
+
+            // THEN UPDATE THIS TO WORK WITH PHRASE!!!!
+            
+
+
+
             // Check if there are any rows in the grid
             if (dgvPhrase.Rows.Count == 0)
             {
