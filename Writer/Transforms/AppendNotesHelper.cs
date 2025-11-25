@@ -137,7 +137,7 @@ namespace Music.Writer
 
         private static void ApplyTupletNotation(
             MusicXml.Domain.Note note, 
-            NoteEvent pitchEvent, 
+            NoteEvent noteEvent, 
             AppendNotes.TupletState ts, 
             Dictionary<string, AppendNotes.TupletState> tupletStates, 
             string key)
@@ -154,7 +154,7 @@ namespace Music.Writer
             }
 
             // Decrement and mark stop on last base note
-            if (!pitchEvent.IsChord)
+            if (!noteEvent.IsChord)
             {
                 ts.Remaining--;
                 if (ts.Remaining <= 0)
@@ -171,20 +171,20 @@ namespace Music.Writer
 
         public static void ApplyTupletSettings(
             MusicXml.Domain.Note note, 
-            NoteEvent pitchEvent, 
+            NoteEvent noteEvent, 
             Dictionary<string, AppendNotes.TupletState> tupletStates)
         {
-            if (string.IsNullOrWhiteSpace(pitchEvent.TupletNumber)
-                || pitchEvent.TupletActualNotes <= 0
-                || pitchEvent.TupletNormalNotes <= 0)
+            if (string.IsNullOrWhiteSpace(noteEvent.TupletNumber)
+                || noteEvent.TupletActualNotes <= 0
+                || noteEvent.TupletNormalNotes <= 0)
             {
                 return;
             }
 
-            var key = pitchEvent.TupletNumber!;
+            var key = noteEvent.TupletNumber!;
             if (!tupletStates.TryGetValue(key, out var ts))
             {
-                ts = InitializeTupletState(key, pitchEvent);
+                ts = InitializeTupletState(key, noteEvent);
                 tupletStates[key] = ts;
             }
 
@@ -193,11 +193,11 @@ namespace Music.Writer
             {
                 ActualNotes = ts.Actual,
                 NormalNotes = ts.Normal,
-                NormalType = DurationTypeString(pitchEvent.Duration)
+                NormalType = DurationTypeString(noteEvent.Duration)
             };
 
             // Handle tuplet notation (start/stop markers)
-            ApplyTupletNotation(note, pitchEvent, ts, tupletStates, key);
+            ApplyTupletNotation(note, noteEvent, ts, tupletStates, key);
         }
 
         private static int CalculateNoteDurationInMeasure(int divisions, int noteValue)
@@ -220,53 +220,53 @@ namespace Music.Writer
             return numerator / noteValue;
         }
 
-        public static int CalculateTotalNoteDuration(int divisions, NoteEvent pitchEvent)
+        public static int CalculateTotalNoteDuration(int divisions, NoteEvent noteEvent)
         {
-            var baseDuration = CalculateNoteDurationInMeasure(divisions, pitchEvent.Duration);
+            var baseDuration = CalculateNoteDurationInMeasure(divisions, noteEvent.Duration);
             
             // Calculate total duration including dots
             var noteDurationInMeasure = baseDuration;
-            if (pitchEvent.Dots == 1)
+            if (noteEvent.Dots == 1)
             {
                 noteDurationInMeasure = baseDuration + (baseDuration / 2);
             }
-            else if (pitchEvent.Dots == 2)
+            else if (noteEvent.Dots == 2)
             {
                 noteDurationInMeasure = baseDuration + (baseDuration / 2) + (baseDuration / 4);
             }
 
             // Adjust duration when the note is part of a tuplet
             if (noteDurationInMeasure > 0
-                && pitchEvent.TupletActualNotes > 0
-                && pitchEvent.TupletNormalNotes > 0)
+                && noteEvent.TupletActualNotes > 0
+                && noteEvent.TupletNormalNotes > 0)
             {
                 noteDurationInMeasure = (int)Math.Round(
-                    (double)noteDurationInMeasure * pitchEvent.TupletNormalNotes / pitchEvent.TupletActualNotes);
+                    (double)noteDurationInMeasure * noteEvent.TupletNormalNotes / noteEvent.TupletActualNotes);
             }
 
             return noteDurationInMeasure;
         }
 
-        public static MusicXml.Domain.Note ComposeNote(NoteEvent pitchEvent, int duration, int staff)
+        public static MusicXml.Domain.Note ComposeNote(NoteEvent noteEvent, int duration, int staff)
         {
             var note = new MusicXml.Domain.Note
             {
-                Type = DurationTypeString(pitchEvent.Duration),
+                Type = DurationTypeString(noteEvent.Duration),
                 Duration = duration,
                 Voice = staff == 1 ? 1 : 5,
                 Staff = staff,
-                IsChordTone = pitchEvent.IsChord,
-                IsRest = pitchEvent.IsRest,
-                Dots = pitchEvent.Dots
+                IsChordTone = noteEvent.IsChord,
+                IsRest = noteEvent.IsRest,
+                Dots = noteEvent.Dots
             };
 
-            if (!pitchEvent.IsRest)
+            if (!noteEvent.IsRest)
             {
                 note.Pitch = new Pitch
                 {
-                    Step = char.ToUpper(pitchEvent.Step),
-                    Octave = pitchEvent.Octave,
-                    Alter = pitchEvent.Alter
+                    Step = char.ToUpper(noteEvent.Step),
+                    Octave = noteEvent.Octave,
+                    Alter = noteEvent.Alter
                 };
             }
 
@@ -362,7 +362,7 @@ namespace Music.Writer
 
         public static bool HandleTiedChordAcrossMeasures(
             Part scorePart,
-            List<NoteEvent> pitchEvents,
+            List<NoteEvent> noteEvents,
             AppendNotes.StaffProcessingContext context,
             AppendNotes.MeasureInfo measureInfo,
             int noteDuration,
@@ -374,7 +374,7 @@ namespace Music.Writer
             // Place first part of tied chord notes in current measure
             var measure = scorePart.Measures[context.CurrentBar - 1];
 
-            foreach (var chordNote in pitchEvents)
+            foreach (var chordNote in noteEvents)
             {
                 var firstChordNote = CreateTiedNote(
                     chordNote,
@@ -408,7 +408,7 @@ namespace Music.Writer
             // Place second part of tied chord notes in next measure
             var nextMeasure = scorePart.Measures[context.CurrentBar - 1];
 
-            foreach (var chordNote in pitchEvents)
+            foreach (var chordNote in noteEvents)
             {
                 var secondChordNote = CreateTiedNote(
                     chordNote,
@@ -432,7 +432,7 @@ namespace Music.Writer
 
         public static bool HandleTiedNoteAcrossMeasures(
             Part scorePart, 
-            NoteEvent pitchEvent,
+            NoteEvent noteEvent,
             AppendNotes.StaffProcessingContext context,
             AppendNotes.MeasureInfo measureInfo,
             int noteDuration,
@@ -444,7 +444,7 @@ namespace Music.Writer
             // Place first part of tied note in current measure
             var measure = scorePart.Measures[context.CurrentBar - 1];
             var firstNote = CreateTiedNote(
-                pitchEvent, 
+                noteEvent, 
                 (int)durationInCurrentMeasure, 
                 measureInfo.Divisions, 
                 context.Staff, 
@@ -474,7 +474,7 @@ namespace Music.Writer
             // Place second part of tied note in next measure
             var nextMeasure = scorePart.Measures[context.CurrentBar - 1];
             var secondNote = CreateTiedNote(
-                pitchEvent, 
+                noteEvent, 
                 (int)durationInNextMeasure, 
                 measureInfo.Divisions, 
                 context.Staff, 
@@ -492,16 +492,16 @@ namespace Music.Writer
             return true;
         }
 
-        private static AppendNotes.TupletState InitializeTupletState(string key, NoteEvent pitchEvent)
+        private static AppendNotes.TupletState InitializeTupletState(string key, NoteEvent noteEvent)
         {
             int parsedNum = 1;
             int.TryParse(key, out parsedNum);
             
             return new AppendNotes.TupletState
             {
-                Actual = pitchEvent.TupletActualNotes,
-                Normal = pitchEvent.TupletNormalNotes,
-                Remaining = pitchEvent.TupletActualNotes,
+                Actual = noteEvent.TupletActualNotes,
+                Normal = noteEvent.TupletNormalNotes,
+                Remaining = noteEvent.TupletActualNotes,
                 Number = parsedNum,
                 IsStarted = false
             };
@@ -524,12 +524,12 @@ namespace Music.Writer
 
         public static void UpdatePositionTracking(
             AppendNotes.StaffProcessingContext context, 
-            NoteEvent pitchEvent, 
+            NoteEvent noteEvent, 
             int noteDuration,
             string partName,
             MeasureMeta measureMeta)
         {
-            if (!pitchEvent.IsChord)
+            if (!noteEvent.IsChord)
             {
                 context.CurrentBeatPosition += noteDuration;
                 measureMeta.AddDivisionsUsed(partName, context.Staff, context.CurrentBar, noteDuration);
