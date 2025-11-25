@@ -2,6 +2,7 @@ using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using Music.Tests;
+using Music.Domain;
 
 namespace Music.Writer
 {
@@ -15,7 +16,7 @@ namespace Music.Writer
         /// - Time signature: 4/4
         /// - Treble clef (not stored in MIDI, implied)
         /// - Tempo: 112 BPM
-        /// - Part: Piano right hand (single track)
+        /// - Part: Uses instrument from Parts[0] or defaults to Piano
         /// </summary>
         public static MidiSongDocument Convert(AppendPitchEventsParams config)
         {
@@ -78,16 +79,18 @@ namespace Music.Writer
         {
             var trackChunk = new TrackChunk();
 
-            // Determine track name from part and staff
-            var partName = config.Parts?.FirstOrDefault() ?? "Unknown";
+            // Determine track name and program number from part
+            var partName = config.Parts?.FirstOrDefault() ?? "Acoustic Grand Piano";
             var staffNumber = config.Staffs?.FirstOrDefault() ?? 1;
             var trackName = $"{partName} - Staff {staffNumber}";
             
             trackChunk.Events.Add(new SequenceTrackNameEvent(trackName));
 
-            // Set program change for piano (MIDI program 0)
-            // Could be customized based on part name in the future
-            trackChunk.Events.Add(new ProgramChangeEvent((SevenBitNumber)0));
+            // Get MIDI program number from instrument name in Parts[0]
+            byte programNumber = GetMidiProgramNumber(partName);
+            
+            // Set program change to the selected instrument
+            trackChunk.Events.Add(new ProgramChangeEvent((SevenBitNumber)programNumber));
 
             // Convert pitch events to MIDI notes
             long currentTime = 0;
@@ -126,6 +129,26 @@ namespace Music.Writer
             }
 
             return trackChunk;
+        }
+
+        /// <summary>
+        /// Gets the MIDI program number from an instrument name.
+        /// Returns 0 (Acoustic Grand Piano) if the instrument name is not found.
+        /// </summary>
+        private static byte GetMidiProgramNumber(string instrumentName)
+        {
+            if (string.IsNullOrWhiteSpace(instrumentName))
+                return 0;
+
+            // Get all MIDI instruments
+            var instruments = MidiInstrument.GetGeneralMidiInstruments();
+            
+            // Find matching instrument by name (case-insensitive)
+            var instrument = instruments.FirstOrDefault(i => 
+                i.Name.Equals(instrumentName, StringComparison.OrdinalIgnoreCase));
+
+            // Return program number or default to piano (0)
+            return instrument?.ProgramNumber ?? 0;
         }
 
         /// <summary>

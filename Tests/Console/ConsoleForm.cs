@@ -466,8 +466,8 @@ namespace Music.Writer
             }
 
             // Update the part name with the selected instrument name
-
-            config.Parts.Add(selectedInstrumentName); // this is Part][0] because parts is empty
+            config.Parts.Clear();
+            config.Parts.Add(selectedInstrumentName); // this is Part][0] for now
 
             try
             {

@@ -607,7 +607,7 @@ namespace Music.Writer
             // btnSetWriterTestScenarioG1
             // 
             btnSetWriterTestScenarioG1.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSetWriterTestScenarioG1.Location = new Point(1706, 725);
+            btnSetWriterTestScenarioG1.Location = new Point(478, 469);
             btnSetWriterTestScenarioG1.Name = "btnSetWriterTestScenarioG1";
             btnSetWriterTestScenarioG1.Size = new Size(196, 23);
             btnSetWriterTestScenarioG1.TabIndex = 8;
@@ -618,7 +618,7 @@ namespace Music.Writer
             // btnSetDesignTestScenarioD1
             // 
             btnSetDesignTestScenarioD1.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSetDesignTestScenarioD1.Location = new Point(1069, 467);
+            btnSetDesignTestScenarioD1.Location = new Point(478, 440);
             btnSetDesignTestScenarioD1.Name = "btnSetDesignTestScenarioD1";
             btnSetDesignTestScenarioD1.Size = new Size(179, 23);
             btnSetDesignTestScenarioD1.TabIndex = 10;
