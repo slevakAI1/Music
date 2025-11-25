@@ -11,7 +11,7 @@ namespace Music.Writer
     {
         private List<Score> _scoreList;
         private Designer.Designer? _designer;
-        private ConsoleData? _writer;
+        private WriterFormData? _writer;
         private MeasureMeta _measureMeta;
 
         //===========================   I N I T I A L I Z A T I O N   ===========================

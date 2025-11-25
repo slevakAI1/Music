@@ -13,6 +13,6 @@ namespace Music
         public static List<Score> ScoreList { get; set; } = new List<Score>();
 
         // Persist WriterForm's data application-wide (refactor: moved from form instance to Globals)
-        public static Writer.ConsoleData? Writer { get; set; }
+        public static Writer.WriterFormData? Writer { get; set; }
     }
 }

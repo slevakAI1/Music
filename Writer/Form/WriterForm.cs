@@ -6,11 +6,11 @@ using MusicXml.Domain;
 
 namespace Music.Writer
 {
-    public partial class ConsoleForm : Form
+    public partial class WriterForm : Form
     {
         private List<Score> _scoreList;
         private Designer.Designer? _designer;
-        private ConsoleData? _writer;
+        private WriterFormData? _writer;
         private MeasureMeta _measureMeta;
 
         // playback service (reused for multiple play calls)
@@ -22,7 +22,7 @@ namespace Music.Writer
         private List<MidiInstrument> _midiInstruments;
 
         //===========================   I N I T I A L I Z A T I O N   ===========================
-        public ConsoleForm()
+        public WriterForm()
         {
             InitializeComponent();
 
@@ -321,7 +321,7 @@ namespace Music.Writer
         // Description: Set writer test values using the current design 
         private void btnSetWriterTestScenarioG1_Click(object sender, EventArgs e)
         {
-            _writer = ConsoleTests.SetTestWriterG1(_designer);
+            _writer = WriterFormTests.SetTestWriterG1(_designer);
             ApplyFormData(_writer);
             // KEEP. MessageBox.Show("Test Writer G1 has been applied to the current generator settings.", "Generator Test Scenario G1", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }

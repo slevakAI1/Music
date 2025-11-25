@@ -1,6 +1,6 @@
 namespace Music.Writer
 {
-    partial class ConsoleForm
+    partial class WriterForm
     {
         private System.ComponentModel.IContainer components = null;
         private System.Windows.Forms.ComboBox cbCommand;
@@ -131,12 +131,12 @@ namespace Music.Writer
             ((System.ComponentModel.ISupportInitialize)dgvPhrase).BeginInit();
             SuspendLayout();
             // 
-            // cbPattern
+            // cbCommand
             // 
             cbCommand.DropDownStyle = ComboBoxStyle.DropDownList;
             cbCommand.Items.AddRange(new object[] { "Repeat Note/Chord/Rest" });
             cbCommand.Location = new Point(13, 22);
-            cbCommand.Name = "cbPattern";
+            cbCommand.Name = "cbCommand";
             cbCommand.Size = new Size(250, 23);
             cbCommand.TabIndex = 1;
             // 
@@ -842,7 +842,7 @@ namespace Music.Writer
             col3.Name = "col3";
             col3.ReadOnly = true;
             // 
-            // ConsoleForm
+            // WriterForm
             // 
             BackColor = Color.White;
             ClientSize = new Size(1918, 1061);
@@ -858,8 +858,8 @@ namespace Music.Writer
             Controls.Add(grpPitch);
             Controls.Add(groupBox3);
             Controls.Add(groupBox4);
-            Name = "ConsoleForm";
-            Text = "Console";
+            Name = "WriterForm";
+            Text = "Music Writer";
             grbParts.ResumeLayout(false);
             grbParts.PerformLayout();
             grpPitch.ResumeLayout(false);
