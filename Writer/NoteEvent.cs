@@ -3,7 +3,7 @@ namespace Music.Writer
     /// <summary>
     /// Represents a note or chord to be written into a measure (may cross measures)
     /// </summary>
-    public sealed class PitchEvent
+    public sealed class NoteEvent
     {
 
         // Pitch

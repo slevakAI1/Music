@@ -12,7 +12,7 @@
         public int StartBeat { get; set; }
 
         // List of notes to insert
-        public List<PitchEvent> PitchEvents { get; set; } = new();
+        public List<NoteEvent> PitchEvents { get; set; } = new();
     }
 
     /// <summary>
@@ -24,7 +24,7 @@
         public string MidiPartName { get; set; }
         public string NotionPartName { get; set; }
         public string MidiProgramNumber { get; set; }
-        public List<PitchEvent> PitchEvents { get; set; } = new();
+        public List<NoteEvent> PitchEvents { get; set; } = new();
     }
 }
 

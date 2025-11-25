@@ -340,7 +340,7 @@ namespace Music.Writer
 
             var harmonicEvent = _designer.HarmonicTimeline.Events[1];
 
-            List<PitchEvent> notes;
+            List<NoteEvent> notes;
             try
             {
                 notes = ChordConverter.Convert(

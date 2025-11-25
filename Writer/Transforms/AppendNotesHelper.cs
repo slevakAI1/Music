@@ -137,7 +137,7 @@ namespace Music.Writer
 
         private static void ApplyTupletNotation(
             MusicXml.Domain.Note note, 
-            PitchEvent pitchEvent, 
+            NoteEvent pitchEvent, 
             AppendNotes.TupletState ts, 
             Dictionary<string, AppendNotes.TupletState> tupletStates, 
             string key)
@@ -171,7 +171,7 @@ namespace Music.Writer
 
         public static void ApplyTupletSettings(
             MusicXml.Domain.Note note, 
-            PitchEvent pitchEvent, 
+            NoteEvent pitchEvent, 
             Dictionary<string, AppendNotes.TupletState> tupletStates)
         {
             if (string.IsNullOrWhiteSpace(pitchEvent.TupletNumber)
@@ -220,7 +220,7 @@ namespace Music.Writer
             return numerator / noteValue;
         }
 
-        public static int CalculateTotalNoteDuration(int divisions, PitchEvent pitchEvent)
+        public static int CalculateTotalNoteDuration(int divisions, NoteEvent pitchEvent)
         {
             var baseDuration = CalculateNoteDurationInMeasure(divisions, pitchEvent.Duration);
             
@@ -247,7 +247,7 @@ namespace Music.Writer
             return noteDurationInMeasure;
         }
 
-        public static MusicXml.Domain.Note ComposeNote(PitchEvent pitchEvent, int duration, int staff)
+        public static MusicXml.Domain.Note ComposeNote(NoteEvent pitchEvent, int duration, int staff)
         {
             var note = new MusicXml.Domain.Note
             {
@@ -274,7 +274,7 @@ namespace Music.Writer
         }
 
         public static MusicXml.Domain.Note CreateTiedNote(
-            PitchEvent pitchEvent, 
+            NoteEvent noteEvent, 
             int duration, 
             int divisions, 
             int staff, 
@@ -286,19 +286,19 @@ namespace Music.Writer
                 Duration = duration,
                 Voice = staff == 1 ? 1 : 5,
                 Staff = staff,
-                IsChordTone = pitchEvent.IsChord,
-                IsRest = pitchEvent.IsRest,
-                Tie = pitchEvent.IsRest ? Tie.NotTied : (isFirstPart ? Tie.Start : Tie.Stop),
+                IsChordTone = noteEvent.IsChord,
+                IsRest = noteEvent.IsRest,
+                Tie = noteEvent.IsRest ? Tie.NotTied : (isFirstPart ? Tie.Start : Tie.Stop),
                 Dots = 0  // Tied notes across measures typically don't use dots
             };
 
-            if (!pitchEvent.IsRest)
+            if (!noteEvent.IsRest)
             {
                 note.Pitch = new Pitch
                 {
-                    Step = char.ToUpper(pitchEvent.Step),
-                    Octave = pitchEvent.Octave,
-                    Alter = pitchEvent.Alter
+                    Step = char.ToUpper(noteEvent.Step),
+                    Octave = noteEvent.Octave,
+                    Alter = noteEvent.Alter
                 };
             }
 
@@ -362,7 +362,7 @@ namespace Music.Writer
 
         public static bool HandleTiedChordAcrossMeasures(
             Part scorePart,
-            List<PitchEvent> pitchEvents,
+            List<NoteEvent> pitchEvents,
             AppendNotes.StaffProcessingContext context,
             AppendNotes.MeasureInfo measureInfo,
             int noteDuration,
@@ -432,7 +432,7 @@ namespace Music.Writer
 
         public static bool HandleTiedNoteAcrossMeasures(
             Part scorePart, 
-            PitchEvent pitchEvent,
+            NoteEvent pitchEvent,
             AppendNotes.StaffProcessingContext context,
             AppendNotes.MeasureInfo measureInfo,
             int noteDuration,
@@ -492,7 +492,7 @@ namespace Music.Writer
             return true;
         }
 
-        private static AppendNotes.TupletState InitializeTupletState(string key, PitchEvent pitchEvent)
+        private static AppendNotes.TupletState InitializeTupletState(string key, NoteEvent pitchEvent)
         {
             int parsedNum = 1;
             int.TryParse(key, out parsedNum);
@@ -524,7 +524,7 @@ namespace Music.Writer
 
         public static void UpdatePositionTracking(
             AppendNotes.StaffProcessingContext context, 
-            PitchEvent pitchEvent, 
+            NoteEvent pitchEvent, 
             int noteDuration,
             string partName,
             MeasureMeta measureMeta)

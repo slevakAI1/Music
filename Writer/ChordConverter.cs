@@ -18,7 +18,7 @@ namespace Music.Writer
         /// <returns>A list of WriterNote objects representing the chord voicing.</returns>
         /// <exception cref="ArgumentNullException">When harmonicEvent is null.</exception>
         /// <exception cref="InvalidOperationException">When the chord cannot be constructed.</exception>
-        public static List<PitchEvent> Convert(HarmonicEvent harmonicEvent, int baseOctave = 4, int noteValue = 4)
+        public static List<NoteEvent> Convert(HarmonicEvent harmonicEvent, int baseOctave = 4, int noteValue = 4)
         {
             if (harmonicEvent == null)
                 throw new ArgumentNullException(nameof(harmonicEvent));
@@ -38,7 +38,7 @@ namespace Music.Writer
         /// <returns>A list of WriterNote objects representing the chord voicing.</returns>
         /// <exception cref="ArgumentException">When parameters are invalid.</exception>
         /// <exception cref="InvalidOperationException">When the chord cannot be constructed.</exception>
-        public static List<PitchEvent> Convert(string key, int degree, string quality, string bass, int baseOctave = 4, int noteValue = 4)
+        public static List<NoteEvent> Convert(string key, int degree, string quality, string bass, int baseOctave = 4, int noteValue = 4)
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException("Key cannot be null or empty", nameof(key));
@@ -81,12 +81,12 @@ namespace Music.Writer
                 
                 // Step 8: Convert to WriterNote format
                 // First note has IsChord = false, all subsequent notes have IsChord = true
-                var result = new List<PitchEvent>();
+                var result = new List<NoteEvent>();
                 
                 for (int i = 0; i < voicedNotes.Count; i++)
                 {
                     var note = voicedNotes[i];
-                    result.Add(new PitchEvent
+                    result.Add(new NoteEvent
                     {
                         Step = note.Name.ToString()[0],
                         Octave = note.Octave,

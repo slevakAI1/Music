@@ -127,7 +127,7 @@ namespace Music.Writer
                 ? data.SelectedStaffs 
                 : new List<int> { 1 }; // Default to staff 1 if none selected
 
-            var pitchEvents = new List<PitchEvent>();
+            var noteEvents = new List<NoteEvent>();
 
             // Get tuplet settings from writer data
             bool isTuplet = !string.IsNullOrWhiteSpace(data.TupletNumber);
@@ -139,7 +139,7 @@ namespace Music.Writer
             //========================================================================
             //   MOVE THIS THIS CODE BLOCK INTO AppendNote.EXECUTE
 
-            var pitchEvent = new PitchEvent();
+            var noteEvent = new NoteEvent();
 
             if (data.IsChord ?? false)  // null = false
             {
@@ -148,7 +148,7 @@ namespace Music.Writer
                 // Create Chord pitch event
                 // Chords will be resolved into their component notes byn AppendNotes.Execute()
 
-                pitchEvent = new PitchEvent
+                noteEvent = new NoteEvent
                 {
                     IsChord = true,
                     ChordKey = data.ChordKey,
@@ -165,7 +165,7 @@ namespace Music.Writer
             else
             {
                 // Single note or rest
-                pitchEvent = new PitchEvent
+                noteEvent = new NoteEvent
                 {
                     Step = data.Step,
                     Octave = data.Octave,
@@ -180,15 +180,15 @@ namespace Music.Writer
             // Add tuplet settings if specified
             if (isTuplet)
             {
-                pitchEvent.TupletNumber = tupletNumber;
-                pitchEvent.TupletActualNotes = tupletActualNotes;
-                pitchEvent.TupletNormalNotes = tupletNormalNotes;
+                noteEvent.TupletNumber = tupletNumber;
+                noteEvent.TupletActualNotes = tupletActualNotes;
+                noteEvent.TupletNormalNotes = tupletNormalNotes;
             }
 
             // Create specified number of test Pitch Events
             for (int i = 0; i < (data.NumberOfNotes.GetValueOrDefault(1)); i++)
             {
-                pitchEvents.AddRange(pitchEvent);
+                noteEvents.AddRange(noteEvent);
             }
 
             var appendNotesParams = new AppendPitchEventsParams
@@ -196,7 +196,7 @@ namespace Music.Writer
                 Parts = parts,
                 Staffs = selectedStaffs!,
                 StartBar = data.StartBar.GetValueOrDefault(),
-                PitchEvents = pitchEvents
+                PitchEvents = noteEvents
             };
 
             return appendNotesParams;

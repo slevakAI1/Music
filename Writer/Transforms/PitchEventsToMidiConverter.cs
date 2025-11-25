@@ -95,7 +95,7 @@ namespace Music.Writer
             // Convert pitch events to MIDI notes
             long currentTime = 0;
 
-            foreach (var pitchEvent in config.PitchEvents ?? Enumerable.Empty<PitchEvent>())
+            foreach (var pitchEvent in config.PitchEvents ?? Enumerable.Empty<NoteEvent>())
             {
                 if (pitchEvent.IsRest)
                 {
@@ -179,7 +179,7 @@ namespace Music.Writer
         /// Calculates duration in MIDI ticks based on note value and dots.
         /// Duration codes: 1=whole, 2=half, 4=quarter, 8=eighth, etc.
         /// </summary>
-        private static long CalculateDuration(PitchEvent pitchEvent, short ticksPerQuarterNote)
+        private static long CalculateDuration(NoteEvent pitchEvent, short ticksPerQuarterNote)
         {
             // Base duration in ticks (quarter note = ticksPerQuarterNote)
             var baseDuration = (ticksPerQuarterNote * 4.0) / pitchEvent.Duration;
