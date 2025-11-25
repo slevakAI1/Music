@@ -785,6 +785,7 @@ namespace Music.Writer
             btnClearPhrases.TabIndex = 38;
             btnClearPhrases.Text = "Clear";
             btnClearPhrases.UseVisualStyleBackColor = true;
+            btnClearPhrases.Click += btnClearPhrases_Click;
             // 
             // btnPlayPhrases
             // 

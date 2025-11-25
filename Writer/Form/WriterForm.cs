@@ -219,27 +219,20 @@ namespace Music.Writer
         //  Adds to THE dgvPhrase datagridview CONTROL 
         private void ExecuteCommandRepeatNoteChordRest(WriterFormData _writer)
         {
-
-
-
-            // THIS NEEDS TO BE TOPHRASE. KEEP THE CURRENT ONE FOR XML MAY BE NEEDED
-            var phrase = _writer.ToAppendNoteEventsParams();
-
-
-
+            var phrase = _writer.ToPhrase();
 
             // Set phrase name/number
             phraseNumber++;
             var phraseName = phraseNumber.ToString();
 
-            // Get part name from the phrase (assuming first part)
-            var partName = phrase.Parts?.FirstOrDefault() ?? "Unknown";
+            // Get part name from the phrase
+            var partName = phrase.MidiPartName ?? "Accoustic Grand Piano";
 
             // Add new row
             int newRowIndex = dgvPhrase.Rows.Add();
             var row = dgvPhrase.Rows[newRowIndex];
 
-            // Column 0: Hidden data (AppendNoteEventsToScoreParams object)
+            // Column 0: Hidden data (Phrase object)
             row.Cells["colData"].Value = phrase;
 
             // Column 1: MIDI Instrument dropdown - set to first instrument (Acoustic Grand Piano) as default
@@ -262,7 +255,7 @@ namespace Music.Writer
         /// </summary>
         private async Task PlayMidiFromPhrasesAsync(List<AppendNoteEventsToScoreParams> configs)
         {
-            if (configs == null || configs.Count == 0) 
+            if (configs == null || configs.Count == 0)
                 throw new ArgumentNullException(nameof(configs));
 
             // Always stop any existing playback first
@@ -285,7 +278,7 @@ namespace Music.Writer
             // Wait for playback duration plus buffer
             var duration = midiDoc?.Duration ?? TimeSpan.Zero;
             var totalDelay = duration.TotalMilliseconds + 250;
-            
+
             if (totalDelay > 0)
                 await Task.Delay((int)Math.Min(totalDelay, int.MaxValue));
 
@@ -514,6 +507,11 @@ namespace Music.Writer
                 return null;
 
             return _midiInstruments.FirstOrDefault(i => i.ProgramNumber == programNumber.Value);
+        }
+
+        private void btnClearPhrases_Click(object sender, EventArgs e)
+        {
+            dgvPhrase.Rows.Clear();
         }
     }
 }

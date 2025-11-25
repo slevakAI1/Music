@@ -195,6 +195,86 @@ namespace Music.Writer
             return appendNotesParams;
         }
 
+        /// <summary>
+        /// Converts Writer data to a Phrase for use with the phrase control.
+        /// Similar to ToAppendNoteEventsParams but creates a single-part Phrase object.
+        /// </summary>
+        public static Phrase ToPhrase(this WriterFormData data)
+        {
+            if (data == null) throw new ArgumentNullException(nameof(data));
+
+            // Get the first checked part, or "Unknown" if none
+            var part = (data.PartsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase))
+                .Where(kv => kv.Value)
+                .Select(kv => kv.Key)
+                .FirstOrDefault() ?? "Unknown";
+
+            var noteEvents = new List<NoteEvent>();
+
+            // Get tuplet settings from writer data
+            bool isTuplet = !string.IsNullOrWhiteSpace(data.TupletNumber);
+            string? tupletNumber = isTuplet ? data.TupletNumber : null;
+            int tupletActualNotes = isTuplet ? (data.TupletCount ?? 3) : 0;
+            int tupletNormalNotes = isTuplet ? (data.TupletOf ?? 2) : 0;
+
+            var noteEvent = new NoteEvent();
+
+            if (data.IsChord ?? false)  // null = false
+            {
+                // Create Chord pitch event
+                // Chords will be resolved into their component notes by AppendNotes.Execute()
+                noteEvent = new NoteEvent
+                {
+                    IsChord = true,
+                    ChordKey = data.ChordKey,
+                    ChordDegree = (int)data.ChordDegree,
+                    ChordQuality = data.ChordQuality,
+                    ChordBase = data.ChordBase,
+                    Octave = data.Octave,
+
+                    Duration = GetNoteValue(data.NoteValue),
+                    IsRest = data.IsRest ?? false,
+                    Dots = data.Dots
+                };
+            }
+            else
+            {
+                // Single note or rest
+                noteEvent = new NoteEvent
+                {
+                    Step = data.Step,
+                    Octave = data.Octave,
+                    Duration = GetNoteValue(data.NoteValue),
+                    IsChord = false,
+                    IsRest = data.IsRest ?? false,
+                    Alter = GetAlter(data.Accidental),
+                    Dots = data.Dots
+                };
+            }
+
+            // Add tuplet settings if specified
+            if (isTuplet)
+            {
+                noteEvent.TupletNumber = tupletNumber;
+                noteEvent.TupletActualNotes = tupletActualNotes;
+                noteEvent.TupletNormalNotes = tupletNormalNotes;
+            }
+
+            // Create specified number of test Pitch Events
+            for (int i = 0; i < (data.NumberOfNotes.GetValueOrDefault(1)); i++)
+            {
+                noteEvents.AddRange(noteEvent);
+            }
+
+            var phrase = new Phrase
+            {
+                MidiPartName = part,
+                NoteEvents = noteEvents
+            };
+
+            return phrase;
+        }
+
         private static int GetNoteValue(string? noteValueString)
         {
             if (noteValueString != null && Music.MusicConstants.NoteValueMap.TryGetValue(noteValueString, out var nv))
