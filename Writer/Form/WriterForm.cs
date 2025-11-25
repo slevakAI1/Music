@@ -217,10 +217,9 @@ namespace Music.Writer
         }
 
         //  Adds to THE dgvPhrase datagridview CONTROL 
-        private void ExecuteCommandRepeatNoteChordRest()
+        private void ExecuteCommandRepeatNoteChordRest(WriterFormData _writer)
         {
-            // Get params for this command
-            _writer = CaptureFormData();
+
 
 
             // THIS NEEDS TO BE TOPHRASE. KEEP THE CURRENT ONE FOR XML MAY BE NEEDED
@@ -428,7 +427,8 @@ namespace Music.Writer
             switch (pattern)
             {
                 case "Repeat Note/Chord/Rest":
-                    ExecuteCommandRepeatNoteChordRest();
+                    var formData = CaptureFormData();
+                    ExecuteCommandRepeatNoteChordRest(formData);
                     break;
 
                 // Add additional cases for other patterns as needed
