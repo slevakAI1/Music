@@ -148,7 +148,7 @@ namespace Music.Writer
             grbParts.Controls.Add(lblStaff);
             grbParts.Controls.Add(clbStaffs);
             grbParts.ForeColor = Color.White;
-            grbParts.Location = new Point(1354, 719);
+            grbParts.Location = new Point(1580, 821);
             grbParts.Name = "grbParts";
             grbParts.Size = new Size(322, 174);
             grbParts.TabIndex = 2;
@@ -197,7 +197,7 @@ namespace Music.Writer
             // btnAppend
             // 
             btnAppend.ForeColor = Color.Red;
-            btnAppend.Location = new Point(80, 324);
+            btnAppend.Location = new Point(93, 237);
             btnAppend.Name = "btnAppend";
             btnAppend.Size = new Size(148, 22);
             btnAppend.TabIndex = 4;
@@ -218,9 +218,9 @@ namespace Music.Writer
             grpPitch.Controls.Add(grpAbsolute);
             grpPitch.Controls.Add(grpKeyRelative);
             grpPitch.ForeColor = Color.White;
-            grpPitch.Location = new Point(432, 480);
+            grpPitch.Location = new Point(12, 689);
             grpPitch.Name = "grpPitch";
-            grpPitch.Size = new Size(325, 393);
+            grpPitch.Size = new Size(541, 280);
             grpPitch.TabIndex = 3;
             grpPitch.TabStop = false;
             grpPitch.Text = "Pitch Options";
@@ -235,9 +235,9 @@ namespace Music.Writer
             grpChord.Controls.Add(cbChordQuality);
             grpChord.Controls.Add(label8);
             grpChord.Controls.Add(cbChordBase);
-            grpChord.Location = new Point(8, 245);
+            grpChord.Location = new Point(6, 165);
             grpChord.Name = "grpChord";
-            grpChord.Size = new Size(299, 132);
+            grpChord.Size = new Size(299, 97);
             grpChord.TabIndex = 11;
             grpChord.TabStop = false;
             // 
@@ -341,7 +341,7 @@ namespace Music.Writer
             // 
             rbChord.AutoSize = true;
             rbChord.ForeColor = Color.FromArgb(0, 192, 0);
-            rbChord.Location = new Point(14, 224);
+            rbChord.Location = new Point(15, 147);
             rbChord.Name = "rbChord";
             rbChord.Size = new Size(58, 19);
             rbChord.TabIndex = 5;
@@ -372,7 +372,7 @@ namespace Music.Writer
             // rbPitchKeyRelative
             // 
             rbPitchKeyRelative.AutoSize = true;
-            rbPitchKeyRelative.Location = new Point(14, 153);
+            rbPitchKeyRelative.Location = new Point(28, 312);
             rbPitchKeyRelative.Name = "rbPitchKeyRelative";
             rbPitchKeyRelative.Size = new Size(87, 19);
             rbPitchKeyRelative.TabIndex = 1;
@@ -433,7 +433,7 @@ namespace Music.Writer
             grpKeyRelative.Controls.Add(lblDegree);
             grpKeyRelative.Controls.Add(numDegree);
             grpKeyRelative.Controls.Add(lblOctaveKR);
-            grpKeyRelative.Location = new Point(6, 167);
+            grpKeyRelative.Location = new Point(20, 326);
             grpKeyRelative.Name = "grpKeyRelative";
             grpKeyRelative.Size = new Size(198, 47);
             grpKeyRelative.TabIndex = 3;
@@ -483,7 +483,7 @@ namespace Music.Writer
             groupBox1.Controls.Add(lblTupletOf);
             groupBox1.Controls.Add(numTupletOf);
             groupBox1.ForeColor = Color.White;
-            groupBox1.Location = new Point(60, 677);
+            groupBox1.Location = new Point(12, 502);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(325, 174);
             groupBox1.TabIndex = 6;
@@ -607,7 +607,7 @@ namespace Music.Writer
             // btnSetWriterTestScenarioG1
             // 
             btnSetWriterTestScenarioG1.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSetWriterTestScenarioG1.Location = new Point(150, 51);
+            btnSetWriterTestScenarioG1.Location = new Point(1706, 725);
             btnSetWriterTestScenarioG1.Name = "btnSetWriterTestScenarioG1";
             btnSetWriterTestScenarioG1.Size = new Size(196, 23);
             btnSetWriterTestScenarioG1.TabIndex = 8;
@@ -618,7 +618,7 @@ namespace Music.Writer
             // btnSetDesignTestScenarioD1
             // 
             btnSetDesignTestScenarioD1.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSetDesignTestScenarioD1.Location = new Point(75, 138);
+            btnSetDesignTestScenarioD1.Location = new Point(1069, 467);
             btnSetDesignTestScenarioD1.Name = "btnSetDesignTestScenarioD1";
             btnSetDesignTestScenarioD1.Size = new Size(179, 23);
             btnSetDesignTestScenarioD1.TabIndex = 10;
@@ -630,7 +630,7 @@ namespace Music.Writer
             // 
             btnChordTest.Enabled = false;
             btnChordTest.ForeColor = Color.Red;
-            btnChordTest.Location = new Point(1710, 843);
+            btnChordTest.Location = new Point(1706, 789);
             btnChordTest.Name = "btnChordTest";
             btnChordTest.Size = new Size(196, 23);
             btnChordTest.TabIndex = 11;
@@ -642,7 +642,7 @@ namespace Music.Writer
             // 
             btnUpdateFormFromDesigner.Enabled = false;
             btnUpdateFormFromDesigner.ForeColor = Color.Red;
-            btnUpdateFormFromDesigner.Location = new Point(1710, 814);
+            btnUpdateFormFromDesigner.Location = new Point(1706, 760);
             btnUpdateFormFromDesigner.Name = "btnUpdateFormFromDesigner";
             btnUpdateFormFromDesigner.Size = new Size(196, 23);
             btnUpdateFormFromDesigner.TabIndex = 13;
@@ -676,13 +676,13 @@ namespace Music.Writer
             txtScoreReport.Multiline = true;
             txtScoreReport.Name = "txtScoreReport";
             txtScoreReport.ScrollBars = ScrollBars.Vertical;
-            txtScoreReport.Size = new Size(274, 285);
+            txtScoreReport.Size = new Size(324, 200);
             txtScoreReport.TabIndex = 28;
             // 
             // btnExportToNotion
             // 
             btnExportToNotion.ForeColor = Color.FromArgb(0, 192, 0);
-            btnExportToNotion.Location = new Point(13, 51);
+            btnExportToNotion.Location = new Point(1706, 692);
             btnExportToNotion.Name = "btnExportToNotion";
             btnExportToNotion.Size = new Size(114, 23);
             btnExportToNotion.TabIndex = 30;
@@ -697,9 +697,9 @@ namespace Music.Writer
             grpScoreList.Controls.Add(lblScoreReport);
             grpScoreList.Controls.Add(txtScoreReport);
             grpScoreList.ForeColor = Color.White;
-            grpScoreList.Location = new Point(992, 527);
+            grpScoreList.Location = new Point(1014, 695);
             grpScoreList.Name = "grpScoreList";
-            grpScoreList.Size = new Size(306, 362);
+            grpScoreList.Size = new Size(351, 267);
             grpScoreList.TabIndex = 31;
             grpScoreList.TabStop = false;
             grpScoreList.Text = "Current Score";
@@ -709,12 +709,10 @@ namespace Music.Writer
             groupBox3.BackColor = SystemColors.ActiveCaptionText;
             groupBox3.Controls.Add(btnExecute);
             groupBox3.Controls.Add(cbPattern);
-            groupBox3.Controls.Add(btnExportToNotion);
-            groupBox3.Controls.Add(btnSetWriterTestScenarioG1);
             groupBox3.ForeColor = Color.White;
-            groupBox3.Location = new Point(12, 561);
+            groupBox3.Location = new Point(12, 431);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(403, 100);
+            groupBox3.Size = new Size(416, 59);
             groupBox3.TabIndex = 33;
             groupBox3.TabStop = false;
             groupBox3.Text = "Command";
@@ -734,9 +732,8 @@ namespace Music.Writer
             // 
             grbCurrentDesign.BackColor = Color.Black;
             grbCurrentDesign.Controls.Add(txtDesignerReport);
-            grbCurrentDesign.Controls.Add(btnSetDesignTestScenarioD1);
             grbCurrentDesign.ForeColor = Color.White;
-            grbCurrentDesign.Location = new Point(1340, 538);
+            grbCurrentDesign.Location = new Point(1014, 508);
             grbCurrentDesign.Name = "grbCurrentDesign";
             grbCurrentDesign.Size = new Size(351, 167);
             grbCurrentDesign.TabIndex = 34;
@@ -803,7 +800,6 @@ namespace Music.Writer
             // dgvPhrase
             // 
             dgvPhrase.AllowUserToAddRows = false;
-            dgvPhrase.AllowUserToResizeColumns = true;
             dgvPhrase.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvPhrase.Columns.AddRange(new DataGridViewColumn[] { col1, colPart, col2, col3 });
             dgvPhrase.Location = new Point(15, 19);
@@ -821,7 +817,6 @@ namespace Music.Writer
             col1.Name = "col1";
             col1.ReadOnly = true;
             col1.Visible = false;
-            col1.Width = 39;
             // 
             // colPart
             // 
@@ -829,7 +824,6 @@ namespace Music.Writer
             colPart.HeaderText = "Part";
             colPart.Name = "colPart";
             colPart.ReadOnly = true;
-            colPart.Width = 100;
             // 
             // col2
             // 
@@ -851,9 +845,12 @@ namespace Music.Writer
             // ConsoleForm
             // 
             BackColor = Color.White;
-            ClientSize = new Size(1918, 905);
+            ClientSize = new Size(1918, 1061);
             Controls.Add(grbCurrentDesign);
+            Controls.Add(btnSetDesignTestScenarioD1);
+            Controls.Add(btnExportToNotion);
             Controls.Add(grpScoreList);
+            Controls.Add(btnSetWriterTestScenarioG1);
             Controls.Add(btnUpdateFormFromDesigner);
             Controls.Add(btnChordTest);
             Controls.Add(groupBox1);

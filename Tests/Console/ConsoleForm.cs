@@ -284,7 +284,7 @@ namespace Music.Writer
             // Wait for playback duration plus buffer
             var duration = midiDoc?.Duration ?? TimeSpan.Zero;
             var totalDelay = duration.TotalMilliseconds + 250;
-            
+
             if (totalDelay > 0)
                 await Task.Delay((int)Math.Min(totalDelay, int.MaxValue));
 
@@ -455,11 +455,19 @@ namespace Music.Writer
             var selectedRow = dgvPhrase.SelectedRows[0];
             var cellValue = selectedRow.Cells["colData"].Value;
 
+            // Get the selected MIDI program number (byte) and instrument name
+            var selectedProgramNumber = (byte)dgvPhrase.SelectedRows[0].Cells["colInstrument"].Value;
+            var selectedInstrumentName = dgvPhrase.SelectedRows[0].Cells["colInstrument"].FormattedValue?.ToString() ?? "Acoustic Grand Piano";
+
             if (cellValue is not AppendPitchEventsParams config)
             {
                 MessageBox.Show(this, "Invalid data in the selected row.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+
+            // Update the part name with the selected instrument name
+
+            config.Parts.Add(selectedInstrumentName); // this is Part][0] because parts is empty
 
             try
             {
