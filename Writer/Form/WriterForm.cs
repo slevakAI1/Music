@@ -217,7 +217,7 @@ namespace Music.Writer
         }
 
         //  Adds to THE dgvPhrase datagridview CONTROL 
-        private void ExecuteCommandRepeatNoteChordRest(WriterFormData _writer)
+        private void ExecuteCommandWriteRepeatingNotes(WriterFormData _writer)
         {
             var phrase = _writer.ToPhrase();
 
@@ -226,7 +226,7 @@ namespace Music.Writer
             var phraseName = phraseNumber.ToString();
 
             // Get part name from the phrase
-            var partName = phrase.MidiPartName ?? "Accoustic Grand Piano";
+            var partName = phrase.MidiPartName ?? "Unknown";
 
             // Add new row
             int newRowIndex = dgvPhrase.Rows.Add();
@@ -421,7 +421,7 @@ namespace Music.Writer
             {
                 case "Repeat Note/Chord/Rest":
                     var formData = CaptureFormData();
-                    ExecuteCommandRepeatNoteChordRest(formData);
+                    ExecuteCommandWriteRepeatingNotes(formData);
                     break;
 
                 // Add additional cases for other patterns as needed

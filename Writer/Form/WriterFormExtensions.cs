@@ -203,11 +203,8 @@ namespace Music.Writer
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
 
-            // Get the first checked part, or "Unknown" if none
-            var part = (data.PartsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase))
-                .Where(kv => kv.Value)
-                .Select(kv => kv.Key)
-                .FirstOrDefault() ?? "Unknown";
+            // Default part for new phrase
+            var part = "Acoustic GrandPiano";  
 
             var noteEvents = new List<NoteEvent>();
 
