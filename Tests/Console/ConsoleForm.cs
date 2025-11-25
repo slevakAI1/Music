@@ -85,7 +85,7 @@ namespace Music.Writer
             dgvPhrase.AllowUserToAddRows = false;
             dgvPhrase.AllowUserToResizeColumns = true;
             dgvPhrase.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvPhrase.MultiSelect = false;
+            dgvPhrase.MultiSelect = true; // Changed from false to true
             dgvPhrase.ReadOnly = false; // Allow editing the combo box column
             dgvPhrase.Columns.Clear();
 
@@ -257,18 +257,19 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Converts the provided AppendPitchEventsParams to MIDI and plays it back.
+        /// Converts the provided list of AppendPitchEventsParams to MIDI and plays it back.
         /// Stops and releases the MIDI device after playback completes.
         /// </summary>
-        private async Task PlayMidiFromPitchEventsAsync(AppendPitchEventsParams config)
+        private async Task PlayMidiFromPitchEventsAsync(List<AppendPitchEventsParams> configs)
         {
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            if (configs == null || configs.Count == 0) 
+                throw new ArgumentNullException(nameof(configs));
 
             // Always stop any existing playback first
             _midiPlaybackService.Stop();
 
-            // Convert to MIDI
-            var midiDoc = PitchEventsToMidiConverter.Convert(config);
+            // Convert to MIDI (using the list overload that creates multiple tracks)
+            var midiDoc = PitchEventsToMidiConverter.Convert(configs);
 
             // Select first available output device
             var devices = _midiPlaybackService.EnumerateOutputDevices().ToList();
@@ -284,7 +285,7 @@ namespace Music.Writer
             // Wait for playback duration plus buffer
             var duration = midiDoc?.Duration ?? TimeSpan.Zero;
             var totalDelay = duration.TotalMilliseconds + 250;
-
+            
             if (totalDelay > 0)
                 await Task.Delay((int)Math.Min(totalDelay, int.MaxValue));
 
@@ -451,48 +452,32 @@ namespace Music.Writer
                 return;
             }
 
+            // Build list of AppendPitchEventsParams from all selected rows
+            var configList = new List<AppendPitchEventsParams>();
 
-
-
-
-
-            //=======================================================================================================
-
-
-
-            // Get the AppendPitchEventsParams from the selected row, first column (colData)
-            var selectedRow = dgvPhrase.SelectedRows[0];
-            var cellValue = selectedRow.Cells["colData"].Value;
-
-            // Get the selected MIDI program number (byte) and instrument name
-            //var selectedProgramNumber = (byte)dgvPhrase.SelectedRows[0].Cells["colInstrument"].Value;
-            var selectedInstrumentName = dgvPhrase.SelectedRows[0].Cells["colInstrument"].FormattedValue?.ToString() ?? "Acoustic Grand Piano";
-
-
-            if (cellValue is not AppendPitchEventsParams config)
+            foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
             {
-                MessageBox.Show(this, "Invalid data in the selected row.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                var cellValue = selectedRow.Cells["colData"].Value;
+
+                if (cellValue is not AppendPitchEventsParams config)
+                {
+                    MessageBox.Show(this, $"Invalid data in row {selectedRow.Index}.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Get the selected instrument name for this row
+                var selectedInstrumentName = selectedRow.Cells["colInstrument"].FormattedValue?.ToString() ?? "Acoustic Grand Piano";
+
+                // Update the part name with the selected instrument name
+                config.Parts.Clear();
+                config.Parts.Add(selectedInstrumentName);
+
+                configList.Add(config);
             }
-
-            // Update the part name with the selected instrument name
-            config.Parts.Clear();
-            config.Parts.Add(selectedInstrumentName); // this is Part][0] for now
-
-
-
-            //=======================================================================================================
-
-
-
-
-
-
-
 
             try
             {
-                await PlayMidiFromPitchEventsAsync(config);
+                await PlayMidiFromPitchEventsAsync(configList);
             }
             catch (Exception ex)
             {
