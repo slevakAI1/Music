@@ -156,33 +156,33 @@ namespace Music.Writer
             AppendNotesHelper.UpdatePositionTracking(context, noteEvent, noteDuration, scorePart.Name, measureMeta);
         }
 
-        private static void ProcessChord(Part scorePart, NoteEvent pitchEvent, AppendNoteEventsToScoreParams config, StaffProcessingContext context, MeasureMeta measureMeta)
+        private static void ProcessChord(Part scorePart, NoteEvent noteEvent, AppendNoteEventsToScoreParams config, StaffProcessingContext context, MeasureMeta measureMeta)
         {
             // TO DO - This probably doesnt need note value... that property should be applied here if not already applied!
 
             // Convert chord to individual pitch events
             var chordNotes = ChordConverter.Convert(
-                pitchEvent.ChordKey,
-                (int)pitchEvent.ChordDegree!,
-                pitchEvent.ChordQuality,
-                pitchEvent.ChordBase,
-                baseOctave: pitchEvent.Octave,
-                noteValue: pitchEvent.Duration);
+                noteEvent.ChordKey,
+                (int)noteEvent.ChordDegree!,
+                noteEvent.ChordQuality,
+                noteEvent.ChordBase,
+                baseOctave: noteEvent.Octave,
+                noteValue: noteEvent.Duration);
 
             // Apply dots and tuplet settings to chord notes
             foreach (var cn in chordNotes)
             {
-                cn.Dots = pitchEvent.Dots;
+                cn.Dots = noteEvent.Dots;
             }
 
-            if (!string.IsNullOrWhiteSpace(pitchEvent.TupletNumber))
+            if (!string.IsNullOrWhiteSpace(noteEvent.TupletNumber))
             {
                 foreach (var cn in chordNotes)
                 {
-                    cn.TupletNumber = pitchEvent.TupletNumber;
-                    cn.TupletActualNotes = pitchEvent.TupletActualNotes;
-                    cn.TupletNormalNotes = pitchEvent.TupletNormalNotes;
-                    cn.Dots = pitchEvent.Dots;
+                    cn.TupletNumber = noteEvent.TupletNumber;
+                    cn.TupletActualNotes = noteEvent.TupletActualNotes;
+                    cn.TupletNormalNotes = noteEvent.TupletNormalNotes;
+                    cn.Dots = noteEvent.Dots;
                 }
             }
 

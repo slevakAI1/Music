@@ -95,22 +95,22 @@ namespace Music.Writer
             // Convert pitch events to MIDI notes
             long currentTime = 0;
 
-            foreach (var pitchEvent in config.NoteEvents ?? Enumerable.Empty<NoteEvent>())
+            foreach (var noteEvent in config.NoteEvents ?? Enumerable.Empty<NoteEvent>())
             {
-                if (pitchEvent.IsRest)
+                if (noteEvent.IsRest)
                 {
                     // For rests, just advance time without adding notes
-                    currentTime += CalculateDuration(pitchEvent, ticksPerQuarterNote);
+                    currentTime += CalculateDuration(noteEvent, ticksPerQuarterNote);
                 }
                 else
                 {
                     // Calculate MIDI note number from pitch
                     var noteNumber = CalculateMidiNoteNumber(
-                        pitchEvent.Step, 
-                        pitchEvent.Alter, 
-                        pitchEvent.Octave);
+                        noteEvent.Step, 
+                        noteEvent.Alter, 
+                        noteEvent.Octave);
 
-                    var duration = CalculateDuration(pitchEvent, ticksPerQuarterNote);
+                    var duration = CalculateDuration(noteEvent, ticksPerQuarterNote);
 
                     // Add Note On event
                     trackChunk.Events.Add(new NoteOnEvent(
@@ -179,15 +179,15 @@ namespace Music.Writer
         /// Calculates duration in MIDI ticks based on note value and dots.
         /// Duration codes: 1=whole, 2=half, 4=quarter, 8=eighth, etc.
         /// </summary>
-        private static long CalculateDuration(NoteEvent pitchEvent, short ticksPerQuarterNote)
+        private static long CalculateDuration(NoteEvent noteEvent, short ticksPerQuarterNote)
         {
             // Base duration in ticks (quarter note = ticksPerQuarterNote)
-            var baseDuration = (ticksPerQuarterNote * 4.0) / pitchEvent.Duration;
+            var baseDuration = (ticksPerQuarterNote * 4.0) / noteEvent.Duration;
 
             // Apply dots (each dot adds half of the previous value)
             var dottedMultiplier = 1.0;
             var dotValue = 0.5;
-            for (int i = 0; i < pitchEvent.Dots; i++)
+            for (int i = 0; i < noteEvent.Dots; i++)
             {
                 dottedMultiplier += dotValue;
                 dotValue /= 2;
@@ -196,9 +196,9 @@ namespace Music.Writer
             baseDuration *= dottedMultiplier;
 
             // Apply tuplet if present
-            if (pitchEvent.TupletActualNotes > 0 && pitchEvent.TupletNormalNotes > 0)
+            if (noteEvent.TupletActualNotes > 0 && noteEvent.TupletNormalNotes > 0)
             {
-                baseDuration *= (double)pitchEvent.TupletNormalNotes / pitchEvent.TupletActualNotes;
+                baseDuration *= (double)noteEvent.TupletNormalNotes / noteEvent.TupletActualNotes;
             }
 
             return (long)Math.Round(baseDuration);
