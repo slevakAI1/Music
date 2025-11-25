@@ -108,7 +108,7 @@ namespace Music.Writer
                 DataSource = new List<MidiInstrument>(_midiInstruments),
                 DisplayMember = "Name",
                 ValueMember = "ProgramNumber",
-                DisplayStyle = DataGridViewComboBoxDisplayStyle.Nothing,
+                DisplayStyle = DataGridViewComboBoxDisplayStyle.DropDownButton,
                 FlatStyle = FlatStyle.Flat,
                 ReadOnly = false
             };
@@ -242,8 +242,9 @@ namespace Music.Writer
             // Column 0: Hidden data (AppendPitchEventsParams object)
             row.Cells["colData"].Value = phrase;
 
-            // Column 1: MIDI Instrument dropdown - leave null for "Select Instrument" prompt
-            row.Cells["colInstrument"].Value = null;
+            // Column 1: MIDI Instrument dropdown - set to first instrument (Acoustic Grand Piano) as default
+            // User can change this by clicking the dropdown
+            row.Cells["colInstrument"].Value = _midiInstruments[0].ProgramNumber;
 
             // Column 2: Event number
             row.Cells["colEventNumber"].Value = pitchEventName;
