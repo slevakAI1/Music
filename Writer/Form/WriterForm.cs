@@ -216,7 +216,7 @@ namespace Music.Writer
             Globals.ScoreList = _scoreList;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
         }
 
-        //  Adds to THE dgvPhrase datagridview CONTROL 
+        //  Adds a set of repeating note, chords or rests to the phrase grid
         private void ExecuteCommandWriteRepeatingNotes(WriterFormData _writer)
         {
             var phrase = _writer.ToPhrase();
