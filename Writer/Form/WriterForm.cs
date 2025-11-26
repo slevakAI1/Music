@@ -328,7 +328,7 @@ namespace Music.Writer
             try
             {
                 // Convert phrases to MIDI document here and pass the document to the playback method
-                var midiDoc = NoteEventsToMidiConverter.Convert(phrases);
+                var midiDoc = PhrasesToMidiConverter.Convert(phrases);
                 await PlayMidiFromPhrasesAsync(midiDoc);
             }
             catch (Exception ex)

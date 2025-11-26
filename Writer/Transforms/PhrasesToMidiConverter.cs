@@ -9,66 +9,8 @@ namespace Music.Writer
     /// <summary>
     /// Converts Phrase or AppendNoteEventsToScoreParams to a MIDI file (MidiSongDocument).
     /// </summary>
-    public static class NoteEventsToMidiConverter
+    public static class PhrasesToMidiConverter
     {
-        /// <summary>
-        /// Converts a single pitch event appendNoteEventsToScoreParams to a MIDI document with default settings:
-        /// - Time signature: 4/4
-        /// - Treble clef (not stored in MIDI, implied)
-        /// - Tempo: 112 BPM
-        /// - Part: Uses instrument from Parts[0] or defaults to Piano
-        /// </summary>
-        public static MidiSongDocument Convert(AppendNoteEventsToScoreParams appendNoteEventsToScoreParams)
-        {
-            if (appendNoteEventsToScoreParams == null)
-                throw new ArgumentNullException(nameof(appendNoteEventsToScoreParams));
-
-            return Convert(new List<AppendNoteEventsToScoreParams> { appendNoteEventsToScoreParams });
-        }
-
-        /// <summary>
-        /// Converts multiple pitch event configs to a MIDI document with separate tracks.
-        /// Each AppendNoteEventsToScoreParams becomes its own MIDI track.
-        /// Assumes:
-        /// - Only one staff is selected per appendNoteEventsToScoreParams (either staff 1 or staff 2, not both)
-        /// - Only one part per appendNoteEventsToScoreParams
-        /// Default settings:
-        /// - Time signature: 4/4
-        /// - Tempo: 112 BPM
-        /// </summary>
-        public static MidiSongDocument Convert(List<AppendNoteEventsToScoreParams> configs)
-        {
-            if (configs == null)
-                throw new ArgumentNullException(nameof(configs));
-
-            var midiFile = new MidiFile();
-            var ticksPerQuarterNote = (midiFile.TimeDivision as TicksPerQuarterNoteTimeDivision 
-                ?? new TicksPerQuarterNoteTimeDivision(480)).TicksPerQuarterNote;
-
-            // Set tempo and time signature globally (tempo track)
-            var tempoTrack = new TrackChunk();
-            
-            // Set tempo: 112 BPM
-            var microsecondsPerQuarterNote = 60_000_000 / 112;
-            tempoTrack.Events.Add(new SetTempoEvent(microsecondsPerQuarterNote));
-
-            // Set time signature: 4/4
-            tempoTrack.Events.Add(new TimeSignatureEvent(4, 4));
-
-            midiFile.Chunks.Add(tempoTrack);
-
-            // Create a track for each appendNoteEventsToScoreParams
-            int trackNumber = 1;
-            foreach (var config in configs)
-            {
-                var trackChunk = CreateTrackFromConfig(config, trackNumber, ticksPerQuarterNote);
-                midiFile.Chunks.Add(trackChunk);
-                trackNumber++;
-            }
-
-            return new MidiSongDocument(midiFile);
-        }
-
         /// <summary>
         /// Converts a single Phrase to a MIDI document.
         /// </summary>
