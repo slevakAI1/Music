@@ -475,20 +475,10 @@ namespace Music.Writer
             }
         }
 
+
+        // This plays all of the selected phrases simulatneously as a midi document
         private async void btnPlay_Click(object sender, EventArgs e)
         {
-
-
-
-
-            // Resolve MIDI Program Numbers here and write back into the phrase property which will 
-            // be uninitialized. They are not needed anywhere elsr!!!
-
-            // THEN UPDATE THIS TO WORK WITH PHRASE!!!!
-            
-
-
-
             // Check if there are any rows in the grid
             if (dgvPhrase.Rows.Count == 0)
             {
