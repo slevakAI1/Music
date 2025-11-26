@@ -846,7 +846,7 @@ namespace Music.Writer
             // WriterForm
             // 
             BackColor = Color.White;
-            ClientSize = new Size(1918, 1061);
+            ClientSize = new Size(1938, 991);
             Controls.Add(grbCurrentDesign);
             Controls.Add(btnSetDesignTestScenarioD1);
             Controls.Add(btnExportToNotion);

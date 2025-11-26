@@ -1,8 +1,7 @@
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
-using Melanchall.DryWetMidi.Interaction;
-using Music.Tests;
 using Music.Domain;
+using Music.Tests;
 
 namespace Music.Writer
 {
