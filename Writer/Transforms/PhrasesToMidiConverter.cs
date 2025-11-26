@@ -7,7 +7,7 @@ using Music.Domain;
 namespace Music.Writer
 {
     /// <summary>
-    /// Converts Phrase or AppendNoteEventsToScoreParams to a MIDI file (MidiSongDocument).
+    /// Converts set of Phrases to a MIDI file (MidiSongDocument).
     /// </summary>
     public static class PhrasesToMidiConverter
     {
