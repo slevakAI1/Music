@@ -12,26 +12,26 @@ namespace Music.Writer
     public static class NoteEventsToMidiConverter
     {
         /// <summary>
-        /// Converts a single pitch event config to a MIDI document with default settings:
+        /// Converts a single pitch event appendNoteEventsToScoreParams to a MIDI document with default settings:
         /// - Time signature: 4/4
         /// - Treble clef (not stored in MIDI, implied)
         /// - Tempo: 112 BPM
         /// - Part: Uses instrument from Parts[0] or defaults to Piano
         /// </summary>
-        public static MidiSongDocument Convert(AppendNoteEventsToScoreParams config)
+        public static MidiSongDocument Convert(AppendNoteEventsToScoreParams appendNoteEventsToScoreParams)
         {
-            if (config == null)
-                throw new ArgumentNullException(nameof(config));
+            if (appendNoteEventsToScoreParams == null)
+                throw new ArgumentNullException(nameof(appendNoteEventsToScoreParams));
 
-            return Convert(new List<AppendNoteEventsToScoreParams> { config });
+            return Convert(new List<AppendNoteEventsToScoreParams> { appendNoteEventsToScoreParams });
         }
 
         /// <summary>
         /// Converts multiple pitch event configs to a MIDI document with separate tracks.
         /// Each AppendNoteEventsToScoreParams becomes its own MIDI track.
         /// Assumes:
-        /// - Only one staff is selected per config (either staff 1 or staff 2, not both)
-        /// - Only one part per config
+        /// - Only one staff is selected per appendNoteEventsToScoreParams (either staff 1 or staff 2, not both)
+        /// - Only one part per appendNoteEventsToScoreParams
         /// Default settings:
         /// - Time signature: 4/4
         /// - Tempo: 112 BPM
@@ -57,7 +57,7 @@ namespace Music.Writer
 
             midiFile.Chunks.Add(tempoTrack);
 
-            // Create a track for each config
+            // Create a track for each appendNoteEventsToScoreParams
             int trackNumber = 1;
             foreach (var config in configs)
             {
