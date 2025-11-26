@@ -264,39 +264,6 @@ namespace Music.Writer
             Globals.ScoreList = _scoreList;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
         }
 
-        //  Adds a set of repeating note, chords or rests to the phrase grid
-        private void ExecuteCommandWriteRepeatingNotes(WriterFormData _writer)
-        {
-            var phrase = _writer.ToPhrase();
-
-            // Set phrase name/number
-            phraseNumber++;
-            var phraseName = phraseNumber.ToString();
-
-            // Get part name from the phrase
-            var partName = phrase.MidiPartName ?? "Unknown";
-
-            // Add new row
-            int newRowIndex = dgvPhrase.Rows.Add();
-            var row = dgvPhrase.Rows[newRowIndex];
-
-            // Column 0: Hidden data (Phrase object)
-            row.Cells["colData"].Value = phrase;
-
-            // Column 1: MIDI Instrument dropdown - set to first instrument (Acoustic Grand Piano) as default
-            // User can change this by clicking the dropdown
-            row.Cells["colInstrument"].Value = _midiInstruments[0].ProgramNumber;
-
-            // Column 2: Event number
-            row.Cells["colEventNumber"].Value = phraseName;
-
-            // Column 3: Description
-            row.Cells["colDescription"].Value = $"Part: {partName}";
-
-            // Column 4: Phrase details (placeholder)
-            row.Cells["colPhrase"].Value = "tbd";
-        }
-
         // This plays all of the selected phrases simulaneously as a midi document
         private async void btnPlay_Click(object sender, EventArgs e)
         {
@@ -329,47 +296,13 @@ namespace Music.Writer
             {
                 // Convert phrases to MIDI document here and pass the document to the playback method
                 var midiDoc = PhrasesToMidiConverter.Convert(phrases);
-                await PlayMidiFromPhrasesAsync(midiDoc);
+                await WriterFormHelper.PlayMidiFromPhrasesAsync(_midiPlaybackService, midiDoc, this);
             }
             catch (Exception ex)
             {
                 MessageBox.Show(this, $"Error playing MIDI: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-        /// <summary>
-        /// Plays a MIDI document and releases the MIDI device after playback completes.
-        /// </summary>
-        private async Task PlayMidiFromPhrasesAsync(MidiSongDocument midiDoc)
-        {
-            if (midiDoc == null)
-                throw new ArgumentNullException(nameof(midiDoc));
-
-            // Always stop any existing playback first
-            _midiPlaybackService.Stop();
-
-            // Select first available output device
-            var devices = _midiPlaybackService.EnumerateOutputDevices().ToList();
-            if (devices.Count == 0)
-            {
-                MessageBox.Show(this, "No MIDI output device found.", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            _midiPlaybackService.SelectOutput(devices[0]);
-            _midiPlaybackService.Play(midiDoc);
-
-            // Wait for playback duration plus buffer
-            var duration = midiDoc?.Duration ?? TimeSpan.Zero;
-            var totalDelay = duration.TotalMilliseconds + 250;
-
-            if (totalDelay > 0)
-                await Task.Delay((int)Math.Min(totalDelay, int.MaxValue));
-
-            // Always stop to release resources
-            _midiPlaybackService.Stop();
-        }
-
 
         private void btnUpdateFormFromDesigner_Click(object sender, EventArgs e)
         {
@@ -505,7 +438,7 @@ namespace Music.Writer
             {
                 case "Repeat Note/Chord/Rest":
                     var formData = CaptureFormData();
-                    ExecuteCommandWriteRepeatingNotes(formData);
+                    WriterFormHelper.ExecuteCommandWriteRepeatingNotes(formData, _midiInstruments, dgvPhrase, ref phraseNumber);
                     break;
 
                 // Add additional cases for other patterns as needed
