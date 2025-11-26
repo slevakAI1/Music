@@ -313,9 +313,7 @@ namespace Music.Writer
             // Technical this can run upon activation too, but only in initialize phase, just that one time
         }
 
-        //===========================================================================================
         //                      T E S T   S C E N A R I O   B U T T O N S
-        //  
 
         // This sets design test scenario D1
         private void btnSetDesignTestScenarioD1_Click(object sender, EventArgs e)
