@@ -23,7 +23,7 @@
         // These should be resolved up front!
         public string MidiPartName { get; set; }
         //public string NotionPartName { get; set; }
-        //public string MidiProgramNumber { get; set; }
+        public byte MidiProgramNumber { get; set; }
         public List<NoteEvent> NoteEvents { get; set; } = new();
     }
 }

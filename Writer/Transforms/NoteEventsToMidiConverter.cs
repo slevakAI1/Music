@@ -7,7 +7,7 @@ using Music.Domain;
 namespace Music.Writer
 {
     /// <summary>
-    /// Converts AppendNoteEventsToScoreParams to a MIDI file (MidiSongDocument).
+    /// Converts Phrase or AppendNoteEventsToScoreParams to a MIDI file (MidiSongDocument).
     /// </summary>
     public static class NoteEventsToMidiConverter
     {
@@ -62,6 +62,57 @@ namespace Music.Writer
             foreach (var config in configs)
             {
                 var trackChunk = CreateTrackFromConfig(config, trackNumber, ticksPerQuarterNote);
+                midiFile.Chunks.Add(trackChunk);
+                trackNumber++;
+            }
+
+            return new MidiSongDocument(midiFile);
+        }
+
+        /// <summary>
+        /// Converts a single Phrase to a MIDI document.
+        /// </summary>
+        public static MidiSongDocument Convert(Phrase phrase)
+        {
+            if (phrase == null)
+                throw new ArgumentNullException(nameof(phrase));
+
+            return Convert(new List<Phrase> { phrase });
+        }
+
+        /// <summary>
+        /// Converts multiple Phrase objects to a MIDI document with separate tracks.
+        /// Each Phrase becomes its own MIDI track.
+        /// Default settings:
+        /// - Time signature: 4/4
+        /// - Tempo: 112 BPM
+        /// </summary>
+        public static MidiSongDocument Convert(List<Phrase> phrases)
+        {
+            if (phrases == null)
+                throw new ArgumentNullException(nameof(phrases));
+
+            var midiFile = new MidiFile();
+            var ticksPerQuarterNote = (midiFile.TimeDivision as TicksPerQuarterNoteTimeDivision
+                ?? new TicksPerQuarterNoteTimeDivision(480)).TicksPerQuarterNote;
+
+            // Set tempo and time signature globally (tempo track)
+            var tempoTrack = new TrackChunk();
+
+            // Set tempo: 112 BPM
+            var microsecondsPerQuarterNote = 60_000_000 / 112;
+            tempoTrack.Events.Add(new SetTempoEvent(microsecondsPerQuarterNote));
+
+            // Set time signature: 4/4
+            tempoTrack.Events.Add(new TimeSignatureEvent(4, 4));
+
+            midiFile.Chunks.Add(tempoTrack);
+
+            // Create a track for each phrase
+            int trackNumber = 1;
+            foreach (var phrase in phrases)
+            {
+                var trackChunk = CreateTrackFromPhrase(phrase, trackNumber, ticksPerQuarterNote);
                 midiFile.Chunks.Add(trackChunk);
                 trackNumber++;
             }
@@ -129,6 +180,95 @@ namespace Music.Writer
             }
 
             return trackChunk;
+        }
+
+        /// <summary>
+        /// Creates a single MIDI track from a Phrase.
+        /// Uses Phrase.MidiPartName for track name and derives ProgramChange from MidiProgramNumber if available; 
+        /// falls back to MidiPartName lookup if needed.
+        /// </summary>
+        private static TrackChunk CreateTrackFromPhrase(
+            Phrase phrase,
+            int trackNumber,
+            short ticksPerQuarterNote)
+        {
+            var trackChunk = new TrackChunk();
+
+            var partName = string.IsNullOrWhiteSpace(phrase.MidiPartName) ? "Acoustic Grand Piano" : phrase.MidiPartName;
+            var trackName = $"{partName} - Track {trackNumber}";
+            trackChunk.Events.Add(new SequenceTrackNameEvent(trackName));
+
+            // Prefer explicit MIDI program number if present; otherwise resolve by instrument name
+            byte programNumber = ResolveProgramNumber(phrase);
+
+            // Set program change to the selected instrument
+            trackChunk.Events.Add(new ProgramChangeEvent((SevenBitNumber)programNumber));
+
+            // Convert pitch events to MIDI notes
+            long currentTime = 0;
+
+            foreach (var noteEvent in phrase.NoteEvents ?? Enumerable.Empty<NoteEvent>())
+            {
+                if (noteEvent.IsRest)
+                {
+                    // For rests, just advance time without adding notes
+                    currentTime += CalculateDuration(noteEvent, ticksPerQuarterNote);
+                }
+                else
+                {
+                    // Calculate MIDI note number from pitch
+                    var noteNumber = CalculateMidiNoteNumber(
+                        noteEvent.Step,
+                        noteEvent.Alter,
+                        noteEvent.Octave);
+
+                    var duration = CalculateDuration(noteEvent, ticksPerQuarterNote);
+
+                    // Add Note On event
+                    trackChunk.Events.Add(new NoteOnEvent(
+                        (SevenBitNumber)noteNumber,
+                        (SevenBitNumber)100) // velocity
+                    { DeltaTime = currentTime });
+
+                    // Add Note Off event
+                    trackChunk.Events.Add(new NoteOffEvent(
+                        (SevenBitNumber)noteNumber,
+                        (SevenBitNumber)0)
+                    { DeltaTime = duration });
+
+                    currentTime = 0; // Delta times are relative, reset after note off
+                }
+            }
+
+            return trackChunk;
+        }
+
+        /// <summary>
+        /// Resolves MIDI program number from Phrase.
+        /// Tries Phrase.MidiProgramNumber (byte or parseable string). Falls back to instrument name lookup by Phrase.MidiPartName.
+        /// </summary>
+        private static byte ResolveProgramNumber(Phrase phrase)
+        {
+            // If MidiProgramNumber exists, use it. It may be byte or string; attempt parsing.
+            try
+            {
+                var prop = typeof(Phrase).GetProperty("MidiProgramNumber");
+                if (prop != null)
+                {
+                    var val = prop.GetValue(phrase);
+                    if (val is byte b) return b;
+                    if (val is sbyte sb) return (byte)sb;
+                    if (val is int i && i >= 0 && i <= 127) return (byte)i;
+                    if (val is string s && byte.TryParse(s, out var parsed)) return parsed;
+                }
+            }
+            catch
+            {
+                // ignore reflection errors, fall back to name
+            }
+
+            // Fallback: use instrument name
+            return GetMidiProgramNumber(phrase.MidiPartName);
         }
 
         /// <summary>

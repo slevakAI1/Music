@@ -1,3 +1,7 @@
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+#pragma warning disable CS8605 // Unboxing a possibly null value.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+
 using Music.Designer;
 using Music.Domain;
 using Music.Tests;
@@ -293,20 +297,56 @@ namespace Music.Writer
             row.Cells["colPhrase"].Value = "tbd";
         }
 
-        /// <summary>
-        /// Converts the provided list of AppendNoteEventsToScoreParams to MIDI and plays it back.
-        /// Stops and releases the MIDI device after playback completes.
-        /// </summary>
-        private async Task PlayMidiFromPhrasesAsync(List<AppendNoteEventsToScoreParams> configs)
+        // This plays all of the selected phrases simulaneously as a midi document
+        private async void btnPlay_Click(object sender, EventArgs e)
         {
-            if (configs == null || configs.Count == 0)
-                throw new ArgumentNullException(nameof(configs));
+            // Check if there are any rows in the grid
+            if (dgvPhrase.Rows.Count == 0)
+            {
+                MessageBox.Show(this, "No pitch events to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Check if a row is selected
+            if (dgvPhrase.SelectedRows.Count == 0)
+            {
+                MessageBox.Show(this, "Please select a pitch event to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Build list of Phrase from all selected rows
+            // Phrases midiprogramnumber not set yet
+            // Get the selected instrument from the combobox value property
+            var phrases = new List<Phrase>();
+            foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
+            {
+                var phrase = (Phrase)selectedRow.Cells["colData"].Value;
+                phrase.MidiProgramNumber = (byte)selectedRow.Cells["colInstrument"].Value; // Selected Instrument
+                phrases.Add(phrase);
+            }
+
+            try
+            {
+                // Convert phrases to MIDI document here and pass the document to the playback method
+                var midiDoc = NoteEventsToMidiConverter.Convert(phrases);
+                await PlayMidiFromPhrasesAsync(midiDoc);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, $"Error playing MIDI: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Plays a MIDI document and releases the MIDI device after playback completes.
+        /// </summary>
+        private async Task PlayMidiFromPhrasesAsync(MidiSongDocument midiDoc)
+        {
+            if (midiDoc == null)
+                throw new ArgumentNullException(nameof(midiDoc));
 
             // Always stop any existing playback first
             _midiPlaybackService.Stop();
-
-            // Convert to MIDI (using the list overload that creates multiple tracks)
-            var midiDoc = NoteEventsToMidiConverter.Convert(configs);
 
             // Select first available output device
             var devices = _midiPlaybackService.EnumerateOutputDevices().ToList();
@@ -475,85 +515,6 @@ namespace Music.Writer
             }
         }
 
-
-        // This plays all of the selected phrases simulatneously as a midi document
-        private async void btnPlay_Click(object sender, EventArgs e)
-        {
-            // Check if there are any rows in the grid
-            if (dgvPhrase.Rows.Count == 0)
-            {
-                MessageBox.Show(this, "No pitch events to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            // Check if a row is selected
-            if (dgvPhrase.SelectedRows.Count == 0)
-            {
-                MessageBox.Show(this, "Please select a pitch event to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            // Build list of AppendNoteEventsToScoreParams from all selected rows
-            var configList = new List<AppendNoteEventsToScoreParams>();
-
-            foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
-            {
-                var cellValue = selectedRow.Cells["colData"].Value;
-
-                if (cellValue is not AppendNoteEventsToScoreParams config)
-                {
-                    MessageBox.Show(this, $"Invalid data in row {selectedRow.Index}.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                // Get the selected instrument name for this row
-                var selectedInstrumentName = selectedRow.Cells["colInstrument"].FormattedValue?.ToString() ?? "Acoustic Grand Piano";
-
-                // Update the part name with the selected instrument name
-                config.Parts.Clear();
-                config.Parts.Add(selectedInstrumentName);
-
-                configList.Add(config);
-            }
-
-            try
-            {
-                await PlayMidiFromPhrasesAsync(configList);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(this, $"Error playing MIDI: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        /// <summary>
-        /// Gets the selected MIDI instrument program number for a given row.
-        /// Returns null if no valid selection exists.
-        /// </summary>
-        private byte? GetSelectedMidiProgram(int rowIndex)
-        {
-            if (rowIndex < 0 || rowIndex >= dgvPhrase.Rows.Count)
-                return null;
-
-            var cell = dgvPhrase.Rows[rowIndex].Cells["colInstrument"];
-            if (cell.Value is byte programNumber)
-                return programNumber;
-
-            return null;
-        }
-
-        /// <summary>
-        /// Gets the selected MIDI instrument for a given row.
-        /// Returns null if no valid selection exists.
-        /// </summary>
-        private MidiInstrument? GetSelectedMidiInstrument(int rowIndex)
-        {
-            var programNumber = GetSelectedMidiProgram(rowIndex);
-            if (programNumber == null)
-                return null;
-
-            return _midiInstruments.FirstOrDefault(i => i.ProgramNumber == programNumber.Value);
-        }
 
         private void btnClearPhrases_Click(object sender, EventArgs e)
         {
