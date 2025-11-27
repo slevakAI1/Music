@@ -24,7 +24,7 @@ namespace Music.Writer
             // THE NEW REQUIREMENT IS TO APPEND TO THE SCORE FROM THE SELECTED ROWS (PHRASES) USING THE SELECTED PART IN EACH ROW
             // THIS STILL ASSUMES THAT THE SCORE WAS PRE-CREATED TO CONTAIN THE PARTS SELECTED IN THE PHRASE GRID
 
-            //var config = _writer.ToAppendNoteEventsParams();
+            var config = _writer.ToAppendNoteEventsParams();
             var config = dgvPhrase.ToAppendNoteEventsParams();   // THIS EXTENSION NEEDS TO BE WRITTEN
 
             // THIS SHOULD APPEND FROM WHATS SELECTED IN THE PHRASE  CONTROL
