@@ -1,9 +1,12 @@
 ﻿
 
-NEXT:
-    
 
 
+NEXT: fix append to work with phrase. only?  currently has more capability.
+not sure if that will be ever used. would reduce complexity if removed
+
+
+piano 2 staffs and drum set : https://chatgpt.com/c/69286cf9-3164-8332-8efa-869b9d1afdd2
 
 ==========================================================
 
