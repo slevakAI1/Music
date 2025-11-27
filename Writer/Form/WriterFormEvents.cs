@@ -9,7 +9,8 @@ namespace Music.Writer
         // Inserts notes based on the "number of notes" parameter from the writer form
         public void HandleAppendNotes()
         {
-            _writer = CaptureFormData();
+            // NO LONGER NEEDED!
+            //_writer = CaptureFormData();
 
             // Ensure score list exists and has at least one score
             if (_scoreList == null || _scoreList.Count == 0)
@@ -19,9 +20,12 @@ namespace Music.Writer
                 return;
             }
 
-            // THIS SHOULD NOW BE "CREATE PITCH EVENT" and and SHOW IN THE NEW CONTROL 
 
-            var config = _writer.ToAppendNoteEventsParams();
+            // THE NEW REQUIREMENT IS TO APPEND TO THE SCORE FROM THE SELECTED ROWS (PHRASES) USING THE SELECTED PART IN EACH ROW
+            // THIS STILL ASSUMES THAT THE SCORE WAS PRE-CREATED TO CONTAIN THE PARTS SELECTED IN THE PHRASE GRID
+
+            //var config = _writer.ToAppendNoteEventsParams();
+            var config = dgvPhrase.ToAppendNoteEventsParams();   // THIS EXTENSION NEEDS TO BE WRITTEN
 
             // THIS SHOULD APPEND FROM WHATS SELECTED IN THE PHRASE  CONTROL
 
