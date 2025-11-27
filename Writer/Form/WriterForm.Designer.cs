@@ -98,6 +98,8 @@ namespace Music.Writer
             txtScoreReport = new TextBox();
             btnExportToNotion = new Button();
             grpScoreList = new GroupBox();
+            txtMovementTitle = new TextBox();
+            btnNewScore = new Button();
             groupBox3 = new GroupBox();
             btnExecute = new Button();
             grbCurrentDesign = new GroupBox();
@@ -111,8 +113,6 @@ namespace Music.Writer
             colPart = new DataGridViewTextBoxColumn();
             col2 = new DataGridViewTextBoxColumn();
             col3 = new DataGridViewTextBoxColumn();
-            btnNewScore = new Button();
-            txtMovementTitle = new TextBox();
             grbParts.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -708,6 +708,26 @@ namespace Music.Writer
             grpScoreList.TabStop = false;
             grpScoreList.Text = "Current Score";
             // 
+            // txtMovementTitle
+            // 
+            txtMovementTitle.ForeColor = Color.FromArgb(0, 192, 0);
+            txtMovementTitle.Location = new Point(260, 271);
+            txtMovementTitle.Name = "txtMovementTitle";
+            txtMovementTitle.PlaceholderText = "Movement Title";
+            txtMovementTitle.Size = new Size(250, 23);
+            txtMovementTitle.TabIndex = 31;
+            // 
+            // btnNewScore
+            // 
+            btnNewScore.ForeColor = Color.Red;
+            btnNewScore.Location = new Point(93, 272);
+            btnNewScore.Name = "btnNewScore";
+            btnNewScore.Size = new Size(148, 22);
+            btnNewScore.TabIndex = 30;
+            btnNewScore.Text = "New Score";
+            btnNewScore.UseVisualStyleBackColor = true;
+            btnNewScore.Click += btnNewScore_Click;
+            // 
             // groupBox3
             // 
             groupBox3.BackColor = SystemColors.ActiveCaptionText;
@@ -737,7 +757,7 @@ namespace Music.Writer
             grbCurrentDesign.BackColor = Color.Black;
             grbCurrentDesign.Controls.Add(txtDesignerReport);
             grbCurrentDesign.ForeColor = Color.White;
-            grbCurrentDesign.Location = new Point(1014, 474);
+            grbCurrentDesign.Location = new Point(703, 430);
             grbCurrentDesign.Name = "grbCurrentDesign";
             grbCurrentDesign.Size = new Size(351, 167);
             grbCurrentDesign.TabIndex = 34;
@@ -846,26 +866,6 @@ namespace Music.Writer
             col3.HeaderText = "Phrase";
             col3.Name = "col3";
             col3.ReadOnly = true;
-            // 
-            // btnNewScore
-            // 
-            btnNewScore.ForeColor = Color.Red;
-            btnNewScore.Location = new Point(93, 272);
-            btnNewScore.Name = "btnNewScore";
-            btnNewScore.Size = new Size(148, 22);
-            btnNewScore.TabIndex = 30;
-            btnNewScore.Text = "New Score";
-            btnNewScore.UseVisualStyleBackColor = true;
-            btnNewScore.Click += btnNewScore_Click;
-            // 
-            // txtMovementTitle
-            // 
-            txtMovementTitle.ForeColor = Color.FromArgb(0, 192, 0);
-            txtMovementTitle.Location = new Point(260, 271);
-            txtMovementTitle.Name = "txtMovementTitle";
-            txtMovementTitle.PlaceholderText = "Movement Title";
-            txtMovementTitle.Size = new Size(250, 23);
-            txtMovementTitle.TabIndex = 31;
             // 
             // WriterForm
             // 
