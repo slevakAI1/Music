@@ -111,6 +111,8 @@ namespace Music.Writer
             colPart = new DataGridViewTextBoxColumn();
             col2 = new DataGridViewTextBoxColumn();
             col3 = new DataGridViewTextBoxColumn();
+            btnNewScore = new Button();
+            txtMovementTitle = new TextBox();
             grbParts.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -693,13 +695,15 @@ namespace Music.Writer
             // grpScoreList
             // 
             grpScoreList.BackColor = Color.Black;
+            grpScoreList.Controls.Add(txtMovementTitle);
+            grpScoreList.Controls.Add(btnNewScore);
             grpScoreList.Controls.Add(btnAppend);
             grpScoreList.Controls.Add(lblScoreReport);
             grpScoreList.Controls.Add(txtScoreReport);
             grpScoreList.ForeColor = Color.White;
-            grpScoreList.Location = new Point(1014, 661);
+            grpScoreList.Location = new Point(630, 603);
             grpScoreList.Name = "grpScoreList";
-            grpScoreList.Size = new Size(351, 267);
+            grpScoreList.Size = new Size(610, 328);
             grpScoreList.TabIndex = 31;
             grpScoreList.TabStop = false;
             grpScoreList.Text = "Current Score";
@@ -843,6 +847,26 @@ namespace Music.Writer
             col3.Name = "col3";
             col3.ReadOnly = true;
             // 
+            // btnNewScore
+            // 
+            btnNewScore.ForeColor = Color.Red;
+            btnNewScore.Location = new Point(93, 272);
+            btnNewScore.Name = "btnNewScore";
+            btnNewScore.Size = new Size(148, 22);
+            btnNewScore.TabIndex = 30;
+            btnNewScore.Text = "New Score";
+            btnNewScore.UseVisualStyleBackColor = true;
+            btnNewScore.Click += btnNewScore_Click;
+            // 
+            // txtMovementTitle
+            // 
+            txtMovementTitle.ForeColor = Color.FromArgb(0, 192, 0);
+            txtMovementTitle.Location = new Point(260, 271);
+            txtMovementTitle.Name = "txtMovementTitle";
+            txtMovementTitle.PlaceholderText = "Movement Title";
+            txtMovementTitle.Size = new Size(250, 23);
+            txtMovementTitle.TabIndex = 31;
+            // 
             // WriterForm
             // 
             BackColor = Color.White;
@@ -936,5 +960,7 @@ namespace Music.Writer
         private DataGridViewTextBoxColumn colPart;
         private DataGridViewTextBoxColumn col2;
         private DataGridViewTextBoxColumn col3;
+        private Button btnNewScore;
+        private TextBox txtMovementTitle;
     }
 }

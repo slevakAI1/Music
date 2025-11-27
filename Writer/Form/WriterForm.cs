@@ -178,12 +178,12 @@ namespace Music.Writer
             {
                 // Get the selected instrument name
                 var selectedInstrumentName = row.Cells["colInstrument"].FormattedValue?.ToString();
-                
+
                 if (!string.IsNullOrEmpty(selectedInstrumentName))
                 {
                     // Update the Phrase object's MidiPartName property
                     phrase.MidiPartName = selectedInstrumentName;
-                    
+
                     // Optionally update the description column to reflect the change
                     row.Cells["colDescription"].Value = $"Part: {selectedInstrumentName}";
                 }
@@ -281,6 +281,36 @@ namespace Music.Writer
         private void btnClearPhrases_Click(object sender, EventArgs e)
         {
             HandleClearPhrases();
+        }
+
+        private void btnNewScore_Click(object sender, EventArgs e)
+        {
+            // Resolve Movement Title to use for the new score
+            var movementTitle = txtMovementTitle.Text;
+            if (movementTitle == "")
+            {
+                var now = System.DateTime.Now;
+                movementTitle = now.ToString("dddd, MMM d, yyyy h:mm'.'ss tt");
+            }
+
+            var newScore = ScoreHelper.CreateNewScore(
+
+                _designer,
+                ref _measureMeta,
+                movementTitle);
+
+            // Set current score to newly created score and update 
+            if (newScore != null)
+            {
+                if (_scoreList.Count > 0)
+                    _scoreList[0] = newScore;
+                else
+                    _scoreList.Add(newScore);
+                txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
+            }
+
+            // Clear the movement title textbox
+            txtMovementTitle.Text = "";
         }
     }
 }

@@ -1,5 +1,7 @@
 using Music.Designer;
+using Music.Domain;
 using MusicXml;
+using MusicXml.Domain;
 
 namespace Music.Writer
 {
@@ -9,9 +11,6 @@ namespace Music.Writer
         // Inserts notes based on the "number of notes" parameter from the writer form
         public void HandleAppendNotes()
         {
-            // NO LONGER NEEDED!
-            //_writer = CaptureFormData();
-
             // Ensure score list exists and has at least one score
             if (_scoreList == null || _scoreList.Count == 0)
             {
@@ -20,19 +19,72 @@ namespace Music.Writer
                 return;
             }
 
+            // Check if there are any rows in the grid
+            if (dgvPhrase.Rows.Count == 0)
+            {
+                MessageBox.Show(this, "No phrases to append. Please create phrases first.",
+                    "No Phrases", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
 
-            // THE NEW REQUIREMENT IS TO APPEND TO THE SCORE FROM THE SELECTED ROWS (PHRASES) USING THE SELECTED PART IN EACH ROW
-            // THIS STILL ASSUMES THAT THE SCORE WAS PRE-CREATED TO CONTAIN THE PARTS SELECTED IN THE PHRASE GRID
+            // Check if a row is selected
+            if (dgvPhrase.SelectedRows.Count == 0)
+            {
+                MessageBox.Show(this, "Please select one or more phrases to append to the score.",
+                    "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
 
-            var config = _writer.ToAppendNoteEventsParams();
-            var config = dgvPhrase.ToAppendNoteEventsParams();   // THIS EXTENSION NEEDS TO BE WRITTEN
+            try
+            {
+                // Process each selected phrase row
+                foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
+                {
+                    // Get the Phrase object from the hidden data column
+                    var phrase = (Phrase)selectedRow.Cells["colData"].Value;
+                    
+                    // Get the selected instrument name from the combobox
+                    var selectedInstrumentName = selectedRow.Cells["colInstrument"].FormattedValue?.ToString();
+                    
+                    if (phrase == null || string.IsNullOrEmpty(selectedInstrumentName))
+                        continue;
 
-            // THIS SHOULD APPEND FROM WHATS SELECTED IN THE PHRASE  CONTROL
+                    // THIS IS THE CONVERSION BETWEEN PHRASE AND THE OLD PARAMS CLASS:
 
-            AppendNotes.Execute(_scoreList[0], config, _measureMeta);
+                    // Create AppendNoteEventsToScoreParams from the phrase
+                    var config = new AppendNoteEventsToScoreParams
+                    {
+                        Parts = new List<string> { selectedInstrumentName },
+                        Staffs = new List<int> { 1 },
+                        StartBar = 1, // Default to bar 1, could be enhanced to use a form control
+                        StartBeat = 1, // Default to beat 1
+                        NoteEvents = phrase.NoteEvents ?? new List<NoteEvent>()
+                    };
 
-            txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
-            Globals.ScoreList = _scoreList;  // Note: Do this here for now because File Export MusicXml does not exit this form, so does not trigger Deactivate().
+                    // Append the phrase to the score
+                    AppendNotes.Execute(_scoreList[0], config, _measureMeta);
+                }
+
+                // Update the score report display
+                txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
+                
+                // Update globals
+                Globals.ScoreList = _scoreList;
+
+                MessageBox.Show(this, 
+                    $"Successfully appended {dgvPhrase.SelectedRows.Count} phrase(s) to the score.",
+                    "Append Complete", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, 
+                    $"Error appending phrases to score:\n{ex.Message}", 
+                    "Append Error", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error);
+            }
         }
 
         // This plays all of the selected phrases simulaneously as a midi document
