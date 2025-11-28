@@ -41,11 +41,26 @@ namespace Music.Writer
 
             foreach (var phrase in phrases)
             {
-                if (channelCursor == 9) channelCursor++; // skip percussion channel unless intentionally used
-                var trackChunk = CreateTrackFromPhrase(phrase, trackNumber, ticksPerQuarterNote, channelCursor);
+                // Determine if this is a drum set track
+                bool isDrumSet = IsDrumSet(phrase);
+                
+                int channel;
+                if (isDrumSet)
+                {
+                    // Drum set always uses channel 10 (zero-based index 9)
+                    channel = 9;
+                }
+                else
+                {
+                    // Skip channel 9 (drum channel) for melodic instruments
+                    if (channelCursor == 9) channelCursor++;
+                    channel = channelCursor;
+                    channelCursor = (channelCursor + 1) % 16;
+                }
+                
+                var trackChunk = CreateTrackFromPhrase(phrase, trackNumber, ticksPerQuarterNote, channel, isDrumSet);
                 midiFile.Chunks.Add(trackChunk);
                 trackNumber++;
-                channelCursor = (channelCursor + 1) % 16;
             }
 
             return new MidiSongDocument(midiFile);
@@ -55,7 +70,8 @@ namespace Music.Writer
             Phrase phrase,
             int trackNumber,
             short ticksPerQuarterNote,
-            int channel)
+            int channel,
+            bool isDrumSet)
         {
             var trackChunk = new TrackChunk();
 
@@ -63,12 +79,17 @@ namespace Music.Writer
             var trackName = $"{partName} - Track {trackNumber}";
             trackChunk.Events.Add(new SequenceTrackNameEvent(trackName) { DeltaTime = 0 });
 
-            byte programNumber = ResolveProgramNumber(phrase);
-            trackChunk.Events.Add(new ProgramChangeEvent((SevenBitNumber)programNumber)
+            // Only send program change for non-drum tracks
+            // Channel 10 (drums) ignores program changes per GM spec
+            if (!isDrumSet)
             {
-                Channel = (FourBitNumber)channel,
-                DeltaTime = 0
-            });
+                byte programNumber = ResolveProgramNumber(phrase);
+                trackChunk.Events.Add(new ProgramChangeEvent((SevenBitNumber)programNumber)
+                {
+                    Channel = (FourBitNumber)channel,
+                    DeltaTime = 0
+                });
+            }
 
             long runningDelta = 0;
 
@@ -106,6 +127,18 @@ namespace Music.Writer
         // Reflection helper to instantiate EndOfTrackEvent with internal constructor
         private static MidiEvent CreateEndOfTrackEvent() =>
             (MidiEvent)Activator.CreateInstance(typeof(EndOfTrackEvent), nonPublic: true)!;
+
+        /// <summary>
+        /// Determines if a phrase represents a drum set based on program number or instrument name.
+        /// </summary>
+        private static bool IsDrumSet(Phrase phrase)
+        {
+            // Check if MidiProgramNumber is the sentinel value 255 (from MidiInstrument list)
+            if (phrase.MidiProgramNumber == 255)
+                return true;
+
+            return false;
+        }
 
         private static byte ResolveProgramNumber(Phrase phrase)
         {
