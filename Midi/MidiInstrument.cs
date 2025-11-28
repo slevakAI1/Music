@@ -19,8 +19,9 @@ namespace Music.Domain
         public override string ToString() => Name;
 
         /// <summary>
-        /// Returns the complete General MIDI instrument set (0-127).
-        /// Organized by family groups as per the GM specification.
+        /// Returns the complete General MIDI instrument set (0-127),
+        /// plus a pseudo-entry for the GM Drum Set (Channel 10) using a sentinel program number (255).
+        /// Note: In GM, drums use Channel 10 and ignore program changes; 255 here is for UI/round-tripping only.
         /// </summary>
         public static List<MidiInstrument> GetGeneralMidiInstruments()
         {
@@ -184,7 +185,10 @@ namespace Music.Domain
                 new(124, "Telephone Ring"),
                 new(125, "Helicopter"),
                 new(126, "Applause"),
-                new(127, "Gunshot")
+                new(127, "Gunshot"),
+
+                // GM Drums (Channel 10, program ignored) - sentinel entry for UI and data round-tripping
+                new(255, "Drum Set")
             };
         }
     }

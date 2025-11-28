@@ -21,7 +21,7 @@ namespace Music.Designer
             AddVoice("Acoustic Grand Piano");
             AddVoice("Electric Guitar (clean)");
             AddVoice("Electric Bass (finger)");
-            //AddVoice("Drum Set");  // MIDI track 10 reserved for drum set. Does not use Program Number. Then each note is different percussion.
+            AddVoice("Drum Set");  // MIDI track 10 reserved for drum set. Does not use Program Number. Then each note is different percussion.
             return Parts;
         }
     }
