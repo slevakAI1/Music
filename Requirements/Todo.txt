@@ -8,6 +8,39 @@ not sure if that will be ever used. would reduce complexity if removed
 
 piano 2 staffs and drum set : https://chatgpt.com/c/69286cf9-3164-8332-8efa-869b9d1afdd2
 
+
+ai : Mapping midi to Presonus
+Recommended Approach: Extend the Voice Catalog with Mapping Data
+The cleanest solution is to extend Voices.Notion.json to include MIDI mappings, 
+then use this during both phrase creation and export. This keeps all instrument
+knowledge centralized.
+
+
+=========================  VST STUFF
+=================================
+Below is a concise assessment and a practical path forward.
+Can it work with VST “voice” (instrument) files now? No. The current IMidiPlaybackService + MidiPlaybackService only stream a MIDI file to a hardware/virtual MIDI output device via DryWetMidi. It does not host VST2/VST3 plugins, does not render audio, and has no concept of plugin presets (“voices”).
+What is missing for VST support? You need an audio engine and a plugin host layer:
+1.	Plugin hosting (VST3 preferred; VST2 is deprecated). A .NET wrapper or interop layer around the VST3 SDK.
+2.	Real‑time audio output (WASAPI, ASIO, or CoreAudio). NAudio can help with device abstraction.
+3.	MIDI event routing to the plugin (note on/off, CC, program changes).
+4.	Voice/instrument catalog mapping (your existing Voices.Notion.json extended with plugin identifiers, preset names, optional key range, transposition).
+5.	Latency handling, sample block scheduling, tempo/time signature sync (for plugins needing transport info).
+6.	Mixing (if multiple tracks use different plugins) and resource lifecycle (load/unload).
+Recommended design evolution Option A: Extend existing interface (simpler but mixes concerns). Option B (cleaner): Keep IMidiPlaybackService for raw MIDI out and add a parallel IVstPlaybackService or a generalized IAudioInstrumentPlaybackService.
+Minimal interface extension (if you choose Option A)
+
+You can mix them. Hybrid playback (some parts via external/virtual MIDI device, others via VST instruments) is absolutely doable and common. You do not need to choose “all VST” or “all GM MIDI.” The complexity is manageable if you introduce a clear abstraction for “where notes go.”
+Core considerations
+1.	Transport/Clock: One scheduler must drive timing for both MIDI-output events and VST-hosted synthesis so they stay in sync.
+2.	Latency Alignment: VST audio path has buffer latency; external MIDI devices have near-zero scheduling latency but variable synth response. Add a per-endpoint latency offset if necessary.
+3.	Resource Separation: MIDI endpoints just send events; VST endpoints must render audio blocks. Keep rendering thread real-time safe.
+4.	Voice Catalog: Extend catalog per part/staff/voice with a rendering mode flag (MidiProgram vs VstPlugin + Preset).
+5.	Routing: Each score Part maps to exactly one InstrumentEndpoint; during playback, each timed event is dispatched to that endpoint.
+6.	DryWetMidi Playback: Don’t run two independent playbacks. Use DryWetMidi to parse tempo map and timed events, but do custom scheduling so you can dispatch to mixed endpoints uniformly.
+Recommended abstraction Define a small interface representing an instrument destination.
+
+
 ==========================================================
 
 
