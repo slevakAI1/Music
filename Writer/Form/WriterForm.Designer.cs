@@ -109,10 +109,6 @@ namespace Music.Writer
             btnClearPhrases = new Button();
             btnPlayPhrases = new Button();
             dgvPhrase = new DataGridView();
-            col1 = new DataGridViewTextBoxColumn();
-            colPart = new DataGridViewTextBoxColumn();
-            col2 = new DataGridViewTextBoxColumn();
-            col3 = new DataGridViewTextBoxColumn();
             grbParts.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -826,46 +822,12 @@ namespace Music.Writer
             // 
             dgvPhrase.AllowUserToAddRows = false;
             dgvPhrase.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvPhrase.Columns.AddRange(new DataGridViewColumn[] { col1, colPart, col2, col3 });
             dgvPhrase.Location = new Point(15, 19);
             dgvPhrase.Name = "dgvPhrase";
             dgvPhrase.ReadOnly = true;
             dgvPhrase.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvPhrase.Size = new Size(1532, 334);
             dgvPhrase.TabIndex = 37;
-            // 
-            // col1
-            // 
-            col1.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
-            col1.HeaderText = "#";
-            col1.MaxInputLength = 1000000;
-            col1.Name = "col1";
-            col1.ReadOnly = true;
-            col1.Visible = false;
-            // 
-            // colPart
-            // 
-            colPart.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            colPart.HeaderText = "Part";
-            colPart.Name = "colPart";
-            colPart.ReadOnly = true;
-            // 
-            // col2
-            // 
-            col2.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            col2.FillWeight = 33.33F;
-            col2.HeaderText = "Description";
-            col2.Name = "col2";
-            col2.ReadOnly = true;
-            col2.Width = 200;
-            // 
-            // col3
-            // 
-            col3.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            col3.FillWeight = 66.67F;
-            col3.HeaderText = "Phrase";
-            col3.Name = "col3";
-            col3.ReadOnly = true;
             // 
             // WriterForm
             // 
@@ -956,10 +918,6 @@ namespace Music.Writer
         private Button btnDeletePhrases;
         private Button btnClearPhrases;
         private Button btnAddPhrase;
-        private DataGridViewTextBoxColumn col1;
-        private DataGridViewTextBoxColumn colPart;
-        private DataGridViewTextBoxColumn col2;
-        private DataGridViewTextBoxColumn col3;
         private Button btnNewScore;
         private TextBox txtMovementTitle;
     }

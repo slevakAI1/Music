@@ -115,7 +115,17 @@ namespace Music.Writer
             };
             dgvPhrase.Columns.Add(colInstrument);
 
-            // Column 2: Event number (read-only)
+            // Column 2: Stave
+            var colStaff = new DataGridViewTextBoxColumn
+            {
+                Name = "colStave",
+                HeaderText = "Stave",
+                Width = 40,
+                ReadOnly = false
+            };
+            dgvPhrase.Columns.Add(colStaff);
+
+            // Column 3: Event number (read-only)
             var colEventNumber = new DataGridViewTextBoxColumn
             {
                 Name = "colEventNumber",
@@ -125,7 +135,7 @@ namespace Music.Writer
             };
             dgvPhrase.Columns.Add(colEventNumber);
 
-            // Column 3: Description (read-only for now)
+            // Column 4: Description (read-only for now)
             var colDescription = new DataGridViewTextBoxColumn
             {
                 Name = "colDescription",
@@ -135,7 +145,7 @@ namespace Music.Writer
             };
             dgvPhrase.Columns.Add(colDescription);
 
-            // Column 4: Phrase details (fills remaining space)
+            // Column 5: Phrase details (fills remaining space)
             var colPhrase = new DataGridViewTextBoxColumn
             {
                 Name = "colPhrase",
