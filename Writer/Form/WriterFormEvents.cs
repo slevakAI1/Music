@@ -118,7 +118,15 @@ namespace Music.Writer
             try
             {
                 // Convert phrases to MIDI document here and pass the document to the playback method
+
+                var timedNotes = PhrasesToTimedNotesConverter.Convert(phrases);
+
+
+
                 var midiDoc = PhrasesToMidiConverter.Convert(phrases);
+
+
+
                 await WriterFormHelper.PlayMidiFromPhrasesAsync(_midiPlaybackService, midiDoc, this);
             }
             catch (Exception ex)
