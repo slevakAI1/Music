@@ -36,13 +36,16 @@ namespace Music.Writer
             // User can change this by clicking the dropdown
             row.Cells["colInstrument"].Value = midiInstruments[0].ProgramNumber;
 
-            // Column 2: Event number
+            // Column 2: Stave - adds +1 each time new row is added with same instrument as existing row(s)
+            row.Cells["colStave"].Value = dgvPhrase.Rows.Cast<DataGridViewRow>().Count(r => r.Cells["colInstrument"].Value?.Equals(midiInstruments[0].ProgramNumber) == true);
+
+            // Column 3: Event number
             row.Cells["colEventNumber"].Value = phraseName;
 
-            // Column 3: Description
+            // Column 4: Description
             row.Cells["colDescription"].Value = $"Part: {partName}";
 
-            // Column 4: Phrase details (placeholder)
+            // Column 5: Phrase details (placeholder)
             row.Cells["colPhrase"].Value = "tbd";
         }
 
