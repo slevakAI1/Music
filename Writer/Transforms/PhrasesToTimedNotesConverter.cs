@@ -4,69 +4,77 @@ using Music.Tests;
 namespace Music.Writer
 {
     /// <summary>
-    /// Converts a list of Phrase objects (with the same instrument) to a flat list of TimedNote objects.
+    /// Converts Phrase objects to flat lists of TimedNote objects.
     /// Sequential notes have positive delta times, while simultaneous notes (chords) have delta = 0.
     /// </summary>
     public static class PhrasesToTimedNotesConverter
     {
-        public static List<TimedNote> Convert(List<Phrase> phrases, short ticksPerQuarterNote = 480)
+        /// <summary>
+        /// Converts a list of phrases (which may have different instruments) to a list of TimedNote lists,
+        /// one for each input phrase.
+        /// </summary>
+        public static List<List<TimedNote>> Convert(List<Phrase> phrases, short ticksPerQuarterNote = 480)
         {
             if (phrases == null)
                 throw new ArgumentNullException(nameof(phrases));
 
             if (phrases.Count == 0)
-                return new List<TimedNote>();
+                return new List<List<TimedNote>>();
 
-            // Verify all phrases have the same program number
-            if (phrases.Count > 1)
-            {
-                var firstProgram = phrases[0].MidiProgramNumber;
-                if (phrases.Any(p => p.MidiProgramNumber != firstProgram))
-                    throw new ArgumentException("All phrases must have the same MidiProgramNumber.", nameof(phrases));
-            }
-
-            var timedNotes = new List<TimedNote>();
-            long currentTime = 0;
+            var result = new List<List<TimedNote>>();
 
             foreach (var phrase in phrases)
             {
-                foreach (var noteEvent in phrase.NoteEvents ?? Enumerable.Empty<NoteEvent>())
+                result.Add(ConvertSinglePhrase(phrase, ticksPerQuarterNote));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Converts a single Phrase object to a flat list of TimedNote objects.
+        /// </summary>
+        private static List<TimedNote> ConvertSinglePhrase(Phrase phrase, short ticksPerQuarterNote)
+        {
+            var timedNotes = new List<TimedNote>();
+            long currentTime = 0;
+
+            foreach (var noteEvent in phrase.NoteEvents ?? Enumerable.Empty<NoteEvent>())
+            {
+                var duration = CalculateDuration(noteEvent, ticksPerQuarterNote);
+
+                if (noteEvent.IsRest)
                 {
-                    var duration = CalculateDuration(noteEvent, ticksPerQuarterNote);
+                    // Rests add to the delta for the next note
+                    currentTime += duration;
+                    continue;
+                }
 
-                    if (noteEvent.IsRest)
-                    {
-                        // Rests add to the delta for the next note
-                        currentTime += duration;
-                        continue;
-                    }
+                // For chords, the first note gets the accumulated delta, subsequent notes get 0
+                bool isFirstNoteInChord = true;
 
-                    // For chords, the first note gets the accumulated delta, subsequent notes get 0
-                    bool isFirstNoteInChord = true;
+                // Handle chord notes (if IsChord is true, this note is part of a chord)
+                var noteNumber = CalculateMidiNoteNumber(noteEvent.Step, noteEvent.Alter, noteEvent.Octave);
+                
+                timedNotes.Add(new TimedNote
+                {
+                    Delta = isFirstNoteInChord ? currentTime : 0,
+                    NoteNumber = (byte)noteNumber,
+                    Duration = duration,
+                    Velocity = 100,
+                    IsRest = false
+                });
 
-                    // Handle chord notes (if IsChord is true, this note is part of a chord)
-                    var noteNumber = CalculateMidiNoteNumber(noteEvent.Step, noteEvent.Alter, noteEvent.Octave);
-                    
-                    timedNotes.Add(new TimedNote
-                    {
-                        Delta = isFirstNoteInChord ? currentTime : 0,
-                        NoteNumber = (byte)noteNumber,
-                        Duration = duration,
-                        Velocity = 100,
-                        IsRest = false
-                    });
+                if (isFirstNoteInChord)
+                {
+                    currentTime = 0; // Reset after first note
+                    isFirstNoteInChord = false;
+                }
 
-                    if (isFirstNoteInChord)
-                    {
-                        currentTime = 0; // Reset after first note
-                        isFirstNoteInChord = false;
-                    }
-
-                    // After processing a note (or chord), accumulate time for the next note
-                    if (!noteEvent.IsChord)
-                    {
-                        currentTime += duration;
-                    }
+                // After processing a note (or chord), accumulate time for the next note
+                if (!noteEvent.IsChord)
+                {
+                    currentTime += duration;
                 }
             }
 
