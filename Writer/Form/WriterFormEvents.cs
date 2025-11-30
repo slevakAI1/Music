@@ -120,13 +120,24 @@ namespace Music.Writer
                 // Convert phrases to MIDI document here and pass the document to the playback method
 
 
- 
+                // Step 1 - convert phrases to to midi-compatible list of "timed notes". CHORD NOTES ARE EXPANDING NOW.
                 var timedPhrases = PhrasesToTimedNotesConverter.Convert(phrases);
 
+                // Step 2 - Merge timed notes lists that are for the same instrument, i.e. it has phrases for multiple staves
+                //          Note: Chords are already expanded into individual note events at this point. No need 
+                //                to consider them as a separate case.
+                // Pseudo-code:
+                //    (1) Get list of unique instruments
+                //    (2) Loop through each unique instrument
+                //          (2a) Get timed note lists for this instrument
+                //          (2b) Merge the timed note lists for this instrument into one timed note list
+                //             that assumes the lists will play simultaneously. Notes must stay in the same
+                //             order they appear in each list.
+                //          (2c) Output the merged list
+                //    (3) Return the composite List<List<TimedNote>> containing the merged data
+                //        There should be one List<TimedNote>> per instrument at this point
 
-                // CHORD NOTES ARE EXPANDING NOW, NEED TO MAKE THIS NEXT CALL WORK WITH timedPhrases input NEXT
-
-
+                // Step 3 - NEED TO MAKE THIS NEXT CALL WORK WITH timedPhrases input NEXT
                 var midiDoc = PhrasesToMidiConverter.Convert(phrases);
 
 
