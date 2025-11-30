@@ -232,26 +232,27 @@ namespace Music.Writer
                         }
                     }
 
+                    // Calculate duration once for the chord
+                    var chordDuration = CalculateDuration(chordNotes[0], ticksPerQuarterNote);
+
                     // Convert chord notes to TimedNotes
                     for (int i = 0; i < chordNotes.Count; i++)
                     {
                         var cn = chordNotes[i];
-                        var duration = CalculateDuration(cn, ticksPerQuarterNote);
                         var noteNumber = CalculateMidiNoteNumber(cn.Step, cn.Alter, cn.Octave);
 
                         timedNotes.Add(new TimedNote
                         {
                             Delta = i == 0 ? currentTime : 0, // First note gets accumulated time, rest are simultaneous
                             NoteNumber = (byte)noteNumber,
-                            Duration = duration,
+                            Duration = chordDuration,
                             Velocity = 100,
                             IsRest = false
                         });
                     }
 
-                    // Advance time for the entire chord
-                    var chordDuration = CalculateDuration(chordNotes[0], ticksPerQuarterNote);
-                    currentTime = chordDuration;
+                    // Advance time for the entire chord - reset currentTime to 0 since we've already assigned the delta
+                    currentTime = 0;
                 }
                 else
                 {
@@ -268,8 +269,8 @@ namespace Music.Writer
                         IsRest = false
                     });
 
-                    // Advance time for the next note
-                    currentTime = duration;
+                    // Reset currentTime to 0 after assigning it to the note's delta
+                    currentTime = 0;
                 }
             }
 
