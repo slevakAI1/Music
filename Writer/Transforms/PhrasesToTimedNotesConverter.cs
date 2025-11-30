@@ -193,15 +193,16 @@ namespace Music.Writer
         private static List<TimedNote> ConvertSinglePhrase(Phrase phrase, short ticksPerQuarterNote)
         {
             var timedNotes = new List<TimedNote>();
-            long currentTime = 0;
+            long absoluteTime = 0;  // Track absolute time position
+            long lastNoteStartTime = 0;  // Track when the last note/chord started
 
             foreach (var noteEvent in phrase.NoteEvents ?? Enumerable.Empty<NoteEvent>())
             {
                 if (noteEvent.IsRest)
                 {
-                    // Rests add to the delta for the next note
+                    // Rests add to the absolute time
                     var duration = CalculateDuration(noteEvent, ticksPerQuarterNote);
-                    currentTime += duration;
+                    absoluteTime += duration;
                     continue;
                 }
 
@@ -241,9 +242,12 @@ namespace Music.Writer
                         var cn = chordNotes[i];
                         var noteNumber = CalculateMidiNoteNumber(cn.Step, cn.Alter, cn.Octave);
 
+                        // First note of the chord gets delta from last note, rest are simultaneous
+                        var delta = i == 0 ? (absoluteTime - lastNoteStartTime) : 0;
+
                         timedNotes.Add(new TimedNote
                         {
-                            Delta = i == 0 ? currentTime : 0, // First note gets accumulated time, rest are simultaneous
+                            Delta = delta,
                             NoteNumber = (byte)noteNumber,
                             Duration = chordDuration,
                             Velocity = 100,
@@ -251,8 +255,9 @@ namespace Music.Writer
                         });
                     }
 
-                    // Advance time for the entire chord - reset currentTime to 0 since we've already assigned the delta
-                    currentTime = 0;
+                    // Update tracking: chord started at absoluteTime and lasts for chordDuration
+                    lastNoteStartTime = absoluteTime;
+                    absoluteTime += chordDuration;
                 }
                 else
                 {
@@ -260,17 +265,20 @@ namespace Music.Writer
                     var duration = CalculateDuration(noteEvent, ticksPerQuarterNote);
                     var noteNumber = CalculateMidiNoteNumber(noteEvent.Step, noteEvent.Alter, noteEvent.Octave);
 
+                    var delta = absoluteTime - lastNoteStartTime;
+
                     timedNotes.Add(new TimedNote
                     {
-                        Delta = currentTime,
+                        Delta = delta,
                         NoteNumber = (byte)noteNumber,
                         Duration = duration,
                         Velocity = 100,
                         IsRest = false
                     });
 
-                    // Reset currentTime to 0 after assigning it to the note's delta
-                    currentTime = 0;
+                    // Update tracking
+                    lastNoteStartTime = absoluteTime;
+                    absoluteTime += duration;
                 }
             }
 

@@ -119,7 +119,8 @@ namespace Music.Writer
             {
                 // Step 1 - convert phrases to midi-compatible list of "timed notes". CHORD NOTES ARE EXPANDING NOW.
                 var timedPhrases = PhrasesToTimedNotesConverter.Convert(phrases);
-
+                var inputjson = Helpers.DebugObject(phrases);
+                var outputjson = Helpers.DebugObject(timedPhrases);
                 // Step 2 - Merge timed notes lists that are for the same instrument
                 var mergedByInstrument = PhrasesToTimedNotesConverter.MergeByInstrument(timedPhrases);
 
