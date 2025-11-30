@@ -121,10 +121,14 @@ namespace Music.Writer
                 var timedPhrases = PhrasesToTimedNotesConverter.Convert(phrases);
 
                 // Step 2 - Merge timed notes lists that are for the same instrument
-                var mergedByInstrument = PhrasesToTimedNotesConverter.MergeByInstrument(phrases, timedPhrases);
+                var mergedByInstrument = PhrasesToTimedNotesConverter.MergeByInstrument(timedPhrases);
 
-                // Step 3 - NEED TO MAKE THIS NEXT CALL WORK WITH mergedByInstrument input NEXT
-                var midiDoc = PhrasesToMidiConverter.Convert(phrases);
+                // Step 3 - Convert merged timed notes to MIDI document
+                var midiDoc = PhrasesToMidiConverter.Convert(
+                    mergedByInstrument,
+                    tempo: 112,
+                    timeSignatureNumerator: 4,
+                    timeSignatureDenominator: 4);
 
                 await WriterFormHelper.PlayMidiFromPhrasesAsync(_midiPlaybackService, midiDoc, this);
             }

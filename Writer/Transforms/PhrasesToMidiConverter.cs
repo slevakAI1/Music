@@ -6,43 +6,62 @@ using Music.Tests;
 namespace Music.Writer
 {
     /// <summary>
-    /// Converts set of Phrases to a MIDI file (MidiSongDocument).
+    /// Converts TimedNote lists to a MIDI file (MidiSongDocument).
     /// </summary>
     public static class PhrasesToMidiConverter
     {
-        public static MidiSongDocument Convert(Phrase phrase)
+        public static MidiSongDocument Convert(
+            Dictionary<byte, List<TimedNote>> mergedByInstrument,
+            int tempo,
+            int timeSignatureNumerator,
+            int timeSignatureDenominator,
+            short ticksPerQuarterNote = 480)
         {
-            if (phrase == null)
-                throw new ArgumentNullException(nameof(phrase));
+            if (mergedByInstrument == null)
+                throw new ArgumentNullException(nameof(mergedByInstrument));
+            if (tempo <= 0)
+                throw new ArgumentException("Tempo must be greater than 0", nameof(tempo));
+            if (timeSignatureNumerator <= 0)
+                throw new ArgumentException("Time signature numerator must be greater than 0", nameof(timeSignatureNumerator));
+            if (timeSignatureDenominator <= 0)
+                throw new ArgumentException("Time signature denominator must be greater than 0", nameof(timeSignatureDenominator));
 
-            return Convert(new List<Phrase> { phrase });
-        }
-
-        public static MidiSongDocument Convert(List<Phrase> phrases)
-        {
-            if (phrases == null)
-                throw new ArgumentNullException(nameof(phrases));
-
-            var midiFile = new MidiFile();
-            var ticksPerQuarterNote = (midiFile.TimeDivision as TicksPerQuarterNoteTimeDivision
-                ?? new TicksPerQuarterNoteTimeDivision(480)).TicksPerQuarterNote;
+            // Create MIDI file with specified time division
+            var midiFile = new MidiFile
+            {
+                TimeDivision = new TicksPerQuarterNoteTimeDivision(ticksPerQuarterNote)
+            };
 
             // Global tempo / time signature track (track 0)
             var tempoTrack = new TrackChunk();
-            var microsecondsPerQuarterNote = 60_000_000 / 112;
+            
+            // Calculate microseconds per quarter note from BPM
+            var microsecondsPerQuarterNote = 60_000_000 / tempo;
             tempoTrack.Events.Add(new SetTempoEvent(microsecondsPerQuarterNote) { DeltaTime = 0 });
-            tempoTrack.Events.Add(new TimeSignatureEvent(4, 4) { DeltaTime = 0 });
-            // EndOfTrackEvent has an internal ctor in referenced DryWetMidi build; create via reflection
+            
+            // Set time signature
+            // The denominator in MIDI is expressed as a power of 2 (e.g., 2 = quarter note, 3 = eighth note)
+            byte denominatorPower = (byte)Math.Log2(timeSignatureDenominator);
+            tempoTrack.Events.Add(new TimeSignatureEvent(
+                (byte)timeSignatureNumerator, 
+                denominatorPower) 
+            { 
+                DeltaTime = 0 
+            });
+            
             tempoTrack.Events.Add(CreateEndOfTrackEvent());
             midiFile.Chunks.Add(tempoTrack);
 
             int trackNumber = 1;
             int channelCursor = 0;
 
-            foreach (var phrase in phrases)
+            foreach (var kvp in mergedByInstrument)
             {
+                byte programNumber = kvp.Key;
+                var timedNotes = kvp.Value;
+
                 // Determine if this is a drum set track
-                bool isDrumSet = IsDrumSet(phrase);
+                bool isDrumSet = IsDrumSet(programNumber);
                 
                 int channel;
                 if (isDrumSet)
@@ -58,7 +77,7 @@ namespace Music.Writer
                     channelCursor = (channelCursor + 1) % 16;
                 }
                 
-                var trackChunk = CreateTrackFromPhrase(phrase, trackNumber, ticksPerQuarterNote, channel, isDrumSet);
+                var trackChunk = CreateTrackFromTimedNotes(timedNotes, programNumber, trackNumber, channel, isDrumSet);
                 midiFile.Chunks.Add(trackChunk);
                 trackNumber++;
             }
@@ -66,24 +85,23 @@ namespace Music.Writer
             return new MidiSongDocument(midiFile);
         }
 
-        private static TrackChunk CreateTrackFromPhrase(
-            Phrase phrase,
+        private static TrackChunk CreateTrackFromTimedNotes(
+            List<TimedNote> timedNotes,
+            byte programNumber,
             int trackNumber,
-            short ticksPerQuarterNote,
             int channel,
             bool isDrumSet)
         {
             var trackChunk = new TrackChunk();
 
-            var partName = string.IsNullOrWhiteSpace(phrase.MidiPartName) ? "Acoustic Grand Piano" : phrase.MidiPartName;
-            var trackName = $"{partName} - Track {trackNumber}";
+            var instrumentName = GetInstrumentName(programNumber);
+            var trackName = $"{instrumentName} - Track {trackNumber}";
             trackChunk.Events.Add(new SequenceTrackNameEvent(trackName) { DeltaTime = 0 });
 
             // Only send program change for non-drum tracks
             // Channel 10 (drums) ignores program changes per GM spec
             if (!isDrumSet)
             {
-                byte programNumber = ResolveProgramNumber(phrase);
                 trackChunk.Events.Add(new ProgramChangeEvent((SevenBitNumber)programNumber)
                 {
                     Channel = (FourBitNumber)channel,
@@ -91,35 +109,25 @@ namespace Music.Writer
                 });
             }
 
-            long runningDelta = 0;
-
-            foreach (var noteEvent in phrase.NoteEvents ?? Enumerable.Empty<NoteEvent>())
+            foreach (var timedNote in timedNotes)
             {
-                if (noteEvent.IsRest)
-                {
-                    runningDelta += CalculateDuration(noteEvent, ticksPerQuarterNote);
+                if (timedNote.IsRest)
                     continue;
-                }
 
-                var noteNumber = CalculateMidiNoteNumber(noteEvent.Step, noteEvent.Alter, noteEvent.Octave);
-                var duration = CalculateDuration(noteEvent, ticksPerQuarterNote);
-
-                trackChunk.Events.Add(new NoteOnEvent((SevenBitNumber)noteNumber, (SevenBitNumber)100)
+                trackChunk.Events.Add(new NoteOnEvent((SevenBitNumber)timedNote.NoteNumber, (SevenBitNumber)timedNote.Velocity)
                 {
                     Channel = (FourBitNumber)channel,
-                    DeltaTime = runningDelta
+                    DeltaTime = timedNote.Delta
                 });
 
-                trackChunk.Events.Add(new NoteOffEvent((SevenBitNumber)noteNumber, (SevenBitNumber)0)
+                trackChunk.Events.Add(new NoteOffEvent((SevenBitNumber)timedNote.NoteNumber, (SevenBitNumber)0)
                 {
                     Channel = (FourBitNumber)channel,
-                    DeltaTime = duration
+                    DeltaTime = timedNote.Duration
                 });
-
-                runningDelta = 0;
             }
 
-            // Add end-of-track meta event (created via reflection due to internal ctor)
+            // Add end-of-track meta event
             trackChunk.Events.Add(CreateEndOfTrackEvent());
             return trackChunk;
         }
@@ -129,81 +137,22 @@ namespace Music.Writer
             (MidiEvent)Activator.CreateInstance(typeof(EndOfTrackEvent), nonPublic: true)!;
 
         /// <summary>
-        /// Determines if a phrase represents a drum set based on program number or instrument name.
+        /// Determines if a program number represents a drum set.
         /// </summary>
-        private static bool IsDrumSet(Phrase phrase)
+        private static bool IsDrumSet(byte programNumber)
         {
             // Check if MidiProgramNumber is the sentinel value 255 (from MidiInstrument list)
-            if (phrase.MidiProgramNumber == 255)
-                return true;
-
-            return false;
+            return programNumber == 255;
         }
 
-        private static byte ResolveProgramNumber(Phrase phrase)
+        private static string GetInstrumentName(byte programNumber)
         {
-            try
-            {
-                var prop = typeof(Phrase).GetProperty("MidiProgramNumber");
-                if (prop != null)
-                {
-                    var val = prop.GetValue(phrase);
-                    if (val is byte b) return b;
-                    if (val is sbyte sb) return (byte)sb;
-                    if (val is int i && i is >= 0 and <= 127) return (byte)i;
-                    if (val is string s && byte.TryParse(s, out var parsed)) return parsed;
-                }
-            }
-            catch { }
-            return GetMidiProgramNumber(phrase.MidiPartName);
-        }
-
-        private static byte GetMidiProgramNumber(string instrumentName)
-        {
-            if (string.IsNullOrWhiteSpace(instrumentName))
-                return 0;
+            if (programNumber == 255)
+                return "Drum Set";
 
             var instruments = MidiInstrument.GetGeneralMidiInstruments();
-            var instrument = instruments.FirstOrDefault(i =>
-                i.Name.Equals(instrumentName, StringComparison.OrdinalIgnoreCase));
-
-            return instrument?.ProgramNumber ?? 0;
-        }
-
-        private static int CalculateMidiNoteNumber(char step, int alter, int octave)
-        {
-            var baseNote = char.ToUpper(step) switch
-            {
-                'C' => 0,
-                'D' => 2,
-                'E' => 4,
-                'F' => 5,
-                'G' => 7,
-                'A' => 9,
-                'B' => 11,
-                _ => 0
-            };
-            return (octave + 1) * 12 + baseNote + alter;
-        }
-
-        private static long CalculateDuration(NoteEvent noteEvent, short ticksPerQuarterNote)
-        {
-            var baseDuration = (ticksPerQuarterNote * 4.0) / noteEvent.Duration;
-
-            var dottedMultiplier = 1.0;
-            var dotValue = 0.5;
-            for (int i = 0; i < noteEvent.Dots; i++)
-            {
-                dottedMultiplier += dotValue;
-                dotValue /= 2;
-            }
-
-            baseDuration *= dottedMultiplier;
-
-            if (noteEvent.TupletActualNotes > 0 && noteEvent.TupletNormalNotes > 0)
-                baseDuration *= (double)noteEvent.TupletNormalNotes / noteEvent.TupletActualNotes;
-
-            return (long)Math.Round(baseDuration);
+            var instrument = instruments.FirstOrDefault(i => i.ProgramNumber == programNumber);
+            return instrument?.Name ?? "Acoustic Grand Piano";
         }
     }
 }

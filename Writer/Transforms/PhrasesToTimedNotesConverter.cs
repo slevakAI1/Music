@@ -1,8 +1,26 @@
-using Music.Domain;
-using Music.Tests;
-
 namespace Music.Writer
 {
+    /// <summary>
+    /// Represents a phrase converted to timed notes with instrument information.
+    /// </summary>
+    public sealed class TimedPhrase
+    {
+        /// <summary>
+        /// The MIDI program number for the instrument.
+        /// </summary>
+        public byte MidiProgramNumber { get; set; }
+
+        /// <summary>
+        /// The instrument name (MIDI part name).
+        /// </summary>
+        public string MidiPartName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The list of timed notes for this phrase.
+        /// </summary>
+        public List<TimedNote> TimedNotes { get; set; } = new();
+    }
+
     /// <summary>
     /// Converts Phrase objects to flat lists of TimedNote objects.
     /// Sequential notes have positive delta times, while simultaneous notes (chords) have delta = 0.
@@ -10,22 +28,27 @@ namespace Music.Writer
     public static class PhrasesToTimedNotesConverter
     {
         /// <summary>
-        /// Converts a list of phrases (which may have different instruments) to a list of TimedNote lists,
-        /// one for each input phrase.
+        /// Converts a list of phrases (which may have different instruments) to a list of TimedPhrase objects.
+        /// Each TimedPhrase contains the instrument information and the converted timed notes.
         /// </summary>
-        public static List<List<TimedNote>> Convert(List<Phrase> phrases, short ticksPerQuarterNote = 480)
+        public static List<TimedPhrase> Convert(List<Phrase> phrases, short ticksPerQuarterNote = 480)
         {
             if (phrases == null)
                 throw new ArgumentNullException(nameof(phrases));
 
             if (phrases.Count == 0)
-                return new List<List<TimedNote>>();
+                return new List<TimedPhrase>();
 
-            var result = new List<List<TimedNote>>();
+            var result = new List<TimedPhrase>();
 
             foreach (var phrase in phrases)
             {
-                result.Add(ConvertSinglePhrase(phrase, ticksPerQuarterNote));
+                result.Add(new TimedPhrase
+                {
+                    MidiProgramNumber = phrase.MidiProgramNumber,
+                    MidiPartName = phrase.MidiPartName ?? string.Empty,
+                    TimedNotes = ConvertSinglePhrase(phrase, ticksPerQuarterNote)
+                });
             }
 
             return result;
@@ -35,35 +58,28 @@ namespace Music.Writer
         /// Merges timed note lists for phrases that share the same instrument (MidiProgramNumber).
         /// Multiple phrases for the same instrument are merged to play simultaneously.
         /// </summary>
-        /// <param name="phrases">List of phrases with their associated instruments.</param>
-        /// <param name="timedNoteLists">List of TimedNote lists corresponding to each phrase.</param>
+        /// <param name="timedPhrases">List of timed phrases with their associated instruments.</param>
         /// <returns>A dictionary mapping MidiProgramNumber to merged TimedNote lists.</returns>
-        public static Dictionary<byte, List<TimedNote>> MergeByInstrument(
-            List<Phrase> phrases, 
-            List<List<TimedNote>> timedNoteLists)
+        public static Dictionary<byte, List<TimedNote>> MergeByInstrument(List<TimedPhrase> timedPhrases)
         {
-            if (phrases == null)
-                throw new ArgumentNullException(nameof(phrases));
-            if (timedNoteLists == null)
-                throw new ArgumentNullException(nameof(timedNoteLists));
-            if (phrases.Count != timedNoteLists.Count)
-                throw new ArgumentException("Phrases and timedNoteLists must have the same count.");
+            if (timedPhrases == null)
+                throw new ArgumentNullException(nameof(timedPhrases));
 
             var result = new Dictionary<byte, List<TimedNote>>();
 
-            // Group phrases by their MIDI program number (instrument)
+            // Group timed phrases by their MIDI program number (instrument)
             var groupedByInstrument = new Dictionary<byte, List<List<TimedNote>>>();
 
-            for (int i = 0; i < phrases.Count; i++)
+            foreach (var timedPhrase in timedPhrases)
             {
-                var instrument = phrases[i].MidiProgramNumber;
+                var instrument = timedPhrase.MidiProgramNumber;
                 
                 if (!groupedByInstrument.ContainsKey(instrument))
                 {
                     groupedByInstrument[instrument] = new List<List<TimedNote>>();
                 }
                 
-                groupedByInstrument[instrument].Add(timedNoteLists[i]);
+                groupedByInstrument[instrument].Add(timedPhrase.TimedNotes);
             }
 
             // Merge timed note lists for each instrument
