@@ -32,6 +32,146 @@ namespace Music.Writer
         }
 
         /// <summary>
+        /// Merges timed note lists for phrases that share the same instrument (MidiProgramNumber).
+        /// Multiple phrases for the same instrument are merged to play simultaneously.
+        /// </summary>
+        /// <param name="phrases">List of phrases with their associated instruments.</param>
+        /// <param name="timedNoteLists">List of TimedNote lists corresponding to each phrase.</param>
+        /// <returns>A dictionary mapping MidiProgramNumber to merged TimedNote lists.</returns>
+        public static Dictionary<byte, List<TimedNote>> MergeByInstrument(
+            List<Phrase> phrases, 
+            List<List<TimedNote>> timedNoteLists)
+        {
+            if (phrases == null)
+                throw new ArgumentNullException(nameof(phrases));
+            if (timedNoteLists == null)
+                throw new ArgumentNullException(nameof(timedNoteLists));
+            if (phrases.Count != timedNoteLists.Count)
+                throw new ArgumentException("Phrases and timedNoteLists must have the same count.");
+
+            var result = new Dictionary<byte, List<TimedNote>>();
+
+            // Group phrases by their MIDI program number (instrument)
+            var groupedByInstrument = new Dictionary<byte, List<List<TimedNote>>>();
+
+            for (int i = 0; i < phrases.Count; i++)
+            {
+                var instrument = phrases[i].MidiProgramNumber;
+                
+                if (!groupedByInstrument.ContainsKey(instrument))
+                {
+                    groupedByInstrument[instrument] = new List<List<TimedNote>>();
+                }
+                
+                groupedByInstrument[instrument].Add(timedNoteLists[i]);
+            }
+
+            // Merge timed note lists for each instrument
+            foreach (var kvp in groupedByInstrument)
+            {
+                var instrument = kvp.Key;
+                var listsToMerge = kvp.Value;
+
+                if (listsToMerge.Count == 1)
+                {
+                    // Only one list for this instrument, no merging needed
+                    result[instrument] = listsToMerge[0];
+                }
+                else
+                {
+                    // Merge multiple lists for the same instrument
+                    result[instrument] = MergeSimultaneousTimedNoteLists(listsToMerge);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Merges multiple timed note lists to play simultaneously.
+        /// Notes maintain their original order within each list, and delta times are adjusted
+        /// to ensure proper simultaneous playback.
+        /// </summary>
+        private static List<TimedNote> MergeSimultaneousTimedNoteLists(List<List<TimedNote>> lists)
+        {
+            var merged = new List<TimedNote>();
+            var currentPositions = new int[lists.Count]; // Track position in each list
+            var currentTimes = new long[lists.Count]; // Track accumulated time for each list
+
+            bool hasMoreNotes = true;
+
+            while (hasMoreNotes)
+            {
+                hasMoreNotes = false;
+                long minTime = long.MaxValue;
+
+                // Find the minimum time across all lists
+                for (int i = 0; i < lists.Count; i++)
+                {
+                    if (currentPositions[i] < lists[i].Count)
+                    {
+                        hasMoreNotes = true;
+                        if (currentTimes[i] < minTime)
+                        {
+                            minTime = currentTimes[i];
+                        }
+                    }
+                }
+
+                if (!hasMoreNotes)
+                    break;
+
+                long deltaFromLastNote = merged.Count == 0 ? minTime : minTime - (merged.Count > 0 ? GetLastAbsoluteTime(merged) : 0);
+                bool isFirstNoteAtThisTime = true;
+
+                // Add all notes that occur at minTime
+                for (int i = 0; i < lists.Count; i++)
+                {
+                    while (currentPositions[i] < lists[i].Count && currentTimes[i] == minTime)
+                    {
+                        var note = lists[i][currentPositions[i]];
+                        
+                        var mergedNote = new TimedNote
+                        {
+                            NoteNumber = note.NoteNumber,
+                            Duration = note.Duration,
+                            Velocity = note.Velocity,
+                            IsRest = note.IsRest,
+                            Delta = isFirstNoteAtThisTime ? deltaFromLastNote : 0
+                        };
+
+                        merged.Add(mergedNote);
+                        isFirstNoteAtThisTime = false;
+
+                        // Advance position in this list
+                        currentPositions[i]++;
+                        
+                        // Update time for next note in this list
+                        if (currentPositions[i] < lists[i].Count)
+                        {
+                            currentTimes[i] += lists[i][currentPositions[i]].Delta;
+                        }
+                    }
+                }
+            }
+
+            return merged;
+        }
+
+        /// <summary>
+        /// Calculates the absolute time of the last note in a merged list.
+        /// </summary>
+        private static long GetLastAbsoluteTime(List<TimedNote> notes)
+        {
+            long time = 0;
+            foreach (var note in notes)
+            {
+                time += note.Delta;
+            }
+            return time;
+        }
+
+        /// <summary>
         /// Converts a single Phrase object to a flat list of TimedNote objects.
         /// </summary>
         private static List<TimedNote> ConvertSinglePhrase(Phrase phrase, short ticksPerQuarterNote)
