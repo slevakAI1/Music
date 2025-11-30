@@ -120,9 +120,11 @@ namespace Music.Writer
                 // Convert phrases to MIDI document here and pass the document to the playback method
 
 
-                // CHORDS NOT WORKING!
+ 
                 var timedPhrases = PhrasesToTimedNotesConverter.Convert(phrases);
 
+
+                // CHORD NOTES ARE EXPANDING NOW, NEED TO MAKE THIS NEXT CALL WORK WITH timedPhrases input NEXT
 
 
                 var midiDoc = PhrasesToMidiConverter.Convert(phrases);

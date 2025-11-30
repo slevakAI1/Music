@@ -41,40 +41,79 @@ namespace Music.Writer
 
             foreach (var noteEvent in phrase.NoteEvents ?? Enumerable.Empty<NoteEvent>())
             {
-                var duration = CalculateDuration(noteEvent, ticksPerQuarterNote);
-
                 if (noteEvent.IsRest)
                 {
                     // Rests add to the delta for the next note
+                    var duration = CalculateDuration(noteEvent, ticksPerQuarterNote);
                     currentTime += duration;
                     continue;
                 }
 
-                // For chords, the first note gets the accumulated delta, subsequent notes get 0
-                bool isFirstNoteInChord = true;
-
-                // Handle chord notes (if IsChord is true, this note is part of a chord)
-                var noteNumber = CalculateMidiNoteNumber(noteEvent.Step, noteEvent.Alter, noteEvent.Octave);
-                
-                timedNotes.Add(new TimedNote
+                // Check if this is a chord that needs to be expanded
+                if (!string.IsNullOrWhiteSpace(noteEvent.ChordKey) && 
+                    noteEvent.ChordDegree.HasValue && 
+                    !string.IsNullOrWhiteSpace(noteEvent.ChordQuality) && 
+                    !string.IsNullOrWhiteSpace(noteEvent.ChordBase))
                 {
-                    Delta = isFirstNoteInChord ? currentTime : 0,
-                    NoteNumber = (byte)noteNumber,
-                    Duration = duration,
-                    Velocity = 100,
-                    IsRest = false
-                });
+                    // Use ChordConverter to generate chord notes
+                    var chordNotes = ChordConverter.Convert(
+                        noteEvent.ChordKey,
+                        noteEvent.ChordDegree.Value,
+                        noteEvent.ChordQuality,
+                        noteEvent.ChordBase,
+                        baseOctave: noteEvent.Octave,
+                        noteValue: noteEvent.Duration);
 
-                if (isFirstNoteInChord)
-                {
-                    currentTime = 0; // Reset after first note
-                    isFirstNoteInChord = false;
+                    // Apply dots and tuplet settings to chord notes
+                    foreach (var cn in chordNotes)
+                    {
+                        cn.Dots = noteEvent.Dots;
+                        if (!string.IsNullOrWhiteSpace(noteEvent.TupletNumber))
+                        {
+                            cn.TupletNumber = noteEvent.TupletNumber;
+                            cn.TupletActualNotes = noteEvent.TupletActualNotes;
+                            cn.TupletNormalNotes = noteEvent.TupletNormalNotes;
+                        }
+                    }
+
+                    // Convert chord notes to TimedNotes
+                    for (int i = 0; i < chordNotes.Count; i++)
+                    {
+                        var cn = chordNotes[i];
+                        var duration = CalculateDuration(cn, ticksPerQuarterNote);
+                        var noteNumber = CalculateMidiNoteNumber(cn.Step, cn.Alter, cn.Octave);
+
+                        timedNotes.Add(new TimedNote
+                        {
+                            Delta = i == 0 ? currentTime : 0, // First note gets accumulated time, rest are simultaneous
+                            NoteNumber = (byte)noteNumber,
+                            Duration = duration,
+                            Velocity = 100,
+                            IsRest = false
+                        });
+                    }
+
+                    // Advance time for the entire chord
+                    var chordDuration = CalculateDuration(chordNotes[0], ticksPerQuarterNote);
+                    currentTime = chordDuration;
                 }
-
-                // After processing a note (or chord), accumulate time for the next note
-                if (!noteEvent.IsChord)
+                else
                 {
-                    currentTime += duration;
+                    // Handle single note
+                    var duration = CalculateDuration(noteEvent, ticksPerQuarterNote);
+                    var noteNumber = CalculateMidiNoteNumber(noteEvent.Step, noteEvent.Alter, noteEvent.Octave);
+
+                    timedNotes.Add(new TimedNote
+                    {
+                        Delta = currentTime,
+                        NoteNumber = (byte)noteNumber,
+                        Duration = duration,
+                        Velocity = 100,
+                        IsRest = false
+                    });
+
+                    // Advance time for the next note
+                    currentTime = duration;
                 }
             }
 
