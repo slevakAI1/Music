@@ -49,7 +49,7 @@ namespace Music.Writer
                 DeltaTime = 0 
             });
             
-            tempoTrack.Events.Add(CreateEndOfTrackEvent());
+            //tempoTrack.Events.Add(CreateEndOfTrackEvent());
             midiFile.Chunks.Add(tempoTrack);
 
             int trackNumber = 1;
@@ -128,7 +128,7 @@ namespace Music.Writer
             }
 
             // Add end-of-track meta event
-            trackChunk.Events.Add(CreateEndOfTrackEvent());
+           // trackChunk.Events.Add(CreateEndOfTrackEvent());
             return trackChunk;
         }
 

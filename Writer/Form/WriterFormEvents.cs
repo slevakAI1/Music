@@ -117,21 +117,37 @@ namespace Music.Writer
 
             try
             {
-                // Step 1 - convert phrases to midi-compatible list of "timed notes". CHORD NOTES ARE EXPANDING NOW.
-                var timedPhrases = PhrasesToTimedNotesConverter.Convert(phrases);
-                var inputjson = Helpers.DebugObject(phrases);
-                var outputjson = Helpers.DebugObject(timedPhrases);
-                // Step 2 - Merge timed notes lists that are for the same instrument
-                var mergedByInstrument = PhrasesToTimedNotesConverter.MergeByInstrument(timedPhrases);
-
-                // Step 3 - Convert merged timed notes to MIDI document
-                var midiDoc = PhrasesToMidiConverter.Convert(
-                    mergedByInstrument,
+                // Step 1 - convert phrases to MIDI EVENTS - Absolute positions
+                var midiEventLists = PhrasesToMidiEventsConverter_Phase_1.Convert(
+                    phrases,
                     tempo: 112,
                     timeSignatureNumerator: 4,
                     timeSignatureDenominator: 4);
+                var inputjson = Helpers.DebugObject(phrases);
+                var outputjson = Helpers.DebugObject(midiEventLists);
 
-                await WriterFormHelper.PlayMidiFromPhrasesAsync(_midiPlaybackService, midiDoc, this);
+
+                // Step 2 - Merge timed notes lists that are for the same instrument
+                
+                var mergedMidiEventLists = PhrasesToMidiEventsConverter_Phase_2.Convert(
+                    midiEventLists,
+                    tempo: 112,
+                    timeSignatureNumerator: 4,
+                    timeSignatureDenominator: 4);
+                inputjson = Helpers.DebugObject(midiEventLists);
+                outputjson = Helpers.DebugObject(mergedMidiEventLists);
+
+
+                //var mergedByInstrument = PhrasesToTimedNotesConverter.MergeByInstrument(timedPhrases);
+
+                // Step 3 - Convert merged timed notes to MIDI document
+                // var midiDoc = PhrasesToMidiConverter.Convert(
+                //    mergedByInstrument,
+                //    tempo: 112,
+                //    timeSignatureNumerator: 4,
+                //    timeSignatureDenominator: 4);
+
+                //await WriterFormHelper.PlayMidiFromPhrasesAsync(_midiPlaybackService, midiDoc, this);
             }
             catch (Exception ex)
             {
