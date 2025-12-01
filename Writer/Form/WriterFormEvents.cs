@@ -127,8 +127,10 @@ namespace Music.Writer
                 var outputjson = Helpers.DebugObject(midiEventLists);
 
 
-                // Step 2 - Merge timed notes lists that are for the same instrument
-                
+                //  Step 2:
+                //      Merge midiEventLists lists that are for the same instrument
+                //      Add track 0 global events
+                //      Assign track numbers to midi event lists
                 var mergedMidiEventLists = PhrasesToMidiEventsConverter_Phase_2.Convert(
                     midiEventLists,
                     tempo: 112,
