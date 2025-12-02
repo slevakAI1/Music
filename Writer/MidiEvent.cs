@@ -200,6 +200,13 @@ namespace Music.Writer
         Unknown
     }
 
+
+
+
+
+
+
+
     /// <summary>
     /// High-level, human-readable MIDI event representation.
     /// Uses a dictionary-based parameter system for flexibility.
@@ -229,6 +236,11 @@ namespace Music.Writer
         /// Values can be int, string, or byte[] depending on the parameter type.
         /// </summary>
         public Dictionary<string, object> Parameters { get; init; } = new();
+
+
+
+
+
 
         // ============================================================
         // Factory Methods - Meta Events
