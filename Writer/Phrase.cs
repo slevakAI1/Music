@@ -17,47 +17,15 @@ namespace Music.Writer
 
         private byte MidiProgramNumber { get; set; }
 
-        public List<PhraseEvent> PhraseEvents { get; set; } = new();
+        public List<PhraseNote> PhraseNotes { get; set; } = new();
 
-        public Phrase(string midiProgramName, List<PhraseEvent>? phraseEvents = null)
+        public Phrase(string midiProgramName, List<PhraseNote> phraseNotes)
         {
             MidiProgramName = midiProgramName;
-            PhraseEvents = phraseEvents ?? new List<PhraseEvent>();
+            PhraseNotes = phraseNotes;
 
             // Compute midiProgramNumber here - resolve from the class that contains this data
             // TBD
-        }
-    }
-
-    /// <summary>
-    /// Describes a single musical event within a phrase, such as a note, chord, or rest.
-    /// 
-    /// PhraseEvent provides detailed properties for rhythm, chord structure, and note grouping, allowing
-    /// for expressive and complex musical constructs. It enables the representation of both simple notes
-    /// and advanced chords, supporting accurate conversion to timed notes and MIDI playback.
-    /// </summary>
-    public sealed class PhraseEvent
-    {
-        // Rhythm Tuplet
-        public int? TupletActualNotes { get; set; }  // The 'm' in m:n (e.g., 3 in a triplet)
-        public int? TupletNormalNotes { get; set; }  // The 'n' in m:n (e.g., 2 in a triplet)
-
-        // Chords
-        public PhraseChord? PhraseChord { get; set; }
-        public List<PhraseNote>? PhraseNotes { get; set; }
-
-        // public other - pitch bend, etc...future
-
-        public PhraseEvent(
-            int? tupletActualNotes = null,
-            int? tupletNormalNotes = null,
-            PhraseChord? phraseChord = null,
-            List<PhraseNote>? phraseNotes = null)
-        {
-            TupletActualNotes = tupletActualNotes;
-            TupletNormalNotes = tupletNormalNotes;
-            PhraseChord = phraseChord;
-            PhraseNotes = phraseNotes;
         }
     }
 
@@ -113,7 +81,7 @@ namespace Music.Writer
         public int NoteDurationTicks { get; set; } // note length
         public int NoteOnVelocity { get; set; } = 100; // note volume
 
-        // Calculated fields - can be used for display purposes. Also used by musicxml.
+        // Metadata fields - can be used for display purposes. Also used by musicxml.
 
         // Pitch
         public char Step { get; set; }
@@ -123,6 +91,11 @@ namespace Music.Writer
         // Rhythm
         public int Duration { get; set; }
         public int Dots { get; set; }
+
+        // ... maybe need a tuplet class?
+        public int? TupletActualNotes { get; set; }  // The 'm' in m:n (e.g., 3 in a triplet)
+        public int? TupletNormalNotes { get; set; }  // The 'n' in m:n (e.g., 2 in a triplet)
+        public PhraseChord? phraseChord { get; set; } // Metadata only. Means the note is part of this type chord.
 
         public PhraseNote(
             int noteNumber,
