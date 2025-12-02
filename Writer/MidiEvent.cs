@@ -187,120 +187,6 @@ namespace Music.Writer
 
 
         // ----------------------------
-        // System Exclusive (SMF + Live)
-        // ----------------------------
-
-        // SysEx.
-        // What it is / how it works:
-        // Manufacturer/device-specific message carrying arbitrary bytes; used to set parameters, modes, resets, custom patches, etc.
-        // Affects playback?
-        // Can, massively—if the target device understands it; otherwise it’s ignored.
-        // Example use:
-        // At tick 0 send a SysEx reset/mode configuration so the target synth/module is in a known state for consistent playback.
-        SysEx,
-
-
-        // ----------------------------
-        // System Common (Live MIDI I/O)
-        // ----------------------------
-
-        // TimeCodeQuarterFrame (0xF1).
-        // What it is / how it works:
-        // Carries a portion of MIDI Time Code (MTC); multiple quarter-frame messages assemble into full timecode.
-        // Affects playback?
-        // Indirectly. Used for sync; does not change notes itself.
-        // Example use:
-        // A DAW locks to incoming MTC from video hardware; quarter frame messages keep MIDI aligned to video timecode.
-        TimeCodeQuarterFrame,
-
-        // SongPositionPointer (0xF2).
-        // What it is / how it works:
-        // 14-bit song position used by synced devices to locate within a song/pattern timeline (hardware sequencing contexts).
-        // Affects playback?
-        // Yes for synced devices. It tells slaves where to start/resume.
-        // Example use:
-        // Hitting “locate to bar 33” on the master sends SongPositionPointer so a slave drum machine starts at the right position.
-        SongPositionPointer,
-
-        // SongSelect (0xF3).
-        // What it is / how it works:
-        // Selects a song number (0–127) on devices that store multiple songs/pattern sets.
-        // Affects playback?
-        // Yes on supporting devices (changes which song/pattern will play).
-        // Example use:
-        // A controller selects “Song 12” on a hardware groovebox before sending Start.
-        SongSelect,
-
-        // TuneRequest (0xF6).
-        // What it is / how it works:
-        // Requests certain instruments/modules to run their tuning routine (rare today).
-        // Affects playback?
-        // Potentially yes, but not musically; it’s device maintenance/behavior.
-        // Example use:
-        // A vintage module receives TuneRequest before recording to ensure oscillators are calibrated.
-        TuneRequest,
-
-
-        // ----------------------------
-        // System Real-Time (Live MIDI I/O)
-        // ----------------------------
-
-        // TimingClock (0xF8).
-        // What it is / how it works:
-        // Clock pulse used for tempo sync; sent repeatedly while running so slaves can sync arps/sequencers/LFOs.
-        // Affects playback?
-        // Yes in sync setups. Defines tempo timing for slaves, but is not a “BPM meta” message.
-        // Example use:
-        // A DAW sends TimingClock; a hardware delay pedal syncs tempo subdivisions to the incoming clock.
-        TimingClock,
-
-        // Start (0xFA).
-        // What it is / how it works:
-        // Tells slave devices to start playback from the beginning (often paired with SongPositionPointer for non-zero starts).
-        // Affects playback?
-        // Yes on synced devices (starts transport-driven playback).
-        // Example use:
-        // Press play on the DAW: it sends Start and the drum machine begins its pattern in time.
-        Start,
-
-        // Continue (0xFB).
-        // What it is / how it works:
-        // Resumes playback from the current position (typically after Stop).
-        // Affects playback?
-        // Yes on synced devices (resume).
-        // Example use:
-        // Stop mid-song, then hit play again and send Continue so the groovebox continues where it left off.
-        Continue,
-
-        // Stop (0xFC).
-        // What it is / how it works:
-        // Stops transport/clock-driven playback on slave devices.
-        // Affects playback?
-        // Yes (halts playback on synced devices).
-        // Example use:
-        // Hitting stop in the DAW sends Stop; arpeggiators and drum machines stop together.
-        Stop,
-
-        // ActiveSensing (0xFE).
-        // What it is / how it works:
-        // Keepalive message some devices send; if it stops arriving, receivers may silence notes to prevent hangs on disconnect.
-        // Affects playback?
-        // Indirectly. Connection safety feature; can prevent stuck notes when a connection dies.
-        // Example use:
-        // A keyboard sends ActiveSensing; if unplugged mid-note, the module stops notes instead of droning forever.
-        ActiveSensing,
-
-        // SystemReset.
-        // What it is / how it works:
-        // Resets a device’s MIDI system state (live MIDI concept; device-specific behavior).
-        // Affects playback?
-        // Yes (big hammer). Can wipe controller states, stop notes, reset modes—varies by device.
-        // Example use:
-        // A rig gets into a bad state; a reset message forces modules back to a known baseline (not something you’d casually put in a file).
-        SystemReset,
-
-
-        // ----------------------------
         // Safety / forward-compat
         // ----------------------------
 
@@ -316,15 +202,11 @@ namespace Music.Writer
 
     /// <summary>
     /// High-level, human-readable MIDI event representation.
-    /// Supports channel events, meta events, and system exclusive messages.
-    /// Use factory methods for creating common event types with proper validation.
+    /// Uses a dictionary-based parameter system for flexibility.
+    /// Use factory methods for creating event types with proper validation.
     /// </summary>
     public sealed record MidiEvent
     {
-        // ============================================================
-        // Core properties (always present)
-        // ============================================================
-
         /// <summary>
         /// Absolute time position in ticks from the start of the track.
         /// This is the source of truth for event timing.
@@ -342,379 +224,349 @@ namespace Music.Writer
         /// </summary>
         public MidiEventType Type { get; init; }
 
-        // ============================================================
-        // Channel-specific (for channel events only)
-        // ============================================================
-
         /// <summary>
-        /// MIDI channel (0-15). Null for meta events.
-        /// Channel 9 is typically reserved for drums.
+        /// Dictionary of event parameters. Keys are parameter names following MIDI standards.
+        /// Values can be int, string, or byte[] depending on the parameter type.
         /// </summary>
-        public int? Channel { get; init; }
+        public Dictionary<string, object> Parameters { get; init; } = new();
 
         // ============================================================
-        // Note-related properties (NoteOn/NoteOff/PolyPressure)
+        // Factory Methods - Meta Events
         // ============================================================
 
         /// <summary>
-        /// Human-readable note name, e.g., "C4", "F#3", "Bb5".
-        /// Generator can convert this to NoteNumber.
+        /// Creates a text meta event (0x01).
         /// </summary>
-        public string? Note { get; init; }
-
-        /// <summary>
-        /// MIDI note number (0-127). Alternative to Note property.
-        /// Generator can compute this from Note if present.
-        /// </summary>
-        public int? NoteNumber { get; init; }
-
-        /// <summary>
-        /// Note-on velocity (0-127). 0 is often treated as note-off.
-        /// </summary>
-        public int? Velocity { get; init; }
-
-        /// <summary>
-        /// Note-off release velocity (0-127). Often 0 in practice.
-        /// </summary>
-        public int? ReleaseVelocity { get; init; }
-
-        // ============================================================
-        // Program Change
-        // ============================================================
-
-        /// <summary>
-        /// MIDI program number (0-127) for instrument selection.
-        /// </summary>
-        public int? ProgramNumber { get; init; }
-
-        /// <summary>
-        /// Human-readable program name, e.g., "Acoustic Grand Piano", "Violin".
-        /// Purely for readability; generator resolves to ProgramNumber.
-        /// </summary>
-        public string? ProgramName { get; init; }
-
-        // ============================================================
-        // Control Change
-        // ============================================================
-
-        /// <summary>
-        /// MIDI controller number (0-127).
-        /// Common: 7=Volume, 10=Pan, 64=Sustain, 91=Reverb, 93=Chorus.
-        /// </summary>
-        public int? ControllerNumber { get; init; }
-
-        /// <summary>
-        /// Human-readable controller name, e.g., "Volume", "Pan", "Sustain".
-        /// Generator can resolve to ControllerNumber.
-        /// </summary>
-        public string? ControllerName { get; init; }
-
-        /// <summary>
-        /// Controller value (0-127).
-        /// For Sustain: 0-63=off, 64-127=on.
-        /// </summary>
-        public int? ControllerValue { get; init; }
-
-        // ============================================================
-        // Pitch Bend / Pressure
-        // ============================================================
-
-        /// <summary>
-        /// Pitch bend value (-8192 to +8191). 0 = center (no bend).
-        /// </summary>
-        public int? PitchBendValue { get; init; }
-
-        /// <summary>
-        /// Channel or polyphonic aftertouch pressure (0-127).
-        /// </summary>
-        public int? Pressure { get; init; }
-
-        // ============================================================
-        // Tempo
-        // ============================================================
-
-        /// <summary>
-        /// Tempo in beats per minute (BPM), e.g., 120.
-        /// Alternative to MicrosecondsPerQuarterNote.
-        /// </summary>
-        public int? TempoBpm { get; init; }
-
-        /// <summary>
-        /// Tempo in microseconds per quarter note, e.g., 500000 for 120 BPM.
-        /// Alternative to TempoBpm.
-        /// </summary>
-        public int? MicrosecondsPerQuarterNote { get; init; }
-
-        // ============================================================
-        // Time Signature
-        // ============================================================
-
-        /// <summary>
-        /// Time signature numerator (top number), e.g., 4 for 4/4 time.
-        /// </summary>
-        public int? TimeSigNumerator { get; init; }
-
-        /// <summary>
-        /// Time signature denominator (bottom number), e.g., 4 for 4/4 time.
-        /// </summary>
-        public int? TimeSigDenominator { get; init; }
-
-        /// <summary>
-        /// MIDI clocks per metronome click. Often 24 if not specified.
-        /// </summary>
-        public int? ClocksPerMetronomeClick { get; init; }
-
-        /// <summary>
-        /// Number of 32nd notes per quarter note. Often 8 if not specified.
-        /// </summary>
-        public int? ThirtySecondNotesPerQuarter { get; init; }
-
-        // ============================================================
-        // Key Signature
-        // ============================================================
-
-        /// <summary>
-        /// Number of sharps (positive) or flats (negative) in key signature (-7 to +7).
-        /// 0 = C major / A minor.
-        /// </summary>
-        public int? KeySigSharpsFlats { get; init; }
-
-        /// <summary>
-        /// Key signature mode: "major" or "minor".
-        /// </summary>
-        public string? KeySigMode { get; init; }
-
-        // ============================================================
-        // Text/Meta Content
-        // ============================================================
-
-        /// <summary>
-        /// Text content for meta events (TrackName, Text, Marker, Lyric, CuePoint, etc.).
-        /// </summary>
-        public string? Text { get; init; }
-
-        // ============================================================
-        // System Exclusive
-        // ============================================================
-
-        /// <summary>
-        /// SysEx preset name, e.g., "GM System On", "Roland GS Reset".
-        /// Generator translates known presets to byte sequences.
-        /// </summary>
-        public string? SysExPreset { get; init; }
-
-        /// <summary>
-        /// Human-readable SysEx payload for custom messages.
-        /// Not raw bytes - application-specific format.
-        /// </summary>
-        public string? SysExPayload { get; init; }
-
-        // ============================================================
-        // Factory Methods (recommended usage)
-        // ============================================================
-
-        /// <summary>
-        /// Creates a sequence/track name meta event.
-        /// </summary>
-        public static MidiEvent TrackName(long absoluteTime, string name) =>
-            new() { Type = MidiEventType.SequenceTrackName, AbsoluteTimeTicks = absoluteTime, Text = name };
-
-        /// <summary>
-        /// Creates a tempo meta event using BPM (beats per minute).
-        /// </summary>
-        public static MidiEvent SetTempoBpm(long absoluteTime, int bpm) =>
-            new() { Type = MidiEventType.SetTempo, AbsoluteTimeTicks = absoluteTime, TempoBpm = bpm };
-
-        /// <summary>
-        /// Creates a tempo meta event using microseconds per quarter note.
-        /// </summary>
-        public static MidiEvent SetTempoUsPerQn(long absoluteTime, int microsecondsPerQuarterNote) =>
-            new() 
-            { 
-                Type = MidiEventType.SetTempo, 
-                AbsoluteTimeTicks = absoluteTime, 
-                MicrosecondsPerQuarterNote = microsecondsPerQuarterNote 
+        public static MidiEvent CreateText(long absoluteTime, string text) =>
+            new()
+            {
+                Type = MidiEventType.Text,
+                AbsoluteTimeTicks = absoluteTime,
+                Parameters = new() { ["Text"] = text }
             };
 
         /// <summary>
-        /// Creates a time signature meta event.
+        /// Creates a copyright notice meta event (0x02).
         /// </summary>
-        public static MidiEvent TimeSignature(
-            long absoluteTime, 
-            int numerator, 
+        public static MidiEvent CreateCopyrightNotice(long absoluteTime, string text) =>
+            new()
+            {
+                Type = MidiEventType.CopyrightNotice,
+                AbsoluteTimeTicks = absoluteTime,
+                Parameters = new() { ["Text"] = text }
+            };
+
+        /// <summary>
+        /// Creates a sequence/track name meta event (0x03).
+        /// </summary>
+        public static MidiEvent CreateSequenceTrackName(long absoluteTime, string name) =>
+            new()
+            {
+                Type = MidiEventType.SequenceTrackName,
+                AbsoluteTimeTicks = absoluteTime,
+                Parameters = new() { ["Text"] = name }
+            };
+
+        /// <summary>
+        /// Creates an instrument name meta event (0x04).
+        /// </summary>
+        public static MidiEvent CreateInstrumentName(long absoluteTime, string name) =>
+            new()
+            {
+                Type = MidiEventType.InstrumentName,
+                AbsoluteTimeTicks = absoluteTime,
+                Parameters = new() { ["Text"] = name }
+            };
+
+        /// <summary>
+        /// Creates a lyric meta event (0x05).
+        /// </summary>
+        public static MidiEvent CreateLyric(long absoluteTime, string lyric) =>
+            new()
+            {
+                Type = MidiEventType.Lyric,
+                AbsoluteTimeTicks = absoluteTime,
+                Parameters = new() { ["Text"] = lyric }
+            };
+
+        /// <summary>
+        /// Creates a marker meta event (0x06).
+        /// </summary>
+        public static MidiEvent CreateMarker(long absoluteTime, string marker) =>
+            new()
+            {
+                Type = MidiEventType.Marker,
+                AbsoluteTimeTicks = absoluteTime,
+                Parameters = new() { ["Text"] = marker }
+            };
+
+        /// <summary>
+        /// Creates a program name meta event (0x08).
+        /// </summary>
+        public static MidiEvent CreateProgramName(long absoluteTime, string programName) =>
+            new()
+            {
+                Type = MidiEventType.ProgramName,
+                AbsoluteTimeTicks = absoluteTime,
+                Parameters = new() { ["Text"] = programName }
+            };
+
+        /// <summary>
+        /// Creates an end-of-track meta event (0x2F).
+        /// </summary>
+        public static MidiEvent CreateEndOfTrack(long absoluteTime = 0) =>
+            new()
+            {
+                Type = MidiEventType.EndOfTrack,
+                AbsoluteTimeTicks = absoluteTime,
+                Parameters = new()
+            };
+
+        /// <summary>
+        /// Creates a set tempo meta event (0x51).
+        /// Can specify either BPM or microseconds per quarter note.
+        /// </summary>
+        public static MidiEvent CreateSetTempo(long absoluteTime, int? bpm = null, int? microsecondsPerQuarterNote = null)
+        {
+            var parameters = new Dictionary<string, object>();
+            if (bpm.HasValue)
+                parameters["BPM"] = bpm.Value;
+            if (microsecondsPerQuarterNote.HasValue)
+                parameters["MicrosecondsPerQuarterNote"] = microsecondsPerQuarterNote.Value;
+
+            return new()
+            {
+                Type = MidiEventType.SetTempo,
+                AbsoluteTimeTicks = absoluteTime,
+                Parameters = parameters
+            };
+        }
+
+        /// <summary>
+        /// Creates a time signature meta event (0x58).
+        /// </summary>
+        public static MidiEvent CreateTimeSignature(
+            long absoluteTime,
+            int numerator,
             int denominator,
-            int? clocksPerMetronomeClick = null, 
-            int? thirtySecondNotesPerQuarter = null) =>
+            int clocksPerMetronomeClick = 24,
+            int thirtySecondNotesPerQuarter = 8) =>
             new()
             {
                 Type = MidiEventType.TimeSignature,
                 AbsoluteTimeTicks = absoluteTime,
-                TimeSigNumerator = numerator,
-                TimeSigDenominator = denominator,
-                ClocksPerMetronomeClick = clocksPerMetronomeClick,
-                ThirtySecondNotesPerQuarter = thirtySecondNotesPerQuarter
+                Parameters = new()
+                {
+                    ["Numerator"] = numerator,
+                    ["Denominator"] = denominator,
+                    ["ClocksPerMetronomeClick"] = clocksPerMetronomeClick,
+                    ["ThirtySecondNotesPerQuarter"] = thirtySecondNotesPerQuarter
+                }
             };
 
         /// <summary>
-        /// Creates a key signature meta event.
+        /// Creates a key signature meta event (0x59).
         /// </summary>
-        public static MidiEvent KeySignature(long absoluteTime, int sharpsFlats, string mode) =>
+        /// <param name="sharpsFlats">Number of sharps (positive) or flats (negative), -7 to +7</param>
+        /// <param name="mode">0 for major, 1 for minor</param>
+        public static MidiEvent CreateKeySignature(long absoluteTime, int sharpsFlats, int mode) =>
             new()
             {
                 Type = MidiEventType.KeySignature,
                 AbsoluteTimeTicks = absoluteTime,
-                KeySigSharpsFlats = sharpsFlats,
-                KeySigMode = mode
+                Parameters = new()
+                {
+                    ["SharpsFlats"] = sharpsFlats,
+                    ["Mode"] = mode
+                }
             };
 
         /// <summary>
-        /// Creates a text meta event.
+        /// Creates a sequencer-specific meta event (0x7F).
         /// </summary>
-        public static MidiEvent TextEvent(long absoluteTime, string text) =>
-            new() { Type = MidiEventType.Text, AbsoluteTimeTicks = absoluteTime, Text = text };
-
-        /// <summary>
-        /// Creates an end-of-track meta event.
-        /// </summary>
-        public static MidiEvent EndOfTrack(long absoluteTime = 0) =>
-            new() { Type = MidiEventType.EndOfTrack, AbsoluteTimeTicks = absoluteTime };
-
-        /// <summary>
-        /// Creates a program change event.
-        /// </summary>
-        public static MidiEvent ProgramChange(
-            long absoluteTime, 
-            int channel, 
-            int programNumber, 
-            string? programName = null) =>
+        public static MidiEvent CreateSequencerSpecific(long absoluteTime, byte[] data) =>
             new()
             {
-                Type = MidiEventType.ProgramChange,
+                Type = MidiEventType.SequencerSpecific,
                 AbsoluteTimeTicks = absoluteTime,
-                Channel = channel,
-                ProgramNumber = programNumber,
-                ProgramName = programName
+                Parameters = new() { ["Data"] = data }
             };
 
+        // ============================================================
+        // Factory Methods - Channel Voice Messages
+        // ============================================================
+
         /// <summary>
-        /// Creates a control change event.
+        /// Creates a note-off event (0x8n).
         /// </summary>
-        public static MidiEvent ControlChange(
-            long absoluteTime, 
-            int channel, 
-            int controllerNumber, 
-            int value, 
-            string? controllerName = null) =>
-            new()
+        /// <param name="channel">MIDI channel (0-15)</param>
+        /// <param name="noteNumber">MIDI note number (0-127). Can also provide "Note" for human-readable name.</param>
+        /// <param name="velocity">Release velocity (0-127)</param>
+        /// <param name="note">Optional human-readable note name (e.g., "C4")</param>
+        public static MidiEvent CreateNoteOff(long absoluteTime, int channel, int noteNumber, int velocity = 0, string? note = null)
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                ["Channel"] = channel,
+                ["NoteNumber"] = noteNumber,
+                ["Velocity"] = velocity
+            };
+            if (note != null)
+                parameters["Note"] = note;
+
+            return new()
+            {
+                Type = MidiEventType.NoteOff,
+                AbsoluteTimeTicks = absoluteTime,
+                Parameters = parameters
+            };
+        }
+
+        /// <summary>
+        /// Creates a note-on event (0x9n).
+        /// </summary>
+        /// <param name="channel">MIDI channel (0-15)</param>
+        /// <param name="noteNumber">MIDI note number (0-127)</param>
+        /// <param name="velocity">Note velocity (0-127, 0 is often treated as note-off)</param>
+        /// <param name="note">Optional human-readable note name (e.g., "C4")</param>
+        public static MidiEvent CreateNoteOn(long absoluteTime, int channel, int noteNumber, int velocity, string? note = null)
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                ["Channel"] = channel,
+                ["NoteNumber"] = noteNumber,
+                ["Velocity"] = velocity
+            };
+            if (note != null)
+                parameters["Note"] = note;
+
+            return new()
+            {
+                Type = MidiEventType.NoteOn,
+                AbsoluteTimeTicks = absoluteTime,
+                Parameters = parameters
+            };
+        }
+
+        /// <summary>
+        /// Creates a polyphonic key pressure (aftertouch) event (0xAn).
+        /// </summary>
+        /// <param name="channel">MIDI channel (0-15)</param>
+        /// <param name="noteNumber">MIDI note number (0-127)</param>
+        /// <param name="pressure">Pressure value (0-127)</param>
+        /// <param name="note">Optional human-readable note name</param>
+        public static MidiEvent CreatePolyKeyPressure(long absoluteTime, int channel, int noteNumber, int pressure, string? note = null)
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                ["Channel"] = channel,
+                ["NoteNumber"] = noteNumber,
+                ["Pressure"] = pressure
+            };
+            if (note != null)
+                parameters["Note"] = note;
+
+            return new()
+            {
+                Type = MidiEventType.PolyKeyPressure,
+                AbsoluteTimeTicks = absoluteTime,
+                Parameters = parameters
+            };
+        }
+
+        /// <summary>
+        /// Creates a control change event (0xBn).
+        /// </summary>
+        /// <param name="channel">MIDI channel (0-15)</param>
+        /// <param name="controller">Controller number (0-127)</param>
+        /// <param name="value">Controller value (0-127)</param>
+        /// <param name="controllerName">Optional human-readable controller name</param>
+        public static MidiEvent CreateControlChange(long absoluteTime, int channel, int controller, int value, string? controllerName = null)
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                ["Channel"] = channel,
+                ["Controller"] = controller,
+                ["Value"] = value
+            };
+            if (controllerName != null)
+                parameters["ControllerName"] = controllerName;
+
+            return new()
             {
                 Type = MidiEventType.ControlChange,
                 AbsoluteTimeTicks = absoluteTime,
-                Channel = channel,
-                ControllerNumber = controllerNumber,
-                ControllerValue = value,
-                ControllerName = controllerName
+                Parameters = parameters
             };
+        }
 
         /// <summary>
-        /// Creates a note-on event using human-readable note name.
+        /// Creates a program change event (0xCn).
         /// </summary>
-        public static MidiEvent NoteOn(long absoluteTime, int channel, string note, int velocity) =>
-            new()
+        /// <param name="channel">MIDI channel (0-15)</param>
+        /// <param name="program">Program number (0-127)</param>
+        /// <param name="programName">Optional human-readable program name</param>
+        public static MidiEvent CreateProgramChange(long absoluteTime, int channel, int program, string? programName = null)
+        {
+            var parameters = new Dictionary<string, object>
             {
-                Type = MidiEventType.NoteOn,
-                AbsoluteTimeTicks = absoluteTime,
-                Channel = channel,
-                Note = note,
-                Velocity = velocity
+                ["Channel"] = channel,
+                ["Program"] = program
             };
+            if (programName != null)
+                parameters["ProgramName"] = programName;
 
-        /// <summary>
-        /// Creates a note-on event using MIDI note number.
-        /// </summary>
-        public static MidiEvent NoteOnByNumber(long absoluteTime, int channel, int noteNumber, int velocity) =>
-            new()
+            return new()
             {
-                Type = MidiEventType.NoteOn,
+                Type = MidiEventType.ProgramChange,
                 AbsoluteTimeTicks = absoluteTime,
-                Channel = channel,
-                NoteNumber = noteNumber,
-                Velocity = velocity
+                Parameters = parameters
             };
+        }
 
         /// <summary>
-        /// Creates a note-off event using human-readable note name.
+        /// Creates a channel pressure (aftertouch) event (0xDn).
         /// </summary>
-        public static MidiEvent NoteOff(long absoluteTime, int channel, string note, int releaseVelocity = 0) =>
-            new()
-            {
-                Type = MidiEventType.NoteOff,
-                AbsoluteTimeTicks = absoluteTime,
-                Channel = channel,
-                Note = note,
-                ReleaseVelocity = releaseVelocity
-            };
-
-        /// <summary>
-        /// Creates a note-off event using MIDI note number.
-        /// </summary>
-        public static MidiEvent NoteOffByNumber(long absoluteTime, int channel, int noteNumber, int releaseVelocity = 0) =>
-            new()
-            {
-                Type = MidiEventType.NoteOff,
-                AbsoluteTimeTicks = absoluteTime,
-                Channel = channel,
-                NoteNumber = noteNumber,
-                ReleaseVelocity = releaseVelocity
-            };
-
-        /// <summary>
-        /// Creates a pitch bend event.
-        /// </summary>
-        /// <param name="bendValue">Pitch bend value (-8192 to +8191, 0 = center)</param>
-        public static MidiEvent PitchBend(long absoluteTime, int channel, int bendValue) =>
-            new()
-            {
-                Type = MidiEventType.PitchBend,
-                AbsoluteTimeTicks = absoluteTime,
-                Channel = channel,
-                PitchBendValue = bendValue
-            };
-
-        /// <summary>
-        /// Creates a channel pressure (aftertouch) event.
-        /// </summary>
-        public static MidiEvent ChannelPressure(long absoluteTime, int channel, int pressure) =>
+        /// <param name="channel">MIDI channel (0-15)</param>
+        /// <param name="pressure">Pressure value (0-127)</param>
+        public static MidiEvent CreateChannelPressure(long absoluteTime, int channel, int pressure) =>
             new()
             {
                 Type = MidiEventType.ChannelPressure,
                 AbsoluteTimeTicks = absoluteTime,
-                Channel = channel,
-                Pressure = pressure
+                Parameters = new()
+                {
+                    ["Channel"] = channel,
+                    ["Pressure"] = pressure
+                }
             };
 
         /// <summary>
-        /// Creates a polyphonic pressure (aftertouch) event.
+        /// Creates a pitch bend event (0xEn).
         /// </summary>
-        public static MidiEvent PolyPressure(long absoluteTime, int channel, string note, int pressure) =>
+        /// <param name="channel">MIDI channel (0-15)</param>
+        /// <param name="value">Pitch bend value (-8192 to +8191, 0 = center)</param>
+        public static MidiEvent CreatePitchBend(long absoluteTime, int channel, int value) =>
             new()
             {
-                Type = MidiEventType.PolyKeyPressure,
+                Type = MidiEventType.PitchBend,
                 AbsoluteTimeTicks = absoluteTime,
-                Channel = channel,
-                Note = note,
-                Pressure = pressure
+                Parameters = new()
+                {
+                    ["Channel"] = channel,
+                    ["Value"] = value
+                }
             };
 
         /// <summary>
-        /// Creates a system exclusive event.
+        /// Creates an unknown event type for forward compatibility.
         /// </summary>
-        public static MidiEvent SysEx(long absoluteTime, string preset, string? payload = null) =>
+        public static MidiEvent CreateUnknown(long absoluteTime, byte[] rawData) =>
             new()
             {
-                Type = MidiEventType.SysEx,
+                Type = MidiEventType.Unknown,
                 AbsoluteTimeTicks = absoluteTime,
-                SysExPreset = preset,
-                SysExPayload = payload
+                Parameters = new() { ["RawData"] = rawData }
             };
     }
 }

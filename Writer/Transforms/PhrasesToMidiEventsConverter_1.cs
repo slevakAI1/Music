@@ -46,17 +46,14 @@ namespace Music.Writer
             var trackName = string.IsNullOrWhiteSpace(phrase.MidiPartName) 
                 ? "Unnamed Track" 
                 : phrase.MidiPartName;
-            events.Add(MidiEvent.TrackName(0, trackName));
+            events.Add(MidiEvent.CreateSequenceTrackName(0, trackName));
 
             // Add program change event at the beginning to set the instrument
             // Channel is null and will be assigned in Phase 2
-            events.Add(new MidiEvent
-            {
-                Type = MidiEventType.ProgramChange,
-                AbsoluteTimeTicks = 0,
-                Channel = null,
-                ProgramNumber = phrase.MidiProgramNumber
-            });
+            var programChangeEvent = MidiEvent.CreateProgramChange(0, 0, phrase.MidiProgramNumber);
+            // Remove the channel parameter temporarily (will be assigned in Phase 2)
+            programChangeEvent.Parameters.Remove("Channel");
+            events.Add(programChangeEvent);
 
             // Process each note event in the phrase
             foreach (var noteEvent in phrase.NoteEvents ?? Enumerable.Empty<NoteEvent>())
@@ -131,14 +128,10 @@ namespace Music.Writer
             foreach (var cn in chordNotes)
             {
                 var noteNumber = CalculateMidiNoteNumber(cn.Step, cn.Alter, cn.Octave);
-                events.Add(new MidiEvent
-                {
-                    Type = MidiEventType.NoteOn,
-                    AbsoluteTimeTicks = absoluteTime,
-                    Channel = null, // Channel assignment happens in later stage
-                    NoteNumber = noteNumber,
-                    Velocity = 100 // Default velocity
-                });
+                var noteOnEvent = MidiEvent.CreateNoteOn(absoluteTime, 0, noteNumber, 100);
+                // Remove the channel parameter temporarily (will be assigned in Phase 2)
+                noteOnEvent.Parameters.Remove("Channel");
+                events.Add(noteOnEvent);
             }
 
             // Create NoteOff events for all chord notes at the same end time
@@ -146,14 +139,10 @@ namespace Music.Writer
             foreach (var cn in chordNotes)
             {
                 var noteNumber = CalculateMidiNoteNumber(cn.Step, cn.Alter, cn.Octave);
-                events.Add(new MidiEvent
-                {
-                    Type = MidiEventType.NoteOff,
-                    AbsoluteTimeTicks = noteOffTime,
-                    Channel = null, // Channel assignment happens in later stage
-                    NoteNumber = noteNumber,
-                    ReleaseVelocity = 0
-                });
+                var noteOffEvent = MidiEvent.CreateNoteOff(noteOffTime, 0, noteNumber, 0);
+                // Remove the channel parameter temporarily (will be assigned in Phase 2)
+                noteOffEvent.Parameters.Remove("Channel");
+                events.Add(noteOffEvent);
             }
 
             // Advance absolute time by the chord duration
@@ -173,25 +162,17 @@ namespace Music.Writer
             var noteNumber = CalculateMidiNoteNumber(noteEvent.Step, noteEvent.Alter, noteEvent.Octave);
 
             // Create NoteOn event at current absolute time
-            events.Add(new MidiEvent
-            {
-                Type = MidiEventType.NoteOn,
-                AbsoluteTimeTicks = absoluteTime,
-                Channel = null, // Channel assignment happens in later stage
-                NoteNumber = noteNumber,
-                Velocity = 100 // Default velocity
-            });
+            var noteOnEvent = MidiEvent.CreateNoteOn(absoluteTime, 0, noteNumber, 100);
+            // Remove the channel parameter temporarily (will be assigned in Phase 2)
+            noteOnEvent.Parameters.Remove("Channel");
+            events.Add(noteOnEvent);
 
             // Create NoteOff event at note end time
             long noteOffTime = absoluteTime + duration;
-            events.Add(new MidiEvent
-            {
-                Type = MidiEventType.NoteOff,
-                AbsoluteTimeTicks = noteOffTime,
-                Channel = null, // Channel assignment happens in later stage
-                NoteNumber = noteNumber,
-                ReleaseVelocity = 0
-            });
+            var noteOffEvent = MidiEvent.CreateNoteOff(noteOffTime, 0, noteNumber, 0);
+            // Remove the channel parameter temporarily (will be assigned in Phase 2)
+            noteOffEvent.Parameters.Remove("Channel");
+            events.Add(noteOffEvent);
 
             // Advance absolute time by the note duration
             absoluteTime += duration;

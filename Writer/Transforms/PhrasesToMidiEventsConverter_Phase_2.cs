@@ -68,19 +68,19 @@ namespace Music.Writer
             var track0 = new List<MidiEvent>();
 
             // Add track name event at absolute time 0
-            track0.Add(MidiEvent.TrackName(0, "Global Events"));
+            track0.Add(MidiEvent.CreateSequenceTrackName(0, "Global Events"));
 
             // Add tempo event at absolute time 0
-            track0.Add(MidiEvent.SetTempoBpm(0, tempo));
+            track0.Add(MidiEvent.CreateSetTempo(0, bpm: tempo));
 
             // Add time signature event at absolute time 0
-            track0.Add(MidiEvent.TimeSignature(
+            track0.Add(MidiEvent.CreateTimeSignature(
                 0,
                 timeSignatureNumerator,
                 timeSignatureDenominator));
 
             // Add end of track event at absolute time 0 (will be adjusted later if needed)
-            track0.Add(MidiEvent.EndOfTrack(0));
+            track0.Add(MidiEvent.CreateEndOfTrack(0));
 
             // Sort track 0 events
             return SortEventsByPriority(track0);
@@ -102,7 +102,9 @@ namespace Music.Writer
 
                 // Find the track name (should be first event in the list)
                 var trackNameEvent = eventList.FirstOrDefault(e => e.Type == MidiEventType.SequenceTrackName);
-                var instrumentName = trackNameEvent?.Text ?? "Unknown Instrument";
+                var instrumentName = trackNameEvent?.Parameters.TryGetValue("Text", out var textObj) == true 
+                    ? textObj as string ?? "Unknown Instrument"
+                    : "Unknown Instrument";
 
                 // Initialize list for this instrument if not exists
                 if (!eventsByInstrument.ContainsKey(instrumentName))
@@ -219,9 +221,6 @@ namespace Music.Writer
                 // Note off before note on (critical for same-pitch re-triggering)
                 MidiEventType.NoteOff => 30,
                 MidiEventType.NoteOn => 31,
-
-                // SysEx
-                MidiEventType.SysEx => 40,
 
                 // End of track last
                 MidiEventType.EndOfTrack => 999,
