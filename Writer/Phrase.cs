@@ -38,10 +38,7 @@ namespace Music.Writer
     /// </summary>
     public sealed class PhraseEvent
     {
-        public bool IsRest { get; set; }
-
         // Rhythm Tuplet
-        public string? TupletNumber { get; set; }   // for musicxml only
         public int? TupletActualNotes { get; set; }  // The 'm' in m:n (e.g., 3 in a triplet)
         public int? TupletNormalNotes { get; set; }  // The 'n' in m:n (e.g., 2 in a triplet)
 
@@ -52,15 +49,11 @@ namespace Music.Writer
         // public other - pitch bend, etc...future
 
         public PhraseEvent(
-            bool isRest,
-            string? tupletNumber = null,
             int? tupletActualNotes = null,
             int? tupletNormalNotes = null,
             PhraseChord? phraseChord = null,
             List<PhraseNote>? phraseNotes = null)
         {
-            IsRest = isRest;
-            TupletNumber = tupletNumber;
             TupletActualNotes = tupletActualNotes;
             TupletNormalNotes = tupletNormalNotes;
             PhraseChord = phraseChord;
@@ -112,6 +105,8 @@ namespace Music.Writer
     /// </summary>
     public sealed class PhraseNote
     {
+        public bool IsRest { get; set; }
+
         // MIDI-related.  480 ticks / quarter note is standard
         public int NoteNumber { get; set; } // note volume
         public int AbsolutePositionTicks { get; set; } //  note start
@@ -133,12 +128,14 @@ namespace Music.Writer
             int noteNumber,
             int absolutePositionTicks,
             int noteDurationTicks,
-            int noteOnVelocity = 100)
+            int noteOnVelocity = 100,
+            bool isRest = false)
         {
             NoteNumber = noteNumber;
             AbsolutePositionTicks = absolutePositionTicks;
             NoteDurationTicks = noteDurationTicks;
             NoteOnVelocity = noteOnVelocity;
+            IsRest = isRest;
 
             // Compute the pitch and rhythm properties here
             // TBD
