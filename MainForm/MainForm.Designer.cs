@@ -40,10 +40,12 @@
             viewMusicXmlToolStripMenuItem = new ToolStripMenuItem();
             designToolStripMenuItem = new ToolStripMenuItem();
             generateToolStripMenuItem = new ToolStripMenuItem();
-            writerToolStripMenuItem = new ToolStripMenuItem();
             arrangerToolStripMenuItem = new ToolStripMenuItem();
+            writerToolStripMenuItem = new ToolStripMenuItem();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
+            importMidiToolStripMenuItem = new ToolStripMenuItem();
+            playMidiFileToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             SuspendLayout();
@@ -53,13 +55,13 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { MenuFile, designToolStripMenuItem, generateToolStripMenuItem, arrangerToolStripMenuItem, writerToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(613, 24);
+            menuStrip1.Size = new Size(796, 24);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
             // MenuFile
             // 
-            MenuFile.DropDownItems.AddRange(new ToolStripItem[] { MenuImportMusicXml, MenuExportMusicXml, viewMusicXmlToolStripMenuItem });
+            MenuFile.DropDownItems.AddRange(new ToolStripItem[] { MenuImportMusicXml, MenuExportMusicXml, viewMusicXmlToolStripMenuItem, importMidiToolStripMenuItem, playMidiFileToolStripMenuItem });
             MenuFile.Name = "MenuFile";
             MenuFile.Size = new Size(37, 20);
             MenuFile.Text = "File";
@@ -67,21 +69,21 @@
             // MenuImportMusicXml
             // 
             MenuImportMusicXml.Name = "MenuImportMusicXml";
-            MenuImportMusicXml.Size = new Size(166, 22);
+            MenuImportMusicXml.Size = new Size(180, 22);
             MenuImportMusicXml.Text = "Import MusicXml";
             MenuImportMusicXml.Click += MenuImportMusicXml_Click;
             // 
             // MenuExportMusicXml
             // 
             MenuExportMusicXml.Name = "MenuExportMusicXml";
-            MenuExportMusicXml.Size = new Size(166, 22);
+            MenuExportMusicXml.Size = new Size(180, 22);
             MenuExportMusicXml.Text = "Export MusicXML";
             MenuExportMusicXml.Click += MenuExportMusicXml_Click;
             // 
             // viewMusicXmlToolStripMenuItem
             // 
             viewMusicXmlToolStripMenuItem.Name = "viewMusicXmlToolStripMenuItem";
-            viewMusicXmlToolStripMenuItem.Size = new Size(166, 22);
+            viewMusicXmlToolStripMenuItem.Size = new Size(180, 22);
             viewMusicXmlToolStripMenuItem.Text = "View MusicXml";
             viewMusicXmlToolStripMenuItem.Click += viewMusicXmlToolStripMenuItem_Click;
             // 
@@ -99,13 +101,6 @@
             generateToolStripMenuItem.Text = "Writer";
             generateToolStripMenuItem.Click += generateToolStripMenuItem_Click;
             // 
-            // writerToolStripMenuItem
-            // 
-            writerToolStripMenuItem.Name = "writerToolStripMenuItem";
-            writerToolStripMenuItem.Size = new Size(40, 20);
-            writerToolStripMenuItem.Text = "Test";
-            writerToolStripMenuItem.Click += testToolStripMenuItem_Click;
-            // 
             // arrangerToolStripMenuItem
             // 
             arrangerToolStripMenuItem.Name = "arrangerToolStripMenuItem";
@@ -113,12 +108,19 @@
             arrangerToolStripMenuItem.Text = "Arranger";
             arrangerToolStripMenuItem.Click += arrangerToolStripMenuItem_Click;
             // 
+            // writerToolStripMenuItem
+            // 
+            writerToolStripMenuItem.Name = "writerToolStripMenuItem";
+            writerToolStripMenuItem.Size = new Size(40, 20);
+            writerToolStripMenuItem.Text = "Test";
+            writerToolStripMenuItem.Click += testToolStripMenuItem_Click;
+            // 
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
-            statusStrip1.Location = new Point(0, 324);
+            statusStrip1.Location = new Point(0, 352);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(613, 22);
+            statusStrip1.Size = new Size(796, 22);
             statusStrip1.TabIndex = 1;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -128,9 +130,23 @@
             toolStripStatusLabel1.Size = new Size(63, 17);
             toolStripStatusLabel1.Text = "Status Info";
             // 
+            // importMidiToolStripMenuItem
+            // 
+            importMidiToolStripMenuItem.Name = "importMidiToolStripMenuItem";
+            importMidiToolStripMenuItem.Size = new Size(180, 22);
+            importMidiToolStripMenuItem.Text = "Import Midi File";
+            importMidiToolStripMenuItem.Click += importMidiToolStripMenuItem_Click;
+            // 
+            // playMidiFileToolStripMenuItem
+            // 
+            playMidiFileToolStripMenuItem.Name = "playMidiFileToolStripMenuItem";
+            playMidiFileToolStripMenuItem.Size = new Size(180, 22);
+            playMidiFileToolStripMenuItem.Text = "Play Midi File";
+            playMidiFileToolStripMenuItem.Click += playMidiFileToolStripMenuItem_Click;
+            // 
             // MainForm
             // 
-            ClientSize = new Size(613, 346);
+            ClientSize = new Size(796, 374);
             Controls.Add(menuStrip1);
             Controls.Add(statusStrip1);
             IsMdiContainer = true;
@@ -155,5 +171,7 @@
         private ToolStripMenuItem writerToolStripMenuItem;
         private ToolStripMenuItem viewMusicXmlToolStripMenuItem;
         private ToolStripMenuItem arrangerToolStripMenuItem;
+        private ToolStripMenuItem importMidiToolStripMenuItem;
+        private ToolStripMenuItem playMidiFileToolStripMenuItem;
     }
 }

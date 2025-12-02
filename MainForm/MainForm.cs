@@ -1,3 +1,4 @@
+using Music.Tests;
 using Music.Writer;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,8 @@ namespace Music
     public partial class MainForm : Form
     {
         private readonly FileManager _fileManager;
+        private readonly MidiIoService _midiIoService;
+        private readonly IMidiPlaybackService _playbackService;
 
         public MainForm()
         {
@@ -17,6 +20,8 @@ namespace Music
             this.IsMdiContainer = true;
 
             _fileManager = new FileManager(ShowStatus);
+            _midiIoService = new MidiIoService();
+            _playbackService = new MidiPlaybackService();
 
             // D E F A U L T   F O R M   O N   S T A R T U P
 
@@ -96,6 +101,62 @@ namespace Music
         private void arrangerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ShowChildForm(typeof(ArrangerForm));
+        }
+
+        private void importMidiToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using var ofd = new OpenFileDialog
+            {
+                Filter = "MIDI files (*.mid;*.midi)|*.mid;*.midi",
+                Title = "Import MIDI File"
+            };
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    var doc = _midiIoService.ImportFromFile(ofd.FileName);
+                    AppState.CurrentSong = doc;
+                    ShowStatus($"Loaded {doc.FileName}");             
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"Error importing MIDI file:\n{ex.Message}\n\n{ex.InnerException?.Message}",
+                        "Import Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void playMidiFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var song = AppState.CurrentSong;
+            if (song == null)
+            {
+                MessageBox.Show(
+                    this,
+                    "No MIDI document is loaded. Please import a MIDI file first.",
+                    "No MIDI Document",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                _playbackService.Play(song);
+                ShowStatus($"Playing {song.FileName}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    this,
+                    $"Error playing MIDI file:\n{ex.Message}",
+                    "Playback Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
         }
     }
 }
