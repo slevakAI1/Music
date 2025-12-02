@@ -107,170 +107,170 @@ namespace Music.Writer
         /// Converts Writer data to a AppendNotesParams for use with AppendNotes.
         /// Also adds notes per NumberOfNotes specified in writer data
         /// </summary>
-        public static AppendNoteEventsToScoreParams ToAppendNoteEventsParams(this WriterFormData data)
-        {
-            if (data == null) throw new ArgumentNullException(nameof(data));
+        //public static AppendNoteEventsToScoreParams ToAppendNoteEventsParams(this WriterFormData data)
+        //{
+        //    if (data == null) throw new ArgumentNullException(nameof(data));
 
-            var parts = (data.PartsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase))
-                .Where(kv => kv.Value)
-                .Select(kv => kv.Key)
-                .ToList();
+        //    var parts = (data.PartsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase))
+        //        .Where(kv => kv.Value)
+        //        .Select(kv => kv.Key)
+        //        .ToList();
 
-            var selectedStaffs = (data.SelectedStaffs ?? new List<int>()).Any() 
-                ? data.SelectedStaffs 
-                : new List<int> { 1 }; // Default to staff 1 if none selected
+        //    var selectedStaffs = (data.SelectedStaffs ?? new List<int>()).Any() 
+        //        ? data.SelectedStaffs 
+        //        : new List<int> { 1 }; // Default to staff 1 if none selected
 
-            var noteEvents = new List<PhraseNote>();
+        //    var noteEvents = new List<PhraseNote>();
 
-            // Get tuplet settings from writer data
-            bool isTuplet = !string.IsNullOrWhiteSpace(data.TupletNumber);
-            string? tupletNumber = isTuplet ? data.TupletNumber : null;
-            int tupletActualNotes = isTuplet ? (data.TupletCount ?? 3) : 0;
-            int tupletNormalNotes = isTuplet ? (data.TupletOf ?? 2) : 0;
+        //    // Get tuplet settings from writer data
+        //    bool isTuplet = !string.IsNullOrWhiteSpace(data.TupletNumber);
+        //    string? tupletNumber = isTuplet ? data.TupletNumber : null;
+        //    int tupletActualNotes = isTuplet ? (data.TupletCount ?? 3) : 0;
+        //    int tupletNormalNotes = isTuplet ? (data.TupletOf ?? 2) : 0;
 
 
-            //========================================================================
-            //   MOVE THIS THIS CODE BLOCK INTO AppendNote.EXECUTE
+        //    //========================================================================
+        //    //   MOVE THIS THIS CODE BLOCK INTO AppendNote.EXECUTE
 
-            var noteEvent = new PhraseNote();
+        //    var noteEvent = new PhraseNote();
 
-            if (data.IsChord ?? false)  // null = false
-            {
+        //    if (data.IsChord ?? false)  // null = false
+        //    {
 
-                //========================================================================
-                // Create Chord pitch event
-                // Chords will be resolved into their component notes byn AppendNotes.Execute()
+        //        //========================================================================
+        //        // Create Chord pitch event
+        //        // Chords will be resolved into their component notes byn AppendNotes.Execute()
 
-                noteEvent = new PhraseNote
-                {
-                    IsChord = true,
-                    ChordKey = data.ChordKey,
-                    ChordDegree = (int)data.ChordDegree,
-                    ChordQuality = data.ChordQuality,
-                    ChordBase = data.ChordBase,
-                    Octave = data.Octave,
+        //        noteEvent = new PhraseNote
+        //        {
+        //            IsChord = true,
+        //            ChordKey = data.ChordKey,
+        //            ChordDegree = (int)data.ChordDegree,
+        //            ChordQuality = data.ChordQuality,
+        //            ChordBase = data.ChordBase,
+        //            Octave = data.Octave,
 
-                    Duration = GetNoteValue(data.NoteValue),
-                    IsRest = data.IsRest ?? false,
-                    Dots = data.Dots
-                };
-            }
-            else
-            {
-                // Single note or rest
-                noteEvent = new PhraseNote
-                {
-                    Step = data.Step,
-                    Octave = data.Octave,
-                    Duration = GetNoteValue(data.NoteValue),
-                    IsChord = false,
-                    IsRest = data.IsRest ?? false,
-                    Alter = GetAlter(data.Accidental),
-                    Dots = data.Dots
-                };
-           }
+        //            Duration = GetNoteValue(data.NoteValue),
+        //            IsRest = data.IsRest ?? false,
+        //            Dots = data.Dots
+        //        };
+        //    }
+        //    else
+        //    {
+        //        // Single note or rest
+        //        noteEvent = new PhraseNote
+        //        {
+        //            Step = data.Step,
+        //            Octave = data.Octave,
+        //            Duration = GetNoteValue(data.NoteValue),
+        //            IsChord = false,
+        //            IsRest = data.IsRest ?? false,
+        //            Alter = GetAlter(data.Accidental),
+        //            Dots = data.Dots
+        //        };
+        //   }
 
-            // Add tuplet settings if specified
-            if (isTuplet)
-            {
-                noteEvent.TupletNumber = tupletNumber;
-                noteEvent.TupletActualNotes = tupletActualNotes;
-                noteEvent.TupletNormalNotes = tupletNormalNotes;
-            }
+        //    // Add tuplet settings if specified
+        //    if (isTuplet)
+        //    {
+        //        noteEvent.TupletNumber = tupletNumber;
+        //        noteEvent.TupletActualNotes = tupletActualNotes;
+        //        noteEvent.TupletNormalNotes = tupletNormalNotes;
+        //    }
 
-            // Create specified number of test Pitch Events
-            for (int i = 0; i < (data.NumberOfNotes.GetValueOrDefault(1)); i++)
-            {
-                noteEvents.AddRange(noteEvent);
-            }
+        //    // Create specified number of test Pitch Events
+        //    for (int i = 0; i < (data.NumberOfNotes.GetValueOrDefault(1)); i++)
+        //    {
+        //        noteEvents.AddRange(noteEvent);
+        //    }
 
-            var appendNotesParams = new AppendNoteEventsToScoreParams
-            {
-                Parts = parts,
-                Staffs = selectedStaffs!,
-                StartBar = data.StartBar.GetValueOrDefault(),
-                NoteEvents = noteEvents
-            };
+        //    var appendNotesParams = new AppendNoteEventsToScoreParams
+        //    {
+        //        Parts = parts,
+        //        Staffs = selectedStaffs!,
+        //        StartBar = data.StartBar.GetValueOrDefault(),
+        //        NoteEvents = noteEvents
+        //    };
 
-            return appendNotesParams;
-        }
+        //    return appendNotesParams;
+        //}
 
         /// <summary>
         /// Converts Writer data to a Phrase for use with the phrase control.
         /// Similar to ToAppendNoteEventsParams but creates a single-part Phrase object.
         /// </summary>
-        public static Phrase ToPhrase(this WriterFormData data)
-        {
-            if (data == null) throw new ArgumentNullException(nameof(data));
+        //public static Phrase ToPhrase(this WriterFormData data)
+        //{
+        //    if (data == null) throw new ArgumentNullException(nameof(data));
 
-            // Default part for new phrase
-            var part = "Acoustic GrandPiano";  
+        //    // Default part for new phrase
+        //    var part = "Acoustic GrandPiano";  
 
-            var noteEvents = new List<PhraseNote>();
+        //    var noteEvents = new List<PhraseNote>();
 
-            // Get tuplet settings from writer data
-            bool isTuplet = !string.IsNullOrWhiteSpace(data.TupletNumber);
-            string? tupletNumber = isTuplet ? data.TupletNumber : null;
-            int tupletActualNotes = isTuplet ? (data.TupletCount ?? 3) : 0;
-            int tupletNormalNotes = isTuplet ? (data.TupletOf ?? 2) : 0;
+        //    // Get tuplet settings from writer data
+        //    bool isTuplet = !string.IsNullOrWhiteSpace(data.TupletNumber);
+        //    string? tupletNumber = isTuplet ? data.TupletNumber : null;
+        //    int tupletActualNotes = isTuplet ? (data.TupletCount ?? 3) : 0;
+        //    int tupletNormalNotes = isTuplet ? (data.TupletOf ?? 2) : 0;
 
-            var noteEvent = new PhraseNote();
+        //    var noteEvent = new PhraseNote();
 
-            if (data.IsChord ?? false)  // null = false
-            {
-                // Create Chord pitch event
-                // Chords will be resolved into their component notes by AppendNotes.Execute()
-                noteEvent = new PhraseNote
-                {
-                    IsChord = true,
-                    ChordKey = data.ChordKey,
-                    ChordDegree = (int)data.ChordDegree,
-                    ChordQuality = data.ChordQuality,
-                    ChordBase = data.ChordBase,
-                    Octave = data.Octave,
+        //    if (data.IsChord ?? false)  // null = false
+        //    {
+        //        // Create Chord pitch event
+        //        // Chords will be resolved into their component notes by AppendNotes.Execute()
+        //        noteEvent = new PhraseNote
+        //        {
+        //            IsChord = true,
+        //            ChordKey = data.ChordKey,
+        //            ChordDegree = (int)data.ChordDegree,
+        //            ChordQuality = data.ChordQuality,
+        //            ChordBase = data.ChordBase,
+        //            Octave = data.Octave,
 
-                    Duration = GetNoteValue(data.NoteValue),
-                    IsRest = data.IsRest ?? false,
-                    Dots = data.Dots
-                };
-            }
-            else
-            {
-                // Single note or rest
-                noteEvent = new PhraseNote
-                {
-                    Step = data.Step,
-                    Octave = data.Octave,
-                    Duration = GetNoteValue(data.NoteValue),
-                    IsChord = false,
-                    IsRest = data.IsRest ?? false,
-                    Alter = GetAlter(data.Accidental),
-                    Dots = data.Dots
-                };
-            }
+        //            Duration = GetNoteValue(data.NoteValue),
+        //            IsRest = data.IsRest ?? false,
+        //            Dots = data.Dots
+        //        };
+        //    }
+        //    else
+        //    {
+        //        // Single note or rest
+        //        noteEvent = new PhraseNote
+        //        {
+        //            Step = data.Step,
+        //            Octave = data.Octave,
+        //            Duration = GetNoteValue(data.NoteValue),
+        //            IsChord = false,
+        //            IsRest = data.IsRest ?? false,
+        //            Alter = GetAlter(data.Accidental),
+        //            Dots = data.Dots
+        //        };
+        //    }
 
-            // Add tuplet settings if specified
-            if (isTuplet)
-            {
-                noteEvent.TupletNumber = tupletNumber;
-                noteEvent.TupletActualNotes = tupletActualNotes;
-                noteEvent.TupletNormalNotes = tupletNormalNotes;
-            }
+        //    // Add tuplet settings if specified
+        //    if (isTuplet)
+        //    {
+        //        noteEvent.TupletNumber = tupletNumber;
+        //        noteEvent.TupletActualNotes = tupletActualNotes;
+        //        noteEvent.TupletNormalNotes = tupletNormalNotes;
+        //    }
 
-            // Create specified number of test Pitch Events
-            for (int i = 0; i < (data.NumberOfNotes.GetValueOrDefault(1)); i++)
-            {
-                noteEvents.AddRange(noteEvent);
-            }
+        //    // Create specified number of test Pitch Events
+        //    for (int i = 0; i < (data.NumberOfNotes.GetValueOrDefault(1)); i++)
+        //    {
+        //        noteEvents.AddRange(noteEvent);
+        //    }
 
-            var phrase = new Phrase
-            {
-                MidiPartName = part,
-                NoteEvents = noteEvents
-            };
+        //    var phrase = new Phrase
+        //    {
+        //        MidiPartName = part,
+        //        NoteEvents = noteEvents
+        //    };
 
-            return phrase;
-        }
+        //    return phrase;
+        //}
 
         private static int GetNoteValue(string? noteValueString)
         {

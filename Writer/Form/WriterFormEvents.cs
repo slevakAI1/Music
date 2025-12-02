@@ -9,83 +9,83 @@ namespace Music.Writer
     public partial class WriterForm
     {
         // Inserts notes based on the "number of notes" parameter from the writer form
-        public void HandleAppendNotes()
-        {
-            // Ensure score list exists and has at least one score
-            if (_scoreList == null || _scoreList.Count == 0)
-            {
-                MessageBox.Show(this, "No score available. Please create a new score first.",
-                    "No Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
+        //public void HandleAppendNotes()
+        //{
+        //    // Ensure score list exists and has at least one score
+        //    if (_scoreList == null || _scoreList.Count == 0)
+        //    {
+        //        MessageBox.Show(this, "No score available. Please create a new score first.",
+        //            "No Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //        return;
+        //    }
 
-            // Check if there are any rows in the grid
-            if (dgvPhrase.Rows.Count == 0)
-            {
-                MessageBox.Show(this, "No phrases to append. Please create phrases first.",
-                    "No Phrases", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
+        //    // Check if there are any rows in the grid
+        //    if (dgvPhrase.Rows.Count == 0)
+        //    {
+        //        MessageBox.Show(this, "No phrases to append. Please create phrases first.",
+        //            "No Phrases", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //        return;
+        //    }
 
-            // Check if a row is selected
-            if (dgvPhrase.SelectedRows.Count == 0)
-            {
-                MessageBox.Show(this, "Please select one or more phrases to append to the score.",
-                    "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
+        //    // Check if a row is selected
+        //    if (dgvPhrase.SelectedRows.Count == 0)
+        //    {
+        //        MessageBox.Show(this, "Please select one or more phrases to append to the score.",
+        //            "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //        return;
+        //    }
 
-            try
-            {
-                // Process each selected phrase row
-                foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
-                {
-                    // Get the Phrase object from the hidden data column
-                    var phrase = (Phrase)selectedRow.Cells["colData"].Value;
+        //    try
+        //    {
+        //        // Process each selected phrase row
+        //        foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
+        //        {
+        //            // Get the Phrase object from the hidden data column
+        //            var phrase = (Phrase)selectedRow.Cells["colData"].Value;
                     
-                    // Get the selected instrument name from the combobox
-                    var selectedInstrumentName = selectedRow.Cells["colInstrument"].FormattedValue?.ToString();
+        //            // Get the selected instrument name from the combobox
+        //            var selectedInstrumentName = selectedRow.Cells["colInstrument"].FormattedValue?.ToString();
                     
-                    if (phrase == null || string.IsNullOrEmpty(selectedInstrumentName))
-                        continue;
+        //            if (phrase == null || string.IsNullOrEmpty(selectedInstrumentName))
+        //                continue;
 
-                    // THIS IS THE CONVERSION BETWEEN PHRASE AND THE OLD PARAMS CLASS:
+        //            // THIS IS THE CONVERSION BETWEEN PHRASE AND THE OLD PARAMS CLASS:
 
-                    // Create AppendNoteEventsToScoreParams from the phrase
-                    var config = new AppendNoteEventsToScoreParams
-                    {
-                        Parts = new List<string> { selectedInstrumentName },
-                        Staffs = new List<int> { 1 },
-                        StartBar = 1, // Default to bar 1, could be enhanced to use a form control
-                        StartBeat = 1, // Default to beat 1
-                        NoteEvents = phrase.NoteEvents ?? new List<PhraseNote>()
-                    };
+        //            // Create AppendNoteEventsToScoreParams from the phrase
+        //            var config = new AppendNoteEventsToScoreParams
+        //            {
+        //                Parts = new List<string> { selectedInstrumentName },
+        //                Staffs = new List<int> { 1 },
+        //                StartBar = 1, // Default to bar 1, could be enhanced to use a form control
+        //                StartBeat = 1, // Default to beat 1
+        //                NoteEvents = phrase.NoteEvents ?? new List<PhraseNote>()
+        //            };
 
-                    // Append the phrase to the score
-                    AppendNotes.Execute(_scoreList[0], config, _measureMeta);
-                }
+        //            // Append the phrase to the score
+        //            AppendNotes.Execute(_scoreList[0], config, _measureMeta);
+        //        }
 
-                // Update the score report display
-                txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
+        //        // Update the score report display
+        //        txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
                 
-                // Update globals
-                Globals.ScoreList = _scoreList;
+        //        // Update globals
+        //        Globals.ScoreList = _scoreList;
 
-                MessageBox.Show(this, 
-                    $"Successfully appended {dgvPhrase.SelectedRows.Count} phrase(s) to the score.",
-                    "Append Complete", 
-                    MessageBoxButtons.OK, 
-                    MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(this, 
-                    $"Error appending phrases to score:\n{ex.Message}", 
-                    "Append Error", 
-                    MessageBoxButtons.OK, 
-                    MessageBoxIcon.Error);
-            }
-        }
+        //        MessageBox.Show(this, 
+        //            $"Successfully appended {dgvPhrase.SelectedRows.Count} phrase(s) to the score.",
+        //            "Append Complete", 
+        //            MessageBoxButtons.OK, 
+        //            MessageBoxIcon.Information);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(this, 
+        //            $"Error appending phrases to score:\n{ex.Message}", 
+        //            "Append Error", 
+        //            MessageBoxButtons.OK, 
+        //            MessageBoxIcon.Error);
+        //    }
+        //}
 
         // This plays all of the selected phrases simulaneously as a midi document
         public async Task HandlePlayAsync()
@@ -133,13 +133,13 @@ namespace Music.Writer
                 //      Merge midiEventLists lists that are for the same instrument
                 //      Add track 0 global events
                 //      Assign track numbers to midi event lists
-                var mergedMidiEventLists = PhrasesToMidiEventsConverter_Phase_2.Convert(
-                    midiEventLists,
-                    tempo: 112,
-                    timeSignatureNumerator: 4,
-                    timeSignatureDenominator: 4);
-                inputjson = Helpers.DebugObject(midiEventLists);
-                outputjson = Helpers.DebugObject(mergedMidiEventLists);
+                //var mergedMidiEventLists = PhrasesToMidiEventsConverter_Phase_2.Convert(
+                //    midiEventLists,
+                //    tempo: 112,
+                //    timeSignatureNumerator: 4,
+                //    timeSignatureDenominator: 4);
+                //inputjson = Helpers.DebugObject(midiEventLists);
+                //outputjson = Helpers.DebugObject(mergedMidiEventLists);
 
 
                 //var mergedByInstrument = PhrasesToTimedNotesConverter.MergeByInstrument(timedPhrases);

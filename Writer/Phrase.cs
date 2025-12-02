@@ -1,5 +1,4 @@
 using Music.Domain;
-using MusicTheory;
 
 namespace Music.Writer
 {
@@ -119,7 +118,7 @@ namespace Music.Writer
             {
                 (Step, Alter, Octave) = CalculatePitch(noteNumber);
             }
-            (Duration, Dots) = CalculateRhythm(noteDurationTicks);
+            (Duration, Dots, TupletActualNotes, TupletNormalNotes) = CalculateRhythm(noteDurationTicks);
         }
 
         /// <summary>
@@ -152,9 +151,45 @@ namespace Music.Writer
         /// Calculates the rhythm properties (Duration, Dots) from note duration in ticks.
         /// Assumes 480 ticks per quarter note.
         /// </summary>
-        private static (int Duration, int Dots) CalculateRhythm(int noteDurationTicks)
+        private static (int Duration, int Dots, int? TupletActual, int? TupletNormal) CalculateRhythm(int noteDurationTicks)
         {
             const int ticksPerQuarterNote = 480;
+            
+            // Check for common tuplets first
+            var tupletDurations = new (int ticks, int duration, int dots, int actual, int normal)[]
+            {
+                // Triplets (3:2) - most common
+                (320, 4, 0, 3, 2),   // Quarter note triplet
+                (160, 8, 0, 3, 2),   // Eighth note triplet
+                (80, 16, 0, 3, 2),   // Sixteenth note triplet
+                (640, 2, 0, 3, 2),   // Half note triplet
+                
+                // Quintuplets (5:4)
+                (384, 4, 0, 5, 4),   // Quarter note quintuplet (1920/5)
+                (192, 8, 0, 5, 4),   // Eighth note quintuplet
+                (96, 16, 0, 5, 4),   // Sixteenth note quintuplet
+                
+                // Sextuplets (6:4)
+                (320, 8, 0, 6, 4),   // Eighth note sextuplet (1920/6)
+                (160, 16, 0, 6, 4),  // Sixteenth note sextuplet
+                
+                // Septuplets (7:4)
+                (274, 8, 0, 7, 4),   // Eighth note septuplet (approx 1920/7)
+                (137, 16, 0, 7, 4),  // Sixteenth note septuplet
+                
+                // Nonuplets (9:8)
+                (213, 8, 0, 9, 8),   // Eighth note nonuplet (1920/9)
+                (107, 16, 0, 9, 8),  // Sixteenth note nonuplet
+            };
+
+            // Check for tuplet matches
+            foreach (var (ticks, duration, dots, actual, normal) in tupletDurations)
+            {
+                if (Math.Abs(noteDurationTicks - ticks) <= 1) // Allow 1 tick tolerance for rounding
+                {
+                    return (duration, dots, actual, normal);
+                }
+            }
             
             // Common note durations in ticks (480 ticks per quarter note)
             var noteDurations = new (int ticks, int duration, int dots)[]
@@ -191,12 +226,12 @@ namespace Music.Writer
                 (30, 64, 0),   // Sixty-fourth note
             };
 
-            // Find the closest match
-            foreach (var (ticks, duration1, dots) in noteDurations)
+            // Find the closest match for standard durations
+            foreach (var (ticks, duration, dots) in noteDurations)
             {
                 if (noteDurationTicks == ticks)
                 {
-                    return (duration1, dots);
+                    return (duration, dots, null, null);
                 }
             }
 
@@ -204,20 +239,20 @@ namespace Music.Writer
             int wholeTicks = ticksPerQuarterNote * 4;
             if (noteDurationTicks >= wholeTicks)
             {
-                return (1, 0); // Default to whole note
+                return (1, 0, null, null); // Default to whole note
             }
 
             // Calculate the closest power of 2 duration
-            int duration = 1;
+            int calculatedDuration = 1;
             int closestTicks = wholeTicks;
             
-            while (closestTicks > noteDurationTicks && duration < 64)
+            while (closestTicks > noteDurationTicks && calculatedDuration < 64)
             {
-                duration *= 2;
+                calculatedDuration *= 2;
                 closestTicks /= 2;
             }
 
-            return (duration, 0);
+            return (calculatedDuration, 0, null, null);
         }
     }
 }

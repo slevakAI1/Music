@@ -1,587 +1,587 @@
-using Music.Designer;
-using MusicXml.Domain;
+//using Music.Designer;
+//using MusicXml.Domain;
 
-namespace Music.Writer
-{
-    internal static class AppendNotesHelper
-    {
-        /// <summary>
-        /// Removes all backup elements from all measures in the specified parts.
-        /// This should be called at the start of Execute to ensure a clean slate before post-processing.
-        /// </summary>
-        public static void RemoveAllBackupElements(Score score, List<string> partNames)
-        {
-            foreach (var part in score.Parts.Where(p => partNames.Contains(p.Name)))
-            {
-                if (part.Measures == null) continue;
+//namespace Music.Writer
+//{
+//    internal static class AppendNotesHelper
+//    {
+//        /// <summary>
+//        /// Removes all backup elements from all measures in the specified parts.
+//        /// This should be called at the start of Execute to ensure a clean slate before post-processing.
+//        /// </summary>
+//        public static void RemoveAllBackupElements(Score score, List<string> partNames)
+//        {
+//            foreach (var part in score.Parts.Where(p => partNames.Contains(p.Name)))
+//            {
+//                if (part.Measures == null) continue;
                 
-                foreach (var measure in part.Measures)
-                {
-                    if (measure?.MeasureElements == null) continue;
+//                foreach (var measure in part.Measures)
+//                {
+//                    if (measure?.MeasureElements == null) continue;
                     
-                    // Remove all backup elements from the measure
-                    measure.MeasureElements.RemoveAll(e => 
-                        e?.Type == MeasureElementType.Backup && 
-                        e.Element is Backup);
-                }
-            }
-        }
+//                    // Remove all backup elements from the measure
+//                    measure.MeasureElements.RemoveAll(e => 
+//                        e?.Type == MeasureElementType.Backup && 
+//                        e.Element is Backup);
+//                }
+//            }
+//        }
 
-        /// <summary>
-        /// Post-processes all measures in the score to add required backup elements.
-        /// This should be called after all notes have been inserted.
-        /// A backup is needed when a measure has notes on multiple staves.
-        /// </summary>
-        public static void AddAllRequiredBackupElements(Score score, List<string> partNames, MeasureMeta measureMeta)
-        {
-            foreach (var part in score.Parts.Where(p => partNames.Contains(p.Name)))
-            {
-                if (part.Measures == null) continue;
+//        /// <summary>
+//        /// Post-processes all measures in the score to add required backup elements.
+//        /// This should be called after all notes have been inserted.
+//        /// A backup is needed when a measure has notes on multiple staves.
+//        /// </summary>
+//        public static void AddAllRequiredBackupElements(Score score, List<string> partNames, MeasureMeta measureMeta)
+//        {
+//            foreach (var part in score.Parts.Where(p => partNames.Contains(p.Name)))
+//            {
+//                if (part.Measures == null) continue;
                 
-                for (int measureIndex = 0; measureIndex < part.Measures.Count; measureIndex++)
-                {
-                    int measureNumber = measureIndex + 1;
-                    ProcessMeasureForBackups(part.Name, part.Measures[measureIndex], measureNumber, measureMeta);
-                }
-            }
-        }
+//                for (int measureIndex = 0; measureIndex < part.Measures.Count; measureIndex++)
+//                {
+//                    int measureNumber = measureIndex + 1;
+//                    ProcessMeasureForBackups(part.Name, part.Measures[measureIndex], measureNumber, measureMeta);
+//                }
+//            }
+//        }
 
-        /// <summary>
-        /// Processes a single measure to add backup elements where needed.
-        /// A backup is needed after notes on each staff (except the last) when multiple staves have notes.
-        /// </summary>
-        private static void ProcessMeasureForBackups(string partName, Measure measure, int measureNumber, MeasureMeta measureMeta)
-        {
-            if (measure?.MeasureElements == null || measure.MeasureElements.Count == 0)
-                return;
+//        /// <summary>
+//        /// Processes a single measure to add backup elements where needed.
+//        /// A backup is needed after notes on each staff (except the last) when multiple staves have notes.
+//        /// </summary>
+//        private static void ProcessMeasureForBackups(string partName, Measure measure, int measureNumber, MeasureMeta measureMeta)
+//        {
+//            if (measure?.MeasureElements == null || measure.MeasureElements.Count == 0)
+//                return;
 
-            // Find all unique staves that have notes in this measure
-            var stavesWithNotes = measure.MeasureElements
-                .Where(e => e.Type == MeasureElementType.Note && e.Element is MusicXml.Domain.Note)
-                .Select(e => ((MusicXml.Domain.Note)e.Element).Staff)
-                .Where(staff => staff > 0)
-                .Distinct()
-                .OrderBy(s => s)
-                .ToList();
+//            // Find all unique staves that have notes in this measure
+//            var stavesWithNotes = measure.MeasureElements
+//                .Where(e => e.Type == MeasureElementType.Note && e.Element is MusicXml.Domain.Note)
+//                .Select(e => ((MusicXml.Domain.Note)e.Element).Staff)
+//                .Where(staff => staff > 0)
+//                .Distinct()
+//                .OrderBy(s => s)
+//                .ToList();
 
-            // If only one staff (or no staves), no backup needed
-            if (stavesWithNotes.Count <= 1)
-                return;
+//            // If only one staff (or no staves), no backup needed
+//            if (stavesWithNotes.Count <= 1)
+//                return;
 
-            // Process each staff except the last one (last staff doesn't need backup)
-            for (int i = 0; i < stavesWithNotes.Count - 1; i++)
-            {
-                int staffNumber = stavesWithNotes[i];
+//            // Process each staff except the last one (last staff doesn't need backup)
+//            for (int i = 0; i < stavesWithNotes.Count - 1; i++)
+//            {
+//                int staffNumber = stavesWithNotes[i];
                 
-                // Get the duration used by this staff in this measure
-                long durationUsed = measureMeta.GetDivisionsUsed(partName, staffNumber, measureNumber);
+//                // Get the duration used by this staff in this measure
+//                long durationUsed = measureMeta.GetDivisionsUsed(partName, staffNumber, measureNumber);
                 
-                if (durationUsed > 0)
-                {
-                    // Find the last note for this staff
-                    int lastNotePosition = FindLastNotePositionForStaff(measure, staffNumber);
+//                if (durationUsed > 0)
+//                {
+//                    // Find the last note for this staff
+//                    int lastNotePosition = FindLastNotePositionForStaff(measure, staffNumber);
                     
-                    if (lastNotePosition >= 0 && !HasBackupAtPosition(measure, lastNotePosition))
-                    {
-                        // Insert backup element right after the last note of this staff
-                        measure.MeasureElements.Insert(lastNotePosition + 1, new MeasureElement
-                        {
-                            Type = MeasureElementType.Backup,
-                            Element = new Backup { Duration = (int)durationUsed }
-                        });
-                    }
-                }
-            }
-        }
+//                    if (lastNotePosition >= 0 && !HasBackupAtPosition(measure, lastNotePosition))
+//                    {
+//                        // Insert backup element right after the last note of this staff
+//                        measure.MeasureElements.Insert(lastNotePosition + 1, new MeasureElement
+//                        {
+//                            Type = MeasureElementType.Backup,
+//                            Element = new Backup { Duration = (int)durationUsed }
+//                        });
+//                    }
+//                }
+//            }
+//        }
 
-        /// <summary>
-        /// Finds the index of the last note element for a specific staff in a measure.
-        /// Returns -1 if no notes found for that staff.
-        /// </summary>
-        private static int FindLastNotePositionForStaff(Measure measure, int staffNumber)
-        {
-            int lastPosition = -1;
+//        /// <summary>
+//        /// Finds the index of the last note element for a specific staff in a measure.
+//        /// Returns -1 if no notes found for that staff.
+//        /// </summary>
+//        private static int FindLastNotePositionForStaff(Measure measure, int staffNumber)
+//        {
+//            int lastPosition = -1;
             
-            if (measure?.MeasureElements == null)
-                return lastPosition;
+//            if (measure?.MeasureElements == null)
+//                return lastPosition;
             
-            for (int i = 0; i < measure.MeasureElements.Count; i++)
-            {
-                var element = measure.MeasureElements[i];
-                if (element?.Type == MeasureElementType.Note && 
-                    element.Element is MusicXml.Domain.Note note &&
-                    note.Staff == staffNumber)
-                {
-                    lastPosition = i;
-                }
-            }
+//            for (int i = 0; i < measure.MeasureElements.Count; i++)
+//            {
+//                var element = measure.MeasureElements[i];
+//                if (element?.Type == MeasureElementType.Note && 
+//                    element.Element is MusicXml.Domain.Note note &&
+//                    note.Staff == staffNumber)
+//                {
+//                    lastPosition = i;
+//                }
+//            }
             
-            return lastPosition;
-        }
+//            return lastPosition;
+//        }
 
-        /// <summary>
-        /// Checks if a backup element already exists at the specified position.
-        /// </summary>
-        private static bool HasBackupAtPosition(Measure measure, int afterNotePosition)
-        {
-            if (measure?.MeasureElements == null || 
-                afterNotePosition < 0 || 
-                afterNotePosition >= measure.MeasureElements.Count - 1)
-                return false;
+//        /// <summary>
+//        /// Checks if a backup element already exists at the specified position.
+//        /// </summary>
+//        private static bool HasBackupAtPosition(Measure measure, int afterNotePosition)
+//        {
+//            if (measure?.MeasureElements == null || 
+//                afterNotePosition < 0 || 
+//                afterNotePosition >= measure.MeasureElements.Count - 1)
+//                return false;
             
-            // Check the element right after the specified position
-            var nextElement = measure.MeasureElements[afterNotePosition + 1];
-            return nextElement?.Type == MeasureElementType.Backup && 
-                   nextElement.Element is Backup;
-        }
+//            // Check the element right after the specified position
+//            var nextElement = measure.MeasureElements[afterNotePosition + 1];
+//            return nextElement?.Type == MeasureElementType.Backup && 
+//                   nextElement.Element is Backup;
+//        }
 
-        private static void ApplyTupletNotation(
-            MusicXml.Domain.Note note, 
-            PhraseNote noteEvent, 
-            AppendNotes.TupletState ts, 
-            Dictionary<string, AppendNotes.TupletState> tupletStates, 
-            string key)
-        {
-            // Mark start on first base note
-            if (!ts.IsStarted)
-            {
-                note.TupletNotation = new TupletNotation
-                {
-                    Type = "start",
-                    Number = ts.Number
-                };
-                ts.IsStarted = true;
-            }
+//        private static void ApplyTupletNotation(
+//            MusicXml.Domain.Note note, 
+//            PhraseNote noteEvent, 
+//            AppendNotes.TupletState ts, 
+//            Dictionary<string, AppendNotes.TupletState> tupletStates, 
+//            string key)
+//        {
+//            // Mark start on first base note
+//            if (!ts.IsStarted)
+//            {
+//                note.TupletNotation = new TupletNotation
+//                {
+//                    Type = "start",
+//                    Number = ts.Number
+//                };
+//                ts.IsStarted = true;
+//            }
 
-            // Decrement and mark stop on last base note
-            if (!noteEvent.IsChord)
-            {
-                ts.Remaining--;
-                if (ts.Remaining <= 0)
-                {
-                    note.TupletNotation = new TupletNotation
-                    {
-                        Type = "stop",
-                        Number = ts.Number
-                    };
-                    tupletStates.Remove(key);
-                }
-            }
-        }
+//            // Decrement and mark stop on last base note
+//            if (!noteEvent.IsChord)
+//            {
+//                ts.Remaining--;
+//                if (ts.Remaining <= 0)
+//                {
+//                    note.TupletNotation = new TupletNotation
+//                    {
+//                        Type = "stop",
+//                        Number = ts.Number
+//                    };
+//                    tupletStates.Remove(key);
+//                }
+//            }
+//        }
 
-        public static void ApplyTupletSettings(
-            MusicXml.Domain.Note note, 
-            PhraseNote noteEvent, 
-            Dictionary<string, AppendNotes.TupletState> tupletStates)
-        {
-            if (string.IsNullOrWhiteSpace(noteEvent.TupletNumber)
-                || noteEvent.TupletActualNotes <= 0
-                || noteEvent.TupletNormalNotes <= 0)
-            {
-                return;
-            }
+//        public static void ApplyTupletSettings(
+//            MusicXml.Domain.Note note, 
+//            PhraseNote noteEvent, 
+//            Dictionary<string, AppendNotes.TupletState> tupletStates)
+//        {
+//            if (string.IsNullOrWhiteSpace(noteEvent.TupletNumber)
+//                || noteEvent.TupletActualNotes <= 0
+//                || noteEvent.TupletNormalNotes <= 0)
+//            {
+//                return;
+//            }
 
-            var key = noteEvent.TupletNumber!;
-            if (!tupletStates.TryGetValue(key, out var ts))
-            {
-                ts = InitializeTupletState(key, noteEvent);
-                tupletStates[key] = ts;
-            }
+//            var key = noteEvent.TupletNumber!;
+//            if (!tupletStates.TryGetValue(key, out var ts))
+//            {
+//                ts = InitializeTupletState(key, noteEvent);
+//                tupletStates[key] = ts;
+//            }
 
-            // Set time modification on the note
-            note.TimeModification = new TimeModification
-            {
-                ActualNotes = ts.Actual,
-                NormalNotes = ts.Normal,
-                NormalType = DurationTypeString(noteEvent.Duration)
-            };
+//            // Set time modification on the note
+//            note.TimeModification = new TimeModification
+//            {
+//                ActualNotes = ts.Actual,
+//                NormalNotes = ts.Normal,
+//                NormalType = DurationTypeString(noteEvent.Duration)
+//            };
 
-            // Handle tuplet notation (start/stop markers)
-            ApplyTupletNotation(note, noteEvent, ts, tupletStates, key);
-        }
+//            // Handle tuplet notation (start/stop markers)
+//            ApplyTupletNotation(note, noteEvent, ts, tupletStates, key);
+//        }
 
-        private static int CalculateNoteDurationInMeasure(int divisions, int noteValue)
-        {
-            int numerator = divisions * 4;  // TO DO   this is the 4 beats (quarter note = 1 beat) per measure
-            if (numerator % noteValue != 0)
-            {
-                // Calculate the minimum divisions needed for this note value
-                // For noteValue=32, need divisions?8; for noteValue=64, need divisions?16
-                int minDivisions = (noteValue + 3) / 4; // Round up: (32+3)/4=8, (64+3)/4=16
+//        private static int CalculateNoteDurationInMeasure(int divisions, int noteValue)
+//        {
+//            int numerator = divisions * 4;  // TO DO   this is the 4 beats (quarter note = 1 beat) per measure
+//            if (numerator % noteValue != 0)
+//            {
+//                // Calculate the minimum divisions needed for this note value
+//                // For noteValue=32, need divisions?8; for noteValue=64, need divisions?16
+//                int minDivisions = (noteValue + 3) / 4; // Round up: (32+3)/4=8, (64+3)/4=16
 
-                var msg = $"Cannot represent note value '{noteValue}' (1/{noteValue} note) with divisions={divisions}.\n" +
-                          $"Minimum required divisions: {minDivisions}.\n\n" +
-                          $"To fix this:\n" +
-                          $"1. Create a new score (divisions will be set to {MusicConstants.DefaultDivisions})\n" +
-                          $"2. Or manually edit the score's divisions value";
-                MessageBoxHelper.ShowError(msg, "Invalid Duration");
-                return 0;
-            }
-            return numerator / noteValue;
-        }
+//                var msg = $"Cannot represent note value '{noteValue}' (1/{noteValue} note) with divisions={divisions}.\n" +
+//                          $"Minimum required divisions: {minDivisions}.\n\n" +
+//                          $"To fix this:\n" +
+//                          $"1. Create a new score (divisions will be set to {MusicConstants.DefaultDivisions})\n" +
+//                          $"2. Or manually edit the score's divisions value";
+//                MessageBoxHelper.ShowError(msg, "Invalid Duration");
+//                return 0;
+//            }
+//            return numerator / noteValue;
+//        }
 
-        public static int CalculateTotalNoteDuration(int divisions, PhraseNote noteEvent)
-        {
-            var baseDuration = CalculateNoteDurationInMeasure(divisions, noteEvent.Duration);
+//        public static int CalculateTotalNoteDuration(int divisions, PhraseNote noteEvent)
+//        {
+//            var baseDuration = CalculateNoteDurationInMeasure(divisions, noteEvent.Duration);
             
-            // Calculate total duration including dots
-            var noteDurationInMeasure = baseDuration;
-            if (noteEvent.Dots == 1)
-            {
-                noteDurationInMeasure = baseDuration + (baseDuration / 2);
-            }
-            else if (noteEvent.Dots == 2)
-            {
-                noteDurationInMeasure = baseDuration + (baseDuration / 2) + (baseDuration / 4);
-            }
+//            // Calculate total duration including dots
+//            var noteDurationInMeasure = baseDuration;
+//            if (noteEvent.Dots == 1)
+//            {
+//                noteDurationInMeasure = baseDuration + (baseDuration / 2);
+//            }
+//            else if (noteEvent.Dots == 2)
+//            {
+//                noteDurationInMeasure = baseDuration + (baseDuration / 2) + (baseDuration / 4);
+//            }
 
-            // Adjust duration when the note is part of a tuplet
-            if (noteDurationInMeasure > 0
-                && noteEvent.TupletActualNotes > 0
-                && noteEvent.TupletNormalNotes > 0)
-            {
-                noteDurationInMeasure = (int)Math.Round(
-                    (double)noteDurationInMeasure * noteEvent.TupletNormalNotes / noteEvent.TupletActualNotes);
-            }
+//            // Adjust duration when the note is part of a tuplet
+//            if (noteDurationInMeasure > 0
+//                && noteEvent.TupletActualNotes > 0
+//                && noteEvent.TupletNormalNotes > 0)
+//            {
+//                noteDurationInMeasure = (int)Math.Round(
+//                    (double)noteDurationInMeasure * noteEvent.TupletNormalNotes / noteEvent.TupletActualNotes);
+//            }
 
-            return noteDurationInMeasure;
-        }
+//            return noteDurationInMeasure;
+//        }
 
-        public static MusicXml.Domain.Note ComposeNote(PhraseNote noteEvent, int duration, int staff)
-        {
-            var note = new MusicXml.Domain.Note
-            {
-                Type = DurationTypeString(noteEvent.Duration),
-                Duration = duration,
-                Voice = staff == 1 ? 1 : 5,
-                Staff = staff,
-                IsChordTone = noteEvent.IsChord,
-                IsRest = noteEvent.IsRest,
-                Dots = noteEvent.Dots
-            };
+//        public static MusicXml.Domain.Note ComposeNote(PhraseNote noteEvent, int duration, int staff)
+//        {
+//            var note = new MusicXml.Domain.Note
+//            {
+//                Type = DurationTypeString(noteEvent.Duration),
+//                Duration = duration,
+//                Voice = staff == 1 ? 1 : 5,
+//                Staff = staff,
+//                IsChordTone = noteEvent.IsChord,
+//                IsRest = noteEvent.IsRest,
+//                Dots = noteEvent.Dots
+//            };
 
-            if (!noteEvent.IsRest)
-            {
-                note.Pitch = new Pitch
-                {
-                    Step = char.ToUpper(noteEvent.Step),
-                    Octave = noteEvent.Octave,
-                    Alter = noteEvent.Alter
-                };
-            }
+//            if (!noteEvent.IsRest)
+//            {
+//                note.Pitch = new Pitch
+//                {
+//                    Step = char.ToUpper(noteEvent.Step),
+//                    Octave = noteEvent.Octave,
+//                    Alter = noteEvent.Alter
+//                };
+//            }
 
-            return note;
-        }
+//            return note;
+//        }
 
-        public static MusicXml.Domain.Note CreateTiedNote(
-            PhraseNote noteEvent, 
-            int duration, 
-            int divisions, 
-            int staff, 
-            bool isFirstPart)
-        {
-            var note = new MusicXml.Domain.Note
-            {
-                Type = DurationTypeForTiedNote(duration, divisions),
-                Duration = duration,
-                Voice = staff == 1 ? 1 : 5,
-                Staff = staff,
-                IsChordTone = noteEvent.IsChord,
-                IsRest = noteEvent.IsRest,
-                Tie = noteEvent.IsRest ? Tie.NotTied : (isFirstPart ? Tie.Start : Tie.Stop),
-                Dots = 0  // Tied notes across measures typically don't use dots
-            };
+//        public static MusicXml.Domain.Note CreateTiedNote(
+//            PhraseNote noteEvent, 
+//            int duration, 
+//            int divisions, 
+//            int staff, 
+//            bool isFirstPart)
+//        {
+//            var note = new MusicXml.Domain.Note
+//            {
+//                Type = DurationTypeForTiedNote(duration, divisions),
+//                Duration = duration,
+//                Voice = staff == 1 ? 1 : 5,
+//                Staff = staff,
+//                IsChordTone = noteEvent.IsChord,
+//                IsRest = noteEvent.IsRest,
+//                Tie = noteEvent.IsRest ? Tie.NotTied : (isFirstPart ? Tie.Start : Tie.Stop),
+//                Dots = 0  // Tied notes across measures typically don't use dots
+//            };
 
-            if (!noteEvent.IsRest)
-            {
-                note.Pitch = new Pitch
-                {
-                    Step = char.ToUpper(noteEvent.Step),
-                    Octave = noteEvent.Octave,
-                    Alter = noteEvent.Alter
-                };
-            }
+//            if (!noteEvent.IsRest)
+//            {
+//                note.Pitch = new Pitch
+//                {
+//                    Step = char.ToUpper(noteEvent.Step),
+//                    Octave = noteEvent.Octave,
+//                    Alter = noteEvent.Alter
+//                };
+//            }
 
-            return note;
-        }
+//            return note;
+//        }
 
-        private static string DurationTypeForTiedNote(long duration, int divisions)
-        {
-            // Common durations in terms of divisions
-            var wholeDuration = divisions * 4;
-            var halfDuration = divisions * 2;
-            var quarterDuration = divisions;
-            var eighthDuration = divisions / 2;
-            var sixteenthDuration = divisions / 4;
+//        private static string DurationTypeForTiedNote(long duration, int divisions)
+//        {
+//            // Common durations in terms of divisions
+//            var wholeDuration = divisions * 4;
+//            var halfDuration = divisions * 2;
+//            var quarterDuration = divisions;
+//            var eighthDuration = divisions / 2;
+//            var sixteenthDuration = divisions / 4;
 
-            if (duration >= wholeDuration) return "whole";
-            if (duration >= halfDuration) return "half";
-            if (duration >= quarterDuration) return "quarter";
-            if (duration >= eighthDuration) return "eighth";
-            if (duration >= sixteenthDuration) return "16th";
+//            if (duration >= wholeDuration) return "whole";
+//            if (duration >= halfDuration) return "half";
+//            if (duration >= quarterDuration) return "quarter";
+//            if (duration >= eighthDuration) return "eighth";
+//            if (duration >= sixteenthDuration) return "16th";
             
-            return "quarter"; // fallback
-        }
+//            return "quarter"; // fallback
+//        }
 
-        private static string DurationTypeString(int denom) => denom switch
-        {
-            1 => "whole",
-            2 => "half",
-            4 => "quarter",
-            8 => "eighth",
-            16 => "16th",
-            32 => "32nd",
-            64 => "64th",
-            _ => "quarter"
-        };
+//        private static string DurationTypeString(int denom) => denom switch
+//        {
+//            1 => "whole",
+//            2 => "half",
+//            4 => "quarter",
+//            8 => "eighth",
+//            16 => "16th",
+//            32 => "32nd",
+//            64 => "64th",
+//            _ => "quarter"
+//        };
 
-        public static bool EnsureMeasureAvailable(Part scorePart, int currentBar, string partName)
-        {
-            if (currentBar > scorePart.Measures.Count)
-            {
-                MessageBoxHelper.ShowMessage(
-                     $"Ran out of measures in part '{partName}' at bar {currentBar}. Not all notes were placed.",
-                     "Insufficient Measures");
-                return false;
-            }
-            return true;
-        }
+//        public static bool EnsureMeasureAvailable(Part scorePart, int currentBar, string partName)
+//        {
+//            if (currentBar > scorePart.Measures.Count)
+//            {
+//                MessageBoxHelper.ShowMessage(
+//                     $"Ran out of measures in part '{partName}' at bar {currentBar}. Not all notes were placed.",
+//                     "Insufficient Measures");
+//                return false;
+//            }
+//            return true;
+//        }
 
-        public static AppendNotes.MeasureInfo GetMeasureInfo(Measure measure)
-        {
-            var divisions = Math.Max(1, measure.Attributes?.Divisions ?? MusicConstants.DefaultDivisions);
-            var beatsPerBar = measure.Attributes?.Time?.Beats ?? 4;
+//        public static AppendNotes.MeasureInfo GetMeasureInfo(Measure measure)
+//        {
+//            var divisions = Math.Max(1, measure.Attributes?.Divisions ?? MusicConstants.DefaultDivisions);
+//            var beatsPerBar = measure.Attributes?.Time?.Beats ?? 4;
 
-            return new AppendNotes.MeasureInfo
-            {
-                Divisions = divisions,
-                BeatsPerBar = beatsPerBar,
-                BarLengthDivisions = divisions * beatsPerBar
-            };
-        }
+//            return new AppendNotes.MeasureInfo
+//            {
+//                Divisions = divisions,
+//                BeatsPerBar = beatsPerBar,
+//                BarLengthDivisions = divisions * beatsPerBar
+//            };
+//        }
 
-        public static bool HandleTiedChordAcrossMeasures(
-            Part scorePart,
-            List<PhraseNote> noteEvents,
-            AppendNotes.StaffProcessingContext context,
-            AppendNotes.MeasureInfo measureInfo,
-            int noteDuration,
-            MeasureMeta measureMeta)
-        {
-            long durationInCurrentMeasure = measureInfo.BarLengthDivisions - context.CurrentBeatPosition;
-            long durationInNextMeasure = noteDuration - durationInCurrentMeasure;
+//        public static bool HandleTiedChordAcrossMeasures(
+//            Part scorePart,
+//            List<PhraseNote> noteEvents,
+//            AppendNotes.StaffProcessingContext context,
+//            AppendNotes.MeasureInfo measureInfo,
+//            int noteDuration,
+//            MeasureMeta measureMeta)
+//        {
+//            long durationInCurrentMeasure = measureInfo.BarLengthDivisions - context.CurrentBeatPosition;
+//            long durationInNextMeasure = noteDuration - durationInCurrentMeasure;
 
-            // Place first part of tied chord notes in current measure
-            var measure = scorePart.Measures[context.CurrentBar - 1];
+//            // Place first part of tied chord notes in current measure
+//            var measure = scorePart.Measures[context.CurrentBar - 1];
 
-            foreach (var chordNote in noteEvents)
-            {
-                var firstChordNote = CreateTiedNote(
-                    chordNote,
-                    (int)durationInCurrentMeasure,
-                    measureInfo.Divisions,
-                    context.Staff,
-                    isFirstPart: true);
+//            foreach (var chordNote in noteEvents)
+//            {
+//                var firstChordNote = CreateTiedNote(
+//                    chordNote,
+//                    (int)durationInCurrentMeasure,
+//                    measureInfo.Divisions,
+//                    context.Staff,
+//                    isFirstPart: true);
 
-                measure.MeasureElements.Add(new MeasureElement
-                {
-                    Type = MeasureElementType.Note,
-                    Element = firstChordNote
-                });
-            }
+//                measure.MeasureElements.Add(new MeasureElement
+//                {
+//                    Type = MeasureElementType.Note,
+//                    Element = firstChordNote
+//                });
+//            }
 
-            measureMeta.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInCurrentMeasure);
+//            measureMeta.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInCurrentMeasure);
 
-            // Advance to next measure
-            context.CurrentBar++;
-            context.CurrentBeatPosition = 0;
+//            // Advance to next measure
+//            context.CurrentBar++;
+//            context.CurrentBeatPosition = 0;
 
-            // Check if next measure exists
-            if (context.CurrentBar > scorePart.Measures.Count)
-            {
-                MessageBoxHelper.ShowMessage(
-                     $"Ran out of measures in part '{scorePart.Name}' at bar {context.CurrentBar}. Not all notes were placed.",
-                     "Insufficient Measures");
-                return false;
-            }
+//            // Check if next measure exists
+//            if (context.CurrentBar > scorePart.Measures.Count)
+//            {
+//                MessageBoxHelper.ShowMessage(
+//                     $"Ran out of measures in part '{scorePart.Name}' at bar {context.CurrentBar}. Not all notes were placed.",
+//                     "Insufficient Measures");
+//                return false;
+//            }
 
-            // Place second part of tied chord notes in next measure
-            var nextMeasure = scorePart.Measures[context.CurrentBar - 1];
+//            // Place second part of tied chord notes in next measure
+//            var nextMeasure = scorePart.Measures[context.CurrentBar - 1];
 
-            foreach (var chordNote in noteEvents)
-            {
-                var secondChordNote = CreateTiedNote(
-                    chordNote,
-                    (int)durationInNextMeasure,
-                    measureInfo.Divisions,
-                    context.Staff,
-                    isFirstPart: false);
+//            foreach (var chordNote in noteEvents)
+//            {
+//                var secondChordNote = CreateTiedNote(
+//                    chordNote,
+//                    (int)durationInNextMeasure,
+//                    measureInfo.Divisions,
+//                    context.Staff,
+//                    isFirstPart: false);
 
-                nextMeasure.MeasureElements.Add(new MeasureElement
-                {
-                    Type = MeasureElementType.Note,
-                    Element = secondChordNote
-                });
-            }
+//                nextMeasure.MeasureElements.Add(new MeasureElement
+//                {
+//                    Type = MeasureElementType.Note,
+//                    Element = secondChordNote
+//                });
+//            }
 
-            context.CurrentBeatPosition = durationInNextMeasure;
-            measureMeta.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInNextMeasure);
+//            context.CurrentBeatPosition = durationInNextMeasure;
+//            measureMeta.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInNextMeasure);
 
-            return true;
-        }
+//            return true;
+//        }
 
-        public static bool HandleTiedNoteAcrossMeasures(
-            Part scorePart, 
-            PhraseNote noteEvent,
-            AppendNotes.StaffProcessingContext context,
-            AppendNotes.MeasureInfo measureInfo,
-            int noteDuration,
-            MeasureMeta measureMeta)
-        {
-            long durationInCurrentMeasure = measureInfo.BarLengthDivisions - context.CurrentBeatPosition;
-            long durationInNextMeasure = noteDuration - durationInCurrentMeasure;
+//        public static bool HandleTiedNoteAcrossMeasures(
+//            Part scorePart, 
+//            PhraseNote noteEvent,
+//            AppendNotes.StaffProcessingContext context,
+//            AppendNotes.MeasureInfo measureInfo,
+//            int noteDuration,
+//            MeasureMeta measureMeta)
+//        {
+//            long durationInCurrentMeasure = measureInfo.BarLengthDivisions - context.CurrentBeatPosition;
+//            long durationInNextMeasure = noteDuration - durationInCurrentMeasure;
 
-            // Place first part of tied note in current measure
-            var measure = scorePart.Measures[context.CurrentBar - 1];
-            var firstNote = CreateTiedNote(
-                noteEvent, 
-                (int)durationInCurrentMeasure, 
-                measureInfo.Divisions, 
-                context.Staff, 
-                isFirstPart: true);
+//            // Place first part of tied note in current measure
+//            var measure = scorePart.Measures[context.CurrentBar - 1];
+//            var firstNote = CreateTiedNote(
+//                noteEvent, 
+//                (int)durationInCurrentMeasure, 
+//                measureInfo.Divisions, 
+//                context.Staff, 
+//                isFirstPart: true);
 
-            measure.MeasureElements.Add(new MeasureElement
-            {
-                Type = MeasureElementType.Note,
-                Element = firstNote
-            });
+//            measure.MeasureElements.Add(new MeasureElement
+//            {
+//                Type = MeasureElementType.Note,
+//                Element = firstNote
+//            });
 
-            measureMeta.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInCurrentMeasure);
+//            measureMeta.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInCurrentMeasure);
 
-            // Advance to next measure
-            context.CurrentBar++;
-            context.CurrentBeatPosition = 0;
+//            // Advance to next measure
+//            context.CurrentBar++;
+//            context.CurrentBeatPosition = 0;
 
-            // Check if next measure exists
-            if (context.CurrentBar > scorePart.Measures.Count)
-            {
-                MessageBoxHelper.ShowMessage(
-                     $"Ran out of measures in part '{scorePart.Name}' at bar {context.CurrentBar}. Not all notes were placed.",
-                     "Insufficient Measures");
-                return false;
-            }
+//            // Check if next measure exists
+//            if (context.CurrentBar > scorePart.Measures.Count)
+//            {
+//                MessageBoxHelper.ShowMessage(
+//                     $"Ran out of measures in part '{scorePart.Name}' at bar {context.CurrentBar}. Not all notes were placed.",
+//                     "Insufficient Measures");
+//                return false;
+//            }
 
-            // Place second part of tied note in next measure
-            var nextMeasure = scorePart.Measures[context.CurrentBar - 1];
-            var secondNote = CreateTiedNote(
-                noteEvent, 
-                (int)durationInNextMeasure, 
-                measureInfo.Divisions, 
-                context.Staff, 
-                isFirstPart: false);
+//            // Place second part of tied note in next measure
+//            var nextMeasure = scorePart.Measures[context.CurrentBar - 1];
+//            var secondNote = CreateTiedNote(
+//                noteEvent, 
+//                (int)durationInNextMeasure, 
+//                measureInfo.Divisions, 
+//                context.Staff, 
+//                isFirstPart: false);
 
-            nextMeasure.MeasureElements.Add(new MeasureElement
-            {
-                Type = MeasureElementType.Note,
-                Element = secondNote
-            });
+//            nextMeasure.MeasureElements.Add(new MeasureElement
+//            {
+//                Type = MeasureElementType.Note,
+//                Element = secondNote
+//            });
 
-            context.CurrentBeatPosition = durationInNextMeasure;
-            measureMeta.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInNextMeasure);
+//            context.CurrentBeatPosition = durationInNextMeasure;
+//            measureMeta.AddDivisionsUsed(scorePart.Name, context.Staff, context.CurrentBar, durationInNextMeasure);
 
-            return true;
-        }
+//            return true;
+//        }
 
-        private static AppendNotes.TupletState InitializeTupletState(string key, PhraseNote noteEvent)
-        {
-            int parsedNum = 1;
-            int.TryParse(key, out parsedNum);
+//        private static AppendNotes.TupletState InitializeTupletState(string key, PhraseNote noteEvent)
+//        {
+//            int parsedNum = 1;
+//            int.TryParse(key, out parsedNum);
             
-            return new AppendNotes.TupletState
-            {
-                Actual = noteEvent.TupletActualNotes,
-                Normal = noteEvent.TupletNormalNotes,
-                Remaining = noteEvent.TupletActualNotes,
-                Number = parsedNum,
-                IsStarted = false
-            };
-        }
+//            return new AppendNotes.TupletState
+//            {
+//                Actual = noteEvent.TupletActualNotes,
+//                Normal = noteEvent.TupletNormalNotes,
+//                Remaining = noteEvent.TupletActualNotes,
+//                Number = parsedNum,
+//                IsStarted = false
+//            };
+//        }
 
-        public static void UpdateUsedDivisionsPerMeasure(
-            ref Dictionary<string, long> usedDivisionsPerMeasure, 
-            string partName, 
-            int staff, 
-            int currentBar, 
-            long duration)
-        {
-            // Create composite key: "PartName|Staff|Measure"
-            var key = $"{partName}|{staff}|{currentBar}";
+//        public static void UpdateUsedDivisionsPerMeasure(
+//            ref Dictionary<string, long> usedDivisionsPerMeasure, 
+//            string partName, 
+//            int staff, 
+//            int currentBar, 
+//            long duration)
+//        {
+//            // Create composite key: "PartName|Staff|Measure"
+//            var key = $"{partName}|{staff}|{currentBar}";
             
-            if (!usedDivisionsPerMeasure.ContainsKey(key))
-                usedDivisionsPerMeasure[key] = 0;
-            usedDivisionsPerMeasure[key] += duration;
-        }
+//            if (!usedDivisionsPerMeasure.ContainsKey(key))
+//                usedDivisionsPerMeasure[key] = 0;
+//            usedDivisionsPerMeasure[key] += duration;
+//        }
 
-        public static void UpdatePositionTracking(
-            AppendNotes.StaffProcessingContext context, 
-            PhraseNote noteEvent, 
-            int noteDuration,
-            string partName,
-            MeasureMeta measureMeta)
-        {
-            if (!noteEvent.IsChord)
-            {
-                context.CurrentBeatPosition += noteDuration;
-                measureMeta.AddDivisionsUsed(partName, context.Staff, context.CurrentBar, noteDuration);
-            }
-        }
+//        public static void UpdatePositionTracking(
+//            AppendNotes.StaffProcessingContext context, 
+//            PhraseNote noteEvent, 
+//            int noteDuration,
+//            string partName,
+//            MeasureMeta measureMeta)
+//        {
+//            if (!noteEvent.IsChord)
+//            {
+//                context.CurrentBeatPosition += noteDuration;
+//                measureMeta.AddDivisionsUsed(partName, context.Staff, context.CurrentBar, noteDuration);
+//            }
+//        }
 
-        /// <summary>
-        /// Finds the first measure and beat position where notes can be appended for a given part and staff.
-        /// Returns (measureNumber, beatPosition) based on MeasureMeta tracking.
-        /// </summary>
-        public static (int measureNumber, long beatPosition) FindAppendStartPosition(
-            Part scorePart,
-            int staff,
-            MeasureMeta measureMeta)
-        {
-            if (scorePart?.Measures == null || scorePart.Measures.Count == 0)
-                return (1, 0);
+//        /// <summary>
+//        /// Finds the first measure and beat position where notes can be appended for a given part and staff.
+//        /// Returns (measureNumber, beatPosition) based on MeasureMeta tracking.
+//        /// </summary>
+//        public static (int measureNumber, long beatPosition) FindAppendStartPosition(
+//            Part scorePart,
+//            int staff,
+//            MeasureMeta measureMeta)
+//        {
+//            if (scorePart?.Measures == null || scorePart.Measures.Count == 0)
+//                return (1, 0);
 
-            // Query all divisions used for this part and staff
-            var allDivisions = measureMeta.GetDivisionsUsedForPartAndStaff(scorePart.Name, staff);
+//            // Query all divisions used for this part and staff
+//            var allDivisions = measureMeta.GetDivisionsUsedForPartAndStaff(scorePart.Name, staff);
 
-            // If no data exists, start at measure 1, position 0
-            if (allDivisions.Count == 0)
-                return (1, 0);
+//            // If no data exists, start at measure 1, position 0
+//            if (allDivisions.Count == 0)
+//                return (1, 0);
 
-            // Find the highest measure number with divisions > 0
-            var lastUsedMeasure = allDivisions
-                .Where(x => x.duration > 0)
-                .OrderByDescending(x => x.measureNumber)
-                .FirstOrDefault();
+//            // Find the highest measure number with divisions > 0
+//            var lastUsedMeasure = allDivisions
+//                .Where(x => x.duration > 0)
+//                .OrderByDescending(x => x.measureNumber)
+//                .FirstOrDefault();
 
-            // If no measure has any divisions used, start at measure 1
-            if (lastUsedMeasure.measureNumber == 0)
-                return (1, 0);
+//            // If no measure has any divisions used, start at measure 1
+//            if (lastUsedMeasure.measureNumber == 0)
+//                return (1, 0);
 
-            // Get the measure to check its capacity
-            int measureIndex = lastUsedMeasure.measureNumber - 1;
-            if (measureIndex < 0 || measureIndex >= scorePart.Measures.Count)
-                return (1, 0);
+//            // Get the measure to check its capacity
+//            int measureIndex = lastUsedMeasure.measureNumber - 1;
+//            if (measureIndex < 0 || measureIndex >= scorePart.Measures.Count)
+//                return (1, 0);
 
-            var measure = scorePart.Measures[measureIndex];
-            var measureInfo = GetMeasureInfo(measure);
+//            var measure = scorePart.Measures[measureIndex];
+//            var measureInfo = GetMeasureInfo(measure);
 
-            // If measure is full, start at the next measure
-            if (lastUsedMeasure.duration >= measureInfo.BarLengthDivisions)
-            {
-                int nextMeasure = lastUsedMeasure.measureNumber + 1;
-                return (nextMeasure, 0);
-            }
+//            // If measure is full, start at the next measure
+//            if (lastUsedMeasure.duration >= measureInfo.BarLengthDivisions)
+//            {
+//                int nextMeasure = lastUsedMeasure.measureNumber + 1;
+//                return (nextMeasure, 0);
+//            }
 
-            // Measure has space; return current measure with used divisions as position
-            return (lastUsedMeasure.measureNumber, lastUsedMeasure.duration);
-        }
-    }
-}
+//            // Measure has space; return current measure with used divisions as position
+//            return (lastUsedMeasure.measureNumber, lastUsedMeasure.duration);
+//        }
+//    }
+//}
