@@ -331,7 +331,7 @@ namespace Music.Writer
             var parameters = new Dictionary<string, object>();
             if (bpm.HasValue)
                 parameters["BPM"] = bpm.Value;
-            if (microsecondsPerQuarterNote.HasValue)
+            else if (microsecondsPerQuarterNote.HasValue)
                 parameters["MicrosecondsPerQuarterNote"] = microsecondsPerQuarterNote.Value;
 
             return new()
@@ -359,8 +359,8 @@ namespace Music.Writer
                 {
                     ["Numerator"] = numerator,
                     ["Denominator"] = denominator,
-                    ["ClocksPerMetronomeClick"] = clocksPerMetronomeClick,
-                    ["ThirtySecondNotesPerQuarter"] = thirtySecondNotesPerQuarter
+                    ["ClocksPerMetronomeClick"] = clocksPerMetronomeClick, // what is this?
+                    ["ThirtySecondNotesPerQuarter"] = thirtySecondNotesPerQuarter  // what is this?
                 }
             };
 
@@ -412,7 +412,7 @@ namespace Music.Writer
                 ["Velocity"] = velocity
             };
             if (note != null)
-                parameters["Note"] = note;
+                parameters["Note"] = note;   // What is this ???
 
             return new()
             {
@@ -438,7 +438,7 @@ namespace Music.Writer
                 ["Velocity"] = velocity
             };
             if (note != null)
-                parameters["Note"] = note;
+                parameters["Note"] = note;   // what is this?
 
             return new()
             {
