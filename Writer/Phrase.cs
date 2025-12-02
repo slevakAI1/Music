@@ -12,16 +12,20 @@ namespace Music.Writer
     /// </summary>
     public sealed class Phrase
     {
-        public string MidiPartName { get; set; }
+        public string MidiProgramName { get; set; }
         //public string NotionPartName { get; set; }
-        public byte MidiProgramNumber { get; set; }
+
+        private byte MidiProgramNumber { get; set; }
+
         public List<PhraseEvent> PhraseEvents { get; set; } = new();
 
-        public Phrase(string midiPartName, byte midiProgramNumber, List<PhraseEvent>? phraseEvents = null)
+        public Phrase(string midiProgramName, List<PhraseEvent>? phraseEvents = null)
         {
-            MidiPartName = midiPartName;
-            MidiProgramNumber = midiProgramNumber;
+            MidiProgramName = midiProgramName;
             PhraseEvents = phraseEvents ?? new List<PhraseEvent>();
+
+            // Compute midiProgramNumber here - resolve from the class that contains this data
+            // TBD
         }
     }
 
@@ -129,22 +133,15 @@ namespace Music.Writer
             int noteNumber,
             int absolutePositionTicks,
             int noteDurationTicks,
-            int noteOnVelocity = 100,
-            char step = '\0',
-            int alter = 0,
-            int octave = 0,
-            int duration = 0,
-            int dots = 0)
+            int noteOnVelocity = 100)
         {
             NoteNumber = noteNumber;
             AbsolutePositionTicks = absolutePositionTicks;
             NoteDurationTicks = noteDurationTicks;
             NoteOnVelocity = noteOnVelocity;
-            Step = step;
-            Alter = alter;
-            Octave = octave;
-            Duration = duration;
-            Dots = dots;
+
+            // Compute the pitch and rhythm properties here
+            // TBD
         }
     }
 }
