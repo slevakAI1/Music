@@ -16,6 +16,13 @@ namespace Music.Writer
         //public string NotionPartName { get; set; }
         public byte MidiProgramNumber { get; set; }
         public List<PhraseEvent> PhraseEvents { get; set; } = new();
+
+        public Phrase(string midiPartName, byte midiProgramNumber, List<PhraseEvent>? phraseEvents = null)
+        {
+            MidiPartName = midiPartName;
+            MidiProgramNumber = midiProgramNumber;
+            PhraseEvents = phraseEvents ?? new List<PhraseEvent>();
+        }
     }
 
     /// <summary>
@@ -39,6 +46,22 @@ namespace Music.Writer
         public List<PhraseNote>? PhraseNotes { get; set; }
 
         // public other - pitch bend, etc...future
+
+        public PhraseEvent(
+            bool isRest,
+            string? tupletNumber = null,
+            int? tupletActualNotes = null,
+            int? tupletNormalNotes = null,
+            PhraseChord? phraseChord = null,
+            List<PhraseNote>? phraseNotes = null)
+        {
+            IsRest = isRest;
+            TupletNumber = tupletNumber;
+            TupletActualNotes = tupletActualNotes;
+            TupletNormalNotes = tupletNormalNotes;
+            PhraseChord = phraseChord;
+            PhraseNotes = phraseNotes;
+        }
     }
 
     /// <summary>
@@ -58,6 +81,22 @@ namespace Music.Writer
         public string? ChordQuality { get; set; } // list from musictheory chordtype i think
         public string? ChordBase { get; set; }
         public string? ChordType { get; set; } = "Straight"; // Just an idea. Straight, arppegiated, etc ???
+
+        public PhraseChord(
+            bool isChord,
+            string? chordKey = null,
+            int? chordDegree = null,
+            string? chordQuality = null,
+            string? chordBase = null,
+            string? chordType = "Straight")
+        {
+            IsChord = isChord;
+            ChordKey = chordKey;
+            ChordDegree = chordDegree;
+            ChordQuality = chordQuality;
+            ChordBase = chordBase;
+            ChordType = chordType;
+        }
     }
 
     /// <summary>
@@ -86,5 +125,26 @@ namespace Music.Writer
         public int Duration { get; set; }
         public int Dots { get; set; }
 
+        public PhraseNote(
+            int noteNumber,
+            int absolutePositionTicks,
+            int noteDurationTicks,
+            int noteOnVelocity = 100,
+            char step = '\0',
+            int alter = 0,
+            int octave = 0,
+            int duration = 0,
+            int dots = 0)
+        {
+            NoteNumber = noteNumber;
+            AbsolutePositionTicks = absolutePositionTicks;
+            NoteDurationTicks = noteDurationTicks;
+            NoteOnVelocity = noteOnVelocity;
+            Step = step;
+            Alter = alter;
+            Octave = octave;
+            Duration = duration;
+            Dots = dots;
+        }
     }
 }
