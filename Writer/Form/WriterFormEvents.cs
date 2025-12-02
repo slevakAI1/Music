@@ -58,7 +58,7 @@ namespace Music.Writer
                         Staffs = new List<int> { 1 },
                         StartBar = 1, // Default to bar 1, could be enhanced to use a form control
                         StartBeat = 1, // Default to beat 1
-                        NoteEvents = phrase.NoteEvents ?? new List<NoteEvent>()
+                        NoteEvents = phrase.NoteEvents ?? new List<PhraseNote>()
                     };
 
                     // Append the phrase to the score
@@ -202,7 +202,7 @@ namespace Music.Writer
 
             var harmonicEvent = _designer.HarmonicTimeline.Events[1];
 
-            List<NoteEvent> notes;
+            List<PhraseNote> notes;
             try
             {
                 notes = ChordConverter.Convert(

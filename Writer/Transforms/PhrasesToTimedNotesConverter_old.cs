@@ -196,7 +196,7 @@ namespace Music.Writer
             long absoluteTime = 0;  // Track absolute time position
             long lastNoteStartTime = 0;  // Track when the last note/chord started
 
-            foreach (var noteEvent in phrase.NoteEvents ?? Enumerable.Empty<NoteEvent>())
+            foreach (var noteEvent in phrase.NoteEvents ?? Enumerable.Empty<PhraseNote>())
             {
                 if (noteEvent.IsRest)
                 {
@@ -301,7 +301,7 @@ namespace Music.Writer
             return (octave + 1) * 12 + baseNote + alter;
         }
 
-        private static long CalculateDuration(NoteEvent noteEvent, short ticksPerQuarterNote)
+        private static long CalculateDuration(PhraseNote noteEvent, short ticksPerQuarterNote)
         {
             var baseDuration = (ticksPerQuarterNote * 4.0) / noteEvent.Duration;
 

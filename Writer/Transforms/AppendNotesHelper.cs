@@ -137,7 +137,7 @@ namespace Music.Writer
 
         private static void ApplyTupletNotation(
             MusicXml.Domain.Note note, 
-            NoteEvent noteEvent, 
+            PhraseNote noteEvent, 
             AppendNotes.TupletState ts, 
             Dictionary<string, AppendNotes.TupletState> tupletStates, 
             string key)
@@ -171,7 +171,7 @@ namespace Music.Writer
 
         public static void ApplyTupletSettings(
             MusicXml.Domain.Note note, 
-            NoteEvent noteEvent, 
+            PhraseNote noteEvent, 
             Dictionary<string, AppendNotes.TupletState> tupletStates)
         {
             if (string.IsNullOrWhiteSpace(noteEvent.TupletNumber)
@@ -220,7 +220,7 @@ namespace Music.Writer
             return numerator / noteValue;
         }
 
-        public static int CalculateTotalNoteDuration(int divisions, NoteEvent noteEvent)
+        public static int CalculateTotalNoteDuration(int divisions, PhraseNote noteEvent)
         {
             var baseDuration = CalculateNoteDurationInMeasure(divisions, noteEvent.Duration);
             
@@ -247,7 +247,7 @@ namespace Music.Writer
             return noteDurationInMeasure;
         }
 
-        public static MusicXml.Domain.Note ComposeNote(NoteEvent noteEvent, int duration, int staff)
+        public static MusicXml.Domain.Note ComposeNote(PhraseNote noteEvent, int duration, int staff)
         {
             var note = new MusicXml.Domain.Note
             {
@@ -274,7 +274,7 @@ namespace Music.Writer
         }
 
         public static MusicXml.Domain.Note CreateTiedNote(
-            NoteEvent noteEvent, 
+            PhraseNote noteEvent, 
             int duration, 
             int divisions, 
             int staff, 
@@ -362,7 +362,7 @@ namespace Music.Writer
 
         public static bool HandleTiedChordAcrossMeasures(
             Part scorePart,
-            List<NoteEvent> noteEvents,
+            List<PhraseNote> noteEvents,
             AppendNotes.StaffProcessingContext context,
             AppendNotes.MeasureInfo measureInfo,
             int noteDuration,
@@ -432,7 +432,7 @@ namespace Music.Writer
 
         public static bool HandleTiedNoteAcrossMeasures(
             Part scorePart, 
-            NoteEvent noteEvent,
+            PhraseNote noteEvent,
             AppendNotes.StaffProcessingContext context,
             AppendNotes.MeasureInfo measureInfo,
             int noteDuration,
@@ -492,7 +492,7 @@ namespace Music.Writer
             return true;
         }
 
-        private static AppendNotes.TupletState InitializeTupletState(string key, NoteEvent noteEvent)
+        private static AppendNotes.TupletState InitializeTupletState(string key, PhraseNote noteEvent)
         {
             int parsedNum = 1;
             int.TryParse(key, out parsedNum);
@@ -524,7 +524,7 @@ namespace Music.Writer
 
         public static void UpdatePositionTracking(
             AppendNotes.StaffProcessingContext context, 
-            NoteEvent noteEvent, 
+            PhraseNote noteEvent, 
             int noteDuration,
             string partName,
             MeasureMeta measureMeta)

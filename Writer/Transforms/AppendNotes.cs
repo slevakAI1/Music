@@ -107,7 +107,7 @@ namespace Music.Writer
             }
         }
 
-        private static void ProcessSingleNote(Part scorePart, NoteEvent noteEvent, AppendNoteEventsToScoreParams config, StaffProcessingContext context, MeasureMeta measureMeta)
+        private static void ProcessSingleNote(Part scorePart, PhraseNote noteEvent, AppendNoteEventsToScoreParams config, StaffProcessingContext context, MeasureMeta measureMeta)
         {
             var measure = scorePart.Measures[context.CurrentBar - 1];
             var measureInfo = AppendNotesHelper.GetMeasureInfo(measure);
@@ -156,7 +156,7 @@ namespace Music.Writer
             AppendNotesHelper.UpdatePositionTracking(context, noteEvent, noteDuration, scorePart.Name, measureMeta);
         }
 
-        private static void ProcessChord(Part scorePart, NoteEvent noteEvent, AppendNoteEventsToScoreParams config, StaffProcessingContext context, MeasureMeta measureMeta)
+        private static void ProcessChord(Part scorePart, PhraseNote noteEvent, AppendNoteEventsToScoreParams config, StaffProcessingContext context, MeasureMeta measureMeta)
         {
             // TO DO - This probably doesnt need note value... that property should be applied here if not already applied!
 

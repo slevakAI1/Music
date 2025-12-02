@@ -56,7 +56,7 @@ namespace Music.Writer
             events.Add(programChangeEvent);
 
             // Process each note event in the phrase
-            foreach (var noteEvent in phrase.NoteEvents ?? Enumerable.Empty<NoteEvent>())
+            foreach (var noteEvent in phrase.NoteEvents ?? Enumerable.Empty<PhraseNote>())
             {
                 if (noteEvent.IsRest)
                 {
@@ -83,7 +83,7 @@ namespace Music.Writer
         /// <summary>
         /// Determines if a note event represents a chord that needs expansion.
         /// </summary>
-        private static bool ShouldExpandChord(NoteEvent noteEvent)
+        private static bool ShouldExpandChord(PhraseNote noteEvent)
         {
             return !string.IsNullOrWhiteSpace(noteEvent.ChordKey) &&
                    noteEvent.ChordDegree.HasValue &&
@@ -96,7 +96,7 @@ namespace Music.Writer
         /// </summary>
         private static void ProcessChord(
             List<MidiEvent> events,
-            NoteEvent noteEvent,
+            PhraseNote noteEvent,
             ref long absoluteTime,
             short ticksPerQuarterNote)
         {
@@ -154,7 +154,7 @@ namespace Music.Writer
         /// </summary>
         private static void ProcessSingleNote(
             List<MidiEvent> events,
-            NoteEvent noteEvent,
+            PhraseNote noteEvent,
             ref long absoluteTime,
             short ticksPerQuarterNote)
         {
@@ -200,7 +200,7 @@ namespace Music.Writer
         /// <summary>
         /// Calculates duration in ticks for a note event.
         /// </summary>
-        private static long CalculateDuration(NoteEvent noteEvent, short ticksPerQuarterNote)
+        private static long CalculateDuration(PhraseNote noteEvent, short ticksPerQuarterNote)
         {
             // Base duration: quarter note = ticksPerQuarterNote
             // Formula: (ticksPerQuarterNote * 4) / noteValue

@@ -9,6 +9,6 @@
         public string MidiPartName { get; set; }
         //public string NotionPartName { get; set; }
         public byte MidiProgramNumber { get; set; }
-        public List<NoteEvent> NoteEvents { get; set; } = new();
+        public List<PhraseNote> NoteEvents { get; set; } = new();
     }
 }

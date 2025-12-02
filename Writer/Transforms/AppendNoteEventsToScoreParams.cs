@@ -12,7 +12,7 @@
         public int StartBeat { get; set; }
 
         // List of notes to insert
-        public List<NoteEvent> NoteEvents { get; set; } = new();
+        public List<PhraseNote> NoteEvents { get; set; } = new();
     }
 }
 

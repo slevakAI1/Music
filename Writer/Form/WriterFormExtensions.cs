@@ -120,7 +120,7 @@ namespace Music.Writer
                 ? data.SelectedStaffs 
                 : new List<int> { 1 }; // Default to staff 1 if none selected
 
-            var noteEvents = new List<NoteEvent>();
+            var noteEvents = new List<PhraseNote>();
 
             // Get tuplet settings from writer data
             bool isTuplet = !string.IsNullOrWhiteSpace(data.TupletNumber);
@@ -132,7 +132,7 @@ namespace Music.Writer
             //========================================================================
             //   MOVE THIS THIS CODE BLOCK INTO AppendNote.EXECUTE
 
-            var noteEvent = new NoteEvent();
+            var noteEvent = new PhraseNote();
 
             if (data.IsChord ?? false)  // null = false
             {
@@ -141,7 +141,7 @@ namespace Music.Writer
                 // Create Chord pitch event
                 // Chords will be resolved into their component notes byn AppendNotes.Execute()
 
-                noteEvent = new NoteEvent
+                noteEvent = new PhraseNote
                 {
                     IsChord = true,
                     ChordKey = data.ChordKey,
@@ -158,7 +158,7 @@ namespace Music.Writer
             else
             {
                 // Single note or rest
-                noteEvent = new NoteEvent
+                noteEvent = new PhraseNote
                 {
                     Step = data.Step,
                     Octave = data.Octave,
@@ -206,7 +206,7 @@ namespace Music.Writer
             // Default part for new phrase
             var part = "Acoustic GrandPiano";  
 
-            var noteEvents = new List<NoteEvent>();
+            var noteEvents = new List<PhraseNote>();
 
             // Get tuplet settings from writer data
             bool isTuplet = !string.IsNullOrWhiteSpace(data.TupletNumber);
@@ -214,13 +214,13 @@ namespace Music.Writer
             int tupletActualNotes = isTuplet ? (data.TupletCount ?? 3) : 0;
             int tupletNormalNotes = isTuplet ? (data.TupletOf ?? 2) : 0;
 
-            var noteEvent = new NoteEvent();
+            var noteEvent = new PhraseNote();
 
             if (data.IsChord ?? false)  // null = false
             {
                 // Create Chord pitch event
                 // Chords will be resolved into their component notes by AppendNotes.Execute()
-                noteEvent = new NoteEvent
+                noteEvent = new PhraseNote
                 {
                     IsChord = true,
                     ChordKey = data.ChordKey,
@@ -237,7 +237,7 @@ namespace Music.Writer
             else
             {
                 // Single note or rest
-                noteEvent = new NoteEvent
+                noteEvent = new PhraseNote
                 {
                     Step = data.Step,
                     Octave = data.Octave,
