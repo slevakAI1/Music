@@ -3,30 +3,315 @@ namespace Music.Writer
     /// <summary>
     /// Represents the type of MIDI event (channel, meta, or system exclusive).
     /// </summary>
+
     public enum MidiEventType
     {
-        // Meta events (track-level)
-        SequenceTrackName,
-        SetTempo,          // supply BPM or MicrosecondsPerQuarterNote
-        TimeSignature,     // supply Numerator/Denominator (+ optional metronome fields)
-        KeySignature,      // optional but common
+        // ----------------------------
+        // Meta events (SMF track-level)
+        // ----------------------------
+
+        // Text (0x01).
+        // What it is / how it works:
+        // Generic text attached to a timestamp. Data is arbitrary text bytes (encoding depends on your app).
+        // Affects playback?
+        // No. It’s for display/notes.
+        // Example use:
+        // At bar 17 you embed “Solo starts here” so the DAW shows a cue during playback.
         Text,
-        Marker,
-        CuePoint,
+
+        // CopyrightNotice (0x02).
+        // What it is / how it works:
+        // Text intended specifically for copyright information.
+        // Affects playback?
+        // No.
+        // Example use:
+        // At time 0: “© 2025 Your Name. All rights reserved.” so metadata survives file sharing.
+        CopyrightNotice,
+
+        // SequenceTrackName (0x03).
+        // What it is / how it works:
+        // Track name (or “sequence name” depending on context). Used by DAWs for labeling tracks.
+        // Affects playback?
+        // No directly. It’s UI/organization.
+        // Example use:
+        // Track 2 gets name “Strings - Legato” so a DAW shows meaningful track labels.
+        SequenceTrackName,
+
+        // InstrumentName (0x04).
+        // What it is / how it works:
+        // A human-readable instrument label. Unlike ProgramChange, this does not select a sound—just a name.
+        // Affects playback?
+        // Usually no. Some tools map names to sounds, but that’s tool-specific.
+        // Example use:
+        // You label a track “Fender Rhodes” even if the actual sound is determined by ProgramChange + Bank Select.
+        InstrumentName,
+
+        // Lyric (0x05).
+        // What it is / how it works:
+        // Timed lyric text, often used for karaoke-style lyric display.
+        // Affects playback?
+        // Doesn’t change audio directly; affects lyric display in karaoke/lyric-aware players.
+        // Example use:
+        // At each sung syllable timestamp you emit “Hel-”, “lo”, “world” so a karaoke player can display them in sync.
         Lyric,
+
+        // Marker (0x06).
+        // What it is / how it works:
+        // A labeled marker at a time position (like DAW markers).
+        // Affects playback?
+        // No. It’s navigation/annotation.
+        // Example use:
+        // At bar 9: “Chorus” so the user can jump to it in an editor.
+        Marker,
+
+        // ProgramName (0x08).
+        // What it is / how it works:
+        // Human-readable program/patch name. This is not the ProgramChange message.
+        // Affects playback?
+        // No by itself. It’s descriptive.
+        // Example use:
+        // You send ProgramChange 41 (violin), and also add ProgramName="Solo Violin KS" so a DAW displays the intended patch name.
+        ProgramName,
+
+        // EndOfTrack (0x2F).
+        // What it is / how it works:
+        // Marks the end of the track data (length always 0).
+        // Affects playback?
+        // Yes in the sense that it defines the track’s end; players use it to know when the track is done.
+        // Example use:
+        // A track with a final chord has EndOfTrack at the chord’s note-off time so the track doesn’t “run forever”.
         EndOfTrack,
 
-        // Channel events (need Channel)
-        NoteOn,
-        NoteOff,
-        ProgramChange,
-        ControlChange,
-        PitchBend,         // -8192..+8191
-        ChannelPressure,   // 0..127
-        PolyPressure,      // 0..127 (needs Note/NoteNumber)
+        // SetTempo (0x51).
+        // What it is / how it works:
+        // 3 bytes: microseconds per quarter note (MPQN). This is how SMF defines tempo changes; BPM is derived from it.
+        // Affects playback?
+        // Yes, strongly. It changes how ticks/delta-times convert into real time.
+        // Example use:
+        // Start at 120 BPM, then at bar 33 slow to 90 BPM by inserting a SetTempo event at that timestamp.
+        SetTempo,
 
-        // System exclusive
-        SysEx
+        // TimeSignature (0x58).
+        // What it is / how it works:
+        // 4 bytes: numerator; log2(denominator); MIDI clocks per metronome click; notated 32nd notes per quarter note.
+        // Affects playback?
+        // Not notes directly, but can affect metronome behavior, bar/beat mapping, grids, looping, and measure counting in sequencers.
+        // Example use:
+        // Switch from 4/4 to 7/8 at bar 9 so DAW barlines and grid stay correct.
+        TimeSignature,
+
+        // KeySignature (0x59).
+        // What it is / how it works:
+        // 2 bytes: sf (-7..+7 flats/sharps) and mi (0 major, 1 minor). Primarily for notation/display.
+        // Affects playback?
+        // No for sound; MIDI notes are absolute pitches.
+        // Example use:
+        // A MIDI intended for sheet generation sets KeySignature=D major (+2 sharps) so notation uses correct accidentals.
+        KeySignature,
+
+        // SequencerSpecific (0x7F).
+        // What it is / how it works:
+        // Arbitrary bytes for a specific sequencer/app to store private data.
+        // Affects playback?
+        // Not by standard MIDI rules; may affect playback only in the specific sequencer that interprets it.
+        // Example use:
+        // Your app stores custom humanization settings in SequencerSpecific and reads them back on import.
+        SequencerSpecific,
+
+        // ----------------------------
+        // Channel voice messages
+        // ----------------------------
+
+        // NoteOff (0x8n).
+        // What it is / how it works:
+        // Ends a note on a channel for a specific key number (0–127). Includes release velocity (often ignored).
+        // Affects playback?
+        // Yes. Stops the note (unless sustain pedal is down or the synth tail continues).
+        // Example use:
+        // Note C4 (60) starts at tick 0; at tick 480 emit NoteOff to make it last one quarter note.
+        NoteOff,
+
+        // NoteOn (0x9n).
+        // What it is / how it works:
+        // Starts a note on a channel for a specific key (0–127) with velocity (1–127). Velocity 0 is commonly treated as NoteOff.
+        // Affects playback?
+        // Yes. Triggers the note; velocity usually maps to loudness/brightness.
+        // Example use:
+        // Trigger drum hits by sending NoteOn on the drum channel with appropriate note numbers and velocities on each beat.
+        NoteOn,
+
+        // PolyKeyPressure (0xAn).
+        // What it is / how it works:
+        // Per-key (per-note) aftertouch/pressure for a specific note number.
+        // Affects playback?
+        // Yes if the synth maps it (often to vibrato depth, filter, volume). Many devices ignore it.
+        // Example use:
+        // Press harder on the top note of a chord and send PolyKeyPressure for that note only to add vibrato to just that note.
+        PolyKeyPressure,
+
+        // ControlChange (0xBn).
+        // What it is / how it works:
+        // Controller number (0–127) plus value (0–127). Used for sustain, modulation, volume, pan, expression, bank select, etc.
+        // Affects playback?
+        // Yes, very often. It’s a primary way to shape and control performance and routing.
+        // Example use:
+        // Sustain pedal: CC64 value=127 (down), later CC64 value=0 (up) so held notes continue while the pedal is down.
+        ControlChange,
+
+        // ProgramChange (0xCn).
+        // What it is / how it works:
+        // Selects an instrument/program number (0–127) for that channel; often paired with Bank Select (CC0/CC32) for more banks.
+        // Affects playback?
+        // Yes. Changes the patch the channel uses going forward until changed again.
+        // Example use:
+        // Switch from strings to choir at the bridge by inserting a ProgramChange at the section start.
+        ProgramChange,
+
+        // ChannelPressure (0xDn).
+        // What it is / how it works:
+        // Channel-wide aftertouch/pressure value (0–127) affecting all notes on the channel.
+        // Affects playback?
+        // Yes if the synth maps it (often vibrato/filter/volume).
+        // Example use:
+        // While holding a lead note, increase ChannelPressure to deepen vibrato without sending a new NoteOn.
+        ChannelPressure,
+
+        // PitchBend (0xEn).
+        // What it is / how it works:
+        // 14-bit pitch bend value (two data bytes). Center means no bend; bend range depends on synth settings.
+        // Affects playback?
+        // Yes. Bends pitch for notes on that channel (channel-wide).
+        // Example use:
+        // Simulate a guitar bend by ramping PitchBend up over 200ms while the note is sounding, then returning to center.
+        PitchBend,
+
+
+        // ----------------------------
+        // System Exclusive (SMF + Live)
+        // ----------------------------
+
+        // SysEx.
+        // What it is / how it works:
+        // Manufacturer/device-specific message carrying arbitrary bytes; used to set parameters, modes, resets, custom patches, etc.
+        // Affects playback?
+        // Can, massively—if the target device understands it; otherwise it’s ignored.
+        // Example use:
+        // At tick 0 send a SysEx reset/mode configuration so the target synth/module is in a known state for consistent playback.
+        SysEx,
+
+
+        // ----------------------------
+        // System Common (Live MIDI I/O)
+        // ----------------------------
+
+        // TimeCodeQuarterFrame (0xF1).
+        // What it is / how it works:
+        // Carries a portion of MIDI Time Code (MTC); multiple quarter-frame messages assemble into full timecode.
+        // Affects playback?
+        // Indirectly. Used for sync; does not change notes itself.
+        // Example use:
+        // A DAW locks to incoming MTC from video hardware; quarter frame messages keep MIDI aligned to video timecode.
+        TimeCodeQuarterFrame,
+
+        // SongPositionPointer (0xF2).
+        // What it is / how it works:
+        // 14-bit song position used by synced devices to locate within a song/pattern timeline (hardware sequencing contexts).
+        // Affects playback?
+        // Yes for synced devices. It tells slaves where to start/resume.
+        // Example use:
+        // Hitting “locate to bar 33” on the master sends SongPositionPointer so a slave drum machine starts at the right position.
+        SongPositionPointer,
+
+        // SongSelect (0xF3).
+        // What it is / how it works:
+        // Selects a song number (0–127) on devices that store multiple songs/pattern sets.
+        // Affects playback?
+        // Yes on supporting devices (changes which song/pattern will play).
+        // Example use:
+        // A controller selects “Song 12” on a hardware groovebox before sending Start.
+        SongSelect,
+
+        // TuneRequest (0xF6).
+        // What it is / how it works:
+        // Requests certain instruments/modules to run their tuning routine (rare today).
+        // Affects playback?
+        // Potentially yes, but not musically; it’s device maintenance/behavior.
+        // Example use:
+        // A vintage module receives TuneRequest before recording to ensure oscillators are calibrated.
+        TuneRequest,
+
+
+        // ----------------------------
+        // System Real-Time (Live MIDI I/O)
+        // ----------------------------
+
+        // TimingClock (0xF8).
+        // What it is / how it works:
+        // Clock pulse used for tempo sync; sent repeatedly while running so slaves can sync arps/sequencers/LFOs.
+        // Affects playback?
+        // Yes in sync setups. Defines tempo timing for slaves, but is not a “BPM meta” message.
+        // Example use:
+        // A DAW sends TimingClock; a hardware delay pedal syncs tempo subdivisions to the incoming clock.
+        TimingClock,
+
+        // Start (0xFA).
+        // What it is / how it works:
+        // Tells slave devices to start playback from the beginning (often paired with SongPositionPointer for non-zero starts).
+        // Affects playback?
+        // Yes on synced devices (starts transport-driven playback).
+        // Example use:
+        // Press play on the DAW: it sends Start and the drum machine begins its pattern in time.
+        Start,
+
+        // Continue (0xFB).
+        // What it is / how it works:
+        // Resumes playback from the current position (typically after Stop).
+        // Affects playback?
+        // Yes on synced devices (resume).
+        // Example use:
+        // Stop mid-song, then hit play again and send Continue so the groovebox continues where it left off.
+        Continue,
+
+        // Stop (0xFC).
+        // What it is / how it works:
+        // Stops transport/clock-driven playback on slave devices.
+        // Affects playback?
+        // Yes (halts playback on synced devices).
+        // Example use:
+        // Hitting stop in the DAW sends Stop; arpeggiators and drum machines stop together.
+        Stop,
+
+        // ActiveSensing (0xFE).
+        // What it is / how it works:
+        // Keepalive message some devices send; if it stops arriving, receivers may silence notes to prevent hangs on disconnect.
+        // Affects playback?
+        // Indirectly. Connection safety feature; can prevent stuck notes when a connection dies.
+        // Example use:
+        // A keyboard sends ActiveSensing; if unplugged mid-note, the module stops notes instead of droning forever.
+        ActiveSensing,
+
+        // SystemReset.
+        // What it is / how it works:
+        // Resets a device’s MIDI system state (live MIDI concept; device-specific behavior).
+        // Affects playback?
+        // Yes (big hammer). Can wipe controller states, stop notes, reset modes—varies by device.
+        // Example use:
+        // A rig gets into a bad state; a reset message forces modules back to a known baseline (not something you’d casually put in a file).
+        SystemReset,
+
+
+        // ----------------------------
+        // Safety / forward-compat
+        // ----------------------------
+
+        // Unknown.
+        // What it is / how it works:
+        // Placeholder for unrecognized or not-yet-supported event types when parsing/importing.
+        // Affects playback?
+        // No by itself; behavior depends on whether you drop it or preserve raw bytes for round-tripping.
+        // Example use:
+        // You load a file containing private sequencer data you don’t implement; store it as Unknown with payload so you can round-trip without losing data.
+        Unknown
     }
 
     /// <summary>
@@ -289,24 +574,6 @@ namespace Music.Writer
             new() { Type = MidiEventType.Text, AbsoluteTimeTicks = absoluteTime, Text = text };
 
         /// <summary>
-        /// Creates a marker meta event.
-        /// </summary>
-        public static MidiEvent Marker(long absoluteTime, string text) =>
-            new() { Type = MidiEventType.Marker, AbsoluteTimeTicks = absoluteTime, Text = text };
-
-        /// <summary>
-        /// Creates a cue point meta event.
-        /// </summary>
-        public static MidiEvent CuePoint(long absoluteTime, string text) =>
-            new() { Type = MidiEventType.CuePoint, AbsoluteTimeTicks = absoluteTime, Text = text };
-
-        /// <summary>
-        /// Creates a lyric meta event.
-        /// </summary>
-        public static MidiEvent Lyric(long absoluteTime, string text) =>
-            new() { Type = MidiEventType.Lyric, AbsoluteTimeTicks = absoluteTime, Text = text };
-
-        /// <summary>
         /// Creates an end-of-track meta event.
         /// </summary>
         public static MidiEvent EndOfTrack(long absoluteTime = 0) =>
@@ -431,7 +698,7 @@ namespace Music.Writer
         public static MidiEvent PolyPressure(long absoluteTime, int channel, string note, int pressure) =>
             new()
             {
-                Type = MidiEventType.PolyPressure,
+                Type = MidiEventType.PolyKeyPressure,
                 AbsoluteTimeTicks = absoluteTime,
                 Channel = channel,
                 Note = note,

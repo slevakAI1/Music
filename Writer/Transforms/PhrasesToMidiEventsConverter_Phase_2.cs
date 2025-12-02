@@ -204,7 +204,6 @@ namespace Music.Writer
                 MidiEventType.TimeSignature => 2,
                 MidiEventType.KeySignature => 3,
                 MidiEventType.Marker => 4,
-                MidiEventType.CuePoint => 5,
                 MidiEventType.Text => 6,
                 MidiEventType.Lyric => 7,
 
@@ -215,7 +214,7 @@ namespace Music.Writer
                 MidiEventType.ControlChange => 20,
                 MidiEventType.PitchBend => 21,
                 MidiEventType.ChannelPressure => 22,
-                MidiEventType.PolyPressure => 23,
+                MidiEventType.PolyKeyPressure => 23,
 
                 // Note off before note on (critical for same-pitch re-triggering)
                 MidiEventType.NoteOff => 30,

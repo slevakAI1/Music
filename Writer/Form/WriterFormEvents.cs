@@ -114,15 +114,17 @@ namespace Music.Writer
                 phrase.MidiProgramNumber = (byte)selectedRow.Cells["colInstrument"].Value; // Selected Instrument
                 phrases.Add(phrase);
             }
-
+            /*
+            Every channel voice message includes a MIDI channel in its status byte (e.g., Note On/Off, Control Change, Program Change, Pitch Bend, etc.).
+            So: yes, the channel is effectively specified on each event (unless you’re using running status, where it’s implied by the previous status byte—but logically it’s still per-message).
+            Program number is not included in Note events.
+            You normally send a Program Change message once (or whenever you want to switch sounds). After that, notes on that same channel will play using the currently selected program until changed again.
+            So: no, program number is not repeated per event—it’s “sticky” state for that channel.
+             * */
             try
             {
                 // Step 1 - convert phrases to MIDI EVENTS - Absolute positions
-                var midiEventLists = PhrasesToMidiEventsConverter_Phase_1.Convert(
-                    phrases,
-                    tempo: 112,
-                    timeSignatureNumerator: 4,
-                    timeSignatureDenominator: 4);
+                var midiEventLists = PhrasesToMidiEventsConverter_Phase_1.Convert(phrases);
                 var inputjson = Helpers.DebugObject(phrases);
                 var outputjson = Helpers.DebugObject(midiEventLists);
 

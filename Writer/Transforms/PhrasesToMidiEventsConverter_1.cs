@@ -16,29 +16,16 @@ namespace Music.Writer
         /// Each phrase is processed independently with its own event list.
         /// </summary>
         /// <param name="phrases">List of phrases to convert</param>
-        /// <param name="tempo">Tempo in beats per minute (not used for timing calculations but kept for context)</param>
-        /// <param name="timeSignatureNumerator">Time signature numerator (not used for timing but kept for context)</param>
-        /// <param name="timeSignatureDenominator">Time signature denominator (not used for timing but kept for context)</param>
         /// <param name="ticksPerQuarterNote">MIDI time resolution (default 480 ticks per quarter note)</param>
         /// <returns>List of MidiEvent lists, one per input phrase</returns>
         public static List<List<MidiEvent>> Convert(
             List<Phrase> phrases,
-            int tempo,
-            int timeSignatureNumerator,
-            int timeSignatureDenominator,
             short ticksPerQuarterNote = DefaultTicksPerQuarterNote)
         {
             if (phrases == null)
                 throw new ArgumentNullException(nameof(phrases));
-            if (tempo <= 0)
-                throw new ArgumentException("Tempo must be greater than 0", nameof(tempo));
-            if (timeSignatureNumerator <= 0)
-                throw new ArgumentException("Time signature numerator must be greater than 0", nameof(timeSignatureNumerator));
-            if (timeSignatureDenominator <= 0)
-                throw new ArgumentException("Time signature denominator must be greater than 0", nameof(timeSignatureDenominator));
 
             var result = new List<List<MidiEvent>>();
-
             foreach (var phrase in phrases)
             {
                 result.Add(ConvertSinglePhrase(phrase, ticksPerQuarterNote));
