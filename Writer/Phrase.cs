@@ -93,7 +93,7 @@ namespace Music.Writer
         public int Octave { get; set; }
 
         // Rhythm
-        public int Duration { get; set; }
+        public int Duration { get; set; } //  4=quarter, 8=eighth note, etc.
         public int Dots { get; set; }
 
         // ... maybe need a tuplet class?
@@ -114,8 +114,110 @@ namespace Music.Writer
             NoteOnVelocity = noteOnVelocity;
             IsRest = isRest;
 
-            // Compute the pitch and rhythm properties here
-            // TBD
+            // Calculate metadata fields from MIDI properties
+            if (!isRest)
+            {
+                (Step, Alter, Octave) = CalculatePitch(noteNumber);
+            }
+            (Duration, Dots) = CalculateRhythm(noteDurationTicks);
+        }
+
+        /// <summary>
+        /// Calculates the pitch properties (Step, Alter, Octave) from MIDI note number.
+        /// </summary>
+        private static (char Step, int Alter, int Octave) CalculatePitch(int noteNumber)
+        {
+            int octave = (noteNumber / 12) - 1;
+            int pitchClass = noteNumber % 12;
+
+            return pitchClass switch
+            {
+                0 => ('C', 0, octave),
+                1 => ('C', 1, octave),  // C#
+                2 => ('D', 0, octave),
+                3 => ('D', 1, octave),  // D#
+                4 => ('E', 0, octave),
+                5 => ('F', 0, octave),
+                6 => ('F', 1, octave),  // F#
+                7 => ('G', 0, octave),
+                8 => ('G', 1, octave),  // G#
+                9 => ('A', 0, octave),
+                10 => ('A', 1, octave), // A#
+                11 => ('B', 0, octave),
+                _ => ('C', 0, octave)
+            };
+        }
+
+        /// <summary>
+        /// Calculates the rhythm properties (Duration, Dots) from note duration in ticks.
+        /// Assumes 480 ticks per quarter note.
+        /// </summary>
+        private static (int Duration, int Dots) CalculateRhythm(int noteDurationTicks)
+        {
+            const int ticksPerQuarterNote = 480;
+            
+            // Common note durations in ticks (480 ticks per quarter note)
+            var noteDurations = new (int ticks, int duration, int dots)[]
+            {
+                // Whole notes
+                (1920, 1, 0),  // Whole note
+                (2880, 1, 1),  // Dotted whole note
+                
+                // Half notes
+                (960, 2, 0),   // Half note
+                (1440, 2, 1),  // Dotted half note
+                (2160, 2, 2),  // Double dotted half note
+                
+                // Quarter notes
+                (480, 4, 0),   // Quarter note
+                (720, 4, 1),   // Dotted quarter note
+                (1080, 4, 2),  // Double dotted quarter note
+                
+                // Eighth notes
+                (240, 8, 0),   // Eighth note
+                (360, 8, 1),   // Dotted eighth note
+                (540, 8, 2),   // Double dotted eighth note
+                
+                // Sixteenth notes
+                (120, 16, 0),  // Sixteenth note
+                (180, 16, 1),  // Dotted sixteenth note
+                (270, 16, 2),  // Double dotted sixteenth note
+                
+                // Thirty-second notes
+                (60, 32, 0),   // Thirty-second note
+                (90, 32, 1),   // Dotted thirty-second note
+                
+                // Sixty-fourth notes
+                (30, 64, 0),   // Sixty-fourth note
+            };
+
+            // Find the closest match
+            foreach (var (ticks, duration1, dots) in noteDurations)
+            {
+                if (noteDurationTicks == ticks)
+                {
+                    return (duration1, dots);
+                }
+            }
+
+            // If no exact match, calculate base duration without dots
+            int wholeTicks = ticksPerQuarterNote * 4;
+            if (noteDurationTicks >= wholeTicks)
+            {
+                return (1, 0); // Default to whole note
+            }
+
+            // Calculate the closest power of 2 duration
+            int duration = 1;
+            int closestTicks = wholeTicks;
+            
+            while (closestTicks > noteDurationTicks && duration < 64)
+            {
+                duration *= 2;
+                closestTicks /= 2;
+            }
+
+            return (duration, 0);
         }
     }
 }
