@@ -1,3 +1,4 @@
+using Music.Domain;
 using MusicTheory;
 
 namespace Music.Writer
@@ -15,7 +16,7 @@ namespace Music.Writer
         public string MidiProgramName { get; set; }
         //public string NotionPartName { get; set; }
 
-        private byte MidiProgramNumber { get; set; }
+        public byte MidiProgramNumber { get; set; }
 
         public List<PhraseNote> PhraseNotes { get; set; } = new();
 
@@ -24,8 +25,11 @@ namespace Music.Writer
             MidiProgramName = midiProgramName;
             PhraseNotes = phraseNotes;
 
-            // Compute midiProgramNumber here - resolve from the class that contains this data
-            // TBD
+            // Resolve MIDI program number from the instrument name
+            var instrument = MidiInstrument.GetGeneralMidiInstruments()
+                .FirstOrDefault(i => i.Name.Equals(midiProgramName, StringComparison.OrdinalIgnoreCase));
+            
+            MidiProgramNumber = instrument?.ProgramNumber ?? 0; // Default to 0 (Acoustic Grand Piano) if not found
         }
     }
 
