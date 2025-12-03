@@ -6,7 +6,7 @@ using Music.Tests;
 namespace Music.Writer
 {
     /// <summary>
-    /// Converts TimedNote lists to a MIDI file (MidiSongDocument).
+    /// Converts set of phrases to a MIDI file (MidiSongDocument).
     /// </summary>
     public static class PhrasesToMidiConverter
     {
