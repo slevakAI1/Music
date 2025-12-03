@@ -25,7 +25,7 @@ namespace Music.Writer
             var phraseName = phraseNumber.ToString();
 
             // Get part name from the phrase
-            var partName = phrase.MidiProgramName ?? "Unknown";
+            var partName = phrase.MidiProgramName ?? "";
 
             // Add new row
             int newRowIndex = dgvPhrase.Rows.Add();
@@ -45,7 +45,7 @@ namespace Music.Writer
 
             // Column 1: MIDI Instrument dropdown - set to first instrument (Acoustic Grand Piano) as default
             // User can change this by clicking the dropdown
-            row.Cells["colInstrument"].Value = midiInstruments[0].ProgramNumber;
+            //row.Cells["colInstrument"].Value = midiInstruments[0].ProgramNumber;
 
             // Column 2: Stave - adds +1 each time new row is added with same instrument as existing row(s)
             row.Cells["colStave"].Value = dgvPhrase.Rows
