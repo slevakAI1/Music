@@ -49,6 +49,10 @@ namespace Music.Writer
 
             foreach (var midiEvent in midiEvents)
             {
+                // Skip EndOfTrack events from input - TrackChunk will add it automatically
+                if (midiEvent.Type == Writer.MidiEventType.EndOfTrack)
+                    continue;
+
                 // Calculate delta time from last event
                 long deltaTime = midiEvent.AbsoluteTimeTicks - lastAbsoluteTime;
                 
@@ -62,16 +66,8 @@ namespace Music.Writer
                 }
             }
 
-            // TrackChunk automatically adds EndOfTrack when written, 
-            // but we can add it explicitly if the last event wasn't EndOfTrack
-            bool hasEndOfTrack = midiEvents.Count > 0 && 
-                                 midiEvents[^1].Type == Writer.MidiEventType.EndOfTrack;
-            
-            if (!hasEndOfTrack)
-            {
-                // The TrackChunk.WriteContent method will automatically add EndOfTrack
-                // No need to manually add it here
-            }
+            // TrackChunk automatically adds EndOfTrack when the MIDI file is written
+            // No need to manually add it
 
             return trackChunk;
         }
