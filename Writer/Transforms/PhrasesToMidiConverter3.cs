@@ -11,7 +11,7 @@ namespace Music.Writer
     public static class PhrasesToMidiConverter
     {
         public static MidiSongDocument Convert(
-            List<Phrase> phrases,
+            List<List<MidiEvent> midiEvents,  // Project data types, not DryWetMidi types
             int tempo,
             int timeSignatureNumerator,
             int timeSignatureDenominator,
@@ -114,7 +114,7 @@ namespace Music.Writer
             // Channel 10 (drums) ignores program changes per GM spec
             if (!isDrumSet)
             {
-                trackChunk.Events.Add(new ProgramChangeEvent((SevenBitNumber)programNumber)
+                trackChunk.Events.Add(new SevenBitNumber((SevenBitNumber)programNumber)
                 {
                     Channel = (FourBitNumber)channel,
                     DeltaTime = 0
