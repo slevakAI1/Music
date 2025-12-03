@@ -18,7 +18,11 @@ namespace Music.Writer
         {
 
             // Get the params from Writer
-            // tbd
+            var numberOfNotes = writer.NumberOfNotes ?? 1;
+            var midiProgramName = "Acoustic Grand Piano"; // Default instrument
+            var selectedStaffs = writer.SelectedStaffs ?? new List<int> { 1 };
+            var startBar = writer.StartBar ?? 1;
+            var startBeat = writer.StartBeat ?? 1;
 
             // Create the repeating phrase - this is a transform!
             // tbd
