@@ -146,8 +146,8 @@ namespace Music.Writer
                 //var mergedByInstrument = PhrasesToTimedNotesConverter.MergeByInstrument(timedPhrases);
 
                 // Step 3 - Execute merged timed notes to MIDI document
-                 var midiDoc = PhrasesToMidiConverter.Convert(
-                    midiEventLists,
+                var midiDoc = PhrasesToMidiConverter.Convert(
+                    phrases,
                     tempo: 112,
                     timeSignatureNumerator: 4,
                     timeSignatureDenominator: 4);

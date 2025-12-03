@@ -11,14 +11,14 @@ namespace Music.Writer
     public static class PhrasesToMidiConverter
     {
         public static MidiSongDocument Convert(
-            Dictionary<byte, List<TimedNote>> mergedByInstrument,
+            List<Phrase> phrases,
             int tempo,
             int timeSignatureNumerator,
             int timeSignatureDenominator,
             short ticksPerQuarterNote = 480)
         {
-            if (mergedByInstrument == null)
-                throw new ArgumentNullException(nameof(mergedByInstrument));
+            if (phrases == null)
+                throw new ArgumentNullException(nameof(phrases));
             if (tempo <= 0)
                 throw new ArgumentException("Tempo must be greater than 0", nameof(tempo));
             if (timeSignatureNumerator <= 0)
@@ -52,13 +52,18 @@ namespace Music.Writer
             //tempoTrack.Events.Add(CreateEndOfTrackEvent());
             midiFile.Chunks.Add(tempoTrack);
 
+            // Group phrases by instrument
+            var phrasesByInstrument = phrases
+                .GroupBy(p => p.MidiProgramNumber)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
             int trackNumber = 1;
             int channelCursor = 0;
 
-            foreach (var kvp in mergedByInstrument)
+            foreach (var kvp in phrasesByInstrument)
             {
                 byte programNumber = kvp.Key;
-                var timedNotes = kvp.Value;
+                var phrasesForInstrument = kvp.Value;
 
                 // Determine if this is a drum set track
                 bool isDrumSet = IsDrumSet(programNumber);
@@ -77,7 +82,13 @@ namespace Music.Writer
                     channelCursor = (channelCursor + 1) % 16;
                 }
                 
-                var trackChunk = CreateTrackFromTimedNotes(timedNotes, programNumber, trackNumber, channel, isDrumSet);
+                var trackChunk = CreateTrackFromPhrases(
+                    phrasesForInstrument, 
+                    programNumber, 
+                    trackNumber, 
+                    channel, 
+                    isDrumSet,
+                    ticksPerQuarterNote);
                 midiFile.Chunks.Add(trackChunk);
                 trackNumber++;
             }
@@ -85,12 +96,13 @@ namespace Music.Writer
             return new MidiSongDocument(midiFile);
         }
 
-        private static TrackChunk CreateTrackFromTimedNotes(
-            List<TimedNote> timedNotes,
+        private static TrackChunk CreateTrackFromPhrases(
+            List<Phrase> phrases,
             byte programNumber,
             int trackNumber,
             int channel,
-            bool isDrumSet)
+            bool isDrumSet,
+            short ticksPerQuarterNote)
         {
             var trackChunk = new TrackChunk();
 
@@ -109,27 +121,99 @@ namespace Music.Writer
                 });
             }
 
-            foreach (var timedNote in timedNotes)
+            // Convert all phrases to timed events and merge them
+            var allEvents = new List<(long absoluteTime, bool isNoteOn, byte noteNumber, byte velocity, long duration)>();
+
+            foreach (var phrase in phrases)
             {
-                if (timedNote.IsRest)
-                    continue;
+                foreach (var phraseNote in phrase.PhraseNotes ?? Enumerable.Empty<PhraseNote>())
+                {
+                    if (phraseNote.IsRest)
+                    {
+                        continue;
+                    }
 
-                trackChunk.Events.Add(new NoteOnEvent((SevenBitNumber)timedNote.NoteNumber, (SevenBitNumber)timedNote.Velocity)
+                    var noteNumber = CalculateMidiNoteNumber(phraseNote.Step, phraseNote.Alter, phraseNote.Octave);
+                    var duration = phraseNote.Duration;
+
+                    allEvents.Add((phraseNote.AbsolutePositionTicks, true, (byte)noteNumber, 100, duration));
+                }
+            }
+
+            // Sort events by absolute time, then by event type (NoteOn before NoteOff at same time)
+            var sortedEvents = allEvents
+                .OrderBy(e => e.absoluteTime)
+                .ThenBy(e => e.isNoteOn ? 0 : 1)
+                .ToList();
+
+            // Convert to delta time and add to track
+            long lastAbsoluteTime = 0;
+            var pendingNoteOffs = new List<(long absoluteTime, byte noteNumber)>();
+
+            foreach (var evt in sortedEvents)
+            {
+                // Process any pending note-offs that should happen before or at this time
+                var noteOffsToProcess = pendingNoteOffs
+                    .Where(n => n.absoluteTime <= evt.absoluteTime)
+                    .OrderBy(n => n.absoluteTime)
+                    .ToList();
+
+                foreach (var noteOff in noteOffsToProcess)
+                {
+                    var deltaTime = noteOff.absoluteTime - lastAbsoluteTime;
+                    trackChunk.Events.Add(new NoteOffEvent((SevenBitNumber)noteOff.noteNumber, (SevenBitNumber)0)
+                    {
+                        Channel = (FourBitNumber)channel,
+                        DeltaTime = deltaTime
+                    });
+                    lastAbsoluteTime = noteOff.absoluteTime;
+                    pendingNoteOffs.Remove(noteOff);
+                }
+
+                // Add the current note-on event
+                var noteDelta = evt.absoluteTime - lastAbsoluteTime;
+                trackChunk.Events.Add(new NoteOnEvent((SevenBitNumber)evt.noteNumber, (SevenBitNumber)evt.velocity)
                 {
                     Channel = (FourBitNumber)channel,
-                    DeltaTime = timedNote.Delta
+                    DeltaTime = noteDelta
                 });
+                lastAbsoluteTime = evt.absoluteTime;
 
-                trackChunk.Events.Add(new NoteOffEvent((SevenBitNumber)timedNote.NoteNumber, (SevenBitNumber)0)
+                // Schedule the note-off
+                pendingNoteOffs.Add((evt.absoluteTime + evt.duration, evt.noteNumber));
+            }
+
+            // Process any remaining note-offs
+            foreach (var noteOff in pendingNoteOffs.OrderBy(n => n.absoluteTime))
+            {
+                var deltaTime = noteOff.absoluteTime - lastAbsoluteTime;
+                trackChunk.Events.Add(new NoteOffEvent((SevenBitNumber)noteOff.noteNumber, (SevenBitNumber)0)
                 {
                     Channel = (FourBitNumber)channel,
-                    DeltaTime = timedNote.Duration
+                    DeltaTime = deltaTime
                 });
+                lastAbsoluteTime = noteOff.absoluteTime;
             }
 
             // Add end-of-track meta event
-           // trackChunk.Events.Add(CreateEndOfTrackEvent());
+            // trackChunk.Events.Add(CreateEndOfTrackEvent());
             return trackChunk;
+        }
+
+        private static int CalculateMidiNoteNumber(char step, int alter, int octave)
+        {
+            int baseNote = step switch
+            {
+                'C' => 0,
+                'D' => 2,
+                'E' => 4,
+                'F' => 5,
+                'G' => 7,
+                'A' => 9,
+                'B' => 11,
+                _ => 0
+            };
+            return (octave + 1) * 12 + baseNote + alter;
         }
 
         // Reflection helper to instantiate EndOfTrackEvent with internal constructor
