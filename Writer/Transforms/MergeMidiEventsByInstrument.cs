@@ -10,7 +10,7 @@ namespace Music.Writer
     /// - Sorts events by absolute time position and event type priority
     /// Delta time calculation happens in Phase 3.
     /// </summary>
-    public static class PhrasesToMidiEventsConverter_Phase_2
+    public static class MergeMidiEventsByInstrument
     {
         private const int GlobalTrack = 0;
         private const int DrumTrack = 10;

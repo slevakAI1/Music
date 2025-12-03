@@ -124,7 +124,7 @@ namespace Music.Writer
             try
             {
                 // Step 1 - convert phrases to MIDI EVENTS - Absolute positions
-                var midiEventLists = PhrasesToMidiEventsConverter_Phase_1.Convert(phrases);
+                var midiEventLists = ConvertPhrasesToMidiEvents.Convert(phrases);
                 var inputjson = Helpers.DebugObject(phrases);
                 var outputjson = Helpers.DebugObject(midiEventLists);
 
@@ -146,7 +146,7 @@ namespace Music.Writer
                 //var mergedByInstrument = PhrasesToTimedNotesConverter.MergeByInstrument(timedPhrases);
 
                 // Step 3 - Execute merged timed notes to MIDI document
-                var midiDoc = MidiEventsToMidiDocumentConverter.Convert(
+                var midiDoc = ConvertMidiEventsToMidiDocument.Convert(
                     midiEventLists,
                     tempo: 112,
                     timeSignatureNumerator: 4,

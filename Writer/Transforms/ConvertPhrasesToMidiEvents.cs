@@ -7,7 +7,7 @@ namespace Music.Writer
     /// This is stage 1 processing - creates NoteOn, NoteOff, and SequenceTrackName events only.
     /// Channel assignment and other processing happens in later stages.
     /// </summary>
-    public static class PhrasesToMidiEventsConverter_Phase_1
+    public static class ConvertPhrasesToMidiEvents
     {
         private const short DefaultTicksPerQuarterNote = 480;
 
