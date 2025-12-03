@@ -116,10 +116,10 @@ namespace Music.Writer
             }
             /*
             Every channel voice message includes a MIDI channel in its status byte (e.g., Note On/Off, Control Change, Program Change, Pitch Bend, etc.).
-            So: yes, the channel is effectively specified on each event (unless you’re using running status, where it’s implied by the previous status byte—but logically it’s still per-message).
+            So: yes, the channel is effectively specified on each event (unless you're using running status, where it's implied by the previous status byte—but logically it's still per-message).
             Program number is not included in Note events.
             You normally send a Program Change message once (or whenever you want to switch sounds). After that, notes on that same channel will play using the currently selected program until changed again.
-            So: no, program number is not repeated per event—it’s “sticky” state for that channel.
+            So: no, program number is not repeated per event—it's "sticky" state for that channel.
              * */
             try
             {
@@ -291,7 +291,8 @@ namespace Music.Writer
             {
                 case "Repeat Note/Chord/Rest":
                     var formData = CaptureFormData();
-                    TransformRepeatingNotes.ExecuteCommandWriteRepeatingNotes(formData, _midiInstruments, dgvPhrase, ref phraseNumber);
+                    var phrase = TransformRepeatingNotes.ExecuteCommandWriteRepeatingNotes(formData);
+                    PhraseGridManager.AddPhraseToGrid(phrase, _midiInstruments, dgvPhrase, ref phraseNumber);
                     break;
 
                 // Add additional cases for other patterns as needed
