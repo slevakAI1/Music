@@ -128,6 +128,7 @@ namespace Music.Writer
                 var inputjson = Helpers.DebugObject(phrases);
                 var outputjson = Helpers.DebugObject(midiEventLists);
 
+                var x = 0;
 
                 //  Step 2:
                 //      Merge midiEventLists lists that are for the same instrument
@@ -145,11 +146,11 @@ namespace Music.Writer
                 //var mergedByInstrument = PhrasesToTimedNotesConverter.MergeByInstrument(timedPhrases);
 
                 // Step 3 - Execute merged timed notes to MIDI document
-                // var midiDoc = PhrasesToMidiConverter.Execute(
-                //    mergedByInstrument,
-                //    tempo: 112,
-                //    timeSignatureNumerator: 4,
-                //    timeSignatureDenominator: 4);
+                 var midiDoc = PhrasesToMidiConverter.Execute(
+                    midiEventLists,,
+                    tempo: 112,
+                    timeSignatureNumerator: 4,
+                    timeSignatureDenominator: 4);
 
                 //await Transform1.PlayMidiFromPhrasesAsync(_midiPlaybackService, midiDoc, this);
             }
@@ -280,6 +281,11 @@ namespace Music.Writer
             }
         }
 
+        public void HandleClearPhrases()
+        {
+            dgvPhrase.Rows.Clear();
+        }
+
         // Branch on Command
         public void HandleExecute()
         {
@@ -291,78 +297,14 @@ namespace Music.Writer
             {
                 case "Repeat Note":   // REPEAT CHORD WILL BE A SEPARATE METHOD
 
-                    // THIS IS THE HANDLE FOR THE WRITER FORM SO OK TO GET PARAMS FROM THERE
-                    // CreateRepeatingNotes.Execute() is already separated and resuable
-
                     var formData = CaptureFormData();
-
-                    var numberOfNotes = formData.NumberOfNotes ?? 1;
-
-                    // Extract properties needed by CreateRepeatingNotes.Execute
-                    var isRest = formData.IsRest ?? false;
-
-                    // Calculate MIDI note number from step, accidental, and octave
-                    var step = formData.Step;
-                    var octave = formData.OctaveAbsolute ?? 4;
-                    var accidental = formData.Accidental;
-                    
-                    // Convert accidental string to alter value
-                    int alter = accidental switch
-                    {
-                        "Sharp" or "#" => 1,
-                        "Flat" or "b" => -1,
-                        "Natural" => 0,
-                        _ => 0
-                    };
-
-                    // Calculate MIDI note number
-                    int baseNote = step switch
-                    {
-                        'C' => 0,
-                        'D' => 2,
-                        'E' => 4,
-                        'F' => 5,
-                        'G' => 7,
-                        'A' => 9,
-                        'B' => 11,
-                        _ => 0
-                    };
-                    int noteNumber = (octave + 1) * 12 + baseNote + alter;
-
-                    // Calculate note duration in ticks
-                    var noteValue = formData.NoteValue;
-                    var dots = formData.Dots;
-                    var tupletNumber = formData.TupletNumber;
-                    var tupletCount = formData.TupletCount ?? 0;
-                    var tupletOf = formData.TupletOf ?? 0;
-
-                    const int ticksPerQuarterNote = 480;
-                    int duration = int.TryParse(noteValue, out int d) ? d : 4;
-                    
-                    // Base ticks for this duration (e.g., quarter=480, eighth=240)
-                    int baseTicks = (ticksPerQuarterNote * 4) / duration;
-                    
-                    // Apply dots (each dot adds half of the previous value)
-                    int dottedTicks = baseTicks;
-                    int addedValue = baseTicks / 2;
-                    for (int i = 0; i < dots; i++)
-                    {
-                        dottedTicks += addedValue;
-                        addedValue /= 2;
-                    }
-
-                    // Apply tuplet if specified
-                    int noteDurationTicks = dottedTicks;
-                    if (!string.IsNullOrWhiteSpace(tupletNumber) && tupletCount > 0 && tupletOf > 0)
-                    {
-                        // Tuplet adjusts duration: e.g., triplet = 2/3 of normal duration
-                        noteDurationTicks = (dottedTicks * tupletOf) / tupletCount;
-                    }
+                    var (noteNumber, noteDurationTicks, repeatCount, isRest) = 
+                        GetRepeatingNotesParameters(formData);
 
                     var phrase = CreateRepeatingNotes.Execute(
                         noteNumber: noteNumber,
                         noteDurationTicks: noteDurationTicks,
-                        repeatCount: numberOfNotes,
+                        repeatCount: repeatCount,
                         noteOnVelocity: 100,
                         isRest: isRest);
 
@@ -377,9 +319,76 @@ namespace Music.Writer
             }
         }
 
-        public void HandleClearPhrases()
+
+        // This returns all 4 parameters
+        private static (int noteNumber, int noteDurationTicks, int repeatCount, bool isRest) 
+            GetRepeatingNotesParameters(WriterFormData formData)
         {
-            dgvPhrase.Rows.Clear();
+            // Extract repeat count
+            var repeatCount = formData.NumberOfNotes ?? 1;
+
+            // Extract rest flag
+            var isRest = formData.IsRest ?? false;
+
+            // Calculate MIDI note number from step, accidental, and octave
+            var step = formData.Step;
+            var octave = formData.OctaveAbsolute ?? 4;
+            var accidental = formData.Accidental;
+
+            // Convert accidental string to alter value
+            int alter = accidental switch
+            {
+                "Sharp" or "#" => 1,
+                "Flat" or "b" => -1,
+                "Natural" => 0,
+                _ => 0
+            };
+
+            // Calculate MIDI note number
+            int baseNote = step switch
+            {
+                'C' => 0,
+                'D' => 2,
+                'E' => 4,
+                'F' => 5,
+                'G' => 7,
+                'A' => 9,
+                'B' => 11,
+                _ => 0
+            };
+            int noteNumber = (octave + 1) * 12 + baseNote + alter;
+
+            // Calculate note duration in ticks
+            var noteValue = formData.NoteValue;
+            var dots = formData.Dots;
+            var tupletNumber = formData.TupletNumber;
+            var tupletCount = formData.TupletCount ?? 0;
+            var tupletOf = formData.TupletOf ?? 0;
+
+            const int ticksPerQuarterNote = 480;
+            int duration = int.TryParse(noteValue, out int d) ? d : 4;
+
+            // Base ticks for this duration (e.g., quarter=480, eighth=240)
+            int baseTicks = (ticksPerQuarterNote * 4) / duration;
+
+            // Apply dots (each dot adds half of the previous value)
+            int dottedTicks = baseTicks;
+            int addedValue = baseTicks / 2;
+            for (int i = 0; i < dots; i++)
+            {
+                dottedTicks += addedValue;
+                addedValue /= 2;
+            }
+
+            // Apply tuplet if specified
+            int noteDurationTicks = dottedTicks;
+            if (!string.IsNullOrWhiteSpace(tupletNumber) && tupletCount > 0 && tupletOf > 0)
+            {
+                // Tuplet adjusts duration: e.g., triplet = 2/3 of normal duration
+                noteDurationTicks = (dottedTicks * tupletOf) / tupletCount;
+            }
+
+            return (noteNumber, noteDurationTicks, repeatCount, isRest);
         }
     }
 }

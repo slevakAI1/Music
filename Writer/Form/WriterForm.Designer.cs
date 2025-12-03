@@ -132,7 +132,7 @@ namespace Music.Writer
             // cbCommand
             // 
             cbCommand.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbCommand.Items.AddRange(new object[] { "Repeat Note/Chord/Rest" });
+            cbCommand.Items.AddRange(new object[] { "Repeat Note" });
             cbCommand.Location = new Point(13, 22);
             cbCommand.Name = "cbCommand";
             cbCommand.Size = new Size(250, 23);
