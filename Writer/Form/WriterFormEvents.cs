@@ -42,10 +42,10 @@ namespace Music.Writer
         //        {
         //            // Get the Phrase object from the hidden data column
         //            var phrase = (Phrase)selectedRow.Cells["colData"].Value;
-                    
+
         //            // Get the selected instrument name from the combobox
         //            var selectedInstrumentName = selectedRow.Cells["colInstrument"].FormattedValue?.ToString();
-                    
+
         //            if (phrase == null || string.IsNullOrEmpty(selectedInstrumentName))
         //                continue;
 
@@ -67,7 +67,7 @@ namespace Music.Writer
 
         //        // Update the score report display
         //        txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
-                
+
         //        // Update globals
         //        Globals.ScoreList = _scoreList;
 
@@ -131,23 +131,21 @@ namespace Music.Writer
                 var x = 0;
 
                 //  Step 2:
-                //      Merge midiEventLists lists that are for the same instrument
-                //      Add track 0 global events
-                //      Assign track numbers to midi event lists
-                //var mergedMidiEventLists = PhrasesToMidiEventsConverter_Phase_2.Execute(
-                //    midiEventLists,
-                //    tempo: 112,
-                //    timeSignatureNumerator: 4,
-                //    timeSignatureDenominator: 4);
-                //inputjson = Helpers.DebugObject(midiEventLists);
-                //outputjson = Helpers.DebugObject(mergedMidiEventLists);
+                // Merge midiEventLists lists that are for the same instrument
+                // and adds global events
 
-
-                //var mergedByInstrument = PhrasesToTimedNotesConverter.MergeByInstrument(timedPhrases);
+                //Assign track numbers to midi event lists
+                var mergedMidiEventLists = MergeMidiEventsByInstrument.Convert(
+                    midiEventLists,
+                    tempo: 112,
+                    timeSignatureNumerator: 4,
+                    timeSignatureDenominator: 4);
+                inputjson = Helpers.DebugObject(midiEventLists);
+                outputjson = Helpers.DebugObject(mergedMidiEventLists);
 
                 // Step 3 - Execute merged timed notes to MIDI document
                 var midiDoc = ConvertMidiEventsToMidiDocument.Convert(
-                    midiEventLists,
+                    mergedMidiEventLists,
                     tempo: 112,
                     timeSignatureNumerator: 4,
                     timeSignatureDenominator: 4);
@@ -298,7 +296,7 @@ namespace Music.Writer
                 case "Repeat Note":   // REPEAT CHORD WILL BE A SEPARATE METHOD
 
                     var formData = CaptureFormData();
-                    var (noteNumber, noteDurationTicks, repeatCount, isRest) = 
+                    var (noteNumber, noteDurationTicks, repeatCount, isRest) =
                         GetRepeatingNotesParameters(formData);
 
                     var phrase = CreateRepeatingNotes.Execute(
@@ -321,7 +319,7 @@ namespace Music.Writer
 
 
         // This returns all 4 parameters
-        private static (int noteNumber, int noteDurationTicks, int repeatCount, bool isRest) 
+        private static (int noteNumber, int noteDurationTicks, int repeatCount, bool isRest)
             GetRepeatingNotesParameters(WriterFormData formData)
         {
             // Extract repeat count

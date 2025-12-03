@@ -88,7 +88,7 @@ namespace Music.Writer
 
         /// <summary>
         /// Groups MIDI events by instrument name (extracted from SequenceTrackName event).
-        /// Only keeps the first SequenceTrackName event per instrument.
+        /// Merges all event lists for the same instrument into one combined list.
         /// </summary>
         private static Dictionary<string, List<MidiEvent>> GroupEventsByInstrument(
             List<List<MidiEvent>> midiEventLists)
@@ -110,16 +110,33 @@ namespace Music.Writer
                 if (!eventsByInstrument.ContainsKey(instrumentName))
                 {
                     eventsByInstrument[instrumentName] = new List<MidiEvent>();
+                    
                     // Add the track name event only once (from the first list for this instrument)
                     if (trackNameEvent != null)
                     {
                         eventsByInstrument[instrumentName].Add(trackNameEvent);
                     }
+                    
+                    // Add the program change event if present (should be second event)
+                    var programChangeEvent = eventList.FirstOrDefault(e => e.Type == MidiEventType.ProgramChange);
+                    if (programChangeEvent != null)
+                    {
+                        eventsByInstrument[instrumentName].Add(programChangeEvent);
+                    }
                 }
 
-                // Add all non-track-name events from this list
+                // Add all note events (NoteOn, NoteOff) from this list
+                // Skip the track name and program change events as they're already added
                 eventsByInstrument[instrumentName].AddRange(
-                    eventList.Where(e => e.Type != MidiEventType.SequenceTrackName));
+                    eventList.Where(e => 
+                        e.Type != MidiEventType.SequenceTrackName && 
+                        e.Type != MidiEventType.ProgramChange));
+            }
+
+            // Sort each instrument's event list by absolute time and priority
+            foreach (var instrumentName in eventsByInstrument.Keys.ToList())
+            {
+                eventsByInstrument[instrumentName] = SortEventsByPriority(eventsByInstrument[instrumentName]);
             }
 
             return eventsByInstrument;
@@ -153,10 +170,8 @@ namespace Music.Writer
                 if (nextAvailableTrack == DrumTrack)
                     nextAvailableTrack++;
 
-                // Sort events by absolute time and priority
-                var sortedEvents = SortEventsByPriority(events);
-
-                result.Add(sortedEvents);
+                // Events are already sorted by GroupEventsByInstrument
+                result.Add(events);
                 nextAvailableTrack++;
             }
 
@@ -166,10 +181,8 @@ namespace Music.Writer
                 var instrumentName = kvp.Key;
                 var events = kvp.Value;
 
-                // Sort events by absolute time and priority
-                var sortedEvents = SortEventsByPriority(events);
-
-                result.Add(sortedEvents);
+                // Events are already sorted by GroupEventsByInstrument
+                result.Add(events);
             }
 
             return result;
