@@ -10,17 +10,14 @@ namespace Music.Writer
     public static class WriterFormDataToPhrase
     {
         /// <summary>
-        /// Converts Writer form data to a Phrase for use with the phrase control.
+        /// Converts Writer form writerFormData to a Phrase for use with the phrase control.
         /// </summary>
         public static Phrase Convert(
-            WriterFormData data,
+            WriterFormData writerFormData,
             int numberOfNotes,
-            string midiProgramName,
-            List<int> selectedStaffs,
-            int startBar,
-            int startBeat)
+            string midiProgramName)
         {
-            if (data == null) throw new ArgumentNullException(nameof(data));
+            if (writerFormData == null) throw new ArgumentNullException(nameof(writerFormData));
 
             var phraseNotes = new List<PhraseNote>();
 
@@ -28,32 +25,32 @@ namespace Music.Writer
             const int ticksPerQuarterNote = 480;
             int currentPosition = 0;
 
-            // Get tuplet settings from writer data
-            bool isTuplet = !string.IsNullOrWhiteSpace(data.TupletNumber);
+            // Get tuplet settings from writer writerFormData
+            bool isTuplet = !string.IsNullOrWhiteSpace(writerFormData.TupletNumber);
 
-            if (data.IsChord ?? false)  // null = false
+            if (writerFormData.IsChord ?? false)  // null = false
             {
                 // Create Chord pitch events
                 // Chords will be resolved into their component notes by ChordConverter
                 var harmonicEvent = new HarmonicEvent
                 {
-                    Key = data.ChordKey ?? "C major",
-                    Degree = data.ChordDegree ?? 1,
-                    Quality = data.ChordQuality ?? "Major",
-                    Bass = data.ChordBase ?? "root"
+                    Key = writerFormData.ChordKey ?? "C major",
+                    Degree = writerFormData.ChordDegree ?? 1,
+                    Quality = writerFormData.ChordQuality ?? "Major",
+                    Bass = writerFormData.ChordBase ?? "root"
                 };
 
                 var chordNotes = ChordConverter.Convert(
                     harmonicEvent,
-                    baseOctave: data.Octave,
-                    noteValue: GetNoteValue(data.NoteValue));
+                    baseOctave: writerFormData.Octave,
+                    noteValue: GetNoteValue(writerFormData.NoteValue));
 
                 // Convert chord notes to PhraseNote with MIDI properties
                 foreach (var chordNote in chordNotes)
                 {
                     int noteDurationTicks = CalculateNoteDurationTicks(
-                        GetNoteValue(data.NoteValue),
-                        data.Dots,
+                        GetNoteValue(writerFormData.NoteValue),
+                        writerFormData.Dots,
                         ticksPerQuarterNote);
 
                     var phraseNote = new PhraseNote(
@@ -68,8 +65,8 @@ namespace Music.Writer
 
                 // Advance position after chord
                 currentPosition += CalculateNoteDurationTicks(
-                    GetNoteValue(data.NoteValue),
-                    data.Dots,
+                    GetNoteValue(writerFormData.NoteValue),
+                    writerFormData.Dots,
                     ticksPerQuarterNote);
             }
             else
@@ -78,20 +75,20 @@ namespace Music.Writer
                 for (int i = 0; i < numberOfNotes; i++)
                 {
                     int noteDurationTicks = CalculateNoteDurationTicks(
-                        GetNoteValue(data.NoteValue),
-                        data.Dots,
+                        GetNoteValue(writerFormData.NoteValue),
+                        writerFormData.Dots,
                         ticksPerQuarterNote);
 
-                    int noteNumber = data.IsRest ?? false
+                    int noteNumber = writerFormData.IsRest ?? false
                         ? 60 // Default middle C for rests (not used but required)
-                        : CalculateNoteNumber(data.Step, GetAlter(data.Accidental), data.Octave);
+                        : CalculateNoteNumber(writerFormData.Step, GetAlter(writerFormData.Accidental), writerFormData.Octave);
 
                     var phraseNote = new PhraseNote(
                         noteNumber: noteNumber,
                         absolutePositionTicks: currentPosition,
                         noteDurationTicks: noteDurationTicks,
                         noteOnVelocity: 100,
-                        isRest: data.IsRest ?? false);
+                        isRest: writerFormData.IsRest ?? false);
 
                     phraseNotes.Add(phraseNote);
 

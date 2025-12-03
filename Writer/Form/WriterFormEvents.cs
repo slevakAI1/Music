@@ -151,7 +151,7 @@ namespace Music.Writer
                 //    timeSignatureNumerator: 4,
                 //    timeSignatureDenominator: 4);
 
-                //await WriterFormHelper.PlayMidiFromPhrasesAsync(_midiPlaybackService, midiDoc, this);
+                //await Transform1.PlayMidiFromPhrasesAsync(_midiPlaybackService, midiDoc, this);
             }
             catch (Exception ex)
             {
@@ -291,7 +291,7 @@ namespace Music.Writer
             {
                 case "Repeat Note/Chord/Rest":
                     var formData = CaptureFormData();
-                    WriterFormHelper.ExecuteCommandWriteRepeatingNotes(formData, _midiInstruments, dgvPhrase, ref phraseNumber);
+                    TransformRepeatingNotes.ExecuteCommandWriteRepeatingNotes(formData, _midiInstruments, dgvPhrase, ref phraseNumber);
                     break;
 
                 // Add additional cases for other patterns as needed
