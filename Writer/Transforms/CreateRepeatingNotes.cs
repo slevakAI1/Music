@@ -20,8 +20,8 @@ namespace Music.Writer
         /// <returns>A Phrase object containing the repeating notes.</returns>
         public static Phrase Execute(
             int noteNumber,
-            int repeatCount = 1,
-            int noteDurationTicks = 480,
+            int noteDurationTicks,
+            int repeatCount,
             int noteOnVelocity = 100,
             bool isRest = false)
         {

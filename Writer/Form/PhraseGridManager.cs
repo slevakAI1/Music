@@ -38,7 +38,7 @@ namespace Music.Writer
             // var instrument = MidiInstrument.GetGeneralMidiInstruments()
             //     .FirstOrDefault(i => i.Name.Equals(midiProgramName, StringComparison.OrdinalIgnoreCase));
 
-            MidiProgramNumber = instrument?.ProgramNumber ?? 0; // Default to 0 (Acoustic Grand Piano) if not found
+            //MidiProgramNumber = instrument?.ProgramNumber ?? 0; // Default to 0 (Acoustic Grand Piano) if not found
 
 
 
