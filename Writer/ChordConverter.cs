@@ -81,7 +81,7 @@ namespace Music.Writer
                 // Step 7: Apply inversion by rotating and adjusting octaves
                 var voicedNotes = ApplyVoicing(chordNotes, bass, baseOctave);
                 
-                // Step 8: Convert to PhraseNote format using the new constructor
+                // Step 8: Execute to PhraseNote format using the new constructor
                 var result = new List<PhraseNote>();
                 
                 // Calculate note duration in ticks based on note value

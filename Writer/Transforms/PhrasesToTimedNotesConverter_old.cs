@@ -31,7 +31,7 @@
 //        /// Converts a list of phrases (which may have different instruments) to a list of TimedPhrase objects.
 //        /// Each TimedPhrase contains the instrument information and the converted timed notes.
 //        /// </summary>
-//        public static List<TimedPhrase> Convert(List<Phrase> phrases, short ticksPerQuarterNote = 480)
+//        public static List<TimedPhrase> Execute(List<Phrase> phrases, short ticksPerQuarterNote = 480)
 //        {
 //            if (phrases == null)
 //                throw new ArgumentNullException(nameof(phrases));
@@ -213,7 +213,7 @@
 //                    !string.IsNullOrWhiteSpace(noteEvent.ChordBase))
 //                {
 //                    // Use ChordConverter to generate chord notes
-//                    var chordNotes = ChordConverter.Convert(
+//                    var chordNotes = ChordConverter.Execute(
 //                        noteEvent.ChordKey,
 //                        noteEvent.ChordDegree.Value,
 //                        noteEvent.ChordQuality,
@@ -236,7 +236,7 @@
 //                    // Calculate duration once for the chord
 //                    var chordDuration = CalculateDuration(chordNotes[0], ticksPerQuarterNote);
 
-//                    // Convert chord notes to TimedNotes
+//                    // Execute chord notes to TimedNotes
 //                    for (int i = 0; i < chordNotes.Count; i++)
 //                    {
 //                        var cn = chordNotes[i];

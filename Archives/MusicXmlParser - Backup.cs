@@ -77,7 +77,7 @@
 
 //								var divisionsNode = attributesNode.SelectSingleNode("divisions");
 //								if (divisionsNode != null)
-//									measure.Attributes.Divisions = Convert.ToInt32(divisionsNode.InnerText);
+//									measure.Attributes.Divisions = Execute.ToInt32(divisionsNode.InnerText);
 
 //								var keyNode = attributesNode.SelectSingleNode("key");
 
@@ -87,7 +87,7 @@
 
 //									var fifthsNode = keyNode.SelectSingleNode("fifths");
 //									if (fifthsNode != null)
-//										measure.Attributes.Key.Fifths = Convert.ToInt32(fifthsNode.InnerText);
+//										measure.Attributes.Key.Fifths = Execute.ToInt32(fifthsNode.InnerText);
 
 //									var modeNode = keyNode.SelectSingleNode("mode");
 //									if (modeNode != null)
@@ -140,7 +140,7 @@
 
 //			if (forwardNode != null)
 //			{
-//				forward.Duration = Convert.ToInt32(forwardNode.InnerText);
+//				forward.Duration = Execute.ToInt32(forwardNode.InnerText);
 //			}
 
 //			return forward;
@@ -154,7 +154,7 @@
 
 //			if (backupNode != null)
 //			{
-//				backup.Duration = Convert.ToInt32(backupNode.InnerText);
+//				backup.Duration = Execute.ToInt32(backupNode.InnerText);
 //			}
 
 //			return backup;
@@ -170,11 +170,11 @@
 
 //			var voiceNode = noteNode.SelectSingleNode("voice");
 //			if (voiceNode != null)
-//				note.Voice = Convert.ToInt32(voiceNode.InnerText);
+//				note.Voice = Execute.ToInt32(voiceNode.InnerText);
 
 //			var durationNode = noteNode.SelectSingleNode("duration");
 //			if (durationNode != null)
-//				note.Duration = Convert.ToInt32(durationNode.InnerText);
+//				note.Duration = Execute.ToInt32(durationNode.InnerText);
 
 //			var accidental = noteNode.SelectSingleNode("accidental");
 //			if (accidental != null)
@@ -186,7 +186,7 @@
 
 //			var staffNode = noteNode.SelectSingleNode("staff");
 //			if (staffNode != null)
-//				note.Staff = Convert.ToInt32(staffNode.InnerText);
+//				note.Staff = Execute.ToInt32(staffNode.InnerText);
 
 //			var chordNode = noteNode.SelectSingleNode("chord");
 //			if (chordNode != null)
@@ -226,11 +226,11 @@
 
 //				var alterNode = pitchNode.SelectSingleNode("alter");
 //				if (alterNode != null)
-//					pitch.Alter = Convert.ToInt32(alterNode.InnerText);
+//					pitch.Alter = Execute.ToInt32(alterNode.InnerText);
 
 //				var octaveNode = pitchNode.SelectSingleNode("octave");
 //				if (octaveNode != null)
-//					pitch.Octave = Convert.ToInt32(octaveNode.InnerText);
+//					pitch.Octave = Execute.ToInt32(octaveNode.InnerText);
 //			}
 //			else
 //			{
@@ -290,7 +290,7 @@
 //			{
 //				var lineNode = clefNode.SelectSingleNode("line");
 //				if (lineNode != null)
-//					clef.Line = Convert.ToInt32(lineNode.InnerText);
+//					clef.Line = Execute.ToInt32(lineNode.InnerText);
 
 //				var signNode = clefNode.SelectSingleNode("sign");
 //				if (signNode != null)
@@ -309,7 +309,7 @@
 //				var beatsNode = timeNode.SelectSingleNode("beats");
 
 //				if (beatsNode != null)
-//					time.Beats = Convert.ToInt32(beatsNode.InnerText);
+//					time.Beats = Execute.ToInt32(beatsNode.InnerText);
 
 //				var beatTypeNode = timeNode.SelectSingleNode("beat-type");
 
@@ -380,7 +380,7 @@
 
 //				var encodingDate = encodingNode.SelectSingleNode("encoding-date");
 //				if (encodingDate != null)
-//					encoding.EncodingDate = Convert.ToDateTime(encodingDate.InnerText);
+//					encoding.EncodingDate = Execute.ToDateTime(encodingDate.InnerText);
 //			}
 
 //			return encoding;

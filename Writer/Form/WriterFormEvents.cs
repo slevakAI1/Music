@@ -133,7 +133,7 @@ namespace Music.Writer
                 //      Merge midiEventLists lists that are for the same instrument
                 //      Add track 0 global events
                 //      Assign track numbers to midi event lists
-                //var mergedMidiEventLists = PhrasesToMidiEventsConverter_Phase_2.Convert(
+                //var mergedMidiEventLists = PhrasesToMidiEventsConverter_Phase_2.Execute(
                 //    midiEventLists,
                 //    tempo: 112,
                 //    timeSignatureNumerator: 4,
@@ -144,8 +144,8 @@ namespace Music.Writer
 
                 //var mergedByInstrument = PhrasesToTimedNotesConverter.MergeByInstrument(timedPhrases);
 
-                // Step 3 - Convert merged timed notes to MIDI document
-                // var midiDoc = PhrasesToMidiConverter.Convert(
+                // Step 3 - Execute merged timed notes to MIDI document
+                // var midiDoc = PhrasesToMidiConverter.Execute(
                 //    mergedByInstrument,
                 //    tempo: 112,
                 //    timeSignatureNumerator: 4,
@@ -289,12 +289,18 @@ namespace Music.Writer
 
             switch (pattern)
             {
-                case "Repeat Note/Chord/Rest":
+                case "Repeat Note":   // REPEAT CHORD WILL BE A SEPARATE METHOD
+
+
+                    // THE CONVERSION FROM THE FORM TO CreateRepeatingNotes.Execute params should be done
+                    // prior to this method... should already be in the params format by now
+                    // move this up one level
+
                     var formData = CaptureFormData();
 
                     var numberOfNotes = formData.NumberOfNotes ?? 1;
 
-                    // Extract properties needed by CreateRepeatingNotesPhrase.Convert
+                    // Extract properties needed by CreateRepeatingNotes.Execute
                     var isRest = formData.IsRest ?? false;
 
                     var isChord = formData.IsChord ?? false;
@@ -315,13 +321,11 @@ namespace Music.Writer
                     //var midiProgramName = "Acoustic Grand Piano"; // Default instrument
 
 
-                    var phrase = CreateRepeatingNotesPhrase.Convert(
-                             writer,
-                             numberOfNotes,
-                             midiProgramName);
+                    var phrase = CreateRepeatingNotes.Execute(
+                        // TBD
+                        );
 
-                    var phrase = TransformRepeatingNotes.ExecuteCommandWriteRepeatingNotes(formData);
-
+                    // SHOULD RETURN PHRASE AND CALLING AREA WILL CALL THIS TO ADD!
                     PhraseGridManager.AddPhraseToGrid(phrase, _midiInstruments, dgvPhrase, ref phraseNumber);
                     break;
 

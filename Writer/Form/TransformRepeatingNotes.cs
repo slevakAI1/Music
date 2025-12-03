@@ -19,7 +19,7 @@
 //            var midiProgramName = "Acoustic Grand Piano"; // Default instrument
 
 //            // Create the repeating phrase - this is a transform!
-//            var phrase = CreateRepeatingNotesPhrase.Convert(
+//            var phrase = CreateRepeatingNotes.Execute(
 //                writer,
 //                numberOfNotes,
 //                midiProgramName);

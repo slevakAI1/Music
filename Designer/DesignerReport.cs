@@ -101,7 +101,7 @@ namespace Music.Designer
 
                         any = true;
 
-                        // Convert to bar:beat (inclusive end)
+                        // Execute to bar:beat (inclusive end)
                         static void ToBarBeat(int abs, int beatsPerBar, out int bar, out int beat)
                         {
                             bar = abs / beatsPerBar + 1;

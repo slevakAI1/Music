@@ -160,8 +160,8 @@
 //        {
 //            // TO DO - This probably doesnt need note value... that property should be applied here if not already applied!
 
-//            // Convert chord to individual pitch events
-//            var chordNotes = ChordConverter.Convert(
+//            // Execute chord to individual pitch events
+//            var chordNotes = ChordConverter.Execute(
 //                noteEvent.ChordKey,
 //                (int)noteEvent.ChordDegree!,
 //                noteEvent.ChordQuality,

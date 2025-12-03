@@ -46,7 +46,7 @@ namespace Music.Writer
             // Capture chord radio button state
             var isChord = rbChord.Checked;
 
-            // Convert step string to char (use '\0' for Rest)
+            // Execute step string to char (use '\0' for Rest)
             char stepChar = '\0';
             if (!isRest && !string.IsNullOrWhiteSpace(stepSelected))
             {
