@@ -34,6 +34,15 @@ namespace Music.Writer
             // Column 0: Hidden data (Phrase object)
             row.Cells["colData"].Value = phrase;
 
+            // Resolve MIDI program number from the instrument name
+            // var instrument = MidiInstrument.GetGeneralMidiInstruments()
+            //     .FirstOrDefault(i => i.Name.Equals(midiProgramName, StringComparison.OrdinalIgnoreCase));
+
+            MidiProgramNumber = instrument?.ProgramNumber ?? 0; // Default to 0 (Acoustic Grand Piano) if not found
+
+
+
+
             // Column 1: MIDI Instrument dropdown - set to first instrument (Acoustic Grand Piano) as default
             // User can change this by clicking the dropdown
             row.Cells["colInstrument"].Value = midiInstruments[0].ProgramNumber;

@@ -7,23 +7,27 @@ namespace Music.Writer
     /// <summary>
     /// Transforms WriterFormData to Phrase objects with MIDI tick-based timing.
     /// </summary>
-    public static class WriterFormDataToPhrase
+    public static class CreateRepeatingNotesPhrase
     {
+
+        //  I THINK THIS IS CONFLATING TWO THINGS
+        //  ONE IS CREATING THE REPEATING NOTES/CHORDS/RESTS
+        //  TWO IS CONVERTING FROM THE TEST INPUT (WRITERFORM) TO WHAT THIS NEEDS AS INPUT
+        //     THE CONVERT IS ONLY FROM THE TEST FORM SINCE AUTOMATED METHODS NEED TO CALL THIS
+
+
+
         /// <summary>
         /// Converts Writer form writerFormData to a Phrase for use with the phrase control.
         /// </summary>
-        public static Phrase Convert(
-            WriterFormData writerFormData,
-            int numberOfNotes,
-            string midiProgramName)
+        public static Phrase Convert(?????)
         {
-            if (writerFormData == null) throw new ArgumentNullException(nameof(writerFormData));
-
             var phraseNotes = new List<PhraseNote>();
 
             // Constants
             const int ticksPerQuarterNote = 480;
             int currentPosition = 0;
+
 
             // Get tuplet settings from writer writerFormData
             bool isTuplet = !string.IsNullOrWhiteSpace(writerFormData.TupletNumber);
@@ -96,7 +100,7 @@ namespace Music.Writer
                 }
             }
 
-            var phrase = new Phrase(midiProgramName, phraseNotes);
+            var phrase = new Phrase(phraseNotes);
 
             return phrase;
         }

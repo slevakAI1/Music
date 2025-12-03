@@ -291,7 +291,37 @@ namespace Music.Writer
             {
                 case "Repeat Note/Chord/Rest":
                     var formData = CaptureFormData();
+
+                    var numberOfNotes = formData.NumberOfNotes ?? 1;
+
+                    // Extract properties needed by CreateRepeatingNotesPhrase.Convert
+                    var isRest = formData.IsRest ?? false;
+
+                    var isChord = formData.IsChord ?? false;
+                    var chordKey = formData.ChordKey ?? "C major";
+                    var chordDegree = formData.ChordDegree ?? 1;
+                    var chordQuality = formData.ChordQuality ?? "Major";
+                    var chordBase = formData.ChordBase ?? "root";
+
+                    //var noteNumber = ??
+                    var step = formData.Step;
+                    var octave = formData.OctaveAbsolute ?? 4;
+                    var accidental = formData.Accidental;
+
+                    var noteValue = formData.NoteValue;
+                    var dots = formData.Dots;
+                    var tupletNumber = formData.TupletNumber;
+
+                    //var midiProgramName = "Acoustic Grand Piano"; // Default instrument
+
+
+                    var phrase = CreateRepeatingNotesPhrase.Convert(
+                             writer,
+                             numberOfNotes,
+                             midiProgramName);
+
                     var phrase = TransformRepeatingNotes.ExecuteCommandWriteRepeatingNotes(formData);
+
                     PhraseGridManager.AddPhraseToGrid(phrase, _midiInstruments, dgvPhrase, ref phraseNumber);
                     break;
 

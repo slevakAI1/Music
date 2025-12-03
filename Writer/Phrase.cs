@@ -12,23 +12,17 @@ namespace Music.Writer
     /// </summary>
     public sealed class Phrase
     {
+
+        // THESE GET SET BY GRID DROPDOWN CHANGE EVENT, WHAT ABOUT DEFAULT?
         public string MidiProgramName { get; set; }
         //public string NotionPartName { get; set; }
-
         public byte MidiProgramNumber { get; set; }
 
         public List<PhraseNote> PhraseNotes { get; set; } = new();
 
-        public Phrase(string midiProgramName, List<PhraseNote> phraseNotes)
+        public Phrase(List<PhraseNote> phraseNotes)
         {
-            MidiProgramName = midiProgramName;
             PhraseNotes = phraseNotes;
-
-            // Resolve MIDI program number from the instrument name
-            var instrument = MidiInstrument.GetGeneralMidiInstruments()
-                .FirstOrDefault(i => i.Name.Equals(midiProgramName, StringComparison.OrdinalIgnoreCase));
-            
-            MidiProgramNumber = instrument?.ProgramNumber ?? 0; // Default to 0 (Acoustic Grand Piano) if not found
         }
     }
 
