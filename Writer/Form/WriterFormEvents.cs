@@ -128,9 +128,7 @@ namespace Music.Writer
                 var inputjson = Helpers.DebugObject(phrases);
                 var outputjson = Helpers.DebugObject(midiEventLists);
 
-                var x = 0;
-
-                //  Step 2:
+                 //  Step 2:
                 // Merge midiEventLists lists that are for the same instrument
                 // and adds global events
 
