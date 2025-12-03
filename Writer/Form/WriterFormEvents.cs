@@ -147,12 +147,12 @@ namespace Music.Writer
 
                 // Step 3 - Execute merged timed notes to MIDI document
                 var midiDoc = PhrasesToMidiConverter.Convert(
-                    phrases,
+                    midiEventLists,
                     tempo: 112,
                     timeSignatureNumerator: 4,
                     timeSignatureDenominator: 4);
 
-                //await Transform1.PlayMidiFromPhrasesAsync(_midiPlaybackService, midiDoc, this);
+                await Player.PlayMidiFromPhrasesAsync(_midiPlaybackService, midiDoc, this);
             }
             catch (Exception ex)
             {
