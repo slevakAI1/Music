@@ -785,6 +785,7 @@ namespace Music.Writer
             btnAddPhrase.TabIndex = 40;
             btnAddPhrase.Text = "Add";
             btnAddPhrase.UseVisualStyleBackColor = true;
+            btnAddPhrase.Click += btnAddPhrase_Click;
             // 
             // btnDeletePhrases
             // 

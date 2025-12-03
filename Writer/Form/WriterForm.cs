@@ -322,5 +322,30 @@ namespace Music.Writer
             // Clear the movement title textbox
             txtMovementTitle.Text = "";
         }
+
+        // New Add button handler: add an empty phrase row and select it.
+        private void btnAddPhrase_Click(object? sender, EventArgs e)
+        {
+            // Create an empty Phrase and add it to the grid via the existing helper.
+            var emptyPhrase = new Phrase(new List<PhraseNote>());
+
+            // Use PhraseGridManager to initialize the row consistently with other adds.
+            PhraseGridManager.AddPhraseToGrid(emptyPhrase, _midiInstruments, dgvPhrase, ref phraseNumber);
+
+            // Select the newly added row (last row)
+            if (dgvPhrase.Rows.Count > 0)
+            {
+                int newRowIndex = dgvPhrase.Rows.Count - 1;
+                dgvPhrase.ClearSelection();
+                dgvPhrase.Rows[newRowIndex].Selected = true;
+
+                // Move current cell to an editable cell so the selection is visible and focusable
+                var instrumentCol = dgvPhrase.Columns["colInstrument"];
+                if (instrumentCol != null && dgvPhrase.Rows[newRowIndex].Cells[instrumentCol.Index] != null)
+                {
+                    dgvPhrase.CurrentCell = dgvPhrase.Rows[newRowIndex].Cells[instrumentCol.Index];
+                }
+            }
+        }
     }
 }
