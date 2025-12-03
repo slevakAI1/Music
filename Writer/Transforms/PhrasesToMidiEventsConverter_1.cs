@@ -40,12 +40,11 @@ namespace Music.Writer
         private static List<MidiEvent> ConvertSinglePhrase(Phrase phrase, short ticksPerQuarterNote)
         {
             var events = new List<MidiEvent>();
-            long absoluteTime = 0;
 
             // Add track name event at the beginning (using instrument name)
-            var trackName = string.IsNullOrWhiteSpace(phrase.MidiPartName) 
+            var trackName = string.IsNullOrWhiteSpace(phrase.MidiProgramName) 
                 ? "Unnamed Track" 
-                : phrase.MidiPartName;
+                : phrase.MidiProgramName;
             events.Add(MidiEvent.CreateSequenceTrackName(0, trackName));
 
             // Add program change event at the beginning to set the instrument
@@ -55,25 +54,23 @@ namespace Music.Writer
             programChangeEvent.Parameters.Remove("Channel");
             events.Add(programChangeEvent);
 
-            // Process each note event in the phrase
-            foreach (var noteEvent in phrase.NoteEvents ?? Enumerable.Empty<PhraseNote>())
+            // Process each note in the phrase
+            foreach (var phraseNote in phrase.PhraseNotes ?? Enumerable.Empty<PhraseNote>())
             {
-                if (noteEvent.IsRest)
+                if (phraseNote.IsRest)
                 {
-                    // Rests advance time but don't create MIDI events
-                    var duration = CalculateDuration(noteEvent, ticksPerQuarterNote);
-                    absoluteTime += duration;
+                    // Rests don't create MIDI events, timing is already handled by AbsolutePositionTicks
                     continue;
                 }
 
-                // Check if this is a chord that needs to be expanded
-                if (ShouldExpandChord(noteEvent))
+                // Check if this note is part of a chord that needs expansion
+                if (phraseNote.phraseChord != null && phraseNote.phraseChord.IsChord)
                 {
-                    ProcessChord(events, noteEvent, ref absoluteTime, ticksPerQuarterNote);
+                    ProcessChord(events, phraseNote);
                 }
                 else
                 {
-                    ProcessSingleNote(events, noteEvent, ref absoluteTime, ticksPerQuarterNote);
+                    ProcessSingleNote(events, phraseNote);
                 }
             }
 
@@ -81,101 +78,62 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Determines if a note event represents a chord that needs expansion.
+        /// Processes a chord note by expanding it to individual notes using ChordConverter.
         /// </summary>
-        private static bool ShouldExpandChord(PhraseNote noteEvent)
+        private static void ProcessChord(List<MidiEvent> events, PhraseNote phraseNote)
         {
-            return !string.IsNullOrWhiteSpace(noteEvent.ChordKey) &&
-                   noteEvent.ChordDegree.HasValue &&
-                   !string.IsNullOrWhiteSpace(noteEvent.ChordQuality) &&
-                   !string.IsNullOrWhiteSpace(noteEvent.ChordBase);
-        }
+            var chord = phraseNote.phraseChord!;
 
-        /// <summary>
-        /// Processes a chord note event by expanding it to individual notes.
-        /// </summary>
-        private static void ProcessChord(
-            List<MidiEvent> events,
-            PhraseNote noteEvent,
-            ref long absoluteTime,
-            short ticksPerQuarterNote)
-        {
             // Use ChordConverter to generate individual chord notes
             var chordNotes = ChordConverter.Convert(
-                noteEvent.ChordKey!,
-                noteEvent.ChordDegree!.Value,
-                noteEvent.ChordQuality!,
-                noteEvent.ChordBase!,
-                baseOctave: noteEvent.Octave,
-                noteValue: noteEvent.Duration);
+                chord.ChordKey!,
+                chord.ChordDegree!.Value,
+                chord.ChordQuality!,
+                chord.ChordBase!,
+                baseOctave: phraseNote.Octave,
+                noteValue: phraseNote.Duration);
 
-            // Apply dots and tuplet settings to all chord notes
-            foreach (var cn in chordNotes)
-            {
-                cn.Dots = noteEvent.Dots;
-                if (!string.IsNullOrWhiteSpace(noteEvent.TupletNumber))
-                {
-                    cn.TupletNumber = noteEvent.TupletNumber;
-                    cn.TupletActualNotes = noteEvent.TupletActualNotes;
-                    cn.TupletNormalNotes = noteEvent.TupletNormalNotes;
-                }
-            }
-
-            // Calculate chord duration once
-            var chordDuration = CalculateDuration(chordNotes[0], ticksPerQuarterNote);
-
-            // Create NoteOn events for all chord notes at the same absolute time
+            // Create NoteOn and NoteOff events for all chord notes
             foreach (var cn in chordNotes)
             {
                 var noteNumber = CalculateMidiNoteNumber(cn.Step, cn.Alter, cn.Octave);
-                var noteOnEvent = MidiEvent.CreateNoteOn(absoluteTime, 0, noteNumber, 100);
-                // Remove the channel parameter temporarily (will be assigned in Phase 2)
+
+                // NoteOn at the phrase note's absolute position
+                var noteOnEvent = MidiEvent.CreateNoteOn(
+                    phraseNote.AbsolutePositionTicks, 
+                    0, 
+                    noteNumber, 
+                    phraseNote.NoteOnVelocity);
                 noteOnEvent.Parameters.Remove("Channel");
                 events.Add(noteOnEvent);
-            }
 
-            // Create NoteOff events for all chord notes at the same end time
-            long noteOffTime = absoluteTime + chordDuration;
-            foreach (var cn in chordNotes)
-            {
-                var noteNumber = CalculateMidiNoteNumber(cn.Step, cn.Alter, cn.Octave);
+                // NoteOff at absolute position + duration
+                long noteOffTime = phraseNote.AbsolutePositionTicks + phraseNote.NoteDurationTicks;
                 var noteOffEvent = MidiEvent.CreateNoteOff(noteOffTime, 0, noteNumber, 0);
-                // Remove the channel parameter temporarily (will be assigned in Phase 2)
                 noteOffEvent.Parameters.Remove("Channel");
                 events.Add(noteOffEvent);
             }
-
-            // Advance absolute time by the chord duration
-            absoluteTime += chordDuration;
         }
 
         /// <summary>
         /// Processes a single note event.
         /// </summary>
-        private static void ProcessSingleNote(
-            List<MidiEvent> events,
-            PhraseNote noteEvent,
-            ref long absoluteTime,
-            short ticksPerQuarterNote)
+        private static void ProcessSingleNote(List<MidiEvent> events, PhraseNote phraseNote)
         {
-            var duration = CalculateDuration(noteEvent, ticksPerQuarterNote);
-            var noteNumber = CalculateMidiNoteNumber(noteEvent.Step, noteEvent.Alter, noteEvent.Octave);
-
-            // Create NoteOn event at current absolute time
-            var noteOnEvent = MidiEvent.CreateNoteOn(absoluteTime, 0, noteNumber, 100);
-            // Remove the channel parameter temporarily (will be assigned in Phase 2)
+            // Create NoteOn event at the note's absolute position
+            var noteOnEvent = MidiEvent.CreateNoteOn(
+                phraseNote.AbsolutePositionTicks, 
+                0, 
+                phraseNote.NoteNumber, 
+                phraseNote.NoteOnVelocity);
             noteOnEvent.Parameters.Remove("Channel");
             events.Add(noteOnEvent);
 
-            // Create NoteOff event at note end time
-            long noteOffTime = absoluteTime + duration;
-            var noteOffEvent = MidiEvent.CreateNoteOff(noteOffTime, 0, noteNumber, 0);
-            // Remove the channel parameter temporarily (will be assigned in Phase 2)
+            // Create NoteOff event at absolute position + duration
+            long noteOffTime = phraseNote.AbsolutePositionTicks + phraseNote.NoteDurationTicks;
+            var noteOffEvent = MidiEvent.CreateNoteOff(noteOffTime, 0, phraseNote.NoteNumber, 0);
             noteOffEvent.Parameters.Remove("Channel");
             events.Add(noteOffEvent);
-
-            // Advance absolute time by the note duration
-            absoluteTime += duration;
         }
 
         /// <summary>
@@ -195,37 +153,6 @@ namespace Music.Writer
                 _ => 0
             };
             return (octave + 1) * 12 + baseNote + alter;
-        }
-
-        /// <summary>
-        /// Calculates duration in ticks for a note event.
-        /// </summary>
-        private static long CalculateDuration(PhraseNote noteEvent, short ticksPerQuarterNote)
-        {
-            // Base duration: quarter note = ticksPerQuarterNote
-            // Formula: (ticksPerQuarterNote * 4) / noteValue
-            // Example: whole note (1) = 480 * 4 / 1 = 1920 ticks
-            //          quarter note (4) = 480 * 4 / 4 = 480 ticks
-            //          eighth note (8) = 480 * 4 / 8 = 240 ticks
-            var baseDuration = (ticksPerQuarterNote * 4.0) / noteEvent.Duration;
-
-            // Apply dots (each dot adds half of the previous value)
-            var dottedMultiplier = 1.0;
-            var dotValue = 0.5;
-            for (int i = 0; i < noteEvent.Dots; i++)
-            {
-                dottedMultiplier += dotValue;
-                dotValue /= 2;
-            }
-            baseDuration *= dottedMultiplier;
-
-            // Apply tuplet ratio
-            if (noteEvent.TupletActualNotes > 0 && noteEvent.TupletNormalNotes > 0)
-            {
-                baseDuration *= (double)noteEvent.TupletNormalNotes / noteEvent.TupletActualNotes;
-            }
-
-            return (long)Math.Round(baseDuration);
         }
     }
 }

@@ -9,6 +9,8 @@ namespace Music.Writer
     /// </summary>
     public static class ChordConverter
     {
+        private const int TicksPerQuarterNote = 480;
+
         /// <summary>
         /// Converts a HarmonicEvent to a list of notes representing the chord.
         /// </summary>
@@ -79,22 +81,42 @@ namespace Music.Writer
                 // Step 7: Apply inversion by rotating and adjusting octaves
                 var voicedNotes = ApplyVoicing(chordNotes, bass, baseOctave);
                 
-                // Step 8: Convert to WriterNote format
-                // First note has IsChord = false, all subsequent notes have IsChord = true
+                // Step 8: Convert to PhraseNote format using the new constructor
                 var result = new List<PhraseNote>();
+                
+                // Calculate note duration in ticks based on note value
+                int noteDurationTicks = CalculateNoteDurationTicks(noteValue);
+                
+                // Create PhraseChord metadata object
+                var phraseChord = new PhraseChord(
+                    isChord: true,
+                    chordKey: key,
+                    chordDegree: degree,
+                    chordQuality: quality,
+                    chordBase: bass);
                 
                 for (int i = 0; i < voicedNotes.Count; i++)
                 {
                     var note = voicedNotes[i];
-                    result.Add(new PhraseNote
-                    {
-                        Step = note.Name.ToString()[0],
-                        Octave = note.Octave,
-                        Alter = MapAlterationToAlter(note.Alteration),
-                        IsChord = i > 0,  // First note is false, rest are true
-                        IsRest = false,
-                        Duration = noteValue
-                    });
+                    
+                    // Calculate MIDI note number
+                    char step = note.Name.ToString()[0];
+                    int alter = MapAlterationToAlter(note.Alteration);
+                    int octave = note.Octave;
+                    int noteNumber = CalculateMidiNoteNumber(step, alter, octave);
+                    
+                    // Create PhraseNote with MIDI properties
+                    var phraseNote = new PhraseNote(
+                        noteNumber: noteNumber,
+                        absolutePositionTicks: 0, // Will be set by the calling code
+                        noteDurationTicks: noteDurationTicks,
+                        noteOnVelocity: 100,
+                        isRest: false);
+                    
+                    // Attach chord metadata
+                    phraseNote.phraseChord = phraseChord;
+                    
+                    result.Add(phraseNote);
                 }
                 
                 return result;
@@ -106,6 +128,34 @@ namespace Music.Writer
                     $"Degree={degree}, Quality={quality}, " +
                     $"Bass={bass}", ex);
             }
+        }
+
+        /// <summary>
+        /// Calculates MIDI note number from note properties.
+        /// </summary>
+        private static int CalculateMidiNoteNumber(char step, int alter, int octave)
+        {
+            var baseNote = char.ToUpper(step) switch
+            {
+                'C' => 0,
+                'D' => 2,
+                'E' => 4,
+                'F' => 5,
+                'G' => 7,
+                'A' => 9,
+                'B' => 11,
+                _ => 0
+            };
+            return (octave + 1) * 12 + baseNote + alter;
+        }
+
+        /// <summary>
+        /// Calculates note duration in ticks based on note value.
+        /// Duration: 1=whole, 2=half, 4=quarter, 8=eighth, etc.
+        /// </summary>
+        private static int CalculateNoteDurationTicks(int noteValue)
+        {
+            return (TicksPerQuarterNote * 4) / noteValue;
         }
 
         /// <summary>

@@ -172,7 +172,7 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Updates the Phrase object's MidiPartName when the user changes the instrument selection.
+        /// Updates the Phrase object's MidiProgramName when the user changes the instrument selection.
         /// </summary>
         private void DgvPhrase_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
         {
@@ -191,8 +191,8 @@ namespace Music.Writer
 
                 if (!string.IsNullOrEmpty(selectedInstrumentName))
                 {
-                    // Update the Phrase object's MidiPartName property
-                    phrase.MidiPartName = selectedInstrumentName;
+                    // Update the Phrase object's MidiProgramName property
+                    phrase.MidiProgramName = selectedInstrumentName;
 
                     // Optionally update the description column to reflect the change
                     row.Cells["colDescription"].Value = $"Part: {selectedInstrumentName}";
@@ -250,7 +250,7 @@ namespace Music.Writer
 
         private void btnAppendNotes_Click(object sender, EventArgs e)
         {
-            HandleAppendNotes();
+            //HandleAppendNotes();
         }
 
         private async void btnPlay_Click(object sender, EventArgs e)

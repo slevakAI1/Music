@@ -1,3 +1,4 @@
+using Music.Designer;
 using Music.Domain;
 using Music.Tests;
 

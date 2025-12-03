@@ -33,7 +33,6 @@ namespace Music.Writer
                 startBar,
                 startBeat);
 
-
             // Add the phrase to the grid (just appends a new row for now
             // Set phrase name/number
             phraseNumber++;
