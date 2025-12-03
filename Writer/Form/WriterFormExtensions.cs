@@ -1,4 +1,5 @@
 using Melanchall.DryWetMidi.Interaction;
+using Music.Designer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -104,173 +105,133 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Converts Writer data to a AppendNotesParams for use with AppendNotes.
-        /// Also adds notes per NumberOfNotes specified in writer data
-        /// </summary>
-        //public static AppendNoteEventsToScoreParams ToAppendNoteEventsParams(this WriterFormData data)
-        //{
-        //    if (data == null) throw new ArgumentNullException(nameof(data));
-
-        //    var parts = (data.PartsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase))
-        //        .Where(kv => kv.Value)
-        //        .Select(kv => kv.Key)
-        //        .ToList();
-
-        //    var selectedStaffs = (data.SelectedStaffs ?? new List<int>()).Any() 
-        //        ? data.SelectedStaffs 
-        //        : new List<int> { 1 }; // Default to staff 1 if none selected
-
-        //    var noteEvents = new List<PhraseNote>();
-
-        //    // Get tuplet settings from writer data
-        //    bool isTuplet = !string.IsNullOrWhiteSpace(data.TupletNumber);
-        //    string? tupletNumber = isTuplet ? data.TupletNumber : null;
-        //    int tupletActualNotes = isTuplet ? (data.TupletCount ?? 3) : 0;
-        //    int tupletNormalNotes = isTuplet ? (data.TupletOf ?? 2) : 0;
-
-
-        //    //========================================================================
-        //    //   MOVE THIS THIS CODE BLOCK INTO AppendNote.EXECUTE
-
-        //    var noteEvent = new PhraseNote();
-
-        //    if (data.IsChord ?? false)  // null = false
-        //    {
-
-        //        //========================================================================
-        //        // Create Chord pitch event
-        //        // Chords will be resolved into their component notes byn AppendNotes.Execute()
-
-        //        noteEvent = new PhraseNote
-        //        {
-        //            IsChord = true,
-        //            ChordKey = data.ChordKey,
-        //            ChordDegree = (int)data.ChordDegree,
-        //            ChordQuality = data.ChordQuality,
-        //            ChordBase = data.ChordBase,
-        //            Octave = data.Octave,
-
-        //            Duration = GetNoteValue(data.NoteValue),
-        //            IsRest = data.IsRest ?? false,
-        //            Dots = data.Dots
-        //        };
-        //    }
-        //    else
-        //    {
-        //        // Single note or rest
-        //        noteEvent = new PhraseNote
-        //        {
-        //            Step = data.Step,
-        //            Octave = data.Octave,
-        //            Duration = GetNoteValue(data.NoteValue),
-        //            IsChord = false,
-        //            IsRest = data.IsRest ?? false,
-        //            Alter = GetAlter(data.Accidental),
-        //            Dots = data.Dots
-        //        };
-        //   }
-
-        //    // Add tuplet settings if specified
-        //    if (isTuplet)
-        //    {
-        //        noteEvent.TupletNumber = tupletNumber;
-        //        noteEvent.TupletActualNotes = tupletActualNotes;
-        //        noteEvent.TupletNormalNotes = tupletNormalNotes;
-        //    }
-
-        //    // Create specified number of test Pitch Events
-        //    for (int i = 0; i < (data.NumberOfNotes.GetValueOrDefault(1)); i++)
-        //    {
-        //        noteEvents.AddRange(noteEvent);
-        //    }
-
-        //    var appendNotesParams = new AppendNoteEventsToScoreParams
-        //    {
-        //        Parts = parts,
-        //        Staffs = selectedStaffs!,
-        //        StartBar = data.StartBar.GetValueOrDefault(),
-        //        NoteEvents = noteEvents
-        //    };
-
-        //    return appendNotesParams;
-        //}
-
-        /// <summary>
         /// Converts Writer data to a Phrase for use with the phrase control.
         /// Similar to ToAppendNoteEventsParams but creates a single-part Phrase object.
         /// </summary>
-        //public static Phrase ToPhrase(this WriterFormData data)
-        //{
-        //    if (data == null) throw new ArgumentNullException(nameof(data));
+        public static Phrase ToPhrase(this WriterFormData data)
+        {
+            if (data == null) throw new ArgumentNullException(nameof(data));
 
-        //    // Default part for new phrase
-        //    var part = "Acoustic GrandPiano";  
+            // Default part for new phrase
+            var midiProgramName = "Acoustic Grand Piano";
 
-        //    var noteEvents = new List<PhraseNote>();
+            var phraseNotes = new List<PhraseNote>();
 
-        //    // Get tuplet settings from writer data
-        //    bool isTuplet = !string.IsNullOrWhiteSpace(data.TupletNumber);
-        //    string? tupletNumber = isTuplet ? data.TupletNumber : null;
-        //    int tupletActualNotes = isTuplet ? (data.TupletCount ?? 3) : 0;
-        //    int tupletNormalNotes = isTuplet ? (data.TupletOf ?? 2) : 0;
+            // Constants
+            const int ticksPerQuarterNote = 480;
+            int currentPosition = 0;
 
-        //    var noteEvent = new PhraseNote();
+            // Get tuplet settings from writer data
+            bool isTuplet = !string.IsNullOrWhiteSpace(data.TupletNumber);
 
-        //    if (data.IsChord ?? false)  // null = false
-        //    {
-        //        // Create Chord pitch event
-        //        // Chords will be resolved into their component notes by AppendNotes.Execute()
-        //        noteEvent = new PhraseNote
-        //        {
-        //            IsChord = true,
-        //            ChordKey = data.ChordKey,
-        //            ChordDegree = (int)data.ChordDegree,
-        //            ChordQuality = data.ChordQuality,
-        //            ChordBase = data.ChordBase,
-        //            Octave = data.Octave,
+            if (data.IsChord ?? false)  // null = false
+            {
+                // Create Chord pitch events
+                // Chords will be resolved into their component notes by ChordConverter
+                var harmonicEvent = new HarmonicEvent
+                {
+                    Key = data.ChordKey ?? "C major",
+                    Degree = data.ChordDegree ?? 1,
+                    Quality = data.ChordQuality ?? "Major",
+                    Bass = data.ChordBase ?? "root"
+                };
 
-        //            Duration = GetNoteValue(data.NoteValue),
-        //            IsRest = data.IsRest ?? false,
-        //            Dots = data.Dots
-        //        };
-        //    }
-        //    else
-        //    {
-        //        // Single note or rest
-        //        noteEvent = new PhraseNote
-        //        {
-        //            Step = data.Step,
-        //            Octave = data.Octave,
-        //            Duration = GetNoteValue(data.NoteValue),
-        //            IsChord = false,
-        //            IsRest = data.IsRest ?? false,
-        //            Alter = GetAlter(data.Accidental),
-        //            Dots = data.Dots
-        //        };
-        //    }
+                var chordNotes = ChordConverter.Convert(
+                    harmonicEvent,
+                    baseOctave: data.Octave,
+                    noteValue: GetNoteValue(data.NoteValue));
 
-        //    // Add tuplet settings if specified
-        //    if (isTuplet)
-        //    {
-        //        noteEvent.TupletNumber = tupletNumber;
-        //        noteEvent.TupletActualNotes = tupletActualNotes;
-        //        noteEvent.TupletNormalNotes = tupletNormalNotes;
-        //    }
+                // Convert chord notes to PhraseNote with MIDI properties
+                foreach (var chordNote in chordNotes)
+                {
+                    int noteDurationTicks = CalculateNoteDurationTicks(
+                        GetNoteValue(data.NoteValue),
+                        data.Dots,
+                        ticksPerQuarterNote);
 
-        //    // Create specified number of test Pitch Events
-        //    for (int i = 0; i < (data.NumberOfNotes.GetValueOrDefault(1)); i++)
-        //    {
-        //        noteEvents.AddRange(noteEvent);
-        //    }
+                    var phraseNote = new PhraseNote(
+                        noteNumber: CalculateNoteNumber(chordNote.Step, chordNote.Alter, chordNote.Octave),
+                        absolutePositionTicks: currentPosition,
+                        noteDurationTicks: noteDurationTicks,
+                        noteOnVelocity: 100,
+                        isRest: false);
 
-        //    var phrase = new Phrase
-        //    {
-        //        MidiPartName = part,
-        //        NoteEvents = noteEvents
-        //    };
+                    phraseNotes.Add(phraseNote);
+                }
 
-        //    return phrase;
-        //}
+                // Advance position after chord
+                currentPosition += CalculateNoteDurationTicks(
+                    GetNoteValue(data.NoteValue),
+                    data.Dots,
+                    ticksPerQuarterNote);
+            }
+            else
+            {
+                // Single note or rest - create specified number of notes
+                for (int i = 0; i < (data.NumberOfNotes.GetValueOrDefault(1)); i++)
+                {
+                    int noteDurationTicks = CalculateNoteDurationTicks(
+                        GetNoteValue(data.NoteValue),
+                        data.Dots,
+                        ticksPerQuarterNote);
+
+                    int noteNumber = data.IsRest ?? false
+                        ? 60 // Default middle C for rests (not used but required)
+                        : CalculateNoteNumber(data.Step, GetAlter(data.Accidental), data.Octave);
+
+                    var phraseNote = new PhraseNote(
+                        noteNumber: noteNumber,
+                        absolutePositionTicks: currentPosition,
+                        noteDurationTicks: noteDurationTicks,
+                        noteOnVelocity: 100,
+                        isRest: data.IsRest ?? false);
+
+                    phraseNotes.Add(phraseNote);
+
+                    currentPosition += noteDurationTicks;
+                }
+            }
+
+            var phrase = new Phrase(midiProgramName, phraseNotes);
+
+            return phrase;
+        }
+
+        private static int CalculateNoteNumber(char step, int alter, int octave)
+        {
+            // C4 = MIDI note 60
+            int baseNote = step switch
+            {
+                'C' => 0,
+                'D' => 2,
+                'E' => 4,
+                'F' => 5,
+                'G' => 7,
+                'A' => 9,
+                'B' => 11,
+                _ => 0
+            };
+
+            return (octave + 1) * 12 + baseNote + alter;
+        }
+
+        private static int CalculateNoteDurationTicks(int duration, int dots, int ticksPerQuarterNote)
+        {
+            // Duration: 1=whole, 2=half, 4=quarter, 8=eighth, etc.
+            // Base ticks for this duration
+            int baseTicks = (ticksPerQuarterNote * 4) / duration;
+
+            // Apply dots: each dot adds half of the previous value
+            int totalTicks = baseTicks;
+            int dotValue = baseTicks;
+            for (int i = 0; i < dots; i++)
+            {
+                dotValue /= 2;
+                totalTicks += dotValue;
+            }
+
+            return totalTicks;
+        }
 
         private static int GetNoteValue(string? noteValueString)
         {

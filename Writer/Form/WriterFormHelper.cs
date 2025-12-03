@@ -16,7 +16,21 @@ namespace Music.Writer
             DataGridView dgvPhrase,
             ref int phraseNumber)
         {
+
+            // Get the params from Writer
+            // tbd
+
+            // Create the repeating phrase - this is a transform!
+            // tbd
+
+
+
+            // Add the phrase to the grid (just appends a new row for now
+
+
             var phrase = writer.ToPhrase();
+
+
 
             // Set phrase name/number
             phraseNumber++;
