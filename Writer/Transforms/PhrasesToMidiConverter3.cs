@@ -133,10 +133,7 @@ namespace Music.Writer
                         continue;
                     }
 
-                    var noteNumber = CalculateMidiNoteNumber(phraseNote.Step, phraseNote.Alter, phraseNote.Octave);
-                    var duration = phraseNote.Duration;
-
-                    allEvents.Add((phraseNote.AbsolutePositionTicks, true, (byte)noteNumber, 100, duration));
+                    allEvents.Add((phraseNote.AbsolutePositionTicks, true, (byte)phraseNote.NoteNumber, (byte)phraseNote.NoteOnVelocity, phraseNote.Duration));
                 }
             }
 
@@ -200,26 +197,6 @@ namespace Music.Writer
             return trackChunk;
         }
 
-        private static int CalculateMidiNoteNumber(char step, int alter, int octave)
-        {
-            int baseNote = step switch
-            {
-                'C' => 0,
-                'D' => 2,
-                'E' => 4,
-                'F' => 5,
-                'G' => 7,
-                'A' => 9,
-                'B' => 11,
-                _ => 0
-            };
-            return (octave + 1) * 12 + baseNote + alter;
-        }
-
-        // Reflection helper to instantiate EndOfTrackEvent with internal constructor
-        private static MidiEvent CreateEndOfTrackEvent() =>
-            (MidiEvent)Activator.CreateInstance(typeof(EndOfTrackEvent), nonPublic: true)!;
-
         /// <summary>
         /// Determines if a program number represents a drum set.
         /// </summary>
@@ -231,9 +208,6 @@ namespace Music.Writer
 
         private static string GetInstrumentName(byte programNumber)
         {
-            if (programNumber == 255)
-                return "Drum Set";
-
             var instruments = MidiInstrument.GetGeneralMidiInstruments();
             var instrument = instruments.FirstOrDefault(i => i.ProgramNumber == programNumber);
             return instrument?.Name ?? "Acoustic Grand Piano";
