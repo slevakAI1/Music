@@ -25,23 +25,22 @@ namespace Music.Writer
             var startBeat = writer.StartBeat ?? 1;
 
             // Create the repeating phrase - this is a transform!
-            // tbd
-
+            var phrase = WriterFormDataToPhrase.Convert(
+                writer,
+                numberOfNotes,
+                midiProgramName,
+                selectedStaffs,
+                startBar,
+                startBeat);
 
 
             // Add the phrase to the grid (just appends a new row for now
-
-
-            var phrase = writer.ToPhrase();
-
-
-
             // Set phrase name/number
             phraseNumber++;
             var phraseName = phraseNumber.ToString();
 
             // Get part name from the phrase
-            var partName = phrase.MidiPartName ?? "Unknown";
+            var partName = phrase.MidiProgramName ?? "Unknown";
 
             // Add new row
             int newRowIndex = dgvPhrase.Rows.Add();
