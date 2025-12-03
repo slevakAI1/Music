@@ -7,10 +7,10 @@ namespace Music.Domain
     /// </summary>
     public sealed class MidiInstrument
     {
-        public byte ProgramNumber { get; }
+        public int ProgramNumber { get; }
         public string Name { get; }
 
-        public MidiInstrument(byte programNumber, string name)
+        public MidiInstrument(int programNumber, string name)
         {
             ProgramNumber = programNumber;
             Name = name;
@@ -27,6 +27,8 @@ namespace Music.Domain
         {
             return new List<MidiInstrument>
             {
+                new (-1, "Select..."),
+
                 // Piano (0-7)
                 new(0, "Acoustic Grand Piano"),
                 new(1, "Bright Acoustic Piano"),
