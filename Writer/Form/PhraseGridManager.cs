@@ -25,7 +25,7 @@ namespace Music.Writer
             var phraseName = phraseNumber.ToString();
 
             // Get part name from the phrase
-            var partName = phrase.MidiProgramName ?? "";
+            var partName = phrase.MidiProgramName;
 
             // Add new row
             int newRowIndex = dgvPhrase.Rows.Add();
@@ -34,32 +34,23 @@ namespace Music.Writer
             // Column 0: Hidden data (Phrase object)
             row.Cells["colData"].Value = phrase;
 
-            // Resolve MIDI program number from the instrument name
-            // var instrument = MidiInstrument.GetGeneralMidiInstruments()
-            //     .FirstOrDefault(i => i.Name.Equals(midiProgramName, StringComparison.OrdinalIgnoreCase));
+            // Column 1: MIDI Instrument dropdown - leave unselected (null/DBNull)
+            // User can select an instrument or leave it unselected
+            row.Cells["colInstrument"].Value = DBNull.Value;
 
-            //MidiProgramNumber = instrument?.ProgramNumber ?? 0; // Default to 0 (Acoustic Grand Piano) if not found
+            // Column 2: Stave - default to 1 for newly added rows
+            row.Cells["colStave"].Value = 1;
 
-
-
-
-            // Column 1: MIDI Instrument dropdown - set to first instrument (Acoustic Grand Piano) as default
-            // User can change this by clicking the dropdown
-            //row.Cells["colInstrument"].Value = midiInstruments[0].ProgramNumber;
-
-            // Column 2: Stave - adds +1 each time new row is added with same instrument as existing row(s)
-            row.Cells["colStave"].Value = dgvPhrase.Rows
-                .Cast<DataGridViewRow>()
-                .Count(r => r.Cells["colInstrument"].Value?.Equals(midiInstruments[0].ProgramNumber) == true);
-
+            // TODO fix this name!
             // Column 3: Event number
             row.Cells["colEventNumber"].Value = phraseName;
 
             // Column 4: Description
-            row.Cells["colDescription"].Value = $"Part: {partName}";
+            if (partName != "Select...")
+                row.Cells["colDescription"].Value = $"Part: {partName}";
 
             // Column 5: Phrase details (placeholder)
-            row.Cells["colPhrase"].Value = "tbd";
+            row.Cells["colPhrase"].Value = "";
         }
     }
 }
