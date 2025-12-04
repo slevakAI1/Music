@@ -183,7 +183,21 @@ namespace Music.Writer
 
         private void btnExecute_Click(object sender, EventArgs e)
         {
-            HandleExecute();
+            var pattern = cbCommand?.Text?.Trim() ?? string.Empty;
+            if (string.IsNullOrEmpty(pattern))
+                return;
+
+            switch (pattern)
+            {
+                case "Repeat Note":
+                    HandleRepeatNote();
+                    break;
+
+                // Other cases will be added here later.
+
+                default:
+                    break;
+            }
         }
 
         private void btnClearPhrases_Click(object sender, EventArgs e)

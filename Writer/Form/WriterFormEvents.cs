@@ -206,51 +206,42 @@ namespace Music.Writer
             dgvPhrase.Rows.Clear();
         }
 
-        // Branch on Command
-        public void HandleExecute()
+
+        #region "Execute Commands"
+
+        // Adds repeating notes to the phrases selected in the grid
+        // TODO - what if there are already notes? it should append. Can always clear so don't need overwrite.
+        public void HandleRepeatNote()
         {
-            var pattern = cbCommand?.Text?.Trim() ?? string.Empty;
-            if (string.IsNullOrEmpty(pattern))
-                return;
-
-            switch (pattern)
+            // Check if any rows are selected
+            if (dgvPhrase.SelectedRows.Count == 0)
             {
-                case "Repeat Note":
-                    // Check if any rows are selected
-                    if (dgvPhrase.SelectedRows.Count == 0)
-                    {
-                        MessageBox.Show(this, "Please select one or more rows to apply this command.", "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        return;
-                    }
+                MessageBox.Show(this, "Please select one or more rows to apply this command.", "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
 
-                    var formData = CaptureFormData();
-                    var (noteNumber, noteDurationTicks, repeatCount, isRest) =
-                        GetRepeatingNotesParameters(formData);
+            var formData = CaptureFormData();
+            var (noteNumber, noteDurationTicks, repeatCount, isRest) =
+                GetRepeatingNotesParameters(formData);
 
-                    var phrase = CreateRepeatingNotes.Execute(
-                        noteNumber: noteNumber,
-                        noteDurationTicks: noteDurationTicks,
-                        repeatCount: repeatCount,
-                        noteOnVelocity: 100,
-                        isRest: isRest);
+            var phrase = CreateRepeatingNotes.Execute(
+                noteNumber: noteNumber,
+                noteDurationTicks: noteDurationTicks,
+                repeatCount: repeatCount,
+                noteOnVelocity: 100,
+                isRest: isRest);
 
-                    // Write the phrase object to colData (cell[0]) of each selected row
-                    foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
-                    {
-                        selectedRow.Cells["colData"].Value = phrase;
-                        selectedRow.Cells["colPhrase"].Value = "Contains Phrase Data";
-                    }
-                    break;
-
-                // Add additional cases for other patterns as needed
-                default:
-                    // No-op for unrecognized patterns
-                    break;
+            // Write the phrase object to colData (cell[0]) of each selected row
+            foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
+            {
+                selectedRow.Cells["colData"].Value = phrase;
+                selectedRow.Cells["colPhrase"].Value = "Contains Phrase Data";
             }
         }
 
-
         // This returns all 4 parameters
+        // TODO this has some reusable parts that should be extracted
+
         private static (int noteNumber, int noteDurationTicks, int repeatCount, bool isRest)
             GetRepeatingNotesParameters(WriterFormData formData)
         {
@@ -259,6 +250,8 @@ namespace Music.Writer
 
             // Extract rest flag
             var isRest = formData.IsRest ?? false;
+
+            // CAN REUSE the note calculation part!
 
             // Calculate MIDI note number from step, accidental, and octave
             var step = formData.Step;
@@ -320,5 +313,6 @@ namespace Music.Writer
 
             return (noteNumber, noteDurationTicks, repeatCount, isRest);
         }
+        #endregion
     }
 }
