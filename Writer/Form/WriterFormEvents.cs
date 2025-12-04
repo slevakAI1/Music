@@ -31,18 +31,6 @@ namespace Music.Writer
             {
                 // Validate instrument cell value first (may be DBNull or null)
                 var instrObj = selectedRow.Cells["colInstrument"].Value;
-                if (instrObj == null || instrObj == DBNull.Value)
-                {
-                    var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
-                    MessageBox.Show(
-                        this,
-                        $"No instrument selected for row #{eventNumber}. Please select an instrument before playing.",
-                        "Missing Instrument",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
-                    return; // Abort playback
-                }
-
                 int programNumber = programNumber = Convert.ToInt32(instrObj);
                 if (programNumber == -1)  // -1 = placeholder "Select..." -> treat as missing selection
                 {
