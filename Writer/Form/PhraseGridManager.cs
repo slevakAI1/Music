@@ -170,9 +170,8 @@ namespace Music.Writer
             // Column 0: Hidden data (Phrase object)
             row.Cells["colData"].Value = phrase;
 
-            // Column 1: MIDI Instrument dropdown - leave unselected (null/DBNull)
-            // User can select an instrument or leave it unselected
-            row.Cells["colInstrument"].Value = DBNull.Value;
+            // Column 1: MIDI Instrument dropdown - default to "Select..." (ProgramNumber = -1)
+            row.Cells["colInstrument"].Value = -1;
 
             // Column 2: Stave - default to 1 for newly added rows
             row.Cells["colStave"].Value = 1;
