@@ -9,6 +9,10 @@ namespace Music.Writer
     public partial class WriterForm
     {
         // This plays all of the selected phrases simulaneously as a midi document
+
+        // TODO this needs reorg. This should be calling a separate method for converting
+        // Phrases to MidiEvents. Maybe want to rename MidiEvents to MidiMetaEvents.or maybe eliminate the middleman.
+
         public async Task HandlePlayAsync()
         {
             // Check if there are any rows in the grid
