@@ -63,32 +63,11 @@ namespace Music.Writer
                 phrases.Add(phrase);
             }
 
-
-
-
             try
             {
-                // Step 1 - convert phrases to MIDI EVENTS - Absolute positions
-                var midiEventLists = ConvertPhrasesToMidiEvents.Convert(phrases);
-                var inputjson = Helpers.DebugObject(phrases);
-                var outputjson = Helpers.DebugObject(midiEventLists);
-
-                //  Step 2:
-                // Merge midiEventLists lists that are for the same instrument
-                // and adds global events
-
-                //Assign track numbers to midi event lists
-                var mergedMidiEventLists = MergeMidiEventsByInstrument.Convert(
-                    midiEventLists,
-                    tempo: 112,
-                    timeSignatureNumerator: 4,
-                    timeSignatureDenominator: 4);
-                inputjson = Helpers.DebugObject(midiEventLists);
-                outputjson = Helpers.DebugObject(mergedMidiEventLists);
-
-                // Step 3 - Execute merged timed notes to MIDI document
-                var midiDoc = ConvertMidiEventsToMidiDocument.Convert(
-                    mergedMidiEventLists,
+                // Consolidated conversion: phrases -> midi document
+                var midiDoc = PhrasesToMidiDocumentConverter.Convert(
+                    phrases,
                     tempo: 112,
                     timeSignatureNumerator: 4,
                     timeSignatureDenominator: 4);
