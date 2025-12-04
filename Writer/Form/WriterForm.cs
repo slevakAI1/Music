@@ -181,13 +181,16 @@ namespace Music.Writer
             HandleExportToNotion();
         }
 
+        // TO DO - should have a popup to view a phrase on clicking the phrase column. can display in JSON maybe
+        // although that could be large for long phrases. This is a must though.
+
         private void btnExecute_Click(object sender, EventArgs e)
         {
-            var pattern = cbCommand?.Text?.Trim() ?? string.Empty;
-            if (string.IsNullOrEmpty(pattern))
+            var command = cbCommand?.Text?.Trim() ?? string.Empty;
+            if (string.IsNullOrEmpty(command))
                 return;
 
-            switch (pattern)
+            switch (command)
             {
                 case "Repeat Note":
                     HandleRepeatNote();

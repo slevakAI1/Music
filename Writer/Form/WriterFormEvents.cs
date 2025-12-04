@@ -213,6 +213,9 @@ namespace Music.Writer
         // TODO - what if there are already notes? it should append. Can always clear so don't need overwrite.
         public void HandleRepeatNote()
         {
+
+            // TO DO SHOULD THIS BE A HIGHER LEVEL CHECK - DO ALL OR MOST COMMANDS NEED SELECTED PHRASES IF SO THEN YES
+            
             // Check if any rows are selected
             if (dgvPhrase.SelectedRows.Count == 0)
             {
@@ -220,7 +223,10 @@ namespace Music.Writer
                 return;
             }
 
+            // TO DO SHOULD THIS BE A HIGHER LEVEL? almost certainly all or most commands need form data
             var formData = CaptureFormData();
+
+
             var (noteNumber, noteDurationTicks, repeatCount, isRest) =
                 GetRepeatingNotesParameters(formData);
 
@@ -231,6 +237,7 @@ namespace Music.Writer
                 noteOnVelocity: 100,
                 isRest: isRest);
 
+            // TO DO THIS LOOKS LIKE A COMMON TARGET WRITER METHOD
             // Write the phrase object to colData (cell[0]) of each selected row
             foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
             {
