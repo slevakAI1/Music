@@ -29,11 +29,11 @@ namespace Music.Writer
             var phrases = new List<Phrase>();
             foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
             {
-                // Check if instrument is selected (not null/DBNull)
-                int programNumber = (int)selectedRow.Cells["colInstrument"].Value;
-                if (programNumber == -1)  // -1 = not selected
+                // Validate instrument cell value first (may be DBNull or null)
+                var instrObj = selectedRow.Cells["colInstrument"].Value;
+                if (instrObj == null || instrObj == DBNull.Value)
                 {
-                    var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString();
+                    var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
                     MessageBox.Show(
                         this,
                         $"No instrument selected for row #{eventNumber}. Please select an instrument before playing.",
@@ -43,8 +43,34 @@ namespace Music.Writer
                     return; // Abort playback
                 }
 
-                // Valid program number (0-127 or 255 for drums)
+                int programNumber = programNumber = Convert.ToInt32(instrObj);
+                if (programNumber == -1)  // -1 = placeholder "Select..." -> treat as missing selection
+                {
+                    var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
+                    MessageBox.Show(
+                        this,
+                        $"No instrument selected for row #{eventNumber}. Please select an instrument before playing.",
+                        "Missing Instrument",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return; // Abort playback
+                }
+
+                // Validate phrase data exists in hidden data column before using it
                 var phrase = (Phrase)selectedRow.Cells["colData"].Value;
+                if (phrase.PhraseNotes.Count == 0)
+                {
+                    var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
+                    MessageBox.Show(
+                        this,
+                        $"No phrase data for row #{eventNumber}. Please add or assign a phrase before playing.",
+                        "Missing Phrase",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return; // Abort playback
+                }
+
+                // Valid program number (0-127 or 255 for drums) — safe to cast now
                 phrase.MidiProgramNumber = (byte)programNumber;
                 phrases.Add(phrase);
             }
