@@ -29,23 +29,26 @@ namespace Music.Writer
             var phrases = new List<Phrase>();
             foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
             {
-                var phrase = (Phrase)selectedRow.Cells["colData"].Value;
-                
                 // Check if instrument is selected (not null/DBNull)
-                var instrumentCellValue = selectedRow.Cells["colInstrument"].Value;
-                if (instrumentCellValue != null && instrumentCellValue != DBNull.Value)
+                int programNumber = (int)selectedRow.Cells["colInstrument"].Value;
+                if (programNumber == -1)  // -1 = not selected
                 {
-                    phrase.MidiProgramNumber = (byte)instrumentCellValue;
+                    var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString();
+                    MessageBox.Show(
+                        this,
+                        $"No instrument selected for row #{eventNumber}. Please select an instrument before playing.",
+                        "Missing Instrument",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return; // Abort playback
                 }
-                else
-                {
-                    // Default to Acoustic Grand Piano (0) if no instrument selected
-                    phrase.MidiProgramNumber = 0;
-                }
-                
+
+                // Valid program number (0-127 or 255 for drums)
+                var phrase = (Phrase)selectedRow.Cells["colData"].Value;
+                phrase.MidiProgramNumber = (byte)programNumber;
                 phrases.Add(phrase);
             }
-            
+
             try
             {
                 // Step 1 - convert phrases to MIDI EVENTS - Absolute positions
@@ -53,7 +56,7 @@ namespace Music.Writer
                 var inputjson = Helpers.DebugObject(phrases);
                 var outputjson = Helpers.DebugObject(midiEventLists);
 
-                 //  Step 2:
+                //  Step 2:
                 // Merge midiEventLists lists that are for the same instrument
                 // and adds global events
 
