@@ -27,7 +27,6 @@
     <EmbeddedResource Remove="Designer\DesignerFrom.DataBinder.resx" />
     <EmbeddedResource Remove="Writer\Form\ConsoleTransform.resx" />
     <EmbeddedResource Remove="Writer\Form\WriterForm.DataBinder.resx" />
-    <EmbeddedResource Remove="Writer\Form\WriterFormEvents.resx" />
   </ItemGroup>
 
   <ItemGroup>

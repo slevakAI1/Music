@@ -8,85 +8,6 @@ namespace Music.Writer
     // Event handler logic extracted from WriterForm into a partial class
     public partial class WriterForm
     {
-        // Inserts notes based on the "number of notes" parameter from the writer form
-        //public void HandleAppendNotes()
-        //{
-        //    // Ensure score list exists and has at least one score
-        //    if (_scoreList == null || _scoreList.Count == 0)
-        //    {
-        //        MessageBox.Show(this, "No score available. Please create a new score first.",
-        //            "No Score", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //        return;
-        //    }
-
-        //    // Check if there are any rows in the grid
-        //    if (dgvPhrase.Rows.Count == 0)
-        //    {
-        //        MessageBox.Show(this, "No phrases to append. Please create phrases first.",
-        //            "No Phrases", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //        return;
-        //    }
-
-        //    // Check if a row is selected
-        //    if (dgvPhrase.SelectedRows.Count == 0)
-        //    {
-        //        MessageBox.Show(this, "Please select one or more phrases to append to the score.",
-        //            "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //        return;
-        //    }
-
-        //    try
-        //    {
-        //        // Process each selected phrase row
-        //        foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
-        //        {
-        //            // Get the Phrase object from the hidden data column
-        //            var phrase = (Phrase)selectedRow.Cells["colData"].Value;
-
-        //            // Get the selected instrument name from the combobox
-        //            var selectedInstrumentName = selectedRow.Cells["colInstrument"].FormattedValue?.ToString();
-
-        //            if (phrase == null || string.IsNullOrEmpty(selectedInstrumentName))
-        //                continue;
-
-        //            // THIS IS THE CONVERSION BETWEEN PHRASE AND THE OLD PARAMS CLASS:
-
-        //            // Create AppendNoteEventsToScoreParams from the phrase
-        //            var config = new AppendNoteEventsToScoreParams
-        //            {
-        //                Parts = new List<string> { selectedInstrumentName },
-        //                Staffs = new List<int> { 1 },
-        //                StartBar = 1, // Default to bar 1, could be enhanced to use a form control
-        //                StartBeat = 1, // Default to beat 1
-        //                NoteEvents = phrase.NoteEvents ?? new List<PhraseNote>()
-        //            };
-
-        //            // Append the phrase to the score
-        //            AppendNotes.Execute(_scoreList[0], config, _measureMeta);
-        //        }
-
-        //        // Update the score report display
-        //        txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
-
-        //        // Update globals
-        //        Globals.ScoreList = _scoreList;
-
-        //        MessageBox.Show(this, 
-        //            $"Successfully appended {dgvPhrase.SelectedRows.Count} phrase(s) to the score.",
-        //            "Append Complete", 
-        //            MessageBoxButtons.OK, 
-        //            MessageBoxIcon.Information);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(this, 
-        //            $"Error appending phrases to score:\n{ex.Message}", 
-        //            "Append Error", 
-        //            MessageBoxButtons.OK, 
-        //            MessageBoxIcon.Error);
-        //    }
-        //}
-
         // This plays all of the selected phrases simulaneously as a midi document
         public async Task HandlePlayAsync()
         {
@@ -105,22 +26,26 @@ namespace Music.Writer
             }
 
             // Build list of Phrase from all selected rows
-            // Phrases midiprogramnumber not set yet
-            // Get the selected instrument from the combobox value property
             var phrases = new List<Phrase>();
             foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
             {
                 var phrase = (Phrase)selectedRow.Cells["colData"].Value;
-                phrase.MidiProgramNumber = (byte)selectedRow.Cells["colInstrument"].Value; // Selected Instrument
+                
+                // Check if instrument is selected (not null/DBNull)
+                var instrumentCellValue = selectedRow.Cells["colInstrument"].Value;
+                if (instrumentCellValue != null && instrumentCellValue != DBNull.Value)
+                {
+                    phrase.MidiProgramNumber = (byte)instrumentCellValue;
+                }
+                else
+                {
+                    // Default to Acoustic Grand Piano (0) if no instrument selected
+                    phrase.MidiProgramNumber = 0;
+                }
+                
                 phrases.Add(phrase);
             }
-            /*
-            Every channel voice message includes a MIDI channel in its status byte (e.g., Note On/Off, Control Change, Program Change, Pitch Bend, etc.).
-            So: yes, the channel is effectively specified on each event (unless you're using running status, where it's implied by the previous status byte—but logically it's still per-message).
-            Program number is not included in Note events.
-            You normally send a Program Change message once (or whenever you want to switch sounds). After that, notes on that same channel will play using the currently selected program until changed again.
-            So: no, program number is not repeated per event—it's "sticky" state for that channel.
-             * */
+            
             try
             {
                 // Step 1 - convert phrases to MIDI EVENTS - Absolute positions
@@ -291,7 +216,13 @@ namespace Music.Writer
 
             switch (pattern)
             {
-                case "Repeat Note":   // REPEAT CHORD WILL BE A SEPARATE METHOD
+                case "Repeat Note":
+                    // Check if any rows are selected
+                    if (dgvPhrase.SelectedRows.Count == 0)
+                    {
+                        MessageBox.Show(this, "Please select one or more rows to apply this command.", "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
 
                     var formData = CaptureFormData();
                     var (noteNumber, noteDurationTicks, repeatCount, isRest) =
@@ -304,8 +235,12 @@ namespace Music.Writer
                         noteOnVelocity: 100,
                         isRest: isRest);
 
-                    // SHOULD RETURN PHRASE AND CALLING AREA WILL CALL THIS TO ADD!
-                    PhraseGridManager.AddPhraseToGrid(phrase, _midiInstruments, dgvPhrase, ref phraseNumber);
+                    // Write the phrase object to colData (cell[0]) of each selected row
+                    foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
+                    {
+                        selectedRow.Cells["colData"].Value = phrase;
+                        selectedRow.Cells["colPhrase"].Value = "Contains Phrase Data";
+                    }
                     break;
 
                 // Add additional cases for other patterns as needed

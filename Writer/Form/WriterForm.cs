@@ -69,7 +69,11 @@ namespace Music.Writer
             cbCommand.SelectedIndex = 0;
 
             // Configure dgvPhrases with MIDI instrument dropdown
-            ConfigurePhraseDataGridView();
+            PhraseGridManager.ConfigurePhraseDataGridView(
+                dgvPhrase,
+                _midiInstruments,
+                DgvPhrase_CellValueChanged,
+                DgvPhrase_CurrentCellDirtyStateChanged);
 
             // ====================   T H I S   H A S   T O   B E   L A S T  !   =================
 
@@ -79,96 +83,11 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Configures the dgvPhrase DataGridView with proper columns including MIDI instrument dropdown.
-        /// </summary>
-        private void ConfigurePhraseDataGridView()
-        {
-            dgvPhrase.AllowUserToAddRows = false;
-            dgvPhrase.AllowUserToResizeColumns = true;
-            dgvPhrase.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvPhrase.MultiSelect = true; // Changed from false to true
-            dgvPhrase.ReadOnly = false; // Allow editing the combo box column
-            dgvPhrase.Columns.Clear();
-
-            // Column 0: Hidden column containing the AppendNoteEventsToScoreParams object
-            var colData = new DataGridViewTextBoxColumn
-            {
-                Name = "colData",
-                HeaderText = "Data",
-                Visible = false,
-                ReadOnly = true
-            };
-            dgvPhrase.Columns.Add(colData);
-
-            // Column 1: MIDI Instrument dropdown (editable)
-            var colInstrument = new DataGridViewComboBoxColumn
-            {
-                Name = "colInstrument",
-                HeaderText = "Instrument",
-                Width = 200,
-                DataSource = new List<MidiInstrument>(_midiInstruments),
-                DisplayMember = "Name",
-                ValueMember = "ProgramNumber",
-                DisplayStyle = DataGridViewComboBoxDisplayStyle.DropDownButton,
-                FlatStyle = FlatStyle.Flat,
-                ReadOnly = false
-            };
-            dgvPhrase.Columns.Add(colInstrument);
-
-            // Column 2: Stave
-            var colStaff = new DataGridViewTextBoxColumn
-            {
-                Name = "colStave",
-                HeaderText = "Stave",
-                Width = 40,
-                ReadOnly = false
-            };
-            dgvPhrase.Columns.Add(colStaff);
-
-            // Column 3: Event number (read-only)
-            var colEventNumber = new DataGridViewTextBoxColumn
-            {
-                Name = "colEventNumber",
-                HeaderText = "#",
-                Width = 50,
-                ReadOnly = true
-            };
-            dgvPhrase.Columns.Add(colEventNumber);
-
-            // Column 4: Description (read-only for now)
-            var colDescription = new DataGridViewTextBoxColumn
-            {
-                Name = "colDescription",
-                HeaderText = "Description",
-                Width = 300,
-                ReadOnly = true
-            };
-            dgvPhrase.Columns.Add(colDescription);
-
-            // Column 5: Phrase details (fills remaining space)
-            var colPhrase = new DataGridViewTextBoxColumn
-            {
-                Name = "colPhrase",
-                HeaderText = "Phrase",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                ReadOnly = true
-            };
-            dgvPhrase.Columns.Add(colPhrase);
-
-            // Wire up event handlers
-            dgvPhrase.CellValueChanged += DgvPhrase_CellValueChanged;
-            dgvPhrase.CurrentCellDirtyStateChanged += DgvPhrase_CurrentCellDirtyStateChanged;
-        }
-
-        /// <summary>
         /// Commits the combo box edit immediately so CellValueChanged fires.
         /// </summary>
         private void DgvPhrase_CurrentCellDirtyStateChanged(object? sender, EventArgs e)
         {
-            if (dgvPhrase.IsCurrentCellDirty && dgvPhrase.CurrentCell is DataGridViewComboBoxCell)
-            {
-                dgvPhrase.CommitEdit(DataGridViewDataErrorContexts.Commit);
-            }
+            PhraseGridManager.HandleCurrentCellDirtyStateChanged(dgvPhrase, sender, e);
         }
 
         /// <summary>
@@ -176,28 +95,7 @@ namespace Music.Writer
         /// </summary>
         private void DgvPhrase_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
         {
-            // Only handle changes to the instrument column
-            if (e.RowIndex < 0 || e.ColumnIndex != dgvPhrase.Columns["colInstrument"]?.Index)
-                return;
-
-            var row = dgvPhrase.Rows[e.RowIndex];
-            var cellValue = row.Cells["colData"].Value;
-
-            // Check if the hidden data cell contains a Phrase object
-            if (cellValue is Phrase phrase)
-            {
-                // Get the selected instrument name
-                var selectedInstrumentName = row.Cells["colInstrument"].FormattedValue?.ToString();
-
-                if (!string.IsNullOrEmpty(selectedInstrumentName))
-                {
-                    // Update the Phrase object's MidiProgramName property
-                    phrase.MidiProgramName = selectedInstrumentName;
-
-                    // Optionally update the description column to reflect the change
-                    row.Cells["colDescription"].Value = $"Part: {selectedInstrumentName}";
-                }
-            }
+            PhraseGridManager.HandleCellValueChanged(dgvPhrase, sender, e);
         }
 
         protected override void OnShown(EventArgs e)
