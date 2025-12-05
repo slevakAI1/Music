@@ -75,15 +75,6 @@ namespace Music.Writer
                 DgvPhrase_CellValueChanged,
                 DgvPhrase_CurrentCellDirtyStateChanged);
 
-
-
-
-            // Wire up double-click event for phrase viewer
-            dgvPhrase.CellDoubleClick += DgvPhrase_CellDoubleClick;
-
-
-
-
             // ====================   T H I S   H A S   T O   B E   L A S T  !   =================
 
             // Capture form control values manually set in the form designer

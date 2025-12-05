@@ -830,6 +830,8 @@ namespace Music.Writer
             dgvPhrase.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvPhrase.Size = new Size(1532, 334);
             dgvPhrase.TabIndex = 37;
+            dgvPhrase.CellDoubleClick += DgvPhrase_CellDoubleClick;
+
             // 
             // WriterForm
             // 
