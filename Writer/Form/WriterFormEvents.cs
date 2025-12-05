@@ -210,10 +210,8 @@ namespace Music.Writer
         #region "Execute Commands"
 
         // Adds repeating notes to the phrases selected in the grid
-        // TODO - what if there are already notes? it should append. Can always clear so don't need overwrite.
-
-        // TODO - its odd that data from the form is being passed view formdata and pulled directly from the grid.
-        //        look at this.
+        // TO DO - what if there are already notes? it should append. Can always clear so don't need overwrite.
+        // Note: WriterFormData does some preprocessing of the form data. Keep this note.
         public void HandleRepeatNote(WriterFormData formData)
         {
 
@@ -246,7 +244,7 @@ namespace Music.Writer
         }
 
         // This returns all 4 parameters
-        // TODO this has some reusable parts that should be extracted
+        // TO DO this has some reusable parts that should be extracted
 
         private static (int noteNumber, int noteDurationTicks, int repeatCount, bool isRest)
             GetRepeatingNotesParameters(WriterFormData formData)
