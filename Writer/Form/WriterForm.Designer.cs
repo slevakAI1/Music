@@ -109,6 +109,7 @@ namespace Music.Writer
             btnClearPhrases = new Button();
             btnPlayPhrases = new Button();
             dgvPhrase = new DataGridView();
+            btnImport = new Button();
             grbParts.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -763,6 +764,7 @@ namespace Music.Writer
             // groupBox4
             // 
             groupBox4.BackColor = Color.Black;
+            groupBox4.Controls.Add(btnImport);
             groupBox4.Controls.Add(btnAddPhrase);
             groupBox4.Controls.Add(btnDeletePhrases);
             groupBox4.Controls.Add(btnClearPhrases);
@@ -831,7 +833,17 @@ namespace Music.Writer
             dgvPhrase.Size = new Size(1532, 334);
             dgvPhrase.TabIndex = 37;
             dgvPhrase.CellDoubleClick += DgvPhrase_CellDoubleClick;
-
+            // 
+            // btnImport
+            // 
+            btnImport.ForeColor = Color.Red;
+            btnImport.Location = new Point(374, 363);
+            btnImport.Name = "btnImport";
+            btnImport.Size = new Size(72, 23);
+            btnImport.TabIndex = 41;
+            btnImport.Text = "Import";
+            btnImport.UseVisualStyleBackColor = true;
+            btnImport.Click += btnImport_Click;
             // 
             // WriterForm
             // 
@@ -924,5 +936,6 @@ namespace Music.Writer
         private Button btnAddPhrase;
         private Button btnNewScore;
         private TextBox txtMovementTitle;
+        private Button btnImport;
     }
 }

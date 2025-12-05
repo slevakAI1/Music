@@ -215,7 +215,7 @@ namespace Music.Writer
         {
             HandleExportToNotion();
         }
-        
+
         // TO DO  -  Maybe the writing out to the grid should happen here and
         //           each command returns the data to write out ??? what data would this require?
 
@@ -309,6 +309,11 @@ namespace Music.Writer
         private void btnDeletePhrases_Click(object sender, EventArgs e)
         {
             HandleDeletePhrases();
+        }
+
+        private void btnImport_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
