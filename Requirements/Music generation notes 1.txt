@@ -110,4 +110,69 @@ Typical placement
 Intro → Verse → (Pre-Chorus)* → Chorus → Verse → (Pre-Chorus)* → Chorus → Bridge → Chorus (×1–2) → Outro/Ending
 (*Pre-chorus would be one of those “Custom” cases in your enum.)
 
+tom petty file
+========================================================================================
+
+Based on my analysis of the Tom Petty "Breakdown" MIDI file and the MidiEvent model class, here are the MIDI events found in the file and their support status:
+✅ FULLY SUPPORTED EVENTS (Found in the file)
+1.	NoteOn (0x9n) - Extensively used throughout all tracks
+2.	NoteOff (0x8n) - Used throughout all tracks
+3.	ProgramChange (0xCn) - Found in tracks (setting instruments)
+4.	ControlChange (0xBn) - Present in multiple tracks
+5.	SetTempo (0x51) - Found at the beginning
+6.	TimeSignature (0x58) - Found at the beginning
+7.	EndOfTrack (0x2F) - Present at the end of each track
+8.	SequenceTrackName (0x03) - Found in each track (PIANO, GUITAR 1, GUITAR 2, GUITAR 3, ORGAN, BASS, DRUMS, PERC EFFECTS)
+❌ UNSUPPORTED/POTENTIALLY MISSING EVENTS
+Based on the MIDI file structure, here are events that might be present but are NOT explicitly handled by your MidiEvent model:
+Channel Events:
+1.	Running Status - MIDI optimization where status bytes are omitted for consecutive events of the same type on the same channel. Your converter needs to handle this implicitly (DryWetMidi library handles this).
+Meta Events:
+2.	SequenceNumber (0x00) - Not in your model
+3.	MIDI Channel Prefix (0x20) - Not in your model
+4.	MIDI Port (0x21) - Not in your model
+5.	CuePoint (0x07) - Not in your model
+6.	DeviceName (0x09) - Not in your model
+7.	UnknownMeta - Generic catch-all for unrecognized meta events
+System Exclusive (SysEx) Events:
+8.	NormalSysExEvent (0xF0) - Not in your model
+9.	EscapeSysExEvent (0xF7) - Not in your model
+System Common/Real-Time:
+10.	MTC Quarter Frame (0xF1) - Not in your model
+11.	SongPositionPointer (0xF2) - Not in your model
+12.	SongSelect (0xF3) - Not in your model
+13.	TuneRequest (0xF6) - Not in your model
+14.	TimingClock (0xF8) - Not in your model
+15.	Start (0xFA) - Not in your model
+16.	Continue (0xFB) - Not in your model
+17.	Stop (0xFC) - Not in your model
+18.	ActiveSensing (0xFE) - Not in your model
+19.	Reset (0xFF) - Not in your model (Note: 0xFF is also meta event marker)
+📊 SPECIFIC ANALYSIS OF TOM PETTY FILE
+Looking at the raw MIDI data visible in the file context:
+1.	Track 0 (Header track):
+•	Contains tempo (SetTempo) ✅
+•	Contains time signature (TimeSignature) ✅
+•	Track name ✅
+2.	Tracks 1-8 (Instrument tracks):
+•	Heavy use of NoteOn/NoteOff ✅
+•	ProgramChange for instrument selection ✅
+•	ControlChange events ✅
+•	Track names ✅
+3.	Potential Issues:
+•	The hex data shows extensive use of MIDI velocity values and complex timing
+•	Some control changes might be for:
+•	Volume (CC 7) ✅ Supported via ControlChange
+•	Pan (CC 10) ✅ Supported via ControlChange
+•	Sustain Pedal (CC 64) ✅ Supported via ControlChange
+•	Bank Select (CC 0/32) ✅ Supported via ControlChange
+🎯 RECOMMENDATION
+Your current MidiEvent model should handle the Tom Petty "Breakdown" MIDI file successfully because:
+1.	All the core events used in typical MIDI files (NoteOn, NoteOff, ProgramChange, ControlChange, SetTempo, TimeSignature, SequenceTrackName) are supported
+2.	The DryWetMidi library will handle the low-level parsing
+3.	Any unsupported events will trigger your NotSupportedException with detailed error messages
+To test this, simply try importing the file using your current implementation. If any unsupported events are encountered, your error handling will show you exactly what needs to be added with this format:
+
+
+
 
