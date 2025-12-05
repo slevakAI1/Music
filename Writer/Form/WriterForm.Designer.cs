@@ -796,6 +796,7 @@ namespace Music.Writer
             btnDeletePhrases.TabIndex = 39;
             btnDeletePhrases.Text = "Delete";
             btnDeletePhrases.UseVisualStyleBackColor = true;
+            btnDeletePhrases.Click += btnDeletePhrases_Click;
             // 
             // btnClearPhrases
             // 

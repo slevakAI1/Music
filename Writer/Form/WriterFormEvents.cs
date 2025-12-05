@@ -402,6 +402,35 @@ namespace Music.Writer
             return dottedTicks;
         }
 
+        /// <summary>
+        /// Deletes all selected rows from the phrase grid.
+        /// Shows an informational message if nothing is selected.
+        /// </summary>
+        public void HandleDeletePhrases()
+        {
+            if (dgvPhrase.SelectedRows.Count == 0)
+            {
+                MessageBox.Show(this,
+                    "Please select one or more rows to delete.",
+                    "Delete Phrases",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            // Collect selected row indices and remove in descending order to avoid reindex issues
+            var indices = dgvPhrase.SelectedRows
+                .Cast<DataGridViewRow>()
+                .Select(r => r.Index)
+                .OrderByDescending(i => i)
+                .ToList();
+
+            foreach (var idx in indices)
+            {
+                if (idx >= 0 && idx < dgvPhrase.Rows.Count)
+                    dgvPhrase.Rows.RemoveAt(idx);
+            }
+        }
         #endregion
     }
 }

@@ -266,5 +266,10 @@ namespace Music.Writer
                 }
             }
         }
+
+        private void btnDeletePhrases_Click(object sender, EventArgs e)
+        {
+            HandleDeletePhrases();
+        }
     }
 }
