@@ -75,6 +75,15 @@ namespace Music.Writer
                 DgvPhrase_CellValueChanged,
                 DgvPhrase_CurrentCellDirtyStateChanged);
 
+
+
+
+            // Wire up double-click event for phrase viewer
+            dgvPhrase.CellDoubleClick += DgvPhrase_CellDoubleClick;
+
+
+
+
             // ====================   T H I S   H A S   T O   B E   L A S T  !   =================
 
             // Capture form control values manually set in the form designer
@@ -96,6 +105,41 @@ namespace Music.Writer
         private void DgvPhrase_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
         {
             PhraseGridManager.HandleCellValueChanged(dgvPhrase, sender, e);
+        }
+
+        /// <summary>
+        /// Opens a JSON viewer when the user double-clicks on the Phrase column.
+        /// </summary>
+        private void DgvPhrase_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            // Only handle double-clicks on the Phrase column (not header row)
+            if (e.RowIndex < 0)
+                return;
+
+            var phraseColumnIndex = dgvPhrase.Columns["colPhrase"]?.Index;
+            if (phraseColumnIndex == null || e.ColumnIndex != phraseColumnIndex.Value)
+                return;
+
+            var row = dgvPhrase.Rows[e.RowIndex];
+            var phraseData = row.Cells["colData"].Value;
+
+            // Validate that we have a Phrase object
+            if (phraseData is not Phrase phrase)
+            {
+                MessageBox.Show(this,
+                    "No phrase data available for this row.",
+                    "View Phrase",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            // Get the phrase number for the dialog title
+            var phraseNumber = row.Cells["colEventNumber"].Value?.ToString() ?? (e.RowIndex + 1).ToString();
+
+            // Open the JSON viewer dialog
+            using var viewer = new PhraseJsonViewer(phrase, phraseNumber);
+            viewer.ShowDialog(this);
         }
 
         protected override void OnShown(EventArgs e)
