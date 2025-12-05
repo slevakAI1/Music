@@ -122,7 +122,7 @@ namespace Music.Writer
                     MidiEvent.CreateTimeSignature(
                         absoluteTime,
                         timeSignatureEvent.Numerator,
-                        1 << timeSignatureEvent.Denominator, // Convert from MIDI format
+                        1 << timeSignatureEvent.Denominator,
                         timeSignatureEvent.ClocksPerClick,
                         timeSignatureEvent.ThirtySecondNotesPerBeat),
 
@@ -134,6 +134,16 @@ namespace Music.Writer
 
                 SequencerSpecificEvent sequencerEvent => 
                     MidiEvent.CreateSequencerSpecific(absoluteTime, sequencerEvent.Data),
+
+                SmpteOffsetEvent smpteEvent => 
+                    MidiEvent.CreateSmpteOffset(
+                        absoluteTime,
+                        (int)smpteEvent.Format,
+                        smpteEvent.Hours,
+                        smpteEvent.Minutes,
+                        smpteEvent.Seconds,
+                        smpteEvent.Frames,
+                        smpteEvent.SubFrames),
 
                 // Channel Voice Messages
                 NoteOffEvent noteOffEvent => 

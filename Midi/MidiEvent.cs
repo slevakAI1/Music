@@ -185,6 +185,11 @@ namespace Music.Writer
         // Simulate a guitar bend by ramping PitchBend up over 200ms while the note is sounding, then returning to center.
         PitchBend,
 
+        /// <summary>
+        /// SMPTE offset meta event (0x54).
+        /// Specifies SMPTE time code offset for synchronization.
+        /// </summary>
+        SmpteOffset,
 
         // ----------------------------
         // Safety / forward-compat
@@ -236,6 +241,7 @@ namespace Music.Writer
         /// Values can be int, string, or byte[] depending on the parameter type.
         /// </summary>
         public Dictionary<string, object> Parameters { get; init; } = new();
+
 
 
 
@@ -403,6 +409,75 @@ namespace Music.Writer
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["Data"] = data }
             };
+
+        /// <summary>
+        /// Creates a SMPTE offset meta event (0x54).
+        /// Specifies an offset for SMPTE time code synchronization.
+        /// </summary>
+        /// <param name="absoluteTime">Absolute time in ticks</param>
+        /// <param name="hours">Hours (0-23)</param>
+        /// <param name="minutes">Minutes (0-59)</param>
+        /// <param name="seconds">Seconds (0-59)</param>
+        /// <param name="frames">Frames (0-29, depending on frame rate)</param>
+        /// <param name="subFrames">Fractional frames (0-99, hundredths of a frame)</param>
+        public static MidiEvent CreateSmpteOffset(
+            long absoluteTime,
+            byte hours,
+            byte minutes,
+            byte seconds,
+            byte frames,
+            byte subFrames)
+        {
+            return new MidiEvent
+            {
+                AbsoluteTimeTicks = absoluteTime,
+                Type = MidiEventType.SmpteOffset,
+                Parameters = new Dictionary<string, object>
+                {
+                    { "Hours", hours },
+                    { "Minutes", minutes },
+                    { "Seconds", seconds },
+                    { "Frames", frames },
+                    { "SubFrames", subFrames }
+                }
+            };
+        }
+
+        /// <summary>
+        /// Creates a SMPTE offset meta event (0x54) with format specification.
+        /// Specifies an offset for SMPTE time code synchronization.
+        /// </summary>
+        /// <param name="absoluteTime">Absolute time in ticks</param>
+        /// <param name="format">SMPTE format (frame rate): 0=24fps, 1=25fps, 2=29.97fps(drop), 3=30fps</param>
+        /// <param name="hours">Hours (0-23)</param>
+        /// <param name="minutes">Minutes (0-59)</param>
+        /// <param name="seconds">Seconds (0-59)</param>
+        /// <param name="frames">Frames (0-29, depending on frame rate)</param>
+        /// <param name="subFrames">Fractional frames (0-99, hundredths of a frame)</param>
+        public static MidiEvent CreateSmpteOffset(
+            long absoluteTime,
+            int format,
+            byte hours,
+            byte minutes,
+            byte seconds,
+            byte frames,
+            byte subFrames)
+        {
+            return new MidiEvent
+            {
+                AbsoluteTimeTicks = absoluteTime,
+                Type = MidiEventType.SmpteOffset,
+                Parameters = new Dictionary<string, object>
+                {
+                    { "Format", format },
+                    { "Hours", hours },
+                    { "Minutes", minutes },
+                    { "Seconds", seconds },
+                    { "Frames", frames },
+                    { "SubFrames", subFrames }
+                }
+            };
+        }
 
         // ============================================================
         // Factory Methods - Channel Voice Messages

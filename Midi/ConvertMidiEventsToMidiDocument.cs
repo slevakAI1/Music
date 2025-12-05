@@ -139,6 +139,8 @@ namespace Music.Writer
                 {
                     DeltaTime = deltaTime
                 },
+
+                Writer.MidiEventType.SmpteOffset => CreateSmpteOffsetEvent(midiEvent, deltaTime),
                 
                 // Channel Voice Messages
                 Writer.MidiEventType.NoteOff => new NoteOffEvent(
@@ -229,6 +231,30 @@ namespace Music.Writer
             return new PitchBendEvent(unsignedValue)
             {
                 Channel = (FourBitNumber)GetIntParam(midiEvent, "Channel"),
+                DeltaTime = deltaTime
+            };
+        }
+
+        private static SmpteOffsetEvent CreateSmpteOffsetEvent(MidiEvent midiEvent, long deltaTime)
+        {
+            int formatValue = GetIntParam(midiEvent, "Format");
+            byte hours = (byte)GetIntParam(midiEvent, "Hours");
+            byte minutes = (byte)GetIntParam(midiEvent, "Minutes");
+            byte seconds = (byte)GetIntParam(midiEvent, "Seconds");
+            byte frames = (byte)GetIntParam(midiEvent, "Frames");
+            byte subFrames = (byte)GetIntParam(midiEvent, "SubFrames");
+
+            SmpteFormat format = formatValue switch
+            {
+                0 => SmpteFormat.TwentyFour,
+                1 => SmpteFormat.TwentyFive,
+                2 => SmpteFormat.ThirtyDrop,
+                3 => SmpteFormat.Thirty,
+                _ => SmpteFormat.TwentyFour
+            };
+            
+            return new SmpteOffsetEvent(format, hours, minutes, seconds, frames, subFrames)
+            {
                 DeltaTime = deltaTime
             };
         }
