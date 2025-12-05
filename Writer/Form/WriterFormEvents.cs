@@ -215,7 +215,7 @@ namespace Music.Writer
         public void HandleRepeatNote(WriterFormData formData)
         {
 
-            // TO DO SHOULD THIS BE A HIGHER LEVEL CHECK - DO ALL OR MOST COMMANDS NEED SELECTED PHRASES IF SO THEN YES
+            // TO DO  THIS should BE A check in the calling method ALL COMMANDS NEED SELECTED PHRASes
             
             // Check if any rows are selected
             if (dgvPhrase.SelectedRows.Count == 0)
