@@ -41,7 +41,8 @@ namespace Music.Writer
                 Dock = DockStyle.Fill,
                 BackColor = Color.Black,
                 ForeColor = Color.Lime,
-                BorderStyle = BorderStyle.None
+                BorderStyle = BorderStyle.None,
+                TabStop = false
             };
 
             // Close button
