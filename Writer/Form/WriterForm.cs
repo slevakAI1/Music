@@ -182,18 +182,18 @@ namespace Music.Writer
         }
 
         // TO DO - should have a popup to view a phrase on clicking the phrase column. can display in JSON maybe
-        // although that could be large for long phrases. This is a must though.
+        // although that could be large for long phrases. This is a must though. Will need to be something scrollable and structured/designed for future editing capability
 
         private void btnExecute_Click(object sender, EventArgs e)
         {
-            var pattern = cbCommand?.Text?.Trim() ?? string.Empty;
-            if (string.IsNullOrEmpty(pattern))
+            var command = cbCommand?.Text?.Trim() ?? string.Empty;
+            if (string.IsNullOrEmpty(command))
                 return;
 
             // Capture form data once at the higher level and pass to command handlers
             var formData = CaptureFormData();
 
-            switch (pattern)
+            switch (command)
             {
                 case "Repeat Note":
                     HandleRepeatNote(formData);

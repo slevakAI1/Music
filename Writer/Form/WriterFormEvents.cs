@@ -210,19 +210,11 @@ namespace Music.Writer
         #region "Execute Commands"
 
         // Adds repeating notes to the phrases selected in the grid
-        // TO DO - what if there are already notes? it should append. Can always clear so don't need overwrite.
-        // Note: WriterFormData does some preprocessing of the form data. Keep this note.
         public void HandleRepeatNote(WriterFormData formData)
         {
-
-            // TO DO  THIS should BE A check in the calling method ALL COMMANDS NEED SELECTED PHRASes
-            
-            // Check if any rows are selected
-            if (dgvPhrase.SelectedRows.Count == 0)
-            {
-                MessageBox.Show(this, "Please select one or more rows to apply this command.", "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // Validate that phrases are selected before executing
+            if (!ValidatePhrasesSelected())
                 return;
-            }
 
             var (noteNumber, noteDurationTicks, repeatCount, isRest) =
                 GetRepeatingNotesParameters(formData);
@@ -234,8 +226,40 @@ namespace Music.Writer
                 noteOnVelocity: 100,
                 isRest: isRest);
 
-            // TO DO THIS LOOKS LIKE A COMMON TARGET WRITER METHOD
-            // Write the phrase object to colData (cell[0]) of each selected row
+            // Write the phrase to all selected rows
+            WritePhraseToSelectedRows(phrase);
+        }
+
+        #endregion
+
+        #region "Helper Methods"
+
+        /// <summary>
+        /// Validates that one or more phrase rows are selected in the grid.
+        /// Shows a message box if no rows are selected.
+        /// </summary>
+        /// <returns>True if at least one row is selected, false otherwise.</returns>
+        private bool ValidatePhrasesSelected()
+        {
+            if (dgvPhrase.SelectedRows.Count == 0)
+            {
+                MessageBox.Show(
+                    this, 
+                    "Please select one or more rows to apply this command.", 
+                    "No Selection", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Information);
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Writes a phrase object to the colData and colPhrase cells of all selected rows.
+        /// </summary>
+        /// <param name="phrase">The phrase to write to the grid.</param>
+        private void WritePhraseToSelectedRows(Phrase phrase)
+        {
             foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
             {
                 selectedRow.Cells["colData"].Value = phrase;
@@ -243,9 +267,9 @@ namespace Music.Writer
             }
         }
 
-        // This returns all 4 parameters
-        // TO DO this has some reusable parts that should be extracted
-
+        /// <summary>
+        /// Extracts all repeating note parameters from form data.
+        /// </summary>
         private static (int noteNumber, int noteDurationTicks, int repeatCount, bool isRest)
             GetRepeatingNotesParameters(WriterFormData formData)
         {
@@ -255,13 +279,32 @@ namespace Music.Writer
             // Extract rest flag
             var isRest = formData.IsRest ?? false;
 
-            // CAN REUSE the note calculation part!
-
             // Calculate MIDI note number from step, accidental, and octave
-            var step = formData.Step;
-            var octave = formData.OctaveAbsolute ?? 4;
-            var accidental = formData.Accidental;
+            var noteNumber = CalculateMidiNoteNumber(
+                formData.Step,
+                formData.OctaveAbsolute ?? 4,
+                formData.Accidental);
 
+            // Calculate note duration in ticks
+            var noteDurationTicks = CalculateNoteDurationTicks(
+                formData.NoteValue,
+                formData.Dots,
+                formData.TupletNumber,
+                formData.TupletCount ?? 0,
+                formData.TupletOf ?? 0);
+
+            return (noteNumber, noteDurationTicks, repeatCount, isRest);
+        }
+
+        /// <summary>
+        /// Calculates MIDI note number from musical note components.
+        /// </summary>
+        /// <param name="step">The note step (C, D, E, F, G, A, B)</param>
+        /// <param name="octave">The octave number</param>
+        /// <param name="accidental">The accidental string ("Sharp", "Flat", "Natural", etc.)</param>
+        /// <returns>The MIDI note number (0-127)</returns>
+        private static int CalculateMidiNoteNumber(char step, int octave, string? accidental)
+        {
             // Convert accidental string to alter value
             int alter = accidental switch
             {
@@ -283,15 +326,26 @@ namespace Music.Writer
                 'B' => 11,
                 _ => 0
             };
-            int noteNumber = (octave + 1) * 12 + baseNote + alter;
 
-            // Calculate note duration in ticks
-            var noteValue = formData.NoteValue;
-            var dots = formData.Dots;
-            var tupletNumber = formData.TupletNumber;
-            var tupletCount = formData.TupletCount ?? 0;
-            var tupletOf = formData.TupletOf ?? 0;
+            return (octave + 1) * 12 + baseNote + alter;
+        }
 
+        /// <summary>
+        /// Calculates note duration in MIDI ticks.
+        /// </summary>
+        /// <param name="noteValue">The note value string (e.g., "4" for quarter note)</param>
+        /// <param name="dots">Number of dots to apply</param>
+        /// <param name="tupletNumber">Optional tuplet identifier</param>
+        /// <param name="tupletCount">Tuplet count (m in m:n tuplet)</param>
+        /// <param name="tupletOf">Tuplet basis (n in m:n tuplet)</param>
+        /// <returns>Duration in MIDI ticks</returns>
+        private static int CalculateNoteDurationTicks(
+            string? noteValue,
+            int dots,
+            string? tupletNumber,
+            int tupletCount,
+            int tupletOf)
+        {
             const int ticksPerQuarterNote = 480;
             int duration = int.TryParse(noteValue, out int d) ? d : 4;
 
@@ -299,24 +353,55 @@ namespace Music.Writer
             int baseTicks = (ticksPerQuarterNote * 4) / duration;
 
             // Apply dots (each dot adds half of the previous value)
+            int dottedTicks = ApplyDots(baseTicks, dots);
+
+            // Apply tuplet if specified
+            return ApplyTuplet(dottedTicks, tupletNumber, tupletCount, tupletOf);
+        }
+
+        /// <summary>
+        /// Applies dot duration extensions to a base duration.
+        /// </summary>
+        /// <param name="baseTicks">The base duration in ticks</param>
+        /// <param name="dots">Number of dots to apply</param>
+        /// <returns>The dotted duration in ticks</returns>
+        private static int ApplyDots(int baseTicks, int dots)
+        {
             int dottedTicks = baseTicks;
             int addedValue = baseTicks / 2;
+            
             for (int i = 0; i < dots; i++)
             {
                 dottedTicks += addedValue;
                 addedValue /= 2;
             }
 
-            // Apply tuplet if specified
-            int noteDurationTicks = dottedTicks;
+            return dottedTicks;
+        }
+
+        /// <summary>
+        /// Applies tuplet adjustment to a duration.
+        /// </summary>
+        /// <param name="dottedTicks">The dotted duration in ticks</param>
+        /// <param name="tupletNumber">Optional tuplet identifier</param>
+        /// <param name="tupletCount">Tuplet count (m in m:n tuplet)</param>
+        /// <param name="tupletOf">Tuplet basis (n in m:n tuplet)</param>
+        /// <returns>The tuplet-adjusted duration in ticks</returns>
+        private static int ApplyTuplet(
+            int dottedTicks,
+            string? tupletNumber,
+            int tupletCount,
+            int tupletOf)
+        {
             if (!string.IsNullOrWhiteSpace(tupletNumber) && tupletCount > 0 && tupletOf > 0)
             {
                 // Tuplet adjusts duration: e.g., triplet = 2/3 of normal duration
-                noteDurationTicks = (dottedTicks * tupletOf) / tupletCount;
+                return (dottedTicks * tupletOf) / tupletCount;
             }
 
-            return (noteNumber, noteDurationTicks, repeatCount, isRest);
+            return dottedTicks;
         }
+
         #endregion
     }
 }
