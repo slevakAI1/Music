@@ -186,19 +186,23 @@ namespace Music.Writer
 
         private void btnExecute_Click(object sender, EventArgs e)
         {
-            var command = cbCommand?.Text?.Trim() ?? string.Empty;
-            if (string.IsNullOrEmpty(command))
+            var pattern = cbCommand?.Text?.Trim() ?? string.Empty;
+            if (string.IsNullOrEmpty(pattern))
                 return;
 
-            switch (command)
+            // Capture form data once at the higher level and pass to command handlers
+            var formData = CaptureFormData();
+
+            switch (pattern)
             {
                 case "Repeat Note":
-                    HandleRepeatNote();
+                    HandleRepeatNote(formData);
                     break;
 
                 // Other cases will be added here later.
 
                 default:
+                    // Do nothing - do not change this branch code ever
                     break;
             }
         }

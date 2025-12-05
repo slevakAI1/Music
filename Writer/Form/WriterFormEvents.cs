@@ -211,7 +211,10 @@ namespace Music.Writer
 
         // Adds repeating notes to the phrases selected in the grid
         // TODO - what if there are already notes? it should append. Can always clear so don't need overwrite.
-        public void HandleRepeatNote()
+
+        // TODO - its odd that data from the form is being passed view formdata and pulled directly from the grid.
+        //        look at this.
+        public void HandleRepeatNote(WriterFormData formData)
         {
 
             // TO DO SHOULD THIS BE A HIGHER LEVEL CHECK - DO ALL OR MOST COMMANDS NEED SELECTED PHRASES IF SO THEN YES
@@ -222,10 +225,6 @@ namespace Music.Writer
                 MessageBox.Show(this, "Please select one or more rows to apply this command.", "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-
-            // TO DO SHOULD THIS BE A HIGHER LEVEL? almost certainly all or most commands need form data
-            var formData = CaptureFormData();
-
 
             var (noteNumber, noteDurationTicks, repeatCount, isRest) =
                 GetRepeatingNotesParameters(formData);
