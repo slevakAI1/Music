@@ -215,9 +215,13 @@ namespace Music.Writer
         {
             HandleExportToNotion();
         }
+        
+        // TO DO  -  Maybe the writing out to the grid should happen here and
+        //           each command returns the data to write out ??? what data would this require?
 
-        // TO DO - should have a popup to view a phrase on clicking the phrase column. can display in JSON maybe
-        // although that could be large for long phrases. This is a must though. Will need to be something scrollable and structured/designed for future editing capability
+
+        // TO DO - ALWAYS APPEND TO SELECTED ROWS - this should cover everything - even
+        // add an added row.
 
         private void btnExecute_Click(object sender, EventArgs e)
         {
