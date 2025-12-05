@@ -144,7 +144,7 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Adds a phrase to the phrase grid with default instrument and auto-incrementing phrase number.
+        /// Adds a phrase to the phrase grid with instrument information from the phrase itself.
         /// </summary>
         /// <param name="phrase">The phrase to add</param>
         /// <param name="midiInstruments">List of available MIDI instruments</param>
@@ -161,7 +161,7 @@ namespace Music.Writer
             var phraseName = phraseNumber.ToString();
 
             // Get part name from the phrase
-            var partName = phrase.MidiProgramName;
+            var partName = phrase.MidiProgramName ?? "Select...";
 
             // Add new row
             int newRowIndex = dgvPhrase.Rows.Add();
@@ -170,22 +170,32 @@ namespace Music.Writer
             // Column 0: Hidden data (Phrase object)
             row.Cells["colData"].Value = phrase;
 
-            // Column 1: MIDI Instrument dropdown - default to "Select..." (ProgramNumber = -1)
-            row.Cells["colInstrument"].Value = -1;
+            // Column 1: MIDI Instrument dropdown - use phrase's program number if available
+            if (phrase.MidiProgramNumber >= 0 && phrase.MidiProgramNumber <= 127)
+            {
+                row.Cells["colInstrument"].Value = phrase.MidiProgramNumber;
+            }
+            else
+            {
+                row.Cells["colInstrument"].Value = -1; // "Select..."
+            }
 
             // Column 2: Stave - default to 1 for newly added rows
             row.Cells["colStave"].Value = 1;
 
-            // TODO fix this name!
             // Column 3: Event number
             row.Cells["colEventNumber"].Value = phraseName;
 
-            // Column 4: Description
-            if (partName != "Select...")
+            // Column 4: Description - show instrument name
+            if (!string.IsNullOrEmpty(partName) && partName != "Select...")
+            {
                 row.Cells["colDescription"].Value = $"Part: {partName}";
+            }
 
-            // Column 5: Phrase details (placeholder)
-            row.Cells["colPhrase"].Value = "";
+            // Column 5: Phrase details
+            row.Cells["colPhrase"].Value = phrase.PhraseNotes.Count > 0 
+                ? $"{phrase.PhraseNotes.Count} note(s)" 
+                : "Empty phrase";
         }
     }
 }

@@ -19,6 +19,9 @@ namespace Music.Writer
         // playback service (reused for multiple play calls)
         private IMidiPlaybackService _midiPlaybackService;
 
+        // MIDI I/O service for importing/exporting MIDI files
+        private MidiIoService _midiIoService;
+
         private int phraseNumber = 0;
 
         // MIDI instrument list for dropdown
@@ -34,6 +37,9 @@ namespace Music.Writer
 
             // create playback service
             _midiPlaybackService = new MidiPlaybackService();
+
+            // Initialize MIDI I/O service
+            _midiIoService = new MidiIoService();
 
             // Initialize MIDI instruments list
             _midiInstruments = MidiInstrument.GetGeneralMidiInstruments();
@@ -313,7 +319,111 @@ namespace Music.Writer
 
         private void btnImport_Click(object sender, EventArgs e)
         {
+            using var ofd = new OpenFileDialog
+            {
+                Filter = "MIDI files (*.mid;*.midi)|*.mid;*.midi|All files (*.*)|*.*",
+                Title = "Import MIDI File",
+                CheckFileExists = true
+            };
 
+            if (ofd.ShowDialog(this) != DialogResult.OK)
+                return;
+
+            try
+            {
+                // Import the MIDI file using the existing service
+                var midiDoc = _midiIoService.ImportFromFile(ofd.FileName);
+
+                // Convert MIDI document to lists of MidiEvent objects
+                List<List<MidiEvent>> midiEventLists;
+                try
+                {
+                    midiEventLists = ConvertMidiDocumentToMidiEvents.Convert(midiDoc);
+                }
+                catch (NotSupportedException ex)
+                {
+                    // Show detailed error about unsupported MIDI event
+                    MessageBox.Show(
+                        this,
+                        ex.Message,
+                        "Unsupported MIDI Event",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Convert MidiEvent lists to Phrase objects
+                var phrases = ConvertMidiEventListsToPhrases(midiEventLists);
+
+                // Add each phrase to the grid
+                foreach (var phrase in phrases)
+                {
+                    PhraseGridManager.AddPhraseToGrid(
+                        phrase, 
+                        _midiInstruments, 
+                        dgvPhrase, 
+                        ref phraseNumber);
+                }
+
+                MessageBox.Show(
+                    this,
+                    $"Successfully imported {phrases.Count} track(s) from:\n{Path.GetFileName(ofd.FileName)}",
+                    "Import Successful",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    this,
+                    $"Error importing MIDI file:\n{ex.Message}\n\n{ex.InnerException?.Message}",
+                    "Import Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Converts lists of MidiEvent objects to Phrase objects.
+        /// Each list becomes one phrase with instrument information extracted from ProgramChange events.
+        /// </summary>
+        private List<Phrase> ConvertMidiEventListsToPhrases(List<List<MidiEvent>> midiEventLists)
+        {
+            var phrases = new List<Phrase>();
+
+            foreach (var midiEventList in midiEventLists)
+            {
+                var phrase = new Phrase(new List<PhraseNote>());
+
+                // Extract instrument information from ProgramChange event
+                var programChangeEvent = midiEventList
+                    .FirstOrDefault(e => e.Type == MidiEventType.ProgramChange);
+
+                if (programChangeEvent != null &&
+                    programChangeEvent.Parameters.TryGetValue("Program", out var programObj))
+                {
+                    byte programNumber = (byte)Convert.ToInt32(programObj);
+                    phrase.MidiProgramNumber = programNumber;
+
+                    // Find the matching instrument name
+                    var instrument = _midiInstruments
+                        .FirstOrDefault(i => i.ProgramNumber == programNumber);
+                    phrase.MidiProgramName = instrument?.Name ?? $"Program {programNumber}";
+                }
+                else
+                {
+                    // No program change found - use default
+                    phrase.MidiProgramNumber = 0;
+                    phrase.MidiProgramName = "Acoustic Grand Piano";
+                }
+
+                // Store the MidiEvent list in a format that can be used later
+                // For now, we'll just create an empty phrase - actual note conversion 
+                // can be added later if needed
+                phrases.Add(phrase);
+            }
+
+            return phrases;
         }
     }
 }
