@@ -36,9 +36,7 @@ namespace Music.Writer
             // Step 3 - Execute merged timed notes to MIDI document
             var midiDoc = ConvertMidiEventsToMidiDocument.Convert(
                 mergedMidiEventLists,
-                tempo: tempo,
-                timeSignatureNumerator: timeSignatureNumerator,
-                timeSignatureDenominator: timeSignatureDenominator);
+                tempo: tempo);
 
             return midiDoc;
         }

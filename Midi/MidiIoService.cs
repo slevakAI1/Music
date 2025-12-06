@@ -21,6 +21,7 @@ namespace Music.Tests
             }
         }
 
+        // TODO THIS THROWS ERROR WHEN FILE EXISTS - HOW SHOULD IT WORK?
         public void ExportToFile(string path, MidiSongDocument doc)
         {
             try

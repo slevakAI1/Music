@@ -15,8 +15,6 @@ namespace Music.Writer
         public static MidiSongDocument Convert(
             List<List<MidiEvent>> midiEventLists,
             int tempo,
-            int timeSignatureNumerator,
-            int timeSignatureDenominator,
             short ticksPerQuarterNote = 480)
         {
             if (midiEventLists == null)
@@ -123,7 +121,7 @@ namespace Music.Writer
                 
                 Writer.MidiEventType.TimeSignature => new TimeSignatureEvent(
                     (byte)GetIntParam(midiEvent, "Numerator"),
-                    (byte)Math.Log2(GetIntParam(midiEvent, "Denominator")))
+                    (byte)GetIntParam(midiEvent, "Denominator"))
                 {
                     DeltaTime = deltaTime
                 },
