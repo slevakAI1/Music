@@ -352,14 +352,8 @@ namespace Music.Writer
                     return;
                 }
 
-
-
-
                 // Convert MidiEvent lists to Phrase objects
-                var phrases = ConvertMidiEventListsToPhrases(midiEventLists);
-
-
-
+                var phrases = MidiEventListConverter.ConvertMidiEventListsToPhrases(midiEventLists, _midiInstruments);
 
                 // Add each phrase to the grid
                 foreach (var phrase in phrases)
@@ -387,49 +381,6 @@ namespace Music.Writer
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }
-        }
-
-        /// <summary>
-        /// Converts lists of MidiEvent objects to Phrase objects.
-        /// Each list becomes one phrase with instrument information extracted from ProgramChange events.
-        /// </summary>
-        private List<Phrase> ConvertMidiEventListsToPhrases(List<List<MidiEvent>> midiEventLists)
-        {
-            var phrases = new List<Phrase>();
-
-            foreach (var midiEventList in midiEventLists)
-            {
-                var phrase = new Phrase(new List<PhraseNote>());
-
-                // Extract instrument information from ProgramChange event
-                var programChangeEvent = midiEventList
-                    .FirstOrDefault(e => e.Type == MidiEventType.ProgramChange);
-
-                if (programChangeEvent != null &&
-                    programChangeEvent.Parameters.TryGetValue("Program", out var programObj))
-                {
-                    byte programNumber = (byte)Convert.ToInt32(programObj);
-                    phrase.MidiProgramNumber = programNumber;
-
-                    // Find the matching instrument name
-                    var instrument = _midiInstruments
-                        .FirstOrDefault(i => i.ProgramNumber == programNumber);
-                    phrase.MidiProgramName = instrument?.Name ?? $"Program {programNumber}";
-                }
-                else
-                {
-                    // No program change found - use default
-                    phrase.MidiProgramNumber = 0;
-                    phrase.MidiProgramName = "Acoustic Grand Piano";
-                }
-
-                // Store the MidiEvent list in a format that can be used later
-                // For now, we'll just create an empty phrase - actual note conversion 
-                // can be added later if needed
-                phrases.Add(phrase);
-            }
-
-            return phrases;
         }
     }
 }
