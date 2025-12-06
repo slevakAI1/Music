@@ -352,8 +352,14 @@ namespace Music.Writer
                     return;
                 }
 
+
+
+
                 // Convert MidiEvent lists to Phrase objects
                 var phrases = ConvertMidiEventListsToPhrases(midiEventLists);
+
+
+
 
                 // Add each phrase to the grid
                 foreach (var phrase in phrases)

@@ -88,7 +88,13 @@ namespace Music.Writer
         {
             return dryWetEvent switch
             {
+                // ============================================================
                 // Meta Events
+                // ============================================================
+
+                SequenceNumberEvent sequenceNumberEvent => 
+                    MidiEvent.CreateSequenceNumber(absoluteTime, sequenceNumberEvent.Number),
+
                 TextEvent textEvent => 
                     MidiEvent.CreateText(absoluteTime, textEvent.Text),
 
@@ -107,8 +113,20 @@ namespace Music.Writer
                 MarkerEvent markerEvent => 
                     MidiEvent.CreateMarker(absoluteTime, markerEvent.Text),
 
+                CuePointEvent cuePointEvent => 
+                    MidiEvent.CreateCuePoint(absoluteTime, cuePointEvent.Text),
+
                 ProgramNameEvent programNameEvent => 
                     MidiEvent.CreateProgramName(absoluteTime, programNameEvent.Text),
+
+                DeviceNameEvent deviceNameEvent => 
+                    MidiEvent.CreateDeviceName(absoluteTime, deviceNameEvent.Text),
+
+                ChannelPrefixEvent channelPrefixEvent => 
+                    MidiEvent.CreateMidiChannelPrefix(absoluteTime, channelPrefixEvent.Channel),
+
+                PortPrefixEvent portPrefixEvent => 
+                    MidiEvent.CreateMidiPort(absoluteTime, portPrefixEvent.Port),
 
                 EndOfTrackEvent => 
                     MidiEvent.CreateEndOfTrack(absoluteTime),
@@ -117,6 +135,16 @@ namespace Music.Writer
                     MidiEvent.CreateSetTempo(
                         absoluteTime, 
                         microsecondsPerQuarterNote: (int)tempoEvent.MicrosecondsPerQuarterNote),
+
+                SmpteOffsetEvent smpteEvent => 
+                    MidiEvent.CreateSmpteOffset(
+                        absoluteTime,
+                        (int)smpteEvent.Format,
+                        smpteEvent.Hours,
+                        smpteEvent.Minutes,
+                        smpteEvent.Seconds,
+                        smpteEvent.Frames,
+                        smpteEvent.SubFrames),
 
                 TimeSignatureEvent timeSignatureEvent => 
                     MidiEvent.CreateTimeSignature(
@@ -135,17 +163,16 @@ namespace Music.Writer
                 SequencerSpecificEvent sequencerEvent => 
                     MidiEvent.CreateSequencerSpecific(absoluteTime, sequencerEvent.Data),
 
-                SmpteOffsetEvent smpteEvent => 
-                    MidiEvent.CreateSmpteOffset(
-                        absoluteTime,
-                        (int)smpteEvent.Format,
-                        smpteEvent.Hours,
-                        smpteEvent.Minutes,
-                        smpteEvent.Seconds,
-                        smpteEvent.Frames,
-                        smpteEvent.SubFrames),
+                UnknownMetaEvent unknownMetaEvent => 
+                    MidiEvent.CreateUnknownMeta(
+                        absoluteTime, 
+                        unknownMetaEvent.StatusByte, 
+                        unknownMetaEvent.Data),
 
+                // ============================================================
                 // Channel Voice Messages
+                // ============================================================
+
                 NoteOffEvent noteOffEvent => 
                     MidiEvent.CreateNoteOff(
                         absoluteTime,
@@ -192,7 +219,61 @@ namespace Music.Writer
                         (int)pitchBendEvent.Channel,
                         pitchBendEvent.PitchValue - 8192), // Convert from unsigned to signed
 
-                // Unknown/unsupported event type
+                // ============================================================
+                // System Exclusive Events
+                // ============================================================
+
+                NormalSysExEvent normalSysExEvent => 
+                    MidiEvent.CreateNormalSysEx(absoluteTime, normalSysExEvent.Data),
+
+                EscapeSysExEvent escapeSysExEvent => 
+                    MidiEvent.CreateEscapeSysEx(absoluteTime, escapeSysExEvent.Data),
+
+                // ============================================================
+                // System Common Messages
+                // ============================================================
+
+                MidiTimeCodeEvent mtcEvent => 
+                    MidiEvent.CreateMtcQuarterFrame(
+                        absoluteTime, 
+                        (byte)mtcEvent.Component, 
+                        mtcEvent.ComponentValue),
+
+                SongPositionPointerEvent songPositionEvent => 
+                    MidiEvent.CreateSongPositionPointer(absoluteTime, songPositionEvent.PointerValue),
+
+                SongSelectEvent songSelectEvent => 
+                    MidiEvent.CreateSongSelect(absoluteTime, songSelectEvent.Number),
+
+                TuneRequestEvent => 
+                    MidiEvent.CreateTuneRequest(absoluteTime),
+
+                // ============================================================
+                // System Real-Time Messages
+                // ============================================================
+
+                TimingClockEvent => 
+                    MidiEvent.CreateTimingClock(absoluteTime),
+
+                StartEvent => 
+                    MidiEvent.CreateStart(absoluteTime),
+
+                ContinueEvent => 
+                    MidiEvent.CreateContinue(absoluteTime),
+
+                StopEvent => 
+                    MidiEvent.CreateStop(absoluteTime),
+
+                ActiveSensingEvent => 
+                    MidiEvent.CreateActiveSensing(absoluteTime),
+
+                ResetEvent => 
+                    MidiEvent.CreateSystemReset(absoluteTime),
+
+                // ============================================================
+                // Unknown/Unsupported
+                // ============================================================
+
                 _ => throw new NotSupportedException(
                     $"MIDI event type '{dryWetEvent.GetType().Name}' is not currently supported.")
             };

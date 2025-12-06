@@ -160,7 +160,7 @@ namespace Music.Writer
             phraseNumber++;
             var phraseName = phraseNumber.ToString();
 
-            // Get part name from the phrase
+            // Get part name from the phrase (this should already be set correctly by ConvertMidiEventListsToPhrases)
             var partName = phrase.MidiProgramName ?? "Select...";
 
             // Add new row
@@ -170,15 +170,22 @@ namespace Music.Writer
             // Column 0: Hidden data (Phrase object)
             row.Cells["colData"].Value = phrase;
 
-            // Column 1: MIDI Instrument dropdown - use phrase's program number if available
-            if (phrase.MidiProgramNumber >= 0 && phrase.MidiProgramNumber <= 127)
+            // Column 1: MIDI Instrument dropdown
+            // The combo box uses ValueMember="ProgramNumber" and DisplayMember="Name"
+            // So we set the cell value to the program number, and it will display the name
+            int programNumberToSet = -1; // Default to "Select..."
+
+            if (phrase.MidiProgramNumber >= 0 && phrase.MidiProgramNumber <= 255)
             {
-                row.Cells["colInstrument"].Value = phrase.MidiProgramNumber;
+                // Verify the program number exists in the instrument list
+                var matchingInstrument = midiInstruments.FirstOrDefault(i => i.ProgramNumber == phrase.MidiProgramNumber);
+                if (matchingInstrument != null)
+                {
+                    programNumberToSet = phrase.MidiProgramNumber;
+                }
             }
-            else
-            {
-                row.Cells["colInstrument"].Value = -1; // "Select..."
-            }
+
+            row.Cells["colInstrument"].Value = programNumberToSet;
 
             // Column 2: Stave - default to 1 for newly added rows
             row.Cells["colStave"].Value = 1;
@@ -186,10 +193,14 @@ namespace Music.Writer
             // Column 3: Event number
             row.Cells["colEventNumber"].Value = phraseName;
 
-            // Column 4: Description - show instrument name
+            // Column 4: Description - show the actual instrument name from the phrase
             if (!string.IsNullOrEmpty(partName) && partName != "Select...")
             {
                 row.Cells["colDescription"].Value = $"Part: {partName}";
+            }
+            else
+            {
+                row.Cells["colDescription"].Value = string.Empty;
             }
 
             // Column 5: Phrase details
