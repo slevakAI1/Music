@@ -794,7 +794,7 @@ namespace Music.Writer
             // btnImport
             // 
             btnImport.ForeColor = Color.FromArgb(255, 128, 0);
-            btnImport.Location = new Point(725, 365);
+            btnImport.Location = new Point(549, 363);
             btnImport.Name = "btnImport";
             btnImport.Size = new Size(147, 23);
             btnImport.TabIndex = 41;
