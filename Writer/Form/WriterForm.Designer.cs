@@ -104,12 +104,13 @@ namespace Music.Writer
             btnExecute = new Button();
             grbCurrentDesign = new GroupBox();
             groupBox4 = new GroupBox();
+            btnImport = new Button();
             btnAddPhrase = new Button();
             btnDeletePhrases = new Button();
             btnClearPhrases = new Button();
             btnPlayPhrases = new Button();
             dgvPhrase = new DataGridView();
-            btnImport = new Button();
+            btnExport = new Button();
             grbParts.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -740,7 +741,7 @@ namespace Music.Writer
             // 
             // btnExecute
             // 
-            btnExecute.ForeColor = Color.Red;
+            btnExecute.ForeColor = Color.FromArgb(255, 128, 0);
             btnExecute.Location = new Point(284, 21);
             btnExecute.Name = "btnExecute";
             btnExecute.Size = new Size(114, 23);
@@ -764,6 +765,7 @@ namespace Music.Writer
             // groupBox4
             // 
             groupBox4.BackColor = Color.Black;
+            groupBox4.Controls.Add(btnExport);
             groupBox4.Controls.Add(btnImport);
             groupBox4.Controls.Add(btnAddPhrase);
             groupBox4.Controls.Add(btnDeletePhrases);
@@ -778,9 +780,20 @@ namespace Music.Writer
             groupBox4.TabStop = false;
             groupBox4.Text = "Phrases";
             // 
+            // btnImport
+            // 
+            btnImport.ForeColor = Color.FromArgb(255, 128, 0);
+            btnImport.Location = new Point(374, 363);
+            btnImport.Name = "btnImport";
+            btnImport.Size = new Size(72, 23);
+            btnImport.TabIndex = 41;
+            btnImport.Text = "Import";
+            btnImport.UseVisualStyleBackColor = true;
+            btnImport.Click += btnImport_Click;
+            // 
             // btnAddPhrase
             // 
-            btnAddPhrase.ForeColor = Color.Red;
+            btnAddPhrase.ForeColor = Color.FromArgb(0, 192, 0);
             btnAddPhrase.Location = new Point(15, 365);
             btnAddPhrase.Name = "btnAddPhrase";
             btnAddPhrase.Size = new Size(72, 23);
@@ -791,7 +804,7 @@ namespace Music.Writer
             // 
             // btnDeletePhrases
             // 
-            btnDeletePhrases.ForeColor = Color.Red;
+            btnDeletePhrases.ForeColor = Color.FromArgb(0, 192, 0);
             btnDeletePhrases.Location = new Point(281, 363);
             btnDeletePhrases.Name = "btnDeletePhrases";
             btnDeletePhrases.Size = new Size(72, 23);
@@ -802,7 +815,7 @@ namespace Music.Writer
             // 
             // btnClearPhrases
             // 
-            btnClearPhrases.ForeColor = Color.Red;
+            btnClearPhrases.ForeColor = Color.FromArgb(0, 192, 0);
             btnClearPhrases.Location = new Point(193, 363);
             btnClearPhrases.Name = "btnClearPhrases";
             btnClearPhrases.Size = new Size(72, 23);
@@ -813,7 +826,7 @@ namespace Music.Writer
             // 
             // btnPlayPhrases
             // 
-            btnPlayPhrases.ForeColor = Color.Red;
+            btnPlayPhrases.ForeColor = Color.FromArgb(0, 192, 0);
             btnPlayPhrases.Location = new Point(103, 365);
             btnPlayPhrases.Name = "btnPlayPhrases";
             btnPlayPhrases.Size = new Size(72, 23);
@@ -834,16 +847,15 @@ namespace Music.Writer
             dgvPhrase.TabIndex = 37;
             dgvPhrase.CellDoubleClick += DgvPhrase_CellDoubleClick;
             // 
-            // btnImport
+            // btnExport
             // 
-            btnImport.ForeColor = Color.Red;
-            btnImport.Location = new Point(374, 363);
-            btnImport.Name = "btnImport";
-            btnImport.Size = new Size(72, 23);
-            btnImport.TabIndex = 41;
-            btnImport.Text = "Import";
-            btnImport.UseVisualStyleBackColor = true;
-            btnImport.Click += btnImport_Click;
+            btnExport.ForeColor = Color.Red;
+            btnExport.Location = new Point(463, 363);
+            btnExport.Name = "btnExport";
+            btnExport.Size = new Size(72, 23);
+            btnExport.TabIndex = 42;
+            btnExport.Text = "Export";
+            btnExport.UseVisualStyleBackColor = true;
             // 
             // WriterForm
             // 
@@ -937,5 +949,6 @@ namespace Music.Writer
         private Button btnNewScore;
         private TextBox txtMovementTitle;
         private Button btnImport;
+        private Button btnExport;
     }
 }
