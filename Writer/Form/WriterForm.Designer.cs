@@ -782,7 +782,7 @@ namespace Music.Writer
             // 
             // btnExport
             // 
-            btnExport.ForeColor = Color.FromArgb(255, 128, 0);
+            btnExport.ForeColor = Color.FromArgb(0, 192, 0);
             btnExport.Location = new Point(367, 363);
             btnExport.Name = "btnExport";
             btnExport.Size = new Size(164, 23);
