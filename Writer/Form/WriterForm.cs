@@ -359,9 +359,9 @@ namespace Music.Writer
                 foreach (var phrase in phrases)
                 {
                     PhraseGridManager.AddPhraseToGrid(
-                        phrase, 
-                        _midiInstruments, 
-                        dgvPhrase, 
+                        phrase,
+                        _midiInstruments,
+                        dgvPhrase,
                         ref phraseNumber);
                 }
 
@@ -380,6 +380,97 @@ namespace Music.Writer
                     "Import Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnExport_Click(object sender, EventArgs e)
+        {
+            // Check if there are any rows in the grid
+            if (dgvPhrase.Rows.Count == 0)
+            {
+                MessageBox.Show(this, "No pitch events to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Check if a row is selected
+            if (dgvPhrase.SelectedRows.Count == 0)
+            {
+                MessageBox.Show(this, "Please select a pitch event to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Build list of Phrase from all selected rows
+            var phrases = new List<Phrase>();
+            foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
+            {
+                // Validate instrument cell value first (may be DBNull or null)
+                var instrObj = selectedRow.Cells["colInstrument"].Value;
+                int programNumber = programNumber = Convert.ToInt32(instrObj);
+                if (programNumber == -1)  // -1 = placeholder "Select..." -> treat as missing selection
+                {
+                    var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
+                    MessageBox.Show(
+                        this,
+                        $"No instrument selected for row #{eventNumber}. Please select an instrument before exporting.",
+                        "Missing Instrument",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return; // Abort export
+                }
+
+                // Validate phrase data exists in hidden data column before using it
+                var phrase = (Phrase)selectedRow.Cells["colData"].Value;
+                if (phrase.PhraseNotes.Count == 0)
+                {
+                    var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
+                    MessageBox.Show(
+                        this,
+                        $"No phrase data for row #{eventNumber}. Please add or assign a phrase before exporting.",
+                        "Missing Phrase",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return; // Abort export
+                }
+
+                // Valid program number (0-127 or 255 for drums) – safe to cast now
+                phrase.MidiProgramNumber = (byte)programNumber;
+                phrases.Add(phrase);
+            }
+
+            // Ask user where to save the MIDI file
+            using var sfd = new SaveFileDialog
+            {
+                Filter = "MIDI files (*.mid)|*.mid|All files (*.*)|*.*",
+                Title = "Export MIDI File",
+                DefaultExt = "mid",
+                AddExtension = true
+            };
+
+            if (sfd.ShowDialog(this) != DialogResult.OK)
+                return;
+
+            try
+            {
+                // Consolidated conversion: phrases -> midi document
+                var midiDoc = PhrasesToMidiDocumentConverter.Convert(
+                    phrases,
+                    tempo: 112,
+                    timeSignatureNumerator: 4,
+                    timeSignatureDenominator: 4);
+
+                // Export to file
+                _midiIoService.ExportToFile(sfd.FileName, midiDoc);
+
+                MessageBox.Show(
+                    this,
+                    $"Successfully exported to:\n{Path.GetFileName(sfd.FileName)}",
+                    "Export Successful",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, $"Error exporting MIDI: {ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

@@ -104,13 +104,13 @@ namespace Music.Writer
             btnExecute = new Button();
             grbCurrentDesign = new GroupBox();
             groupBox4 = new GroupBox();
+            btnExport = new Button();
             btnImport = new Button();
             btnAddPhrase = new Button();
             btnDeletePhrases = new Button();
             btnClearPhrases = new Button();
             btnPlayPhrases = new Button();
             dgvPhrase = new DataGridView();
-            btnExport = new Button();
             grbParts.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -780,14 +780,25 @@ namespace Music.Writer
             groupBox4.TabStop = false;
             groupBox4.Text = "Phrases";
             // 
+            // btnExport
+            // 
+            btnExport.ForeColor = Color.FromArgb(255, 128, 0);
+            btnExport.Location = new Point(367, 363);
+            btnExport.Name = "btnExport";
+            btnExport.Size = new Size(164, 23);
+            btnExport.TabIndex = 42;
+            btnExport.Text = "Export - New Untested";
+            btnExport.UseVisualStyleBackColor = true;
+            btnExport.Click += btnExport_Click;
+            // 
             // btnImport
             // 
             btnImport.ForeColor = Color.FromArgb(255, 128, 0);
-            btnImport.Location = new Point(374, 363);
+            btnImport.Location = new Point(725, 365);
             btnImport.Name = "btnImport";
-            btnImport.Size = new Size(72, 23);
+            btnImport.Size = new Size(147, 23);
             btnImport.TabIndex = 41;
-            btnImport.Text = "Import";
+            btnImport.Text = "Import - Malfunctioning";
             btnImport.UseVisualStyleBackColor = true;
             btnImport.Click += btnImport_Click;
             // 
@@ -846,16 +857,6 @@ namespace Music.Writer
             dgvPhrase.Size = new Size(1532, 334);
             dgvPhrase.TabIndex = 37;
             dgvPhrase.CellDoubleClick += DgvPhrase_CellDoubleClick;
-            // 
-            // btnExport
-            // 
-            btnExport.ForeColor = Color.Red;
-            btnExport.Location = new Point(463, 363);
-            btnExport.Name = "btnExport";
-            btnExport.Size = new Size(72, 23);
-            btnExport.TabIndex = 42;
-            btnExport.Text = "Export";
-            btnExport.UseVisualStyleBackColor = true;
             // 
             // WriterForm
             // 
