@@ -175,15 +175,12 @@ namespace Music.Writer
             // So we set the cell value to the program number, and it will display the name
             int programNumberToSet = -1; // Default to "Select..."
 
-            if (phrase.MidiProgramNumber >= 0 && phrase.MidiProgramNumber <= 255)
+            // Only use the phrase's program number if it's a valid program (0-127) or drums sentinel (255)
+            if (phrase.MidiProgramNumber <= 127 || phrase.MidiProgramNumber == 255)
             {
-                // Verify the program number exists in the instrument list
-                var matchingInstrument = midiInstruments.FirstOrDefault(i => i.ProgramNumber == phrase.MidiProgramNumber);
-                if (matchingInstrument != null)
-                {
-                    programNumberToSet = phrase.MidiProgramNumber;
-                }
+                programNumberToSet = phrase.MidiProgramNumber;
             }
+            // Otherwise keep programNumberToSet = -1 for "Select..."
 
             row.Cells["colInstrument"].Value = programNumberToSet;
 

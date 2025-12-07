@@ -291,7 +291,10 @@ namespace Music.Writer
         private void btnAddPhrase_Click(object? sender, EventArgs e)
         {
             // Create an empty Phrase and add it to the grid via the existing helper.
-            var emptyPhrase = new Phrase(new List<PhraseNote>());
+            var emptyPhrase = new Phrase(new List<PhraseNote>())
+            {
+                MidiProgramNumber = -1  // "Select..."
+            };
 
             // Use PhraseGridManager to initialize the row consistently with other adds.
             PhraseGridManager.AddPhraseToGrid(emptyPhrase, _midiInstruments, dgvPhrase, ref phraseNumber);

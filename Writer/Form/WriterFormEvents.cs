@@ -333,7 +333,7 @@ namespace Music.Writer
         /// <summary>
         /// Calculates note duration in MIDI ticks.
         /// </summary>
-        /// <param name="noteValue">The note value string (e.g., "4" for quarter note)</param>
+        /// <param name="noteValue">The note value string (e.g., "Quarter (1/4)" for quarter note)</param>
         /// <param name="dots">Number of dots to apply</param>
         /// <param name="tupletNumber">Optional tuplet identifier</param>
         /// <param name="tupletCount">Tuplet count (m in m:n tuplet)</param>
@@ -347,7 +347,10 @@ namespace Music.Writer
             int tupletOf)
         {
             const int ticksPerQuarterNote = 480;
-            int duration = int.TryParse(noteValue, out int d) ? d : 4;
+            
+            // Parse the duration from the display string format "Name (1/n)"
+            // Examples: "Whole (1)", "Half (1/2)", "Quarter (1/4)", "Eighth (1/8)", "16th (1/16)", "32nd (1/32)"
+            int duration = ParseNoteValueDuration(noteValue);
 
             // Base ticks for this duration (e.g., quarter=480, eighth=240)
             int baseTicks = (ticksPerQuarterNote * 4) / duration;
@@ -357,6 +360,41 @@ namespace Music.Writer
 
             // Apply tuplet if specified
             return ApplyTuplet(dottedTicks, tupletNumber, tupletCount, tupletOf);
+        }
+
+        /// <summary>
+        /// Parses the numeric duration value from a note value display string.
+        /// </summary>
+        /// <param name="noteValue">Display string like "Quarter (1/4)" or "Eighth (1/8)"</param>
+        /// <returns>The numeric duration (1, 2, 4, 8, 16, 32), defaulting to 4 (quarter note)</returns>
+        private static int ParseNoteValueDuration(string? noteValue)
+        {
+            if (string.IsNullOrWhiteSpace(noteValue))
+                return 4; // Default to quarter note
+
+            // Extract the denominator from formats like "Quarter (1/4)" or "Whole (1)"
+            // For "Whole (1)", the duration is 1
+            // For others like "Quarter (1/4)", extract the "4"
+            var parenIndex = noteValue.IndexOf('(');
+            if (parenIndex < 0)
+                return 4;
+
+            var valuesPart = noteValue.Substring(parenIndex + 1).TrimEnd(')').Trim();
+            
+            // Handle "Whole (1)" case - no slash
+            if (!valuesPart.Contains('/'))
+            {
+                return int.TryParse(valuesPart, out int wholeValue) && wholeValue == 1 ? 1 : 4;
+            }
+
+            // Handle fraction format like "1/4", "1/8", etc.
+            var parts = valuesPart.Split('/');
+            if (parts.Length == 2 && int.TryParse(parts[1], out int denominator))
+            {
+                return denominator;
+            }
+
+            return 4; // Default to quarter note
         }
 
         /// <summary>

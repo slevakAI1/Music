@@ -16,7 +16,7 @@ namespace Music.Writer
         // THESE GET SET BY GRID DROPDOWN CHANGE EVENT, WHAT ABOUT DEFAULT?
         public string MidiProgramName { get; set; }
         //public string NotionPartName { get; set; }
-        public byte MidiProgramNumber { get; set; }
+        public int MidiProgramNumber { get; set; }
 
         public List<PhraseNote> PhraseNotes { get; set; } = new();
 
