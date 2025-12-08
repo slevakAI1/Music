@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Music.Domain;
 using Music.Tests;
+using Music;
 
 namespace Music.Writer
 {
@@ -26,6 +27,9 @@ namespace Music.Writer
             // Step 1 - convert phrases to MIDI EVENTS - Absolute positions
             var midiEventLists = ConvertPhrasesToMidiEvents.Convert(phrases);
 
+            var json1 = Helpers.DebugObject(phrases);
+            var json2 = Helpers.DebugObject(midiEventLists);
+
             // Step 2 - Merge midiEventLists lists that are for the same instrument
             var mergedMidiEventLists = MergeMidiEventsByInstrument.Convert(
                 midiEventLists,
@@ -33,10 +37,15 @@ namespace Music.Writer
                 timeSignatureNumerator: timeSignatureNumerator,
                 timeSignatureDenominator: timeSignatureDenominator);
 
+            var json3 = Helpers.DebugObject(mergedMidiEventLists);
+
             // Step 3 - Execute merged timed notes to MIDI document
             var midiDoc = ConvertMidiEventsToMidiDocument.Convert(
                 mergedMidiEventLists,
                 tempo: tempo);
+
+            var json43 = Helpers.DebugObject(midiDoc);
+
 
             return midiDoc;
         }

@@ -65,6 +65,10 @@ namespace Music.Writer
 
             try
             {
+
+                // TO DO -- MERGE PHRASES SEEMS TO BE BROKEN. PHRASES PLAY OK ONE AT A TIME
+
+
                 // Consolidated conversion: phrases -> midi document
                 var midiDoc = PhrasesToMidiDocumentConverter.Convert(
                     phrases,

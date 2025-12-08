@@ -144,12 +144,14 @@ namespace Music.Writer
 
         /// <summary>
         /// Assigns track numbers to instruments and sorts events by absolute time and priority.
+        /// Also assigns MIDI channels to note events.
         /// </summary>
         private static List<List<MidiEvent>> AssignTracksAndSort(
             Dictionary<string, List<MidiEvent>> eventsByInstrument)
         {
             var result = new List<List<MidiEvent>>();
             var nextAvailableTrack = 1; // Track 0 is reserved for globals
+            var nextAvailableChannel = 0; // MIDI channels 0-15
 
             // Separate drums from other instruments
             var drumEvents = eventsByInstrument
@@ -170,22 +172,52 @@ namespace Music.Writer
                 if (nextAvailableTrack == DrumTrack)
                     nextAvailableTrack++;
 
-                // Events are already sorted by GroupEventsByInstrument
+                // Skip MIDI channel 9 (reserved for drums, zero-indexed)
+                if (nextAvailableChannel == 9)
+                    nextAvailableChannel++;
+
+                // Assign channel to all channel events
+                AssignChannelToEvents(events, nextAvailableChannel);
+
                 result.Add(events);
                 nextAvailableTrack++;
+                nextAvailableChannel++;
             }
 
-            // Process drum sets (assign to track 10)
+            // Process drum sets (assign to track 10, channel 9)
             foreach (var kvp in drumEvents)
             {
                 var instrumentName = kvp.Key;
                 var events = kvp.Value;
 
-                // Events are already sorted by GroupEventsByInstrument
+                // Drums use channel 9 (zero-indexed)
+                AssignChannelToEvents(events, 9);
+
                 result.Add(events);
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Assigns a MIDI channel to all channel voice events in the list.
+        /// </summary>
+        private static void AssignChannelToEvents(List<MidiEvent> events, int channel)
+        {
+            foreach (var evt in events)
+            {
+                // Only assign channel to events that need it
+                if (evt.Type == MidiEventType.NoteOn ||
+                    evt.Type == MidiEventType.NoteOff ||
+                    evt.Type == MidiEventType.ProgramChange ||
+                    evt.Type == MidiEventType.ControlChange ||
+                    evt.Type == MidiEventType.PitchBend ||
+                    evt.Type == MidiEventType.ChannelPressure ||
+                    evt.Type == MidiEventType.PolyKeyPressure)
+                {
+                    evt.Parameters["Channel"] = channel;
+                }
+            }
         }
 
         /// <summary>
