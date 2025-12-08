@@ -343,18 +343,8 @@ namespace Music.Writer
                 Directory.CreateDirectory(debugDir);
 
                 // Write first debug JSON
-                var json1 = Helpers.DebugObject(midiDoc) ?? string.Empty;
-                File.WriteAllText(Path.Combine(debugDir, "json1.json"), json1);
-
-
-                // TO DO THIS SEEMS NOT TO GET USED!!!
-
-                // Extract ticks per quarter note from the MIDI file
-                short ticksPerQuarterNote = 480; // Default
-                if (midiDoc.Raw.TimeDivision is Melanchall.DryWetMidi.Core.TicksPerQuarterNoteTimeDivision tpqn)
-                {
-                    ticksPerQuarterNote = tpqn.TicksPerQuarterNote;
-                }
+                //var json1 = Helpers.DebugObject(midiDoc) ?? string.Empty;
+                //File.WriteAllText(Path.Combine(debugDir, "json1.json"), json1);
 
                 // Convert MIDI document to lists of MidiEvent objects
                 List<List<MidiEvent>> midiEventLists;
@@ -362,8 +352,8 @@ namespace Music.Writer
                 {
                     midiEventLists = ConvertMidiSongDocumentToMidiEventLists.Convert(midiDoc);
 
-                    var json2 = Helpers.DebugObject(midiEventLists) ?? string.Empty;
-                    File.WriteAllText(Path.Combine(debugDir, "json2.json"), json2);
+                    //var json2 = Helpers.DebugObject(midiEventLists) ?? string.Empty;
+                    //File.WriteAllText(Path.Combine(debugDir, "json2.json"), json2);
                 }
                 catch (NotSupportedException ex)
                 {
@@ -377,14 +367,21 @@ namespace Music.Writer
                     return;
                 }
 
+                // Extract ticks per quarter note from the MIDI file
+                short ticksPerQuarterNote = MusicConstants.TicksPerQuarterNote; // Default
+                if (midiDoc.Raw.TimeDivision is Melanchall.DryWetMidi.Core.TicksPerQuarterNoteTimeDivision tpqn)
+                {
+                    ticksPerQuarterNote = tpqn.TicksPerQuarterNote;
+                }
+
                 // Convert MidiEvent lists to Phrase objects, passing the source ticks per quarter note
                 var phrases = ConvertMidiEventListsToPhraseLists.ConvertMidiEventListsToPhraseList(
                     midiEventLists, 
                     _midiInstruments,
                     ticksPerQuarterNote);
 
-                var json3 = Helpers.DebugObject(phrases) ?? string.Empty;
-                File.WriteAllText(Path.Combine(debugDir, "json3.json"), json3);
+                //var json3 = Helpers.DebugObject(phrases) ?? string.Empty;
+                //File.WriteAllText(Path.Combine(debugDir, "json3.json"), json3);
 
                 // Add each phrase to the grid
                 foreach (var phrase in phrases)
