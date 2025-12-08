@@ -376,7 +376,7 @@ namespace Music.Writer
 
                 // Convert MidiEvent lists to Phrase objects, passing the source ticks per quarter note
                 var phrases = ConvertMidiEventListsToPhraseLists.ConvertMidiEventListsToPhraseList(
-                    midiEventLists, 
+                    midiEventLists,
                     _midiInstruments,
                     ticksPerQuarterNote);
 
@@ -433,7 +433,7 @@ namespace Music.Writer
             {
                 var instrObj = selectedRow.Cells["colInstrument"].Value;
                 int programNumber = Convert.ToInt32(instrObj);
-                
+
                 if (programNumber == -1)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
@@ -498,6 +498,11 @@ namespace Music.Writer
             {
                 MessageBox.Show(this, $"Error exporting MIDI: {ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+            _midiPlaybackService.Stop();
         }
     }
 }
