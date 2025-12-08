@@ -161,7 +161,7 @@
 //            // TO DO - This probably doesnt need note value... that property should be applied here if not already applied!
 
 //            // Execute chord to individual pitch events
-//            var chordNotes = ChordConverter.Execute(
+//            var chordNotes = ConvertHarmonicEventToListOfPhraseNotes.Execute(
 //                noteEvent.ChordKey,
 //                (int)noteEvent.ChordDegree!,
 //                noteEvent.ChordQuality,

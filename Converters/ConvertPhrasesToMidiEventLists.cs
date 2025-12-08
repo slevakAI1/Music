@@ -7,7 +7,7 @@ namespace Music.Writer
     /// This is stage 1 processing - creates NoteOn, NoteOff, and SequenceTrackName events only.
     /// Channel assignment and other processing happens in later stages.
     /// </summary>
-    public static class ConvertPhrasesToMidiEvents
+    public static class ConvertPhrasesToMidiEventLists
     {
         private const short DefaultTicksPerQuarterNote = 480;
 
@@ -78,14 +78,14 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Processes a chord note by expanding it to individual notes using ChordConverter.
+        /// Processes a chord note by expanding it to individual notes using ConvertHarmonicEventToListOfPhraseNotes.
         /// </summary>
         private static void ProcessChord(List<MidiEvent> events, PhraseNote phraseNote)
         {
             var chord = phraseNote.phraseChord!;
 
-            // Use ChordConverter to generate individual chord notes
-            var chordNotes = ChordConverter.Convert(
+            // Use ConvertHarmonicEventToListOfPhraseNotes to generate individual chord notes
+            var chordNotes = ConvertHarmonicEventToListOfPhraseNotes.Convert(
                 chord.ChordKey!,
                 chord.ChordDegree!.Value,
                 chord.ChordQuality!,

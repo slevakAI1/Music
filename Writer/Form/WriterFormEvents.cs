@@ -66,7 +66,7 @@ namespace Music.Writer
 //            try
 //            {
                 // Consolidated conversion: phrases -> midi document
-                var midiDoc = PhrasesToMidiDocumentConverter.Convert(
+                var midiDoc = ConvertListOfPhrasesToMidiSongDocument.Convert(
                     phrases,
                     tempo: 112,
                     timeSignatureNumerator: 4,
@@ -126,7 +126,7 @@ namespace Music.Writer
             List<PhraseNote> notes;
             try
             {
-                notes = ChordConverter.Convert(
+                notes = ConvertHarmonicEventToListOfPhraseNotes.Convert(
                     harmonicEvent.Key,
                     harmonicEvent.Degree,
                     harmonicEvent.Quality,

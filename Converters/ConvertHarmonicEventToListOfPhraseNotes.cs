@@ -7,7 +7,7 @@ namespace Music.Writer
     /// Converts HarmonicEvent objects to lists of WriterNote compatible with Writer.
     /// Uses the MusicTheory library to generate chord voicings.
     /// </summary>
-    public static class ChordConverter
+    public static class ConvertHarmonicEventToListOfPhraseNotes
     {
         /// <summary>
         /// Converts a HarmonicEvent to a list of notes representing the chord.

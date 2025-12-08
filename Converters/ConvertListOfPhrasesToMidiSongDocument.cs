@@ -14,7 +14,7 @@ namespace Music.Writer
     /// 
     /// This preserves existing logic and keeps changes minimal.
     /// </summary>
-    public static class PhrasesToMidiDocumentConverter
+    public static class ConvertListOfPhrasesToMidiSongDocument
     {
         public static MidiSongDocument Convert(
             List<Phrase> phrases,
@@ -25,13 +25,13 @@ namespace Music.Writer
             if (phrases == null) throw new ArgumentNullException(nameof(phrases));
 
             // Step 1 - convert phrases to MIDI EVENTS - Absolute positions
-            var midiEventLists = ConvertPhrasesToMidiEvents.Convert(phrases);
+            var midiEventLists = ConvertPhrasesToMidiEventLists.Convert(phrases);
 
             var json1 = Helpers.DebugObject(phrases);
             var json2 = Helpers.DebugObject(midiEventLists);
 
             // Step 2 - Merge midiEventLists lists that are for the same instrument
-            var mergedMidiEventLists = MergeMidiEventsByInstrument.Convert(
+            var mergedMidiEventLists = MergeMidiEventListsByInstrument.Convert(
                 midiEventLists,
                 tempo: tempo,
                 timeSignatureNumerator: timeSignatureNumerator,
@@ -40,7 +40,7 @@ namespace Music.Writer
             var json3 = Helpers.DebugObject(mergedMidiEventLists);
 
             // Step 3 - Execute merged timed notes to MIDI document
-            var midiDoc = ConvertMidiEventsToMidiDocument.Convert(
+            var midiDoc = ConvertMidiEventsToMidiSongDocument.Convert(
                 mergedMidiEventLists,
                 tempo: tempo);
 

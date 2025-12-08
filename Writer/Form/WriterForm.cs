@@ -357,7 +357,7 @@ namespace Music.Writer
                 List<List<MidiEvent>> midiEventLists;
                 try
                 {
-                    midiEventLists = ConvertMidiDocumentToMidiEvents.Convert(midiDoc);
+                    midiEventLists = ConvertMidiSongDocumentToMidiEventLists.Convert(midiDoc);
 
                     var json2 = Helpers.DebugObject(midiEventLists) ?? string.Empty;
                     File.WriteAllText(Path.Combine(debugDir, "json2.json"), json2);
@@ -375,7 +375,7 @@ namespace Music.Writer
                 }
 
                 // Convert MidiEvent lists to Phrase objects, passing the source ticks per quarter note
-                var phrases = MidiEventListConverter.ConvertMidiEventListsToPhrases(
+                var phrases = ConvertMidiEventListsToPhraseLists.ConvertMidiEventListsToPhrases(
                     midiEventLists, 
                     _midiInstruments,
                     ticksPerQuarterNote);
@@ -478,7 +478,7 @@ namespace Music.Writer
             try
             {
                 // Consolidated conversion: phrases -> midi document
-                var midiDoc = PhrasesToMidiDocumentConverter.Convert(
+                var midiDoc = ConvertListOfPhrasesToMidiSongDocument.Convert(
                     phrases,
                     tempo: 112,
                     timeSignatureNumerator: 4,

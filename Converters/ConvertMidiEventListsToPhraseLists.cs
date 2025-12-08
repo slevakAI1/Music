@@ -10,7 +10,7 @@ namespace Music.Writer
     /// Helper to convert lists of MidiEvent objects to Phrase objects.
     /// Extracted from WriterForm to keep UI code focused.
     /// </summary>
-    internal static class MidiEventListConverter
+    internal static class ConvertMidiEventListsToPhraseLists
     {
         private const int StandardTicksPerQuarterNote = 480;
 
