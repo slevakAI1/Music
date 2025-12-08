@@ -346,6 +346,9 @@ namespace Music.Writer
                 var json1 = Helpers.DebugObject(midiDoc) ?? string.Empty;
                 File.WriteAllText(Path.Combine(debugDir, "json1.json"), json1);
 
+
+                // TO DO THIS SEEMS NOT TO GET USED!!!
+
                 // Extract ticks per quarter note from the MIDI file
                 short ticksPerQuarterNote = 480; // Default
                 if (midiDoc.Raw.TimeDivision is Melanchall.DryWetMidi.Core.TicksPerQuarterNoteTimeDivision tpqn)

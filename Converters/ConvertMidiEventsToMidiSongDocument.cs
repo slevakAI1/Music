@@ -14,8 +14,7 @@ namespace Music.Writer
     {
         public static MidiSongDocument Convert(
             List<List<MidiEvent>> midiEventLists,
-            int tempo,
-            short ticksPerQuarterNote = 480)
+            int tempo)
         {
             if (midiEventLists == null)
                 throw new ArgumentNullException(nameof(midiEventLists));
@@ -25,7 +24,7 @@ namespace Music.Writer
             // Create MIDI file with specified time division
             var midiFile = new MidiFile
             {
-                TimeDivision = new TicksPerQuarterNoteTimeDivision(ticksPerQuarterNote)
+                TimeDivision = new TicksPerQuarterNoteTimeDivision(MusicConstants.TicksPerQuarterNote)
             };
 
             // Convert each MidiEvent list to a track

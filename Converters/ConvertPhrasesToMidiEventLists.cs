@@ -9,8 +9,6 @@ namespace Music.Writer
     /// </summary>
     public static class ConvertPhrasesToMidiEventLists
     {
-        private const short DefaultTicksPerQuarterNote = 480;
-
         /// <summary>
         /// Converts a list of phrases to lists of MIDI events (one list per phrase).
         /// Each phrase is processed independently with its own event list.
@@ -19,8 +17,7 @@ namespace Music.Writer
         /// <param name="ticksPerQuarterNote">MIDI time resolution (default 480 ticks per quarter note)</param>
         /// <returns>List of MidiEvent lists, one per input phrase</returns>
         public static List<List<MidiEvent>> Convert(
-            List<Phrase> phrases,
-            short ticksPerQuarterNote = DefaultTicksPerQuarterNote)
+            List<Phrase> phrases)
         {
             if (phrases == null)
                 throw new ArgumentNullException(nameof(phrases));
@@ -28,7 +25,7 @@ namespace Music.Writer
             var result = new List<List<MidiEvent>>();
             foreach (var phrase in phrases)
             {
-                result.Add(ConvertSinglePhrase(phrase, ticksPerQuarterNote));
+                result.Add(ConvertSinglePhrase(phrase));
             }
 
             return result;
@@ -37,7 +34,7 @@ namespace Music.Writer
         /// <summary>
         /// Converts a single phrase to a list of MIDI events with absolute time positioning.
         /// </summary>
-        private static List<MidiEvent> ConvertSinglePhrase(Phrase phrase, short ticksPerQuarterNote)
+        private static List<MidiEvent> ConvertSinglePhrase(Phrase phrase)
         {
             var events = new List<MidiEvent>();
 

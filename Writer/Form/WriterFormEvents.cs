@@ -346,8 +346,6 @@ namespace Music.Writer
             int tupletCount,
             int tupletOf)
         {
-            const int ticksPerQuarterNote = 480;
-            
             // Parse the duration from the display string format "Name (1/n)"
             // Examples: "Whole (1)", "Half (1/2)", "Quarter (1/4)", "Eighth (1/8)", "16th (1/16)", "32nd (1/32)"
             int duration = ParseNoteValueDuration(noteValue);
