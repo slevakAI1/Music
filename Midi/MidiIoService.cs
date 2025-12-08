@@ -1,7 +1,6 @@
 using Melanchall.DryWetMidi.Core;
-using Music.MyMidi;
 
-namespace Music.Tests
+namespace Music.MyMidi
 {
     internal class MidiIoService 
     {

@@ -1,4 +1,4 @@
-namespace Music.Domain
+namespace Music.MyMidi
 {
     /// <summary>
     /// Represents a General MIDI instrument with its program number and display name.

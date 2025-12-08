@@ -1,7 +1,4 @@
-using Music.MyMidi;
-using Music.Tests;
-
-namespace Music.Writer
+namespace Music.MyMidi
 {
     // Helper class extracted from WriterForm for non-event, non-lifecycle logic.
     internal static class Player
@@ -11,7 +8,7 @@ namespace Music.Writer
         /// (Moved from WriterForm.PlayMidiFromPhrasesAsync)
         /// </summary>
         internal static async Task PlayMidiFromPhrasesAsync(
-            IMidiPlaybackService playbackService,
+            MidiPlaybackService playbackService,
             MidiSongDocument midiDoc,
             Form owner)
         {

@@ -1,7 +1,6 @@
 using Music.Designer;
-using Music.Domain;
+using Music.MyMidi;
 using MusicXml;
-using MusicXml.Domain;
 
 namespace Music.Writer
 {

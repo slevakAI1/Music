@@ -1,7 +1,3 @@
-using Music.Designer;
-using Music.Domain;
-using Music.Tests;
-
 namespace Music.Writer
 {
     /// <summary>

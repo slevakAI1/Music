@@ -3,9 +3,7 @@
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 
 using Music.Designer;
-using Music.Domain;
 using Music.MyMidi;
-using Music.Tests;
 using MusicXml.Domain;
 
 namespace Music.Writer
@@ -18,7 +16,7 @@ namespace Music.Writer
         private MeasureMeta _measureMeta;
 
         // playback service (reused for multiple play calls)
-        private IMidiPlaybackService _midiPlaybackService;
+        private MidiPlaybackService _midiPlaybackService;
 
         // MIDI I/O service for importing/exporting MIDI files
         private MidiIoService _midiIoService;

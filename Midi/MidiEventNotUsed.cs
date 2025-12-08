@@ -2,7 +2,7 @@
 // TO DO - check this - may be included already now
 
 
-namespace Music.Writer
+namespace Music.MyMidi
 {
     /// <summary>
     /// Represents the type of live and advanced MIDI events

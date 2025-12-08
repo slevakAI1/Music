@@ -1,4 +1,3 @@
-using Music.Domain;
 using Music.MyMidi;
 
 namespace Music.Writer

@@ -1,9 +1,8 @@
 using Melanchall.DryWetMidi.Multimedia;
-using Music.MyMidi;
 
-namespace Music.Tests
+namespace Music.MyMidi
 {
-    internal class MidiPlaybackService : IMidiPlaybackService
+    internal class MidiPlaybackService
     {
         private OutputDevice? _outputDevice;
         private Playback? _playback;

@@ -1,10 +1,5 @@
 using Music.MyMidi;
-using Music.Tests;
 using Music.Writer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace Music
 {
@@ -12,7 +7,7 @@ namespace Music
     {
         private readonly FileManager _fileManager;
         private readonly MidiIoService _midiIoService;
-        private readonly IMidiPlaybackService _playbackService;
+        private readonly MidiPlaybackService _playbackService;
 
         public MainForm()
         {
