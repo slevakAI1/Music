@@ -1,7 +1,7 @@
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 
-namespace Music.Tests
+namespace Music.MyMidi
 {
     /// <summary>
     /// Represents a loaded MIDI song, with access to tracks, notes, chords, and metadata.

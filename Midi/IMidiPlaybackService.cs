@@ -1,3 +1,5 @@
+using Music.MyMidi;
+
 namespace Music.Tests
 {
     public interface IMidiPlaybackService

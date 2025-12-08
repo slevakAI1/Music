@@ -1,4 +1,4 @@
-namespace Music.Tests
+namespace Music.MyMidi
 {
     internal static class AppState
     {

@@ -1,4 +1,5 @@
 using Melanchall.DryWetMidi.Core;
+using Music.MyMidi;
 
 namespace Music.Tests
 {
