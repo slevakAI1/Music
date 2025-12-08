@@ -337,7 +337,14 @@ namespace Music.Writer
                 // Import the MIDI file using the existing service
                 var midiDoc = _midiIoService.ImportFromFile(ofd.FileName);
 
-                var json1 = Helpers.DebugObject(midiDoc);
+                // Resolve project root (same approach used elsewhere in the solution)
+                var projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
+                var debugDir = Path.Combine(projectRoot, "Files", "Debug");
+                Directory.CreateDirectory(debugDir);
+
+                // Write first debug JSON
+                var json1 = Helpers.DebugObject(midiDoc) ?? string.Empty;
+                File.WriteAllText(Path.Combine(debugDir, "json1.json"), json1);
 
                 // Convert MIDI document to lists of MidiEvent objects
                 List<List<MidiEvent>> midiEventLists;
@@ -345,8 +352,8 @@ namespace Music.Writer
                 {
                     midiEventLists = ConvertMidiDocumentToMidiEvents.Convert(midiDoc);
 
-                    var json2 = Helpers.DebugObject(midiEventLists);
-
+                    var json2 = Helpers.DebugObject(midiEventLists) ?? string.Empty;
+                    File.WriteAllText(Path.Combine(debugDir, "json2.json"), json2);
                 }
                 catch (NotSupportedException ex)
                 {
@@ -363,8 +370,8 @@ namespace Music.Writer
                 // Convert MidiEvent lists to Phrase objects
                 var phrases = MidiEventListConverter.ConvertMidiEventListsToPhrases(midiEventLists, _midiInstruments);
 
-                var json3 = Helpers.DebugObject(phrases);
-
+                var json3 = Helpers.DebugObject(phrases) ?? string.Empty;
+                File.WriteAllText(Path.Combine(debugDir, "json3.json"), json3);
 
                 // Add each phrase to the grid
                 foreach (var phrase in phrases)

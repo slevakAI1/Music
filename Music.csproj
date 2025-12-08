@@ -53,7 +53,7 @@
 
   <ItemGroup>
     <Folder Include="Archives\Prototypes\" />
-    <Folder Include="Files\DebugFiles\" />
+    <Folder Include="Files\Debug\" />
     <Folder Include="Files\NotionExchange\" />
   </ItemGroup>
 
