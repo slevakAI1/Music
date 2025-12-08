@@ -1,7 +1,9 @@
+using Music.MyMidi;
+
 namespace Music.Writer
 {
     /// <summary>
-    /// Converts Phrase objects to lists of MidiEvent objects with absolute time positioning.
+    /// Converts Phrase objects to lists of MetaMidiEvent objects with absolute time positioning.
     /// This is stage 1 processing - creates NoteOn, NoteOff, and SequenceTrackName events only.
     /// Channel assignment and other processing happens in later stages.
     /// </summary>
@@ -13,14 +15,14 @@ namespace Music.Writer
         /// </summary>
         /// <param name="phrases">List of phrases to convert</param>
         /// <param name="ticksPerQuarterNote">MIDI time resolution (default 480 ticks per quarter note)</param>
-        /// <returns>List of MidiEvent lists, one per input phrase</returns>
-        public static List<List<MidiEvent>> Convert(
+        /// <returns>List of MetaMidiEvent lists, one per input phrase</returns>
+        public static List<List<MetaMidiEvent>> Convert(
             List<Phrase> phrases)
         {
             if (phrases == null)
                 throw new ArgumentNullException(nameof(phrases));
 
-            var result = new List<List<MidiEvent>>();
+            var result = new List<List<MetaMidiEvent>>();
             foreach (var phrase in phrases)
             {
                 result.Add(ConvertSinglePhrase(phrase));
@@ -32,19 +34,19 @@ namespace Music.Writer
         /// <summary>
         /// Converts a single phrase to a list of MIDI events with absolute time positioning.
         /// </summary>
-        private static List<MidiEvent> ConvertSinglePhrase(Phrase phrase)
+        private static List<MetaMidiEvent> ConvertSinglePhrase(Phrase phrase)
         {
-            var events = new List<MidiEvent>();
+            var events = new List<MetaMidiEvent>();
 
             // Add track name event at the beginning (using instrument name)
             var trackName = string.IsNullOrWhiteSpace(phrase.MidiProgramName) 
                 ? "Unnamed Track" 
                 : phrase.MidiProgramName;
-            events.Add(MidiEvent.CreateSequenceTrackName(0, trackName));
+            events.Add(MetaMidiEvent.CreateSequenceTrackName(0, trackName));
 
             // Add program change event at the beginning to set the instrument
             // Channel is null and will be assigned in Phase 2
-            var programChangeEvent = MidiEvent.CreateProgramChange(0, 0, phrase.MidiProgramNumber);
+            var programChangeEvent = MetaMidiEvent.CreateProgramChange(0, 0, phrase.MidiProgramNumber);
             // Remove the channel parameter temporarily (will be assigned in Phase 2)
             programChangeEvent.Parameters.Remove("Channel");
             events.Add(programChangeEvent);
@@ -75,7 +77,7 @@ namespace Music.Writer
         /// <summary>
         /// Processes a chord note by expanding it to individual notes using ConvertHarmonicEventToListOfPhraseNotes.
         /// </summary>
-        private static void ProcessChord(List<MidiEvent> events, PhraseNote phraseNote)
+        private static void ProcessChord(List<MetaMidiEvent> events, PhraseNote phraseNote)
         {
             var chord = phraseNote.phraseChord!;
 
@@ -94,7 +96,7 @@ namespace Music.Writer
                 var noteNumber = CalculateMidiNoteNumber(cn.Step, cn.Alter, cn.Octave);
 
                 // NoteOn at the phrase note's absolute position
-                var noteOnEvent = MidiEvent.CreateNoteOn(
+                var noteOnEvent = MetaMidiEvent.CreateNoteOn(
                     phraseNote.AbsolutePositionTicks, 
                     0, 
                     noteNumber, 
@@ -104,7 +106,7 @@ namespace Music.Writer
 
                 // NoteOff at absolute position + duration
                 long noteOffTime = phraseNote.AbsolutePositionTicks + phraseNote.NoteDurationTicks;
-                var noteOffEvent = MidiEvent.CreateNoteOff(noteOffTime, 0, noteNumber, 0);
+                var noteOffEvent = MetaMidiEvent.CreateNoteOff(noteOffTime, 0, noteNumber, 0);
                 noteOffEvent.Parameters.Remove("Channel");
                 events.Add(noteOffEvent);
             }
@@ -113,10 +115,10 @@ namespace Music.Writer
         /// <summary>
         /// Processes a single note event.
         /// </summary>
-        private static void ProcessSingleNote(List<MidiEvent> events, PhraseNote phraseNote)
+        private static void ProcessSingleNote(List<MetaMidiEvent> events, PhraseNote phraseNote)
         {
             // Create NoteOn event at the note's absolute position
-            var noteOnEvent = MidiEvent.CreateNoteOn(
+            var noteOnEvent = MetaMidiEvent.CreateNoteOn(
                 phraseNote.AbsolutePositionTicks, 
                 0, 
                 phraseNote.NoteNumber, 
@@ -126,7 +128,7 @@ namespace Music.Writer
 
             // Create NoteOff event at absolute position + duration
             long noteOffTime = phraseNote.AbsolutePositionTicks + phraseNote.NoteDurationTicks;
-            var noteOffEvent = MidiEvent.CreateNoteOff(noteOffTime, 0, phraseNote.NoteNumber, 0);
+            var noteOffEvent = MetaMidiEvent.CreateNoteOff(noteOffTime, 0, phraseNote.NoteNumber, 0);
             noteOffEvent.Parameters.Remove("Channel");
             events.Add(noteOffEvent);
         }

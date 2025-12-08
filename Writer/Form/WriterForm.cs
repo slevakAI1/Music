@@ -4,6 +4,7 @@
 
 using Music.Designer;
 using Music.Domain;
+using Music.MyMidi;
 using Music.Tests;
 using MusicXml.Domain;
 
@@ -346,8 +347,8 @@ namespace Music.Writer
                 //var json1 = Helpers.DebugObject(midiDoc) ?? string.Empty;
                 //File.WriteAllText(Path.Combine(debugDir, "json1.json"), json1);
 
-                // Convert MIDI document to lists of MidiEvent objects
-                List<List<MidiEvent>> midiEventLists;
+                // Convert MIDI document to lists of MetaMidiEvent objects
+                List<List<MetaMidiEvent>> midiEventLists;
                 try
                 {
                     midiEventLists = ConvertMidiSongDocumentToMidiEventLists.Convert(midiDoc);
@@ -374,7 +375,7 @@ namespace Music.Writer
                     ticksPerQuarterNote = tpqn.TicksPerQuarterNote;
                 }
 
-                // Convert MidiEvent lists to Phrase objects, passing the source ticks per quarter note
+                // Convert MetaMidiEvent lists to Phrase objects, passing the source ticks per quarter note
                 var phrases = ConvertMidiEventListsToPhraseLists.ConvertMidiEventListsToPhraseList(
                     midiEventLists,
                     _midiInstruments,

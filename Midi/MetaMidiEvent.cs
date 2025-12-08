@@ -1,4 +1,4 @@
-namespace Music.Writer
+namespace Music.MyMidi
 {
     /// <summary>
     /// Represents the type of MIDI event (channel, meta, or system exclusive).
@@ -211,7 +211,7 @@ namespace Music.Writer
     /// Uses a dictionary-based parameter system for flexibility.
     /// Use factory methods for creating event types with proper validation.
     /// </summary>
-    public sealed record MidiEvent
+    public sealed record MetaMidiEvent
     {
         /// <summary>
         /// Absolute time position in ticks from the start of the track.
@@ -243,7 +243,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a sequence number meta event (0x00).
         /// </summary>
-        public static MidiEvent CreateSequenceNumber(long absoluteTime, ushort sequenceNumber) =>
+        public static MetaMidiEvent CreateSequenceNumber(long absoluteTime, ushort sequenceNumber) =>
             new()
             {
                 Type = MidiEventType.SequenceNumber,
@@ -254,7 +254,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a text meta event (0x01).
         /// </summary>
-        public static MidiEvent CreateText(long absoluteTime, string text) =>
+        public static MetaMidiEvent CreateText(long absoluteTime, string text) =>
             new()
             {
                 Type = MidiEventType.Text,
@@ -265,7 +265,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a copyright notice meta event (0x02).
         /// </summary>
-        public static MidiEvent CreateCopyrightNotice(long absoluteTime, string text) =>
+        public static MetaMidiEvent CreateCopyrightNotice(long absoluteTime, string text) =>
             new()
             {
                 Type = MidiEventType.CopyrightNotice,
@@ -276,7 +276,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a sequence/track name meta event (0x03).
         /// </summary>
-        public static MidiEvent CreateSequenceTrackName(long absoluteTime, string name) =>
+        public static MetaMidiEvent CreateSequenceTrackName(long absoluteTime, string name) =>
             new()
             {
                 Type = MidiEventType.SequenceTrackName,
@@ -287,7 +287,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates an instrument name meta event (0x04).
         /// </summary>
-        public static MidiEvent CreateInstrumentName(long absoluteTime, string name) =>
+        public static MetaMidiEvent CreateInstrumentName(long absoluteTime, string name) =>
             new()
             {
                 Type = MidiEventType.InstrumentName,
@@ -298,7 +298,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a lyric meta event (0x05).
         /// </summary>
-        public static MidiEvent CreateLyric(long absoluteTime, string lyric) =>
+        public static MetaMidiEvent CreateLyric(long absoluteTime, string lyric) =>
             new()
             {
                 Type = MidiEventType.Lyric,
@@ -309,7 +309,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a marker meta event (0x06).
         /// </summary>
-        public static MidiEvent CreateMarker(long absoluteTime, string marker) =>
+        public static MetaMidiEvent CreateMarker(long absoluteTime, string marker) =>
             new()
             {
                 Type = MidiEventType.Marker,
@@ -320,7 +320,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a cue point meta event (0x07).
         /// </summary>
-        public static MidiEvent CreateCuePoint(long absoluteTime, string cuePoint) =>
+        public static MetaMidiEvent CreateCuePoint(long absoluteTime, string cuePoint) =>
             new()
             {
                 Type = MidiEventType.CuePoint,
@@ -331,7 +331,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a program name meta event (0x08).
         /// </summary>
-        public static MidiEvent CreateProgramName(long absoluteTime, string programName) =>
+        public static MetaMidiEvent CreateProgramName(long absoluteTime, string programName) =>
             new()
             {
                 Type = MidiEventType.ProgramName,
@@ -342,7 +342,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a device name meta event (0x09).
         /// </summary>
-        public static MidiEvent CreateDeviceName(long absoluteTime, string deviceName) =>
+        public static MetaMidiEvent CreateDeviceName(long absoluteTime, string deviceName) =>
             new()
             {
                 Type = MidiEventType.DeviceName,
@@ -353,7 +353,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a MIDI channel prefix meta event (0x20).
         /// </summary>
-        public static MidiEvent CreateMidiChannelPrefix(long absoluteTime, byte channel) =>
+        public static MetaMidiEvent CreateMidiChannelPrefix(long absoluteTime, byte channel) =>
             new()
             {
                 Type = MidiEventType.MidiChannelPrefix,
@@ -364,7 +364,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a MIDI port meta event (0x21).
         /// </summary>
-        public static MidiEvent CreateMidiPort(long absoluteTime, byte port) =>
+        public static MetaMidiEvent CreateMidiPort(long absoluteTime, byte port) =>
             new()
             {
                 Type = MidiEventType.MidiPort,
@@ -375,7 +375,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates an end-of-track meta event (0x2F).
         /// </summary>
-        public static MidiEvent CreateEndOfTrack(long absoluteTime = 0) =>
+        public static MetaMidiEvent CreateEndOfTrack(long absoluteTime = 0) =>
             new()
             {
                 Type = MidiEventType.EndOfTrack,
@@ -387,7 +387,7 @@ namespace Music.Writer
         /// Creates a set tempo meta event (0x51).
         /// Can specify either BPM or microseconds per quarter note.
         /// </summary>
-        public static MidiEvent CreateSetTempo(long absoluteTime, int? bpm = null, int? microsecondsPerQuarterNote = null)
+        public static MetaMidiEvent CreateSetTempo(long absoluteTime, int? bpm = null, int? microsecondsPerQuarterNote = null)
         {
             var parameters = new Dictionary<string, object>();
             if (bpm.HasValue)
@@ -407,7 +407,7 @@ namespace Music.Writer
         /// Creates a SMPTE offset meta event (0x54).
         /// Specifies an offset for SMPTE time code synchronization.
         /// </summary>
-        public static MidiEvent CreateSmpteOffset(
+        public static MetaMidiEvent CreateSmpteOffset(
             long absoluteTime,
             byte hours,
             byte minutes,
@@ -415,7 +415,7 @@ namespace Music.Writer
             byte frames,
             byte subFrames)
         {
-            return new MidiEvent
+            return new MetaMidiEvent
             {
                 AbsoluteTimeTicks = absoluteTime,
                 Type = MidiEventType.SmpteOffset,
@@ -433,7 +433,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a SMPTE offset meta event (0x54) with format specification.
         /// </summary>
-        public static MidiEvent CreateSmpteOffset(
+        public static MetaMidiEvent CreateSmpteOffset(
             long absoluteTime,
             int format,
             byte hours,
@@ -442,7 +442,7 @@ namespace Music.Writer
             byte frames,
             byte subFrames)
         {
-            return new MidiEvent
+            return new MetaMidiEvent
             {
                 AbsoluteTimeTicks = absoluteTime,
                 Type = MidiEventType.SmpteOffset,
@@ -461,7 +461,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a time signature meta event (0x58).
         /// </summary>
-        public static MidiEvent CreateTimeSignature(
+        public static MetaMidiEvent CreateTimeSignature(
             long absoluteTime,
             int numerator,
             int denominator,
@@ -483,7 +483,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a key signature meta event (0x59).
         /// </summary>
-        public static MidiEvent CreateKeySignature(long absoluteTime, int sharpsFlats, int mode) =>
+        public static MetaMidiEvent CreateKeySignature(long absoluteTime, int sharpsFlats, int mode) =>
             new()
             {
                 Type = MidiEventType.KeySignature,
@@ -498,7 +498,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a sequencer-specific meta event (0x7F).
         /// </summary>
-        public static MidiEvent CreateSequencerSpecific(long absoluteTime, byte[] data) =>
+        public static MetaMidiEvent CreateSequencerSpecific(long absoluteTime, byte[] data) =>
             new()
             {
                 Type = MidiEventType.SequencerSpecific,
@@ -509,7 +509,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates an unknown meta event for forward compatibility.
         /// </summary>
-        public static MidiEvent CreateUnknownMeta(long absoluteTime, byte statusByte, byte[] data) =>
+        public static MetaMidiEvent CreateUnknownMeta(long absoluteTime, byte statusByte, byte[] data) =>
             new()
             {
                 Type = MidiEventType.UnknownMeta,
@@ -528,7 +528,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a note-off event (0x8n).
         /// </summary>
-        public static MidiEvent CreateNoteOff(long absoluteTime, int channel, int noteNumber, int velocity = 0, string? note = null)
+        public static MetaMidiEvent CreateNoteOff(long absoluteTime, int channel, int noteNumber, int velocity = 0, string? note = null)
         {
             var parameters = new Dictionary<string, object>
             {
@@ -550,7 +550,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a note-on event (0x9n).
         /// </summary>
-        public static MidiEvent CreateNoteOn(long absoluteTime, int channel, int noteNumber, int velocity, string? note = null)
+        public static MetaMidiEvent CreateNoteOn(long absoluteTime, int channel, int noteNumber, int velocity, string? note = null)
         {
             var parameters = new Dictionary<string, object>
             {
@@ -572,7 +572,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a polyphonic key pressure (aftertouch) event (0xAn).
         /// </summary>
-        public static MidiEvent CreatePolyKeyPressure(long absoluteTime, int channel, int noteNumber, int pressure, string? note = null)
+        public static MetaMidiEvent CreatePolyKeyPressure(long absoluteTime, int channel, int noteNumber, int pressure, string? note = null)
         {
             var parameters = new Dictionary<string, object>
             {
@@ -594,7 +594,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a control change event (0xBn).
         /// </summary>
-        public static MidiEvent CreateControlChange(long absoluteTime, int channel, int controller, int value, string? controllerName = null)
+        public static MetaMidiEvent CreateControlChange(long absoluteTime, int channel, int controller, int value, string? controllerName = null)
         {
             var parameters = new Dictionary<string, object>
             {
@@ -616,7 +616,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a program change event (0xCn).
         /// </summary>
-        public static MidiEvent CreateProgramChange(long absoluteTime, int channel, int program, string? programName = null)
+        public static MetaMidiEvent CreateProgramChange(long absoluteTime, int channel, int program, string? programName = null)
         {
             var parameters = new Dictionary<string, object>
             {
@@ -637,7 +637,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a channel pressure (aftertouch) event (0xDn).
         /// </summary>
-        public static MidiEvent CreateChannelPressure(long absoluteTime, int channel, int pressure) =>
+        public static MetaMidiEvent CreateChannelPressure(long absoluteTime, int channel, int pressure) =>
             new()
             {
                 Type = MidiEventType.ChannelPressure,
@@ -652,7 +652,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a pitch bend event (0xEn).
         /// </summary>
-        public static MidiEvent CreatePitchBend(long absoluteTime, int channel, int value) =>
+        public static MetaMidiEvent CreatePitchBend(long absoluteTime, int channel, int value) =>
             new()
             {
                 Type = MidiEventType.PitchBend,
@@ -671,7 +671,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a normal system exclusive event (0xF0).
         /// </summary>
-        public static MidiEvent CreateNormalSysEx(long absoluteTime, byte[] data) =>
+        public static MetaMidiEvent CreateNormalSysEx(long absoluteTime, byte[] data) =>
             new()
             {
                 Type = MidiEventType.NormalSysEx,
@@ -682,7 +682,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates an escape system exclusive event (0xF7).
         /// </summary>
-        public static MidiEvent CreateEscapeSysEx(long absoluteTime, byte[] data) =>
+        public static MetaMidiEvent CreateEscapeSysEx(long absoluteTime, byte[] data) =>
             new()
             {
                 Type = MidiEventType.EscapeSysEx,
@@ -697,7 +697,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates an MTC quarter frame event (0xF1).
         /// </summary>
-        public static MidiEvent CreateMtcQuarterFrame(long absoluteTime, byte messageType, byte values) =>
+        public static MetaMidiEvent CreateMtcQuarterFrame(long absoluteTime, byte messageType, byte values) =>
             new()
             {
                 Type = MidiEventType.MtcQuarterFrame,
@@ -712,7 +712,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a song position pointer event (0xF2).
         /// </summary>
-        public static MidiEvent CreateSongPositionPointer(long absoluteTime, ushort position) =>
+        public static MetaMidiEvent CreateSongPositionPointer(long absoluteTime, ushort position) =>
             new()
             {
                 Type = MidiEventType.SongPositionPointer,
@@ -723,7 +723,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a song select event (0xF3).
         /// </summary>
-        public static MidiEvent CreateSongSelect(long absoluteTime, byte songNumber) =>
+        public static MetaMidiEvent CreateSongSelect(long absoluteTime, byte songNumber) =>
             new()
             {
                 Type = MidiEventType.SongSelect,
@@ -734,7 +734,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a tune request event (0xF6).
         /// </summary>
-        public static MidiEvent CreateTuneRequest(long absoluteTime) =>
+        public static MetaMidiEvent CreateTuneRequest(long absoluteTime) =>
             new()
             {
                 Type = MidiEventType.TuneRequest,
@@ -749,7 +749,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a timing clock event (0xF8).
         /// </summary>
-        public static MidiEvent CreateTimingClock(long absoluteTime) =>
+        public static MetaMidiEvent CreateTimingClock(long absoluteTime) =>
             new()
             {
                 Type = MidiEventType.TimingClock,
@@ -760,7 +760,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a start event (0xFA).
         /// </summary>
-        public static MidiEvent CreateStart(long absoluteTime) =>
+        public static MetaMidiEvent CreateStart(long absoluteTime) =>
             new()
             {
                 Type = MidiEventType.Start,
@@ -771,7 +771,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a continue event (0xFB).
         /// </summary>
-        public static MidiEvent CreateContinue(long absoluteTime) =>
+        public static MetaMidiEvent CreateContinue(long absoluteTime) =>
             new()
             {
                 Type = MidiEventType.Continue,
@@ -782,7 +782,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a stop event (0xFC).
         /// </summary>
-        public static MidiEvent CreateStop(long absoluteTime) =>
+        public static MetaMidiEvent CreateStop(long absoluteTime) =>
             new()
             {
                 Type = MidiEventType.Stop,
@@ -793,7 +793,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates an active sensing event (0xFE).
         /// </summary>
-        public static MidiEvent CreateActiveSensing(long absoluteTime) =>
+        public static MetaMidiEvent CreateActiveSensing(long absoluteTime) =>
             new()
             {
                 Type = MidiEventType.ActiveSensing,
@@ -804,7 +804,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a system reset event (0xFF).
         /// </summary>
-        public static MidiEvent CreateSystemReset(long absoluteTime) =>
+        public static MetaMidiEvent CreateSystemReset(long absoluteTime) =>
             new()
             {
                 Type = MidiEventType.SystemReset,
@@ -819,7 +819,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates an unknown event type for forward compatibility.
         /// </summary>
-        public static MidiEvent CreateUnknown(long absoluteTime, byte[] rawData) =>
+        public static MetaMidiEvent CreateUnknown(long absoluteTime, byte[] rawData) =>
             new()
             {
                 Type = MidiEventType.Unknown,

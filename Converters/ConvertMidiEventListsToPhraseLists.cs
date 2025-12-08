@@ -1,21 +1,22 @@
 using Music.Domain;
+using Music.MyMidi;
 
 namespace Music.Writer
 {
     /// <summary>
-    /// Helper to convert lists of MidiEvent objects to Phrase objects.
+    /// Helper to convert lists of MetaMidiEvent objects to Phrase objects.
     /// </summary>
     internal static class ConvertMidiEventListsToPhraseLists
     {
         /// <summary>
-        /// Converts lists of MidiEvent objects to Phrase objects.
+        /// Converts lists of MetaMidiEvent objects to Phrase objects.
         /// Splits tracks by program changes - each program change segment becomes a separate phrase.
         /// </summary>
-        /// <param name="midiEventLists">Lists of MidiEvent objects, one per track</param>
+        /// <param name="midiEventLists">Lists of MetaMidiEvent objects, one per track</param>
         /// <param name="midiInstruments">Available MIDI instruments for name lookup</param>
         /// <param name="sourceTicksPerQuarterNote">The ticks per quarter note from the source MIDI file (default 480)</param>
         public static List<Phrase> ConvertMidiEventListsToPhraseList(
-            List<List<MidiEvent>> midiEventLists,
+            List<List<MetaMidiEvent>> midiEventLists,
             List<MidiInstrument> midiInstruments,
             short sourceTicksPerQuarterNote)
         {
@@ -67,7 +68,7 @@ namespace Music.Writer
                     double tickScale = (double)MusicConstants.TicksPerQuarterNote / sourceTicksPerQuarterNote;
 
                     // Process note events
-                    var noteOnEvents = new Dictionary<int, MidiEvent>();
+                    var noteOnEvents = new Dictionary<int, MetaMidiEvent>();
 
                     foreach (var midiEvent in segment.Events.OrderBy(e => e.AbsoluteTimeTicks))
                     {
@@ -123,7 +124,7 @@ namespace Music.Writer
         /// Splits a list of MIDI events by program changes.
         /// Each segment contains events from one program change to the next.
         /// </summary>
-        private static List<EventSegment> SplitByProgramChanges(List<MidiEvent> events)
+        private static List<EventSegment> SplitByProgramChanges(List<MetaMidiEvent> events)
         {
             var segments = new List<EventSegment>();
             var currentSegment = new EventSegment();
@@ -161,15 +162,15 @@ namespace Music.Writer
         /// </summary>
         private class EventSegment
         {
-            public List<MidiEvent> Events { get; set; } = new List<MidiEvent>();
+            public List<MetaMidiEvent> Events { get; set; } = new List<MetaMidiEvent>();
         }
 
         /// <summary>
         /// Creates a PhraseNote from a NoteOn/NoteOff event pair.
         /// </summary>
         private static void CreatePhraseNoteFromPair(
-            MidiEvent noteOnEvent,
-            MidiEvent noteOffEvent,
+            MetaMidiEvent noteOnEvent,
+            MetaMidiEvent noteOffEvent,
             List<PhraseNote> phraseNotes,
             double tickScale)
         {

@@ -1,3 +1,5 @@
+using Music.MyMidi;
+
 namespace Music.Writer
 {
     /// <summary>
@@ -22,8 +24,8 @@ namespace Music.Writer
         /// <param name="timeSignatureNumerator">Time signature numerator for track 0</param>
         /// <param name="timeSignatureDenominator">Time signature denominator for track 0</param>
         /// <returns>List of MIDI event lists - track 0 + one per instrument, sorted by absolute time</returns>
-        public static List<List<MidiEvent>> Convert(
-            List<List<MidiEvent>> midiEventLists,
+        public static List<List<MetaMidiEvent>> Convert(
+            List<List<MetaMidiEvent>> midiEventLists,
             int tempo,
             int timeSignatureNumerator,
             int timeSignatureDenominator)
@@ -37,7 +39,7 @@ namespace Music.Writer
             if (timeSignatureDenominator <= 0)
                 throw new ArgumentException("Time signature denominator must be greater than 0", nameof(timeSignatureDenominator));
 
-            var result = new List<List<MidiEvent>>();
+            var result = new List<List<MetaMidiEvent>>();
 
             // Step 1: Create track 0 with global events
             var track0 = CreateGlobalTrack(tempo, timeSignatureNumerator, timeSignatureDenominator);
@@ -58,27 +60,27 @@ namespace Music.Writer
         /// <summary>
         /// Creates track 0 with global MIDI events (tempo, time signature, end of track).
         /// </summary>
-        private static List<MidiEvent> CreateGlobalTrack(
+        private static List<MetaMidiEvent> CreateGlobalTrack(
             int tempo,
             int timeSignatureNumerator,
             int timeSignatureDenominator)
         {
-            var track0 = new List<MidiEvent>();
+            var track0 = new List<MetaMidiEvent>();
 
             // Add track name event at absolute time 0
-            track0.Add(MidiEvent.CreateSequenceTrackName(0, "Global Events"));
+            track0.Add(MetaMidiEvent.CreateSequenceTrackName(0, "Global Events"));
 
             // Add tempo event at absolute time 0
-            track0.Add(MidiEvent.CreateSetTempo(0, bpm: tempo));
+            track0.Add(MetaMidiEvent.CreateSetTempo(0, bpm: tempo));
 
             // Add time signature event at absolute time 0
-            track0.Add(MidiEvent.CreateTimeSignature(
+            track0.Add(MetaMidiEvent.CreateTimeSignature(
                 0,
                 timeSignatureNumerator,
                 timeSignatureDenominator));
 
             // Add end of track event at absolute time 0 (will be adjusted later if needed)
-            track0.Add(MidiEvent.CreateEndOfTrack(0));
+            track0.Add(MetaMidiEvent.CreateEndOfTrack(0));
 
             // Sort track 0 events
             return SortEventsByPriority(track0);
@@ -88,10 +90,10 @@ namespace Music.Writer
         /// Groups MIDI events by instrument name (extracted from SequenceTrackName event).
         /// Merges all event lists for the same instrument into one combined list.
         /// </summary>
-        private static Dictionary<string, List<MidiEvent>> GroupEventsByInstrument(
-            List<List<MidiEvent>> midiEventLists)
+        private static Dictionary<string, List<MetaMidiEvent>> GroupEventsByInstrument(
+            List<List<MetaMidiEvent>> midiEventLists)
         {
-            var eventsByInstrument = new Dictionary<string, List<MidiEvent>>();
+            var eventsByInstrument = new Dictionary<string, List<MetaMidiEvent>>();
 
             foreach (var eventList in midiEventLists)
             {
@@ -107,7 +109,7 @@ namespace Music.Writer
                 // Initialize list for this instrument if not exists
                 if (!eventsByInstrument.ContainsKey(instrumentName))
                 {
-                    eventsByInstrument[instrumentName] = new List<MidiEvent>();
+                    eventsByInstrument[instrumentName] = new List<MetaMidiEvent>();
                     
                     // Add the track name event only once (from the first list for this instrument)
                     if (trackNameEvent != null)
@@ -144,10 +146,10 @@ namespace Music.Writer
         /// Assigns track numbers to instruments and sorts events by absolute time and priority.
         /// Also assigns MIDI channels to note events.
         /// </summary>
-        private static List<List<MidiEvent>> AssignTracksAndSort(
-            Dictionary<string, List<MidiEvent>> eventsByInstrument)
+        private static List<List<MetaMidiEvent>> AssignTracksAndSort(
+            Dictionary<string, List<MetaMidiEvent>> eventsByInstrument)
         {
-            var result = new List<List<MidiEvent>>();
+            var result = new List<List<MetaMidiEvent>>();
             var nextAvailableTrack = 1; // Track 0 is reserved for globals
             var nextAvailableChannel = 0; // MIDI channels 0-15
 
@@ -200,7 +202,7 @@ namespace Music.Writer
         /// <summary>
         /// Assigns a MIDI channel to all channel voice events in the list.
         /// </summary>
-        private static void AssignChannelToEvents(List<MidiEvent> events, int channel)
+        private static void AssignChannelToEvents(List<MetaMidiEvent> events, int channel)
         {
             foreach (var evt in events)
             {
@@ -228,7 +230,7 @@ namespace Music.Writer
         /// 5. NoteOn
         /// 6. EndOfTrack (last)
         /// </summary>
-        private static List<MidiEvent> SortEventsByPriority(List<MidiEvent> events)
+        private static List<MetaMidiEvent> SortEventsByPriority(List<MetaMidiEvent> events)
         {
             return events.OrderBy(e => e.AbsoluteTimeTicks)
                          .ThenBy(e => GetEventPriority(e))
@@ -239,7 +241,7 @@ namespace Music.Writer
         /// Returns the priority order for event types at the same absolute time.
         /// Lower numbers = higher priority (earlier in sequence).
         /// </summary>
-        private static int GetEventPriority(MidiEvent evt)
+        private static int GetEventPriority(MetaMidiEvent evt)
         {
             return evt.Type switch
             {
