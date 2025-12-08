@@ -8,7 +8,6 @@ namespace Music.Writer
 {
     /// <summary>
     /// Helper to convert lists of MidiEvent objects to Phrase objects.
-    /// Extracted from WriterForm to keep UI code focused.
     /// </summary>
     internal static class ConvertMidiEventListsToPhraseLists
     {
@@ -21,7 +20,7 @@ namespace Music.Writer
         /// <param name="midiEventLists">Lists of MidiEvent objects, one per track</param>
         /// <param name="midiInstruments">Available MIDI instruments for name lookup</param>
         /// <param name="sourceTicksPerQuarterNote">The ticks per quarter note from the source MIDI file (default 480)</param>
-        public static List<Phrase> ConvertMidiEventListsToPhrases(
+        public static List<Phrase> ConvertMidiEventListsToPhraseList(
             List<List<MidiEvent>> midiEventLists,
             List<MidiInstrument> midiInstruments,
             short sourceTicksPerQuarterNote = StandardTicksPerQuarterNote)

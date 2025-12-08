@@ -160,7 +160,7 @@ namespace Music.Writer
             phraseNumber++;
             var phraseName = phraseNumber.ToString();
 
-            // Get part name from the phrase (this should already be set correctly by ConvertMidiEventListsToPhrases)
+            // Get part name from the phrase (this should already be set correctly by ConvertMidiEventListsToPhraseList)
             var partName = phrase.MidiProgramName ?? "Select...";
 
             // Add new row

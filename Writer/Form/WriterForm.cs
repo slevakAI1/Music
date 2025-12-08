@@ -375,7 +375,7 @@ namespace Music.Writer
                 }
 
                 // Convert MidiEvent lists to Phrase objects, passing the source ticks per quarter note
-                var phrases = ConvertMidiEventListsToPhraseLists.ConvertMidiEventListsToPhrases(
+                var phrases = ConvertMidiEventListsToPhraseLists.ConvertMidiEventListsToPhraseList(
                     midiEventLists, 
                     _midiInstruments,
                     ticksPerQuarterNote);
