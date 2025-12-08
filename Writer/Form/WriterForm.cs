@@ -503,5 +503,31 @@ namespace Music.Writer
         {
             _midiPlaybackService.Stop();
         }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            if (dgvPhrase.SelectedRows == null || dgvPhrase.SelectedRows.Count == 0)
+            {
+                MessageBox.Show(this, "Please select one or more phrase rows to clear.", "Clear Phrases", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            foreach (DataGridViewRow row in dgvPhrase.SelectedRows)
+            {
+                var instrCol = dgvPhrase.Columns["colInstrument"];
+                if (instrCol != null)
+                    row.Cells[instrCol.Index].Value = -1;
+
+                var dataCol = dgvPhrase.Columns["colData"];
+                if (dataCol != null)
+                    row.Cells[dataCol.Index].Value = new Phrase(new List<PhraseNote>()) { MidiProgramNumber = -1 };
+
+                var phraseCol = dgvPhrase.Columns["colPhrase"];
+                if (phraseCol != null)
+                    row.Cells[phraseCol.Index].Value = string.Empty;
+            }
+
+            dgvPhrase.Refresh();
+        }
     }
 }

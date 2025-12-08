@@ -104,14 +104,15 @@ namespace Music.Writer
             btnExecute = new Button();
             grbCurrentDesign = new GroupBox();
             groupBox4 = new GroupBox();
+            btnStop = new Button();
             btnExport = new Button();
             btnImport = new Button();
             btnAddPhrase = new Button();
             btnDeletePhrases = new Button();
-            btnClearPhrases = new Button();
+            btnClearAllPhrases = new Button();
             btnPlayPhrases = new Button();
             dgvPhrase = new DataGridView();
-            btnStop = new Button();
+            btnClear = new Button();
             grbParts.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -608,7 +609,7 @@ namespace Music.Writer
             // btnSetWriterTestScenarioG1
             // 
             btnSetWriterTestScenarioG1.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSetWriterTestScenarioG1.Location = new Point(478, 469);
+            btnSetWriterTestScenarioG1.Location = new Point(416, 550);
             btnSetWriterTestScenarioG1.Name = "btnSetWriterTestScenarioG1";
             btnSetWriterTestScenarioG1.Size = new Size(196, 23);
             btnSetWriterTestScenarioG1.TabIndex = 8;
@@ -619,7 +620,7 @@ namespace Music.Writer
             // btnSetDesignTestScenarioD1
             // 
             btnSetDesignTestScenarioD1.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSetDesignTestScenarioD1.Location = new Point(478, 440);
+            btnSetDesignTestScenarioD1.Location = new Point(416, 521);
             btnSetDesignTestScenarioD1.Name = "btnSetDesignTestScenarioD1";
             btnSetDesignTestScenarioD1.Size = new Size(179, 23);
             btnSetDesignTestScenarioD1.TabIndex = 10;
@@ -735,7 +736,7 @@ namespace Music.Writer
             groupBox3.ForeColor = Color.White;
             groupBox3.Location = new Point(12, 431);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(416, 59);
+            groupBox3.Size = new Size(413, 59);
             groupBox3.TabIndex = 33;
             groupBox3.TabStop = false;
             groupBox3.Text = "Command";
@@ -766,12 +767,13 @@ namespace Music.Writer
             // groupBox4
             // 
             groupBox4.BackColor = Color.Black;
+            groupBox4.Controls.Add(btnClear);
             groupBox4.Controls.Add(btnStop);
             groupBox4.Controls.Add(btnExport);
             groupBox4.Controls.Add(btnImport);
             groupBox4.Controls.Add(btnAddPhrase);
             groupBox4.Controls.Add(btnDeletePhrases);
-            groupBox4.Controls.Add(btnClearPhrases);
+            groupBox4.Controls.Add(btnClearAllPhrases);
             groupBox4.Controls.Add(btnPlayPhrases);
             groupBox4.Controls.Add(dgvPhrase);
             groupBox4.ForeColor = Color.White;
@@ -782,10 +784,21 @@ namespace Music.Writer
             groupBox4.TabStop = false;
             groupBox4.Text = "Phrases";
             // 
+            // btnStop
+            // 
+            btnStop.ForeColor = Color.FromArgb(0, 192, 0);
+            btnStop.Location = new Point(722, 365);
+            btnStop.Name = "btnStop";
+            btnStop.Size = new Size(72, 23);
+            btnStop.TabIndex = 43;
+            btnStop.Text = "Stop";
+            btnStop.UseVisualStyleBackColor = true;
+            btnStop.Click += btnStop_Click;
+            // 
             // btnExport
             // 
             btnExport.ForeColor = Color.FromArgb(0, 192, 0);
-            btnExport.Location = new Point(431, 363);
+            btnExport.Location = new Point(474, 363);
             btnExport.Name = "btnExport";
             btnExport.Size = new Size(75, 23);
             btnExport.TabIndex = 42;
@@ -796,7 +809,7 @@ namespace Music.Writer
             // btnImport
             // 
             btnImport.ForeColor = Color.FromArgb(0, 192, 0);
-            btnImport.Location = new Point(353, 363);
+            btnImport.Location = new Point(396, 363);
             btnImport.Name = "btnImport";
             btnImport.Size = new Size(72, 23);
             btnImport.TabIndex = 41;
@@ -818,7 +831,7 @@ namespace Music.Writer
             // btnDeletePhrases
             // 
             btnDeletePhrases.ForeColor = Color.FromArgb(0, 192, 0);
-            btnDeletePhrases.Location = new Point(97, 365);
+            btnDeletePhrases.Location = new Point(95, 365);
             btnDeletePhrases.Name = "btnDeletePhrases";
             btnDeletePhrases.Size = new Size(72, 23);
             btnDeletePhrases.TabIndex = 39;
@@ -826,21 +839,21 @@ namespace Music.Writer
             btnDeletePhrases.UseVisualStyleBackColor = true;
             btnDeletePhrases.Click += btnDeletePhrases_Click;
             // 
-            // btnClearPhrases
+            // btnClearAllPhrases
             // 
-            btnClearPhrases.ForeColor = Color.FromArgb(0, 192, 0);
-            btnClearPhrases.Location = new Point(179, 364);
-            btnClearPhrases.Name = "btnClearPhrases";
-            btnClearPhrases.Size = new Size(72, 23);
-            btnClearPhrases.TabIndex = 38;
-            btnClearPhrases.Text = "Clear";
-            btnClearPhrases.UseVisualStyleBackColor = true;
-            btnClearPhrases.Click += btnClearPhrases_Click;
+            btnClearAllPhrases.ForeColor = Color.FromArgb(0, 192, 0);
+            btnClearAllPhrases.Location = new Point(253, 364);
+            btnClearAllPhrases.Name = "btnClearAllPhrases";
+            btnClearAllPhrases.Size = new Size(72, 23);
+            btnClearAllPhrases.TabIndex = 38;
+            btnClearAllPhrases.Text = "Clear All";
+            btnClearAllPhrases.UseVisualStyleBackColor = true;
+            btnClearAllPhrases.Click += btnClearPhrases_Click;
             // 
             // btnPlayPhrases
             // 
             btnPlayPhrases.ForeColor = Color.FromArgb(0, 192, 0);
-            btnPlayPhrases.Location = new Point(599, 365);
+            btnPlayPhrases.Location = new Point(642, 365);
             btnPlayPhrases.Name = "btnPlayPhrases";
             btnPlayPhrases.Size = new Size(72, 23);
             btnPlayPhrases.TabIndex = 32;
@@ -860,16 +873,16 @@ namespace Music.Writer
             dgvPhrase.TabIndex = 37;
             dgvPhrase.CellDoubleClick += DgvPhrase_CellDoubleClick;
             // 
-            // btnStop
+            // btnClear
             // 
-            btnStop.ForeColor = Color.FromArgb(0, 192, 0);
-            btnStop.Location = new Point(691, 365);
-            btnStop.Name = "btnStop";
-            btnStop.Size = new Size(72, 23);
-            btnStop.TabIndex = 43;
-            btnStop.Text = "Stop";
-            btnStop.UseVisualStyleBackColor = true;
-            btnStop.Click += btnStop_Click;
+            btnClear.ForeColor = Color.FromArgb(0, 192, 0);
+            btnClear.Location = new Point(174, 365);
+            btnClear.Name = "btnClear";
+            btnClear.Size = new Size(72, 23);
+            btnClear.TabIndex = 44;
+            btnClear.Text = "Clear";
+            btnClear.UseVisualStyleBackColor = true;
+            btnClear.Click += btnClear_Click;
             // 
             // WriterForm
             // 
@@ -958,12 +971,13 @@ namespace Music.Writer
         private DataGridView dgvPhrase;
         private Button btnPlayPhrases;
         private Button btnDeletePhrases;
-        private Button btnClearPhrases;
+        private Button btnClearAllPhrases;
         private Button btnAddPhrase;
         private Button btnNewScore;
         private TextBox txtMovementTitle;
         private Button btnImport;
         private Button btnExport;
         private Button btnStop;
+        private Button btnClear;
     }
 }
