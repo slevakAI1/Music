@@ -225,8 +225,8 @@ namespace Music.Writer
                 noteOnVelocity: 100,
                 isRest: isRest);
 
-            // Write the phrase to all selected rows
-            WritePhraseToSelectedRows(phrase);
+            // Append the phrase notes to all selected rows
+            AppendPhraseNotesToSelectedRows(phrase);
         }
 
         #endregion
@@ -253,6 +253,8 @@ namespace Music.Writer
             return true;
         }
 
+
+        // KEEP THIS FOR FUTURE EXPANSION
         /// <summary>
         /// Writes a phrase object to the colData and colPhrase cells of all selected rows.
         /// </summary>
@@ -263,6 +265,55 @@ namespace Music.Writer
             {
                 selectedRow.Cells["colData"].Value = phrase;
                 selectedRow.Cells["colPhrase"].Value = "Contains Phrase Data";
+            }
+        }
+
+        /// <summary>
+        /// Appends phrase notes to the existing Phrase objects in all selected rows.
+        /// The appended notes' absolute positions are adjusted to start after the existing phrase ends.
+        /// </summary>
+        /// <param name="phrase">The phrase containing notes to append to the grid.</param>
+        private void AppendPhraseNotesToSelectedRows(Phrase phrase)
+        {
+            foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
+            {
+                // Get existing phrase or create new one if null
+                var existingPhrase = selectedRow.Cells["colData"].Value as Phrase;
+                if (existingPhrase == null)
+                {
+                    // No existing phrase, create new one with the notes (no offset needed)
+                    existingPhrase = new Phrase(new List<PhraseNote>(phrase.PhraseNotes));
+                    selectedRow.Cells["colData"].Value = existingPhrase;
+                }
+                else
+                {
+                    // Calculate offset: find where the existing phrase ends
+                    int offset = 0;
+                    if (existingPhrase.PhraseNotes.Count > 0)
+                    {
+                        // Find the last note's end time (absolute position + duration)
+                        var lastNote = existingPhrase.PhraseNotes
+                            .OrderBy(n => n.AbsolutePositionTicks + n.NoteDurationTicks)
+                            .Last();
+                        offset = lastNote.AbsolutePositionTicks + lastNote.NoteDurationTicks;
+                    }
+
+                    // Append new notes with adjusted absolutePositions
+                    foreach (var note in phrase.PhraseNotes)
+                    {
+                        var adjustedNote = new PhraseNote(
+                            noteNumber: note.NoteNumber,
+                            absolutePositionTicks: note.AbsolutePositionTicks + offset,
+                            noteDurationTicks: note.NoteDurationTicks,
+                            noteOnVelocity: note.NoteOnVelocity,
+                            isRest: note.IsRest);
+
+                        existingPhrase.PhraseNotes.Add(adjustedNote);
+                    }
+                }
+
+                // Update display
+                selectedRow.Cells["colPhrase"].Value = $"{existingPhrase.PhraseNotes.Count} note(s)";
             }
         }
 
@@ -302,7 +353,7 @@ namespace Music.Writer
         /// <param name="octave">The octave number</param>
         /// <param name="accidental">The accidental string ("Sharp", "Flat", "Natural", etc.)</param>
         /// <returns>The MIDI note number (0-127)</returns>
-        private static int CalculateMidiNoteNumber(char step, int octave, string? accidental)
+        private static int CalculateMidiNoteNumber(char step, int octave, string accidental)
         {
             // Convert accidental string to alter value
             int alter = accidental switch
@@ -339,9 +390,9 @@ namespace Music.Writer
         /// <param name="tupletOf">Tuplet basis (n in m:n tuplet)</param>
         /// <returns>Duration in MIDI ticks</returns>
         private static int CalculateNoteDurationTicks(
-            string? noteValue,
+            string noteValue,
             int dots,
-            string? tupletNumber,
+            string tupletNumber,
             int tupletCount,
             int tupletOf)
         {
@@ -364,7 +415,7 @@ namespace Music.Writer
         /// </summary>
         /// <param name="noteValue">Display string like "Quarter (1/4)" or "Eighth (1/8)"</param>
         /// <returns>The numeric duration (1, 2, 4, 8, 16, 32), defaulting to 4 (quarter note)</returns>
-        private static int ParseNoteValueDuration(string? noteValue)
+        private static int ParseNoteValueDuration(string noteValue)
         {
             if (string.IsNullOrWhiteSpace(noteValue))
                 return 4; // Default to quarter note
@@ -424,7 +475,7 @@ namespace Music.Writer
         /// <returns>The tuplet-adjusted duration in ticks</returns>
         private static int ApplyTuplet(
             int dottedTicks,
-            string? tupletNumber,
+            string tupletNumber,
             int tupletCount,
             int tupletOf)
         {
