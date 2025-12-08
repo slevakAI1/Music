@@ -59,12 +59,12 @@ namespace Music.Writer
                 }
 
                 // Valid program number (0-127 or 255 for drums) — safe to cast now
-                phrase.MidiProgramNumber = (byte)programNumber;
+                phrase.MidiProgramNumber = (int)programNumber;
                 phrases.Add(phrase);
             }
 
-            try
-            {
+//            try
+//            {
                 // Consolidated conversion: phrases -> midi document
                 var midiDoc = PhrasesToMidiDocumentConverter.Convert(
                     phrases,
@@ -73,11 +73,11 @@ namespace Music.Writer
                     timeSignatureDenominator: 4);
 
                 await Player.PlayMidiFromPhrasesAsync(_midiPlaybackService, midiDoc, this);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(this, $"Error playing MIDI: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(this, $"Error playing MIDI: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
         }
 
         public void HandleUpdateFormFromDesigner()

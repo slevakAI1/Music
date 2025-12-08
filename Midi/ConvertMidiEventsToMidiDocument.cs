@@ -45,6 +45,11 @@ namespace Music.Writer
             var trackChunk = new TrackChunk();
             long lastAbsoluteTime = 0;
 
+            // Detect if this is a drum track by checking for program number 255
+            bool isDrumTrack = midiEvents.Any(e => 
+                e.Type == Writer.MidiEventType.ProgramChange && 
+                GetIntParam(e, "Program") == 255);
+
             foreach (var midiEvent in midiEvents)
             {
                 // Skip EndOfTrack events from input - TrackChunk will add it automatically
@@ -55,7 +60,7 @@ namespace Music.Writer
                 long deltaTime = midiEvent.AbsoluteTimeTicks - lastAbsoluteTime;
                 
                 // Convert high-level MidiEvent to DryWetMidi event
-                var dryWetMidiEvent = ConvertToDryWetMidiEvent(midiEvent, deltaTime, tempo);
+                var dryWetMidiEvent = ConvertToDryWetMidiEvent(midiEvent, deltaTime, tempo, isDrumTrack);
                 
                 if (dryWetMidiEvent != null)
                 {
@@ -73,7 +78,8 @@ namespace Music.Writer
         private static Melanchall.DryWetMidi.Core.MidiEvent? ConvertToDryWetMidiEvent(
             MidiEvent midiEvent,
             long deltaTime,
-            int tempo)
+            int tempo,
+            bool isDrumTrack)
         {
             return midiEvent.Type switch
             {
@@ -145,7 +151,7 @@ namespace Music.Writer
                     (SevenBitNumber)GetIntParam(midiEvent, "NoteNumber"),
                     (SevenBitNumber)GetIntParam(midiEvent, "Velocity"))
                 {
-                    Channel = (FourBitNumber)GetIntParam(midiEvent, "Channel"),
+                    Channel = isDrumTrack ? (FourBitNumber)9 : (FourBitNumber)GetIntParam(midiEvent, "Channel"),
                     DeltaTime = deltaTime
                 },
                 
@@ -153,7 +159,7 @@ namespace Music.Writer
                     (SevenBitNumber)GetIntParam(midiEvent, "NoteNumber"),
                     (SevenBitNumber)GetIntParam(midiEvent, "Velocity"))
                 {
-                    Channel = (FourBitNumber)GetIntParam(midiEvent, "Channel"),
+                    Channel = isDrumTrack ? (FourBitNumber)9 : (FourBitNumber)GetIntParam(midiEvent, "Channel"),
                     DeltaTime = deltaTime
                 },
                 
@@ -161,7 +167,7 @@ namespace Music.Writer
                     (SevenBitNumber)GetIntParam(midiEvent, "NoteNumber"),
                     (SevenBitNumber)GetIntParam(midiEvent, "Pressure"))
                 {
-                    Channel = (FourBitNumber)GetIntParam(midiEvent, "Channel"),
+                    Channel = isDrumTrack ? (FourBitNumber)9 : (FourBitNumber)GetIntParam(midiEvent, "Channel"),
                     DeltaTime = deltaTime
                 },
                 
@@ -169,29 +175,39 @@ namespace Music.Writer
                     (SevenBitNumber)GetIntParam(midiEvent, "Controller"),
                     (SevenBitNumber)GetIntParam(midiEvent, "Value"))
                 {
-                    Channel = (FourBitNumber)GetIntParam(midiEvent, "Channel"),
+                    Channel = isDrumTrack ? (FourBitNumber)9 : (FourBitNumber)GetIntParam(midiEvent, "Channel"),
                     DeltaTime = deltaTime
                 },
                 
-                Writer.MidiEventType.ProgramChange => new ProgramChangeEvent(
-                    (SevenBitNumber)GetIntParam(midiEvent, "Program"))
-                {
-                    Channel = (FourBitNumber)GetIntParam(midiEvent, "Channel"),
-                    DeltaTime = deltaTime
-                },
+                Writer.MidiEventType.ProgramChange => CreateProgramChangeEvent(midiEvent, deltaTime, isDrumTrack),
                 
                 Writer.MidiEventType.ChannelPressure => new ChannelAftertouchEvent(
                     (SevenBitNumber)GetIntParam(midiEvent, "Pressure"))
                 {
-                    Channel = (FourBitNumber)GetIntParam(midiEvent, "Channel"),
+                    Channel = isDrumTrack ? (FourBitNumber)9 : (FourBitNumber)GetIntParam(midiEvent, "Channel"),
                     DeltaTime = deltaTime
                 },
                 
-                Writer.MidiEventType.PitchBend => CreatePitchBendEvent(midiEvent, deltaTime),
+                Writer.MidiEventType.PitchBend => CreatePitchBendEvent(midiEvent, deltaTime, isDrumTrack),
                 
                 Writer.MidiEventType.Unknown => null, // Skip unknown events
                 
                 _ => null
+            };
+        }
+
+        private static ProgramChangeEvent? CreateProgramChangeEvent(MidiEvent midiEvent, long deltaTime, bool isDrumTrack)
+        {
+            int programNumber = GetIntParam(midiEvent, "Program");
+            
+            // Skip program change events for drum tracks (255 sentinel value)
+            if (programNumber == 255)
+                return null;
+            
+            return new ProgramChangeEvent((SevenBitNumber)programNumber)
+            {
+                Channel = isDrumTrack ? (FourBitNumber)9 : (FourBitNumber)GetIntParam(midiEvent, "Channel"),
+                DeltaTime = deltaTime
             };
         }
 
@@ -219,7 +235,7 @@ namespace Music.Writer
             };
         }
 
-        private static PitchBendEvent CreatePitchBendEvent(MidiEvent midiEvent, long deltaTime)
+        private static PitchBendEvent CreatePitchBendEvent(MidiEvent midiEvent, long deltaTime, bool isDrumTrack)
         {
             int value = GetIntParam(midiEvent, "Value");
             
@@ -228,7 +244,7 @@ namespace Music.Writer
             
             return new PitchBendEvent(unsignedValue)
             {
-                Channel = (FourBitNumber)GetIntParam(midiEvent, "Channel"),
+                Channel = isDrumTrack ? (FourBitNumber)9 : (FourBitNumber)GetIntParam(midiEvent, "Channel"),
                 DeltaTime = deltaTime
             };
         }
