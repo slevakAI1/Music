@@ -337,11 +337,16 @@ namespace Music.Writer
                 // Import the MIDI file using the existing service
                 var midiDoc = _midiIoService.ImportFromFile(ofd.FileName);
 
+                var json1 = Helpers.DebugObject(midiDoc);
+
                 // Convert MIDI document to lists of MidiEvent objects
                 List<List<MidiEvent>> midiEventLists;
                 try
                 {
                     midiEventLists = ConvertMidiDocumentToMidiEvents.Convert(midiDoc);
+
+                    var json2 = Helpers.DebugObject(midiEventLists);
+
                 }
                 catch (NotSupportedException ex)
                 {
@@ -357,6 +362,9 @@ namespace Music.Writer
 
                 // Convert MidiEvent lists to Phrase objects
                 var phrases = MidiEventListConverter.ConvertMidiEventListsToPhrases(midiEventLists, _midiInstruments);
+
+                var json3 = Helpers.DebugObject(phrases);
+
 
                 // Add each phrase to the grid
                 foreach (var phrase in phrases)
