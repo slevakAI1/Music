@@ -1,7 +1,7 @@
-using System;
-using System.Windows.Forms;
-
 namespace Music.Writer
+
+    // CLEAN - This should be used everywhere
+
 {
     internal static class MessageBoxHelper
     {

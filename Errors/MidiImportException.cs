@@ -1,4 +1,4 @@
-using System;
+// CLEAN - is this necessary or useful?
 
 namespace Music
 {
