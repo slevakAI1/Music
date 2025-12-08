@@ -104,6 +104,7 @@ namespace Music.Writer
             btnExecute = new Button();
             grbCurrentDesign = new GroupBox();
             groupBox4 = new GroupBox();
+            btnClear = new Button();
             btnStop = new Button();
             btnExport = new Button();
             btnImport = new Button();
@@ -112,7 +113,6 @@ namespace Music.Writer
             btnClearAllPhrases = new Button();
             btnPlayPhrases = new Button();
             dgvPhrase = new DataGridView();
-            btnClear = new Button();
             grbParts.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -743,7 +743,7 @@ namespace Music.Writer
             // 
             // btnExecute
             // 
-            btnExecute.ForeColor = Color.FromArgb(255, 128, 0);
+            btnExecute.ForeColor = Color.FromArgb(0, 192, 0);
             btnExecute.Location = new Point(284, 21);
             btnExecute.Name = "btnExecute";
             btnExecute.Size = new Size(114, 23);
@@ -783,6 +783,17 @@ namespace Music.Writer
             groupBox4.TabIndex = 36;
             groupBox4.TabStop = false;
             groupBox4.Text = "Phrases";
+            // 
+            // btnClear
+            // 
+            btnClear.ForeColor = Color.FromArgb(255, 128, 0);
+            btnClear.Location = new Point(174, 365);
+            btnClear.Name = "btnClear";
+            btnClear.Size = new Size(72, 23);
+            btnClear.TabIndex = 44;
+            btnClear.Text = "Clear";
+            btnClear.UseVisualStyleBackColor = true;
+            btnClear.Click += btnClear_Click;
             // 
             // btnStop
             // 
@@ -872,17 +883,6 @@ namespace Music.Writer
             dgvPhrase.Size = new Size(1532, 334);
             dgvPhrase.TabIndex = 37;
             dgvPhrase.CellDoubleClick += DgvPhrase_CellDoubleClick;
-            // 
-            // btnClear
-            // 
-            btnClear.ForeColor = Color.FromArgb(0, 192, 0);
-            btnClear.Location = new Point(174, 365);
-            btnClear.Name = "btnClear";
-            btnClear.Size = new Size(72, 23);
-            btnClear.TabIndex = 44;
-            btnClear.Text = "Clear";
-            btnClear.UseVisualStyleBackColor = true;
-            btnClear.Click += btnClear_Click;
             // 
             // WriterForm
             // 
