@@ -1,5 +1,4 @@
 using Melanchall.DryWetMidi.Core;
-using Music.Domain;
 using Music.Tests;
 
 namespace Music.Writer

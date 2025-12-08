@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Music
+﻿namespace Music
 {
     // Central holder for public enums used across the design domain
     public static class MusicConstants

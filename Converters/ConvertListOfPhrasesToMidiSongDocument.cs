@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using Music.Domain;
 using Music.Tests;
-using Music;
 
 namespace Music.Writer
 {

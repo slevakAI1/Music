@@ -1,5 +1,3 @@
-using Melanchall.DryWetMidi.Common;
-
 namespace Music.Domain
 {
     /// <summary>

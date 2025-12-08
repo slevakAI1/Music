@@ -1,6 +1,4 @@
-using Music.Designer;
 using MusicXml.Domain;
-using Music.Writer;
 
 namespace Music
 {

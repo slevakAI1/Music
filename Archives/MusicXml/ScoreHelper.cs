@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using MusicXml.Domain;
-using Music;
 using Music.Designer;
+using MusicXml.Domain;
 
 namespace Music.Writer
 {

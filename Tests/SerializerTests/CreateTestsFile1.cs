@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using MusicXml.Domain;
-using Music;
 
 namespace Music.Tests
 {

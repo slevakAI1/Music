@@ -1,5 +1,3 @@
-using Music.Domain;
-
 namespace Music.Writer
 {
     /// <summary>
