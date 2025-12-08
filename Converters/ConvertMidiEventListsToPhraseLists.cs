@@ -11,8 +11,6 @@ namespace Music.Writer
     /// </summary>
     internal static class ConvertMidiEventListsToPhraseLists
     {
-        private const int StandardTicksPerQuarterNote = 480;
-
         /// <summary>
         /// Converts lists of MidiEvent objects to Phrase objects.
         /// Splits tracks by program changes - each program change segment becomes a separate phrase.
@@ -23,7 +21,7 @@ namespace Music.Writer
         public static List<Phrase> ConvertMidiEventListsToPhraseList(
             List<List<MidiEvent>> midiEventLists,
             List<MidiInstrument> midiInstruments,
-            short sourceTicksPerQuarterNote = StandardTicksPerQuarterNote)
+            short sourceTicksPerQuarterNote)
         {
             var phrases = new List<Phrase>();
 
@@ -70,7 +68,7 @@ namespace Music.Writer
                     }
 
                     // Calculate tick scaling factor
-                    double tickScale = (double)StandardTicksPerQuarterNote / sourceTicksPerQuarterNote;
+                    double tickScale = (double)MusicConstants.TicksPerQuarterNote / sourceTicksPerQuarterNote;
 
                     // Process note events
                     var noteOnEvents = new Dictionary<int, MidiEvent>();
