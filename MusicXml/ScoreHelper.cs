@@ -95,7 +95,7 @@ namespace Music.Writer
                     var first = p.Measures[0];
                     first.Attributes ??= new MeasureAttributes();
                     // Use single source of truth for divisions
-                    first.Attributes.Divisions = MusicConstants.DefaultDivisions;
+                    first.Attributes.Divisions = MusicConstants.TicksPerQuarterNote;
                     first.Attributes.Key ??= new Key { Fifths = 0, Mode = "major" };
                     first.Attributes.Time ??= new Time();
                     first.Attributes.Time.Beats = 4;

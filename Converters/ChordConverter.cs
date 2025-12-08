@@ -9,8 +9,6 @@ namespace Music.Writer
     /// </summary>
     public static class ChordConverter
     {
-        private const int TicksPerQuarterNote = 480;
-
         /// <summary>
         /// Converts a HarmonicEvent to a list of notes representing the chord.
         /// </summary>
@@ -155,7 +153,7 @@ namespace Music.Writer
         /// </summary>
         private static int CalculateNoteDurationTicks(int noteValue)
         {
-            return (TicksPerQuarterNote * 4) / noteValue;
+            return (MusicConstants.TicksPerQuarterNote * 4) / noteValue;
         }
 
         /// <summary>

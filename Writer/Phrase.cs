@@ -230,7 +230,7 @@ namespace Music.Writer
             }
 
             // If no exact match, calculate base duration without dots
-            int wholeTicks = ticksPerQuarterNote * 4;
+            int wholeTicks = MusicConstants.TicksPerQuarterNote * 4;
             if (noteDurationTicks >= wholeTicks)
             {
                 return (1, 0, null, null); // Default to whole note

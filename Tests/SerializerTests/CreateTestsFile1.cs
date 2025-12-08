@@ -11,7 +11,7 @@ namespace Music.Tests
             // Measure attributes: C major, 4/4, treble clef, divisions=480 (fixed default)
             var attributes = new MeasureAttributes
             {
-                Divisions = Music.MusicConstants.DefaultDivisions,
+                Divisions = Music.MusicConstants.TicksPerQuarterNote,
                 Key = new Key { Fifths = 0, Mode = "major" },
                 Time = new Time { Beats = 4, Mode = "4" },
                 Clef = new Clef { Sign = "G", Line = 2 }

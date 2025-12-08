@@ -10,7 +10,7 @@ namespace Music
 
         // Fixed divisions value (ticks per quarter note). Use this everywhere instead of literals.
         // Typical value: 480 (quarter note = 480 ticks)
-        public const int DefaultDivisions = 480;
+        public const short TicksPerQuarterNote = 480;
 
         // Map of note value display strings to their corresponding denominator values
         // These values are loaded into the Note Value dropdown

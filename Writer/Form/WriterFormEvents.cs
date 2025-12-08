@@ -353,7 +353,7 @@ namespace Music.Writer
             int duration = ParseNoteValueDuration(noteValue);
 
             // Base ticks for this duration (e.g., quarter=480, eighth=240)
-            int baseTicks = (ticksPerQuarterNote * 4) / duration;
+            int baseTicks = (MusicConstants.TicksPerQuarterNote * 4) / duration;
 
             // Apply dots (each dot adds half of the previous value)
             int dottedTicks = ApplyDots(baseTicks, dots);
