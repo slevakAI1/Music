@@ -16,7 +16,7 @@ namespace Music.Writer
 
         /// <summary>
         /// Converts lists of MidiEvent objects to Phrase objects.
-        /// Each list becomes one phrase with instrument information extracted from ProgramChange events.
+        /// Splits tracks by program changes - each program change segment becomes a separate phrase.
         /// </summary>
         /// <param name="midiEventLists">Lists of MidiEvent objects, one per track</param>
         /// <param name="midiInstruments">Available MIDI instruments for name lookup</param>
@@ -30,108 +30,150 @@ namespace Music.Writer
 
             foreach (var midiEventList in midiEventLists)
             {
-                var phraseNotes = new List<PhraseNote>();
-                var phrase = new Phrase(phraseNotes);
+                // Split track by program changes
+                var segmentedEvents = SplitByProgramChanges(midiEventList);
 
-                // Extract instrument information from ProgramChange event
-                var programChangeEvents = midiEventList
-                    .Where(e => e.Type == MidiEventType.ProgramChange)
-                    .ToList();
-
-                if (programChangeEvents.Count > 1)
+                foreach (var segment in segmentedEvents)
                 {
-                    // Multiple program changes detected - show error
-                    var programNumbers = string.Join(", ", programChangeEvents
-                        .Select(e => e.Parameters.TryGetValue("Program", out var p) ? p.ToString() : "unknown"));
-                    MessageBox.Show(
-                        $"Multiple ProgramChange events detected in a single track.\n" +
-                        $"Program numbers: {programNumbers}\n" +
-                        $"Each track should have only one instrument assignment.",
-                        "Multiple Instruments Detected",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
-                }
+                    var phraseNotes = new List<PhraseNote>();
+                    var phrase = new Phrase(phraseNotes);
 
-                var programChangeEvent = programChangeEvents.FirstOrDefault();
+                    // Get instrument info from this segment's program change
+                    var programChangeEvent = segment.Events
+                        .FirstOrDefault(e => e.Type == MidiEventType.ProgramChange);
 
-                if (programChangeEvent != null &&
-                    programChangeEvent.Parameters.TryGetValue("Program", out var programObj))
-                {
-                    int programNumber = Convert.ToInt32(programObj);
-                    phrase.MidiProgramNumber = programNumber;
+                    // Determine if this is a drum track (channel 10/9)
+                    bool isDrumTrack = segment.Events.Any(e => 
+                        e.Parameters.TryGetValue("Channel", out var ch) && 
+                        Convert.ToInt32(ch) == 9);
 
-                    // Find the matching instrument name using the provided instrument list
-                    var instrument = midiInstruments
-                        .FirstOrDefault(i => i.ProgramNumber == programNumber);
-                    phrase.MidiProgramName = instrument?.Name ?? $"Program {programNumber}";
-                }
-                else
-                {
-                    // No program change found - use default
-                    phrase.MidiProgramNumber = 0;
-                    phrase.MidiProgramName = "Acoustic Grand Piano";
-                }
-
-                // Calculate tick scaling factor to normalize to 480 ticks per quarter note
-                double tickScale = (double)StandardTicksPerQuarterNote / sourceTicksPerQuarterNote;
-
-                // Process note events - pair NoteOn with NoteOff events
-                var noteOnEvents = new Dictionary<int, MidiEvent>(); // Key: note number, Value: NoteOn event
-
-                foreach (var midiEvent in midiEventList.OrderBy(e => e.AbsoluteTimeTicks))
-                {
-                    if (midiEvent.Type == MidiEventType.NoteOn)
+                    if (isDrumTrack)
                     {
-                        if (!midiEvent.Parameters.TryGetValue("NoteNumber", out var noteNumObj) ||
-                            !midiEvent.Parameters.TryGetValue("Velocity", out var velocityObj))
-                            continue;
+                        // Drums use channel 10 (index 9) and don't have program changes
+                        phrase.MidiProgramNumber = 255; // Sentinel value for drums
+                        phrase.MidiProgramName = "Drum Set";
+                    }
+                    else if (programChangeEvent != null &&
+                             programChangeEvent.Parameters.TryGetValue("Program", out var programObj))
+                    {
+                        int programNumber = Convert.ToInt32(programObj);
+                        phrase.MidiProgramNumber = programNumber;
 
-                        int noteNumber = Convert.ToInt32(noteNumObj);
-                        int velocity = Convert.ToInt32(velocityObj);
+                        var instrument = midiInstruments
+                            .FirstOrDefault(i => i.ProgramNumber == programNumber);
+                        phrase.MidiProgramName = instrument?.Name ?? $"Program {programNumber}";
+                    }
+                    else
+                    {
+                        // No program change found - use default
+                        phrase.MidiProgramNumber = 0;
+                        phrase.MidiProgramName = "Acoustic Grand Piano";
+                    }
 
-                        // Velocity 0 is treated as NoteOff
-                        if (velocity == 0)
+                    // Calculate tick scaling factor
+                    double tickScale = (double)StandardTicksPerQuarterNote / sourceTicksPerQuarterNote;
+
+                    // Process note events
+                    var noteOnEvents = new Dictionary<int, MidiEvent>();
+
+                    foreach (var midiEvent in segment.Events.OrderBy(e => e.AbsoluteTimeTicks))
+                    {
+                        if (midiEvent.Type == MidiEventType.NoteOn)
                         {
+                            if (!midiEvent.Parameters.TryGetValue("NoteNumber", out var noteNumObj) ||
+                                !midiEvent.Parameters.TryGetValue("Velocity", out var velocityObj))
+                                continue;
+
+                            int noteNumber = Convert.ToInt32(noteNumObj);
+                            int velocity = Convert.ToInt32(velocityObj);
+
+                            if (velocity == 0)
+                            {
+                                if (noteOnEvents.TryGetValue(noteNumber, out var noteOnEvent))
+                                {
+                                    CreatePhraseNoteFromPair(noteOnEvent, midiEvent, phraseNotes, tickScale);
+                                    noteOnEvents.Remove(noteNumber);
+                                }
+                            }
+                            else
+                            {
+                                noteOnEvents[noteNumber] = midiEvent;
+                            }
+                        }
+                        else if (midiEvent.Type == MidiEventType.NoteOff)
+                        {
+                            if (!midiEvent.Parameters.TryGetValue("NoteNumber", out var noteNumObj))
+                                continue;
+
+                            int noteNumber = Convert.ToInt32(noteNumObj);
+
                             if (noteOnEvents.TryGetValue(noteNumber, out var noteOnEvent))
                             {
                                 CreatePhraseNoteFromPair(noteOnEvent, midiEvent, phraseNotes, tickScale);
                                 noteOnEvents.Remove(noteNumber);
                             }
                         }
-                        else
-                        {
-                            // Store the NoteOn event
-                            noteOnEvents[noteNumber] = midiEvent;
-                        }
                     }
-                    else if (midiEvent.Type == MidiEventType.NoteOff)
+
+                    // Only add phrase if it has notes
+                    if (phraseNotes.Count > 0)
                     {
-                        if (!midiEvent.Parameters.TryGetValue("NoteNumber", out var noteNumObj))
-                            continue;
-
-                        int noteNumber = Convert.ToInt32(noteNumObj);
-
-                        if (noteOnEvents.TryGetValue(noteNumber, out var noteOnEvent))
-                        {
-                            CreatePhraseNoteFromPair(noteOnEvent, midiEvent, phraseNotes, tickScale);
-                            noteOnEvents.Remove(noteNumber);
-                        }
+                        phrases.Add(phrase);
                     }
                 }
-
-                phrases.Add(phrase);
             }
 
             return phrases;
         }
 
         /// <summary>
+        /// Splits a list of MIDI events by program changes.
+        /// Each segment contains events from one program change to the next.
+        /// </summary>
+        private static List<EventSegment> SplitByProgramChanges(List<MidiEvent> events)
+        {
+            var segments = new List<EventSegment>();
+            var currentSegment = new EventSegment();
+
+            foreach (var evt in events)
+            {
+                if (evt.Type == MidiEventType.ProgramChange && currentSegment.Events.Any())
+                {
+                    // Start new segment when we encounter a program change
+                    // (but only if current segment has events)
+                    segments.Add(currentSegment);
+                    currentSegment = new EventSegment();
+                }
+
+                currentSegment.Events.Add(evt);
+            }
+
+            // Add final segment
+            if (currentSegment.Events.Any())
+            {
+                segments.Add(currentSegment);
+            }
+
+            // If no program changes were found, return single segment with all events
+            if (segments.Count == 0)
+            {
+                segments.Add(new EventSegment { Events = events });
+            }
+
+            return segments;
+        }
+
+        /// <summary>
+        /// Helper class to group events by program change segments
+        /// </summary>
+        private class EventSegment
+        {
+            public List<MidiEvent> Events { get; set; } = new List<MidiEvent>();
+        }
+
+        /// <summary>
         /// Creates a PhraseNote from a NoteOn/NoteOff event pair.
         /// </summary>
-        /// <param name="noteOnEvent">The NoteOn event</param>
-        /// <param name="noteOffEvent">The NoteOff event</param>
-        /// <param name="phraseNotes">The list to add the created PhraseNote to</param>
-        /// <param name="tickScale">Scale factor to normalize ticks to 480 per quarter note</param>
         private static void CreatePhraseNoteFromPair(
             MidiEvent noteOnEvent,
             MidiEvent noteOffEvent,
@@ -145,15 +187,12 @@ namespace Music.Writer
             int noteNumber = Convert.ToInt32(noteNumObj);
             int velocity = Convert.ToInt32(velocityObj);
             
-            // Scale the timing values to standard 480 ticks per quarter note
             int absolutePositionTicks = (int)Math.Round(noteOnEvent.AbsoluteTimeTicks * tickScale);
             int noteDurationTicks = (int)Math.Round((noteOffEvent.AbsoluteTimeTicks - noteOnEvent.AbsoluteTimeTicks) * tickScale);
 
-            // Ensure minimum duration of 1 tick
             if (noteDurationTicks < 1)
                 noteDurationTicks = 1;
 
-            // Create the PhraseNote - constructor will calculate metadata fields
             var phraseNote = new PhraseNote(
                 noteNumber,
                 absolutePositionTicks,

@@ -431,10 +431,10 @@ namespace Music.Writer
             var phrases = new List<Phrase>();
             foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
             {
-                // Validate instrument cell value first (may be DBNull or null)
                 var instrObj = selectedRow.Cells["colInstrument"].Value;
-                int programNumber = programNumber = Convert.ToInt32(instrObj);
-                if (programNumber == -1)  // -1 = placeholder "Select..." -> treat as missing selection
+                int programNumber = Convert.ToInt32(instrObj);
+                
+                if (programNumber == -1)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
                     MessageBox.Show(
@@ -446,7 +446,6 @@ namespace Music.Writer
                     return; // Abort export
                 }
 
-                // Validate phrase data exists in hidden data column before using it
                 var phrase = (Phrase)selectedRow.Cells["colData"].Value;
                 if (phrase.PhraseNotes.Count == 0)
                 {
@@ -460,12 +459,11 @@ namespace Music.Writer
                     return; // Abort export
                 }
 
-                // Valid program number (0-127 or 255 for drums) – safe to cast now
+                // Preserve drum track indicator (255) or use selected program number
                 phrase.MidiProgramNumber = (byte)programNumber;
                 phrases.Add(phrase);
             }
 
-            // Ask user where to save the MIDI file
             using var sfd = new SaveFileDialog
             {
                 Filter = "MIDI files (*.mid)|*.mid|All files (*.*)|*.*",
