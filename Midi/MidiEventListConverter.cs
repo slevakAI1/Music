@@ -12,13 +12,19 @@ namespace Music.Writer
     /// </summary>
     internal static class MidiEventListConverter
     {
+        private const int StandardTicksPerQuarterNote = 480;
+
         /// <summary>
         /// Converts lists of MidiEvent objects to Phrase objects.
         /// Each list becomes one phrase with instrument information extracted from ProgramChange events.
         /// </summary>
+        /// <param name="midiEventLists">Lists of MidiEvent objects, one per track</param>
+        /// <param name="midiInstruments">Available MIDI instruments for name lookup</param>
+        /// <param name="sourceTicksPerQuarterNote">The ticks per quarter note from the source MIDI file (default 480)</param>
         public static List<Phrase> ConvertMidiEventListsToPhrases(
             List<List<MidiEvent>> midiEventLists,
-            List<MidiInstrument> midiInstruments)
+            List<MidiInstrument> midiInstruments,
+            short sourceTicksPerQuarterNote = StandardTicksPerQuarterNote)
         {
             var phrases = new List<Phrase>();
 
@@ -43,7 +49,7 @@ namespace Music.Writer
                         $"Each track should have only one instrument assignment.",
                         "Multiple Instruments Detected",
                         MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
+                        MessageBoxIcon.Warning);
                 }
 
                 var programChangeEvent = programChangeEvents.FirstOrDefault();
@@ -51,7 +57,7 @@ namespace Music.Writer
                 if (programChangeEvent != null &&
                     programChangeEvent.Parameters.TryGetValue("Program", out var programObj))
                 {
-                    byte programNumber = (byte)Convert.ToInt32(programObj);
+                    int programNumber = Convert.ToInt32(programObj);
                     phrase.MidiProgramNumber = programNumber;
 
                     // Find the matching instrument name using the provided instrument list
@@ -65,6 +71,9 @@ namespace Music.Writer
                     phrase.MidiProgramNumber = 0;
                     phrase.MidiProgramName = "Acoustic Grand Piano";
                 }
+
+                // Calculate tick scaling factor to normalize to 480 ticks per quarter note
+                double tickScale = (double)StandardTicksPerQuarterNote / sourceTicksPerQuarterNote;
 
                 // Process note events - pair NoteOn with NoteOff events
                 var noteOnEvents = new Dictionary<int, MidiEvent>(); // Key: note number, Value: NoteOn event
@@ -85,7 +94,7 @@ namespace Music.Writer
                         {
                             if (noteOnEvents.TryGetValue(noteNumber, out var noteOnEvent))
                             {
-                                CreatePhraseNoteFromPair(noteOnEvent, midiEvent, phraseNotes);
+                                CreatePhraseNoteFromPair(noteOnEvent, midiEvent, phraseNotes, tickScale);
                                 noteOnEvents.Remove(noteNumber);
                             }
                         }
@@ -104,7 +113,7 @@ namespace Music.Writer
 
                         if (noteOnEvents.TryGetValue(noteNumber, out var noteOnEvent))
                         {
-                            CreatePhraseNoteFromPair(noteOnEvent, midiEvent, phraseNotes);
+                            CreatePhraseNoteFromPair(noteOnEvent, midiEvent, phraseNotes, tickScale);
                             noteOnEvents.Remove(noteNumber);
                         }
                     }
@@ -119,10 +128,15 @@ namespace Music.Writer
         /// <summary>
         /// Creates a PhraseNote from a NoteOn/NoteOff event pair.
         /// </summary>
+        /// <param name="noteOnEvent">The NoteOn event</param>
+        /// <param name="noteOffEvent">The NoteOff event</param>
+        /// <param name="phraseNotes">The list to add the created PhraseNote to</param>
+        /// <param name="tickScale">Scale factor to normalize ticks to 480 per quarter note</param>
         private static void CreatePhraseNoteFromPair(
             MidiEvent noteOnEvent,
             MidiEvent noteOffEvent,
-            List<PhraseNote> phraseNotes)
+            List<PhraseNote> phraseNotes,
+            double tickScale)
         {
             if (!noteOnEvent.Parameters.TryGetValue("NoteNumber", out var noteNumObj) ||
                 !noteOnEvent.Parameters.TryGetValue("Velocity", out var velocityObj))
@@ -130,8 +144,14 @@ namespace Music.Writer
 
             int noteNumber = Convert.ToInt32(noteNumObj);
             int velocity = Convert.ToInt32(velocityObj);
-            int absolutePositionTicks = (int)noteOnEvent.AbsoluteTimeTicks;
-            int noteDurationTicks = (int)(noteOffEvent.AbsoluteTimeTicks - noteOnEvent.AbsoluteTimeTicks);
+            
+            // Scale the timing values to standard 480 ticks per quarter note
+            int absolutePositionTicks = (int)Math.Round(noteOnEvent.AbsoluteTimeTicks * tickScale);
+            int noteDurationTicks = (int)Math.Round((noteOffEvent.AbsoluteTimeTicks - noteOnEvent.AbsoluteTimeTicks) * tickScale);
+
+            // Ensure minimum duration of 1 tick
+            if (noteDurationTicks < 1)
+                noteDurationTicks = 1;
 
             // Create the PhraseNote - constructor will calculate metadata fields
             var phraseNote = new PhraseNote(
