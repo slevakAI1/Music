@@ -10,9 +10,12 @@ Tempo / Track 0 globals / MidiEvent List
 Design Solution - This supports the whole execute --> writing thing! right in the grid!: 
 
 Prep work:
-    (1) Add four empty rows to start of grid. 
-    (2) Add a new text column for , read only, with title type.
-    (3) Fix all code to work with the new layout.
+    (1) Add four empty rows to start of grid. All grid cells for these 4 rows will start off empty. 
+    (2) Add a new text column for Type, read only, with title type. This will be the first visible column
+    and other columns will push to the right (higher index)
+    (3) Update methods that use the grid to account for (a) the four fixed rows that 
+        will always be in the grid at the same position - starting at the first row in the grid.
+        (b) the new column - since they are accessed via name mostly, this may not be a problem.
 
 
     Add the 4 time-related design elements to the grid
