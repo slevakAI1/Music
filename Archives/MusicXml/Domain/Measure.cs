@@ -24,10 +24,10 @@ namespace MusicXml.Domain
 				<direction-type>
 					<metronome default-y='20'>
 						<beat-unit>quarter</beat-unit>
-						<per-minute>112</per-minute>
+						<per-minute>98</per-minute>
 					</metronome>
 				</direction-type>
-				<sound tempo='112'/>
+				<sound tempo='98'/>
 			</direction>
 		 */
     }

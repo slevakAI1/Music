@@ -36,7 +36,7 @@ namespace Music.Designer
 
         private sealed class WorkingEvent
         {
-            public int Bpm { get; set; } = 112;
+            public int Bpm { get; set; } = 122;
             public int BarCount { get; set; } = 4;
             public int StartBar { get; set; } = 1; // computed
         }

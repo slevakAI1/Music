@@ -1,7 +1,8 @@
 ﻿
-Finish Clear button
+
 
 Tempo / Track 0 globals / MidiEvent List
+
 
 Design  - to manage options per command, like f(multiple phrases) --> new line, etc
 
@@ -11,11 +12,6 @@ Recommended Approach: Extend the Voice Catalog with Mapping Data
 The cleanest solution is to extend Voices.Notion.json to include MIDI mappings, 
 then use this during both phrase creation and export. This keeps all instrument
 knowledge centralized.
-
-
-
-
-
 
 
 
