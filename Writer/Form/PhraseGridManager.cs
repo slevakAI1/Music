@@ -7,6 +7,13 @@ namespace Music.Writer
     /// </summary>
     internal static class PhraseGridManager
     {
+        // Constants for the four fixed rows at the top of the grid
+        internal const int FIXED_ROW_TEMPO = 0;
+        internal const int FIXED_ROW_TIME_SIGNATURE = 1;
+        internal const int FIXED_ROW_KEY_SIGNATURE = 2;
+        internal const int FIXED_ROW_HARMONY = 3;
+        internal const int FIXED_ROWS_COUNT = 4;
+
         /// <summary>
         /// Configures the dgvPhrase DataGridView with proper columns including MIDI instrument dropdown.
         /// </summary>
@@ -23,11 +30,21 @@ namespace Music.Writer
             dgvPhrase.AllowUserToAddRows = false;
             dgvPhrase.AllowUserToResizeColumns = true;
             dgvPhrase.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvPhrase.MultiSelect = true; // Changed from false to true
-            dgvPhrase.ReadOnly = false; // Allow editing the combo box column
+            dgvPhrase.MultiSelect = true;
+            dgvPhrase.ReadOnly = false;
             dgvPhrase.Columns.Clear();
 
-            // Column 0: Hidden column containing the AppendNoteEventsToScoreParams object
+            // Column 0: Type column (read-only)
+            var colType = new DataGridViewTextBoxColumn
+            {
+                Name = "colType",
+                HeaderText = "Type",
+                Width = 100,
+                ReadOnly = true
+            };
+            dgvPhrase.Columns.Add(colType);
+
+            // Column 1: Hidden column containing the data object
             var colData = new DataGridViewTextBoxColumn
             {
                 Name = "colData",
@@ -37,7 +54,7 @@ namespace Music.Writer
             };
             dgvPhrase.Columns.Add(colData);
 
-            // Column 1: MIDI Instrument dropdown (editable)
+            // Column 2: MIDI Instrument dropdown (editable)
             var colInstrument = new DataGridViewComboBoxColumn
             {
                 Name = "colInstrument",
@@ -52,7 +69,7 @@ namespace Music.Writer
             };
             dgvPhrase.Columns.Add(colInstrument);
 
-            // Column 2: Stave
+            // Column 3: Stave
             var colStaff = new DataGridViewTextBoxColumn
             {
                 Name = "colStave",
@@ -62,7 +79,7 @@ namespace Music.Writer
             };
             dgvPhrase.Columns.Add(colStaff);
 
-            // Column 3: Event number (read-only)
+            // Column 4: Event number (read-only)
             var colEventNumber = new DataGridViewTextBoxColumn
             {
                 Name = "colEventNumber",
@@ -72,7 +89,7 @@ namespace Music.Writer
             };
             dgvPhrase.Columns.Add(colEventNumber);
 
-            // Column 4: Description (read-only for now)
+            // Column 5: Description (read-only for now)
             var colDescription = new DataGridViewTextBoxColumn
             {
                 Name = "colDescription",
@@ -82,7 +99,7 @@ namespace Music.Writer
             };
             dgvPhrase.Columns.Add(colDescription);
 
-            // Column 5: Phrase details (fills remaining space)
+            // Column 6: Phrase details (fills remaining space)
             var colPhrase = new DataGridViewTextBoxColumn
             {
                 Name = "colPhrase",
@@ -95,6 +112,27 @@ namespace Music.Writer
             // Wire up event handlers
             dgvPhrase.CellValueChanged += cellValueChangedHandler;
             dgvPhrase.CurrentCellDirtyStateChanged += currentCellDirtyStateChangedHandler;
+
+            // Add the four fixed rows at the top
+            InitializeFixedRows(dgvPhrase);
+        }
+
+        /// <summary>
+        /// Initializes the four fixed rows at the top of the grid.
+        /// </summary>
+        private static void InitializeFixedRows(DataGridView dgvPhrase)
+        {
+            // Add four empty rows
+            for (int i = 0; i < FIXED_ROWS_COUNT; i++)
+            {
+                dgvPhrase.Rows.Add();
+            }
+
+            // Set Type column values for the fixed rows
+            dgvPhrase.Rows[FIXED_ROW_TEMPO].Cells["colType"].Value = "Tempo";
+            dgvPhrase.Rows[FIXED_ROW_TIME_SIGNATURE].Cells["colType"].Value = "Time Signature";
+            dgvPhrase.Rows[FIXED_ROW_KEY_SIGNATURE].Cells["colType"].Value = "Key Signature";
+            dgvPhrase.Rows[FIXED_ROW_HARMONY].Cells["colType"].Value = "Harmony";
         }
 
         /// <summary>
@@ -119,6 +157,10 @@ namespace Music.Writer
         /// <param name="e">Event args</param>
         internal static void HandleCellValueChanged(DataGridView dgvPhrase, object? sender, DataGridViewCellEventArgs e)
         {
+            // Skip fixed rows
+            if (e.RowIndex < FIXED_ROWS_COUNT)
+                return;
+
             // Only handle changes to the instrument column
             if (e.RowIndex < 0 || e.ColumnIndex != dgvPhrase.Columns["colInstrument"]?.Index)
                 return;
@@ -160,37 +202,36 @@ namespace Music.Writer
             phraseNumber++;
             var phraseName = phraseNumber.ToString();
 
-            // Get part name from the phrase (this should already be set correctly by ConvertMidiEventListsToPhraseList)
+            // Get part name from the phrase
             var partName = phrase.MidiProgramName ?? "Select...";
 
             // Add new row
             int newRowIndex = dgvPhrase.Rows.Add();
             var row = dgvPhrase.Rows[newRowIndex];
 
-            // Column 0: Hidden data (Phrase object)
+            // Column 0: Type (Phrase for phrase rows)
+            row.Cells["colType"].Value = "Phrase";
+
+            // Column 1: Hidden data (Phrase object)
             row.Cells["colData"].Value = phrase;
 
-            // Column 1: MIDI Instrument dropdown
-            // The combo box uses ValueMember="ProgramNumber" and DisplayMember="Name"
-            // So we set the cell value to the program number, and it will display the name
-            int programNumberToSet = -1; // Default to "Select..."
+            // Column 2: MIDI Instrument dropdown
+            int programNumberToSet = -1;
 
-            // Only use the phrase's program number if it's a valid program (0-127) or drums sentinel (255)
             if (phrase.MidiProgramNumber <= 127 || phrase.MidiProgramNumber == 255)
             {
                 programNumberToSet = phrase.MidiProgramNumber;
             }
-            // Otherwise keep programNumberToSet = -1 for "Select..."
 
             row.Cells["colInstrument"].Value = programNumberToSet;
 
-            // Column 2: Stave - default to 1 for newly added rows
+            // Column 3: Stave - default to 1 for newly added rows
             row.Cells["colStave"].Value = 1;
 
-            // Column 3: Event number
+            // Column 4: Event number
             row.Cells["colEventNumber"].Value = phraseName;
 
-            // Column 4: Description - show the actual instrument name from the phrase
+            // Column 5: Description
             if (!string.IsNullOrEmpty(partName) && partName != "Select...")
             {
                 row.Cells["colDescription"].Value = $"Part: {partName}";
@@ -200,7 +241,7 @@ namespace Music.Writer
                 row.Cells["colDescription"].Value = string.Empty;
             }
 
-            // Column 5: Phrase details
+            // Column 6: Phrase details
             row.Cells["colPhrase"].Value = phrase.PhraseNotes.Count > 0 
                 ? $"{phrase.PhraseNotes.Count} note(s)" 
                 : "Empty phrase";

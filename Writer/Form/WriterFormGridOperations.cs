@@ -1,3 +1,5 @@
+using Music.MyMidi;
+
 namespace Music.Writer
 {
     // Grid-specific operations for WriterForm
@@ -17,7 +19,7 @@ namespace Music.Writer
             PhraseGridManager.AddPhraseToGrid(emptyPhrase, _midiInstruments, dgvPhrase, ref phraseNumber);
 
             // Select the newly added row (last row)
-            if (dgvPhrase.Rows.Count > 0)
+            if (dgvPhrase.Rows.Count > PhraseGridManager.FIXED_ROWS_COUNT)
             {
                 int newRowIndex = dgvPhrase.Rows.Count - 1;
                 dgvPhrase.ClearSelection();
@@ -45,22 +47,28 @@ namespace Music.Writer
             }
 
             // Collect selected row indices and remove in descending order to avoid reindex issues
+            // Skip fixed rows
             var indices = dgvPhrase.SelectedRows
                 .Cast<DataGridViewRow>()
                 .Select(r => r.Index)
+                .Where(i => i >= PhraseGridManager.FIXED_ROWS_COUNT)
                 .OrderByDescending(i => i)
                 .ToList();
 
             foreach (var idx in indices)
             {
-                if (idx >= 0 && idx < dgvPhrase.Rows.Count)
+                if (idx >= PhraseGridManager.FIXED_ROWS_COUNT && idx < dgvPhrase.Rows.Count)
                     dgvPhrase.Rows.RemoveAt(idx);
             }
         }
 
         public void HandleClearPhrases()
         {
-            dgvPhrase.Rows.Clear();
+            // Remove all rows except the fixed rows
+            while (dgvPhrase.Rows.Count > PhraseGridManager.FIXED_ROWS_COUNT)
+            {
+                dgvPhrase.Rows.RemoveAt(PhraseGridManager.FIXED_ROWS_COUNT);
+            }
         }
 
         public void HandleClear()
@@ -73,6 +81,10 @@ namespace Music.Writer
 
             foreach (DataGridViewRow row in dgvPhrase.SelectedRows)
             {
+                // Skip fixed rows
+                if (row.Index < PhraseGridManager.FIXED_ROWS_COUNT)
+                    continue;
+
                 // Reset instrument to "Select..." (-1)
                 var instrCol = dgvPhrase.Columns["colInstrument"];
                 if (instrCol != null)
@@ -106,11 +118,16 @@ namespace Music.Writer
         /// <returns>True if at least one row is selected, false otherwise.</returns>
         private bool ValidatePhrasesSelected()
         {
-            if (dgvPhrase.SelectedRows.Count == 0)
+            // Check if any non-fixed rows are selected
+            var hasValidSelection = dgvPhrase.SelectedRows
+                .Cast<DataGridViewRow>()
+                .Any(r => r.Index >= PhraseGridManager.FIXED_ROWS_COUNT);
+
+            if (!hasValidSelection)
             {
                 MessageBox.Show(
                     this,
-                    "Please select one or more rows to apply this command.",
+                    "Please select one or more phrase rows to apply this command.",
                     "No Selection",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
@@ -130,6 +147,10 @@ namespace Music.Writer
         {
             foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
             {
+                // Skip fixed rows
+                if (selectedRow.Index < PhraseGridManager.FIXED_ROWS_COUNT)
+                    continue;
+
                 selectedRow.Cells["colData"].Value = phrase;
                 selectedRow.Cells["colPhrase"].Value = "Contains Phrase Data";
             }
@@ -144,6 +165,10 @@ namespace Music.Writer
         {
             foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
             {
+                // Skip fixed rows
+                if (selectedRow.Index < PhraseGridManager.FIXED_ROWS_COUNT)
+                    continue;
+
                 // Get existing phrase or create new one if null
                 var existingPhrase = selectedRow.Cells["colData"].Value as Phrase;
                 if (existingPhrase == null)

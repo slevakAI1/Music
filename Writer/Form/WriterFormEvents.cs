@@ -13,24 +13,32 @@ namespace Music.Writer
         // This creates a midi document from the selected phrases and plays them (simultaneously)
         public async Task HandlePlayAsync()
         {
-            // Check if there are any rows in the grid
-            if (dgvPhrase.Rows.Count == 0)
+            // Check if there are any phrase rows in the grid (excluding fixed rows)
+            if (dgvPhrase.Rows.Count <= PhraseGridManager.FIXED_ROWS_COUNT)
             {
                 MessageBox.Show(this, "No pitch events to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            // Check if a row is selected
-            if (dgvPhrase.SelectedRows.Count == 0)
+            // Check if a phrase row is selected
+            var hasPhraseSelection = dgvPhrase.SelectedRows
+                .Cast<DataGridViewRow>()
+                .Any(r => r.Index >= PhraseGridManager.FIXED_ROWS_COUNT);
+
+            if (!hasPhraseSelection)
             {
                 MessageBox.Show(this, "Please select a pitch event to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            // Build list of Phrase from all selected rows
+            // Build list of Phrase from all selected phrase rows (skip fixed rows)
             var phrases = new List<Phrase>();
             foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
             {
+                // Skip fixed rows
+                if (selectedRow.Index < PhraseGridManager.FIXED_ROWS_COUNT)
+                    continue;
+
                 // Validate instrument cell value first (may be DBNull or null)
                 var instrObj = selectedRow.Cells["colInstrument"].Value;
                 int programNumber = Convert.ToInt32(instrObj);
@@ -77,24 +85,32 @@ namespace Music.Writer
 
         public void HandleExport()
         {
-            // Check if there are any rows in the grid
-            if (dgvPhrase.Rows.Count == 0)
+            // Check if there are any phrase rows in the grid (excluding fixed rows)
+            if (dgvPhrase.Rows.Count <= PhraseGridManager.FIXED_ROWS_COUNT)
             {
                 MessageBox.Show(this, "No pitch events to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            // Check if a row is selected
-            if (dgvPhrase.SelectedRows.Count == 0)
+            // Check if a phrase row is selected
+            var hasPhraseSelection = dgvPhrase.SelectedRows
+                .Cast<DataGridViewRow>()
+                .Any(r => r.Index >= PhraseGridManager.FIXED_ROWS_COUNT);
+
+            if (!hasPhraseSelection)
             {
                 MessageBox.Show(this, "Please select a pitch event to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            // Build list of Phrase from all selected rows
+            // Build list of Phrase from all selected phrase rows (skip fixed rows)
             var phrases = new List<Phrase>();
             foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
             {
+                // Skip fixed rows
+                if (selectedRow.Index < PhraseGridManager.FIXED_ROWS_COUNT)
+                    continue;
+
                 var instrObj = selectedRow.Cells["colInstrument"].Value;
                 int programNumber = Convert.ToInt32(instrObj);
 
@@ -250,7 +266,7 @@ namespace Music.Writer
         public void HandleUpdateFormFromDesigner()
         {
             // Update the form to take into account any changes to Designer
-            Globals.Writer?.Update(_designer);
+            UpdateWriterFormDataFromDesigner.Update(_writer, _designer);
             txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
         }
 
@@ -396,8 +412,8 @@ namespace Music.Writer
 
         public void HandlePhraseDoubleClick(DataGridViewCellEventArgs e)
         {
-            // Only handle double-clicks on the Phrase column (not header row)
-            if (e.RowIndex < 0)
+            // Skip fixed rows
+            if (e.RowIndex < PhraseGridManager.FIXED_ROWS_COUNT)
                 return;
 
             var phraseColumnIndex = dgvPhrase.Columns["colPhrase"]?.Index;
