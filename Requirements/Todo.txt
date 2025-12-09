@@ -2,6 +2,29 @@
 
 
 Tempo / Track 0 globals / MidiEvent List
+    This should support TempoEvents. That needs to display and be editable. It needs to import
+    and export as well. Must handle multiple Tempo events with absolute positions.
+    This needs to inject into the conversion to midi.
+    This needs to extract from converion from midi to phrases
+
+Design Solution: 
+    Add the 4 time-related design elements to the grid
+    rename the grid to???
+    Need a columm for row type, the 4 above + ""phrase"
+    The buttons are all phrase buttons
+    The grid should auto load from designer
+    The conversions, both ways need to populate the controls and whatever backing variables they
+    have
+    The "Phrase" should be replaced by measures which would then allow us to see the alignment
+     - measures for phrases will show # of notes in the measure and the start tick e.g.  "14 (2240)       15 (2680) ...."
+    The play button will need to allow selection of a block of measures
+    Needs  ^v method of rearranging the grid
+    The grid needs to initialize with the 4 (fixed) control rows, and then phrases add
+    starting after. What is the first row?  0 or 1? find out!!!
+
+
+
+
 
 
 Design  - to manage options per command, like f(multiple phrases) --> new line, etc
