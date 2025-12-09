@@ -1,13 +1,7 @@
 ﻿
-
-
-
-NEXT: fix append to work with phrase. only?  currently has more capability.
-not sure if that will be ever used. would reduce complexity if removed
-
-
-piano 2 staffs and drum set : https://chatgpt.com/c/69286cf9-3164-8332-8efa-869b9d1afdd2
-
+Tempo
+Track 0 globals / MidiEvent List
+Finish Clear button
 
 ai : Mapping midi to Presonus
 Recommended Approach: Extend the Voice Catalog with Mapping Data
@@ -15,6 +9,16 @@ The cleanest solution is to extend Voices.Notion.json to include MIDI mappings,
 then use this during both phrase creation and export. This keeps all instrument
 knowledge centralized.
 
+
+
+
+
+
+
+
+
+
+piano 2 staffs and drum set : https://chatgpt.com/c/69286cf9-3164-8332-8efa-869b9d1afdd2
 
 =========================  VST STUFF
 =================================
@@ -50,8 +54,6 @@ Testing:
                         18 1/4 note triplets 2 staves - 4 voices
     Tests seems like maybe need to be updated? thats a maybe.
 
-Voice:
-    Percussion
 
 Generate:
        Music can be generated one part at a time, several parts at once, etc. and in small chunks.
