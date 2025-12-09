@@ -342,7 +342,7 @@ namespace Music.Writer
             // rbChord
             // 
             rbChord.AutoSize = true;
-            rbChord.ForeColor = Color.FromArgb(0, 192, 0);
+            rbChord.ForeColor = Color.FromArgb(255, 128, 0);
             rbChord.Location = new Point(15, 147);
             rbChord.Name = "rbChord";
             rbChord.Size = new Size(58, 19);
@@ -786,7 +786,7 @@ namespace Music.Writer
             // 
             // btnClear
             // 
-            btnClear.ForeColor = Color.FromArgb(255, 128, 0);
+            btnClear.ForeColor = Color.FromArgb(0, 192, 0);
             btnClear.Location = new Point(174, 365);
             btnClear.Name = "btnClear";
             btnClear.Size = new Size(72, 23);

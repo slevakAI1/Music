@@ -514,17 +514,25 @@ namespace Music.Writer
 
             foreach (DataGridViewRow row in dgvPhrase.SelectedRows)
             {
+                // Reset instrument to "Select..." (-1)
                 var instrCol = dgvPhrase.Columns["colInstrument"];
                 if (instrCol != null)
                     row.Cells[instrCol.Index].Value = -1;
 
+                // Reset data to empty Phrase
                 var dataCol = dgvPhrase.Columns["colData"];
                 if (dataCol != null)
                     row.Cells[dataCol.Index].Value = new Phrase(new List<PhraseNote>()) { MidiProgramNumber = -1 };
 
+                // Clear the Part description (should be empty, not "Part: Select...")
+                var descriptionCol = dgvPhrase.Columns["colDescription"];
+                if (descriptionCol != null)
+                    row.Cells[descriptionCol.Index].Value = string.Empty;
+
+                // Set Phrase column to "Empty phrase"
                 var phraseCol = dgvPhrase.Columns["colPhrase"];
                 if (phraseCol != null)
-                    row.Cells[phraseCol.Index].Value = string.Empty;
+                    row.Cells[phraseCol.Index].Value = "Empty phrase";
             }
 
             dgvPhrase.Refresh();
