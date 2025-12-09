@@ -119,6 +119,7 @@ namespace Music.Writer
 
         /// <summary>
         /// Initializes the four fixed rows at the top of the grid.
+        /// Entire fixed rows are set to ReadOnly so users cannot edit them.
         /// </summary>
         private static void InitializeFixedRows(DataGridView dgvPhrase)
         {
@@ -128,11 +129,18 @@ namespace Music.Writer
                 dgvPhrase.Rows.Add();
             }
 
-            // Set Type column values for the fixed rows
+            // Set Type column values for the fixed rows and mark each row read-only
             dgvPhrase.Rows[FIXED_ROW_TEMPO].Cells["colType"].Value = "Tempo";
+            dgvPhrase.Rows[FIXED_ROW_TEMPO].ReadOnly = true;
+
             dgvPhrase.Rows[FIXED_ROW_TIME_SIGNATURE].Cells["colType"].Value = "Time Signature";
+            dgvPhrase.Rows[FIXED_ROW_TIME_SIGNATURE].ReadOnly = true;
+
             dgvPhrase.Rows[FIXED_ROW_SECTION].Cells["colType"].Value = "Section";
+            dgvPhrase.Rows[FIXED_ROW_SECTION].ReadOnly = true;
+
             dgvPhrase.Rows[FIXED_ROW_HARMONY].Cells["colType"].Value = "Harmony";
+            dgvPhrase.Rows[FIXED_ROW_HARMONY].ReadOnly = true;
         }
 
         /// <summary>
