@@ -7,7 +7,7 @@ Tempo / Track 0 globals / MidiEvent List
     This needs to inject into the conversion to midi.
     This needs to extract from converion from midi to phrases
 
-Design Solution: 
+Design Solution - This supports the whole execute --> writing thing! right in the grid!: 
     Add the 4 time-related design elements to the grid
     rename the grid to???
     Need a columm for row type, the 4 above + ""phrase"
