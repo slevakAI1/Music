@@ -78,7 +78,8 @@ namespace Music.Writer
                 dgvPhrase,
                 _midiInstruments,
                 DgvPhrase_CellValueChanged,
-                DgvPhrase_CurrentCellDirtyStateChanged);
+                DgvPhrase_CurrentCellDirtyStateChanged,
+                _designer?.TempoTimeline);
 
             // ====================   T H I S   H A S   T O   B E   L A S T  !   =================
 

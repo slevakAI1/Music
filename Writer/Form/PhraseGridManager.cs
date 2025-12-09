@@ -1,4 +1,5 @@
 using Music.MyMidi;
+using Music.Designer;
 
 namespace Music.Writer
 {
@@ -21,11 +22,13 @@ namespace Music.Writer
         /// <param name="midiInstruments">List of available MIDI instruments</param>
         /// <param name="cellValueChangedHandler">Event handler for cell value changes</param>
         /// <param name="currentCellDirtyStateChangedHandler">Event handler for dirty state changes</param>
+        /// <param name="tempoTimeline">Optional TempoTimeline to place into the fixed Tempo row hidden data cell</param>
         internal static void ConfigurePhraseDataGridView(
             DataGridView dgvPhrase,
             List<MidiInstrument> midiInstruments,
             DataGridViewCellEventHandler cellValueChangedHandler,
-            EventHandler currentCellDirtyStateChangedHandler)
+            EventHandler currentCellDirtyStateChangedHandler,
+            TempoTimeline? tempoTimeline = null)
         {
             dgvPhrase.AllowUserToAddRows = false;
             dgvPhrase.AllowUserToResizeColumns = true;
@@ -113,15 +116,16 @@ namespace Music.Writer
             dgvPhrase.CellValueChanged += cellValueChangedHandler;
             dgvPhrase.CurrentCellDirtyStateChanged += currentCellDirtyStateChangedHandler;
 
-            // Add the four fixed rows at the top
-            InitializeFixedRows(dgvPhrase);
+            // Add the four fixed rows at the top and optionally attach tempoTimeline to the hidden data cell
+            InitializeFixedRows(dgvPhrase, tempoTimeline);
         }
 
         /// <summary>
         /// Initializes the four fixed rows at the top of the grid.
         /// Entire fixed rows are set to ReadOnly so users cannot edit them.
+        /// If a TempoTimeline is provided it will be stored in the fixed Tempo row's hidden data cell.
         /// </summary>
-        private static void InitializeFixedRows(DataGridView dgvPhrase)
+        private static void InitializeFixedRows(DataGridView dgvPhrase, TempoTimeline? tempoTimeline = null)
         {
             // Add four empty rows
             for (int i = 0; i < FIXED_ROWS_COUNT; i++)
@@ -141,6 +145,14 @@ namespace Music.Writer
 
             dgvPhrase.Rows[FIXED_ROW_HARMONY].Cells["colType"].Value = "Harmony";
             dgvPhrase.Rows[FIXED_ROW_HARMONY].ReadOnly = true;
+
+            // If a TempoTimeline was supplied, store it in the hidden data column of the Tempo fixed row.
+            if (tempoTimeline != null
+                && dgvPhrase.Columns.Contains("colData")
+                && dgvPhrase.Rows.Count > FIXED_ROW_TEMPO)
+            {
+                dgvPhrase.Rows[FIXED_ROW_TEMPO].Cells["colData"].Value = tempoTimeline;
+            }
         }
 
         /// <summary>
