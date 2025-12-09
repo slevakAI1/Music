@@ -24,8 +24,8 @@ namespace Music.Writer
             // Step 1 - convert phrases to MIDI EVENTS - Absolute positions
             var midiEventLists = ConvertPhrasesToMidiEventLists.Convert(phrases);
 
-            var json1 = Helpers.DebugObject(phrases);
-            var json2 = Helpers.DebugObject(midiEventLists);
+            var json1 = Debug.Json(phrases);
+            var json2 = Debug.Json(midiEventLists);
 
             // Step 2 - Merge midiEventLists lists that are for the same instrument
             var mergedMidiEventLists = MergeMidiEventListsByInstrument.Convert(
@@ -34,14 +34,14 @@ namespace Music.Writer
                 timeSignatureNumerator: timeSignatureNumerator,
                 timeSignatureDenominator: timeSignatureDenominator);
 
-            var json3 = Helpers.DebugObject(mergedMidiEventLists);
+            var json3 = Debug.Json(mergedMidiEventLists);
 
             // Step 3 - Execute merged timed notes to MIDI document
             var midiDoc = ConvertMidiEventsToMidiSongDocument.Convert(
                 mergedMidiEventLists,
                 tempo: tempo);
 
-            var json43 = Helpers.DebugObject(midiDoc);
+            var json43 = Debug.Json(midiDoc);
 
 
             return midiDoc;

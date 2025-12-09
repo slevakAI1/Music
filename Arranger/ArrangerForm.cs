@@ -123,7 +123,7 @@ namespace Music.Writer
         private void btnUpdateFormFromDesigner_Click(object sender, EventArgs e)
         {
             // Update the form to take into account any changes to Designer
-            Globals.Writer?.UpdateFromDesigner(_designer);
+            Globals.Writer?.Update(_designer);
             txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
         }
 

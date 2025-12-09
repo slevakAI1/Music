@@ -1,9 +1,4 @@
-﻿using System;
-using System.Drawing.Imaging;
-using System.Linq;
-using static Music.Helpers;
-
-namespace Music.Writer
+﻿namespace Music.Writer
 {
     // Converted helper into a partial class so it can access designer controls directly
     public partial class WriterForm
@@ -235,6 +230,13 @@ namespace Music.Writer
 
             if (data.ChordBase != null && cbChordBase != null && cbChordBase.Items.Contains(data.ChordBase))
                 cbChordBase.SelectedItem = data.ChordBase;
+        }
+        // Forces the value for a numeric up-down control to an integer within its min/max range.
+        public static decimal LimitRange(NumericUpDown control, int value)
+        {
+            var min = (int)control.Minimum;
+            var max = (int)control.Maximum;
+            return (decimal)Math.Max(min, Math.Min(max, value));
         }
     }
 }

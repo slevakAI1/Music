@@ -19,7 +19,7 @@
 //            // Pre-process: remove all backup elements before appending notes.
 //            AppendNotesHelper.RemoveAllBackupElements(score, config.Parts);
 
-//            var debugConfig = Helpers.DebugObject(config);
+//            var debugConfig = Helpers.Json(config);
 
 //            if (score == null) throw new ArgumentNullException(nameof(score));
 //            if (config == null) throw new ArgumentNullException(nameof(config));

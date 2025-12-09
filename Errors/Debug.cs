@@ -1,27 +1,14 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections;
 using System.Reflection;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace Music
 {
-    public static class Helpers
+    public static class Debug
     {
-        // Forces the value for a numeric up-down control to an integer within its min/max range.
-        public static decimal LimitRange(NumericUpDown control, int value)
-        {
-            var min = (int)control.Minimum;
-            var max = (int)control.Maximum;
-            return (decimal)Math.Max(min, Math.Min(max, value));
-        }
-
         // Safe debug serializer: builds a "safe" object graph by reflection, catching getter exceptions,
         // stopping on cyclic references, and limiting recursion depth. Then serializes that safe graph.
-        public static string DebugObject<T>(T obj) => DebugObject(obj, maxDepth: 6);
+        public static string Json<T>(T obj) => DebugObject(obj, maxDepth: 6);
 
         private static string DebugObject<T>(T obj, int maxDepth)
         {

@@ -6,12 +6,12 @@ using System.Linq;
 
 namespace Music.Writer
 {
-    public static class WriterFormExtensions
+    public static class UpdateWriterFormDataFromDesigner
     {
         // Applies design-driven defaults into an existing Writer instance.
         // Accept a nullable receiver so callers holding a `Writer?` (e.g. Globals.GenerationData)
         // can call this extension directly without a null-forgiving operator.
-        public static void UpdateFromDesigner(this WriterFormData? data, Designer.Designer? design)
+        public static void Update(this WriterFormData? data, Designer.Designer? design)
         {
             if (data == null) return;
 
