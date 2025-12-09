@@ -10,7 +10,7 @@ namespace Music.Writer
         // Constants for the four fixed rows at the top of the grid
         internal const int FIXED_ROW_TEMPO = 0;
         internal const int FIXED_ROW_TIME_SIGNATURE = 1;
-        internal const int FIXED_ROW_KEY_SIGNATURE = 2;
+        internal const int FIXED_ROW_SECTION = 2;
         internal const int FIXED_ROW_HARMONY = 3;
         internal const int FIXED_ROWS_COUNT = 4;
 
@@ -131,7 +131,7 @@ namespace Music.Writer
             // Set Type column values for the fixed rows
             dgvPhrase.Rows[FIXED_ROW_TEMPO].Cells["colType"].Value = "Tempo";
             dgvPhrase.Rows[FIXED_ROW_TIME_SIGNATURE].Cells["colType"].Value = "Time Signature";
-            dgvPhrase.Rows[FIXED_ROW_KEY_SIGNATURE].Cells["colType"].Value = "Key Signature";
+            dgvPhrase.Rows[FIXED_ROW_SECTION].Cells["colType"].Value = "Section";
             dgvPhrase.Rows[FIXED_ROW_HARMONY].Cells["colType"].Value = "Harmony";
         }
 
