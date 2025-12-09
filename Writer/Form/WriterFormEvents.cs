@@ -205,6 +205,298 @@ namespace Music.Writer
             dgvPhrase.Rows.Clear();
         }
 
+        public void HandlePhraseDoubleClick(DataGridViewCellEventArgs e)
+        {
+            // Only handle double-clicks on the Phrase column (not header row)
+            if (e.RowIndex < 0)
+                return;
+
+            var phraseColumnIndex = dgvPhrase.Columns["colPhrase"]?.Index;
+            if (phraseColumnIndex == null || e.ColumnIndex != phraseColumnIndex.Value)
+                return;
+
+            var row = dgvPhrase.Rows[e.RowIndex];
+            var phraseData = row.Cells["colData"].Value;
+
+            // Validate that we have a Phrase object
+            if (phraseData is not Phrase phrase)
+            {
+                MessageBox.Show(this,
+                    "No phrase data available for this row.",
+                    "View Phrase",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            // Get the phrase number for the dialog title
+            var phraseNumber = row.Cells["colEventNumber"].Value?.ToString() ?? (e.RowIndex + 1).ToString();
+
+            // Open the JSON viewer dialog
+            using var viewer = new PhraseJsonViewer(phrase, phraseNumber);
+            viewer.ShowDialog(this);
+        }
+
+        public void HandleNewScore()
+        {
+            // Resolve Movement Title to use for the new score
+            var movementTitle = txtMovementTitle.Text;
+            if (movementTitle == "")
+            {
+                var now = System.DateTime.Now;
+                movementTitle = now.ToString("dddd, MMM d, yyyy h:mm'.'ss tt");
+            }
+
+            var newScore = ScoreHelper.CreateNewScore(
+                _designer,
+                ref _measureMeta,
+                movementTitle);
+
+            // Set current score to newly created score and update 
+            if (newScore != null)
+            {
+                if (_scoreList.Count > 0)
+                    _scoreList[0] = newScore;
+                else
+                    _scoreList.Add(newScore);
+                txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
+            }
+
+            // Clear the movement title textbox
+            txtMovementTitle.Text = "";
+        }
+
+        public void HandleAddPhrase()
+        {
+            // Create an empty Phrase and add it to the grid via the existing helper.
+            var emptyPhrase = new Phrase(new List<PhraseNote>())
+            {
+                MidiProgramNumber = -1  // "Select..."
+            };
+
+            // Use PhraseGridManager to initialize the row consistently with other adds.
+            PhraseGridManager.AddPhraseToGrid(emptyPhrase, _midiInstruments, dgvPhrase, ref phraseNumber);
+
+            // Select the newly added row (last row)
+            if (dgvPhrase.Rows.Count > 0)
+            {
+                int newRowIndex = dgvPhrase.Rows.Count - 1;
+                dgvPhrase.ClearSelection();
+                dgvPhrase.Rows[newRowIndex].Selected = true;
+
+                // Move current cell to an editable cell so the selection is visible and focusable
+                var instrumentCol = dgvPhrase.Columns["colInstrument"];
+                if (instrumentCol != null && dgvPhrase.Rows[newRowIndex].Cells[instrumentCol.Index] != null)
+                {
+                    dgvPhrase.CurrentCell = dgvPhrase.Rows[newRowIndex].Cells[instrumentCol.Index];
+                }
+            }
+        }
+
+        public void HandleImport()
+        {
+            using var ofd = new OpenFileDialog
+            {
+                Filter = "MIDI files (*.mid;*.midi)|*.mid;*.midi|All files (*.*)|*.*",
+                Title = "Import MIDI File",
+                CheckFileExists = true
+            };
+
+            if (ofd.ShowDialog(this) != DialogResult.OK)
+                return;
+
+            try
+            {
+                // Import the MIDI file using the existing service
+                var midiDoc = _midiIoService.ImportFromFile(ofd.FileName);
+
+                // Resolve project root (same approach used elsewhere in the solution)
+                var projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
+                var debugDir = Path.Combine(projectRoot, "Files", "Debug");
+                Directory.CreateDirectory(debugDir);
+
+                // Convert MIDI document to lists of MetaMidiEvent objects
+                List<List<MetaMidiEvent>> midiEventLists;
+                try
+                {
+                    midiEventLists = ConvertMidiSongDocumentToMidiEventLists.Convert(midiDoc);
+                }
+                catch (NotSupportedException ex)
+                {
+                    // Show detailed error about unsupported MIDI event
+                    MessageBox.Show(
+                        this,
+                        ex.Message,
+                        "Unsupported MIDI Event",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Extract ticks per quarter note from the MIDI file
+                short ticksPerQuarterNote = MusicConstants.TicksPerQuarterNote; // Default
+                if (midiDoc.Raw.TimeDivision is Melanchall.DryWetMidi.Core.TicksPerQuarterNoteTimeDivision tpqn)
+                {
+                    ticksPerQuarterNote = tpqn.TicksPerQuarterNote;
+                }
+
+                // Convert MetaMidiEvent lists to Phrase objects, passing the source ticks per quarter note
+                var phrases = ConvertMidiEventListsToPhraseLists.ConvertMidiEventListsToPhraseList(
+                    midiEventLists,
+                    _midiInstruments,
+                    ticksPerQuarterNote);
+
+                // Add each phrase to the grid
+                foreach (var phrase in phrases)
+                {
+                    PhraseGridManager.AddPhraseToGrid(
+                        phrase,
+                        _midiInstruments,
+                        dgvPhrase,
+                        ref phraseNumber);
+                }
+
+                MessageBox.Show(
+                    this,
+                    $"Successfully imported {phrases.Count} track(s) from:\n{Path.GetFileName(ofd.FileName)}",
+                    "Import Successful",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    this,
+                    $"Error importing MIDI file:\n{ex.Message}\n\n{ex.InnerException?.Message}",
+                    "Import Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        public void HandleExport()
+        {
+            // Check if there are any rows in the grid
+            if (dgvPhrase.Rows.Count == 0)
+            {
+                MessageBox.Show(this, "No pitch events to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Check if a row is selected
+            if (dgvPhrase.SelectedRows.Count == 0)
+            {
+                MessageBox.Show(this, "Please select a pitch event to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Build list of Phrase from all selected rows
+            var phrases = new List<Phrase>();
+            foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
+            {
+                var instrObj = selectedRow.Cells["colInstrument"].Value;
+                int programNumber = Convert.ToInt32(instrObj);
+
+                if (programNumber == -1)
+                {
+                    var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
+                    MessageBox.Show(
+                        this,
+                        $"No instrument selected for row #{eventNumber}. Please select an instrument before exporting.",
+                        "Missing Instrument",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return; // Abort export
+                }
+
+                var phrase = (Phrase)selectedRow.Cells["colData"].Value;
+                if (phrase.PhraseNotes.Count == 0)
+                {
+                    var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
+                    MessageBox.Show(
+                        this,
+                        $"No phrase data for row #{eventNumber}. Please add or assign a phrase before exporting.",
+                        "Missing Phrase",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return; // Abort export
+                }
+
+                // Preserve drum track indicator (255) or use selected program number
+                phrase.MidiProgramNumber = (byte)programNumber;
+                phrases.Add(phrase);
+            }
+
+            using var sfd = new SaveFileDialog
+            {
+                Filter = "MIDI files (*.mid)|*.mid|All files (*.*)|*.*",
+                Title = "Export MIDI File",
+                DefaultExt = "mid",
+                AddExtension = true
+            };
+
+            if (sfd.ShowDialog(this) != DialogResult.OK)
+                return;
+
+            try
+            {
+                // Consolidated conversion: phrases -> midi document
+                var midiDoc = ConvertListOfPhrasesToMidiSongDocument.Convert(
+                    phrases,
+                    tempo: 112,
+                    timeSignatureNumerator: 4,
+                    timeSignatureDenominator: 4);
+
+                // Export to file
+                _midiIoService.ExportToFile(sfd.FileName, midiDoc);
+
+                MessageBox.Show(
+                    this,
+                    $"Successfully exported to:\n{Path.GetFileName(sfd.FileName)}",
+                    "Export Successful",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, $"Error exporting MIDI: {ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public void HandleClear()
+        {
+            if (dgvPhrase.SelectedRows == null || dgvPhrase.SelectedRows.Count == 0)
+            {
+                MessageBox.Show(this, "Please select one or more phrase rows to clear.", "Clear Phrases", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            foreach (DataGridViewRow row in dgvPhrase.SelectedRows)
+            {
+                // Reset instrument to "Select..." (-1)
+                var instrCol = dgvPhrase.Columns["colInstrument"];
+                if (instrCol != null)
+                    row.Cells[instrCol.Index].Value = -1;
+
+                // Reset data to empty Phrase
+                var dataCol = dgvPhrase.Columns["colData"];
+                if (dataCol != null)
+                    row.Cells[dataCol.Index].Value = new Phrase(new List<PhraseNote>()) { MidiProgramNumber = -1 };
+
+                // Clear the Part description (should be empty, not "Part: Select...")
+                var descriptionCol = dgvPhrase.Columns["colDescription"];
+                if (descriptionCol != null)
+                    row.Cells[descriptionCol.Index].Value = string.Empty;
+
+                // Set Phrase column to "Empty phrase"
+                var phraseCol = dgvPhrase.Columns["colPhrase"];
+                if (phraseCol != null)
+                    row.Cells[phraseCol.Index].Value = "Empty phrase";
+            }
+
+            dgvPhrase.Refresh();
+        }
+
 
         #region "Execute Commands"
 
