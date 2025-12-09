@@ -1,9 +1,10 @@
 ﻿
-Tempo
-Track 0 globals / MidiEvent List
 Finish Clear button
 
-Figure out how to manage options per command, like f(multiple phrases) --> new line, etc
+Tempo / Track 0 globals / MidiEvent List
+
+Design  - to manage options per command, like f(multiple phrases) --> new line, etc
+
 
 ai : Mapping midi to Presonus
 Recommended Approach: Extend the Voice Catalog with Mapping Data
