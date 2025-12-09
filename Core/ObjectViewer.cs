@@ -4,13 +4,13 @@ using System.Text.Json;
 
 namespace Music
 {
-    public static class Debug
+    public static class ObjectViewer
     {
         // Safe debug serializer: builds a "safe" object graph by reflection, catching getter exceptions,
         // stopping on cyclic references, and limiting recursion depth. Then serializes that safe graph.
-        public static string Json<T>(T obj) => DebugObject(obj, maxDepth: 6);
+        public static string Json<T>(T obj) => Show(obj, maxDepth: 6);
 
-        private static string DebugObject<T>(T obj, int maxDepth)
+        private static string Show<T>(T obj, int maxDepth)
         {
             var visited = new HashSet<object>(new ReferenceEqualityComparer());
             var safe = CreateSafeObject(obj, 0, maxDepth, visited);

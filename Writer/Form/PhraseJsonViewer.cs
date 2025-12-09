@@ -76,7 +76,7 @@ namespace Music.Writer
             try
             {
                 // Use the existing Helpers.Json method to convert to JSON
-                string json = Debug.Json(phrase);
+                string json = ObjectViewer.Json(phrase);
                 txtJson.Text = json;
             }
             catch (Exception ex)
