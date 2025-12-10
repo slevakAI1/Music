@@ -1,5 +1,9 @@
 ﻿namespace Music.Designer
 {
+
+    // Current plan is to limit sections to whole bars. Will try to deal with lead ins and
+    // lead outs in the section generators
+
     public class SectionClass
     {
         // Existing
