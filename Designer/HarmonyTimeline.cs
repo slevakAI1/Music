@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace Music.Designer
 {
     // Global bar/beat-aligned harmony timeline
@@ -25,42 +23,12 @@ namespace Music.Designer
             Reindex();
         }
 
-        public void Reset()
-        {
-            Events.Clear();
-            _barHeads.Clear();
-        }
-
         public void Add(HarmonyEvent evt)
         {
             Events.Add(evt);
             IndexEventForBars(evt);
         }
-
-        // Fast lookup of the harmony active at the start of a bar (beat 1).
-        public bool TryGetAtBar(int bar, out HarmonyEvent? evt)
-        {
-            if (_barHeads.TryGetValue(bar, out var e))
-            {
-                evt = e;
-                return true;
-            }
-
-            // Fallback scan (also memoizes)
-            foreach (var he in Events)
-            {
-                if (he.Contains(bar, 1, BeatsPerBar))
-                {
-                    _barHeads[bar] = he;
-                    evt = he;
-                    return true;
-                }
-            }
-
-            evt = null;
-            return false;
-        }
-
+       
         private void IndexEventForBars(HarmonyEvent evt)
         {
             var startAbs = (evt.StartBar - 1) * BeatsPerBar + (evt.StartBeat - 1);
