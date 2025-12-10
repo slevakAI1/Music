@@ -160,7 +160,7 @@ namespace Music.Designer
                 foreach (var te in tempoTimeline.Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat))
                 {
                     if (!firstTempo) sb.Append("\r\n");
-                    sb.Append($"Bar {te.StartBar} Beat {te.StartBeat}, {te.DurationBeats} beats | {te.TempoBpm} BPM");
+                    sb.Append($"Bar {te.StartBar} Beat {te.StartBeat}, | {te.TempoBpm} BPM");
                     firstTempo = false;
                 }
             }

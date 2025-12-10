@@ -42,15 +42,27 @@ namespace Music.Designer
                 return true;
             }
 
-            // Fallback scan (also memoizes)
+            // Fallback: find the most recent event at or before this bar
+            var targetAbs = (bar - 1) * BeatsPerBar;
+            
+            TempoEvent? bestMatch = null;
+            int bestStartAbs = -1;
+
             foreach (var te in Events)
             {
-                if (te.Contains(bar, 1, BeatsPerBar))
+                var startAbs = (te.StartBar - 1) * BeatsPerBar + (te.StartBeat - 1);
+                if (startAbs <= targetAbs && startAbs > bestStartAbs)
                 {
-                    _barHeads[bar] = te;
-                    evt = te;
-                    return true;
+                    bestMatch = te;
+                    bestStartAbs = startAbs;
                 }
+            }
+
+            if (bestMatch != null)
+            {
+                _barHeads[bar] = bestMatch;
+                evt = bestMatch;
+                return true;
             }
 
             evt = null;
@@ -59,20 +71,8 @@ namespace Music.Designer
 
         private void IndexEventForBars(TempoEvent evt)
         {
-            var startAbs = (evt.StartBar - 1) * BeatsPerBar + (evt.StartBeat - 1);
-            var endAbsExcl = startAbs + evt.DurationBeats;
-
-            var startBar = evt.StartBar;
-            var endBarInclusive = (int)Math.Floor((endAbsExcl - 1) / (double)BeatsPerBar) + 1;
-
-            for (int bar = startBar; bar <= endBarInclusive; bar++)
-            {
-                var barStartAbs = (bar - 1) * BeatsPerBar;
-                if (startAbs <= barStartAbs && endAbsExcl > barStartAbs)
-                {
-                    _barHeads[bar] = evt;
-                }
-            }
+            // Index this event at its starting bar
+            _barHeads[evt.StartBar] = evt;
         }
 
         private void Reindex()
@@ -85,6 +85,26 @@ namespace Music.Designer
         public void EnsureIndexed()
         {
             Reindex();
+        }
+
+        // Helper: Get the duration in beats for a specific event (until next event or end of timeline)
+        public int GetEventDuration(TempoEvent evt, int totalBars)
+        {
+            var startAbs = (evt.StartBar - 1) * BeatsPerBar + (evt.StartBeat - 1);
+            
+            // Find the next event
+            int nextStartAbs = totalBars * BeatsPerBar; // default to end of timeline
+            
+            foreach (var te in Events)
+            {
+                var teStartAbs = (te.StartBar - 1) * BeatsPerBar + (te.StartBeat - 1);
+                if (teStartAbs > startAbs && teStartAbs < nextStartAbs)
+                {
+                    nextStartAbs = teStartAbs;
+                }
+            }
+            
+            return nextStartAbs - startAbs;
         }
     }
 }

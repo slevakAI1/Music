@@ -14,7 +14,6 @@ namespace Music.Designer
                 StartBar = 1,
                 StartBeat = 1,
                 TempoBpm = DesignerTests.DefaultTempoBpm,
-                DurationBeats = DesignerTests.TotalBars * timeline.BeatsPerBar
             });
 
             return timeline;

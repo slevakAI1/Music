@@ -191,19 +191,35 @@ namespace Music.Designer
             // Build initial working set
             if (initial != null && initial.Events.Count > 0)
             {
-                // Import existing events
-                var imported = initial.Events
+                // Import existing events - reconstruct BarCount from sequential positions
+                var sorted = initial.Events
                     .OrderBy(e => e.StartBar)
                     .ThenBy(e => e.StartBeat)
-                    .Select(e => new WorkingEvent
-                    {
-                        Bpm = e.TempoBpm,
-                        // Approximate bars based on 4 beats/bar when reconstructing UI span.
-                        BarCount = Math.Max(1, e.DurationBeats / 4)
-                    })
                     .ToList();
 
-                _working.AddRange(imported);
+                for (int i = 0; i < sorted.Count; i++)
+                {
+                    var evt = sorted[i];
+                    int barCount;
+                    
+                    if (i < sorted.Count - 1)
+                    {
+                        // Calculate bars until next event
+                        var nextEvt = sorted[i + 1];
+                        barCount = nextEvt.StartBar - evt.StartBar;
+                    }
+                    else
+                    {
+                        // Last event - default to 4 bars
+                        barCount = 4;
+                    }
+
+                    _working.Add(new WorkingEvent
+                    {
+                        Bpm = evt.TempoBpm,
+                        BarCount = Math.Max(1, barCount)
+                    });
+                }
             }
             else
             {
@@ -233,7 +249,6 @@ namespace Music.Designer
         private TempoTimeline BuildResultTimeline()
         {
             var t = new TempoTimeline();
-            int beatsPerBar = 4;
             int startBar = 1;
 
             foreach (var we in _working)
@@ -242,8 +257,7 @@ namespace Music.Designer
                 {
                     StartBar = startBar,
                     StartBeat = 1,
-                    TempoBpm = we.Bpm,
-                    DurationBeats = we.BarCount * beatsPerBar
+                    TempoBpm = we.Bpm
                 });
                 startBar += we.BarCount;
             }
