@@ -18,7 +18,7 @@ namespace Music.Writer
         /// <returns>A list of WriterNote objects representing the chord voicing.</returns>
         /// <exception cref="ArgumentNullException">When harmonicEvent is null.</exception>
         /// <exception cref="InvalidOperationException">When the chord cannot be constructed.</exception>
-        public static List<PhraseNote> Convert(HarmonicEvent harmonicEvent, int baseOctave = 4, int noteValue = 4)
+        public static List<PhraseNote> Convert(HarmonyEvent harmonicEvent, int baseOctave = 4, int noteValue = 4)
         {
             if (harmonicEvent == null)
                 throw new ArgumentNullException(nameof(harmonicEvent));

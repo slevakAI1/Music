@@ -13,7 +13,7 @@
         public SectionTimelineClass SectionSet { get; set; } = new();
 
         // Harmonic timeline persisted with the design
-        public HarmonicTimeline? HarmonicTimeline { get; set; }
+        public HarmonyTimeline? HarmonicTimeline { get; set; }
 
         // New: independent timelines for tempo and time signature
         public TempoTimeline? TempoTimeline { get; set; }

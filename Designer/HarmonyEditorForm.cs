@@ -7,7 +7,7 @@ using System.Windows.Forms;
 namespace Music.Designer
 {
     // Popup editor for arranging Harmonic Events and configuring the timeline
-    public sealed class HarmonicEditorForm : Form
+    public sealed class HarmonyEditorForm : Form
     {
         private readonly ListView _lv;
         private readonly Button _btnAdd;
@@ -43,7 +43,7 @@ namespace Music.Designer
         // Current global settings
         private int _beatsPerBar = 4;
 
-        public HarmonicTimeline ResultTimeline { get; private set; } = new HarmonicTimeline();
+        public HarmonyTimeline ResultTimeline { get; private set; } = new HarmonyTimeline();
 
         // Predefined values
         private static readonly string[] AllKeys = new[]
@@ -97,7 +97,7 @@ namespace Music.Designer
             };
         }
 
-        public HarmonicEditorForm(HarmonicTimeline? initial = null)
+        public HarmonyEditorForm(HarmonyTimeline? initial = null)
         {
             Text = "Edit Harmonic Timeline";
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -329,7 +329,7 @@ namespace Music.Designer
             cb.EndUpdate();
         }
 
-        private void LoadInitial(HarmonicTimeline? initial)
+        private void LoadInitial(HarmonyTimeline? initial)
         {
             _working.Clear();
 
@@ -401,13 +401,13 @@ namespace Music.Designer
             UpdateButtonsEnabled();
         }
 
-        private HarmonicTimeline BuildResult()
+        private HarmonyTimeline BuildResult()
         {
-            var tl = new HarmonicTimeline();
+            var tl = new HarmonyTimeline();
             tl.ConfigureGlobal($"{_beatsPerBar}/4");
             foreach (var w in _working)
             {
-                tl.Add(new HarmonicEvent
+                tl.Add(new HarmonyEvent
                 {
                     StartBar = w.StartBar,
                     StartBeat = w.StartBeat,
@@ -727,7 +727,7 @@ namespace Music.Designer
 
         private void ApplyDefaultTimeline()
         {
-            var defaults = HarmonicTests.CreateTestTimelineD1();
+            var defaults = HarmonyTests.CreateTestTimelineD1();
 
             _working.Clear();
             _beatsPerBar = Math.Max(1, defaults.BeatsPerBar);

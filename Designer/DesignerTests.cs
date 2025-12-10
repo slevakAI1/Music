@@ -18,7 +18,7 @@ namespace Music.Designer
             design.PartSet.SetTestVoicesD1();    // TODO - the others have separate classes!
 
             // 3) Harmonic timeline: use the same defaults as the Harmonic Editor's "Set Defaults"
-            design.HarmonicTimeline = HarmonicTests.CreateTestTimelineD1();
+            design.HarmonicTimeline = HarmonyTests.CreateTestTimelineD1();
 
             // 4) Time signature timeline: apply default (4/4 starting at bar 1)
             design.TimeSignatureTimeline = TimeSignatureTests.CreateTestTimelineD1();

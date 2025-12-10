@@ -1,7 +1,7 @@
 namespace Music.Designer
 {
     // One harmonic event, potentially spanning multiple bars
-    public sealed class HarmonicEvent
+    public sealed class HarmonyEvent
     {
         // Placement (1-based bar/beat)
         public int StartBar { get; init; }

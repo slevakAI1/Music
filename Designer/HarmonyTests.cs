@@ -1,11 +1,11 @@
 namespace Music.Designer
 {
     // Builds the app's default harmonic timeline (48 bars).
-    public static class HarmonicTests
+    public static class HarmonyTests
     {
-        public static HarmonicTimeline CreateTestTimelineD1()
+        public static HarmonyTimeline CreateTestTimelineD1()
         {
-            var timeline = new HarmonicTimeline();
+            var timeline = new HarmonyTimeline();
             timeline.ConfigureGlobal(DesignerTests.GlobalTimeSignature);
 
             // Common 4-chord loop: I – V – vi – IV, one chord per bar across 48 bars.
@@ -26,9 +26,9 @@ namespace Music.Designer
             return timeline;
         }
 
-        private static void Add(HarmonicTimeline timeline, int bar, string key, int degree, string quality)
+        private static void Add(HarmonyTimeline timeline, int bar, string key, int degree, string quality)
         {
-            timeline.Add(new HarmonicEvent
+            timeline.Add(new HarmonyEvent
             {
                 StartBar = bar,
                 StartBeat = 1,

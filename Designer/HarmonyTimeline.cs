@@ -3,13 +3,13 @@ using System.Text.Json.Serialization;
 namespace Music.Designer
 {
     // Global bar/beat-aligned harmony timeline
-    public class HarmonicTimeline
+    public class HarmonyTimeline
     {
-        private readonly Dictionary<int, HarmonicEvent> _barHeads = new(); // bar -> event active at beat 1
+        private readonly Dictionary<int, HarmonyEvent> _barHeads = new(); // bar -> event active at beat 1
 
         public int BeatsPerBar { get; set; } = 4; // Remove - this is represented elsewhere
 
-        public List<HarmonicEvent> Events { get; set; } = new();
+        public List<HarmonyEvent> Events { get; set; } = new();
 
         public void ConfigureGlobal(string meter)
         {
@@ -31,14 +31,14 @@ namespace Music.Designer
             _barHeads.Clear();
         }
 
-        public void Add(HarmonicEvent evt)
+        public void Add(HarmonyEvent evt)
         {
             Events.Add(evt);
             IndexEventForBars(evt);
         }
 
         // Fast lookup of the harmony active at the start of a bar (beat 1).
-        public bool TryGetAtBar(int bar, out HarmonicEvent? evt)
+        public bool TryGetAtBar(int bar, out HarmonyEvent? evt)
         {
             if (_barHeads.TryGetValue(bar, out var e))
             {
@@ -61,7 +61,7 @@ namespace Music.Designer
             return false;
         }
 
-        private void IndexEventForBars(HarmonicEvent evt)
+        private void IndexEventForBars(HarmonyEvent evt)
         {
             var startAbs = (evt.StartBar - 1) * BeatsPerBar + (evt.StartBeat - 1);
             var endAbsExcl = startAbs + evt.DurationBeats;

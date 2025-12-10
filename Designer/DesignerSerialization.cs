@@ -48,7 +48,7 @@ namespace Music.Designer
             // Harmonic timeline: preserve order and values
             if (dto.HarmonicTimeline != null)
             {
-                var tl = new HarmonicTimeline
+                var tl = new HarmonyTimeline
                 {
                     BeatsPerBar = dto.HarmonicTimeline.BeatsPerBar > 0 ? dto.HarmonicTimeline.BeatsPerBar : 4
                     // TempoBpm removed from HarmonicTimeline; dto.HarmonicTimeline.TempoBpm is ignored (migrated to TempoTimeline separately)
@@ -57,7 +57,7 @@ namespace Music.Designer
                 {
                     foreach (var e in dto.HarmonicTimeline.Events)
                     {
-                        tl.Events.Add(new HarmonicEvent
+                        tl.Events.Add(new HarmonyEvent
                         {
                             StartBar = e.StartBar,
                             StartBeat = e.StartBeat,
@@ -110,7 +110,7 @@ namespace Music.Designer
         {
             public int BeatsPerBar { get; set; }
             // Deprecated: was stored alongside Harmony; retained for back-compat but ignored here.
-            public List<HarmonicEvent>? Events { get; set; }
+            public List<HarmonyEvent>? Events { get; set; }
         }
     }
 }

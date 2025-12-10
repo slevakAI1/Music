@@ -126,7 +126,7 @@ namespace Music
             if (!EnsureDesignOrNotify(form)) return;
 
             var existing = Globals.Designer!.HarmonicTimeline;
-            using var dlg = new HarmonicEditorForm(existing);
+            using var dlg = new HarmonyEditorForm(existing);
             if (dlg.ShowDialog(form) == DialogResult.OK)
             {
                 Globals.Designer!.HarmonicTimeline = dlg.ResultTimeline;
