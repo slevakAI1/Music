@@ -103,7 +103,7 @@ namespace Music.Writer
             groupBox3 = new GroupBox();
             btnExecute = new Button();
             grbCurrentDesign = new GroupBox();
-            groupBox4 = new GroupBox();
+            gbWriter = new GroupBox();
             btnPause = new Button();
             btnClear = new Button();
             btnStop = new Button();
@@ -130,7 +130,7 @@ namespace Music.Writer
             grpScoreList.SuspendLayout();
             groupBox3.SuspendLayout();
             grbCurrentDesign.SuspendLayout();
-            groupBox4.SuspendLayout();
+            gbWriter.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvPhrase).BeginInit();
             SuspendLayout();
             // 
@@ -609,24 +609,26 @@ namespace Music.Writer
             // 
             // btnSetWriterTestScenarioG1
             // 
+            btnSetWriterTestScenarioG1.BackColor = Color.Black;
             btnSetWriterTestScenarioG1.ForeColor = Color.FromArgb(0, 192, 0);
             btnSetWriterTestScenarioG1.Location = new Point(333, 612);
             btnSetWriterTestScenarioG1.Name = "btnSetWriterTestScenarioG1";
             btnSetWriterTestScenarioG1.Size = new Size(196, 23);
             btnSetWriterTestScenarioG1.TabIndex = 8;
             btnSetWriterTestScenarioG1.Text = "Set Writer - Test Scenario G1";
-            btnSetWriterTestScenarioG1.UseVisualStyleBackColor = true;
+            btnSetWriterTestScenarioG1.UseVisualStyleBackColor = false;
             btnSetWriterTestScenarioG1.Click += btnSetWriterTestScenarioG1_Click;
             // 
             // btnSetDesignTestScenarioD1
             // 
+            btnSetDesignTestScenarioD1.BackColor = Color.Black;
             btnSetDesignTestScenarioD1.ForeColor = Color.FromArgb(0, 192, 0);
             btnSetDesignTestScenarioD1.Location = new Point(139, 612);
             btnSetDesignTestScenarioD1.Name = "btnSetDesignTestScenarioD1";
             btnSetDesignTestScenarioD1.Size = new Size(179, 23);
             btnSetDesignTestScenarioD1.TabIndex = 10;
             btnSetDesignTestScenarioD1.Text = "Set Design - Test Scenario D1";
-            btnSetDesignTestScenarioD1.UseVisualStyleBackColor = true;
+            btnSetDesignTestScenarioD1.UseVisualStyleBackColor = false;
             btnSetDesignTestScenarioD1.Click += btnSetDesignTestScenarioD1_Click;
             // 
             // btnChordTest
@@ -765,26 +767,26 @@ namespace Music.Writer
             grbCurrentDesign.TabStop = false;
             grbCurrentDesign.Text = "Current Design";
             // 
-            // groupBox4
+            // gbWriter
             // 
-            groupBox4.BackColor = Color.Black;
-            groupBox4.Controls.Add(btnPause);
-            groupBox4.Controls.Add(btnClear);
-            groupBox4.Controls.Add(btnStop);
-            groupBox4.Controls.Add(btnExport);
-            groupBox4.Controls.Add(btnImport);
-            groupBox4.Controls.Add(btnAddPhrase);
-            groupBox4.Controls.Add(btnDeletePhrases);
-            groupBox4.Controls.Add(btnClearAllPhrases);
-            groupBox4.Controls.Add(btnPlayPhrases);
-            groupBox4.Controls.Add(dgvPhrase);
-            groupBox4.ForeColor = Color.White;
-            groupBox4.Location = new Point(12, 12);
-            groupBox4.Name = "groupBox4";
-            groupBox4.Size = new Size(1900, 581);
-            groupBox4.TabIndex = 36;
-            groupBox4.TabStop = false;
-            groupBox4.Text = "Phrases";
+            gbWriter.BackColor = Color.Black;
+            gbWriter.Controls.Add(btnPause);
+            gbWriter.Controls.Add(btnClear);
+            gbWriter.Controls.Add(btnStop);
+            gbWriter.Controls.Add(btnExport);
+            gbWriter.Controls.Add(btnImport);
+            gbWriter.Controls.Add(btnAddPhrase);
+            gbWriter.Controls.Add(btnDeletePhrases);
+            gbWriter.Controls.Add(btnClearAllPhrases);
+            gbWriter.Controls.Add(btnPlayPhrases);
+            gbWriter.Controls.Add(dgvPhrase);
+            gbWriter.ForeColor = Color.White;
+            gbWriter.Location = new Point(12, 12);
+            gbWriter.Name = "gbWriter";
+            gbWriter.Size = new Size(1900, 581);
+            gbWriter.TabIndex = 36;
+            gbWriter.TabStop = false;
+            gbWriter.Text = "Writer";
             // 
             // btnPause
             // 
@@ -912,7 +914,7 @@ namespace Music.Writer
             Controls.Add(grbParts);
             Controls.Add(grpPitch);
             Controls.Add(groupBox3);
-            Controls.Add(groupBox4);
+            Controls.Add(gbWriter);
             Name = "WriterForm";
             Text = "Music Writer";
             grbParts.ResumeLayout(false);
@@ -939,7 +941,7 @@ namespace Music.Writer
             groupBox3.ResumeLayout(false);
             grbCurrentDesign.ResumeLayout(false);
             grbCurrentDesign.PerformLayout();
-            groupBox4.ResumeLayout(false);
+            gbWriter.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvPhrase).EndInit();
             ResumeLayout(false);
         }
@@ -979,7 +981,7 @@ namespace Music.Writer
         private TextBox txtTupletNumber;
         private GroupBox groupBox3;
         private GroupBox grbCurrentDesign;
-        private GroupBox groupBox4;
+        private GroupBox gbWriter;
         private Button btnExecute;
         private DataGridView dgvPhrase;
         private Button btnPlayPhrases;
