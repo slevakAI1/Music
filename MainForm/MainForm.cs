@@ -5,7 +5,6 @@ namespace Music
 {
     public partial class MainForm : Form
     {
-        private readonly FileManager _fileManager;
         private readonly MidiIoService _midiIoService;
         private readonly MidiPlaybackService _playbackService;
 
@@ -15,7 +14,6 @@ namespace Music
             this.WindowState = FormWindowState.Maximized;
             this.IsMdiContainer = true;
 
-            _fileManager = new FileManager(ShowStatus);
             _midiIoService = new MidiIoService();
             _playbackService = new MidiPlaybackService();
 
@@ -58,12 +56,12 @@ namespace Music
 
         private void MenuImportMusicXml_Click(object sender, EventArgs e)
         {
-            _fileManager.ImportMusicXml(this);
+            //_fileManager.ImportMusicXml(this);
         }
 
         private void MenuExportMusicXml_Click(object sender, EventArgs e)
         {
-            _fileManager.ExportMusicXml(this);
+            //_fileManager.ExportMusicXml(this);
         }
 
         // Your top-level menu item handlers (wired via designer)
@@ -86,7 +84,7 @@ namespace Music
 
         private void testToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ShowChildForm(typeof(SerializerTestForm));
+            //ShowChildForm(typeof(SerializerTestForm));
         }
 
         private void viewMusicXmlToolStripMenuItem_Click(object sender, EventArgs e)
@@ -96,7 +94,7 @@ namespace Music
 
         private void arrangerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ShowChildForm(typeof(ArrangerForm));
+            //ShowChildForm(typeof(ArrangerForm));
         }
 
         private void importMidiToolStripMenuItem_Click(object sender, EventArgs e)

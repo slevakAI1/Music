@@ -1,7 +1,6 @@
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
 using Music.MyMidi;
-using Music.Tests;
 using MidiEventType = Music.MyMidi.MidiEventType;
 
 namespace Music.Writer

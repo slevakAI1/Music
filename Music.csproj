@@ -9,21 +9,38 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Archives\Arranger\**" />
+    <Compile Remove="Archives\MusicXml\**" />
     <Compile Remove="Designer\MusicXmlFiles\**" />
-    <Compile Remove="Archives\Prototypes\**" />
     <Compile Remove="Files\OutputSamples\**" />
-    <Compile Remove="Tests\InputSamples\**" />
+    <EmbeddedResource Remove="Archives\Arranger\**" />
+    <EmbeddedResource Remove="Archives\MusicXml\**" />
     <EmbeddedResource Remove="Designer\MusicXmlFiles\**" />
-    <EmbeddedResource Remove="Archives\Prototypes\**" />
     <EmbeddedResource Remove="Files\OutputSamples\**" />
-    <EmbeddedResource Remove="Tests\InputSamples\**" />
+    <None Remove="Archives\Arranger\**" />
+    <None Remove="Archives\MusicXml\**" />
     <None Remove="Designer\MusicXmlFiles\**" />
-    <None Remove="Archives\Prototypes\**" />
     <None Remove="Files\OutputSamples\**" />
-    <None Remove="Tests\InputSamples\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Archives\AppendNoteEventsToScoreParams.cs" />
+    <Compile Remove="Archives\AppendNotes.cs" />
+    <Compile Remove="Archives\AppendNotesHelper.cs" />
+    <Compile Remove="Archives\CreateTestFile.cs" />
+    <Compile Remove="Archives\CreateTestFile2.cs" />
+    <Compile Remove="Archives\CreateTestsFile1.cs" />
+    <Compile Remove="Archives\FileManager.cs" />
+    <Compile Remove="Archives\MusicXmlParser - Backup.cs" />
+    <Compile Remove="Archives\MusicXmlParserTests.cs" />
+    <Compile Remove="Archives\MusicXmlSerializerTests.cs" />
+    <Compile Remove="Archives\ScoreDesign_original draft.cs" />
+    <Compile Remove="Archives\SerializerTestForm.cs" />
+    <Compile Remove="Archives\SerializerTestForm.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Archives\SerializerTestForm.resx" />
     <EmbeddedResource Remove="Designer\DesignerFrom.DataBinder.resx" />
     <EmbeddedResource Remove="Writer\Form\ConsoleTransform.resx" />
     <EmbeddedResource Remove="Writer\Form\WriterForm.DataBinder.resx" />
@@ -54,7 +71,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Archives\Prototypes\" />
+    <Folder Include="Archives\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\NotionExchange\" />
   </ItemGroup>

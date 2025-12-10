@@ -1,6 +1,5 @@
 using Music.Designer;
 using Music.MyMidi;
-using MusicXml;
 
 namespace Music.Writer
 {
@@ -354,59 +353,59 @@ namespace Music.Writer
 
         public void HandleExportToNotion()
         {
-            // Ensure score list exists and has at least one score
-            if (_scoreList == null || _scoreList.Count == 0)
-            {
-                MessageBox.Show(this, "No score to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
+        //    // Ensure score list exists and has at least one score
+        //    if (_scoreList == null || _scoreList.Count == 0)
+        //    {
+        //        MessageBox.Show(this, "No score to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //        return;
+        //    }
 
-            try
-            {
-                var path = Path.Combine("..", "..", "..", "Files", "NotionExchange", "Score.musicxml");
-                var fullPath = Path.GetFullPath(path);
-                var dir = Path.GetDirectoryName(fullPath);
-                if (!string.IsNullOrEmpty(dir))
-                    Directory.CreateDirectory(dir);
+        //    try
+        //    {
+        //        var path = Path.Combine("..", "..", "..", "Files", "NotionExchange", "Score.musicxml");
+        //        var fullPath = Path.GetFullPath(path);
+        //        var dir = Path.GetDirectoryName(fullPath);
+        //        if (!string.IsNullOrEmpty(dir))
+        //            Directory.CreateDirectory(dir);
 
-                var xml = MusicXmlScoreSerializer.Serialize(_scoreList[0]);
-                File.WriteAllText(fullPath, xml, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+        //        var xml = MusicXmlScoreSerializer.Serialize(_scoreList[0]);
+        //        File.WriteAllText(fullPath, xml, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
 
-                MessageBox.Show(this, $"Exported to {fullPath}", "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(this, $"Error exporting MusicXML:\n{ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+        //        MessageBox.Show(this, $"Exported to {fullPath}", "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(this, $"Error exporting MusicXML:\n{ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
         }
 
         public void HandleNewScore()
         {
-            // Resolve Movement Title to use for the new score
-            var movementTitle = txtMovementTitle.Text;
-            if (movementTitle == "")
-            {
-                var now = System.DateTime.Now;
-                movementTitle = now.ToString("dddd, MMM d, yyyy h:mm'.'ss tt");
-            }
+            //// Resolve Movement Title to use for the new score
+            //var movementTitle = txtMovementTitle.Text;
+            //if (movementTitle == "")
+            //{
+            //    var now = System.DateTime.Now;
+            //    movementTitle = now.ToString("dddd, MMM d, yyyy h:mm'.'ss tt");
+            //}
 
-            var newScore = ScoreHelper.CreateNewScore(
-                _designer,
-                ref _measureMeta,
-                movementTitle);
+            //var newScore = ScoreHelper.CreateNewScore(
+            //    _designer,
+            //    ref _measureMeta,
+            //    movementTitle);
 
-            // Set current score to newly created score and update 
-            if (newScore != null)
-            {
-                if (_scoreList.Count > 0)
-                    _scoreList[0] = newScore;
-                else
-                    _scoreList.Add(newScore);
-                txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
-            }
+            //// Set current score to newly created score and update 
+            //if (newScore != null)
+            //{
+            //    if (_scoreList.Count > 0)
+            //        _scoreList[0] = newScore;
+            //    else
+            //        _scoreList.Add(newScore);
+            //    txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
+            //}
 
-            // Clear the movement title textbox
-            txtMovementTitle.Text = "";
+            //// Clear the movement title textbox
+            //txtMovementTitle.Text = "";
         }
 
         // ========== GRID CELL EVENT HANDLERS ==========

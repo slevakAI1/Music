@@ -4,17 +4,14 @@
 
 using Music.Designer;
 using Music.MyMidi;
-using MusicXml.Domain;
 using System.Reflection;
 
 namespace Music.Writer
 {
     public partial class WriterForm : Form
     {
-        private List<Score> _scoreList;
         private Designer.Designer? _designer;
         private WriterFormData? _writer;
-        private MeasureMeta _measureMeta;
 
         // playback service (reused for multiple play calls)
         private MidiPlaybackService _midiPlaybackService;
@@ -32,9 +29,6 @@ namespace Music.Writer
         {
             InitializeComponent();
 
-            // Initialize MeasureMeta tracking object
-            _measureMeta = new MeasureMeta();
-
             // create playback service
             _midiPlaybackService = new MidiPlaybackService();
 
@@ -49,11 +43,6 @@ namespace Music.Writer
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.Manual;
-
-            // Load current global score list
-            _scoreList = Globals.ScoreList;
-            if (_scoreList.Count > 0)
-                txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
 
             _designer = Globals.Designer;
             txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
@@ -129,12 +118,6 @@ namespace Music.Writer
 
             // Get from globals on the way in but not if null, would overwrite current state
 
-            if (Globals.ScoreList != null && Globals.ScoreList.Count > 0)
-            {
-                _scoreList = Globals.ScoreList;
-                // Update score report display when score is refreshed from globals
-                txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
-            }
             if (Globals.Designer != null)
             {
                 _designer = Globals.Designer;
@@ -152,7 +135,6 @@ namespace Music.Writer
             base.OnDeactivate(e);
 
             // Save on the way out
-            Globals.ScoreList = _scoreList;
             Globals.Designer = _designer;
             _writer = Globals.Writer = CaptureFormData();
             Globals.Writer = _writer;
