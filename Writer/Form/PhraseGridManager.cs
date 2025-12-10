@@ -146,13 +146,31 @@ namespace Music.Writer
             dgvPhrase.Rows[FIXED_ROW_HARMONY].Cells["colType"].Value = "Harmony";
             dgvPhrase.Rows[FIXED_ROW_HARMONY].ReadOnly = true;
 
-            // If a TempoTimeline was supplied, store it in the hidden data column of the Tempo fixed row.
-            if (tempoTimeline != null
-                && dgvPhrase.Columns.Contains("colData")
-                && dgvPhrase.Rows.Count > FIXED_ROW_TEMPO)
-            {
-                dgvPhrase.Rows[FIXED_ROW_TEMPO].Cells["colData"].Value = tempoTimeline;
-            }
+            // Delegate attaching the TempoTimeline to the new public method
+            AttachTempoTimeline(dgvPhrase, tempoTimeline);
+        }
+
+        /// <summary>
+        /// Public helper to attach a TempoTimeline instance to the fixed Tempo row's hidden data cell.
+        /// Safe to call anytime after the grid's columns and rows have been created.
+        /// </summary>
+        /// <param name="dgvPhrase">Target DataGridView</param>
+        /// <param name="tempoTimeline">TempoTimeline to store in the hidden data cell (null to skip)</param>
+        public static void AttachTempoTimeline(DataGridView dgvPhrase, TempoTimeline? tempoTimeline)
+        {
+            if (tempoTimeline == null)
+                return;
+
+            if (!dgvPhrase.Columns.Contains("colData"))
+                return;
+
+            if (dgvPhrase.Rows.Count <= FIXED_ROW_TEMPO)
+                return;
+
+            dgvPhrase.Rows[FIXED_ROW_TEMPO].Cells["colData"].Value = tempoTimeline;
+
+            // TO DO update the grid to show the tempo - need measures first I think
+
         }
 
         /// <summary>

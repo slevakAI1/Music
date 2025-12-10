@@ -276,6 +276,7 @@ namespace Music.Writer
         {
             _designer ??= new Designer.Designer();
             DesignerTests.SetTestDesignD1(_designer);
+            PhraseGridManager.AttachTempoTimeline(dgvPhrase, _designer.TempoTimeline);
             txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
         }
 
