@@ -275,81 +275,21 @@ namespace Music.Writer
 
             try
             {
-                var svc = _midiPlaybackService;
-                var svcType = svc.GetType();
-
-                // Try to find an internal Playback instance on the service (common wrapper pattern).
-                var playbackField = svcType.GetField("_playback", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
-                var playback = playbackField?.GetValue(svc);
-
-                // Inspect available state properties (service or underlying playback)
-                bool? isRunning = null;
-                bool? isPaused = null;
-
-                // Check service-level properties first
-                var svcIsRunningProp = svcType.GetProperty("IsRunning") ?? svcType.GetProperty("IsPlaying");
-                if (svcIsRunningProp != null)
-                    isRunning = svcIsRunningProp.GetValue(svc) as bool?;
-
-                var svcIsPausedProp = svcType.GetProperty("IsPaused");
-                if (svcIsPausedProp != null)
-                    isPaused = svcIsPausedProp.GetValue(svc) as bool?;
-
-                // If service doesn't expose state, inspect underlying playback if present
-                if (playback != null)
+                // Use the playback service's public API when available.
+                // (Simpler and more reliable than reflection.)
+                if (_midiPlaybackService.IsPlaying)
                 {
-                    var pbType = playback.GetType();
-                    var pbIsRunningProp = pbType.GetProperty("IsRunning") ?? pbType.GetProperty("IsPlaying");
-                    if (pbIsRunningProp != null)
-                        isRunning ??= pbIsRunningProp.GetValue(playback) as bool?;
-
-                    var pbIsPausedProp = pbType.GetProperty("IsPaused");
-                    if (pbIsPausedProp != null)
-                        isPaused ??= pbIsPausedProp.GetValue(playback) as bool?;
-                }
-
-                // Determine current state: not playing (neither running nor paused), playing, or paused.
-                bool currentlyPlaying = isRunning == true;
-                bool currentlyPaused = isPaused == true;
-
-                // Locate Pause / Resume methods on service or underlying playback
-                System.Reflection.MethodInfo? pauseMethod = svcType.GetMethod("Pause", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
-                                                               ?? playback?.GetType().GetMethod("Pause", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
-                System.Reflection.MethodInfo? resumeMethod = svcType.GetMethod("Resume", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
-                                                                ?? svcType.GetMethod("Continue", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
-                                                                ?? playback?.GetType().GetMethod("Resume", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
-                                                                ?? playback?.GetType().GetMethod("Start", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
-
-                // (1) If not playing and not paused -> nothing to do
-                if (!currentlyPlaying && !currentlyPaused)
-                    return;
-
-                // (2) If playing -> pause
-                if (currentlyPlaying)
-                {
-                    if (pauseMethod != null)
-                    {
-                        var target = pauseMethod.DeclaringType == svcType ? svc : playback;
-                        pauseMethod.Invoke(target, null);
-                        return;
-                    }
-
-                    MessageBox.Show(this, "Playback cannot be paused by the current playback service.", "Pause Unsupported", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    _midiPlaybackService.Pause();
                     return;
                 }
 
-                // (3) If paused -> resume
-                if (currentlyPaused)
+                if (_midiPlaybackService.IsPaused)
                 {
-                    if (resumeMethod != null)
-                    {
-                        var target = resumeMethod.DeclaringType == svcType ? svc : playback;
-                        resumeMethod.Invoke(target, null);
-                        return;
-                    }
-
-                    MessageBox.Show(this, "Playback cannot be resumed by the current playback service.", "Resume Unsupported", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    _midiPlaybackService.Resume();
+                    return;
                 }
+
+                // Not playing and not paused -> nothing to do.
             }
             catch (TargetInvocationException tie)
             {
