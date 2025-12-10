@@ -113,6 +113,7 @@ namespace Music.Writer
             btnClearAllPhrases = new Button();
             btnPlayPhrases = new Button();
             dgvPhrase = new DataGridView();
+            btnPause = new Button();
             grbParts.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -767,6 +768,7 @@ namespace Music.Writer
             // groupBox4
             // 
             groupBox4.BackColor = Color.Black;
+            groupBox4.Controls.Add(btnPause);
             groupBox4.Controls.Add(btnClear);
             groupBox4.Controls.Add(btnStop);
             groupBox4.Controls.Add(btnExport);
@@ -884,6 +886,17 @@ namespace Music.Writer
             dgvPhrase.TabIndex = 37;
             dgvPhrase.CellDoubleClick += DgvPhrase_CellDoubleClick;
             // 
+            // btnPause
+            // 
+            btnPause.ForeColor = Color.FromArgb(0, 192, 0);
+            btnPause.Location = new Point(809, 365);
+            btnPause.Name = "btnPause";
+            btnPause.Size = new Size(72, 23);
+            btnPause.TabIndex = 45;
+            btnPause.Text = "Pause";
+            btnPause.UseVisualStyleBackColor = true;
+            btnPause.Click += btnPause_Click;
+            // 
             // WriterForm
             // 
             BackColor = Color.White;
@@ -979,5 +992,6 @@ namespace Music.Writer
         private Button btnExport;
         private Button btnStop;
         private Button btnClear;
+        private Button btnPause;
     }
 }

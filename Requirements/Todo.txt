@@ -204,3 +204,33 @@ Summary: Current design addresses basic part/staff targeting and coarse segment 
 
 
 
+==========================================================================================  for a midi show measures as they play event...
+
+  Does the midi player in this application have any type of feedback mechanism that would let me track what tick it's currently playing in order to drive an indicator that shows what percentage of the midi document has played? Do not write code just explain if and how it can be done.
+
+  GitHub Copilot
+Yes — you can drive a playback progress indicator. The app already uses Melanchall.DryWetMidi for playback (you create a DryWetMidi Playback via midiDoc.Raw.GetPlayback(...)). That Playback object exposes enough information and events to drive a percent/position indicator. High‑level options and considerations:
+1.	Playback state / time polling (simple, reliable)
+•	Keep a reference to the Playback instance returned by GetPlayback(...) (your MidiPlaybackService already stores one).
+•	Poll Playback.CurrentTime (a TimeSpan) at a UI-friendly interval (e.g. 40–100 ms) with a WinForms Timer. Compute percent = CurrentTime.TotalMilliseconds / midiDoc.Duration.TotalMilliseconds.
+•	Update the UI via Invoke/BeginInvoke because polling runs on the UI timer thread or a background timer.
+•	Pros: straightforward, stable across tempo maps. Cons: polling interval vs. CPU/latency tradeoff.
+2.	Event-driven updates (more precise, lower overhead)
+•	DryWetMidi Playback supports events you can subscribe to (e.g. EventPlayed, Finished / Stopped / Started depending on library version). Use those to update the UI when events occur.
+•	EventPlayed fires for each MIDI event — you can compute progress based on event time (gives fine-grained updates). Throttle UI updates (don’t update UI for every event).
+•	Pros: lower polling, more immediate. Cons: may be very frequent (throttle) and tied to event density.
+3.	Tick-level tracking vs. time
+•	Playback exposes time as TimeSpan. If you need ticks (MIDI ticks), convert between time and ticks using the song’s TempoMap (tempo map -> time <-> ticks conversions are provided by DryWetMidi APIs).
+•	Alternatively, track played events’ absolute tick positions from EventPlayed (it provides event info/absolute time in many API variants). Then compute percent = currentTick / totalTicks where totalTicks comes from the MIDI document (or computed from tempo map + duration).
+4.	Total length source
+•	Use the MIDI document duration (TimeSpan) or total ticks computed from the raw MIDI + tempo map. Using the same source for numerator and denominator ensures correct percent even with tempo changes.
+5.	Threading, UI and latency
+•	Always marshal UI updates to the UI thread.
+•	Device/output latency and buffering mean the visual position may slightly lead or lag audible output — acceptable for UI progress bars, but important if you need sample-accurate UI sync.
+Recommended approach for your app
+•	Expose the Playback instance (or a method to query its CurrentTime) from MidiPlaybackService.
+•	Use a short WinForms Timer to poll Playback.CurrentTime and compute percent using midiDoc.Duration. Update a progress bar or indicator on the UI thread.
+•	If you need higher accuracy or tick-based info, subscribe to Playback.EventPlayed or convert CurrentTime <-> ticks via the MIDI document’s tempo map.
+No code provided per request, but that’s the practical options and tradeoffs.
+
+==========================================================================================

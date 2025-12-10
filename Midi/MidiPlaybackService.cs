@@ -36,11 +36,43 @@ namespace Music.MyMidi
             _playback.Start();
         }
 
+        /// <summary>
+        /// Pauses playback at the current position. Call Resume() to continue from this point.
+        /// </summary>
+        public void Pause()
+        {
+            if (_playback?.IsRunning == true)
+            {
+                _playback.Stop();
+                // Store pause state flag so Resume() knows not to restart from beginning
+                _isPaused = true;
+            }
+        }
+
+        /// <summary>
+        /// Resumes playback from the paused position.
+        /// </summary>
+        public void Resume()
+        {
+            if (_isPaused && _playback != null)
+            {
+                _playback.Start();
+                _isPaused = false;
+            }
+        }
+
+        public bool IsPlaying => _playback?.IsRunning ?? false;
+
+        public bool IsPaused => _isPaused;
+
+        private bool _isPaused = false;
+
         public void Stop()
         {
             _playback?.Stop();
             _playback?.Dispose();
             _playback = null;
+            _isPaused = false;
 
             _outputDevice?.Dispose();
             _outputDevice = null;
