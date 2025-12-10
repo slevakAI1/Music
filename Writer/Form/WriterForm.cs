@@ -269,36 +269,8 @@ namespace Music.Writer
 
         private void btnPause_Click(object sender, EventArgs e)
         {
-            // If there is no playback service, nothing to do.
-            if (_midiPlaybackService == null)
-                return;
-
-            try
-            {
-                // Use the playback service's public API when available.
-                // (Simpler and more reliable than reflection.)
-                if (_midiPlaybackService.IsPlaying)
-                {
-                    _midiPlaybackService.Pause();
-                    return;
-                }
-
-                if (_midiPlaybackService.IsPaused)
-                {
-                    _midiPlaybackService.Resume();
-                    return;
-                }
-
-                // Not playing and not paused -> nothing to do.
-            }
-            catch (TargetInvocationException tie)
-            {
-                MessageBox.Show(this, $"Playback control failed: {tie.InnerException?.Message ?? tie.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(this, $"Playback control failed: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            // Delegate pause/resume behavior to the grid/operations file for consistency.
+            HandlePause();
         }
     }
 }

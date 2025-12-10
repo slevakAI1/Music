@@ -1,4 +1,4 @@
-using Music.MyMidi;
+using System.Reflection;
 
 namespace Music.Writer
 {
@@ -209,6 +209,45 @@ namespace Music.Writer
 
                 // Update measure cell display
                 PhraseGridManager.PopulateMeasureCells(dgvPhrase, selectedRow.Index);
+            }
+        }
+
+        // ========== PLAYBACK CONTROL ==========
+
+        /// <summary>
+        /// Handles Pause/Resume logic for the shared MidiPlaybackService.
+        /// Extracted from the form event handler to keep grid/event logic together.
+        /// </summary>
+        public void HandlePause()
+        {
+            // If there is no playback service, nothing to do.
+            if (_midiPlaybackService == null)
+                return;
+
+            try
+            {
+                // Use the playback service's public API when available.
+                if (_midiPlaybackService.IsPlaying)
+                {
+                    _midiPlaybackService.Pause();
+                    return;
+                }
+
+                if (_midiPlaybackService.IsPaused)
+                {
+                    _midiPlaybackService.Resume();
+                    return;
+                }
+
+                // Not playing and not paused -> nothing to do.
+            }
+            catch (TargetInvocationException tie)
+            {
+                MessageBox.Show(this, $"Playback control failed: {tie.InnerException?.Message ?? tie.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, $"Playback control failed: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
