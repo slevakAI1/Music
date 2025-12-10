@@ -18,66 +18,13 @@ namespace Music.Designer
                 throw new ArgumentException("Invalid meter format. Expected like \"4/4\".", nameof(meter));
 
             BeatsPerBar = Math.Max(1, beats);
-            Reindex();
-        }
-
-        public void Reset()
-        {
-            Events.Clear();
-            _barHeads.Clear();
         }
 
         public void Add(TimeSignatureEvent evt)
         {
             Events.Add(evt);
-            IndexEventForBars(evt);
-        }
-
-        // Fast lookup of the signature active at the start of a bar (beat 1).
-        public bool TryGetAtBar(int bar, out TimeSignatureEvent? evt)
-        {
-            if (_barHeads.TryGetValue(bar, out var e))
-            {
-                evt = e;
-                return true;
-            }
-
-            // Fallback scan (also memoizes)
-            foreach (var se in Events)
-            {
-                if (se.Contains(bar, BeatsPerBar))
-                {
-                    _barHeads[bar] = se;
-                    evt = se;
-                    return true;
-                }
-            }
-
-            evt = null;
-            return false;
-        }
-
-        private void IndexEventForBars(TimeSignatureEvent evt)
-        {
-            var startBar = evt.StartBar;
-            var endBarExclusive = startBar + evt.BarCount;
-
-            for (int bar = startBar; bar < endBarExclusive; bar++)
-            {
-                _barHeads[bar] = evt;
-            }
-        }
-
-        private void Reindex()
-        {
+            // Clear cache when adding new events
             _barHeads.Clear();
-            foreach (var se in Events)
-                IndexEventForBars(se);
-        }
-
-        public void EnsureIndexed()
-        {
-            Reindex();
         }
     }
 }

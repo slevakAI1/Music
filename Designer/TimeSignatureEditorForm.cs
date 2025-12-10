@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace Music.Designer
 {
-    // Popup editor for arranging Time Signature Events and configuring their spans
+    // Popup editor for arranging Time Signature Events
     public sealed class TimeSignatureEditorForm : Form
     {
         private readonly ListView _lv;
@@ -21,10 +21,9 @@ namespace Music.Designer
         private readonly Button _btnCancel;
 
         // Event editor controls
+        private readonly NumericUpDown _numStartBar;
         private readonly NumericUpDown _numNumerator;
         private readonly NumericUpDown _numDenominator;
-        private readonly NumericUpDown _numBars;
-        private readonly Label _lblStart;
 
         // Working list mirroring the ListView
         private readonly List<WorkingEvent> _working = new();
@@ -39,10 +38,10 @@ namespace Music.Designer
 
         private sealed class WorkingEvent
         {
+            public int StartBar { get; set; } = 1;
+            public int StartBeat { get; set; } = 1;
             public int Numerator { get; set; } = 4;
             public int Denominator { get; set; } = 4;
-            public int BarCount { get; set; } = 4;
-            public int StartBar { get; set; } = 1; // computed
         }
 
         public TimeSignatureEditorForm(TimeSignatureTimeline? initial = null)
@@ -89,9 +88,8 @@ namespace Music.Designer
                 AllowDrop = true
             };
             _lv.Columns.Add("#", 40, HorizontalAlignment.Right);
+            _lv.Columns.Add("Start Bar", 80, HorizontalAlignment.Right);
             _lv.Columns.Add("Meter", 120, HorizontalAlignment.Left);
-            _lv.Columns.Add("Bars", 60, HorizontalAlignment.Right);
-            _lv.Columns.Add("Start", 60, HorizontalAlignment.Right);
 
             _lv.SelectedIndexChanged += OnListSelectionChanged;
             _lv.ItemDrag += OnItemDrag;
@@ -118,8 +116,8 @@ namespace Music.Designer
             _btnDown = new Button { Text = "Move Down", AutoSize = true };
             _btnDefaults = new Button { Text = "Set Defaults", AutoSize = true };
 
-            _btnAdd.Click += (s, e) => AddEvent(afterIndex: _lv.SelectedIndices.Count > 0 ? _lv.SelectedIndices[0] : (_working.Count - 1));
-            _btnInsert.Click += (s, e) => InsertEvent(atIndex: _lv.SelectedIndices.Count > 0 ? _lv.SelectedIndices[0] : 0);
+            _btnAdd.Click += (s, e) => AddEvent();
+            _btnInsert.Click += (s, e) => InsertEvent();
             _btnDelete.Click += (s, e) => DeleteSelected();
             _btnDuplicate.Click += (s, e) => DuplicateSelected();
             _btnUp.Click += (s, e) => MoveSelected(-1);
@@ -143,16 +141,25 @@ namespace Music.Designer
             {
                 Dock = DockStyle.Fill,
                 ColumnCount = 2,
-                RowCount = 8,
+                RowCount = 6,
                 Padding = new Padding(6)
             };
             editor.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 120));
             editor.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
             right.Controls.Add(editor, 0, 0);
 
+            var lblStartBar = new Label { Text = "Start Bar:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) };
             var lblMeter = new Label { Text = "Meter:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) };
-            var lblBars = new Label { Text = "Bars:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) };
-            var lblStart = new Label { Text = "Start:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) };
+
+            _numStartBar = new NumericUpDown
+            {
+                Minimum = 1,
+                Maximum = 9999,
+                Value = 1,
+                Anchor = AnchorStyles.Left,
+                Width = 80
+            };
+            _numStartBar.ValueChanged += (s, e) => ApplyEditorToSelected();
 
             _numNumerator = new NumericUpDown
             {
@@ -174,23 +181,16 @@ namespace Music.Designer
             };
             _numDenominator.ValueChanged += (s, e) => ApplyEditorToSelected();
 
-            _numBars = new NumericUpDown
-            {
-                Minimum = 1,
-                Maximum = 1024,
-                Value = 4,
-                Anchor = AnchorStyles.Left,
-                Width = 80
-            };
-            _numBars.ValueChanged += (s, e) => ApplyEditorToSelected();
-
-            _lblStart = new Label { Text = "-", AutoSize = true, Anchor = AnchorStyles.Left };
-
             // layout rows
             int row = 0;
             editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 28)); // title
             editor.Controls.Add(new Label { Text = "Selected Time Signature", AutoSize = true, Font = new Font(SystemFonts.DefaultFont, FontStyle.Bold) }, 0, row);
             editor.SetColumnSpan(editor.GetControlFromPosition(0, row), 2);
+            row++;
+
+            editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
+            editor.Controls.Add(lblStartBar, 0, row);
+            editor.Controls.Add(_numStartBar, 1, row);
             row++;
 
             editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
@@ -200,16 +200,6 @@ namespace Music.Designer
             meterPanel.Controls.AddRange(new Control[] { _numNumerator, slashLabel, _numDenominator });
             editor.Controls.Add(lblMeter, 0, row);
             editor.Controls.Add(meterPanel, 1, row);
-            row++;
-
-            editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
-            editor.Controls.Add(lblBars, 0, row);
-            editor.Controls.Add(_numBars, 1, row);
-            row++;
-
-            editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
-            editor.Controls.Add(lblStart, 0, row);
-            editor.Controls.Add(_lblStart, 1, row);
             row++;
 
             for (; row < editor.RowCount; row++)
@@ -248,16 +238,22 @@ namespace Music.Designer
                 return;
             }
 
-            foreach (var ev in initial.Events)
+            // Sort events by start position
+            var sorted = initial.Events
+                .OrderBy(e => e.StartBar)
+                .ThenBy(e => e.StartBeat)
+                .ToList();
+
+            foreach (var ev in sorted)
             {
                 _working.Add(new WorkingEvent
                 {
+                    StartBar = ev.StartBar,
+                    StartBeat = ev.StartBeat,
                     Numerator = Math.Max(1, ev.Numerator),
-                    Denominator = Math.Max(1, ev.Denominator),
-                    BarCount = Math.Max(1, ev.BarCount)
+                    Denominator = Math.Max(1, ev.Denominator)
                 });
             }
-            RecalculateStartBars();
         }
 
         private void RefreshListView(int selectIndex = -1)
@@ -269,9 +265,8 @@ namespace Music.Designer
             {
                 var s = _working[i];
                 var item = new ListViewItem((i + 1).ToString()); // "#"
+                item.SubItems.Add(s.StartBar.ToString()); // "Start Bar"
                 item.SubItems.Add($"{s.Numerator}/{s.Denominator}"); // "Meter"
-                item.SubItems.Add(s.BarCount.ToString());        // "Bars"
-                item.SubItems.Add(s.StartBar.ToString());        // "Start"
                 item.Tag = s;
                 _lv.Items.Add(item);
             }
@@ -294,9 +289,8 @@ namespace Music.Designer
             var s = _working[index];
             var it = _lv.Items[index];
             it.Text = (index + 1).ToString();
-            it.SubItems[1].Text = $"{s.Numerator}/{s.Denominator}";
-            it.SubItems[2].Text = s.BarCount.ToString();
-            it.SubItems[3].Text = s.StartBar.ToString();
+            it.SubItems[1].Text = s.StartBar.ToString();
+            it.SubItems[2].Text = $"{s.Numerator}/{s.Denominator}";
         }
 
         private void UpdateButtonsEnabled()
@@ -304,15 +298,10 @@ namespace Music.Designer
             bool hasSel = _lv.SelectedIndices.Count > 0;
             int idx = hasSel ? _lv.SelectedIndices[0] : -1;
 
-            int addInsertAt = hasSel ? idx + 1 : _working.Count;
-            int insertAt = hasSel ? idx : 0;
+            bool isValid = ValidateEditorValues(out _);
 
-            _ = ValidateAndGetEditorValues(addInsertAt, out _, out _, out _, out string? addErr);
-            _ = ValidateAndGetEditorValues(insertAt, out _, out _, out _, out string? insErr);
-
-            _btnAdd.Enabled = addErr == null;
-            _btnInsert.Enabled = insErr == null;
-
+            _btnAdd.Enabled = isValid;
+            _btnInsert.Enabled = isValid;
             _btnDelete.Enabled = hasSel;
             _btnDuplicate.Enabled = hasSel;
             _btnUp.Enabled = hasSel && idx > 0;
@@ -331,11 +320,10 @@ namespace Music.Designer
             bool hasSel = _lv.SelectedIndices.Count > 0;
 
             // Always allow editing when none is selected so the user can stage values for Add/Insert
-            _numNumerator.Enabled = _numDenominator.Enabled = _numBars.Enabled = true;
+            _numStartBar.Enabled = _numNumerator.Enabled = _numDenominator.Enabled = true;
 
             if (!hasSel)
             {
-                _lblStart.Text = PreviewStartForIndex(_working.Count).ToString();
                 UpdateButtonsEnabled();
                 return;
             }
@@ -346,10 +334,9 @@ namespace Music.Designer
             _suppressEditorApply = true;
             try
             {
+                _numStartBar.Value = Math.Max(_numStartBar.Minimum, Math.Min(_numStartBar.Maximum, w.StartBar));
                 _numNumerator.Value = Math.Max(_numNumerator.Minimum, Math.Min(_numNumerator.Maximum, w.Numerator));
                 _numDenominator.Value = Math.Max(_numDenominator.Minimum, Math.Min(_numDenominator.Maximum, w.Denominator));
-                _numBars.Value = Math.Max(_numBars.Minimum, Math.Min(_numBars.Maximum, w.BarCount));
-                _lblStart.Text = w.StartBar.ToString();
             }
             finally
             {
@@ -365,54 +352,71 @@ namespace Music.Designer
 
             if (_lv.SelectedIndices.Count == 0)
             {
-                _lblStart.Text = PreviewStartForIndex(_working.Count).ToString();
                 UpdateButtonsEnabled();
                 return;
             }
 
             var w = (WorkingEvent)_lv.SelectedItems[0].Tag!;
 
+            w.StartBar = (int)_numStartBar.Value;
             w.Numerator = (int)_numNumerator.Value;
             w.Denominator = (int)_numDenominator.Value;
-            w.BarCount = (int)_numBars.Value;
 
-            RecalculateStartBars();
             UpdateRowVisuals(_lv.SelectedIndices[0]);
             UpdateButtonsEnabled();
         }
 
-        private void AddEvent(int afterIndex)
+        private void AddEvent()
         {
-            int insertAt = Math.Max(-1, afterIndex) + 1;
-            if (insertAt < 0 || insertAt > _working.Count) insertAt = _working.Count;
-
-            if (!ValidateAndGetEditorValues(insertAt, out var num, out var den, out var bars, out var error))
+            if (!ValidateEditorValues(out var error))
             {
                 MessageBox.Show(this, error!, "Add Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            var w = new WorkingEvent { Numerator = num, Denominator = den, BarCount = bars };
-            _working.Insert(insertAt, w);
-            RecalculateStartBars();
-            RefreshListView(-1);
+            var w = new WorkingEvent
+            {
+                StartBar = (int)_numStartBar.Value,
+                StartBeat = 1,
+                Numerator = (int)_numNumerator.Value,
+                Denominator = (int)_numDenominator.Value
+            };
+
+            _working.Add(w);
+            
+            // Sort by start position
+            _working.Sort((a, b) => a.StartBar.CompareTo(b.StartBar));
+            
+            int newIndex = _working.IndexOf(w);
+            RefreshListView(newIndex);
             ResetEditorForNextAdd();
         }
 
-        private void InsertEvent(int atIndex)
+        private void InsertEvent()
         {
-            int insertAt = Math.Max(0, Math.Min(atIndex, _working.Count));
-
-            if (!ValidateAndGetEditorValues(insertAt, out var num, out var den, out var bars, out var error))
+            if (!ValidateEditorValues(out var error))
             {
                 MessageBox.Show(this, error!, "Insert Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            var w = new WorkingEvent { Numerator = num, Denominator = den, BarCount = bars };
+            int insertAt = _lv.SelectedIndices.Count > 0 ? _lv.SelectedIndices[0] : 0;
+
+            var w = new WorkingEvent
+            {
+                StartBar = (int)_numStartBar.Value,
+                StartBeat = 1,
+                Numerator = (int)_numNumerator.Value,
+                Denominator = (int)_numDenominator.Value
+            };
+
             _working.Insert(insertAt, w);
-            RecalculateStartBars();
-            RefreshListView(-1);
+            
+            // Sort by start position
+            _working.Sort((a, b) => a.StartBar.CompareTo(b.StartBar));
+            
+            int newIndex = _working.IndexOf(w);
+            RefreshListView(newIndex);
             ResetEditorForNextAdd();
         }
 
@@ -423,10 +427,14 @@ namespace Music.Designer
             _suppressEditorApply = true;
             try
             {
+                // Suggest next bar after the last event
+                int nextBar = _working.Count > 0 
+                    ? _working.Max(w => w.StartBar) + 1 
+                    : 1;
+                
+                _numStartBar.Value = Math.Max(_numStartBar.Minimum, Math.Min(_numStartBar.Maximum, nextBar));
                 _numNumerator.Value = 4;
                 _numDenominator.Value = 4;
-                _numBars.Value = Math.Max(_numBars.Minimum, Math.Min(_numBars.Maximum, 4));
-                _lblStart.Text = PreviewStartForIndex(_working.Count).ToString();
             }
             finally
             {
@@ -441,7 +449,6 @@ namespace Music.Designer
             if (_lv.SelectedIndices.Count == 0) return;
             int idx = _lv.SelectedIndices[0];
             _working.RemoveAt(idx);
-            RecalculateStartBars();
             int nextSel = Math.Min(idx, _working.Count - 1);
             RefreshListView(nextSel);
         }
@@ -453,12 +460,12 @@ namespace Music.Designer
             var src = _working[idx];
             var clone = new WorkingEvent
             {
+                StartBar = src.StartBar + 1, // Suggest next bar
+                StartBeat = src.StartBeat,
                 Numerator = src.Numerator,
-                Denominator = src.Denominator,
-                BarCount = src.BarCount
+                Denominator = src.Denominator
             };
             _working.Insert(idx + 1, clone);
-            RecalculateStartBars();
             RefreshListView(idx + 1);
         }
 
@@ -472,7 +479,6 @@ namespace Music.Designer
             var w = _working[idx];
             _working.RemoveAt(idx);
             _working.Insert(newIdx, w);
-            RecalculateStartBars();
             RefreshListView(newIdx);
         }
 
@@ -534,58 +540,26 @@ namespace Music.Designer
             if (to >= _working.Count) _working.Add(w);
             else _working.Insert(to, w);
 
-            RecalculateStartBars();
             RefreshListView(to);
             _dragItem = null;
-        }
-
-        private void RecalculateStartBars()
-        {
-            int start = 1;
-            foreach (var w in _working)
-            {
-                w.StartBar = start;
-                start += Math.Max(1, w.BarCount);
-            }
-
-            int count = Math.Min(_lv.Items.Count, _working.Count);
-            for (int i = 0; i < count; i++)
-                UpdateRowVisuals(i);
-
-            if (_lv.SelectedIndices.Count > 0)
-            {
-                int sel = _lv.SelectedIndices[0];
-                if (sel >= 0 && sel < _working.Count)
-                    _lblStart.Text = _working[sel].StartBar.ToString();
-                else
-                    _lblStart.Text = PreviewStartForIndex(_working.Count).ToString();
-            }
-            else
-            {
-                _lblStart.Text = PreviewStartForIndex(_working.Count).ToString();
-            }
-
-            UpdateButtonsEnabled();
         }
 
         private TimeSignatureTimeline BuildResult()
         {
             var tl = new TimeSignatureTimeline();
-            tl.ConfigureGlobal("4/4"); // default global for alignment in this editor
+            tl.ConfigureGlobal("4/4");
 
             foreach (var w in _working)
             {
                 tl.Add(new TimeSignatureEvent
                 {
                     StartBar = w.StartBar,
-                    StartBeat = 1,
+                    StartBeat = w.StartBeat,
                     Numerator = w.Numerator,
-                    Denominator = w.Denominator,
-                    BarCount = Math.Max(1, w.BarCount)
+                    Denominator = w.Denominator
                 });
             }
 
-            tl.EnsureIndexed();
             return tl;
         }
 
@@ -594,50 +568,34 @@ namespace Music.Designer
             var defaults = TimeSignatureTests.CreateTestTimelineD1();
 
             _working.Clear();
+            
             foreach (var e in defaults.Events)
             {
                 _working.Add(new WorkingEvent
                 {
+                    StartBar = e.StartBar,
+                    StartBeat = e.StartBeat,
                     Numerator = Math.Max(1, e.Numerator),
-                    Denominator = Math.Max(1, e.Denominator),
-                    BarCount = Math.Max(1, e.BarCount)
+                    Denominator = Math.Max(1, e.Denominator)
                 });
             }
-            RecalculateStartBars();
+            
             RefreshListView(selectIndex: _working.Count > 0 ? 0 : -1);
         }
 
-        private int PreviewStartForIndex(int insertAt)
-        {
-            int start = 1;
-            for (int i = 0; i < insertAt && i < _working.Count; i++)
-                start += Math.Max(1, _working[i].BarCount);
-            return start;
-        }
-
-        private bool ValidateAndGetEditorValues(
-            int insertAt,
-            out int numerator,
-            out int denominator,
-            out int bars,
-            out string? error)
+        private bool ValidateEditorValues(out string? error)
         {
             error = null;
-            numerator = (int)_numNumerator.Value;
-            denominator = (int)_numDenominator.Value;
-            bars = (int)_numBars.Value;
+            int startBar = (int)_numStartBar.Value;
+            int numerator = (int)_numNumerator.Value;
+            int denominator = (int)_numDenominator.Value;
 
+            if (startBar < 1)
+                error = "Start Bar must be at least 1.";
             if (numerator < 1)
-                error = "Numerator must be at least 1.";
+                error = (error == null) ? "Numerator must be at least 1." : error + " Numerator must be at least 1.";
             if (denominator < 1)
                 error = (error == null) ? "Denominator must be at least 1." : error + " Denominator must be at least 1.";
-            if (bars < 1)
-                error = (error == null) ? "Bars must be at least 1." : error + " Bars must be at least 1.";
-
-            // Start is computed; ensure it's positive
-            int startPreview = PreviewStartForIndex(insertAt);
-            if (startPreview < 1)
-                error = (error == null) ? "Start could not be determined." : error + " Start could not be determined.";
 
             return error == null;
         }

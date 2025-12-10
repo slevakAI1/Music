@@ -16,7 +16,7 @@ namespace Music
             if (Globals.Designer != null) return true;
 
             MessageBox.Show(owner,
-                "Create a new score design first.",
+                "Create a new design first.",
                 "No Design",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
@@ -34,7 +34,7 @@ namespace Music
             if (Globals.Designer == null)
             {
                 MessageBox.Show(form,
-                    "Create a new score design first.",
+                    "Create a new design first.",
                     "No Design",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);

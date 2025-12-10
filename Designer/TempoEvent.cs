@@ -8,6 +8,6 @@ namespace Music.Designer
         public int StartBeat { get; init; } = 1;
 
         // Tempo value in beats per minute
-        public int TempoBpm { get; init; } = 96;
+        public int TempoBpm { get; init; }
     }
 }

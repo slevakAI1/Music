@@ -6,8 +6,7 @@ using System.Windows.Forms;
 
 namespace Music.Designer
 {
-    // Popup editor for arranging Tempo Events and configuring their spans (in bars)
-    // Mirrors interaction patterns used by TimeSignatureEditorForm and SectionEditorForm.
+    // Popup editor for arranging Tempo Events
     public sealed class TempoEditorForm : Form
     {
         private readonly ListView _lv;
@@ -22,12 +21,15 @@ namespace Music.Designer
         private readonly Button _btnCancel;
 
         // Event editor controls
+        private readonly NumericUpDown _numStartBar;
+        private readonly NumericUpDown _numStartBeat;
         private readonly NumericUpDown _numBpm;
-        private readonly NumericUpDown _numBars;
-        private readonly Label _lblStart;
 
         // Working list mirroring the ListView
         private readonly List<WorkingEvent> _working = new();
+
+        // Drag-and-drop support
+        private ListViewItem? _dragItem;
 
         // Suppress feedback updates while programmatically changing editor controls
         private bool _suppressEditorApply;
@@ -36,9 +38,9 @@ namespace Music.Designer
 
         private sealed class WorkingEvent
         {
-            public int Bpm { get; set; } = 122;
-            public int BarCount { get; set; } = 4;
-            public int StartBar { get; set; } = 1; // computed
+            public int StartBar { get; set; } = 1;
+            public int StartBeat { get; set; } = 1;
+            public int Bpm { get; set; } = 112;
         }
 
         public TempoEditorForm(TempoTimeline? initial = null)
@@ -50,7 +52,7 @@ namespace Music.Designer
             MaximizeBox = false;
             ShowInTaskbar = false;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            ClientSize = new Size(860, 480);
+            ClientSize = new Size(900, 520);
 
             // Root layout
             var root = new TableLayoutPanel
@@ -81,52 +83,57 @@ namespace Music.Designer
                 View = View.Details,
                 FullRowSelect = true,
                 HideSelection = false,
-                MultiSelect = false
+                MultiSelect = false,
+                AllowDrop = true
             };
-            _lv.Columns.Add("Start", 120);
-            _lv.Columns.Add("BPM", 80);
-            _lv.Columns.Add("Bars", 80);
-            _lv.Columns.Add("Span (beats)", 110);
-            _lv.SelectedIndexChanged += (_, __) => LoadEditorFromSelection();
+            _lv.Columns.Add("#", 40, HorizontalAlignment.Right);
+            _lv.Columns.Add("Start Bar", 80, HorizontalAlignment.Right);
+            _lv.Columns.Add("Start Beat", 80, HorizontalAlignment.Right);
+            _lv.Columns.Add("BPM", 80, HorizontalAlignment.Right);
+
+            _lv.SelectedIndexChanged += OnListSelectionChanged;
+            _lv.ItemDrag += OnItemDrag;
+            _lv.DragEnter += OnDragEnter;
+            _lv.DragOver += OnDragOver;
+            _lv.DragDrop += OnDragDrop;
+            _lv.KeyDown += OnListKeyDown;
+
             left.Controls.Add(_lv, 0, 0);
 
-            var rowBtns = new FlowLayoutPanel
+            var rowButtons = new FlowLayoutPanel
             {
                 Dock = DockStyle.Fill,
-                FlowDirection = FlowDirection.LeftToRight
+                FlowDirection = FlowDirection.LeftToRight,
+                WrapContents = false
             };
-            left.Controls.Add(rowBtns, 0, 1);
+            left.Controls.Add(rowButtons, 0, 1);
 
-            _btnAdd = new Button { Text = "Add" };
-            _btnInsert = new Button { Text = "Insert" };
-            _btnDelete = new Button { Text = "Delete" };
-            _btnDuplicate = new Button { Text = "Duplicate" };
-            _btnUp = new Button { Text = "Up" };
-            _btnDown = new Button { Text = "Down" };
+            _btnAdd = new Button { Text = "Add", AutoSize = true };
+            _btnInsert = new Button { Text = "Insert", AutoSize = true };
+            _btnDelete = new Button { Text = "Delete", AutoSize = true };
+            _btnDuplicate = new Button { Text = "Duplicate", AutoSize = true };
+            _btnUp = new Button { Text = "Move Up", AutoSize = true };
+            _btnDown = new Button { Text = "Move Down", AutoSize = true };
+            _btnDefaults = new Button { Text = "Set Defaults", AutoSize = true };
 
-            _btnAdd.Click += (_, __) => { AddEvent(); };
-            _btnInsert.Click += (_, __) => { InsertEventAtSelection(); };
-            _btnDelete.Click += (_, __) => { DeleteSelection(); };
-            _btnDuplicate.Click += (_, __) => { DuplicateSelection(); };
-            _btnUp.Click += (_, __) => { MoveSelection(-1); };
-            _btnDown.Click += (_, __) => { MoveSelection(1); };
+            _btnAdd.Click += (s, e) => AddEvent();
+            _btnInsert.Click += (s, e) => InsertEvent();
+            _btnDelete.Click += (s, e) => DeleteSelected();
+            _btnDuplicate.Click += (s, e) => DuplicateSelected();
+            _btnUp.Click += (s, e) => MoveSelected(-1);
+            _btnDown.Click += (s, e) => MoveSelected(1);
+            _btnDefaults.Click += (s, e) => ApplyDefaultTimeline();
 
-            rowBtns.Controls.AddRange(new Control[]
-            {
-                _btnAdd, _btnInsert, _btnDelete, _btnDuplicate, _btnUp, _btnDown
-            });
+            rowButtons.Controls.AddRange(new Control[] { _btnAdd, _btnInsert, _btnDelete, _btnDuplicate, _btnUp, _btnDown });
 
-            // Right: editor + defaults + OK/Cancel
+            // Right: editor and OK/Cancel
             var right = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
                 ColumnCount = 1,
-                RowCount = 4,
-                Padding = new Padding(8)
+                RowCount = 2
             };
             right.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            right.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
-            right.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
             right.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
             root.Controls.Add(right, 1, 0);
 
@@ -134,285 +141,468 @@ namespace Music.Designer
             {
                 Dock = DockStyle.Fill,
                 ColumnCount = 2,
-                RowCount = 3
+                RowCount = 5,
+                Padding = new Padding(6)
             };
-            editor.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 140));
+            editor.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 120));
             editor.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
             right.Controls.Add(editor, 0, 0);
 
-            // Start label (read-only)
-            editor.Controls.Add(new Label { Text = "Start (computed):", AutoSize = true, Anchor = AnchorStyles.Left }, 0, 0);
-            _lblStart = new Label { Text = "Bar 1", AutoSize = true, Anchor = AnchorStyles.Left };
-            editor.Controls.Add(_lblStart, 1, 0);
+            var lblStartBar = new Label { Text = "Start Bar:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) };
+            var lblStartBeat = new Label { Text = "Start Beat:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) };
+            var lblBpm = new Label { Text = "BPM:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) };
 
-            // BPM
-            editor.Controls.Add(new Label { Text = "BPM:", AutoSize = true, Anchor = AnchorStyles.Left }, 0, 1);
+            _numStartBar = new NumericUpDown
+            {
+                Minimum = 1,
+                Maximum = 9999,
+                Value = 1,
+                Anchor = AnchorStyles.Left,
+                Width = 80
+            };
+            _numStartBar.ValueChanged += (s, e) => ApplyEditorToSelected();
+
+            _numStartBeat = new NumericUpDown
+            {
+                Minimum = 1,
+                Maximum = 32,
+                Value = 1,
+                Anchor = AnchorStyles.Left,
+                Width = 80
+            };
+            _numStartBeat.ValueChanged += (s, e) => ApplyEditorToSelected();
+
             _numBpm = new NumericUpDown
             {
                 Minimum = 20,
                 Maximum = 300,
-                Increment = 1,
                 Value = 112,
-                Anchor = AnchorStyles.Left | AnchorStyles.Right,
-                TextAlign = HorizontalAlignment.Right
+                Anchor = AnchorStyles.Left,
+                Width = 80
             };
-            _numBpm.ValueChanged += (_, __) => ApplyEditorToSelection();
-            editor.Controls.Add(_numBpm, 1, 1);
+            _numBpm.ValueChanged += (s, e) => ApplyEditorToSelected();
 
-            // Bars
-            editor.Controls.Add(new Label { Text = "Bars:", AutoSize = true, Anchor = AnchorStyles.Left }, 0, 2);
-            _numBars = new NumericUpDown
-            {
-                Minimum = 1,
-                Maximum = 512,
-                Increment = 1,
-                Value = 4,
-                Anchor = AnchorStyles.Left | AnchorStyles.Right,
-                TextAlign = HorizontalAlignment.Right
-            };
-            _numBars.ValueChanged += (_, __) => ApplyEditorToSelection();
-            editor.Controls.Add(_numBars, 1, 2);
+            // layout rows
+            int row = 0;
+            editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 28)); // title
+            editor.Controls.Add(new Label { Text = "Selected Tempo Event", AutoSize = true, Font = new Font(SystemFonts.DefaultFont, FontStyle.Bold) }, 0, row);
+            editor.SetColumnSpan(editor.GetControlFromPosition(0, row), 2);
+            row++;
 
-            // Defaults button
-            _btnDefaults = new Button { Text = "Set Defaults", Dock = DockStyle.Fill };
-            _btnDefaults.Click += (_, __) => ApplyDefaults();
-            right.Controls.Add(_btnDefaults, 0, 1);
+            editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
+            editor.Controls.Add(lblStartBar, 0, row);
+            editor.Controls.Add(_numStartBar, 1, row);
+            row++;
 
-            // OK/Cancel buttons (visible, like SectionEditor)
+            editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
+            editor.Controls.Add(lblStartBeat, 0, row);
+            editor.Controls.Add(_numStartBeat, 1, row);
+            row++;
+
+            editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
+            editor.Controls.Add(lblBpm, 0, row);
+            editor.Controls.Add(_numBpm, 1, row);
+            row++;
+
+            for (; row < editor.RowCount; row++)
+                editor.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+
             var bottomButtons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.RightToLeft };
-            _btnOk = new Button { Text = "OK", AutoSize = true };
-            _btnCancel = new Button { Text = "Cancel", AutoSize = true };
-            bottomButtons.Controls.AddRange(new Control[] { _btnOk, _btnCancel });
-            right.Controls.Add(bottomButtons, 0, 3);
+            right.Controls.Add(bottomButtons, 0, 1);
+
+            _btnOk = new Button { Text = "OK", DialogResult = DialogResult.OK, AutoSize = true };
+            _btnCancel = new Button { Text = "Cancel", DialogResult = DialogResult.Cancel, AutoSize = true };
+            bottomButtons.Controls.AddRange(new Control[] { _btnOk, _btnCancel, _btnDefaults });
 
             AcceptButton = _btnOk;
             CancelButton = _btnCancel;
 
-            // Build initial working set
-            if (initial != null && initial.Events.Count > 0)
+            // Load data
+            LoadInitial(initial);
+            RefreshListView(selectIndex: _working.Count > 0 ? 0 : -1);
+
+            // Build ResultTimeline only when OK
+            _btnOk.Click += (s, e) =>
             {
-                // Import existing events - reconstruct BarCount from sequential positions
-                var sorted = initial.Events
-                    .OrderBy(e => e.StartBar)
-                    .ThenBy(e => e.StartBeat)
-                    .ToList();
-
-                for (int i = 0; i < sorted.Count; i++)
-                {
-                    var evt = sorted[i];
-                    int barCount;
-                    
-                    if (i < sorted.Count - 1)
-                    {
-                        // Calculate bars until next event
-                        var nextEvt = sorted[i + 1];
-                        barCount = nextEvt.StartBar - evt.StartBar;
-                    }
-                    else
-                    {
-                        // Last event - default to 4 bars
-                        barCount = 4;
-                    }
-
-                    _working.Add(new WorkingEvent
-                    {
-                        Bpm = evt.TempoBpm,
-                        BarCount = Math.Max(1, barCount)
-                    });
-                }
-            }
-            else
-            {
-                // Defaults
-                _working.Add(new WorkingEvent { Bpm = 112, BarCount = 4 });
-            }
-
-            RecomputeStarts();
-            RebuildListView();
-            if (_lv.Items.Count > 0)
-                _lv.Items[0].Selected = true;
-
-            // Commit/cancel like SectionEditor
-            _btnOk.Click += (_, __) =>
-            {
-                ResultTimeline = BuildResultTimeline();
+                ResultTimeline = BuildResult();
                 DialogResult = DialogResult.OK;
                 Close();
             };
-            _btnCancel.Click += (_, __) =>
-            {
-                DialogResult = DialogResult.Cancel;
-                Close(); // just return
-            };
         }
 
-        private TempoTimeline BuildResultTimeline()
-        {
-            var t = new TempoTimeline();
-            int startBar = 1;
-
-            foreach (var we in _working)
-            {
-                t.Add(new TempoEvent
-                {
-                    StartBar = startBar,
-                    StartBeat = 1,
-                    TempoBpm = we.Bpm
-                });
-                startBar += we.BarCount;
-            }
-
-            return t;
-        }
-
-        // --- Actions ---
-
-        private void ApplyDefaults()
+        private void LoadInitial(TempoTimeline? initial)
         {
             _working.Clear();
-            _working.Add(new WorkingEvent { Bpm = 112, BarCount = 4 });
-            RecomputeStarts();
-            RebuildListView();
-            SelectRow(0);
+
+            if (initial == null || initial.Events.Count == 0)
+            {
+                // Start empty
+                return;
+            }
+
+            // Sort events by start position
+            var sorted = initial.Events
+                .OrderBy(e => e.StartBar)
+                .ThenBy(e => e.StartBeat)
+                .ToList();
+
+            foreach (var ev in sorted)
+            {
+                _working.Add(new WorkingEvent
+                {
+                    StartBar = ev.StartBar,
+                    StartBeat = ev.StartBeat,
+                    Bpm = ev.TempoBpm
+                });
+            }
         }
 
-        private void AddEvent()
+        private void RefreshListView(int selectIndex = -1)
         {
-            var bpm = _working.Count > 0 ? _working.Last().Bpm : 112;
-            _working.Add(new WorkingEvent { Bpm = bpm, BarCount = 4 });
-            RecomputeStarts();
-            RebuildListView();
-            SelectRow(_working.Count - 1);
+            _lv.BeginUpdate();
+            _lv.Items.Clear();
+
+            for (int i = 0; i < _working.Count; i++)
+            {
+                var w = _working[i];
+                var item = new ListViewItem((i + 1).ToString()); // "#"
+                item.SubItems.Add(w.StartBar.ToString()); // "Start Bar"
+                item.SubItems.Add(w.StartBeat.ToString()); // "Start Beat"
+                item.SubItems.Add(w.Bpm.ToString()); // "BPM"
+                item.Tag = w;
+                _lv.Items.Add(item);
+            }
+
+            _lv.EndUpdate();
+
+            if (selectIndex >= 0 && selectIndex < _lv.Items.Count)
+            {
+                _lv.Items[selectIndex].Selected = true;
+                _lv.EnsureVisible(selectIndex);
+            }
+
+            UpdateEditorFromSelected();
+            UpdateButtonsEnabled();
         }
 
-        private void InsertEventAtSelection()
+        private void UpdateRowVisuals(int index)
         {
-            int idx = SelectedIndex();
-            if (idx < 0) idx = _working.Count;
-            var bpm = idx > 0 ? _working[idx - 1].Bpm : 112;
-            _working.Insert(idx, new WorkingEvent { Bpm = bpm, BarCount = 4 });
-            RecomputeStarts();
-            RebuildListView();
-            SelectRow(idx);
+            if (index < 0 || index >= _lv.Items.Count) return;
+            var w = _working[index];
+            var it = _lv.Items[index];
+            it.Text = (index + 1).ToString();
+            it.SubItems[1].Text = w.StartBar.ToString();
+            it.SubItems[2].Text = w.StartBeat.ToString();
+            it.SubItems[3].Text = w.Bpm.ToString();
         }
 
-        private void DeleteSelection()
+        private void UpdateButtonsEnabled()
         {
-            int idx = SelectedIndex();
-            if (idx < 0) return;
-            _working.RemoveAt(idx);
-            RecomputeStarts();
-            RebuildListView();
-            if (_working.Count > 0) SelectRow(Math.Min(idx, _working.Count - 1));
+            bool hasSel = _lv.SelectedIndices.Count > 0;
+            int idx = hasSel ? _lv.SelectedIndices[0] : -1;
+
+            bool isValid = ValidateEditorValues(out _);
+
+            _btnAdd.Enabled = isValid;
+            _btnInsert.Enabled = isValid;
+            _btnDelete.Enabled = hasSel;
+            _btnDuplicate.Enabled = hasSel;
+            _btnUp.Enabled = hasSel && idx > 0;
+            _btnDown.Enabled = hasSel && idx >= 0 && idx < _working.Count - 1;
+            _btnDefaults.Enabled = true;
         }
 
-        private void DuplicateSelection()
+        private void OnListSelectionChanged(object? sender, EventArgs e)
         {
-            int idx = SelectedIndex();
-            if (idx < 0) return;
-            var src = _working[idx];
-            _working.Insert(idx + 1, new WorkingEvent { Bpm = src.Bpm, BarCount = src.BarCount });
-            RecomputeStarts();
-            RebuildListView();
-            SelectRow(idx + 1);
+            UpdateEditorFromSelected();
+            UpdateButtonsEnabled();
         }
 
-        private void MoveSelection(int delta)
+        private void UpdateEditorFromSelected()
         {
-            int idx = SelectedIndex();
-            if (idx < 0) return;
-            int newIdx = idx + delta;
-            if (newIdx < 0 || newIdx >= _working.Count) return;
-            (_working[idx], _working[newIdx]) = (_working[newIdx], _working[idx]);
-            RecomputeStarts();
-            RebuildListView();
-            SelectRow(newIdx);
-        }
+            bool hasSel = _lv.SelectedIndices.Count > 0;
 
-        // --- UI sync ---
+            // Always allow editing when none is selected so the user can stage values for Add/Insert
+            _numStartBar.Enabled = _numStartBeat.Enabled = _numBpm.Enabled = true;
 
-        private int SelectedIndex()
-        {
-            if (_lv.SelectedItems.Count == 0) return -1;
-            return _lv.SelectedItems[0].Index;
-        }
+            if (!hasSel)
+            {
+                UpdateButtonsEnabled();
+                return;
+            }
 
-        private void SelectRow(int idx)
-        {
-            if (idx < 0 || idx >= _lv.Items.Count) return;
-            _lv.SelectedIndices.Clear();
-            _lv.Items[idx].Selected = true;
-            _lv.Items[idx].Focused = true;
-            _lv.EnsureVisible(idx);
-        }
+            var w = _lv.SelectedItems[0].Tag as WorkingEvent;
+            if (w == null) return;
 
-        private void LoadEditorFromSelection()
-        {
-            int idx = SelectedIndex();
             _suppressEditorApply = true;
             try
             {
-                if (idx < 0)
-                {
-                    _lblStart.Text = "Bar -";
-                    return;
-                }
-
-                var we = _working[idx];
-                _lblStart.Text = $"Bar {we.StartBar}";
-                _numBpm.Value = Math.Max(_numBpm.Minimum, Math.Min(_numBpm.Maximum, we.Bpm));
-                _numBars.Value = Math.Max(_numBars.Minimum, Math.Min(_numBars.Maximum, we.BarCount));
+                _numStartBar.Value = Math.Max(_numStartBar.Minimum, Math.Min(_numStartBar.Maximum, w.StartBar));
+                _numStartBeat.Value = Math.Max(_numStartBeat.Minimum, Math.Min(_numStartBeat.Maximum, w.StartBeat));
+                _numBpm.Value = Math.Max(_numBpm.Minimum, Math.Min(_numBpm.Maximum, w.Bpm));
             }
             finally
             {
                 _suppressEditorApply = false;
             }
+
+            UpdateButtonsEnabled();
         }
 
-        private void ApplyEditorToSelection()
+        private void ApplyEditorToSelected()
         {
             if (_suppressEditorApply) return;
 
-            int idx = SelectedIndex();
-            if (idx < 0) return;
+            if (_lv.SelectedIndices.Count == 0)
+            {
+                UpdateButtonsEnabled();
+                return;
+            }
 
-            var we = _working[idx];
-            we.Bpm = (int)_numBpm.Value;
-            we.BarCount = (int)_numBars.Value;
+            var w = (WorkingEvent)_lv.SelectedItems[0].Tag!;
 
-            RecomputeStarts();
-            RebuildListView();
-            SelectRow(idx);
+            w.StartBar = (int)_numStartBar.Value;
+            w.StartBeat = (int)_numStartBeat.Value;
+            w.Bpm = (int)_numBpm.Value;
+
+            UpdateRowVisuals(_lv.SelectedIndices[0]);
+            UpdateButtonsEnabled();
         }
 
-        private void RecomputeStarts()
+        private void AddEvent()
         {
-            int bar = 1;
-            foreach (var we in _working)
+            if (!ValidateEditorValues(out var error))
             {
-                we.StartBar = bar;
-                bar += Math.Max(1, we.BarCount);
+                MessageBox.Show(this, error!, "Add Tempo Event", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            var w = new WorkingEvent
+            {
+                StartBar = (int)_numStartBar.Value,
+                StartBeat = (int)_numStartBeat.Value,
+                Bpm = (int)_numBpm.Value
+            };
+
+            _working.Add(w);
+            
+            // Sort by start position
+            _working.Sort((a, b) =>
+            {
+                int cmp = a.StartBar.CompareTo(b.StartBar);
+                return cmp != 0 ? cmp : a.StartBeat.CompareTo(b.StartBeat);
+            });
+            
+            int newIndex = _working.IndexOf(w);
+            RefreshListView(newIndex);
+            ResetEditorForNextAdd();
+        }
+
+        private void InsertEvent()
+        {
+            if (!ValidateEditorValues(out var error))
+            {
+                MessageBox.Show(this, error!, "Insert Tempo Event", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            int insertAt = _lv.SelectedIndices.Count > 0 ? _lv.SelectedIndices[0] : 0;
+
+            var w = new WorkingEvent
+            {
+                StartBar = (int)_numStartBar.Value,
+                StartBeat = (int)_numStartBeat.Value,
+                Bpm = (int)_numBpm.Value
+            };
+
+            _working.Insert(insertAt, w);
+            
+            // Sort by start position
+            _working.Sort((a, b) =>
+            {
+                int cmp = a.StartBar.CompareTo(b.StartBar);
+                return cmp != 0 ? cmp : a.StartBeat.CompareTo(b.StartBeat);
+            });
+            
+            int newIndex = _working.IndexOf(w);
+            RefreshListView(newIndex);
+            ResetEditorForNextAdd();
+        }
+
+        private void ResetEditorForNextAdd()
+        {
+            _lv.SelectedIndices.Clear();
+
+            _suppressEditorApply = true;
+            try
+            {
+                // Suggest next bar after the last event
+                int nextBar = _working.Count > 0 
+                    ? _working.Max(w => w.StartBar) + 1 
+                    : 1;
+                
+                _numStartBar.Value = Math.Max(_numStartBar.Minimum, Math.Min(_numStartBar.Maximum, nextBar));
+                _numStartBeat.Value = 1;
+                _numBpm.Value = 112;
+            }
+            finally
+            {
+                _suppressEditorApply = false;
+            }
+
+            UpdateButtonsEnabled();
+        }
+
+        private void DeleteSelected()
+        {
+            if (_lv.SelectedIndices.Count == 0) return;
+            int idx = _lv.SelectedIndices[0];
+            _working.RemoveAt(idx);
+            int nextSel = Math.Min(idx, _working.Count - 1);
+            RefreshListView(nextSel);
+        }
+
+        private void DuplicateSelected()
+        {
+            if (_lv.SelectedIndices.Count == 0) return;
+            int idx = _lv.SelectedIndices[0];
+            var src = _working[idx];
+            var clone = new WorkingEvent
+            {
+                StartBar = src.StartBar + 1, // Suggest next bar
+                StartBeat = src.StartBeat,
+                Bpm = src.Bpm
+            };
+            _working.Insert(idx + 1, clone);
+            RefreshListView(idx + 1);
+        }
+
+        private void MoveSelected(int delta)
+        {
+            if (_lv.SelectedIndices.Count == 0) return;
+            int idx = _lv.SelectedIndices[0];
+            int newIdx = idx + delta;
+            if (newIdx < 0 || newIdx >= _working.Count) return;
+
+            var w = _working[idx];
+            _working.RemoveAt(idx);
+            _working.Insert(newIdx, w);
+            RefreshListView(newIdx);
+        }
+
+        private void OnListKeyDown(object? sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+            {
+                DeleteSelected();
+                e.Handled = true;
+            }
+            else if (e.Control && e.KeyCode == Keys.Up)
+            {
+                MoveSelected(-1);
+                e.Handled = true;
+            }
+            else if (e.Control && e.KeyCode == Keys.Down)
+            {
+                MoveSelected(1);
+                e.Handled = true;
             }
         }
 
-        private void RebuildListView()
+        private void OnItemDrag(object? sender, ItemDragEventArgs e)
         {
-            _lv.BeginUpdate();
-            _lv.Items.Clear();
+            _dragItem = (ListViewItem)e.Item;
+            DoDragDrop(e.Item, DragDropEffects.Move);
+        }
 
-            foreach (var we in _working)
+        private void OnDragEnter(object? sender, DragEventArgs e)
+        {
+            if (e.Data != null && e.Data.GetDataPresent(typeof(ListViewItem)))
+                e.Effect = DragDropEffects.Move;
+        }
+
+        private void OnDragOver(object? sender, DragEventArgs e)
+        {
+            if (e.Data == null || !e.Data.GetDataPresent(typeof(ListViewItem)))
             {
-                int beatsPerBar = 4;
-                int spanBeats = we.BarCount * beatsPerBar;
+                e.Effect = DragDropEffects.None;
+                return;
+            }
+            e.Effect = DragDropEffects.Move;
+        }
 
-                var lvi = new ListViewItem($"Bar {we.StartBar}");
-                lvi.SubItems.Add(we.Bpm.ToString());
-                lvi.SubItems.Add(we.BarCount.ToString());
-                lvi.SubItems.Add(spanBeats.ToString());
-                _lv.Items.Add(lvi);
+        private void OnDragDrop(object? sender, DragEventArgs e)
+        {
+            if (_dragItem == null) return;
+
+            var clientPoint = _lv.PointToClient(new Point(e.X, e.Y));
+            var target = _lv.GetItemAt(clientPoint.X, clientPoint.Y);
+
+            int from = _dragItem.Index;
+            int to = target != null ? target.Index : _working.Count - 1;
+
+            if (from == to) return;
+
+            var w = _working[from];
+            _working.RemoveAt(from);
+            if (to >= _working.Count) _working.Add(w);
+            else _working.Insert(to, w);
+
+            RefreshListView(to);
+            _dragItem = null;
+        }
+
+        private TempoTimeline BuildResult()
+        {
+            var tl = new TempoTimeline();
+
+            foreach (var w in _working)
+            {
+                tl.Add(new TempoEvent
+                {
+                    StartBar = w.StartBar,
+                    StartBeat = w.StartBeat,
+                    TempoBpm = w.Bpm
+                });
             }
 
-            _lv.EndUpdate();
+            return tl;
+        }
+
+        private void ApplyDefaultTimeline()
+        {
+            var defaults = TempoTests.CreateTestTimelineD1();
+
+            _working.Clear();
+            
+            foreach (var e in defaults.Events)
+            {
+                _working.Add(new WorkingEvent
+                {
+                    StartBar = e.StartBar,
+                    StartBeat = e.StartBeat,
+                    Bpm = e.TempoBpm
+                });
+            }
+            
+            RefreshListView(selectIndex: _working.Count > 0 ? 0 : -1);
+        }
+
+        private bool ValidateEditorValues(out string? error)
+        {
+            error = null;
+            int startBar = (int)_numStartBar.Value;
+            int startBeat = (int)_numStartBeat.Value;
+            int bpm = (int)_numBpm.Value;
+
+            if (startBar < 1)
+                error = "Start Bar must be at least 1.";
+            if (startBeat < 1)
+                error = (error == null) ? "Start Beat must be at least 1." : error + " Start Beat must be at least 1.";
+            if (bpm < 20)
+                error = (error == null) ? "BPM must be at least 20." : error + " BPM must be at least 20.";
+
+            return error == null;
         }
     }
 }
