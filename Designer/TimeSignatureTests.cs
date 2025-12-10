@@ -15,7 +15,7 @@ namespace Music.Designer
                 StartBeat = 1,
                 Numerator = 4,
                 Denominator = 4,
-                DurationBeats = DesignerTests.TotalBars * 4
+                BarCount = DesignerTests.TotalBars
             });
 
             return timeline;

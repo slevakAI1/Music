@@ -42,6 +42,7 @@
   <ItemGroup>
     <EmbeddedResource Remove="Archives\SerializerTestForm.resx" />
     <EmbeddedResource Remove="Designer\DesignerFrom.DataBinder.resx" />
+    <EmbeddedResource Remove="Designer\TimeSignatureEditorForm.resx" />
     <EmbeddedResource Remove="Writer\Form\ConsoleTransform.resx" />
     <EmbeddedResource Remove="Writer\Form\WriterForm.DataBinder.resx" />
     <EmbeddedResource Remove="Writer\Form\WriterFormEvents.resx" />

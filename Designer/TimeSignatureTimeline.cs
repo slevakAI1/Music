@@ -45,7 +45,7 @@ namespace Music.Designer
             // Fallback scan (also memoizes)
             foreach (var se in Events)
             {
-                if (se.Contains(bar, 1, BeatsPerBar))
+                if (se.Contains(bar, BeatsPerBar))
                 {
                     _barHeads[bar] = se;
                     evt = se;
@@ -59,19 +59,12 @@ namespace Music.Designer
 
         private void IndexEventForBars(TimeSignatureEvent evt)
         {
-            var startAbs = (evt.StartBar - 1) * BeatsPerBar + (evt.StartBeat - 1);
-            var endAbsExcl = startAbs + evt.DurationBeats;
-
             var startBar = evt.StartBar;
-            var endBarInclusive = (int)Math.Floor((endAbsExcl - 1) / (double)BeatsPerBar) + 1;
+            var endBarExclusive = startBar + evt.BarCount;
 
-            for (int bar = startBar; bar <= endBarInclusive; bar++)
+            for (int bar = startBar; bar < endBarExclusive; bar++)
             {
-                var barStartAbs = (bar - 1) * BeatsPerBar;
-                if (startAbs <= barStartAbs && endAbsExcl > barStartAbs)
-                {
-                    _barHeads[bar] = evt;
-                }
+                _barHeads[bar] = evt;
             }
         }
 

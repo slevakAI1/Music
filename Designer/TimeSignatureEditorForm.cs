@@ -250,14 +250,11 @@ namespace Music.Designer
 
             foreach (var ev in initial.Events)
             {
-                // Estimate bar count from duration and numerator
-                int num = Math.Max(1, ev.Numerator);
-                int bars = Math.Max(1, ev.DurationBeats / num);
                 _working.Add(new WorkingEvent
                 {
-                    Numerator = num,
+                    Numerator = Math.Max(1, ev.Numerator),
                     Denominator = Math.Max(1, ev.Denominator),
-                    BarCount = bars
+                    BarCount = Math.Max(1, ev.BarCount)
                 });
             }
             RecalculateStartBars();
@@ -584,7 +581,7 @@ namespace Music.Designer
                     StartBeat = 1,
                     Numerator = w.Numerator,
                     Denominator = w.Denominator,
-                    DurationBeats = Math.Max(1, w.BarCount) * Math.Max(1, w.Numerator)
+                    BarCount = Math.Max(1, w.BarCount)
                 });
             }
 
@@ -599,12 +596,11 @@ namespace Music.Designer
             _working.Clear();
             foreach (var e in defaults.Events)
             {
-                int bars = Math.Max(1, e.DurationBeats / Math.Max(1, e.Numerator));
                 _working.Add(new WorkingEvent
                 {
                     Numerator = Math.Max(1, e.Numerator),
                     Denominator = Math.Max(1, e.Denominator),
-                    BarCount = bars
+                    BarCount = Math.Max(1, e.BarCount)
                 });
             }
             RecalculateStartBars();

@@ -141,7 +141,7 @@ namespace Music.Designer
                 {
                     if (!firstTs) sb.Append("\r\n");
                     // List event placement and span in beats. Meter detail (e.g., 4/4) can be added later if needed.
-                    sb.Append($"Bar {se.StartBar} Beat {se.StartBeat}, {se.DurationBeats} beats");
+                    sb.Append($"Bar {se.StartBar} Beat {se.StartBeat}");
                     firstTs = false;
                 }
             }
