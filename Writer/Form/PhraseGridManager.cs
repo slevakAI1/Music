@@ -15,6 +15,12 @@ namespace Music.Writer
         internal const int FIXED_ROW_HARMONY = 3;
         internal const int FIXED_ROWS_COUNT = 4;
 
+        // Index where measure columns begin
+        internal const int MEASURE_START_COLUMN_INDEX = 6;
+
+        // Default number of measure columns to create initially
+        private const int DEFAULT_MEASURE_COLUMNS = 32;
+
         /// <summary>
         /// Configures the dgvPhrase DataGridView with proper columns including MIDI instrument dropdown.
         /// </summary>
@@ -102,15 +108,23 @@ namespace Music.Writer
             };
             dgvPhrase.Columns.Add(colDescription);
 
-            // Column 6: Phrase details (fills remaining space)
-            var colPhrase = new DataGridViewTextBoxColumn
+            // Columns 6+: Measure columns (dynamically created)
+            // Create initial set of measure columns
+            for (int i = 0; i < DEFAULT_MEASURE_COLUMNS; i++)
             {
-                Name = "colPhrase",
-                HeaderText = "Phrase",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                ReadOnly = true
-            };
-            dgvPhrase.Columns.Add(colPhrase);
+                var colMeasure = new DataGridViewTextBoxColumn
+                {
+                    Name = $"colMeasure{i + 1}",
+                    HeaderText = $"{i + 1}",
+                    Width = 40,
+                    ReadOnly = true,
+                    DefaultCellStyle = new DataGridViewCellStyle
+                    {
+                        Alignment = DataGridViewContentAlignment.MiddleCenter
+                    }
+                };
+                dgvPhrase.Columns.Add(colMeasure);
+            }
 
             // Wire up event handlers
             dgvPhrase.CellValueChanged += cellValueChangedHandler;
@@ -168,9 +182,74 @@ namespace Music.Writer
                 return;
 
             dgvPhrase.Rows[FIXED_ROW_TEMPO].Cells["colData"].Value = tempoTimeline;
+        }
 
-            // TO DO update the grid to show the tempo - need measures first I think
+        /// <summary>
+        /// Populates the measure columns for a phrase row based on the Phrase object's notes.
+        /// Assumes 4/4 time signature (4 quarter notes per measure).
+        /// </summary>
+        /// <param name="dgvPhrase">Target DataGridView</param>
+        /// <param name="rowIndex">Index of the row to populate</param>
+        public static void PopulateMeasureCells(DataGridView dgvPhrase, int rowIndex)
+        {
+            // Skip fixed rows
+            if (rowIndex < FIXED_ROWS_COUNT || rowIndex >= dgvPhrase.Rows.Count)
+                return;
 
+            var row = dgvPhrase.Rows[rowIndex];
+            var phrase = row.Cells["colData"].Value as Phrase;
+
+            // Clear existing measure cells first
+            for (int colIndex = MEASURE_START_COLUMN_INDEX; colIndex < dgvPhrase.Columns.Count; colIndex++)
+            {
+                row.Cells[colIndex].Value = string.Empty;
+            }
+
+            if (phrase == null || phrase.PhraseNotes.Count == 0)
+                return;
+
+            // Calculate ticks per measure (4/4 time: 4 quarter notes per measure)
+            int ticksPerMeasure = MusicConstants.TicksPerQuarterNote * 4;
+
+            // Group notes by measure based on their absolute position
+            var notesByMeasure = phrase.PhraseNotes
+                .GroupBy(note => note.AbsolutePositionTicks / ticksPerMeasure)
+                .OrderBy(g => g.Key)
+                .ToList();
+
+            // Ensure we have enough columns for all measures
+            int maxMeasure = notesByMeasure.Any() ? (int)notesByMeasure.Last().Key : 0;
+            int requiredColumns = MEASURE_START_COLUMN_INDEX + maxMeasure + 1;
+            
+            while (dgvPhrase.Columns.Count < requiredColumns)
+            {
+                int measureNumber = dgvPhrase.Columns.Count - MEASURE_START_COLUMN_INDEX + 1;
+                var colMeasure = new DataGridViewTextBoxColumn
+                {
+                    Name = $"colMeasure{measureNumber}",
+                    HeaderText = $"{measureNumber}",
+                    Width = 40,
+                    ReadOnly = true,
+                    DefaultCellStyle = new DataGridViewCellStyle
+                    {
+                        Alignment = DataGridViewContentAlignment.MiddleCenter
+                    }
+                };
+                dgvPhrase.Columns.Add(colMeasure);
+            }
+
+            // Populate measure cells with note counts
+            foreach (var measureGroup in notesByMeasure)
+            {
+                int measureIndex = (int)measureGroup.Key;
+                int columnIndex = MEASURE_START_COLUMN_INDEX + measureIndex;
+                
+                if (columnIndex < dgvPhrase.Columns.Count)
+                {
+                    int noteCount = measureGroup.Count();
+                    row.Cells[columnIndex].Value = noteCount.ToString();
+                }
+            }
         }
 
         /// <summary>
@@ -279,10 +358,8 @@ namespace Music.Writer
                 row.Cells["colDescription"].Value = string.Empty;
             }
 
-            // Column 6: Phrase details
-            row.Cells["colPhrase"].Value = phrase.PhraseNotes.Count > 0 
-                ? $"{phrase.PhraseNotes.Count} note(s)" 
-                : "Empty phrase";
+            // Populate measure cells (columns 6+) with note counts per measure
+            PopulateMeasureCells(dgvPhrase, newRowIndex);
         }
     }
 }

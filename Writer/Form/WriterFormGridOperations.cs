@@ -95,15 +95,16 @@ namespace Music.Writer
                 if (dataCol != null)
                     row.Cells[dataCol.Index].Value = new Phrase(new List<PhraseNote>()) { MidiProgramNumber = -1 };
 
-                // Clear the Part description (should be empty, not "Part: Select...")
+                // Clear the Part description
                 var descriptionCol = dgvPhrase.Columns["colDescription"];
                 if (descriptionCol != null)
                     row.Cells[descriptionCol.Index].Value = string.Empty;
 
-                // Set Phrase column to "Empty phrase"
-                var phraseCol = dgvPhrase.Columns["colPhrase"];
-                if (phraseCol != null)
-                    row.Cells[phraseCol.Index].Value = "Empty phrase";
+                // Clear all measure cells
+                for (int colIndex = PhraseGridManager.MEASURE_START_COLUMN_INDEX; colIndex < dgvPhrase.Columns.Count; colIndex++)
+                {
+                    row.Cells[colIndex].Value = string.Empty;
+                }
             }
 
             dgvPhrase.Refresh();
@@ -140,7 +141,7 @@ namespace Music.Writer
 
         // KEEP THIS FOR FUTURE EXPANSION
         /// <summary>
-        /// Writes a phrase object to the colData and colPhrase cells of all selected rows.
+        /// Writes a phrase object to the colData cell of all selected rows and updates measure display.
         /// </summary>
         /// <param name="phrase">The phrase to write to the grid.</param>
         private void WritePhraseToSelectedRows(Phrase phrase)
@@ -152,7 +153,9 @@ namespace Music.Writer
                     continue;
 
                 selectedRow.Cells["colData"].Value = phrase;
-                selectedRow.Cells["colPhrase"].Value = "Contains Phrase Data";
+                
+                // Update measure cells to show note distribution
+                PhraseGridManager.PopulateMeasureCells(dgvPhrase, selectedRow.Index);
             }
         }
 
@@ -204,8 +207,8 @@ namespace Music.Writer
                     }
                 }
 
-                // Update display
-                selectedRow.Cells["colPhrase"].Value = $"{existingPhrase.PhraseNotes.Count} note(s)";
+                // Update measure cell display
+                PhraseGridManager.PopulateMeasureCells(dgvPhrase, selectedRow.Index);
             }
         }
     }

@@ -417,8 +417,8 @@ namespace Music.Writer
             if (e.RowIndex < PhraseGridManager.FIXED_ROWS_COUNT)
                 return;
 
-            var phraseColumnIndex = dgvPhrase.Columns["colPhrase"]?.Index;
-            if (phraseColumnIndex == null || e.ColumnIndex != phraseColumnIndex.Value)
+            // Allow double-click on any measure column (starting from MEASURE_START_COLUMN_INDEX)
+            if (e.ColumnIndex < PhraseGridManager.MEASURE_START_COLUMN_INDEX)
                 return;
 
             var row = dgvPhrase.Rows[e.RowIndex];
