@@ -19,9 +19,6 @@
         // Optional: friendly label (e.g., "Chorus A", "Verse 2")
         public string? Name { get; set; }
 
-        // Optional: stable ID if you later want to map to a reusable harmonic pattern
-        public Guid Id { get; } = Guid.NewGuid();
-
         // Helper: returns true if this section spans the given bar
         public bool ContainsBar(int bar) => bar >= StartBar && bar < StartBar + BarCount;
 
