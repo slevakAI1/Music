@@ -9,10 +9,10 @@ namespace Music.Writer
     internal static class PhraseGridManager
     {
         // Constants for the four fixed rows at the top of the grid
-        internal const int FIXED_ROW_TEMPO = 0;
+        internal const int FIXED_ROW_SECTION = 0;
         internal const int FIXED_ROW_TIME_SIGNATURE = 1;
-        internal const int FIXED_ROW_SECTION = 2;
-        internal const int FIXED_ROW_HARMONY = 3;
+        internal const int FIXED_ROW_HARMONY = 2;
+        internal const int FIXED_ROW_TEMPO = 3;
         internal const int FIXED_ROWS_COUNT = 4;
 
         // Index where measure columns begin
