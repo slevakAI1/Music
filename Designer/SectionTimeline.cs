@@ -1,9 +1,10 @@
 namespace Music.Designer
 {
-    // Score Sections
-    public class SectionTimelineClass
+    // The SectionTimeline contains an order list of Sections that constitutes an entire song.
+
+    public class SectionTimeline
     {
-        public List<SectionClass> Sections { get; set; } = new();
+        public List<Section> Sections { get; set; } = new();
 
         private int _nextBar = 1;
 
@@ -15,7 +16,7 @@ namespace Music.Designer
 
         public void Add(MusicConstants.eSectionType sectionType, int barCount, string? name = null)
         {
-            var section = new SectionClass
+            var section = new Section
             {
                 SectionType = sectionType,
                 BarCount = barCount > 0 ? barCount : 1,

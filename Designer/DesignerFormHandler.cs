@@ -82,11 +82,11 @@ namespace Music
         {
             if (!EnsureDesignOrNotify(form)) return;
 
-            using var dlg = new SectionEditorForm(Globals.Designer!.SectionSet);
+            using var dlg = new SectionEditorForm(Globals.Designer!.SectionTimeline);
             if (dlg.ShowDialog(form) == DialogResult.OK)
             {
                 // Copy back into the existing Sections instance to preserve references
-                var target = Globals.Designer!.SectionSet;
+                var target = Globals.Designer!.SectionTimeline;
                 target.Reset();
                 foreach (var s in dlg.ResultSections.Sections)
                 {

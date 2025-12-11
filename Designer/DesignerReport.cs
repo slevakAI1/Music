@@ -30,7 +30,7 @@ namespace Music.Designer
             // SECTIONS
             sb.Append("SECTIONS:\r\n");
             first = true;
-            foreach (var s in designer.SectionSet.Sections)
+            foreach (var s in designer.SectionTimeline.Sections)
             {
                 if (!first) sb.Append("\r\n");
                 if (s == null)
@@ -74,7 +74,7 @@ namespace Music.Designer
             else
             {
                 int bpb = timeline.BeatsPerBar;
-                foreach (var s in designer.SectionSet.Sections)
+                foreach (var s in designer.SectionTimeline.Sections)
                 {
                     if (s == null) continue;
 

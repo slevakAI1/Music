@@ -23,7 +23,7 @@ namespace Music.Designer
                 {
                     design.DesignId,
                     design.PartSet,
-                    design.SectionSet,
+                    design.SectionTimeline,
                     design.HarmonicTimeline,
                     design.TempoTimeline,
                     design.TimeSignatureTimeline

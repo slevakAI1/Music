@@ -10,7 +10,7 @@
         // Design Space
         public PartSetClass PartSet { get; set; } = new();
 
-        public SectionTimelineClass SectionSet { get; set; } = new();
+        public SectionTimeline SectionTimeline { get; set; } = new();
 
         // Harmonic timeline persisted with the design
         public HarmonyTimeline? HarmonicTimeline { get; set; }

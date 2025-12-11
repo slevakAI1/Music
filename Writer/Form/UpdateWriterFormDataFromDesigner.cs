@@ -58,9 +58,9 @@ namespace Music.Writer
             // Preserve existing checked states for sections
 
             var availableSections = new List<string>();
-            if (design?.SectionSet?.Sections != null)
+            if (design?.SectionTimeline?.Sections != null)
             {
-                foreach (var section in design.SectionSet.Sections)
+                foreach (var section in design.SectionTimeline.Sections)
                 {
                     var name = section?.Name;
                     if (!string.IsNullOrWhiteSpace(name))
@@ -94,7 +94,7 @@ namespace Music.Writer
             // ========== END BAR ADJUSTMENT ==========
             // Ensure EndBar is within valid range based on design's total bars
 
-            var total = design?.SectionSet?.TotalBars ?? 0;
+            var total = design?.SectionTimeline?.TotalBars ?? 0;
             if (total > 0)
             {
                 if (!data.EndBar.HasValue)

@@ -26,7 +26,7 @@ namespace Music.Designer
         private readonly Label _lblStart;
 
         // Working list that mirrors the ListView
-        private readonly List<SectionClass> _working = new();
+        private readonly List<Section> _working = new();
 
         // Drag-and-drop support
         private ListViewItem? _dragItem;
@@ -34,9 +34,9 @@ namespace Music.Designer
         // Prevent programmatic editor changes from writing back into the model
         private bool _suppressEditorApply;
 
-        public SectionTimelineClass ResultSections { get; private set; } = new SectionTimelineClass();
+        public SectionTimeline ResultSections { get; private set; } = new SectionTimeline();
 
-        public SectionEditorForm(SectionTimelineClass? initial = null)
+        public SectionEditorForm(SectionTimeline? initial = null)
         {
             Text = "Edit Sections";
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -224,7 +224,7 @@ namespace Music.Designer
             };
         }
 
-        private void LoadInitial(SectionTimelineClass? initial)
+        private void LoadInitial(SectionTimeline? initial)
         {
             _working.Clear();
 
@@ -236,7 +236,7 @@ namespace Music.Designer
 
             foreach (var s in initial.Sections)
             {
-                _working.Add(new SectionClass
+                _working.Add(new Section
                 {
                     SectionType = s.SectionType,
                     BarCount = Math.Max(1, s.BarCount),
@@ -333,7 +333,7 @@ namespace Music.Designer
             }
 
             // Populate from selection WITHOUT writing back to the model
-            var s = _lv.SelectedItems[0].Tag as SectionClass;
+            var s = _lv.SelectedItems[0].Tag as Section;
             if (s == null) return;
 
             _suppressEditorApply = true;
@@ -367,7 +367,7 @@ namespace Music.Designer
                 return;
             }
 
-            var s = (SectionClass)_lv.SelectedItems[0].Tag!;
+            var s = (Section)_lv.SelectedItems[0].Tag!;
 
             if (_cbType.SelectedIndex >= 0)
             {
@@ -395,7 +395,7 @@ namespace Music.Designer
                 return;
             }
 
-            var s = new SectionClass
+            var s = new Section
             {
                 SectionType = type,
                 BarCount = bars,
@@ -418,7 +418,7 @@ namespace Music.Designer
                 return;
             }
 
-            var s = new SectionClass
+            var s = new Section
             {
                 SectionType = type,
                 BarCount = bars,
@@ -467,7 +467,7 @@ namespace Music.Designer
             if (_lv.SelectedIndices.Count == 0) return;
             int idx = _lv.SelectedIndices[0];
             var src = _working[idx];
-            var clone = new SectionClass
+            var clone = new Section
             {
                 SectionType = src.SectionType,
                 BarCount = src.BarCount,
@@ -586,9 +586,9 @@ namespace Music.Designer
             UpdateButtonsEnabled();
         }
 
-        private SectionTimelineClass BuildResult()
+        private SectionTimeline BuildResult()
         {
-            var result = new SectionTimelineClass();
+            var result = new SectionTimeline();
             foreach (var s in _working)
             {
                 result.Add(s.SectionType, s.BarCount, s.Name);
@@ -599,14 +599,14 @@ namespace Music.Designer
 
         private void ApplyDefaultSections()
         {
-            var defaults = new SectionTimelineClass();
+            var defaults = new SectionTimeline();
             var defBuilder = new SectionTests();
             defBuilder.SetTestSectionsD1(defaults);
 
             _working.Clear();
             foreach (var s in defaults.Sections)
             {
-                _working.Add(new SectionClass
+                _working.Add(new Section
                 {
                     SectionType = s.SectionType,
                     BarCount = Math.Max(1, s.BarCount),

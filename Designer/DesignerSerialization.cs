@@ -27,12 +27,12 @@ namespace Music.Designer
             }
 
             // Sections: preserve StartBar and order from JSON (no recalculation)
-            design.SectionSet.Reset();
+            design.SectionTimeline.Reset();
             if (dto.SectionSet?.Sections != null)
             {
                 foreach (var s in dto.SectionSet.Sections)
                 {
-                    design.SectionSet.Sections.Add(new SectionClass
+                    design.SectionTimeline.Sections.Add(new Section
                     {
                         SectionType = (MusicConstants.eSectionType)s.SectionType,
                         StartBar = s.StartBar > 0 ? s.StartBar : 1,
@@ -42,7 +42,7 @@ namespace Music.Designer
                     });
                 }
                 // Sync internal state based on existing StartBar/BarCount without changing them
-                design.SectionSet.SyncAfterExternalLoad();
+                design.SectionTimeline.SyncAfterExternalLoad();
             }
 
             // Harmonic timeline: preserve order and values

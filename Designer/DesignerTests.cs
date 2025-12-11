@@ -12,7 +12,7 @@ namespace Music.Designer
         {
             // 1) Sections: apply default/test structure
             var sectionTestData = new SectionTests();
-            sectionTestData.SetTestSectionsD1(design.SectionSet);
+            sectionTestData.SetTestSectionsD1(design.SectionTimeline);
 
             // 2) Voices: apply default voices
             design.PartSet.SetTestVoicesD1();    // TODO - the others have separate classes!

@@ -35,9 +35,9 @@ namespace Music.Writer
             // Populate SectionsState with all sections from design
 
             var sectionNames = new List<string>();
-            if (designer?.SectionSet?.Sections != null)
+            if (designer?.SectionTimeline?.Sections != null)
             {
-                foreach (var s in designer.SectionSet.Sections)
+                foreach (var s in designer.SectionTimeline.Sections)
                 {
                     var name = s?.Name;
                     if (!string.IsNullOrWhiteSpace(name))
@@ -58,7 +58,7 @@ namespace Music.Writer
             data.SelectedStaffs = new List<int> { 1 };
 
             // End bar: default to design total bars when available
-            var total = designer?.SectionSet?.TotalBars ?? 0;
+            var total = designer?.SectionTimeline?.TotalBars ?? 0;
             if (total > 0)
                 data.EndBar = total;
             else
