@@ -206,7 +206,6 @@ namespace Music.Writer
             btnAppend.TabIndex = 4;
             btnAppend.Text = "Old Append to Score?";
             btnAppend.UseVisualStyleBackColor = true;
-            btnAppend.Click += btnAppendNotes_Click;
             // 
             // grpPitch
             // 
