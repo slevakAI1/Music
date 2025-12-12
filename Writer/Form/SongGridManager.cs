@@ -177,6 +177,7 @@ namespace Music.Writer
             // Delegate attaching the control lines to the control line manager class
             if (designer != null)
             {
+                GridControlLinesManager.AttachSectionTimeline(dgSong, designer.SectionTimeline);
                 GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, designer.TimeSignatureTimeline);
                 GridControlLinesManager.AttachTempoTimeline(dgSong, designer.TempoTimeline);
             }
