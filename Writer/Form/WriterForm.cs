@@ -64,7 +64,7 @@ namespace Music.Writer
             cbCommand.SelectedIndex = 0;
 
             // Configure dgvPhrases with MIDI instrument dropdown
-            PhraseGridManager.ConfigurePhraseDataGridView(
+            SongGridManager.ConfigureSongGridView(
                 dgSong,
                 _midiInstruments,
                 DgvPhrase_CellValueChanged,
@@ -83,7 +83,7 @@ namespace Music.Writer
         /// </summary>
         private void DgvPhrase_CurrentCellDirtyStateChanged(object? sender, EventArgs e)
         {
-            PhraseGridManager.HandleCurrentCellDirtyStateChanged(dgSong, sender, e);
+            SongGridManager.HandleCurrentCellDirtyStateChanged(dgSong, sender, e);
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Music.Writer
         /// </summary>
         private void DgvPhrase_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
         {
-            PhraseGridManager.HandleCellValueChanged(dgSong, sender, e);
+            SongGridManager.HandleCellValueChanged(dgSong, sender, e);
         }
 
         /// <summary>

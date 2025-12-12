@@ -15,11 +15,11 @@ namespace Music.Writer
                 MidiProgramNumber = -1  // "Select..."
             };
 
-            // Use PhraseGridManager to initialize the row consistently with other adds.
-            PhraseGridManager.AddPhraseToGrid(emptyPhrase, _midiInstruments, dgSong, ref phraseNumber);
+            // Use SongGridManager to initialize the row consistently with other adds.
+            SongGridManager.AddPhraseToGrid(emptyPhrase, _midiInstruments, dgSong, ref phraseNumber);
 
             // Select the newly added row (last row)
-            if (dgSong.Rows.Count > PhraseGridManager.FIXED_ROWS_COUNT)
+            if (dgSong.Rows.Count > SongGridManager.FIXED_ROWS_COUNT)
             {
                 int newRowIndex = dgSong.Rows.Count - 1;
                 dgSong.ClearSelection();
@@ -51,13 +51,13 @@ namespace Music.Writer
             var indices = dgSong.SelectedRows
                 .Cast<DataGridViewRow>()
                 .Select(r => r.Index)
-                .Where(i => i >= PhraseGridManager.FIXED_ROWS_COUNT)
+                .Where(i => i >= SongGridManager.FIXED_ROWS_COUNT)
                 .OrderByDescending(i => i)
                 .ToList();
 
             foreach (var idx in indices)
             {
-                if (idx >= PhraseGridManager.FIXED_ROWS_COUNT && idx < dgSong.Rows.Count)
+                if (idx >= SongGridManager.FIXED_ROWS_COUNT && idx < dgSong.Rows.Count)
                     dgSong.Rows.RemoveAt(idx);
             }
         }
@@ -65,9 +65,9 @@ namespace Music.Writer
         public void HandleClearPhrases()
         {
             // Remove all rows except the fixed rows
-            while (dgSong.Rows.Count > PhraseGridManager.FIXED_ROWS_COUNT)
+            while (dgSong.Rows.Count > SongGridManager.FIXED_ROWS_COUNT)
             {
-                dgSong.Rows.RemoveAt(PhraseGridManager.FIXED_ROWS_COUNT);
+                dgSong.Rows.RemoveAt(SongGridManager.FIXED_ROWS_COUNT);
             }
         }
 
@@ -82,7 +82,7 @@ namespace Music.Writer
             foreach (DataGridViewRow row in dgSong.SelectedRows)
             {
                 // Skip fixed rows
-                if (row.Index < PhraseGridManager.FIXED_ROWS_COUNT)
+                if (row.Index < SongGridManager.FIXED_ROWS_COUNT)
                     continue;
 
                 // Reset instrument to "Select..." (-1)
@@ -101,7 +101,7 @@ namespace Music.Writer
                     row.Cells[descriptionCol.Index].Value = string.Empty;
 
                 // Clear all measure cells
-                for (int colIndex = PhraseGridManager.MEASURE_START_COLUMN_INDEX; colIndex < dgSong.Columns.Count; colIndex++)
+                for (int colIndex = SongGridManager.MEASURE_START_COLUMN_INDEX; colIndex < dgSong.Columns.Count; colIndex++)
                 {
                     row.Cells[colIndex].Value = string.Empty;
                 }
@@ -122,7 +122,7 @@ namespace Music.Writer
             // Check if any non-fixed rows are selected
             var hasValidSelection = dgSong.SelectedRows
                 .Cast<DataGridViewRow>()
-                .Any(r => r.Index >= PhraseGridManager.FIXED_ROWS_COUNT);
+                .Any(r => r.Index >= SongGridManager.FIXED_ROWS_COUNT);
 
             if (!hasValidSelection)
             {
@@ -149,13 +149,13 @@ namespace Music.Writer
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
                 // Skip fixed rows
-                if (selectedRow.Index < PhraseGridManager.FIXED_ROWS_COUNT)
+                if (selectedRow.Index < SongGridManager.FIXED_ROWS_COUNT)
                     continue;
 
                 selectedRow.Cells["colData"].Value = phrase;
                 
                 // Update measure cells to show note distribution
-                PhraseGridManager.PopulateMeasureCells(dgSong, selectedRow.Index);
+                SongGridManager.PopulateMeasureCells(dgSong, selectedRow.Index);
             }
         }
 
@@ -169,7 +169,7 @@ namespace Music.Writer
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
                 // Skip fixed rows
-                if (selectedRow.Index < PhraseGridManager.FIXED_ROWS_COUNT)
+                if (selectedRow.Index < SongGridManager.FIXED_ROWS_COUNT)
                     continue;
 
                 // Get existing phrase or create new one if null
@@ -208,7 +208,7 @@ namespace Music.Writer
                 }
 
                 // Update measure cell display
-                PhraseGridManager.PopulateMeasureCells(dgSong, selectedRow.Index);
+                SongGridManager.PopulateMeasureCells(dgSong, selectedRow.Index);
             }
         }
 

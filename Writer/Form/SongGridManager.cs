@@ -4,46 +4,48 @@ using Music.Designer;
 namespace Music.Writer
 {
     /// <summary>
-    /// Manages adding phrases to the phrase DataGridView.
+    /// Manages adding song components to the dgSong DataGridView control
+    /// on the WriterForm form. Components include Sections, Harmonies, Time Signatures, Tempos, PhraseNotes
     /// </summary>
-    internal static class PhraseGridManager
+    internal static class SongGridManager
     {
         // Constants for the four fixed rows at the top of the grid
         internal const int FIXED_ROW_SECTION = 0;
         internal const int FIXED_ROW_HARMONY = 1;
         internal const int FIXED_ROW_TIME_SIGNATURE = 2;
         internal const int FIXED_ROW_TEMPO = 3;
-        internal const int FIXED_ROWS_COUNT = 4;
+        internal const int FIXED_ROW_SEPARATOR = 4;
+        internal const int FIXED_ROWS_COUNT = 5;
 
         // Index where measure columns begin (reduced by 1 due to column consolidation)
-        internal const int MEASURE_START_COLUMN_INDEX = 5;
+        internal const int MEASURE_START_COLUMN_INDEX = 6;
 
         // Default number of measure columns to create initially
         private const int DEFAULT_MEASURE_COLUMNS = 32;
 
         /// <summary>
-        /// Configures the dgvPhrase DataGridView with proper columns including MIDI instrument dropdown.
+        /// Configures the dgSong DataGridView with proper columns including MIDI instrument dropdown.
         /// </summary>
-        /// <param name="dgvPhrase">The DataGridView to configure</param>
+        /// <param name="dgSong">The DataGridView to configure</param>
         /// <param name="midiInstruments">List of available MIDI instruments</param>
         /// <param name="cellValueChangedHandler">Event handler for cell value changes</param>
         /// <param name="currentCellDirtyStateChangedHandler">Event handler for dirty state changes</param>
         /// <param name="tempoTimeline">Optional TempoTimeline to place into the fixed Tempo row hidden data cell</param>
-        internal static void ConfigurePhraseDataGridView(
-            DataGridView dgvPhrase,
+        internal static void ConfigureSongGridView(
+            DataGridView dgSong,
             List<MidiInstrument> midiInstruments,
             DataGridViewCellEventHandler cellValueChangedHandler,
             EventHandler currentCellDirtyStateChangedHandler,
             Designer.Designer? designer = null)
         {
-            dgvPhrase.AllowUserToAddRows = false;
-            dgvPhrase.AllowUserToResizeColumns = true;
-            dgvPhrase.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvPhrase.MultiSelect = true;
-            dgvPhrase.ReadOnly = false;
-            dgvPhrase.Columns.Clear();
+            dgSong.AllowUserToAddRows = false;
+            dgSong.AllowUserToResizeColumns = true;
+            dgSong.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgSong.MultiSelect = true;
+            dgSong.ReadOnly = false;
+            dgSong.Columns.Clear();
 
-            // Column 0: Type column - text for fixed rows, combo box for phrase rows
+            // Column 0: Type column - text for fixed rows, combo box for song rows
             var colType = new DataGridViewTextBoxColumn
             {
                 Name = "colType",
@@ -51,7 +53,7 @@ namespace Music.Writer
                 Width = 200,
                 ReadOnly = false // Will be set per-cell basis in InitializeFixedRows
             };
-            dgvPhrase.Columns.Add(colType);
+            dgSong.Columns.Add(colType);
 
             // Column 1: Hidden column containing the data object
             var colData = new DataGridViewTextBoxColumn
@@ -61,7 +63,7 @@ namespace Music.Writer
                 Visible = false,
                 ReadOnly = true
             };
-            dgvPhrase.Columns.Add(colData);
+            dgSong.Columns.Add(colData);
 
             // Column 2: Stave
             var colStaff = new DataGridViewTextBoxColumn
@@ -71,7 +73,7 @@ namespace Music.Writer
                 Width = 40,
                 ReadOnly = false
             };
-            dgvPhrase.Columns.Add(colStaff);
+            dgSong.Columns.Add(colStaff);
 
             // Column 3: Event number (read-only)
             var colEventNumber = new DataGridViewTextBoxColumn
@@ -81,7 +83,7 @@ namespace Music.Writer
                 Width = 50,
                 ReadOnly = true
             };
-            dgvPhrase.Columns.Add(colEventNumber);
+            dgSong.Columns.Add(colEventNumber);
 
             // Column 4: Description (read-only for now)
             var colDescription = new DataGridViewTextBoxColumn
@@ -91,7 +93,7 @@ namespace Music.Writer
                 Width = 300,
                 ReadOnly = true
             };
-            dgvPhrase.Columns.Add(colDescription);
+            dgSong.Columns.Add(colDescription);
 
             // Columns 5+: Measure columns (dynamically created)
             // Create initial set of measure columns
@@ -108,15 +110,15 @@ namespace Music.Writer
                         Alignment = DataGridViewContentAlignment.MiddleCenter
                     }
                 };
-                dgvPhrase.Columns.Add(colMeasure);
+                dgSong.Columns.Add(colMeasure);
             }
 
             // Wire up event handlers
-            dgvPhrase.CellValueChanged += cellValueChangedHandler;
-            dgvPhrase.CurrentCellDirtyStateChanged += currentCellDirtyStateChangedHandler;
+            dgSong.CellValueChanged += cellValueChangedHandler;
+            dgSong.CurrentCellDirtyStateChanged += currentCellDirtyStateChangedHandler;
 
             // Add the four fixed rows at the top and optionally attach tempoTimeline to the hidden data cell
-            InitializeFixedRows(dgvPhrase, midiInstruments, designer);
+            InitializeFixedRows(dgSong, midiInstruments, designer);
         }
 
         /// <summary>
@@ -125,53 +127,53 @@ namespace Music.Writer
         /// If a TempoTimeline is provided it will be stored in the fixed Tempo row's hidden data cell.
         /// </summary>
         private static void InitializeFixedRows(
-            DataGridView dgvPhrase,
+            DataGridView dgSong,
             List<MidiInstrument> midiInstruments,
             Designer.Designer? designer = null)
         {
             // Add four empty rows
             for (int i = 0; i < FIXED_ROWS_COUNT; i++)
             {
-                dgvPhrase.Rows.Add();
+                dgSong.Rows.Add();
             }
 
             // Set Type column values for the fixed rows and mark each cell read-only
-            dgvPhrase.Rows[FIXED_ROW_SECTION].Cells["colType"].Value = "Section";
-            dgvPhrase.Rows[FIXED_ROW_SECTION].Cells["colType"].ReadOnly = true;
+            dgSong.Rows[FIXED_ROW_SECTION].Cells["colType"].Value = "Section";
+            dgSong.Rows[FIXED_ROW_SECTION].Cells["colType"].ReadOnly = true;
 
-            dgvPhrase.Rows[FIXED_ROW_TIME_SIGNATURE].Cells["colType"].Value = "Time Signature";
-            dgvPhrase.Rows[FIXED_ROW_TIME_SIGNATURE].Cells["colType"].ReadOnly = true;
+            dgSong.Rows[FIXED_ROW_TIME_SIGNATURE].Cells["colType"].Value = "Time Signature";
+            dgSong.Rows[FIXED_ROW_TIME_SIGNATURE].Cells["colType"].ReadOnly = true;
 
-            dgvPhrase.Rows[FIXED_ROW_HARMONY].Cells["colType"].Value = "Harmony";
-            dgvPhrase.Rows[FIXED_ROW_HARMONY].Cells["colType"].ReadOnly = true;
+            dgSong.Rows[FIXED_ROW_HARMONY].Cells["colType"].Value = "Harmony";
+            dgSong.Rows[FIXED_ROW_HARMONY].Cells["colType"].ReadOnly = true;
 
-            dgvPhrase.Rows[FIXED_ROW_TEMPO].Cells["colType"].Value = "Tempo";
-            dgvPhrase.Rows[FIXED_ROW_TEMPO].Cells["colType"].ReadOnly = true;
+            dgSong.Rows[FIXED_ROW_TEMPO].Cells["colType"].Value = "Tempo";
+            dgSong.Rows[FIXED_ROW_TEMPO].Cells["colType"].ReadOnly = true;
 
             // Delegate attaching the TempoTimeline to the new manager class
             if (designer != null)
             {
-                GridControlLinesManager.AttachTempoTimeline(dgvPhrase, designer.TempoTimeline);
+                GridControlLinesManager.AttachTempoTimeline(dgSong, designer.TempoTimeline);
             }
         }
 
         /// <summary>
-        /// Populates the measure columns for a phrase row based on the Phrase object's notes.
+        /// Populates the measure columns for a song row based on the Song object's notes.
         /// Assumes 4/4 time signature (4 quarter notes per measure).
         /// </summary>
-        /// <param name="dgvPhrase">Target DataGridView</param>
+        /// <param name="dgSong">Target DataGridView</param>
         /// <param name="rowIndex">Index of the row to populate</param>
-        public static void PopulateMeasureCells(DataGridView dgvPhrase, int rowIndex)
+        public static void PopulateMeasureCells(DataGridView dgSong, int rowIndex)
         {
             // Skip fixed rows
-            if (rowIndex < FIXED_ROWS_COUNT || rowIndex >= dgvPhrase.Rows.Count)
+            if (rowIndex < FIXED_ROWS_COUNT || rowIndex >= dgSong.Rows.Count)
                 return;
 
-            var row = dgvPhrase.Rows[rowIndex];
+            var row = dgSong.Rows[rowIndex];
             var phrase = row.Cells["colData"].Value as Phrase;
 
             // Clear existing measure cells first
-            for (int colIndex = MEASURE_START_COLUMN_INDEX; colIndex < dgvPhrase.Columns.Count; colIndex++)
+            for (int colIndex = MEASURE_START_COLUMN_INDEX; colIndex < dgSong.Columns.Count; colIndex++)
             {
                 row.Cells[colIndex].Value = string.Empty;
             }
@@ -192,9 +194,9 @@ namespace Music.Writer
             int maxMeasure = notesByMeasure.Any() ? (int)notesByMeasure.Last().Key : 0;
             int requiredColumns = MEASURE_START_COLUMN_INDEX + maxMeasure + 1;
             
-            while (dgvPhrase.Columns.Count < requiredColumns)
+            while (dgSong.Columns.Count < requiredColumns)
             {
-                int measureNumber = dgvPhrase.Columns.Count - MEASURE_START_COLUMN_INDEX + 1;
+                int measureNumber = dgSong.Columns.Count - MEASURE_START_COLUMN_INDEX + 1;
                 var colMeasure = new DataGridViewTextBoxColumn
                 {
                     Name = $"colMeasure{measureNumber}",
@@ -206,7 +208,7 @@ namespace Music.Writer
                         Alignment = DataGridViewContentAlignment.MiddleCenter
                     }
                 };
-                dgvPhrase.Columns.Add(colMeasure);
+                dgSong.Columns.Add(colMeasure);
             }
 
             // Populate measure cells with note counts
@@ -215,7 +217,7 @@ namespace Music.Writer
                 int measureIndex = (int)measureGroup.Key;
                 int columnIndex = MEASURE_START_COLUMN_INDEX + measureIndex;
                 
-                if (columnIndex < dgvPhrase.Columns.Count)
+                if (columnIndex < dgSong.Columns.Count)
                 {
                     int noteCount = measureGroup.Count();
                     row.Cells[columnIndex].Value = noteCount.ToString();
@@ -226,34 +228,34 @@ namespace Music.Writer
         /// <summary>
         /// Handles the CurrentCellDirtyStateChanged event to commit combo box edits immediately.
         /// </summary>
-        /// <param name="dgvPhrase">The DataGridView</param>
+        /// <param name="dgSong">The DataGridView</param>
         /// <param name="sender">Event sender</param>
         /// <param name="e">Event args</param>
-        internal static void HandleCurrentCellDirtyStateChanged(DataGridView dgvPhrase, object? sender, EventArgs e)
+        internal static void HandleCurrentCellDirtyStateChanged(DataGridView dgSong, object? sender, EventArgs e)
         {
-            if (dgvPhrase.IsCurrentCellDirty && dgvPhrase.CurrentCell is DataGridViewComboBoxCell)
+            if (dgSong.IsCurrentCellDirty && dgSong.CurrentCell is DataGridViewComboBoxCell)
             {
-                dgvPhrase.CommitEdit(DataGridViewDataErrorContexts.Commit);
+                dgSong.CommitEdit(DataGridViewDataErrorContexts.Commit);
             }
         }
 
         /// <summary>
-        /// Handles the CellValueChanged event to update Phrase objects when instrument selection changes.
+        /// Handles the CellValueChanged event to update Song objects when instrument selection changes.
         /// </summary>
-        /// <param name="dgvPhrase">The DataGridView</param>
+        /// <param name="dgSong">The DataGridView</param>
         /// <param name="sender">Event sender</param>
         /// <param name="e">Event args</param>
-        internal static void HandleCellValueChanged(DataGridView dgvPhrase, object? sender, DataGridViewCellEventArgs e)
+        internal static void HandleCellValueChanged(DataGridView dgSong, object? sender, DataGridViewCellEventArgs e)
         {
             // Skip fixed rows
             if (e.RowIndex < FIXED_ROWS_COUNT)
                 return;
 
-            // Only handle changes to the Type column (which now contains the instrument dropdown for phrase rows)
-            if (e.RowIndex < 0 || e.ColumnIndex != dgvPhrase.Columns["colType"]?.Index)
+            // Only handle changes to the Type column (which now contains the instrument dropdown for song rows)
+            if (e.RowIndex < 0 || e.ColumnIndex != dgSong.Columns["colType"]?.Index)
                 return;
 
-            var row = dgvPhrase.Rows[e.RowIndex];
+            var row = dgSong.Rows[e.RowIndex];
             var cellValue = row.Cells["colData"].Value;
 
             // Check if the hidden data cell contains a Phrase object
@@ -278,24 +280,24 @@ namespace Music.Writer
         /// </summary>
         /// <param name="phrase">The phrase to add</param>
         /// <param name="midiInstruments">List of available MIDI instruments</param>
-        /// <param name="dgvPhrase">The DataGridView to add to</param>
-        /// <param name="phraseNumber">Reference to the phrase counter (will be incremented)</param>
+        /// <param name="dgSong">The DataGridView to add to</param>
+        /// <param name="rowNumber">Reference to the row counter (will be incremented)</param>
         internal static void AddPhraseToGrid(
             Phrase phrase,
             List<MidiInstrument> midiInstruments,
-            DataGridView dgvPhrase,
-            ref int phraseNumber)
+            DataGridView dgSong,
+            ref int rowNumber)
         {
-            // Set phrase name/number
-            phraseNumber++;
-            var phraseName = phraseNumber.ToString();
+            // Set row name/number
+            rowNumber++;
+            var rowName = rowNumber.ToString();
 
             // Get part name from the phrase
             var partName = phrase.MidiProgramName ?? "Select...";
 
             // Add new row
-            int newRowIndex = dgvPhrase.Rows.Add();
-            var row = dgvPhrase.Rows[newRowIndex];
+            int newRowIndex = dgSong.Rows.Add();
+            var row = dgSong.Rows[newRowIndex];
 
             // Column 0: Type column - convert to combo box for this row
             // Replace the text box cell with a combo box cell
@@ -326,7 +328,7 @@ namespace Music.Writer
             row.Cells["colStave"].Value = 1;
 
             // Column 3: Event number
-            row.Cells["colEventNumber"].Value = phraseName;
+            row.Cells["colEventNumber"].Value = rowName;
 
             // Column 4: Description
             if (!string.IsNullOrEmpty(partName) && partName != "Select...")
@@ -339,7 +341,7 @@ namespace Music.Writer
             }
 
             // Populate measure cells (columns 5+) with note counts per measure
-            PopulateMeasureCells(dgvPhrase, newRowIndex);
+            PopulateMeasureCells(dgSong, newRowIndex);
         }
     }
 }
