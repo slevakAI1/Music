@@ -142,12 +142,6 @@ namespace Music.Writer
 
         //===============================   E V E N T S   ==============================
 
-
-        private void btnAppendNotes_Click(object sender, EventArgs e)
-        {
-            //HandleAppendNotes();
-        }
-
         private async void btnPlay_Click(object sender, EventArgs e)
         {
             await HandlePlayAsync();
