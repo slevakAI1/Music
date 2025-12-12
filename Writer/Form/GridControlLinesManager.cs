@@ -101,6 +101,105 @@ namespace Music.Writer
 
         #endregion
 
+        #region AttachHarmonyTimeline
+
+        /// <summary>
+        /// Public helper to attach a HarmonyTimeline instance to the fixed Harmony row's hidden data cell.
+        /// Safe to call anytime after the grid's columns and rows have been created.
+        /// </summary>
+        /// <param name="dgSong">Target DataGridView</param>
+        /// <param name="harmonyTimeline">HarmonyTimeline to store in the hidden data cell (null to skip)</param>
+        public static void AttachHarmonyTimeline(DataGridView dgSong, HarmonyTimeline? harmonyTimeline)
+        {
+            if (harmonyTimeline == null)
+                return;
+
+            if (!dgSong.Columns.Contains("colData"))
+                return;
+
+            if (dgSong.Rows.Count <= SongGridManager.FIXED_ROW_HARMONY)
+                return;
+
+            // Populate the harmony row with the timeline data
+            PopulateHarmonyRow(dgSong, harmonyTimeline);
+        }
+
+        /// <summary>
+        /// Populates the fixed Harmony row with chord notation at their respective measure positions.
+        /// Multiple chords per measure are separated by line breaks.
+        /// </summary>
+        /// <param name="dgSong">Target DataGridView</param>
+        /// <param name="harmonyTimeline">HarmonyTimeline containing harmony events</param>
+        private static void PopulateHarmonyRow(DataGridView dgSong, HarmonyTimeline harmonyTimeline)
+        {
+            // Store the timeline in the hidden data cell
+            dgSong.Rows[SongGridManager.FIXED_ROW_HARMONY].Cells["colData"].Value = harmonyTimeline;
+
+            // Clear all existing measure cells in the harmony row
+            for (int colIndex = SongGridManager.MEASURE_START_COLUMN_INDEX; colIndex < dgSong.Columns.Count; colIndex++)
+            {
+                dgSong.Rows[SongGridManager.FIXED_ROW_HARMONY].Cells[colIndex].Value = string.Empty;
+            }
+
+            if (harmonyTimeline.Events.Count == 0)
+                return;
+
+            // Group harmony events by the bar they start in
+            var eventsByBar = harmonyTimeline.Events
+                .GroupBy(evt => evt.StartBar)
+                .OrderBy(g => g.Key)
+                .ToList();
+
+            // Populate measure cells with chord notations
+            foreach (var barGroup in eventsByBar)
+            {
+                int bar = barGroup.Key;
+                
+                // Convert 1-based bar number to 0-based measure index
+                int measureIndex = bar - 1;
+                
+                // Calculate the column index for this measure
+                int columnIndex = SongGridManager.MEASURE_START_COLUMN_INDEX + measureIndex;
+
+                // Ensure the column exists (dynamically add if needed)
+                while (dgSong.Columns.Count <= columnIndex)
+                {
+                    int measureNumber = dgSong.Columns.Count - SongGridManager.MEASURE_START_COLUMN_INDEX + 1;
+                    var colMeasure = new DataGridViewTextBoxColumn
+                    {
+                        Name = $"colMeasure{measureNumber}",
+                        HeaderText = $"{measureNumber}",
+                        Width = 40,
+                        ReadOnly = true,
+                        DefaultCellStyle = new DataGridViewCellStyle
+                        {
+                            Alignment = DataGridViewContentAlignment.MiddleCenter
+                        }
+                    };
+                    dgSong.Columns.Add(colMeasure);
+                }
+
+                // Convert harmony events to chord notation and join with line breaks
+                if (columnIndex < dgSong.Columns.Count)
+                {
+                    var chordNotations = barGroup
+                        .OrderBy(evt => evt.StartBeat) // Order by beat within the bar
+                        .Select(evt => MusicCalculations.ConvertToChordNotation(
+                            evt.Key,
+                            evt.Degree,
+                            evt.Quality,
+                            evt.Bass))
+                        .ToList();
+
+                    // Join multiple chords with CRLF
+                    dgSong.Rows[SongGridManager.FIXED_ROW_HARMONY].Cells[columnIndex].Value = 
+                        string.Join(Environment.NewLine, chordNotations);
+                }
+            }
+        }
+
+        #endregion
+
         #region AttachTimeSignatureTimeline
 
         /// <summary>

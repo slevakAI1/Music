@@ -178,6 +178,7 @@ namespace Music.Writer
             if (designer != null)
             {
                 GridControlLinesManager.AttachSectionTimeline(dgSong, designer.SectionTimeline);
+                GridControlLinesManager.AttachHarmonyTimeline(dgSong, designer.HarmonicTimeline);
                 GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, designer.TimeSignatureTimeline);
                 GridControlLinesManager.AttachTempoTimeline(dgSong, designer.TempoTimeline);
             }
