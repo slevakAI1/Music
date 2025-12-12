@@ -34,7 +34,7 @@ namespace Music.Writer
             List<MidiInstrument> midiInstruments,
             DataGridViewCellEventHandler cellValueChangedHandler,
             EventHandler currentCellDirtyStateChangedHandler,
-            TempoTimeline? tempoTimeline = null)
+            Designer.Designer? designer = null)
         {
             dgvPhrase.AllowUserToAddRows = false;
             dgvPhrase.AllowUserToResizeColumns = true;
@@ -131,7 +131,7 @@ namespace Music.Writer
             dgvPhrase.CurrentCellDirtyStateChanged += currentCellDirtyStateChangedHandler;
 
             // Add the four fixed rows at the top and optionally attach tempoTimeline to the hidden data cell
-            InitializeFixedRows(dgvPhrase, tempoTimeline);
+            InitializeFixedRows(dgvPhrase, designer);
         }
 
         /// <summary>
@@ -139,7 +139,9 @@ namespace Music.Writer
         /// Entire fixed rows are set to ReadOnly so users cannot edit them.
         /// If a TempoTimeline is provided it will be stored in the fixed Tempo row's hidden data cell.
         /// </summary>
-        private static void InitializeFixedRows(DataGridView dgvPhrase, TempoTimeline? tempoTimeline = null)
+        private static void InitializeFixedRows(
+            DataGridView dgvPhrase, 
+            Designer.Designer? designer = null)
         {
             // Add four empty rows
             for (int i = 0; i < FIXED_ROWS_COUNT; i++)
@@ -161,7 +163,10 @@ namespace Music.Writer
             dgvPhrase.Rows[FIXED_ROW_HARMONY].ReadOnly = true;
 
             // Delegate attaching the TempoTimeline to the new manager class
-            GridControlLinesManager.AttachTempoTimeline(dgvPhrase, tempoTimeline);
+            if (designer != null)
+            {
+                GridControlLinesManager.AttachTempoTimeline(dgvPhrase, designer.TempoTimeline);
+            }
         }
 
         /// <summary>

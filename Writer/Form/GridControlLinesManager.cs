@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 using Music.Designer;
 
 namespace Music.Writer
@@ -11,6 +7,9 @@ namespace Music.Writer
     /// </summary>
     internal static class GridControlLinesManager
     {
+
+        #region AttachTempoTimeline
+
         /// <summary>
         /// Public helper to attach a TempoTimeline instance to the fixed Tempo row's hidden data cell.
         /// Safe to call anytime after the grid's columns and rows have been created.
@@ -85,5 +84,9 @@ namespace Music.Writer
                 }
             }
         }
+        
+        #endregion
+
+
     }
 }
