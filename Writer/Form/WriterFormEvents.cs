@@ -39,7 +39,7 @@ namespace Music.Writer
                     continue;
 
                 // Validate instrument cell value first (may be DBNull or null)
-                var instrObj = selectedRow.Cells["colInstrument"].Value;
+                var instrObj = selectedRow.Cells["colType"].Value;
                 int programNumber = Convert.ToInt32(instrObj);
                 if (programNumber == -1)  // -1 = placeholder "Select..." -> treat as missing selection
                 {
