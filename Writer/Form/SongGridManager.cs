@@ -114,6 +114,19 @@ namespace Music.Writer
                 dgSong.Columns.Add(colMeasure);
             }
 
+            // Ensure existing columns are not sortable and make future added columns not sortable as well
+            foreach (DataGridViewColumn col in dgSong.Columns)
+            {
+                col.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            }
+
+            // This is an event handler!
+            dgSong.ColumnAdded += (s, e) =>
+            {
+                if (e?.Column != null)
+                    e.Column.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            };
+
             // Wire up event handlers
             dgSong.CellValueChanged += cellValueChangedHandler;
             dgSong.CurrentCellDirtyStateChanged += currentCellDirtyStateChangedHandler;
