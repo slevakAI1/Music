@@ -14,37 +14,37 @@ namespace Music.Writer
         /// Public helper to attach a SectionTimeline instance to the fixed Section row's hidden data cell.
         /// Safe to call anytime after the grid's columns and rows have been created.
         /// </summary>
-        /// <param name="dgvPhrase">Target DataGridView</param>
+        /// <param name="dgSong">Target DataGridView</param>
         /// <param name="sectionTimeline">SectionTimeline to store in the hidden data cell (null to skip)</param>
-        public static void AttachSectionTimeline(DataGridView dgvPhrase, SectionTimeline? sectionTimeline)
+        public static void AttachSectionTimeline(DataGridView dgSong, SectionTimeline? sectionTimeline)
         {
             if (sectionTimeline == null)
                 return;
 
-            if (!dgvPhrase.Columns.Contains("colData"))
+            if (!dgSong.Columns.Contains("colData"))
                 return;
 
-            if (dgvPhrase.Rows.Count <= SongGridManager.FIXED_ROW_SECTION)
+            if (dgSong.Rows.Count <= SongGridManager.FIXED_ROW_SECTION)
                 return;
 
             // Populate the section row with the timeline data
-            PopulateSectionRow(dgvPhrase, sectionTimeline);
+            PopulateSectionRow(dgSong, sectionTimeline);
         }
 
         /// <summary>
         /// Populates the fixed Section row with section numbers at their respective measure positions.
         /// </summary>
-        /// <param name="dgvPhrase">Target DataGridView</param>
+        /// <param name="dgSong">Target DataGridView</param>
         /// <param name="sectionTimeline">SectionTimeline containing section events</param>
-        private static void PopulateSectionRow(DataGridView dgvPhrase, SectionTimeline sectionTimeline)
+        private static void PopulateSectionRow(DataGridView dgSong, SectionTimeline sectionTimeline)
         {
             // Store the timeline in the hidden data cell
-            dgvPhrase.Rows[SongGridManager.FIXED_ROW_SECTION].Cells["colData"].Value = sectionTimeline;
+            dgSong.Rows[SongGridManager.FIXED_ROW_SECTION].Cells["colData"].Value = sectionTimeline;
 
             // Clear all existing measure cells in the section row
-            for (int colIndex = SongGridManager.MEASURE_START_COLUMN_INDEX; colIndex < dgvPhrase.Columns.Count; colIndex++)
+            for (int colIndex = SongGridManager.MEASURE_START_COLUMN_INDEX; colIndex < dgSong.Columns.Count; colIndex++)
             {
-                dgvPhrase.Rows[SongGridManager.FIXED_ROW_SECTION].Cells[colIndex].Value = string.Empty;
+                dgSong.Rows[SongGridManager.FIXED_ROW_SECTION].Cells[colIndex].Value = string.Empty;
             }
 
             if (sectionTimeline.Sections.Count == 0)
@@ -55,9 +55,9 @@ namespace Music.Writer
 
             // Ensure we have enough columns for all measures
             int requiredColumns = SongGridManager.MEASURE_START_COLUMN_INDEX + totalMeasures;
-            while (dgvPhrase.Columns.Count < requiredColumns)
+            while (dgSong.Columns.Count < requiredColumns)
             {
-                int measureNumber = dgvPhrase.Columns.Count - SongGridManager.MEASURE_START_COLUMN_INDEX + 1;
+                int measureNumber = dgSong.Columns.Count - SongGridManager.MEASURE_START_COLUMN_INDEX + 1;
                 var colMeasure = new DataGridViewTextBoxColumn
                 {
                     Name = $"colMeasure{measureNumber}",
@@ -69,7 +69,7 @@ namespace Music.Writer
                         Alignment = DataGridViewContentAlignment.MiddleCenter
                     }
                 };
-                dgvPhrase.Columns.Add(colMeasure);
+                dgSong.Columns.Add(colMeasure);
             }
 
             // Populate measure cells with section numbers
@@ -91,9 +91,9 @@ namespace Music.Writer
                     int columnIndex = SongGridManager.MEASURE_START_COLUMN_INDEX + measureIndex;
 
                     // Set the section number in the appropriate measure cell
-                    if (columnIndex < dgvPhrase.Columns.Count)
+                    if (columnIndex < dgSong.Columns.Count)
                     {
-                        dgvPhrase.Rows[SongGridManager.FIXED_ROW_SECTION].Cells[columnIndex].Value = sectionNumber.ToString();
+                        dgSong.Rows[SongGridManager.FIXED_ROW_SECTION].Cells[columnIndex].Value = sectionNumber.ToString();
                     }
                 }
             }
@@ -107,37 +107,37 @@ namespace Music.Writer
         /// Public helper to attach a TempoTimeline instance to the fixed Tempo row's hidden data cell.
         /// Safe to call anytime after the grid's columns and rows have been created.
         /// </summary>
-        /// <param name="dgvPhrase">Target DataGridView</param>
+        /// <param name="dgSong">Target DataGridView</param>
         /// <param name="tempoTimeline">TempoTimeline to store in the hidden data cell (null to skip)</param>
-        public static void AttachTempoTimeline(DataGridView dgvPhrase, TempoTimeline? tempoTimeline)
+        public static void AttachTempoTimeline(DataGridView dgSong, TempoTimeline? tempoTimeline)
         {
             if (tempoTimeline == null)
                 return;
 
-            if (!dgvPhrase.Columns.Contains("colData"))
+            if (!dgSong.Columns.Contains("colData"))
                 return;
 
-            if (dgvPhrase.Rows.Count <= SongGridManager.FIXED_ROW_TEMPO)
+            if (dgSong.Rows.Count <= SongGridManager.FIXED_ROW_TEMPO)
                 return;
 
             // Populate the tempo row with the timeline data
-            PopulateTempoRow(dgvPhrase, tempoTimeline);
+            PopulateTempoRow(dgSong, tempoTimeline);
         }
 
         /// <summary>
         /// Populates the fixed Tempo row with BPM values at their respective measure positions.
         /// </summary>
-        /// <param name="dgvPhrase">Target DataGridView</param>
+        /// <param name="dgSong">Target DataGridView</param>
         /// <param name="tempoTimeline">TempoTimeline containing tempo events</param>
-        private static void PopulateTempoRow(DataGridView dgvPhrase, TempoTimeline tempoTimeline)
+        private static void PopulateTempoRow(DataGridView dgSong, TempoTimeline tempoTimeline)
         {
             // Store the timeline in the hidden data cell
-            dgvPhrase.Rows[SongGridManager.FIXED_ROW_TEMPO].Cells["colData"].Value = tempoTimeline;
+            dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO].Cells["colData"].Value = tempoTimeline;
 
             // Clear all existing measure cells in the tempo row
-            for (int colIndex = SongGridManager.MEASURE_START_COLUMN_INDEX; colIndex < dgvPhrase.Columns.Count; colIndex++)
+            for (int colIndex = SongGridManager.MEASURE_START_COLUMN_INDEX; colIndex < dgSong.Columns.Count; colIndex++)
             {
-                dgvPhrase.Rows[SongGridManager.FIXED_ROW_TEMPO].Cells[colIndex].Value = string.Empty;
+                dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO].Cells[colIndex].Value = string.Empty;
             }
 
             if (tempoTimeline.Events.Count == 0)
@@ -153,9 +153,9 @@ namespace Music.Writer
                 int columnIndex = SongGridManager.MEASURE_START_COLUMN_INDEX + measureIndex;
 
                 // Ensure the column exists (dynamically add if needed)
-                while (dgvPhrase.Columns.Count <= columnIndex)
+                while (dgSong.Columns.Count <= columnIndex)
                 {
-                    int measureNumber = dgvPhrase.Columns.Count - SongGridManager.MEASURE_START_COLUMN_INDEX + 1;
+                    int measureNumber = dgSong.Columns.Count - SongGridManager.MEASURE_START_COLUMN_INDEX + 1;
                     var colMeasure = new DataGridViewTextBoxColumn
                     {
                         Name = $"colMeasure{measureNumber}",
@@ -167,13 +167,13 @@ namespace Music.Writer
                             Alignment = DataGridViewContentAlignment.MiddleCenter
                         }
                     };
-                    dgvPhrase.Columns.Add(colMeasure);
+                    dgSong.Columns.Add(colMeasure);
                 }
 
                 // Set the BPM value in the appropriate measure cell
-                if (columnIndex < dgvPhrase.Columns.Count)
+                if (columnIndex < dgSong.Columns.Count)
                 {
-                    dgvPhrase.Rows[SongGridManager.FIXED_ROW_TEMPO].Cells[columnIndex].Value = tempoEvent.TempoBpm.ToString();
+                    dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO].Cells[columnIndex].Value = tempoEvent.TempoBpm.ToString();
                 }
             }
         }

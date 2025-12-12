@@ -46,7 +46,18 @@ namespace Music.Writer
             dgSong.ReadOnly = false;
             dgSong.Columns.Clear();
 
-            // Column 0: Type column - text for fixed rows, combo box for song rows
+            // Column 0: Event number (read-only)
+            var colEventNumber = new DataGridViewTextBoxColumn
+            {
+                Name = "colEventNumber",
+                HeaderText = "#",
+                Width = 50,
+                ReadOnly = true
+            };
+
+            dgSong.Columns.Add(colEventNumber);
+
+            // Column 1: Type column - text for fixed rows, combo box for song rows
             var colType = new DataGridViewTextBoxColumn
             {
                 Name = "colType",
@@ -56,7 +67,8 @@ namespace Music.Writer
             };
             dgSong.Columns.Add(colType);
 
-            // Column 1: Hidden column containing the data object
+
+            // Column 2: Hidden column containing the data object
             var colData = new DataGridViewTextBoxColumn
             {
                 Name = "colData",
@@ -65,16 +77,6 @@ namespace Music.Writer
                 ReadOnly = true
             };
             dgSong.Columns.Add(colData);
-
-            // Column 2: Event number (read-only)
-            var colEventNumber = new DataGridViewTextBoxColumn
-            {
-                Name = "colEventNumber",
-                HeaderText = "#",
-                Width = 50,
-                ReadOnly = true
-            };
-            dgSong.Columns.Add(colEventNumber);
 
             // Column 3: Description (read-only for now)
             var colDescription = new DataGridViewTextBoxColumn

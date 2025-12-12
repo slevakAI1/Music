@@ -63,12 +63,12 @@ namespace Music.Writer
 
             cbCommand.SelectedIndex = 0;
 
-            // Configure dgvPhrases with MIDI instrument dropdown
+            // Configure dgSong with MIDI instrument dropdown
             SongGridManager.ConfigureSongGridView(
                 dgSong,
                 _midiInstruments,
-                DgvPhrase_CellValueChanged,
-                DgvPhrase_CurrentCellDirtyStateChanged,
+                dgSong_CellValueChanged,
+                dgSong_CurrentCellDirtyStateChanged,
                 _designer);
 
             // ====================   T H I S   H A S   T O   B E   L A S T  !   =================
@@ -81,7 +81,7 @@ namespace Music.Writer
         /// <summary>
         /// Commits the combo box edit immediately so CellValueChanged fires.
         /// </summary>
-        private void DgvPhrase_CurrentCellDirtyStateChanged(object? sender, EventArgs e)
+        private void dgSong_CurrentCellDirtyStateChanged(object? sender, EventArgs e)
         {
             SongGridManager.HandleCurrentCellDirtyStateChanged(dgSong, sender, e);
         }
@@ -89,7 +89,7 @@ namespace Music.Writer
         /// <summary>
         /// Updates the Phrase object's MidiProgramName when the user changes the instrument selection.
         /// </summary>
-        private void DgvPhrase_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
+        private void dgSong_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
         {
             SongGridManager.HandleCellValueChanged(dgSong, sender, e);
         }
@@ -97,7 +97,7 @@ namespace Music.Writer
         /// <summary>
         /// Opens a JSON viewer when the user double-clicks on the Phrase column.
         /// </summary>
-        private void DgvPhrase_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
+        private void dgSong_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
         {
             HandlePhraseDoubleClick(e);
         }
