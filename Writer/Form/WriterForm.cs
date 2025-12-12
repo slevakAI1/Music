@@ -47,8 +47,8 @@ namespace Music.Writer
             _designer = Globals.Designer;
             txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
 
-            dgvPhrase.DefaultCellStyle.ForeColor = Color.Black; // had trouble setting this in the forms designer
-            dgvPhrase.DefaultCellStyle.BackColor = Color.White;
+            dgSong.DefaultCellStyle.ForeColor = Color.Black; // had trouble setting this in the forms designer
+            dgSong.DefaultCellStyle.BackColor = Color.White;
 
 
             // Initialize comboboxes - doesn't seem to be a way to set a default in the designer or form.
@@ -65,7 +65,7 @@ namespace Music.Writer
 
             // Configure dgvPhrases with MIDI instrument dropdown
             PhraseGridManager.ConfigurePhraseDataGridView(
-                dgvPhrase,
+                dgSong,
                 _midiInstruments,
                 DgvPhrase_CellValueChanged,
                 DgvPhrase_CurrentCellDirtyStateChanged,
@@ -83,7 +83,7 @@ namespace Music.Writer
         /// </summary>
         private void DgvPhrase_CurrentCellDirtyStateChanged(object? sender, EventArgs e)
         {
-            PhraseGridManager.HandleCurrentCellDirtyStateChanged(dgvPhrase, sender, e);
+            PhraseGridManager.HandleCurrentCellDirtyStateChanged(dgSong, sender, e);
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Music.Writer
         /// </summary>
         private void DgvPhrase_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
         {
-            PhraseGridManager.HandleCellValueChanged(dgvPhrase, sender, e);
+            PhraseGridManager.HandleCellValueChanged(dgSong, sender, e);
         }
 
         /// <summary>

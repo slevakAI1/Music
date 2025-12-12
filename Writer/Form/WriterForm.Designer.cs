@@ -103,7 +103,7 @@ namespace Music.Writer
             groupBox3 = new GroupBox();
             btnExecute = new Button();
             grbCurrentDesign = new GroupBox();
-            gbWriter = new GroupBox();
+            gbSong = new GroupBox();
             btnPause = new Button();
             btnClear = new Button();
             btnStop = new Button();
@@ -113,7 +113,7 @@ namespace Music.Writer
             btnDeletePhrases = new Button();
             btnClearAllPhrases = new Button();
             btnPlayPhrases = new Button();
-            dgvPhrase = new DataGridView();
+            dgSong = new DataGridView();
             grbParts.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -130,8 +130,8 @@ namespace Music.Writer
             grpScoreList.SuspendLayout();
             groupBox3.SuspendLayout();
             grbCurrentDesign.SuspendLayout();
-            gbWriter.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dgvPhrase).BeginInit();
+            gbSong.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgSong).BeginInit();
             SuspendLayout();
             // 
             // cbCommand
@@ -766,26 +766,26 @@ namespace Music.Writer
             grbCurrentDesign.TabStop = false;
             grbCurrentDesign.Text = "Current Design";
             // 
-            // gbWriter
+            // gbSong
             // 
-            gbWriter.BackColor = Color.Black;
-            gbWriter.Controls.Add(btnPause);
-            gbWriter.Controls.Add(btnClear);
-            gbWriter.Controls.Add(btnStop);
-            gbWriter.Controls.Add(btnExport);
-            gbWriter.Controls.Add(btnImport);
-            gbWriter.Controls.Add(btnAddPhrase);
-            gbWriter.Controls.Add(btnDeletePhrases);
-            gbWriter.Controls.Add(btnClearAllPhrases);
-            gbWriter.Controls.Add(btnPlayPhrases);
-            gbWriter.Controls.Add(dgvPhrase);
-            gbWriter.ForeColor = Color.White;
-            gbWriter.Location = new Point(12, 12);
-            gbWriter.Name = "gbWriter";
-            gbWriter.Size = new Size(1900, 581);
-            gbWriter.TabIndex = 36;
-            gbWriter.TabStop = false;
-            gbWriter.Text = "Writer";
+            gbSong.BackColor = Color.Black;
+            gbSong.Controls.Add(btnPause);
+            gbSong.Controls.Add(btnClear);
+            gbSong.Controls.Add(btnStop);
+            gbSong.Controls.Add(btnExport);
+            gbSong.Controls.Add(btnImport);
+            gbSong.Controls.Add(btnAddPhrase);
+            gbSong.Controls.Add(btnDeletePhrases);
+            gbSong.Controls.Add(btnClearAllPhrases);
+            gbSong.Controls.Add(btnPlayPhrases);
+            gbSong.Controls.Add(dgSong);
+            gbSong.ForeColor = Color.White;
+            gbSong.Location = new Point(12, 12);
+            gbSong.Name = "gbSong";
+            gbSong.Size = new Size(1900, 581);
+            gbSong.TabIndex = 36;
+            gbSong.TabStop = false;
+            gbSong.Text = "Song";
             // 
             // btnPause
             // 
@@ -886,17 +886,17 @@ namespace Music.Writer
             btnPlayPhrases.UseVisualStyleBackColor = true;
             btnPlayPhrases.Click += btnPlay_Click;
             // 
-            // dgvPhrase
+            // dgSong
             // 
-            dgvPhrase.AllowUserToAddRows = false;
-            dgvPhrase.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvPhrase.Location = new Point(15, 19);
-            dgvPhrase.Name = "dgvPhrase";
-            dgvPhrase.ReadOnly = true;
-            dgvPhrase.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvPhrase.Size = new Size(1864, 503);
-            dgvPhrase.TabIndex = 37;
-            dgvPhrase.CellDoubleClick += DgvPhrase_CellDoubleClick;
+            dgSong.AllowUserToAddRows = false;
+            dgSong.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgSong.Location = new Point(15, 19);
+            dgSong.Name = "dgSong";
+            dgSong.ReadOnly = true;
+            dgSong.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgSong.Size = new Size(1864, 503);
+            dgSong.TabIndex = 37;
+            dgSong.CellDoubleClick += DgvPhrase_CellDoubleClick;
             // 
             // WriterForm
             // 
@@ -913,7 +913,7 @@ namespace Music.Writer
             Controls.Add(grbParts);
             Controls.Add(grpPitch);
             Controls.Add(groupBox3);
-            Controls.Add(gbWriter);
+            Controls.Add(gbSong);
             Name = "WriterForm";
             Text = "Music Writer";
             grbParts.ResumeLayout(false);
@@ -940,8 +940,8 @@ namespace Music.Writer
             groupBox3.ResumeLayout(false);
             grbCurrentDesign.ResumeLayout(false);
             grbCurrentDesign.PerformLayout();
-            gbWriter.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dgvPhrase).EndInit();
+            gbSong.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgSong).EndInit();
             ResumeLayout(false);
         }
         private GroupBox groupBox1;
@@ -980,9 +980,9 @@ namespace Music.Writer
         private TextBox txtTupletNumber;
         private GroupBox groupBox3;
         private GroupBox grbCurrentDesign;
-        private GroupBox gbWriter;
+        private GroupBox gbSong;
         private Button btnExecute;
-        private DataGridView dgvPhrase;
+        private DataGridView dgSong;
         private Button btnPlayPhrases;
         private Button btnDeletePhrases;
         private Button btnClearAllPhrases;

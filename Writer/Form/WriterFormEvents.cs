@@ -13,14 +13,14 @@ namespace Music.Writer
         public async Task HandlePlayAsync()
         {
             // Check if there are any phrase rows in the grid (excluding fixed rows)
-            if (dgvPhrase.Rows.Count <= PhraseGridManager.FIXED_ROWS_COUNT)
+            if (dgSong.Rows.Count <= PhraseGridManager.FIXED_ROWS_COUNT)
             {
                 MessageBox.Show(this, "No pitch events to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
             // Check if a phrase row is selected
-            var hasPhraseSelection = dgvPhrase.SelectedRows
+            var hasPhraseSelection = dgSong.SelectedRows
                 .Cast<DataGridViewRow>()
                 .Any(r => r.Index >= PhraseGridManager.FIXED_ROWS_COUNT);
 
@@ -32,7 +32,7 @@ namespace Music.Writer
 
             // Build list of Phrase from all selected phrase rows (skip fixed rows)
             var phrases = new List<Phrase>();
-            foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
+            foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
                 // Skip fixed rows
                 if (selectedRow.Index < PhraseGridManager.FIXED_ROWS_COUNT)
@@ -85,14 +85,14 @@ namespace Music.Writer
         public void HandleExport()
         {
             // Check if there are any phrase rows in the grid (excluding fixed rows)
-            if (dgvPhrase.Rows.Count <= PhraseGridManager.FIXED_ROWS_COUNT)
+            if (dgSong.Rows.Count <= PhraseGridManager.FIXED_ROWS_COUNT)
             {
                 MessageBox.Show(this, "No pitch events to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
             // Check if a phrase row is selected
-            var hasPhraseSelection = dgvPhrase.SelectedRows
+            var hasPhraseSelection = dgSong.SelectedRows
                 .Cast<DataGridViewRow>()
                 .Any(r => r.Index >= PhraseGridManager.FIXED_ROWS_COUNT);
 
@@ -104,7 +104,7 @@ namespace Music.Writer
 
             // Build list of Phrase from all selected phrase rows (skip fixed rows)
             var phrases = new List<Phrase>();
-            foreach (DataGridViewRow selectedRow in dgvPhrase.SelectedRows)
+            foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
                 // Skip fixed rows
                 if (selectedRow.Index < PhraseGridManager.FIXED_ROWS_COUNT)
@@ -238,7 +238,7 @@ namespace Music.Writer
                     PhraseGridManager.AddPhraseToGrid(
                         phrase,
                         _midiInstruments,
-                        dgvPhrase,
+                        dgSong,
                         ref phraseNumber);
                 }
 
@@ -280,7 +280,7 @@ namespace Music.Writer
             // TO DO - Populate all 4 fixed control lines
 
 
-            GridControlLinesManager.AttachTempoTimeline(dgvPhrase, _designer.TempoTimeline);
+            GridControlLinesManager.AttachTempoTimeline(dgSong, _designer.TempoTimeline);
 
 
 
@@ -428,7 +428,7 @@ namespace Music.Writer
             if (e.ColumnIndex < PhraseGridManager.MEASURE_START_COLUMN_INDEX)
                 return;
 
-            var row = dgvPhrase.Rows[e.RowIndex];
+            var row = dgSong.Rows[e.RowIndex];
             var phraseData = row.Cells["colData"].Value;
 
             // Validate that we have a Phrase object
