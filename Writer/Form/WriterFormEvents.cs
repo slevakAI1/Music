@@ -275,7 +275,15 @@ namespace Music.Writer
         {
             _designer ??= new Designer.Designer();
             DesignerTests.SetTestDesignD1(_designer);
-            PhraseGridManager.AttachTempoTimeline(dgvPhrase, _designer.TempoTimeline);
+
+
+            // TO DO - Populate all 4 fixed control lines
+
+
+            GridControlLinesManager.AttachTempoTimeline(dgvPhrase, _designer.TempoTimeline);
+
+
+
             txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
         }
 
