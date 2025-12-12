@@ -174,9 +174,10 @@ namespace Music.Writer
             sepRow.DefaultCellStyle.SelectionBackColor = Color.Black;
             sepRow.DefaultCellStyle.SelectionForeColor = Color.White;
 
-            // Delegate attaching the TempoTimeline to the new manager class
+            // Delegate attaching the control lines to the control line manager class
             if (designer != null)
             {
+                GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, designer.TimeSignatureTimeline);
                 GridControlLinesManager.AttachTempoTimeline(dgSong, designer.TempoTimeline);
             }
         }

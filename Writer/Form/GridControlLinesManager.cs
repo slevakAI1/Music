@@ -101,6 +101,86 @@ namespace Music.Writer
 
         #endregion
 
+        #region AttachTimeSignatureTimeline
+
+        /// <summary>
+        /// Public helper to attach a TimeSignatureTimeline instance to the fixed Time Signature row's hidden data cell.
+        /// Safe to call anytime after the grid's columns and rows have been created.
+        /// </summary>
+        /// <param name="dgSong">Target DataGridView</param>
+        /// <param name="timeSignatureTimeline">TimeSignatureTimeline to store in the hidden data cell (null to skip)</param>
+        public static void AttachTimeSignatureTimeline(DataGridView dgSong, TimeSignatureTimeline? timeSignatureTimeline)
+        {
+            if (timeSignatureTimeline == null)
+                return;
+
+            if (!dgSong.Columns.Contains("colData"))
+                return;
+
+            if (dgSong.Rows.Count <= SongGridManager.FIXED_ROW_TIME_SIGNATURE)
+                return;
+
+            // Populate the time signature row with the timeline data
+            PopulateTimeSignatureRow(dgSong, timeSignatureTimeline);
+        }
+
+        /// <summary>
+        /// Populates the fixed Time Signature row with time signature values at their respective measure positions.
+        /// </summary>
+        /// <param name="dgSong">Target DataGridView</param>
+        /// <param name="timeSignatureTimeline">TimeSignatureTimeline containing time signature events</param>
+        private static void PopulateTimeSignatureRow(DataGridView dgSong, TimeSignatureTimeline timeSignatureTimeline)
+        {
+            // Store the timeline in the hidden data cell
+            dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE].Cells["colData"].Value = timeSignatureTimeline;
+
+            // Clear all existing measure cells in the time signature row
+            for (int colIndex = SongGridManager.MEASURE_START_COLUMN_INDEX; colIndex < dgSong.Columns.Count; colIndex++)
+            {
+                dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE].Cells[colIndex].Value = string.Empty;
+            }
+
+            if (timeSignatureTimeline.Events.Count == 0)
+                return;
+
+            // Populate measure cells with time signature at the starting bar of each time signature event
+            foreach (var timeSignatureEvent in timeSignatureTimeline.Events)
+            {
+                // Convert 1-based bar number to 0-based measure index
+                int measureIndex = timeSignatureEvent.StartBar - 1;
+                
+                // Calculate the column index for this measure
+                int columnIndex = SongGridManager.MEASURE_START_COLUMN_INDEX + measureIndex;
+
+                // Ensure the column exists (dynamically add if needed)
+                while (dgSong.Columns.Count <= columnIndex)
+                {
+                    int measureNumber = dgSong.Columns.Count - SongGridManager.MEASURE_START_COLUMN_INDEX + 1;
+                    var colMeasure = new DataGridViewTextBoxColumn
+                    {
+                        Name = $"colMeasure{measureNumber}",
+                        HeaderText = $"{measureNumber}",
+                        Width = 40,
+                        ReadOnly = true,
+                        DefaultCellStyle = new DataGridViewCellStyle
+                        {
+                            Alignment = DataGridViewContentAlignment.MiddleCenter
+                        }
+                    };
+                    dgSong.Columns.Add(colMeasure);
+                }
+
+                // Set the time signature value in the appropriate measure cell (format: "numerator/denominator")
+                if (columnIndex < dgSong.Columns.Count)
+                {
+                    dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE].Cells[columnIndex].Value = 
+                        $"{timeSignatureEvent.Numerator}/{timeSignatureEvent.Denominator}";
+                }
+            }
+        }
+        
+        #endregion
+
         #region AttachTempoTimeline
 
         /// <summary>
