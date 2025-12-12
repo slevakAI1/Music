@@ -1,4 +1,14 @@
 ﻿
+GREAT IDEA - tag notes with "favored note" if its in the prior harmony as well as current< maybe first half of time chunk it checks before, 
+and last half checks forward harmony notes. Maybe super favored if in both.
+
+
+
+
+
+
+
+
 
 
 Below is a focused explanation of each element and how they work together in the ScoreDesign class.

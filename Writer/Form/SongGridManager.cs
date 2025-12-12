@@ -1,5 +1,6 @@
 using Music.MyMidi;
 using Music.Designer;
+using System.Drawing;
 
 namespace Music.Writer
 {
@@ -117,38 +118,56 @@ namespace Music.Writer
             dgSong.CellValueChanged += cellValueChangedHandler;
             dgSong.CurrentCellDirtyStateChanged += currentCellDirtyStateChangedHandler;
 
-            // Add the four fixed rows at the top and optionally attach tempoTimeline to the hidden data cell
+            // Add the fixed rows at the top and optionally attach tempoTimeline to the hidden data cell
             InitializeFixedRows(dgSong, midiInstruments, designer);
         }
 
         /// <summary>
-        /// Initializes the four fixed rows at the top of the grid.
+        /// Initializes the fixed rows at the top of the grid.
         /// Entire fixed rows are set to ReadOnly so users cannot edit them.
         /// If a TempoTimeline is provided it will be stored in the fixed Tempo row's hidden data cell.
+        /// The separator row is styled with black background and white foreground.
         /// </summary>
         private static void InitializeFixedRows(
             DataGridView dgSong,
             List<MidiInstrument> midiInstruments,
             Designer.Designer? designer = null)
         {
-            // Add four empty rows
+            // Add fixed rows
             for (int i = 0; i < FIXED_ROWS_COUNT; i++)
             {
                 dgSong.Rows.Add();
             }
 
-            // Set Type column values for the fixed rows and mark each cell read-only
+            // Set Type column values for the fixed rows and mark each row read-only
             dgSong.Rows[FIXED_ROW_SECTION].Cells["colType"].Value = "Section";
             dgSong.Rows[FIXED_ROW_SECTION].Cells["colType"].ReadOnly = true;
+            dgSong.Rows[FIXED_ROW_SECTION].ReadOnly = true;
 
             dgSong.Rows[FIXED_ROW_TIME_SIGNATURE].Cells["colType"].Value = "Time Signature";
             dgSong.Rows[FIXED_ROW_TIME_SIGNATURE].Cells["colType"].ReadOnly = true;
+            dgSong.Rows[FIXED_ROW_TIME_SIGNATURE].ReadOnly = true;
 
             dgSong.Rows[FIXED_ROW_HARMONY].Cells["colType"].Value = "Harmony";
             dgSong.Rows[FIXED_ROW_HARMONY].Cells["colType"].ReadOnly = true;
+            dgSong.Rows[FIXED_ROW_HARMONY].ReadOnly = true;
 
             dgSong.Rows[FIXED_ROW_TEMPO].Cells["colType"].Value = "Tempo";
             dgSong.Rows[FIXED_ROW_TEMPO].Cells["colType"].ReadOnly = true;
+            dgSong.Rows[FIXED_ROW_TEMPO].ReadOnly = true;
+
+            // Separator row: style black background and white foreground across entire row
+            var sepRow = dgSong.Rows[FIXED_ROW_SEPARATOR];
+            // ensure the Type cell exists and is readonly
+            sepRow.Cells["colType"].Value = string.Empty;
+            sepRow.Cells["colType"].ReadOnly = true;
+            sepRow.ReadOnly = true;
+
+            // Apply row styling (including selection colors so selection doesn't hide the appearance)
+            sepRow.DefaultCellStyle.BackColor = Color.Black;
+            sepRow.DefaultCellStyle.ForeColor = Color.White;
+            sepRow.DefaultCellStyle.SelectionBackColor = Color.Black;
+            sepRow.DefaultCellStyle.SelectionForeColor = Color.White;
 
             // Delegate attaching the TempoTimeline to the new manager class
             if (designer != null)
