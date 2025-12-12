@@ -36,6 +36,121 @@ namespace Music.Writer
         }
 
         /// <summary>
+        /// Converts chord parameters to standard chord notation symbol (e.g., "Cmaj7", "Am", "G7/B").
+        /// </summary>
+        /// <param name="key">The key (e.g., "C major", "F# minor")</param>
+        /// <param name="degree">The scale degree (1-7)</param>
+        /// <param name="quality">The chord quality (e.g., "Major", "Minor7", "Dominant7")</param>
+        /// <param name="bass">The bass note (e.g., "root", "3rd", "5th")</param>
+        /// <returns>Chord symbol notation string</returns>
+        public static string ConvertToChordNotation(string key, int degree, string quality, string bass)
+        {
+            // Parse key to get root and mode
+            var parts = key.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var keyRoot = parts[0];
+            var mode = parts[1];
+
+            // Build scale intervals (major or natural minor)
+            int[] intervals = mode.Equals("major", StringComparison.OrdinalIgnoreCase)
+                ? new[] { 0, 2, 4, 5, 7, 9, 11 }  // Major scale
+                : new[] { 0, 2, 3, 5, 7, 8, 10 }; // Natural minor scale
+
+            // Get root note of the chord based on degree
+            var rootSemitones = intervals[degree - 1];
+            var chordRoot = TransposeNote(keyRoot, rootSemitones);
+
+            // Map quality to chord symbol suffix
+            var suffix = quality switch
+            {
+                "Major" => "",
+                "Minor" => "m",
+                "Diminished" => "dim",
+                "Augmented" => "aug",
+                "Dominant7" => "7",
+                "Major7" => "maj7",
+                "Minor7" => "m7",
+                "Diminished7" => "dim7",
+                "HalfDiminished7" => "m7b5",
+                "MinorMajor7" => "m(maj7)",
+                "Major6" => "6",
+                "Minor6" => "m6",
+                "Sus2" => "sus2",
+                "Sus4" => "sus4",
+                "Power5" => "5",
+                "Dominant9" => "9",
+                "Major9" => "maj9",
+                "Minor9" => "m9",
+                "Dominant11" => "11",
+                "Dominant13" => "13",
+                "MajorAdd9" => "add9",
+                "MajorAdd11" => "add11",
+                "Major6Add9" => "6/9",
+                _ => ""
+            };
+
+            // Build base chord symbol
+            var symbol = $"{chordRoot}{suffix}";
+
+            // Add slash chord notation if not root position
+            if (!bass.Equals("root", StringComparison.OrdinalIgnoreCase))
+            {
+                var bassInterval = bass.ToLowerInvariant() switch
+                {
+                    "3rd" => GetChordInterval(quality, 1),
+                    "5th" => GetChordInterval(quality, 2),
+                    "7th" => GetChordInterval(quality, 3),
+                    _ => 0
+                };
+                if (bassInterval > 0)
+                {
+                    var bassNote = TransposeNote(chordRoot, bassInterval);
+                    symbol = $"{symbol}/{bassNote}";
+                }
+            }
+
+            return symbol;
+        }
+
+        private static string TransposeNote(string note, int semitones)
+        {
+            var noteNames = new[] { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
+            var flatNames = new[] { "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B" };
+
+            // Parse input note
+            var baseNote = note[0].ToString().ToUpper();
+            var accidental = note.Length > 1 ? note[1] : ' ';
+
+            // Find starting position
+            var startIndex = Array.FindIndex(noteNames, n => n[0] == baseNote[0]);
+            if (accidental == '#') startIndex++;
+            if (accidental == 'b') startIndex--;
+
+            // Transpose
+            var newIndex = (startIndex + semitones) % 12;
+            if (newIndex < 0) newIndex += 12;
+
+            // Prefer sharps unless original used flats
+            return accidental == 'b' ? flatNames[newIndex] : noteNames[newIndex];
+        }
+
+        private static int GetChordInterval(string quality, int noteIndex)
+        {
+            // Get semitones for 3rd, 5th, 7th, etc. based on chord quality
+            return (quality, noteIndex) switch
+            {
+                (_, 0) => 0, // Root
+                ("Major", 1) or ("Major7", 1) or ("Major6", 1) or ("Dominant7", 1) or ("Dominant9", 1) => 4, // Major 3rd
+                ("Minor", 1) or ("Minor7", 1) or ("Minor6", 1) or ("Diminished", 1) or ("HalfDiminished7", 1) => 3, // Minor 3rd
+                ("Diminished", 2) or ("Diminished7", 2) or ("HalfDiminished7", 2) => 6, // Diminished 5th
+                (_, 2) => 7, // Perfect 5th (most common)
+                ("Major7", 3) => 11, // Major 7th
+                ("Dominant7", 3) or ("Minor7", 3) or ("HalfDiminished7", 3) => 10, // Minor 7th
+                ("Diminished7", 3) => 9, // Diminished 7th
+                _ => 0
+            };
+        }
+
+        /// <summary>
         /// Calculates MIDI note number from musical note components.
         /// </summary>
         /// <param name="step">The note step (C, D, E, F, G, A, B)</param>
