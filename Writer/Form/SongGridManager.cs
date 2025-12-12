@@ -18,8 +18,8 @@ namespace Music.Writer
         internal const int FIXED_ROW_SEPARATOR = 4;
         internal const int FIXED_ROWS_COUNT = 5;
 
-        // Index where measure columns begin (reduced by 1 due to column consolidation)
-        internal const int MEASURE_START_COLUMN_INDEX = 6;
+        // Index where measure columns begin (adjusted because the Stave column was removed)
+        internal const int MEASURE_START_COLUMN_INDEX = 4;
 
         // Default number of measure columns to create initially
         private const int DEFAULT_MEASURE_COLUMNS = 32;
@@ -66,17 +66,7 @@ namespace Music.Writer
             };
             dgSong.Columns.Add(colData);
 
-            // Column 2: Stave
-            var colStaff = new DataGridViewTextBoxColumn
-            {
-                Name = "colStave",
-                HeaderText = "Stave",
-                Width = 40,
-                ReadOnly = false
-            };
-            dgSong.Columns.Add(colStaff);
-
-            // Column 3: Event number (read-only)
+            // Column 2: Event number (read-only)
             var colEventNumber = new DataGridViewTextBoxColumn
             {
                 Name = "colEventNumber",
@@ -86,7 +76,7 @@ namespace Music.Writer
             };
             dgSong.Columns.Add(colEventNumber);
 
-            // Column 4: Description (read-only for now)
+            // Column 3: Description (read-only for now)
             var colDescription = new DataGridViewTextBoxColumn
             {
                 Name = "colDescription",
@@ -96,7 +86,7 @@ namespace Music.Writer
             };
             dgSong.Columns.Add(colDescription);
 
-            // Columns 5+: Measure columns (dynamically created)
+            // Columns 4+: Measure columns (dynamically created)
             // Create initial set of measure columns
             for (int i = 0; i < DEFAULT_MEASURE_COLUMNS; i++)
             {
@@ -356,13 +346,10 @@ namespace Music.Writer
 
             row.Cells["colType"].Value = programNumberToSet;
 
-            // Column 2: Stave - default to 1 for newly added rows
-            row.Cells["colStave"].Value = 1;
-
-            // Column 3: Event number
+            // Column 2: Event number
             row.Cells["colEventNumber"].Value = rowName;
 
-            // Column 4: Description
+            // Column 3: Description
             if (!string.IsNullOrEmpty(partName) && partName != "Select...")
             {
                 row.Cells["colDescription"].Value = $"Part: {partName}";
@@ -372,7 +359,7 @@ namespace Music.Writer
                 row.Cells["colDescription"].Value = string.Empty;
             }
 
-            // Populate measure cells (columns 5+) with note counts per measure
+            // Populate measure cells (columns 4+) with note counts per measure
             PopulateMeasureCells(dgSong, newRowIndex);
         }
     }
