@@ -28,11 +28,6 @@ namespace Music.Writer
         private System.Windows.Forms.NumericUpDown numDegree;
         private System.Windows.Forms.Label lblOctaveKR;
 
-        private System.Windows.Forms.Button btnAppend;
-
-        // ScoreList management controls
-        private System.Windows.Forms.GroupBox grpScoreList;
-
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -50,7 +45,6 @@ namespace Music.Writer
             clbParts = new CheckedListBox();
             lblStaff = new Label();
             clbStaffs = new CheckedListBox();
-            btnAppend = new Button();
             grpPitch = new GroupBox();
             grpChord = new GroupBox();
             lblKey = new Label();
@@ -93,12 +87,7 @@ namespace Music.Writer
             btnSetDesignTestScenarioD1 = new Button();
             btnChordTest = new Button();
             btnUpdateFormFromDesigner = new Button();
-            lblScoreReport = new Label();
-            txtScoreReport = new TextBox();
             btnExportToNotion = new Button();
-            grpScoreList = new GroupBox();
-            txtMovementTitle = new TextBox();
-            btnNewScore = new Button();
             groupBox3 = new GroupBox();
             btnExecute = new Button();
             gbSong = new GroupBox();
@@ -125,7 +114,6 @@ namespace Music.Writer
             ((System.ComponentModel.ISupportInitialize)numDots).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numTupletCount).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numTupletOf).BeginInit();
-            grpScoreList.SuspendLayout();
             groupBox3.SuspendLayout();
             gbSong.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgSong).BeginInit();
@@ -193,16 +181,6 @@ namespace Music.Writer
             clbStaffs.Name = "clbStaffs";
             clbStaffs.Size = new Size(120, 40);
             clbStaffs.TabIndex = 6;
-            // 
-            // btnAppend
-            // 
-            btnAppend.ForeColor = Color.Red;
-            btnAppend.Location = new Point(93, 237);
-            btnAppend.Name = "btnAppend";
-            btnAppend.Size = new Size(148, 22);
-            btnAppend.TabIndex = 4;
-            btnAppend.Text = "Old Append to Score?";
-            btnAppend.UseVisualStyleBackColor = true;
             // 
             // grpPitch
             // 
@@ -609,7 +587,7 @@ namespace Music.Writer
             btnSetWriterTestScenarioG1.ForeColor = Color.FromArgb(0, 192, 0);
             btnSetWriterTestScenarioG1.Location = new Point(333, 612);
             btnSetWriterTestScenarioG1.Name = "btnSetWriterTestScenarioG1";
-            btnSetWriterTestScenarioG1.Size = new Size(196, 23);
+            btnSetWriterTestScenarioG1.Size = new Size(196, 33);
             btnSetWriterTestScenarioG1.TabIndex = 8;
             btnSetWriterTestScenarioG1.Text = "Set Writer - Test Scenario G1";
             btnSetWriterTestScenarioG1.UseVisualStyleBackColor = false;
@@ -621,7 +599,7 @@ namespace Music.Writer
             btnSetDesignTestScenarioD1.ForeColor = Color.FromArgb(0, 192, 0);
             btnSetDesignTestScenarioD1.Location = new Point(139, 612);
             btnSetDesignTestScenarioD1.Name = "btnSetDesignTestScenarioD1";
-            btnSetDesignTestScenarioD1.Size = new Size(179, 23);
+            btnSetDesignTestScenarioD1.Size = new Size(179, 33);
             btnSetDesignTestScenarioD1.TabIndex = 10;
             btnSetDesignTestScenarioD1.Text = "Set Design - Test Scenario D1";
             btnSetDesignTestScenarioD1.UseVisualStyleBackColor = false;
@@ -631,9 +609,9 @@ namespace Music.Writer
             // 
             btnChordTest.Enabled = false;
             btnChordTest.ForeColor = Color.Red;
-            btnChordTest.Location = new Point(1706, 719);
+            btnChordTest.Location = new Point(1839, 921);
             btnChordTest.Name = "btnChordTest";
-            btnChordTest.Size = new Size(196, 23);
+            btnChordTest.Size = new Size(78, 23);
             btnChordTest.TabIndex = 11;
             btnChordTest.Text = "Chord Test";
             btnChordTest.UseVisualStyleBackColor = true;
@@ -643,80 +621,24 @@ namespace Music.Writer
             // 
             btnUpdateFormFromDesigner.Enabled = false;
             btnUpdateFormFromDesigner.ForeColor = Color.Red;
-            btnUpdateFormFromDesigner.Location = new Point(1706, 690);
+            btnUpdateFormFromDesigner.Location = new Point(1786, 970);
             btnUpdateFormFromDesigner.Name = "btnUpdateFormFromDesigner";
-            btnUpdateFormFromDesigner.Size = new Size(196, 23);
+            btnUpdateFormFromDesigner.Size = new Size(136, 23);
             btnUpdateFormFromDesigner.TabIndex = 13;
             btnUpdateFormFromDesigner.Text = "Update From Designer";
             btnUpdateFormFromDesigner.UseVisualStyleBackColor = true;
             btnUpdateFormFromDesigner.Click += btnUpdateFormFromDesigner_Click;
             // 
-            // lblScoreReport
-            // 
-            lblScoreReport.AutoSize = true;
-            lblScoreReport.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblScoreReport.ForeColor = Color.FromArgb(0, 192, 0);
-            lblScoreReport.Location = new Point(120, 22);
-            lblScoreReport.Name = "lblScoreReport";
-            lblScoreReport.Size = new Size(51, 17);
-            lblScoreReport.TabIndex = 29;
-            lblScoreReport.Text = "Current";
-            // 
-            // txtScoreReport
-            // 
-            txtScoreReport.Location = new Point(16, 26);
-            txtScoreReport.Multiline = true;
-            txtScoreReport.Name = "txtScoreReport";
-            txtScoreReport.ScrollBars = ScrollBars.Vertical;
-            txtScoreReport.Size = new Size(324, 200);
-            txtScoreReport.TabIndex = 28;
-            // 
             // btnExportToNotion
             // 
             btnExportToNotion.ForeColor = Color.FromArgb(0, 192, 0);
-            btnExportToNotion.Location = new Point(1706, 661);
+            btnExportToNotion.Location = new Point(1804, 946);
             btnExportToNotion.Name = "btnExportToNotion";
             btnExportToNotion.Size = new Size(114, 23);
             btnExportToNotion.TabIndex = 30;
             btnExportToNotion.Text = "Export to Notion";
             btnExportToNotion.UseVisualStyleBackColor = true;
             btnExportToNotion.Click += btnExportToNotion_Click;
-            // 
-            // grpScoreList
-            // 
-            grpScoreList.BackColor = Color.Black;
-            grpScoreList.Controls.Add(txtMovementTitle);
-            grpScoreList.Controls.Add(btnNewScore);
-            grpScoreList.Controls.Add(btnAppend);
-            grpScoreList.Controls.Add(lblScoreReport);
-            grpScoreList.Controls.Add(txtScoreReport);
-            grpScoreList.ForeColor = Color.White;
-            grpScoreList.Location = new Point(1706, 769);
-            grpScoreList.Name = "grpScoreList";
-            grpScoreList.Size = new Size(610, 328);
-            grpScoreList.TabIndex = 31;
-            grpScoreList.TabStop = false;
-            grpScoreList.Text = "Current Score";
-            // 
-            // txtMovementTitle
-            // 
-            txtMovementTitle.ForeColor = Color.FromArgb(0, 192, 0);
-            txtMovementTitle.Location = new Point(260, 271);
-            txtMovementTitle.Name = "txtMovementTitle";
-            txtMovementTitle.PlaceholderText = "Movement Title";
-            txtMovementTitle.Size = new Size(250, 23);
-            txtMovementTitle.TabIndex = 31;
-            // 
-            // btnNewScore
-            // 
-            btnNewScore.ForeColor = Color.Red;
-            btnNewScore.Location = new Point(93, 272);
-            btnNewScore.Name = "btnNewScore";
-            btnNewScore.Size = new Size(148, 22);
-            btnNewScore.TabIndex = 30;
-            btnNewScore.Text = "New Score";
-            btnNewScore.UseVisualStyleBackColor = true;
-            btnNewScore.Click += btnNewScore_Click;
             // 
             // groupBox3
             // 
@@ -880,7 +802,6 @@ namespace Music.Writer
             ClientSize = new Size(1924, 991);
             Controls.Add(btnSetDesignTestScenarioD1);
             Controls.Add(btnExportToNotion);
-            Controls.Add(grpScoreList);
             Controls.Add(btnSetWriterTestScenarioG1);
             Controls.Add(btnUpdateFormFromDesigner);
             Controls.Add(btnChordTest);
@@ -910,8 +831,6 @@ namespace Music.Writer
             ((System.ComponentModel.ISupportInitialize)numDots).EndInit();
             ((System.ComponentModel.ISupportInitialize)numTupletCount).EndInit();
             ((System.ComponentModel.ISupportInitialize)numTupletOf).EndInit();
-            grpScoreList.ResumeLayout(false);
-            grpScoreList.PerformLayout();
             groupBox3.ResumeLayout(false);
             gbSong.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgSong).EndInit();
@@ -945,8 +864,6 @@ namespace Music.Writer
         private ComboBox cbChordQuality;
         private ComboBox cbChordBase;
         private Button btnUpdateFormFromDesigner;
-        private Label lblScoreReport;
-        private TextBox txtScoreReport;
         private Button btnExportToNotion;
         private Label lblTupletNumber;
         private TextBox txtTupletNumber;
@@ -958,8 +875,6 @@ namespace Music.Writer
         private Button btnDeletePhrases;
         private Button btnClearAllPhrases;
         private Button btnAddPhrase;
-        private Button btnNewScore;
-        private TextBox txtMovementTitle;
         private Button btnImport;
         private Button btnExport;
         private Button btnStop;
