@@ -45,7 +45,6 @@ namespace Music.Writer
             this.StartPosition = FormStartPosition.Manual;
 
             _designer = Globals.Designer;
-            txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
 
             dgSong.DefaultCellStyle.ForeColor = Color.Black; // had trouble setting this in the forms designer
             dgSong.DefaultCellStyle.BackColor = Color.White;
@@ -121,7 +120,6 @@ namespace Music.Writer
             if (Globals.Designer != null)
             {
                 _designer = Globals.Designer;
-                txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
             }
             if (Globals.Writer != null)
                 _writer = Globals.Writer;

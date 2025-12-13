@@ -266,7 +266,6 @@ namespace Music.Writer
         {
             // Update the form to take into account any changes to Designer
             UpdateWriterFormDataFromDesigner.Update(_writer, _designer);
-            txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
         }
 
         // ========== TEST SCENARIO EVENT HANDLERS ==========
@@ -283,11 +282,6 @@ namespace Music.Writer
             GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, _designer.TimeSignatureTimeline);
             GridControlLinesManager.AttachTempoTimeline(dgSong, _designer.TempoTimeline);
             GridControlLinesManager.AttachHarmonyTimeline(dgSong, _designer.HarmonicTimeline);
-
-
-
-
-            txtDesignerReport.Text = DesignerReport.CreateDesignerReport(_designer);
         }
 
         public void HandleSetWriterTestScenarioG1()

@@ -93,7 +93,6 @@ namespace Music.Writer
             btnSetDesignTestScenarioD1 = new Button();
             btnChordTest = new Button();
             btnUpdateFormFromDesigner = new Button();
-            txtDesignerReport = new TextBox();
             lblScoreReport = new Label();
             txtScoreReport = new TextBox();
             btnExportToNotion = new Button();
@@ -102,7 +101,6 @@ namespace Music.Writer
             btnNewScore = new Button();
             groupBox3 = new GroupBox();
             btnExecute = new Button();
-            grbCurrentDesign = new GroupBox();
             gbSong = new GroupBox();
             btnPause = new Button();
             btnClear = new Button();
@@ -129,7 +127,6 @@ namespace Music.Writer
             ((System.ComponentModel.ISupportInitialize)numTupletOf).BeginInit();
             grpScoreList.SuspendLayout();
             groupBox3.SuspendLayout();
-            grbCurrentDesign.SuspendLayout();
             gbSong.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgSong).BeginInit();
             SuspendLayout();
@@ -151,7 +148,7 @@ namespace Music.Writer
             grbParts.Controls.Add(lblStaff);
             grbParts.Controls.Add(clbStaffs);
             grbParts.ForeColor = Color.FromArgb(255, 128, 0);
-            grbParts.Location = new Point(1352, 668);
+            grbParts.Location = new Point(978, 664);
             grbParts.Name = "grbParts";
             grbParts.Size = new Size(322, 174);
             grbParts.TabIndex = 2;
@@ -654,15 +651,6 @@ namespace Music.Writer
             btnUpdateFormFromDesigner.UseVisualStyleBackColor = true;
             btnUpdateFormFromDesigner.Click += btnUpdateFormFromDesigner_Click;
             // 
-            // txtDesignerReport
-            // 
-            txtDesignerReport.Location = new Point(15, 23);
-            txtDesignerReport.Multiline = true;
-            txtDesignerReport.Name = "txtDesignerReport";
-            txtDesignerReport.ScrollBars = ScrollBars.Vertical;
-            txtDesignerReport.Size = new Size(325, 109);
-            txtDesignerReport.TabIndex = 26;
-            // 
             // lblScoreReport
             // 
             lblScoreReport.AutoSize = true;
@@ -753,18 +741,6 @@ namespace Music.Writer
             btnExecute.Text = "Execute";
             btnExecute.UseVisualStyleBackColor = true;
             btnExecute.Click += btnExecute_Click;
-            // 
-            // grbCurrentDesign
-            // 
-            grbCurrentDesign.BackColor = Color.Black;
-            grbCurrentDesign.Controls.Add(txtDesignerReport);
-            grbCurrentDesign.ForeColor = Color.White;
-            grbCurrentDesign.Location = new Point(988, 664);
-            grbCurrentDesign.Name = "grbCurrentDesign";
-            grbCurrentDesign.Size = new Size(351, 167);
-            grbCurrentDesign.TabIndex = 34;
-            grbCurrentDesign.TabStop = false;
-            grbCurrentDesign.Text = "Current Design";
             // 
             // gbSong
             // 
@@ -902,7 +878,6 @@ namespace Music.Writer
             // 
             BackColor = Color.White;
             ClientSize = new Size(1924, 991);
-            Controls.Add(grbCurrentDesign);
             Controls.Add(btnSetDesignTestScenarioD1);
             Controls.Add(btnExportToNotion);
             Controls.Add(grpScoreList);
@@ -938,8 +913,6 @@ namespace Music.Writer
             grpScoreList.ResumeLayout(false);
             grpScoreList.PerformLayout();
             groupBox3.ResumeLayout(false);
-            grbCurrentDesign.ResumeLayout(false);
-            grbCurrentDesign.PerformLayout();
             gbSong.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgSong).EndInit();
             ResumeLayout(false);
@@ -972,14 +945,12 @@ namespace Music.Writer
         private ComboBox cbChordQuality;
         private ComboBox cbChordBase;
         private Button btnUpdateFormFromDesigner;
-        private TextBox txtDesignerReport;
         private Label lblScoreReport;
         private TextBox txtScoreReport;
         private Button btnExportToNotion;
         private Label lblTupletNumber;
         private TextBox txtTupletNumber;
         private GroupBox groupBox3;
-        private GroupBox grbCurrentDesign;
         private GroupBox gbSong;
         private Button btnExecute;
         private DataGridView dgSong;
