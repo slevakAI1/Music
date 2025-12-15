@@ -170,9 +170,6 @@ namespace Music.Writer
             HandleExportToNotion();
         }
 
-        // TO DO  -  Maybe the writing out to the grid should happen here and
-        //           each command returns the data to write out ??? what data would this require?
-
         private void btnExecute_Click(object sender, EventArgs e)
         {
             var command = cbCommand?.Text?.Trim() ?? string.Empty;
