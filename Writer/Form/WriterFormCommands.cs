@@ -1,4 +1,5 @@
 using Music.MyMidi;
+using static System.Windows.Forms.DataFormats;
 
 namespace Music.Writer
 {
@@ -28,6 +29,24 @@ namespace Music.Writer
 
             // Append the phrase notes to all selected rows
             AppendPhraseNotesToSelectedRows(phrase);
+        }
+
+        public void HandleHarmonySyncTest(WriterFormData formData)
+        {
+            // TO DO
+
+            // Add 4 phrases to the dgSong grid based on the Harmony Event Timeline in the Harmony fixed row.
+            // The parts will be 
+            //  Rock Organ
+            //      Each measure gets two half notes of the chord for the HarmonyEvent for the measure
+            //  Electric Guitar (clean)
+            //      Each measure gets 8 eighth notes of the chord for the HarmonyEvent for the measure
+            //  Electric Bass (finger)
+            //      Each measure gets four quarter notes of the chord for the HarmonyEvent for the measure
+            //  Drum Set
+            //      Each measure gets a bass drum beat on beats 1 and 3 and a snare drum on every beat.
+
+            // Generate 4 measure of the above. Place all the code here.
         }
     }
 }

@@ -122,11 +122,13 @@ namespace Music.Writer
             // cbCommand
             // 
             cbCommand.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbCommand.Items.AddRange(new object[] { "Repeat Note" });
+            cbCommand.Items.AddRange(new object[] { "Repeat Note", "Harmony Sync Test" });
             cbCommand.Location = new Point(13, 22);
             cbCommand.Name = "cbCommand";
             cbCommand.Size = new Size(250, 23);
             cbCommand.TabIndex = 1;
+            // Select the new "Harmony Sync Test" item by default (index 1)
+            cbCommand.SelectedIndex = 0;
             // 
             // grbParts
             // 

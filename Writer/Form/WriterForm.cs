@@ -49,7 +49,6 @@ namespace Music.Writer
             dgSong.DefaultCellStyle.ForeColor = Color.Black; // had trouble setting this in the forms designer
             dgSong.DefaultCellStyle.BackColor = Color.White;
 
-
             // Initialize comboboxes - doesn't seem to be a way to set a default in the designer or form.
             // The changes keep getting discarded. wtf?
             cbChordBase.SelectedIndex = 0; // C
@@ -60,7 +59,7 @@ namespace Music.Writer
             if (clbStaffs != null && clbStaffs.Items.Count > 0)
                 clbStaffs.SetItemChecked(0, true); // Check staff "1"
 
-            cbCommand.SelectedIndex = 0;
+            cbCommand.SelectedIndex = 1; // harmony sync test
 
             // Configure dgSong with MIDI instrument dropdown
             SongGridManager.ConfigureSongGridView(
@@ -183,6 +182,10 @@ namespace Music.Writer
             {
                 case "Repeat Note":
                     HandleRepeatNote(formData);
+                    break;
+
+                case "Harmony Sync Test":
+                    HandleHarmonySyncTest(formData);
                     break;
 
                 // Other cases will be added here later.
