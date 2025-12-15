@@ -1,3 +1,4 @@
+using Music.Designer;
 using Music.MyMidi;
 
 namespace Music.Writer
@@ -12,49 +13,27 @@ namespace Music.Writer
     /// </summary>
     public static class ConvertListOfPhrasesToMidiSongDocument
     {
-
-        // TO DO - UPDATE THIS SIGNATURE TO ACCEPT THE time signature and TEMPO data objects
-
         public static MidiSongDocument Convert(
             List<Phrase> phrases,
-            int tempo,
-            int timeSignatureNumerator,
-            int timeSignatureDenominator)
+            TempoTimeline tempoTimeline,
+            TimeSignatureTimeline timeSignatureTimeline)
         {
             if (phrases == null) throw new ArgumentNullException(nameof(phrases));
-
-            // UPDATE THIS NEXT CALL AND CALLED METHOD TO PASS IN AND USE THE TEMPO EVENTS AND TIME SIGNATURE EVENTS.
-            // WHEN THIS UPDATE IS COMPLETE, THE TEMPO EVENTS AND TIME SIGNATURE EVENTS WILL BE INCLUDED IN THE RETUR
+            if (tempoTimeline == null) throw new ArgumentNullException(nameof(tempoTimeline));
+            if (timeSignatureTimeline == null) throw new ArgumentNullException(nameof(timeSignatureTimeline));
 
             // Step 1 - convert phrases to MIDI EVENTS - Absolute positions
             var midiEventLists = ConvertPhrasesToMidiEventLists.Convert(phrases);
 
-            //var json1 = ObjectViewer.Json(phrases);
-            //var json2 = ObjectViewer.Json(midiEventLists);
-
-            // TO DO - UPDATE THE NEXT CALLED METHOD TO MERGE IN THE TEMPO EVENTS AND TIME SIGNATURE EVENTS BY 
-            //    ABSOLUTE POSITION ALONG WITH THE PHRASES. WHEN COMPLETE THE TEMPO AND TIME SIGNATURE RETURNED META EVENTS WILL CONTAIN 
-            //    THEIR ABSOLUTE POSITION SIMILAR TO HOW PHRASES WORKS.
-
             // Step 2 - Merge midiEventLists lists that are for the same instrument
+            // and integrate tempo and time signature events
             var mergedMidiEventLists = MergeMidiEventListsByInstrument.Convert(
                 midiEventLists,
-                tempo: tempo,
-                timeSignatureNumerator: timeSignatureNumerator,
-                timeSignatureDenominator: timeSignatureDenominator);
-
-            //var json3 = ObjectViewer.Json(mergedMidiEventLists);
-
-
-            // TO DO - IF NEEDED, UPDATE THIS NEXT CALLED METHOD TO INCLUDE THE TEMPO EVENTS AND TIME SIGNATURE EVENTS
-            //     CORRECTLY IN THE MIDI DOCUMENT OUTPUT
+                tempoTimeline,
+                timeSignatureTimeline);
 
             // Step 3 - Execute merged timed notes to MIDI document
-            var midiDoc = ConvertMidiEventsToMidiSongDocument.Convert(
-                mergedMidiEventLists,
-                tempo: tempo);
-
-            //var json4 = ObjectViewer.Json(midiDoc);
+            var midiDoc = ConvertMidiEventsToMidiSongDocument.Convert(mergedMidiEventLists);
 
             return midiDoc;
         }

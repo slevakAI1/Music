@@ -5,7 +5,7 @@ namespace Music.Designer
     {
         public const int TotalBars = 48;
         public const string GlobalTimeSignature = "4/4";
-        public const int DefaultTempoBpm = 112;
+        public const int DefaultTempoBpm = 120;  // per ai, 120 is acutually an industry default
 
         // Apply all defaults so the timelines end on the same beat
         public static void SetTestDesignD1(Designer design)

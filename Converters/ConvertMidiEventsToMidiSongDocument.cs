@@ -12,14 +12,10 @@ namespace Music.Writer
     /// </summary>
     public static class ConvertMidiEventsToMidiSongDocument
     {
-        public static MidiSongDocument Convert(
-            List<List<MetaMidiEvent>> midiEventLists,
-            int tempo)
+        public static MidiSongDocument Convert(List<List<MetaMidiEvent>> midiEventLists)
         {
             if (midiEventLists == null)
                 throw new ArgumentNullException(nameof(midiEventLists));
-            if (tempo <= 0)
-                throw new ArgumentException("Tempo must be greater than 0", nameof(tempo));
 
             // Create MIDI file with specified time division
             var midiFile = new MidiFile
@@ -30,16 +26,14 @@ namespace Music.Writer
             // Convert each MetaMidiEvent list to a track
             foreach (var eventList in midiEventLists)
             {
-                var trackChunk = CreateTrackFromMidiEvents(eventList, tempo);
+                var trackChunk = CreateTrackFromMidiEvents(eventList);
                 midiFile.Chunks.Add(trackChunk);
             }
 
             return new MidiSongDocument(midiFile);
         }
 
-        private static TrackChunk CreateTrackFromMidiEvents(
-            List<MetaMidiEvent> midiEvents,
-            int tempo)
+        private static TrackChunk CreateTrackFromMidiEvents(List<MetaMidiEvent> midiEvents)
         {
             var trackChunk = new TrackChunk();
             long lastAbsoluteTime = 0;
@@ -59,7 +53,7 @@ namespace Music.Writer
                 long deltaTime = midiEvent.AbsoluteTimeTicks - lastAbsoluteTime;
                 
                 // Convert high-level MetaMidiEvent to DryWetMidi event
-                var dryWetMidiEvent = ConvertToDryWetMidiEvent(midiEvent, deltaTime, tempo, isDrumTrack);
+                var dryWetMidiEvent = ConvertToDryWetMidiEvent(midiEvent, deltaTime, isDrumTrack);
                 
                 if (dryWetMidiEvent != null)
                 {
@@ -68,16 +62,12 @@ namespace Music.Writer
                 }
             }
 
-            // TrackChunk automatically adds EndOfTrack when the MIDI file is written
-            // No need to manually add it
-
             return trackChunk;
         }
 
         private static Melanchall.DryWetMidi.Core.MidiEvent? ConvertToDryWetMidiEvent(
             MetaMidiEvent midiEvent,
             long deltaTime,
-            int tempo,
             bool isDrumTrack)
         {
             return midiEvent.Type switch
@@ -122,14 +112,9 @@ namespace Music.Writer
                     // Skip - TrackChunk handles EndOfTrack automatically during write
                     null,
                 
-                MidiEventType.SetTempo => CreateSetTempoEvent(midiEvent, deltaTime, tempo),
+                MidiEventType.SetTempo => CreateSetTempoEvent(midiEvent, deltaTime),
                 
-                MidiEventType.TimeSignature => new TimeSignatureEvent(
-                    (byte)GetIntParam(midiEvent, "Numerator"),
-                    (byte)GetIntParam(midiEvent, "Denominator"))
-                {
-                    DeltaTime = deltaTime
-                },
+                MidiEventType.TimeSignature => CreateTimeSignatureEvent(midiEvent, deltaTime),
                 
                 MidiEventType.KeySignature => new KeySignatureEvent(
                     (sbyte)GetIntParam(midiEvent, "SharpsFlats"),
@@ -210,7 +195,7 @@ namespace Music.Writer
             };
         }
 
-        private static SetTempoEvent CreateSetTempoEvent(MetaMidiEvent midiEvent, long deltaTime, int defaultTempo)
+        private static SetTempoEvent CreateSetTempoEvent(MetaMidiEvent midiEvent, long deltaTime)
         {
             int microsecondsPerQuarterNote;
             
@@ -225,12 +210,28 @@ namespace Music.Writer
             }
             else
             {
-                microsecondsPerQuarterNote = 60_000_000 / defaultTempo;
+                // Default to 120 BPM if no tempo specified
+                microsecondsPerQuarterNote = 500_000;
             }
 
             return new SetTempoEvent(microsecondsPerQuarterNote)
             {
                 DeltaTime = deltaTime
+            };
+        }
+
+        private static TimeSignatureEvent CreateTimeSignatureEvent(MetaMidiEvent midiEvent, long deltaTime)
+        {
+            var numerator = (byte)GetIntParam(midiEvent, "Numerator");
+            var denominator = (byte)GetIntParam(midiEvent, "Denominator");
+            var clocksPerMetronomeClick = midiEvent.Parameters.TryGetValue("ClocksPerMetronomeClick", out var cpm) 
+                ? (byte)System.Convert.ToInt32(cpm) : (byte)24;
+            var thirtySecondNotesPerQuarter = midiEvent.Parameters.TryGetValue("ThirtySecondNotesPerQuarter", out var tsnpq) 
+                ? (byte)System.Convert.ToInt32(tsnpq) : (byte)8;
+
+            return new TimeSignatureEvent(numerator, denominator, clocksPerMetronomeClick, thirtySecondNotesPerQuarter) 
+            { 
+                DeltaTime = deltaTime 
             };
         }
 

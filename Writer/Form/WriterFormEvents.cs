@@ -30,13 +30,23 @@ namespace Music.Writer
                 return;
             }
 
-            // TO DO - Check if Time Signature row selected - required
+            // Extract tempo timeline from fixed row (row index 2)
+            var tempoRow = dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO];
+            var tempoTimeline = tempoRow.Cells["colData"].Value as Music.Designer.TempoTimeline;
+            if (tempoTimeline == null || tempoTimeline.Events.Count == 0)
+            {
+                MessageBox.Show(this, "No tempo events defined. Please add at least one tempo event.", "Missing Tempo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
-
-
-            // TO DO - Check if a tempo row selected - required
-
-
+            // Extract time signature timeline from fixed row (row index 1)
+            var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
+            var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Designer.TimeSignatureTimeline;
+            if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
+            {
+                MessageBox.Show(this, "No time signature events defined. Please add at least one time signature event.", "Missing Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             // Build list of Phrase from all selected phrase rows (skip fixed rows)
             var phrases = new List<Phrase>();
@@ -80,15 +90,11 @@ namespace Music.Writer
                 phrases.Add(phrase);
             }
 
-            // TO DO THIS NEXT CALL MUST PASS IN typed tempo and time signature DATA OBJECTS FROM  THEIR FIXED dgSong GRID ROWS
-            // instead of hardcoded values
-
-            // Consolidated conversion: phrases -> midi document
+            // Consolidated conversion: phrases -> midi document with tempo and time signature timelines
             var midiDoc = ConvertListOfPhrasesToMidiSongDocument.Convert(
                 phrases,
-                tempo: 112,
-                timeSignatureNumerator: 4,
-                timeSignatureDenominator: 4);
+                tempoTimeline,
+                timeSignatureTimeline);
 
             await Player.PlayMidiFromPhrasesAsync(_midiPlaybackService, midiDoc, this);
         }
@@ -113,6 +119,24 @@ namespace Music.Writer
                 return;
             }
 
+            // Extract tempo timeline from fixed row (row index 2)
+            var tempoRow = dgSong.Rows[2];
+            var tempoTimeline = tempoRow.Cells["colData"].Value as Music.Designer.TempoTimeline;
+            if (tempoTimeline == null || tempoTimeline.Events.Count == 0)
+            {
+                MessageBox.Show(this, "No tempo events defined. Please add at least one tempo event.", "Missing Tempo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Extract time signature timeline from fixed row (row index 1)
+            var timeSignatureRow = dgSong.Rows[1];
+            var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Designer.TimeSignatureTimeline;
+            if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
+            {
+                MessageBox.Show(this, "No time signature events defined. Please add at least one time signature event.", "Missing Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             // Build list of Phrase from all selected phrase rows (skip fixed rows)
             var phrases = new List<Phrase>();
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
@@ -121,7 +145,7 @@ namespace Music.Writer
                 if (selectedRow.Index < SongGridManager.FIXED_ROWS_COUNT)
                     continue;
 
-                var instrObj = selectedRow.Cells["colInstrument"].Value;
+                var instrObj = selectedRow.Cells["colType"].Value;
                 int programNumber = Convert.ToInt32(instrObj);
 
                 if (programNumber == -1)
@@ -167,15 +191,11 @@ namespace Music.Writer
 
             try
             {
-                // TO DO THIS NEXT CALL MUST PASS IN THE tempo and time signature DATA OBJECTS FROM  THEIR FIXED dgSong GRID ROWS
-                // instead of hardcoded values
-
-                // Consolidated conversion: phrases -> midi document
+                // Consolidated conversion: phrases -> midi document with tempo and time signature timelines
                 var midiDoc = ConvertListOfPhrasesToMidiSongDocument.Convert(
                     phrases,
-                    tempo: 112,
-                    timeSignatureNumerator: 4,
-                    timeSignatureDenominator: 4);
+                    tempoTimeline,
+                    timeSignatureTimeline);
 
                 // Export to file
                 _midiIoService.ExportToFile(sfd.FileName, midiDoc);

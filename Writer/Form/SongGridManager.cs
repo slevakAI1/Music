@@ -11,18 +11,18 @@ namespace Music.Writer
     internal static class SongGridManager
     {
         // Constants for the four fixed rows at the top of the grid
-        internal const int FIXED_ROW_SECTION = 0;
-        internal const int FIXED_ROW_HARMONY = 1;
-        internal const int FIXED_ROW_TIME_SIGNATURE = 2;
-        internal const int FIXED_ROW_TEMPO = 3;
-        internal const int FIXED_ROW_SEPARATOR = 4;
-        internal const int FIXED_ROWS_COUNT = 5;
+        public const int FIXED_ROW_SECTION = 0;
+        public const int FIXED_ROW_HARMONY = 1;
+        public const int FIXED_ROW_TIME_SIGNATURE = 2;
+        public const int FIXED_ROW_TEMPO = 3;
+        public const int FIXED_ROW_SEPARATOR = 4;
+        public const int FIXED_ROWS_COUNT = 5;
 
         // Index where measure columns begin (adjusted because the Stave column was removed)
-        internal const int MEASURE_START_COLUMN_INDEX = 4;
+        public const int MEASURE_START_COLUMN_INDEX = 4;
 
         // Default number of measure columns to create initially
-        private const int DEFAULT_MEASURE_COLUMNS = 32;
+        public const int DEFAULT_MEASURE_COLUMNS = 32;
 
         /// <summary>
         /// Configures the dgSong DataGridView with proper columns including MIDI instrument dropdown.
