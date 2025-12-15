@@ -39,14 +39,18 @@ namespace Music.Writer
             }
 
             // Merge phrase events by program number
+            // FIXED: Get program number from each event list, not from individual events
             var grouped = midiEventLists
-                .SelectMany((list, index) => list.Select(e => new { Event = e, SourceIndex = index }))
-                .Where(x => x.Event.Type != MidiEventType.SequenceTrackName) // Skip duplicate track names
-                .GroupBy(x => GetProgramNumber(x.Event))
+                .Select((list, index) => new 
+                { 
+                    ProgramNumber = GetProgramNumberFromList(list), 
+                    Events = list.Where(e => e.Type != MidiEventType.SequenceTrackName).ToList() // Skip duplicate track names
+                })
+                .GroupBy(x => x.ProgramNumber)
                 .Select(g => new
                 {
                     ProgramNumber = g.Key,
-                    Events = g.Select(x => x.Event).ToList()
+                    Events = g.SelectMany(x => x.Events).ToList()
                 })
                 .ToList();
 
@@ -86,6 +90,19 @@ namespace Music.Writer
             }
 
             return mergedLists;
+        }
+
+        /// <summary>
+        /// Gets the program number from an event list by finding the first ProgramChange event.
+        /// </summary>
+        private static int GetProgramNumberFromList(List<MetaMidiEvent> eventList)
+        {
+            var programChange = eventList.FirstOrDefault(e => e.Type == MidiEventType.ProgramChange);
+            if (programChange != null && programChange.Parameters.TryGetValue("Program", out var program))
+            {
+                return System.Convert.ToInt32(program);
+            }
+            return -1;
         }
 
         private static int GetProgramNumber(MetaMidiEvent evt)
