@@ -30,7 +30,7 @@ namespace Music.Writer
                 return;
             }
 
-            // Extract tempo timeline from fixed row (row index 2)
+            // Extract tempo timeline from fixed row
             var tempoRow = dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO];
             var tempoTimeline = tempoRow.Cells["colData"].Value as Music.Designer.TempoTimeline;
             if (tempoTimeline == null || tempoTimeline.Events.Count == 0)
@@ -39,7 +39,7 @@ namespace Music.Writer
                 return;
             }
 
-            // Extract time signature timeline from fixed row (row index 1)
+            // Extract time signature timeline from fixed row
             var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
             var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Designer.TimeSignatureTimeline;
             if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
@@ -52,12 +52,53 @@ namespace Music.Writer
             var phrases = new List<Phrase>();
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
-                // Skip fixed rows
+                // Skip fixed rows - they contain control line data, not phrases
                 if (selectedRow.Index < SongGridManager.FIXED_ROWS_COUNT)
                     continue;
 
-                // Validate instrument cell value first (may be DBNull or null)
+                // Get the data object from the hidden column
+                var dataObj = selectedRow.Cells["colData"].Value;
+                
+                // Validate that it's actually a Phrase object (not null or wrong type)
+                if (dataObj is not Phrase phrase)
+                {
+                    var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
+                    MessageBox.Show(
+                        this,
+                        $"No phrase data for row #{eventNumber}. Please add or assign a phrase before playing.",
+                        "Missing Phrase",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return; // Abort playback
+                }
+
+                // Validate phrase has notes
+                if (phrase.PhraseNotes.Count == 0)
+                {
+                    var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
+                    MessageBox.Show(
+                        this,
+                        $"No phrase data for row #{eventNumber}. Please add or assign a phrase before playing.",
+                        "Missing Phrase",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return; // Abort playback
+                }
+
+                // Validate instrument cell value (may be DBNull or null)
                 var instrObj = selectedRow.Cells["colType"].Value;
+                if (instrObj == null || instrObj == DBNull.Value)
+                {
+                    var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
+                    MessageBox.Show(
+                        this,
+                        $"No instrument selected for row #{eventNumber}. Please select an instrument before playing.",
+                        "Missing Instrument",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return; // Abort playback
+                }
+
                 int programNumber = Convert.ToInt32(instrObj);
                 if (programNumber == -1)  // -1 = placeholder "Select..." -> treat as missing selection
                 {
@@ -71,23 +112,16 @@ namespace Music.Writer
                     return; // Abort playback
                 }
 
-                // Validate phrase data exists in hidden data column before using it
-                var phrase = (Phrase)selectedRow.Cells["colData"].Value;
-                if (phrase.PhraseNotes.Count == 0)
-                {
-                    var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
-                    MessageBox.Show(
-                        this,
-                        $"No phrase data for row #{eventNumber}. Please add or assign a phrase before playing.",
-                        "Missing Phrase",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
-                    return; // Abort playback
-                }
-
                 // Valid program number (0-127 or 255 for drums) – safe to cast now
                 phrase.MidiProgramNumber = (int)programNumber;
                 phrases.Add(phrase);
+            }
+
+            // Verify we actually have phrases to play
+            if (phrases.Count == 0)
+            {
+                MessageBox.Show(this, "No valid phrase events selected to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
             }
 
             // Consolidated conversion: phrases -> midi document with tempo and time signature timelines
@@ -119,8 +153,8 @@ namespace Music.Writer
                 return;
             }
 
-            // Extract tempo timeline from fixed row (row index 2)
-            var tempoRow = dgSong.Rows[2];
+            // Extract tempo timeline from fixed row
+            var tempoRow = dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO];
             var tempoTimeline = tempoRow.Cells["colData"].Value as Music.Designer.TempoTimeline;
             if (tempoTimeline == null || tempoTimeline.Events.Count == 0)
             {
@@ -128,8 +162,8 @@ namespace Music.Writer
                 return;
             }
 
-            // Extract time signature timeline from fixed row (row index 1)
-            var timeSignatureRow = dgSong.Rows[1];
+            // Extract time signature timeline from fixed row
+            var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
             var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Designer.TimeSignatureTimeline;
             if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
             {
@@ -141,26 +175,27 @@ namespace Music.Writer
             var phrases = new List<Phrase>();
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
-                // Skip fixed rows
+                // Skip fixed rows - they contain control line data, not phrases
                 if (selectedRow.Index < SongGridManager.FIXED_ROWS_COUNT)
                     continue;
 
-                var instrObj = selectedRow.Cells["colType"].Value;
-                int programNumber = Convert.ToInt32(instrObj);
-
-                if (programNumber == -1)
+                // Get the data object from the hidden column
+                var dataObj = selectedRow.Cells["colData"].Value;
+                
+                // Validate that it's actually a Phrase object (not null or wrong type)
+                if (dataObj is not Phrase phrase)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
                     MessageBox.Show(
                         this,
-                        $"No instrument selected for row #{eventNumber}. Please select an instrument before exporting.",
-                        "Missing Instrument",
+                        $"No phrase data for row #{eventNumber}. Please add or assign a phrase before exporting.",
+                        "Missing Phrase",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
                     return; // Abort export
                 }
 
-                var phrase = (Phrase)selectedRow.Cells["colData"].Value;
+                // Validate phrase has notes
                 if (phrase.PhraseNotes.Count == 0)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
@@ -173,9 +208,43 @@ namespace Music.Writer
                     return; // Abort export
                 }
 
+                // Validate instrument cell value (may be DBNull or null)
+                var instrObj = selectedRow.Cells["colType"].Value;
+                if (instrObj == null || instrObj == DBNull.Value)
+                {
+                    var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
+                    MessageBox.Show(
+                        this,
+                        $"No instrument selected for row #{eventNumber}. Please select an instrument before exporting.",
+                        "Missing Instrument",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return; // Abort export
+                }
+
+                int programNumber = Convert.ToInt32(instrObj);
+                if (programNumber == -1)
+                {
+                    var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
+                    MessageBox.Show(
+                        this,
+                        $"No instrument selected for row #{eventNumber}. Please select an instrument before exporting.",
+                        "Missing Instrument",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return; // Abort export
+                }
+
                 // Preserve drum track indicator (255) or use selected program number
                 phrase.MidiProgramNumber = (byte)programNumber;
                 phrases.Add(phrase);
+            }
+
+            // Verify we actually have phrases to export
+            if (phrases.Count == 0)
+            {
+                MessageBox.Show(this, "No valid phrase events selected to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
             }
 
             using var sfd = new SaveFileDialog
