@@ -19,11 +19,6 @@ namespace Music.Writer
                 return;
             }
 
-
-
-
-
-
             // Check if a phrase row is selected
             var hasPhraseSelection = dgSong.SelectedRows
                 .Cast<DataGridViewRow>()
@@ -88,9 +83,8 @@ namespace Music.Writer
 
             // TO DO - PASS IN TEMPO ROW, NOT TEMPO BPM - THEN TEMPO EVENTS NEED TO INSERT AT PROPER SPOTS
 
-            // TO DO - PASS IN TIME SIGNATURE ROW, NOT SEPARATE HARDCODED VALUES-THESE  EVENTS NEED TO INSERT AT PROPER SPOTS
-            //    IN THE MIDI DOCUMENT
-
+            // TO DO THIS NEXT CALL MUST PASS IN typed tempo and time signature DATA OBJECTS FROM  THEIR FIXED dgSong GRID ROWS
+            // instead of hardcoded values
 
             // Consolidated conversion: phrases -> midi document
             var midiDoc = ConvertListOfPhrasesToMidiSongDocument.Convert(
@@ -176,6 +170,9 @@ namespace Music.Writer
 
             try
             {
+                // TO DO THIS NEXT CALL MUST PASS IN THE tempo and time signature DATA OBJECTS FROM  THEIR FIXED dgSong GRID ROWS
+                // instead of hardcoded values
+
                 // Consolidated conversion: phrases -> midi document
                 var midiDoc = ConvertListOfPhrasesToMidiSongDocument.Convert(
                     phrases,

@@ -13,7 +13,7 @@ namespace Music.Writer
     public static class ConvertListOfPhrasesToMidiSongDocument
     {
 
-        // TODO - FIX THIS SIGNATURE TO ACCEPT THE TEMPO ROW
+        // TO DO - UPDATE THIS SIGNATURE TO ACCEPT THE time signature and TEMPO data objects
 
         public static MidiSongDocument Convert(
             List<Phrase> phrases,
@@ -23,16 +23,18 @@ namespace Music.Writer
         {
             if (phrases == null) throw new ArgumentNullException(nameof(phrases));
 
+            // UPDATE THIS NEXT CALL AND CALLED METHOD TO PASS IN AND USE THE TEMPO EVENTS AND TIME SIGNATURE EVENTS.
+            // WHEN THIS UPDATE IS COMPLETE, THE TEMPO EVENTS AND TIME SIGNATURE EVENTS WILL BE INCLUDED IN THE RETUR
+
             // Step 1 - convert phrases to MIDI EVENTS - Absolute positions
             var midiEventLists = ConvertPhrasesToMidiEventLists.Convert(phrases);
 
             //var json1 = ObjectViewer.Json(phrases);
             //var json2 = ObjectViewer.Json(midiEventLists);
 
-
-            // TO DO - FIX THIS METHOD TO MERGE IN THE TEMPO ROW EVENTS
-            // TO DO - FIX THIS METHOD TO MERGE IN THE TIME SIGNATURE ROW EVENTS
-
+            // TO DO - UPDATE THE NEXT CALLED METHOD TO MERGE IN THE TEMPO EVENTS AND TIME SIGNATURE EVENTS BY 
+            //    ABSOLUTE POSITION ALONG WITH THE PHRASES. WHEN COMPLETE THE TEMPO AND TIME SIGNATURE RETURNED META EVENTS WILL CONTAIN 
+            //    THEIR ABSOLUTE POSITION SIMILAR TO HOW PHRASES WORKS.
 
             // Step 2 - Merge midiEventLists lists that are for the same instrument
             var mergedMidiEventLists = MergeMidiEventListsByInstrument.Convert(
@@ -44,10 +46,8 @@ namespace Music.Writer
             //var json3 = ObjectViewer.Json(mergedMidiEventLists);
 
 
-            // TO DO - FIX THIS METHOD IF NEEDED TO INCLUDE THE TEMPO EVENTS IN THE MIDI DOCUMENT
-
-            // TO DO - FIX THIS METHOD IF NEEDED TO INCLUDE THE TIME SIGNATURE EVENTS IN THE MIDI DOCUMENT
-
+            // TO DO - IF NEEDED, UPDATE THIS NEXT CALLED METHOD TO INCLUDE THE TEMPO EVENTS AND TIME SIGNATURE EVENTS
+            //     CORRECTLY IN THE MIDI DOCUMENT OUTPUT
 
             // Step 3 - Execute merged timed notes to MIDI document
             var midiDoc = ConvertMidiEventsToMidiSongDocument.Convert(
