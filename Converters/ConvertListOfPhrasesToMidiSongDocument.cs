@@ -12,6 +12,9 @@ namespace Music.Writer
     /// </summary>
     public static class ConvertListOfPhrasesToMidiSongDocument
     {
+
+        // TODO - FIX THIS SIGNATURE TO ACCEPT THE TEMPO ROW
+
         public static MidiSongDocument Convert(
             List<Phrase> phrases,
             int tempo,
@@ -26,6 +29,11 @@ namespace Music.Writer
             //var json1 = ObjectViewer.Json(phrases);
             //var json2 = ObjectViewer.Json(midiEventLists);
 
+
+            // TO DO - FIX THIS METHOD TO MERGE IN THE TEMPO ROW EVENTS
+            // TO DO - FIX THIS METHOD TO MERGE IN THE TIME SIGNATURE ROW EVENTS
+
+
             // Step 2 - Merge midiEventLists lists that are for the same instrument
             var mergedMidiEventLists = MergeMidiEventListsByInstrument.Convert(
                 midiEventLists,
@@ -34,6 +42,12 @@ namespace Music.Writer
                 timeSignatureDenominator: timeSignatureDenominator);
 
             //var json3 = ObjectViewer.Json(mergedMidiEventLists);
+
+
+            // TO DO - FIX THIS METHOD IF NEEDED TO INCLUDE THE TEMPO EVENTS IN THE MIDI DOCUMENT
+
+            // TO DO - FIX THIS METHOD IF NEEDED TO INCLUDE THE TIME SIGNATURE EVENTS IN THE MIDI DOCUMENT
+
 
             // Step 3 - Execute merged timed notes to MIDI document
             var midiDoc = ConvertMidiEventsToMidiSongDocument.Convert(

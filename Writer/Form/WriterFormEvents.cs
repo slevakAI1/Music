@@ -19,6 +19,11 @@ namespace Music.Writer
                 return;
             }
 
+
+
+
+
+
             // Check if a phrase row is selected
             var hasPhraseSelection = dgSong.SelectedRows
                 .Cast<DataGridViewRow>()
@@ -29,6 +34,14 @@ namespace Music.Writer
                 MessageBox.Show(this, "Please select a pitch event to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+
+            // TO DO - Check if Time Signature row selected - required
+
+
+
+            // TO DO - Check if a tempo row selected - required
+
+
 
             // Build list of Phrase from all selected phrase rows (skip fixed rows)
             var phrases = new List<Phrase>();
@@ -71,6 +84,13 @@ namespace Music.Writer
                 phrase.MidiProgramNumber = (int)programNumber;
                 phrases.Add(phrase);
             }
+
+
+            // TO DO - PASS IN TEMPO ROW, NOT TEMPO BPM - THEN TEMPO EVENTS NEED TO INSERT AT PROPER SPOTS
+
+            // TO DO - PASS IN TIME SIGNATURE ROW, NOT SEPARATE HARDCODED VALUES-THESE  EVENTS NEED TO INSERT AT PROPER SPOTS
+            //    IN THE MIDI DOCUMENT
+
 
             // Consolidated conversion: phrases -> midi document
             var midiDoc = ConvertListOfPhrasesToMidiSongDocument.Convert(
