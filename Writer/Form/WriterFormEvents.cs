@@ -378,9 +378,6 @@ namespace Music.Writer
             _designer ??= new Designer.Designer();
             DesignerTests.SetTestDesignD1(_designer);
 
-
-            // TO DO - In progress - Populate all 4 fixed control lines in dgSong
-
             GridControlLinesManager.AttachSectionTimeline(dgSong, _designer.SectionTimeline);
             GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, _designer.TimeSignatureTimeline);
             GridControlLinesManager.AttachTempoTimeline(dgSong, _designer.TempoTimeline);
