@@ -1,4 +1,3 @@
-using Music.Designer;
 using Music.MyMidi;
 
 namespace Music.Writer
@@ -100,17 +99,6 @@ namespace Music.Writer
             var programChange = eventList.FirstOrDefault(e => e.Type == MidiEventType.ProgramChange);
             if (programChange != null && programChange.Parameters.TryGetValue("Program", out var program))
             {
-                return System.Convert.ToInt32(program);
-            }
-            return -1;
-        }
-
-        private static int GetProgramNumber(MetaMidiEvent evt)
-        {
-            if (evt.Type == MidiEventType.ProgramChange && 
-                evt.Parameters.TryGetValue("Program", out var program))
-            {
-                // Use System.Convert to avoid collision with this class's Convert method
                 return System.Convert.ToInt32(program);
             }
             return -1;
