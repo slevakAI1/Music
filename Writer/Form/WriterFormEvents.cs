@@ -80,9 +80,6 @@ namespace Music.Writer
                 phrases.Add(phrase);
             }
 
-
-            // TO DO - PASS IN TEMPO ROW, NOT TEMPO BPM - THEN TEMPO EVENTS NEED TO INSERT AT PROPER SPOTS
-
             // TO DO THIS NEXT CALL MUST PASS IN typed tempo and time signature DATA OBJECTS FROM  THEIR FIXED dgSong GRID ROWS
             // instead of hardcoded values
 
