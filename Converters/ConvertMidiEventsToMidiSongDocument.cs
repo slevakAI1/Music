@@ -220,20 +220,56 @@ namespace Music.Writer
             };
         }
 
+        // TO DO look at this. Looks like overkill.
+
         private static TimeSignatureEvent CreateTimeSignatureEvent(MetaMidiEvent midiEvent, long deltaTime)
         {
             var numerator = (byte)GetIntParam(midiEvent, "Numerator");
-            var denominator = (byte)GetIntParam(midiEvent, "Denominator");
+
+            // The Midi meta-event stored in our MetaMidiEvent.Parameters uses the *actual* denominator (e.g. 4, 8, 16).
+            // DryWetMidi's TimeSignatureEvent constructor expects the denominator encoded as the exponent (i.e. 2 -> 4, 3 -> 8).
+            // To avoid squaring twice when round-tripping, convert the actual denominator back to the exponent here.
+            int denomValue = GetIntParam(midiEvent, "Denominator");
+            byte denominatorExponent;
+
+            if (denomValue <= 0)
+            {
+                // fallback to common default: 4 -> exponent 2
+                denominatorExponent = 2;
+            }
+            else
+            {
+                // compute exponent such that (1 << exponent) == denomValue
+                int exp = 0;
+                while ((1 << exp) < denomValue && exp < 8) // limit exponent to reasonable range
+                    exp++;
+
+                if ((1 << exp) != denomValue)
+                {
+                    // If denomValue is not an exact power of two, fall back to nearest exponent
+                    exp = (int)Math.Round(Math.Log(denomValue, 2));
+                    if (exp < 0) exp = 0;
+                    if (exp > 8) exp = 8;
+                }
+
+                denominatorExponent = (byte)exp;
+            }
+
             var clocksPerMetronomeClick = midiEvent.Parameters.TryGetValue("ClocksPerMetronomeClick", out var cpm) 
                 ? (byte)System.Convert.ToInt32(cpm) : (byte)24;
             var thirtySecondNotesPerQuarter = midiEvent.Parameters.TryGetValue("ThirtySecondNotesPerQuarter", out var tsnpq) 
                 ? (byte)System.Convert.ToInt32(tsnpq) : (byte)8;
 
-            return new TimeSignatureEvent(numerator, denominator, clocksPerMetronomeClick, thirtySecondNotesPerQuarter) 
+            return new TimeSignatureEvent(numerator, denominatorExponent, clocksPerMetronomeClick, thirtySecondNotesPerQuarter) 
             { 
                 DeltaTime = deltaTime 
             };
         }
+
+
+
+
+
 
         private static PitchBendEvent CreatePitchBendEvent(MetaMidiEvent midiEvent, long deltaTime, bool isDrumTrack)
         {

@@ -149,7 +149,7 @@ namespace Music.Writer
                     MetaMidiEvent.CreateTimeSignature(
                         absoluteTime,
                         timeSignatureEvent.Numerator,
-                        1 << timeSignatureEvent.Denominator,
+                        timeSignatureEvent.Denominator,  // Store the exponent as-is, don't convert to note value
                         timeSignatureEvent.ClocksPerClick,
                         timeSignatureEvent.ThirtySecondNotesPerBeat),
 
