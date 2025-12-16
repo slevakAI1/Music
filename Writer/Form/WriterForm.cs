@@ -196,9 +196,9 @@ namespace Music.Writer
             }
         }
 
-        private void btnClearPhrases_Click(object sender, EventArgs e)
+        private void btnClearAll_Click(object sender, EventArgs e)
         {
-            HandleClearPhrases();
+            HandleClearAll();
         }
 
         private void btnNewScore_Click(object sender, EventArgs e)
@@ -232,9 +232,9 @@ namespace Music.Writer
             _midiPlaybackService.Stop();
         }
 
-        private void btnClear_Click(object sender, EventArgs e)
+        private void btnClearSelected_Click(object sender, EventArgs e)
         {
-            HandleClear();
+            HandleClearSelected();
         }
 
         private void btnPause_Click(object sender, EventArgs e)

@@ -62,7 +62,7 @@ namespace Music.Writer
             }
         }
 
-        public void HandleClearPhrases()
+        public void HandleClearAll()
         {
             // Remove all rows except the fixed rows
             while (dgSong.Rows.Count > SongGridManager.FIXED_ROWS_COUNT)
@@ -71,7 +71,7 @@ namespace Music.Writer
             }
         }
 
-        public void HandleClear()
+        public void HandleClearSelected()
         {
             if (dgSong.SelectedRows == null || dgSong.SelectedRows.Count == 0)
             {
