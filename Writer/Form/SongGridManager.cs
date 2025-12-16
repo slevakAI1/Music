@@ -253,6 +253,24 @@ namespace Music.Writer
         }
 
         /// <summary>
+        /// Clears the measure display cells (columns MEASURE_START_COLUMN_INDEX and onward) for the specified row.
+        /// Safe to call for both fixed rows and phrase rows.
+        /// </summary>
+        /// <param name="dgSong">Target DataGridView</param>
+        /// <param name="rowIndex">Row index whose measure cells should be cleared</param>
+        public static void ClearMeasureCellsForRow(DataGridView dgSong, int rowIndex)
+        {
+            if (dgSong == null || rowIndex < 0 || rowIndex >= dgSong.Rows.Count)
+                return;
+
+            var row = dgSong.Rows[rowIndex];
+            for (int colIndex = MEASURE_START_COLUMN_INDEX; colIndex < dgSong.Columns.Count; colIndex++)
+            {
+                row.Cells[colIndex].Value = string.Empty;
+            }
+        }
+
+        /// <summary>
         /// Handles the CurrentCellDirtyStateChanged event to commit combo box edits immediately.
         /// </summary>
         /// <param name="dgSong">The DataGridView</param>

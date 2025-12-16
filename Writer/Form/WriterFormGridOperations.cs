@@ -64,10 +64,21 @@ namespace Music.Writer
 
         public void HandleClearAll()
         {
-            // Remove all rows except the fixed rows
+            // Remove all phrase rows
             while (dgSong.Rows.Count > SongGridManager.FIXED_ROWS_COUNT)
             {
                 dgSong.Rows.RemoveAt(SongGridManager.FIXED_ROWS_COUNT);
+            }
+
+            // Clear measure columns and data objects from all fixed rows
+            for (int rowIndex = 0; rowIndex < SongGridManager.FIXED_ROWS_COUNT; rowIndex++)
+            {
+                SongGridManager.ClearMeasureCellsForRow(dgSong, rowIndex);
+                
+                // Clear the data object
+                var dataCol = dgSong.Columns["colData"];
+                if (dataCol != null)
+                    dgSong.Rows[rowIndex].Cells[dataCol.Index].Value = null;
             }
         }
 
@@ -75,36 +86,44 @@ namespace Music.Writer
         {
             if (dgSong.SelectedRows == null || dgSong.SelectedRows.Count == 0)
             {
-                MessageBox.Show(this, "Please select one or more phrase rows to clear.", "Clear Phrases", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(this, "Please select one or more rows to clear.", "Clear Rows", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
             foreach (DataGridViewRow row in dgSong.SelectedRows)
             {
-                // Skip fixed rows
+                // Handle fixed rows
                 if (row.Index < SongGridManager.FIXED_ROWS_COUNT)
+                {
+                    // Clear measure columns for fixed row
+                    SongGridManager.ClearMeasureCellsForRow(dgSong, row.Index);
+                    
+                    // Clear the data object
+                    var dataCol = dgSong.Columns["colData"];
+                    if (dataCol != null)
+                        row.Cells[dataCol.Index].Value = null;
+                    
                     continue;
+                }
 
+                // Handle phrase rows
                 // Reset instrument to "Select..." (-1)
-                var instrCol = dgSong.Columns["colInstrument"];
+                var instrCol = dgSong.Columns["colType"];
                 if (instrCol != null)
                     row.Cells[instrCol.Index].Value = -1;
 
                 // Reset data to empty Phrase
-                var dataCol = dgSong.Columns["colData"];
-                if (dataCol != null)
-                    row.Cells[dataCol.Index].Value = new Phrase(new List<PhraseNote>()) { MidiProgramNumber = -1 };
+                var phraseDataCol = dgSong.Columns["colData"];
+                if (phraseDataCol != null)
+                    row.Cells[phraseDataCol.Index].Value = new Phrase(new List<PhraseNote>()) { MidiProgramNumber = -1 };
 
                 // Clear the Part description
                 var descriptionCol = dgSong.Columns["colDescription"];
                 if (descriptionCol != null)
                     row.Cells[descriptionCol.Index].Value = string.Empty;
 
-                // Clear all measure cells
-                for (int colIndex = SongGridManager.MEASURE_START_COLUMN_INDEX; colIndex < dgSong.Columns.Count; colIndex++)
-                {
-                    row.Cells[colIndex].Value = string.Empty;
-                }
+                // Clear all measure cells for phrase row
+                SongGridManager.ClearMeasureCellsForRow(dgSong, row.Index);
             }
 
             dgSong.Refresh();
