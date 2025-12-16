@@ -329,6 +329,21 @@ namespace Music.Writer
                     ticksPerQuarterNote = tpqn.TicksPerQuarterNote;
                 }
 
+                // Extract tempo and time signature events from MIDI and attach to grid
+                var (tempoTimeline, timeSignatureTimeline) = ExtractTimelinesFromMidiEvents(
+                    midiEventLists, 
+                    ticksPerQuarterNote);
+
+                if (tempoTimeline != null && tempoTimeline.Events.Count > 0)
+                {
+                    GridControlLinesManager.AttachTempoTimeline(dgSong, tempoTimeline);
+                }
+
+                if (timeSignatureTimeline != null && timeSignatureTimeline.Events.Count > 0)
+                {
+                    GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, timeSignatureTimeline);
+                }
+
                 // Convert MetaMidiEvent lists to Phrase objects, passing the source ticks per quarter note
                 var phrases = ConvertMidiEventListsToPhraseLists.ConvertMidiEventListsToPhraseList(
                     midiEventLists,
@@ -361,6 +376,91 @@ namespace Music.Writer
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }
+        }
+
+        /// <summary>
+        /// Extracts tempo and time signature events from MIDI event lists and converts them to timelines.
+        /// </summary>
+        private static (TempoTimeline?, TimeSignatureTimeline?) ExtractTimelinesFromMidiEvents(
+            List<List<MetaMidiEvent>> midiEventLists,
+            short ticksPerQuarterNote)
+        {
+            var tempoTimeline = new TempoTimeline();
+            var timeSignatureTimeline = new TimeSignatureTimeline();
+
+            // Assume 4/4 time signature initially for bar calculation
+            int beatsPerBar = 4;
+            int ticksPerBeat = ticksPerQuarterNote;
+
+            // First pass: extract time signatures to determine beatsPerBar for bar calculations
+            foreach (var trackEvents in midiEventLists)
+            {
+                foreach (var evt in trackEvents.Where(e => e.Type == MidiEventType.TimeSignature))
+                {
+                    if (evt.Parameters.TryGetValue("Numerator", out var numObj) &&
+                        evt.Parameters.TryGetValue("Denominator", out var denObj))
+                    {
+                        int numerator = Convert.ToInt32(numObj);
+                        int denominator = Convert.ToInt32(denObj);
+
+                        // Calculate bar position (1-based)
+                        int ticksPerBar = ticksPerQuarterNote * beatsPerBar;
+                        int bar = (int)(evt.AbsoluteTimeTicks / ticksPerBar) + 1;
+                        int beatInBar = (int)((evt.AbsoluteTimeTicks % ticksPerBar) / ticksPerBeat) + 1;
+
+                        var timeSignatureEvent = new TimeSignatureEvent
+                        {
+                            StartBar = bar,
+                            StartBeat = beatInBar,
+                            Numerator = numerator,
+                            Denominator = denominator
+                        };
+
+                        timeSignatureTimeline.Add(timeSignatureEvent);
+
+                        // Update beatsPerBar for subsequent calculations
+                        beatsPerBar = numerator;
+                    }
+                }
+            }
+
+            // Second pass: extract tempo events using the time signature info
+            foreach (var trackEvents in midiEventLists)
+            {
+                foreach (var evt in trackEvents.Where(e => e.Type == MidiEventType.SetTempo))
+                {
+                    int bpm = 120; // Default
+
+                    if (evt.Parameters.TryGetValue("BPM", out var bpmObj))
+                    {
+                        bpm = Convert.ToInt32(bpmObj);
+                    }
+                    else if (evt.Parameters.TryGetValue("MicrosecondsPerQuarterNote", out var microObj))
+                    {
+                        int microseconds = Convert.ToInt32(microObj);
+                        bpm = (int)Math.Round(60_000_000.0 / microseconds);
+                    }
+
+                    // Calculate bar position (1-based)
+                    int ticksPerBar = ticksPerQuarterNote * beatsPerBar;
+                    int bar = (int)(evt.AbsoluteTimeTicks / ticksPerBar) + 1;
+                    int beatInBar = (int)((evt.AbsoluteTimeTicks % ticksPerBar) / ticksPerQuarterNote) + 1;
+
+                    var tempoEvent = new TempoEvent
+                    {
+                        StartBar = bar,
+                        StartBeat = beatInBar,
+                        TempoBpm = bpm
+                    };
+
+                    tempoTimeline.Add(tempoEvent);
+                }
+            }
+
+            return (
+                tempoTimeline.Events.Count > 0 ? tempoTimeline : null,
+                timeSignatureTimeline.Events.Count > 0 ? timeSignatureTimeline : null
+            );
         }
 
         // ========== DESIGNER & FORM SYNC EVENT HANDLERS ==========

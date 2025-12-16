@@ -40,7 +40,7 @@ namespace Music.Designer
         {
             public int StartBar { get; set; } = 1;
             public int StartBeat { get; set; } = 1;
-            public int Bpm { get; set; } = 112;
+            public int Bpm { get; set; } = 118;
         }
 
         public TempoEditorForm(TempoTimeline? initial = null)
@@ -176,7 +176,7 @@ namespace Music.Designer
             {
                 Minimum = 20,
                 Maximum = 300,
-                Value = 112,
+                Value = 118,
                 Anchor = AnchorStyles.Left,
                 Width = 80
             };
@@ -443,7 +443,7 @@ namespace Music.Designer
                 
                 _numStartBar.Value = Math.Max(_numStartBar.Minimum, Math.Min(_numStartBar.Maximum, nextBar));
                 _numStartBeat.Value = 1;
-                _numBpm.Value = 112;
+                _numBpm.Value = 118;
             }
             finally
             {
