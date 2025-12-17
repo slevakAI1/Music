@@ -1,11 +1,18 @@
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
+
 namespace Music.Designer
 {
     // Multi-select voice picker powered by a Notion JSON voice catalog.
     public sealed class VoiceSelectorForm : Form
     {
         private readonly ListBox _lstCategories;
-        private readonly CheckedListBox _clbVoices;
-        private readonly ListBox _lstSelected;
+        private readonly DataGridView _dgvVoices;
+        private readonly DataGridView _dgvSelected;
         private readonly TextBox _txtFilter;
         private readonly Button _btnSelectAll;
         private readonly Button _btnClear;
@@ -15,10 +22,10 @@ namespace Music.Designer
         private readonly Label _lblSource;
 
         private readonly IReadOnlyDictionary<string, IReadOnlyList<string>> _catalog;
-        private readonly HashSet<string> _selected = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, string> _selectedVoicesWithRoles = new(StringComparer.OrdinalIgnoreCase);
         private string? _currentCategory;
 
-        public List<string> SelectedVoices { get; } = new();
+        public Dictionary<string, string> SelectedVoicesWithRoles { get; } = new();
 
         public VoiceSelectorForm()
         {
@@ -31,7 +38,7 @@ namespace Music.Designer
             MaximizeBox = false;
             ShowInTaskbar = false;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            ClientSize = new Size(780, 520);
+            ClientSize = new Size(900, 520);
 
             _catalog = VoiceCatalog.Load(out var sourcePath);
 
@@ -116,15 +123,51 @@ namespace Music.Designer
             _txtFilter.TextChanged += (_, __) => RefreshVoices();
             filterPanel.Controls.Add(_txtFilter, 1, 0);
 
-            _clbVoices = new CheckedListBox
+            _dgvVoices = new DataGridView
             {
                 Dock = DockStyle.Fill,
-                CheckOnClick = true,
-                IntegralHeight = false,
-                HorizontalScrollbar = true
+                AllowUserToAddRows = false,
+                AllowUserToDeleteRows = false,
+                AllowUserToResizeRows = false,
+                RowHeadersVisible = false,
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                MultiSelect = false,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             };
-            _clbVoices.ItemCheck += OnVoiceItemCheck;
-            middlePanel.Controls.Add(_clbVoices, 0, 1);
+
+            // Add checkbox column for selection
+            var checkColumn = new DataGridViewCheckBoxColumn
+            {
+                Name = "Selected",
+                HeaderText = "Select",
+                Width = 50,
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.None
+            };
+            _dgvVoices.Columns.Add(checkColumn);
+
+            // Add voice name column
+            var nameColumn = new DataGridViewTextBoxColumn
+            {
+                Name = "VoiceName",
+                HeaderText = "Voice Name",
+                ReadOnly = true,
+                FillWeight = 70
+            };
+            _dgvVoices.Columns.Add(nameColumn);
+
+            // Add groove role dropdown column
+            var roleColumn = new DataGridViewComboBoxColumn
+            {
+                Name = "GrooveRole",
+                HeaderText = "Groove Role",
+                FillWeight = 30,
+                DataSource = VoiceSet.ValidGrooveRoles.ToList()
+            };
+            _dgvVoices.Columns.Add(roleColumn);
+
+            _dgvVoices.CellValueChanged += OnVoiceCellValueChanged;
+            _dgvVoices.CurrentCellDirtyStateChanged += OnVoiceCellDirtyStateChanged;
+            middlePanel.Controls.Add(_dgvVoices, 0, 1);
 
             var actionPanel = new FlowLayoutPanel
             {
@@ -183,14 +226,36 @@ namespace Music.Designer
                 Margin = new Padding(0, 0, 0, 4)
             };
 
-            _lstSelected = new ListBox
+            _dgvSelected = new DataGridView
             {
                 Dock = DockStyle.Fill,
-                IntegralHeight = false,
+                AllowUserToAddRows = false,
+                AllowUserToDeleteRows = false,
+                AllowUserToResizeRows = false,
+                RowHeadersVisible = false,
+                ReadOnly = true,
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 Margin = new Padding(0, 4, 0, 0)
             };
 
-            rightPanel.Controls.Add(_lstSelected);
+            var selectedNameColumn = new DataGridViewTextBoxColumn
+            {
+                Name = "VoiceName",
+                HeaderText = "Voice Name",
+                FillWeight = 60
+            };
+            _dgvSelected.Columns.Add(selectedNameColumn);
+
+            var selectedRoleColumn = new DataGridViewTextBoxColumn
+            {
+                Name = "GrooveRole",
+                HeaderText = "Groove Role",
+                FillWeight = 40
+            };
+            _dgvSelected.Columns.Add(selectedRoleColumn);
+
+            rightPanel.Controls.Add(_dgvSelected);
             rightPanel.Controls.Add(lblSelected);
 
             AcceptButton = _btnOk;
@@ -215,20 +280,19 @@ namespace Music.Designer
 
             if (_lstCategories.Items.Count > 0)
             {
-                // Do NOT set defaults on launch anymore; just select the first category with nothing checked.
                 _lstCategories.SelectedIndex = 0;
             }
         }
 
         // Method to initialize form with existing voices from the designer
-        public void SetExistingVoices(IEnumerable<string> voiceNames)
+        public void SetExistingVoices(Dictionary<string, string> voicesWithRoles)
         {
-            if (voiceNames == null) return;
+            if (voicesWithRoles == null) return;
 
-            foreach (var name in voiceNames)
+            _selectedVoicesWithRoles.Clear();
+            foreach (var kvp in voicesWithRoles)
             {
-                if (!string.IsNullOrWhiteSpace(name))
-                    _selected.Add(name);
+                _selectedVoicesWithRoles[kvp.Key] = kvp.Value;
             }
 
             // Refresh views to show selections
@@ -237,7 +301,6 @@ namespace Music.Designer
         }
 
         // Sets the initial default: select the "Rock Band" category and check all voices in it.
-        // Idempotent and always refreshes the view.
         public void SetDefaultVoices()
         {
             const string defaultCategory = "Rock Band";
@@ -245,21 +308,18 @@ namespace Music.Designer
             var catKey = _catalog.Keys.FirstOrDefault(
                 k => string.Equals(k, defaultCategory, StringComparison.OrdinalIgnoreCase));
 
-            // Always clear current selections first
-            _selected.Clear();
+            _selectedVoicesWithRoles.Clear();
 
             if (catKey != null && _catalog.TryGetValue(catKey, out var voices) && voices != null)
             {
                 foreach (var v in voices)
                 {
                     if (!string.IsNullOrWhiteSpace(v))
-                        _selected.Add(v);
+                        _selectedVoicesWithRoles[v] = "Select...";
                 }
 
-                // Ensure category selection reflects defaults
                 _currentCategory = catKey;
 
-                // Update selected index only if different; we always refresh view anyway.
                 for (int i = 0; i < _lstCategories.Items.Count; i++)
                 {
                     if (string.Equals(_lstCategories.Items[i]?.ToString(), catKey, StringComparison.OrdinalIgnoreCase))
@@ -271,14 +331,12 @@ namespace Music.Designer
                 }
             }
 
-            // Always refresh so checks are applied even if category didn't change
             RefreshVoices();
             RefreshSelectedList();
         }
 
         private void OnSetDefaults(object? sender, EventArgs e)
         {
-            // Idempotent: always sets defaults; no toggling/un-do.
             SetDefaultVoices();
         }
 
@@ -290,100 +348,129 @@ namespace Music.Designer
 
         private void RefreshVoices()
         {
-            _clbVoices.BeginUpdate();
-            try
+            _dgvVoices.CellValueChanged -= OnVoiceCellValueChanged;
+            _dgvVoices.Rows.Clear();
+
+            if (_currentCategory == null)
             {
-                _clbVoices.Items.Clear();
-
-                if (_currentCategory == null) return;
-
-                if (!_catalog.TryGetValue(_currentCategory, out var voices)) return;
-
-                var filter = _txtFilter.Text?.Trim();
-                IEnumerable<string> view = voices;
-                if (!string.IsNullOrEmpty(filter))
-                {
-                    view = view.Where(v => v.Contains(filter, StringComparison.OrdinalIgnoreCase));
-                }
-
-                foreach (var v in view)
-                {
-                    var idx = _clbVoices.Items.Add(v);
-                    if (_selected.Contains(v))
-                        _clbVoices.SetItemChecked(idx, true);
-                }
+                _dgvVoices.CellValueChanged += OnVoiceCellValueChanged;
+                return;
             }
-            finally
+
+            if (!_catalog.TryGetValue(_currentCategory, out var voices))
             {
-                _clbVoices.EndUpdate();
+                _dgvVoices.CellValueChanged += OnVoiceCellValueChanged;
+                return;
             }
+
+            var filter = _txtFilter.Text?.Trim();
+            IEnumerable<string> view = voices;
+            if (!string.IsNullOrEmpty(filter))
+            {
+                view = view.Where(v => v.Contains(filter, StringComparison.OrdinalIgnoreCase));
+            }
+
+            foreach (var v in view)
+            {
+                var isSelected = _selectedVoicesWithRoles.ContainsKey(v);
+                var role = isSelected ? _selectedVoicesWithRoles[v] : "Select...";
+                
+                _dgvVoices.Rows.Add(isSelected, v, role);
+            }
+
+            _dgvVoices.CellValueChanged += OnVoiceCellValueChanged;
         }
 
         private void RefreshSelectedList()
         {
-            _lstSelected.BeginUpdate();
-            try
+            _dgvSelected.Rows.Clear();
+
+            var sortedSelected = _selectedVoicesWithRoles
+                .OrderBy(kvp => kvp.Key, StringComparer.OrdinalIgnoreCase);
+
+            foreach (var kvp in sortedSelected)
             {
-                _lstSelected.Items.Clear();
-                var sortedSelected = _selected.OrderBy(s => s, StringComparer.OrdinalIgnoreCase);
-                foreach (var voice in sortedSelected)
-                {
-                    _lstSelected.Items.Add(voice);
-                }
-            }
-            finally
-            {
-                _lstSelected.EndUpdate();
+                _dgvSelected.Rows.Add(kvp.Key, kvp.Value);
             }
         }
 
-        private void OnVoiceItemCheck(object? sender, ItemCheckEventArgs e)
+        private void OnVoiceCellDirtyStateChanged(object? sender, EventArgs e)
         {
-            if (e.Index < 0 || e.Index >= _clbVoices.Items.Count) return;
-            var name = _clbVoices.Items[e.Index]?.ToString();
-            if (string.IsNullOrWhiteSpace(name)) return;
+            if (_dgvVoices.IsCurrentCellDirty)
+            {
+                _dgvVoices.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            }
+        }
 
-            if (e.NewValue == CheckState.Checked)
-                _selected.Add(name);
+        private void OnVoiceCellValueChanged(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.RowIndex >= _dgvVoices.Rows.Count) return;
+
+            var row = _dgvVoices.Rows[e.RowIndex];
+            var voiceName = row.Cells["VoiceName"].Value?.ToString();
+            if (string.IsNullOrWhiteSpace(voiceName)) return;
+
+            var isChecked = row.Cells["Selected"].Value is bool b && b;
+            var role = row.Cells["GrooveRole"].Value?.ToString() ?? "Select...";
+
+            if (isChecked)
+            {
+                _selectedVoicesWithRoles[voiceName] = role;
+            }
             else
-                _selected.Remove(name);
+            {
+                _selectedVoicesWithRoles.Remove(voiceName);
+            }
 
-            // Update selected list after the check state changes
-            BeginInvoke(RefreshSelectedList);
+            RefreshSelectedList();
         }
 
         private void SelectAllInView()
         {
-            for (int i = 0; i < _clbVoices.Items.Count; i++)
+            _dgvVoices.CellValueChanged -= OnVoiceCellValueChanged;
+
+            for (int i = 0; i < _dgvVoices.Rows.Count; i++)
             {
-                var name = _clbVoices.Items[i]?.ToString();
-                if (!string.IsNullOrWhiteSpace(name))
+                var row = _dgvVoices.Rows[i];
+                var voiceName = row.Cells["VoiceName"].Value?.ToString();
+                if (!string.IsNullOrWhiteSpace(voiceName))
                 {
-                    _selected.Add(name);
-                    _clbVoices.SetItemChecked(i, true);
+                    row.Cells["Selected"].Value = true;
+                    var role = row.Cells["GrooveRole"].Value?.ToString() ?? "Select...";
+                    _selectedVoicesWithRoles[voiceName] = role;
                 }
             }
+
+            _dgvVoices.CellValueChanged += OnVoiceCellValueChanged;
             RefreshSelectedList();
         }
 
         private void ClearInView()
         {
-            for (int i = 0; i < _clbVoices.Items.Count; i++)
+            _dgvVoices.CellValueChanged -= OnVoiceCellValueChanged;
+
+            for (int i = 0; i < _dgvVoices.Rows.Count; i++)
             {
-                var name = _clbVoices.Items[i]?.ToString();
-                if (!string.IsNullOrWhiteSpace(name))
+                var row = _dgvVoices.Rows[i];
+                var voiceName = row.Cells["VoiceName"].Value?.ToString();
+                if (!string.IsNullOrWhiteSpace(voiceName))
                 {
-                    _selected.Remove(name);
-                    _clbVoices.SetItemChecked(i, false);
+                    row.Cells["Selected"].Value = false;
+                    _selectedVoicesWithRoles.Remove(voiceName);
                 }
             }
+
+            _dgvVoices.CellValueChanged += OnVoiceCellValueChanged;
             RefreshSelectedList();
         }
 
         private void OnOk(object? sender, EventArgs e)
         {
-            SelectedVoices.Clear();
-            SelectedVoices.AddRange(_selected.OrderBy(s => s, StringComparer.OrdinalIgnoreCase));
+            SelectedVoicesWithRoles.Clear();
+            foreach (var kvp in _selectedVoicesWithRoles.OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase))
+            {
+                SelectedVoicesWithRoles[kvp.Key] = kvp.Value;
+            }
             DialogResult = DialogResult.OK;
             Close();
         }

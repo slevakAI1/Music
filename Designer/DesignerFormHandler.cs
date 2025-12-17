@@ -101,11 +101,13 @@ namespace Music
         {
             using var voiceForm = new VoiceSelectorForm();
             
-            // NEW: Initialize with existing voices from the designer
+            // Initialize with existing voices from the designer
             var existingVoices = Globals.Designer?.Voices?.Voices?
-                .Select(v => v.VoiceName)
-                .Where(name => !string.IsNullOrWhiteSpace(name))
-                .ToList();
+                .Where(v => !string.IsNullOrWhiteSpace(v.VoiceName))
+                .ToDictionary(
+                    v => v.VoiceName, 
+                    v => string.IsNullOrWhiteSpace(v.GrooveRole) ? "Select..." : v.GrooveRole,
+                    StringComparer.OrdinalIgnoreCase);
             
             if (existingVoices?.Count > 0)
             {
@@ -114,7 +116,7 @@ namespace Music
 
             if (voiceForm.ShowDialog(form) == DialogResult.OK)
             {
-                var selected = voiceForm.SelectedVoices;
+                var selected = voiceForm.SelectedVoicesWithRoles;
                 if (selected?.Count > 0)
                 {
                     if (Globals.Designer == null)
@@ -123,9 +125,10 @@ namespace Music
                     Globals.Designer.Voices ??= new VoiceSet();
                     Globals.Designer.Voices.Reset();
 
-                    foreach (var voiceName in selected)
+                    foreach (var kvp in selected)
                     {
-                        Globals.Designer.Voices.AddVoice(voiceName);
+                        var role = kvp.Value == "Select..." ? "" : kvp.Value;
+                        Globals.Designer.Voices.AddVoice(kvp.Key, role);
                     }
 
                     UpdateDesignerReport(form);
