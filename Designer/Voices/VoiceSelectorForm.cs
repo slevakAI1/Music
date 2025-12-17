@@ -5,6 +5,7 @@ namespace Music.Designer
     {
         private readonly ListBox _lstCategories;
         private readonly CheckedListBox _clbVoices;
+        private readonly ListBox _lstSelected;
         private readonly TextBox _txtFilter;
         private readonly Button _btnSelectAll;
         private readonly Button _btnClear;
@@ -38,12 +39,13 @@ namespace Music.Designer
             var root = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
-                ColumnCount = 2,
+                ColumnCount = 3,
                 RowCount = 1,
                 Padding = new Padding(8)
             };
             root.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 220));
-            root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60));
+            root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40));
             Controls.Add(root);
 
             // Left: Categories
@@ -70,19 +72,19 @@ namespace Music.Designer
             leftPanel.Controls.Add(_lstCategories);
             leftPanel.Controls.Add(lblCat);
 
-            // Right: Filter + Voices + Buttons
-            var rightPanel = new TableLayoutPanel
+            // Middle: Filter + Voices + Buttons
+            var middlePanel = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
                 ColumnCount = 1,
                 RowCount = 4,
-                Padding = new Padding(0) // keep right content within form
+                Padding = new Padding(0)
             };
-            rightPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));     // filter
-            rightPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); // list
-            rightPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));     // actions
-            rightPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));     // ok/cancel
-            root.Controls.Add(rightPanel, 1, 0);
+            middlePanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));     // filter
+            middlePanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); // list
+            middlePanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));     // actions
+            middlePanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));     // ok/cancel
+            root.Controls.Add(middlePanel, 1, 0);
 
             var filterPanel = new TableLayoutPanel
             {
@@ -93,7 +95,7 @@ namespace Music.Designer
             };
             filterPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 60));
             filterPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            rightPanel.Controls.Add(filterPanel, 0, 0);
+            middlePanel.Controls.Add(filterPanel, 0, 0);
 
             var lblFilter = new Label
             {
@@ -119,10 +121,10 @@ namespace Music.Designer
                 Dock = DockStyle.Fill,
                 CheckOnClick = true,
                 IntegralHeight = false,
-                HorizontalScrollbar = true // long items scroll instead of overflowing
+                HorizontalScrollbar = true
             };
             _clbVoices.ItemCheck += OnVoiceItemCheck;
-            rightPanel.Controls.Add(_clbVoices, 0, 1);
+            middlePanel.Controls.Add(_clbVoices, 0, 1);
 
             var actionPanel = new FlowLayoutPanel
             {
@@ -131,7 +133,7 @@ namespace Music.Designer
                 Padding = new Padding(0, 4, 0, 4),
                 AutoSize = true
             };
-            rightPanel.Controls.Add(actionPanel, 0, 2);
+            middlePanel.Controls.Add(actionPanel, 0, 2);
 
             _btnSelectAll = new Button { Text = "Select All" };
             _btnSelectAll.Click += (_, __) => SelectAllInView();
@@ -141,7 +143,6 @@ namespace Music.Designer
             _btnClear.Click += (_, __) => ClearInView();
             actionPanel.Controls.Add(_btnClear);
 
-            // Ensure full text always shows and doesn’t change
             _btnDefaults = new Button { Text = "Set Defaults", AutoSize = true };
             _btnDefaults.Click += OnSetDefaults;
             actionPanel.Controls.Add(_btnDefaults);
@@ -161,7 +162,7 @@ namespace Music.Designer
                 Padding = new Padding(0, 4, 0, 0),
                 AutoSize = true
             };
-            rightPanel.Controls.Add(okCancelPanel, 0, 3);
+            middlePanel.Controls.Add(okCancelPanel, 0, 3);
 
             _btnOk = new Button { Text = "OK", DialogResult = DialogResult.OK };
             _btnOk.Click += OnOk;
@@ -169,6 +170,28 @@ namespace Music.Designer
 
             okCancelPanel.Controls.Add(_btnOk);
             okCancelPanel.Controls.Add(_btnCancel);
+
+            // Right: Selected Voices Display
+            var rightPanel = new Panel { Dock = DockStyle.Fill, Padding = new Padding(4, 0, 0, 0) };
+            root.Controls.Add(rightPanel, 2, 0);
+
+            var lblSelected = new Label
+            {
+                Text = "Selected Voices",
+                Dock = DockStyle.Top,
+                AutoSize = true,
+                Margin = new Padding(0, 0, 0, 4)
+            };
+
+            _lstSelected = new ListBox
+            {
+                Dock = DockStyle.Fill,
+                IntegralHeight = false,
+                Margin = new Padding(0, 4, 0, 0)
+            };
+
+            rightPanel.Controls.Add(_lstSelected);
+            rightPanel.Controls.Add(lblSelected);
 
             AcceptButton = _btnOk;
             CancelButton = _btnCancel;
@@ -232,8 +255,9 @@ namespace Music.Designer
                 }
             }
 
-            // Always refresh so checks are applied even if category didn’t change
+            // Always refresh so checks are applied even if category didn't change
             RefreshVoices();
+            RefreshSelectedList();
         }
 
         private void OnSetDefaults(object? sender, EventArgs e)
@@ -279,6 +303,24 @@ namespace Music.Designer
             }
         }
 
+        private void RefreshSelectedList()
+        {
+            _lstSelected.BeginUpdate();
+            try
+            {
+                _lstSelected.Items.Clear();
+                var sortedSelected = _selected.OrderBy(s => s, StringComparer.OrdinalIgnoreCase);
+                foreach (var voice in sortedSelected)
+                {
+                    _lstSelected.Items.Add(voice);
+                }
+            }
+            finally
+            {
+                _lstSelected.EndUpdate();
+            }
+        }
+
         private void OnVoiceItemCheck(object? sender, ItemCheckEventArgs e)
         {
             if (e.Index < 0 || e.Index >= _clbVoices.Items.Count) return;
@@ -289,6 +331,9 @@ namespace Music.Designer
                 _selected.Add(name);
             else
                 _selected.Remove(name);
+
+            // Update selected list after the check state changes
+            BeginInvoke(RefreshSelectedList);
         }
 
         private void SelectAllInView()
@@ -302,6 +347,7 @@ namespace Music.Designer
                     _clbVoices.SetItemChecked(i, true);
                 }
             }
+            RefreshSelectedList();
         }
 
         private void ClearInView()
@@ -315,6 +361,7 @@ namespace Music.Designer
                     _clbVoices.SetItemChecked(i, false);
                 }
             }
+            RefreshSelectedList();
         }
 
         private void OnOk(object? sender, EventArgs e)
