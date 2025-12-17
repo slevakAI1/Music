@@ -18,9 +18,9 @@ namespace Music.Designer
 
         public IReadOnlyList<Voice> SetTestVoicesD1()
         {
-            AddVoice("Acoustic Grand Piano", "Pads");
-            AddVoice("Electric Guitar (clean)", "Comp");
-            AddVoice("Electric Bass (finger)", "Bass");
+            AddVoice("Techno Synth", "Pads");
+            AddVoice("Electric Guitar", "Comp");
+            AddVoice("Electric Bass", "Bass");
             AddVoice("Drum Set", "DrumKit");  // MIDI track 10 reserved for drum set. Does not use Program Number. Then each note is different percussion.
             return Voices;
         }

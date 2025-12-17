@@ -24,7 +24,7 @@ namespace Music.Designer
         {
             Text = "Select Voices";
 
-            // Fixed, non-resizable dialog that’s right-sized for use
+            // Fixed, non-resizable dialog that's right-sized for use
             FormBorderStyle = FormBorderStyle.FixedDialog;
             StartPosition = FormStartPosition.CenterParent;
             MinimizeBox = false;
@@ -35,7 +35,7 @@ namespace Music.Designer
 
             _catalog = VoiceCatalog.Load(out var sourcePath);
 
-            // Layout root with padding so inner controls don’t touch form edges
+            // Layout root with padding so inner controls don't touch form edges
             var root = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
@@ -218,6 +218,22 @@ namespace Music.Designer
                 // Do NOT set defaults on launch anymore; just select the first category with nothing checked.
                 _lstCategories.SelectedIndex = 0;
             }
+        }
+
+        // Method to initialize form with existing voices from the designer
+        public void SetExistingVoices(IEnumerable<string> voiceNames)
+        {
+            if (voiceNames == null) return;
+
+            foreach (var name in voiceNames)
+            {
+                if (!string.IsNullOrWhiteSpace(name))
+                    _selected.Add(name);
+            }
+
+            // Refresh views to show selections
+            RefreshVoices();
+            RefreshSelectedList();
         }
 
         // Sets the initial default: select the "Rock Band" category and check all voices in it.

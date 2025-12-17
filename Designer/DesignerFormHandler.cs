@@ -99,25 +99,37 @@ namespace Music
 
         public static void SelectVoices(DesignerForm form)
         {
-            if (!EnsureDesignOrNotify(form)) return;
-
-            using var dlg = new VoiceSelectorForm();
-            if (dlg.ShowDialog(form) == DialogResult.OK)
+            using var voiceForm = new VoiceSelectorForm();
+            
+            // NEW: Initialize with existing voices from the designer
+            var existingVoices = Globals.Designer?.Voices?.Voices?
+                .Select(v => v.VoiceName)
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .ToList();
+            
+            if (existingVoices?.Count > 0)
             {
-                var score = Globals.Designer!;
-                var existing = new HashSet<string>(score.Voices.Voices.Select(v => v.VoiceName),
-                    StringComparer.OrdinalIgnoreCase);
+                voiceForm.SetExistingVoices(existingVoices);
+            }
 
-                foreach (var name in dlg.SelectedVoices)
+            if (voiceForm.ShowDialog(form) == DialogResult.OK)
+            {
+                var selected = voiceForm.SelectedVoices;
+                if (selected?.Count > 0)
                 {
-                    if (!existing.Contains(name))
-                    {
-                        score.Voices.AddVoice(name);
-                        existing.Add(name);
-                    }
-                }
+                    if (Globals.Designer == null)
+                        Globals.Designer = new Designer.Designer();
 
-                UpdateDesignerReport(form);
+                    Globals.Designer.Voices ??= new VoiceSet();
+                    Globals.Designer.Voices.Reset();
+
+                    foreach (var voiceName in selected)
+                    {
+                        Globals.Designer.Voices.AddVoice(voiceName);
+                    }
+
+                    UpdateDesignerReport(form);
+                }
             }
         }
 
