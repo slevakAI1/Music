@@ -3,6 +3,16 @@ namespace Music.Designer
     // Holds the collection of voices used by the score
     public sealed class VoiceSet
     {
+        // List of valid groove roles (used to populate combo boxes, etc.)
+        public static IReadOnlyList<string> ValidGrooveRoles { get; } = new List<string>
+        {
+            "Select...",
+            "Pads",
+            "Comp",
+            "Bass",
+            "DrumKit"
+        };
+
         public List<Voice> Voices { get; set; } = new();
 
         public void Reset() => Voices.Clear();
