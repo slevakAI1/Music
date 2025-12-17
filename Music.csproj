@@ -83,7 +83,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Designer\Voices.Notion.json">
+    <None Update="Designer\Voices\Voices.Notion.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

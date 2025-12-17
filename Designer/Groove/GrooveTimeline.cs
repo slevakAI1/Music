@@ -59,7 +59,12 @@ namespace Music.Designer
 
         private void IndexEventForBars(GrooveEvent evt)
         {
-            // Index this event at its starting bar
+            // Only index events at a bar head (StartBeat == 1).
+            // Events that start mid-bar should not overwrite the bar-head mapping
+            // because TryGetAtBar is intended to answer "which groove is active at beat 1 of this bar".
+            if (evt.StartBeat != 1)
+                return;
+
             _barHeads[evt.StartBar] = evt;
         }
 

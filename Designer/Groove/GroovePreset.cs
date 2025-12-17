@@ -15,13 +15,18 @@ namespace Music.Designer
     // A layer within a groove (anchor or tension)
     public sealed class GrooveLayer
     {
-        // Onsets for kick drum (beat positions within a bar, 1-based)
+        // Drum roles
         public List<decimal> KickOnsets { get; init; } = new();
-        
-        // Onsets for snare drum (beat positions within a bar, 1-based)
         public List<decimal> SnareOnsets { get; init; } = new();
-        
-        // Onsets for hi-hat/subdivision carrier (beat positions within a bar, 1-based)
         public List<decimal> HatOnsets { get; init; } = new();
+        
+        // Bass role
+        public List<decimal> BassOnsets { get; init; } = new();
+        
+        // Guitar/comping role (rhythm guitar, typically on offbeats/8ths)
+        public List<decimal> CompOnsets { get; init; } = new();
+        
+        // Keys/pads role (sustained chords, typically on longer values)
+        public List<decimal> PadsOnsets { get; init; } = new();
     }
 }
