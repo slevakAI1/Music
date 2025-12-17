@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -42,7 +45,11 @@ namespace Music.Designer
                 return _cachedCatalog;
             }
 
-            var filePath = Path.Combine(AppContext.BaseDirectory, MusicConstants.VoicesNotionJsonRelativePath);
+            // Use the project-root-based location (consistent with other code paths in the app).
+            var baseDir = AppContext.BaseDirectory;
+            var projectRoot = Path.GetFullPath(Path.Combine(baseDir, "..", "..", ".."));
+            var filePath = Path.Combine(projectRoot, MusicConstants.VoicesNotionJsonRelativePath);
+
             _cachedSourcePath = filePath;
             sourcePath = filePath;
 

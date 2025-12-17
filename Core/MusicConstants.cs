@@ -25,6 +25,6 @@
         };
 
         // Relative path from AppContext.BaseDirectory to the Voices.Notion.json file
-        public const string VoicesNotionJsonRelativePath = "Designer\\Voices.Notion.json";
+        public const string VoicesNotionJsonRelativePath = "Designer\\Voices\\Voices.Notion.json";
     }
 }

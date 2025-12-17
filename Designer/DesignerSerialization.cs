@@ -21,8 +21,8 @@ namespace Music.Designer
             {
                 foreach (var v in dto.VoiceSet.Voices)
                 {
-                    if (!string.IsNullOrWhiteSpace(v?.PartName))
-                        design.PartSet.AddVoice(v.PartName);
+                    if (!string.IsNullOrWhiteSpace(v?.VoiceName))
+                        design.PartSet.AddVoice(v.VoiceName);
                 }
             }
 
@@ -88,7 +88,7 @@ namespace Music.Designer
 
         private sealed class VoiceSetDto
         {
-            public List<VoiceClass>? Voices { get; set; }
+            public List<Voice>? Voices { get; set; }
         }
 
         private sealed class SectionSetDto

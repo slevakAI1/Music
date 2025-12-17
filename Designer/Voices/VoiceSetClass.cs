@@ -3,7 +3,7 @@ namespace Music.Designer
     // Holds the collection of voices used by the score
     public sealed class VoiceSetClass
     {
-        public List<VoiceClass> Voices { get; set; } = new();
+        public List<Voice> Voices { get; set; } = new();
 
         public void Reset() => Voices.Clear();
 
@@ -12,11 +12,11 @@ namespace Music.Designer
             if (string.IsNullOrWhiteSpace(voiceName))
                 throw new ArgumentException("Voice name must not be null or empty.", nameof(voiceName));
 
-            var voice = new VoiceClass { PartName = voiceName };
+            var voice = new Voice { VoiceName = voiceName };
             Voices.Add(voice);
         }
 
-        public IReadOnlyList<VoiceClass> SetTestVoicesD1()
+        public IReadOnlyList<Voice> SetTestVoicesD1()
         {
             AddVoice("Acoustic Grand Piano");
             AddVoice("Electric Guitar (clean)");

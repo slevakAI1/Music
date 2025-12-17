@@ -18,7 +18,7 @@ namespace Music.Writer
             {
                 foreach (var v in designer.PartSet.Voices)
                 {
-                    var name = v?.PartName;
+                    var name = v?.VoiceName;
                     if (!string.IsNullOrWhiteSpace(name))
                         partNames.Add(name!);
                 }

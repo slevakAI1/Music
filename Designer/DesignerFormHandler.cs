@@ -105,7 +105,7 @@ namespace Music
             if (dlg.ShowDialog(form) == DialogResult.OK)
             {
                 var score = Globals.Designer!;
-                var existing = new HashSet<string>(score.PartSet.Voices.Select(v => v.PartName),
+                var existing = new HashSet<string>(score.PartSet.Voices.Select(v => v.VoiceName),
                     StringComparer.OrdinalIgnoreCase);
 
                 foreach (var name in dlg.SelectedVoices)

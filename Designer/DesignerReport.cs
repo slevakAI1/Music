@@ -21,7 +21,7 @@ namespace Music.Designer
             foreach (var v in designer.PartSet.Voices)
             {
                 if (!first) sb.Append("\r\n");
-                sb.Append(v?.PartName ?? string.Empty);
+                sb.Append(v?.VoiceName ?? string.Empty);
                 first = false;
             }
 
