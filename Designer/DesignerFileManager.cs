@@ -22,7 +22,7 @@ namespace Music.Designer
                 var snapshot = new
                 {
                     design.DesignId,
-                    design.PartSet,
+                    design.Voices,
                     design.SectionTimeline,
                     design.HarmonicTimeline,
                     design.TempoTimeline,

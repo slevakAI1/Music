@@ -15,7 +15,7 @@ namespace Music.Designer
             sectionTestData.SetTestSectionsD1(design.SectionTimeline);
 
             // 2) Voices: apply default voices
-            design.PartSet.SetTestVoicesD1();    // TODO - the others have separate classes!
+            design.Voices.SetTestVoicesD1();    // TODO - the others have separate classes!
 
             // 3) Harmonic timeline: use the same defaults as the Harmonic Editor's "Set Defaults"
             design.HarmonicTimeline = HarmonyTests.CreateTestTimelineD1();

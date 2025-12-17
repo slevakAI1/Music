@@ -105,14 +105,14 @@ namespace Music
             if (dlg.ShowDialog(form) == DialogResult.OK)
             {
                 var score = Globals.Designer!;
-                var existing = new HashSet<string>(score.PartSet.Voices.Select(v => v.VoiceName),
+                var existing = new HashSet<string>(score.Voices.Voices.Select(v => v.VoiceName),
                     StringComparer.OrdinalIgnoreCase);
 
                 foreach (var name in dlg.SelectedVoices)
                 {
                     if (!existing.Contains(name))
                     {
-                        score.PartSet.AddVoice(name);
+                        score.Voices.AddVoice(name);
                         existing.Add(name);
                     }
                 }

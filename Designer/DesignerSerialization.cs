@@ -16,13 +16,13 @@ namespace Music.Designer
             var design = new Designer(dto.DesignId);
 
             // Voices (preserve order as given in JSON)
-            design.PartSet.Reset();
+            design.Voices.Reset();
             if (dto.VoiceSet?.Voices != null)
             {
                 foreach (var v in dto.VoiceSet.Voices)
                 {
                     if (!string.IsNullOrWhiteSpace(v?.VoiceName))
-                        design.PartSet.AddVoice(v.VoiceName);
+                        design.Voices.AddVoice(v.VoiceName);
                 }
             }
 

@@ -20,9 +20,9 @@ namespace Music.Writer
             // Preserve existing checked states
 
             var availableParts = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            if (design?.PartSet?.Voices != null)
+            if (design?.Voices?.Voices != null)
             {
-                foreach (var v in design.PartSet.Voices)
+                foreach (var v in design.Voices.Voices)
                 {
                     var name = v?.VoiceName;
                     if (!string.IsNullOrWhiteSpace(name))

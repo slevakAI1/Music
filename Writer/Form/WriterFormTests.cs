@@ -14,9 +14,9 @@ namespace Music.Writer
             // Voices: select all named voices from the design
 
             var partNames = new List<string>();
-            if (designer?.PartSet?.Voices != null)
+            if (designer?.Voices?.Voices != null)
             {
-                foreach (var v in designer.PartSet.Voices)
+                foreach (var v in designer.Voices.Voices)
                 {
                     var name = v?.VoiceName;
                     if (!string.IsNullOrWhiteSpace(name))

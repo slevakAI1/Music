@@ -1,14 +1,14 @@
 ﻿namespace Music.Designer
 {
     /// <summary>
-    /// Design structure for a musical score
+    /// Design structure for a song
     /// </summary>
     public sealed class Designer
     {
         public string DesignId { get; }
 
         // Design Space
-        public VoiceSetClass PartSet { get; set; } = new();
+        public VoiceSet Voices { get; set; } = new();
 
         public SectionTimeline SectionTimeline { get; set; } = new();
 

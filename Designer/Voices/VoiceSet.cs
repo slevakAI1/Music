@@ -1,7 +1,7 @@
 namespace Music.Designer
 {
     // Holds the collection of voices used by the score
-    public sealed class VoiceSetClass
+    public sealed class VoiceSet
     {
         public List<Voice> Voices { get; set; } = new();
 
