@@ -18,7 +18,7 @@ namespace Music.Designer
             // VOICES
             sb.Append("VOICES:\r\n");
             var first = true;
-            foreach (var v in designer.PartSet.Parts)
+            foreach (var v in designer.PartSet.Voices)
             {
                 if (!first) sb.Append("\r\n");
                 sb.Append(v?.PartName ?? string.Empty);

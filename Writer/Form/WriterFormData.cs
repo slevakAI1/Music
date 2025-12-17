@@ -15,7 +15,7 @@ namespace Music.Writer
         private string? _pattern;
         private string? _sectionsText;
 
-        // Target scope (Parts / Sections / Staff / Range)
+        // Target scope (Voices / Sections / Staff / Range)
         private Dictionary<string, bool>? _partsState;
         private Dictionary<string, bool>? _sectionsState;
         private List<int>? _selectedStaffs; // Changed from Dictionary<int, bool>? _staffsState
@@ -55,7 +55,7 @@ namespace Music.Writer
             set => _pattern = value;
         }
 
-        // Parts / scope
+        // Voices / scope
         // New: map of part name to checked state. Getter returns an empty dictionary when not set.
         public Dictionary<string, bool>? PartsState
         {

@@ -103,7 +103,7 @@
             if (data.Pattern != null && cbCommand != null && cbCommand.Items.Contains(data.Pattern))
                 cbCommand.SelectedItem = data.Pattern;
 
-            // Parts - if provided, set checked state for matching items
+            // Voices - if provided, set checked state for matching items
             if (data.PartsState != null && data.PartsState.Count > 0 && clbParts != null)
             {
                 // Use case-insensitive lookup

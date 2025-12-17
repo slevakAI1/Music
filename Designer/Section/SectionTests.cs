@@ -9,7 +9,7 @@ namespace Music.Designer
         public void SetDefaultSections(
             IWin32Window owner,
             SectionTimeline sections,
-            PartSetClass voiceSet)
+            VoiceSetClass voiceSet)
         {
             SetTestSectionsD1(sections);
 

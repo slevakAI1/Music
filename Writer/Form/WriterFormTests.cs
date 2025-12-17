@@ -11,12 +11,12 @@ namespace Music.Writer
             var data = new WriterFormData();
 
             //===================================================================
-            // Parts: select all named voices from the design
+            // Voices: select all named voices from the design
 
             var partNames = new List<string>();
-            if (designer?.PartSet?.Parts != null)
+            if (designer?.PartSet?.Voices != null)
             {
-                foreach (var v in designer.PartSet.Parts)
+                foreach (var v in designer.PartSet.Voices)
                 {
                     var name = v?.PartName;
                     if (!string.IsNullOrWhiteSpace(name))

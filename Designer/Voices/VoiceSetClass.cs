@@ -1,11 +1,11 @@
 namespace Music.Designer
 {
     // Holds the collection of voices used by the score
-    public sealed class PartSetClass
+    public sealed class VoiceSetClass
     {
-        public List<VoiceClass> Parts { get; set; } = new();
+        public List<VoiceClass> Voices { get; set; } = new();
 
-        public void Reset() => Parts.Clear();
+        public void Reset() => Voices.Clear();
 
         public void AddVoice(string voiceName)
         {
@@ -13,7 +13,7 @@ namespace Music.Designer
                 throw new ArgumentException("Voice name must not be null or empty.", nameof(voiceName));
 
             var voice = new VoiceClass { PartName = voiceName };
-            Parts.Add(voice);
+            Voices.Add(voice);
         }
 
         public IReadOnlyList<VoiceClass> SetTestVoicesD1()
@@ -22,7 +22,7 @@ namespace Music.Designer
             AddVoice("Electric Guitar (clean)");
             AddVoice("Electric Bass (finger)");
             AddVoice("Drum Set");  // MIDI track 10 reserved for drum set. Does not use Program Number. Then each note is different percussion.
-            return Parts;
+            return Voices;
         }
     }
 }
