@@ -1,20 +1,21 @@
-using Music.MyMidi;
-using static System.Windows.Forms.DataFormats;
-
 namespace Music.Writer
 {
-    // Command execution logic for WriterForm
-    public partial class WriterForm
+    /// <summary>
+    /// Static command execution logic for WriterForm.
+    /// Each method accepts only the specific dependencies it needs.
+    /// </summary>
+    public static class CommandRepeatNote
     {
-        // ========== COMMAND EXECUTION ==========
-
         /// <summary>
         /// Adds repeating notes to the phrases selected in the grid
         /// </summary>
-        public void HandleRepeatNote(WriterFormData formData)
+        public static void HandleRepeatNote(
+            WriterFormData formData,
+            DataGridView dgSong,
+            Form owner)
         {
             // Validate that phrases are selected before executing
-            if (!ValidatePhrasesSelected())
+            if (!ValidatePhrasesSelected(dgSong, owner))
                 return;
 
             var (noteNumber, noteDurationTicks, repeatCount, isRest) =
@@ -28,10 +29,14 @@ namespace Music.Writer
                 isRest: isRest);
 
             // Append the phrase notes to all selected rows
-            AppendPhraseNotesToSelectedRows(phrase);
+            AppendPhraseNotesToSelectedRows(dgSong, phrase);
         }
 
-        public void HandleHarmonySyncTest(WriterFormData formData)
+        public static void HandleHarmonySyncTest(
+            DataGridView dgSong,
+            List<Music.MyMidi.MidiInstrument> midiInstruments,
+            ref int phraseNumber,
+            Form owner)
         {
             // Extract harmony timeline from the fixed harmony row
             var harmonyRow = dgSong.Rows[SongGridManager.FIXED_ROW_HARMONY];
@@ -39,7 +44,7 @@ namespace Music.Writer
             
             if (harmonyTimeline == null || harmonyTimeline.Events.Count == 0)
             {
-                MessageBox.Show(this,
+                MessageBox.Show(owner,
                     "No harmony events defined. Please add harmony events first.",
                     "Missing Harmony",
                     MessageBoxButtons.OK,
@@ -53,7 +58,7 @@ namespace Music.Writer
             
             if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
             {
-                MessageBox.Show(this,
+                MessageBox.Show(owner,
                     "No time signature events defined. Please add at least one time signature event.",
                     "Missing Time Signature",
                     MessageBoxButtons.OK,
@@ -68,12 +73,12 @@ namespace Music.Writer
             var drumSetPhrase = CreateDrumSetPhrase(harmonyTimeline, timeSignatureTimeline);
 
             // Add phrases to the grid
-            SongGridManager.AddPhraseToGrid(rockOrganPhrase, _midiInstruments, dgSong, ref phraseNumber);
-            SongGridManager.AddPhraseToGrid(electricGuitarPhrase, _midiInstruments, dgSong, ref phraseNumber);
-            SongGridManager.AddPhraseToGrid(electricBassPhrase, _midiInstruments, dgSong, ref phraseNumber);
-            SongGridManager.AddPhraseToGrid(drumSetPhrase, _midiInstruments, dgSong, ref phraseNumber);
+            SongGridManager.AddPhraseToGrid(rockOrganPhrase, midiInstruments, dgSong, ref phraseNumber);
+            SongGridManager.AddPhraseToGrid(electricGuitarPhrase, midiInstruments, dgSong, ref phraseNumber);
+            SongGridManager.AddPhraseToGrid(electricBassPhrase, midiInstruments, dgSong, ref phraseNumber);
+            SongGridManager.AddPhraseToGrid(drumSetPhrase, midiInstruments, dgSong, ref phraseNumber);
 
-            MessageBox.Show(this,
+            MessageBox.Show(owner,
                 "Successfully created 4 synchronized phrases based on harmony timeline.",
                 "Harmony Sync Test",
                 MessageBoxButtons.OK,
@@ -81,9 +86,52 @@ namespace Music.Writer
         }
 
         /// <summary>
+        /// Validates that phrases are selected in the grid.
+        /// </summary>
+        private static bool ValidatePhrasesSelected(DataGridView dgSong, Form owner)
+        {
+            var hasPhraseSelection = dgSong.SelectedRows
+                .Cast<DataGridViewRow>()
+                .Any(r => r.Index >= SongGridManager.FIXED_ROWS_COUNT);
+
+            if (!hasPhraseSelection)
+            {
+                MessageBox.Show(owner,
+                    "Please select one or more phrase rows to apply the command.",
+                    "No Phrases Selected",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Appends phrase notes to all selected phrase rows in the grid.
+        /// </summary>
+        private static void AppendPhraseNotesToSelectedRows(DataGridView dgSong, Phrase phrase)
+        {
+            foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
+            {
+                // Skip fixed rows
+                if (selectedRow.Index < SongGridManager.FIXED_ROWS_COUNT)
+                    continue;
+
+                // Get existing phrase data
+                var dataObj = selectedRow.Cells["colData"].Value;
+                if (dataObj is not Phrase existingPhrase)
+                    continue;
+
+                // Append the new notes
+                existingPhrase.PhraseNotes.AddRange(phrase.PhraseNotes);
+            }
+        }
+
+        /// <summary>
         /// Creates a Rock Organ phrase with two half notes per measure based on the harmony timeline.
         /// </summary>
-        private Phrase CreateRockOrganPhrase(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
+        private static Phrase CreateRockOrganPhrase(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
         {
             var notes = new List<PhraseNote>();
             int currentTick = 0;
@@ -142,7 +190,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates an Electric Guitar phrase with 8 eighth notes per measure based on the harmony timeline.
         /// </summary>
-        private Phrase CreateElectricGuitarPhrase(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
+        private static Phrase CreateElectricGuitarPhrase(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
         {
             var notes = new List<PhraseNote>();
             int currentTick = 0;
@@ -194,7 +242,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates an Electric Bass phrase with 4 quarter notes per measure based on the harmony timeline.
         /// </summary>
-        private Phrase CreateElectricBassPhrase(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
+        private static Phrase CreateElectricBassPhrase(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
         {
             var notes = new List<PhraseNote>();
             int currentTick = 0;
@@ -246,7 +294,7 @@ namespace Music.Writer
         /// <summary>
         /// Creates a Drum Set phrase with bass drum on beats 1 and 3, and snare on every beat.
         /// </summary>
-        private Phrase CreateDrumSetPhrase(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
+        private static Phrase CreateDrumSetPhrase(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
         {
             var notes = new List<PhraseNote>();
             int currentTick = 0;

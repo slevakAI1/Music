@@ -181,11 +181,15 @@ namespace Music.Writer
             switch (command)
             {
                 case "Repeat Note":
-                    HandleRepeatNote(formData);
+                    CommandRepeatNote.HandleRepeatNote(formData, dgSong, this);
                     break;
 
                 case "Harmony Sync Test":
-                    HandleHarmonySyncTest(formData);
+                    CommandRepeatNote.HandleHarmonySyncTest(dgSong, _midiInstruments, ref phraseNumber, this);
+                    break;
+
+                case "Harmony Groove Sync Test":
+                    //HandleHarmonyGrooveSyncTest(formData);
                     break;
 
                 // Other cases will be added here later.
