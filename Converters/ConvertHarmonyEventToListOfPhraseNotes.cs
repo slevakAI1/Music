@@ -1,11 +1,12 @@
-﻿using MusicTheory;
+﻿
+
+
 using Music.Designer;
 
 namespace Music.Writer
 {
     /// <summary>
-    /// Converts HarmonyEvent objects to lists of WriterNote compatible with Writer.
-    /// Uses the MusicTheory library to generate chord voicings.
+    /// Converts HarmonyEvent objects to lists of PhraseNote compatible with Writer.
     /// </summary>
     public static class ConvertHarmonyEventToListOfPhraseNotes
     {

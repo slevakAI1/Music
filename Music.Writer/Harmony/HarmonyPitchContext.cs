@@ -1,4 +1,4 @@
-namespace Music.Writer
+﻿namespace Music.Writer
 {
     /// <summary>
     /// Provides pitch information for a harmony event, including chord tones and scale tones.
@@ -12,9 +12,17 @@ namespace Music.Writer
         public Music.Designer.HarmonyEvent? SourceEvent { get; init; }
 
         /// <summary>
-        /// The root pitch class of the chord (0-11, where 0=C).
+        /// The root pitch class of the key (0-11, where 0=C).
+        /// This is the tonic of the key signature, not the chord root.
         /// </summary>
-        public int RootPitchClass { get; init; }
+        public int KeyRootPitchClass { get; init; }
+
+        /// <summary>
+        /// The root pitch class of the chord (0-11, where 0=C).
+        /// This is calculated from the scale degree applied to the key.
+        /// For example: C major, degree 5 → chord root is G (pitch class 7).
+        /// </summary>
+        public int ChordRootPitchClass { get; init; }
 
         /// <summary>
         /// Pitch classes of the chord tones (0-11), sorted and unique.

@@ -163,44 +163,52 @@ namespace Music.Writer
 
         /// <summary>
         /// Maps quality strings from HarmonyEditorForm to MusicTheory ChordType.
+        /// Handles normalization of quality strings used in HarmonyEvent.
         /// </summary>
-        private static ChordType MapQualityToChordType(string quality) => quality switch
+        private static ChordType MapQualityToChordType(string quality)
         {
-            // Triads
-            "Major" => ChordType.Major,
-            "Minor" => ChordType.Minor,
-            "Diminished" => ChordType.Diminished,
-            "Augmented" => ChordType.Augmented,
-            "Sus2" => ChordType.Sus2,
-            "Sus4" => ChordType.Sus4,
-            "Power5" => ChordType.Power5,
+            // Normalize: trim and handle variations
+            var normalized = quality?.Trim().ToLowerInvariant() ?? string.Empty;
 
-            // 6ths
-            "Major6" => ChordType.Major6,
-            "Minor6" => ChordType.Minor6,
-            "Major6Add9" => ChordType.Major6Add9,
+            return normalized switch
+            {
+                // Triads
+                "maj" or "major" => ChordType.Major,
+                "min" or "minor" => ChordType.Minor,
+                "dim" or "diminished" => ChordType.Diminished,
+                "aug" or "augmented" => ChordType.Augmented,
+                "sus2" => ChordType.Sus2,
+                "sus4" => ChordType.Sus4,
+                "5" or "power5" => ChordType.Power5,
 
-            // 7ths
-            "Dominant7" => ChordType.Dominant7,
-            "Major7" => ChordType.Major7,
-            "Minor7" => ChordType.Minor7,
-            "Diminished7" => ChordType.Diminished7,
-            "HalfDiminished7" => ChordType.HalfDiminished7,
-            "MinorMajor7" => ChordType.MinorMajor7,
+                // 6ths
+                "maj6" or "major6" => ChordType.Major6,
+                "min6" or "minor6" => ChordType.Minor6,
+                "6/9" or "major6add9" => ChordType.Major6Add9,
 
-            // Extensions
-            "Dominant9" => ChordType.Dominant9,
-            "Major9" => ChordType.Major9,
-            "Minor9" => ChordType.Minor9,
-            "Dominant11" => ChordType.Dominant11,
-            "Dominant13" => ChordType.Dominant13,
+                // 7ths
+                "dom7" or "dominant7" => ChordType.Dominant7,
+                "maj7" or "major7" => ChordType.Major7,
+                "min7" or "minor7" => ChordType.Minor7,
+                "dim7" or "diminished7" => ChordType.Diminished7,
+                "hdim7" or "halfdiminished7" => ChordType.HalfDiminished7,
+                "minmaj7" or "minormajor7" => ChordType.MinorMajor7,
 
-            // Adds
-            "MajorAdd9" => ChordType.MajorAdd9,
-            "MajorAdd11" => ChordType.MajorAdd11,
+                // Extensions
+                "9" or "dominant9" => ChordType.Dominant9,
+                "maj9" or "major9" => ChordType.Major9,
+                "min9" or "minor9" => ChordType.Minor9,
+                "11" or "dominant11" => ChordType.Dominant11,
+                "13" or "dominant13" => ChordType.Dominant13,
 
-            _ => throw new NotSupportedException($"Chord quality '{quality}' is not supported")
-        };
+                // Adds
+                "add9" or "majoradd9" => ChordType.MajorAdd9,
+                "add11" or "majoradd11" => ChordType.MajorAdd11,
+                "add13" => throw new NotSupportedException($"Chord quality 'add13' is not currently supported by MusicTheory library"),
+
+                _ => throw new NotSupportedException($"Chord quality '{quality}' is not supported. Valid values include: maj, min, dim, aug, sus2, sus4, 5, maj6, min6, 6/9, dom7, maj7, min7, dim7, hdim7, minMaj7, 9, maj9, min9, 11, 13, add9, add11")
+            };
+        }
 
         /// <summary>
         /// Applies chord voicing based on bass option by rotating notes and adjusting octaves.

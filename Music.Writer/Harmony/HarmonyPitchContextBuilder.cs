@@ -35,7 +35,7 @@ namespace Music.Writer
         /// </summary>
         /// <param name="key">The key (e.g., "C major", "F# minor")</param>
         /// <param name="degree">The scale degree (1-7)</param>
-        /// <param name="quality">The chord quality (e.g., "Major", "Minor7")</param>
+        /// <param name="quality">The chord quality (e.g., "maj", "min7")</param>
         /// <param name="bass">The bass note option (e.g., "root", "3rd", "5th")</param>
         /// <param name="baseOctave">The base octave for chord voicing (default: 4)</param>
         /// <param name="sourceEvent">Optional source event for debugging</param>
@@ -48,7 +48,19 @@ namespace Music.Writer
             int baseOctave = 4,
             HarmonyEvent? sourceEvent = null)
         {
-            // Step 1: Get chord tones as MIDI note numbers using the shared helper
+            // Step 1: Get the key root pitch class
+            int keyRootPitchClass = PitchClassUtils.ParseKeyToPitchClass(key);
+
+            // Step 2: Get the scale pitch classes for the key
+            var keyScalePitchClasses = PitchClassUtils.GetScalePitchClassesForKey(key);
+
+            // Step 3: Calculate the chord root pitch class from the scale degree
+            if (degree < 1 || degree > 7)
+                throw new ArgumentOutOfRangeException(nameof(degree), degree, "Degree must be 1-7");
+
+            int chordRootPitchClass = keyScalePitchClasses[degree - 1];
+
+            // Step 4: Get chord tones as MIDI note numbers using the shared helper
             var chordMidiNotes = ChordVoicingHelper.GenerateChordMidiNotes(
                 key: key,
                 degree: degree,
@@ -56,27 +68,28 @@ namespace Music.Writer
                 bass: bass,
                 baseOctave: baseOctave);
 
-            // Step 2: Convert to pitch classes (0-11), unique and sorted
-            var chordPitchClasses = chordMidiNotes
+            // Step 5: Deduplicate, sort chord MIDI notes for predictable generator behavior
+            var sortedChordMidiNotes = chordMidiNotes
+                .Distinct()
+                .OrderBy(n => n)
+                .ToList();
+
+            // Step 6: Convert to pitch classes (0-11), unique and sorted
+            var chordPitchClasses = sortedChordMidiNotes
                 .Select(PitchClassUtils.ToPitchClass)
                 .Distinct()
                 .OrderBy(pc => pc)
                 .ToList();
 
-            // Step 3: Get the root pitch class from the key
-            int rootPitchClass = PitchClassUtils.ParseKeyToPitchClass(key);
-
-            // Step 4: Get the scale pitch classes for the key
-            var keyScalePitchClasses = PitchClassUtils.GetScalePitchClassesForKey(key);
-
-            // Step 5: Build and return the context
+            // Step 7: Build and return the context
             return new HarmonyPitchContext
             {
                 SourceEvent = sourceEvent,
-                RootPitchClass = rootPitchClass,
+                KeyRootPitchClass = keyRootPitchClass,
+                ChordRootPitchClass = chordRootPitchClass,
                 ChordPitchClasses = chordPitchClasses,
                 KeyScalePitchClasses = keyScalePitchClasses,
-                ChordMidiNotes = chordMidiNotes,
+                ChordMidiNotes = sortedChordMidiNotes,
                 BaseOctaveUsed = baseOctave,
                 Key = key,
                 Degree = degree,
