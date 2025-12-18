@@ -28,23 +28,59 @@ namespace Music.Designer
             Events.Add(evt);
             IndexEventForBars(evt);
         }
+
+        // TO DO - THIS IS UNTESTED CODE
+
+        // Fast lookup of the harmony active at a given bar and beat.
+        public bool TryGetAt(int bar, int beat, out HarmonyEvent? evt)
+        {
+            if (bar < 1 || beat < 1 || beat > BeatsPerBar)
+                throw new ArgumentOutOfRangeException($"Invalid bar/beat: {bar}/{beat}");
+
+            var targetAbs = (bar - 1) * BeatsPerBar + (beat - 1);
+
+            // Try bar-head cache if querying beat 1
+            if (beat == 1 && _barHeads.TryGetValue(bar, out var cached))
+            {
+                evt = cached;
+                return true;
+            }
+
+            // Find the most recent event at or before targetAbs
+            HarmonyEvent? bestMatch = null;
+            int bestStartAbs = -1;
+
+            foreach (var he in Events)
+            {
+                var startAbs = (he.StartBar - 1) * BeatsPerBar + (he.StartBeat - 1);
+                if (startAbs <= targetAbs && startAbs > bestStartAbs)
+                {
+                    bestMatch = he;
+                    bestStartAbs = startAbs;
+                }
+            }
+
+            if (bestMatch != null)
+            {
+                // Cache only if querying beat 1
+                if (beat == 1)
+                {
+                    _barHeads[bar] = bestMatch;
+                }
+                evt = bestMatch;
+                return true;
+            }
+
+            evt = null;
+            return false;
+        }
        
         private void IndexEventForBars(HarmonyEvent evt)
         {
-            var startAbs = (evt.StartBar - 1) * BeatsPerBar + (evt.StartBeat - 1);
-            var endAbsExcl = startAbs + evt.DurationBeats;
-
-            var startBar = evt.StartBar;
-            var endBarInclusive = (int)Math.Floor((endAbsExcl - 1) / (double)BeatsPerBar) + 1;
-
-            for (int bar = startBar; bar <= endBarInclusive; bar++)
+            // Only cache bar-head (beat 1) entries
+            if (evt.StartBeat == 1)
             {
-                var barStartAbs = (bar - 1) * BeatsPerBar;
-                // Only index if the event is active at beat 1 of this bar
-                if (startAbs <= barStartAbs && endAbsExcl > barStartAbs)
-                {
-                    _barHeads[bar] = evt;
-                }
+                _barHeads[evt.StartBar] = evt;
             }
         }
 
