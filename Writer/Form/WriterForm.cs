@@ -185,7 +185,7 @@ namespace Music.Writer
                     break;
 
                 case "Harmony Sync Test":
-                    CommandRepeatNote.HandleHarmonySyncTest(dgSong, _midiInstruments, ref phraseNumber, this);
+                    CommandHarmonySyncTest.HandleHarmonySyncTest(dgSong, _midiInstruments, ref phraseNumber, this);
                     break;
 
                 case "Harmony Groove Sync Test":
