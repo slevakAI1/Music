@@ -4,6 +4,7 @@
 
 using Music.Designer;
 using Music.MyMidi;
+using Music.Writer.Generator;
 using System.Reflection;
 
 namespace Music.Writer
@@ -59,7 +60,7 @@ namespace Music.Writer
             if (clbStaffs != null && clbStaffs.Items.Count > 0)
                 clbStaffs.SetItemChecked(0, true); // Check staff "1"
 
-            cbCommand.SelectedIndex = 1; // harmony sync test
+            cbCommand.SelectedIndex = 2; // harmony groove sync test
 
             // Configure dgSong with MIDI instrument dropdown
             SongGridManager.ConfigureSongGridView(
@@ -189,7 +190,7 @@ namespace Music.Writer
                     break;
 
                 case "Harmony Groove Sync Test":
-                    //HandleHarmonyGrooveSyncTest(formData);
+                    CommandGrooveSyncTest.HandleGrooveSyncTest(dgSong, _midiInstruments, ref phraseNumber, this);
                     break;
 
                 // Other cases will be added here later.
