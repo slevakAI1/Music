@@ -28,7 +28,7 @@ namespace Music.Writer
     /// Encapsulates the intent and structure of a chord within a musical phrase.
     /// 
     /// PhraseChord provides a high-level, declarative representation of a chord, including its key, degree, quality, and voicing type.
-    /// This abstraction allows composers and algorithms to specify harmonic content without committing to specific notes,
+    /// This abstraction allows composers and algorithms to specify harmony content without committing to specific notes,
     /// enabling flexible rendering, transposition, and arrangement. It is primarily used to generate the actual notes of a chord
     /// during MIDI or notation conversion, supporting expressive and reusable harmonic patterns in music composition.
     /// </summary>

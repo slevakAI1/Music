@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace Music.Designer
 {
-    // Popup editor for arranging Harmonic Events and configuring the timeline
+    // Popup editor for arranging Harmony Events and configuring the timeline
     public sealed class HarmonyEditorForm : Form
     {
         private readonly ListView _lv;
@@ -99,7 +99,7 @@ namespace Music.Designer
 
         public HarmonyEditorForm(HarmonyTimeline? initial = null)
         {
-            Text = "Edit Harmonic Timeline";
+            Text = "Edit Harmony Timeline";
             FormBorderStyle = FormBorderStyle.FixedDialog;
             StartPosition = FormStartPosition.CenterParent;
             MinimizeBox = false;

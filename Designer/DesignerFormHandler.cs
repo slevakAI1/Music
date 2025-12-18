@@ -140,11 +140,11 @@ namespace Music
         {
             if (!EnsureDesignOrNotify(form)) return;
 
-            var existing = Globals.Designer!.HarmonicTimeline;
+            var existing = Globals.Designer!.HarmonyTimeline;
             using var dlg = new HarmonyEditorForm(existing);
             if (dlg.ShowDialog(form) == DialogResult.OK)
             {
-                Globals.Designer!.HarmonicTimeline = dlg.ResultTimeline;
+                Globals.Designer!.HarmonyTimeline = dlg.ResultTimeline;
                 UpdateDesignerReport(form);
             }
         }

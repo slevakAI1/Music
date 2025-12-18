@@ -45,17 +45,17 @@ namespace Music.Designer
                 design.SectionTimeline.SyncAfterExternalLoad();
             }
 
-            // Harmonic timeline: preserve order and values
-            if (dto.HarmonicTimeline != null)
+            // Harmony timeline: preserve order and values
+            if (dto.HarmonyTimeline != null)
             {
                 var tl = new HarmonyTimeline
                 {
-                    BeatsPerBar = dto.HarmonicTimeline.BeatsPerBar > 0 ? dto.HarmonicTimeline.BeatsPerBar : 4
-                    // TempoBpm removed from HarmonicTimeline; dto.HarmonicTimeline.TempoBpm is ignored (migrated to TempoTimeline separately)
+                    BeatsPerBar = dto.HarmonyTimeline.BeatsPerBar > 0 ? dto.HarmonyTimeline.BeatsPerBar : 4
+                    // TempoBpm removed from HarmonyTimeline; dto.HarmonyTimeline.TempoBpm is ignored (migrated to TempoTimeline separately)
                 };
-                if (dto.HarmonicTimeline.Events != null)
+                if (dto.HarmonyTimeline.Events != null)
                 {
-                    foreach (var e in dto.HarmonicTimeline.Events)
+                    foreach (var e in dto.HarmonyTimeline.Events)
                     {
                         tl.Events.Add(new HarmonyEvent
                         {
@@ -71,7 +71,7 @@ namespace Music.Designer
                 }
                 // Build index without changing the list or StartBar values
                 tl.EnsureIndexed();
-                design.HarmonicTimeline = tl;
+                design.HarmonyTimeline = tl;
             }
 
             return design;
@@ -83,7 +83,7 @@ namespace Music.Designer
             public string? DesignId { get; set; }
             public VoiceSetDto? VoiceSet { get; set; }
             public SectionSetDto? SectionSet { get; set; }
-            public HarmonicTimelineDto? HarmonicTimeline { get; set; }
+            public HarmonyTimelineDto? HarmonyTimeline { get; set; }
         }
 
         private sealed class VoiceSetDto
@@ -106,7 +106,7 @@ namespace Music.Designer
             public Guid Id { get; set; }
         }
 
-        private sealed class HarmonicTimelineDto
+        private sealed class HarmonyTimelineDto
         {
             public int BeatsPerBar { get; set; }
             // Deprecated: was stored alongside Harmony; retained for back-compat but ignored here.

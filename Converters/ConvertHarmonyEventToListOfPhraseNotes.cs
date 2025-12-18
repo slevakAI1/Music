@@ -122,7 +122,7 @@ namespace Music.Writer
             catch (Exception ex)
             {
                 throw new InvalidOperationException(
-                    $"Failed to convert harmonic parameters: Key={key}, " +
+                    $"Failed to convert harmony parameters: Key={key}, " +
                     $"Degree={degree}, Quality={quality}, " +
                     $"Bass={bass}", ex);
             }
@@ -213,7 +213,7 @@ namespace Music.Writer
         };
 
         /// <summary>
-        /// Maps quality strings from HarmonicEditorForm to MusicTheory ChordType.
+        /// Maps quality strings from HarmonyEditorForm to MusicTheory ChordType.
         /// </summary>
         private static ChordType MapQualityToChordType(string quality) => quality switch
         {

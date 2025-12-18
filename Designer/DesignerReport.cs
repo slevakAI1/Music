@@ -7,7 +7,7 @@ namespace Music.Designer
     /// </summary>
     public static class DesignerReport
     {
-        // Builds: VOICES + 2 newlines + SECTIONS + 2 newlines + HARMONIC TIMELINE + 2 newlines + ALIGNMENT + 2 newlines + TIME SIGNATURES + 2 newlines + TEMPO
+        // Builds: VOICES + 2 newlines + SECTIONS + 2 newlines + HARMONY TIMELINE + 2 newlines + ALIGNMENT + 2 newlines + TIME SIGNATURES + 2 newlines + TEMPO
         public static string CreateDesignerReport(Designer designer)
         {
             if (designer == null)
@@ -50,10 +50,10 @@ namespace Music.Designer
 
             sb.Append("\r\n\r\n");
 
-            // HARMONIC TIMELINE
-            sb.Append("HARMONIC TIMELINE:\r\n");
+            // HARMONY TIMELINE
+            sb.Append("HARMONY TIMELINE:\r\n");
             first = true;
-            var timeline = designer.HarmonicTimeline;
+            var timeline = designer.HarmonyTimeline;
             if (timeline != null)
             {
                 foreach (var he in timeline.Events)
@@ -69,7 +69,7 @@ namespace Music.Designer
             sb.Append("ALIGNMENT (Sections vs Harmony):\r\n");
             if (timeline == null || timeline.Events.Count == 0)
             {
-                sb.Append("(no harmonic timeline)\r\n");
+                sb.Append("(no harmony timeline)\r\n");
             }
             else
             {

@@ -481,7 +481,7 @@ namespace Music.Writer
             GridControlLinesManager.AttachSectionTimeline(dgSong, _designer.SectionTimeline);
             GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, _designer.TimeSignatureTimeline);
             GridControlLinesManager.AttachTempoTimeline(dgSong, _designer.TempoTimeline);
-            GridControlLinesManager.AttachHarmonyTimeline(dgSong, _designer.HarmonicTimeline);
+            GridControlLinesManager.AttachHarmonyTimeline(dgSong, _designer.HarmonyTimeline);
         }
 
         public void HandleSetWriterTestScenarioG1()
@@ -492,26 +492,26 @@ namespace Music.Writer
 
         public void HandleChordTest()
         {
-            if (_designer?.HarmonicTimeline == null || _designer.HarmonicTimeline.Events.Count == 0)
+            if (_designer?.HarmonyTimeline == null || _designer.HarmonyTimeline.Events.Count == 0)
             {
                 MessageBox.Show(this,
-                    "No harmonic events available in the current design.",
+                    "No harmony events available in the current design.",
                     "Chord Test",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
                 return;
             }
 
-            var harmonicEvent = _designer.HarmonicTimeline.Events[1];
+            var harmonyEvent = _designer.HarmonyTimeline.Events[1];
 
             List<PhraseNote> notes;
             try
             {
                 notes = ConvertHarmonyEventToListOfPhraseNotes.Convert(
-                    harmonicEvent.Key,
-                    harmonicEvent.Degree,
-                    harmonicEvent.Quality,
-                    harmonicEvent.Bass,
+                    harmonyEvent.Key,
+                    harmonyEvent.Degree,
+                    harmonyEvent.Quality,
+                    harmonyEvent.Bass,
                     baseOctave: 4);
             }
             catch (Exception ex)
@@ -546,7 +546,7 @@ namespace Music.Writer
                 lines.Add($"{note.Step}{accidental} {note.Octave}");
             }
 
-            var title = $"Chord: {harmonicEvent.Key} (Deg {harmonicEvent.Degree}, {harmonicEvent.Quality})";
+            var title = $"Chord: {harmonyEvent.Key} (Deg {harmonyEvent.Degree}, {harmonyEvent.Quality})";
             MessageBox.Show(this,
                 string.Join(Environment.NewLine, lines),
                 title,

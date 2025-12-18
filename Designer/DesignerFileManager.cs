@@ -24,7 +24,7 @@ namespace Music.Designer
                     design.DesignId,
                     design.Voices,
                     design.SectionTimeline,
-                    design.HarmonicTimeline,
+                    design.HarmonyTimeline,
                     design.TempoTimeline,
                     design.TimeSignatureTimeline
                 };
