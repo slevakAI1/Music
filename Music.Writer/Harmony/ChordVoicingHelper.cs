@@ -14,7 +14,7 @@ namespace Music.Writer
         /// </summary>
         /// <param name="key">The key (e.g., "C major", "F# minor")</param>
         /// <param name="degree">The scale degree (1-7)</param>
-        /// <param name="quality">The chord quality (e.g., "Major", "Minor7")</param>
+        /// <param name="quality">The chord quality (e.g., "maj", "min7")</param>
         /// <param name="bass">The bass note option (e.g., "root", "3rd", "5th")</param>
         /// <param name="baseOctave">The base octave for chord voicing</param>
         /// <returns>List of MIDI note numbers representing the chord</returns>
@@ -36,8 +36,9 @@ namespace Music.Writer
 
             try
             {
-                // Step 1: Parse the key to get the root note and scale
-                var (keyRoot, keyMode) = ParseKey(key);
+                // Step 1: Parse the key using shared logic (single source of truth)
+                var parsed = PitchClassUtils.ParseKey(key);
+                var (keyRoot, keyMode) = ConvertParsedKeyToNote(parsed);
                 
                 // Step 2: Build the scale for the key
                 var scaleType = keyMode.Equals("major", StringComparison.OrdinalIgnoreCase) 
@@ -106,60 +107,33 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Parses a key string like "C major" or "F# minor" into root note and mode.
+        /// Converts ParsedKey to MusicTheory.Note and mode string.
+        /// Uses the shared parsed components from PitchClassUtils.
         /// </summary>
-        private static (Note root, string mode) ParseKey(string keyString)
+        private static (Note root, string mode) ConvertParsedKeyToNote(PitchClassUtils.ParsedKey parsed)
         {
-            if (string.IsNullOrWhiteSpace(keyString))
-                throw new ArgumentException("Key string cannot be empty", nameof(keyString));
-
-            var parts = keyString.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length != 2)
-                throw new ArgumentException($"Invalid key format: '{keyString}'. Expected 'Note mode'", nameof(keyString));
-
-            var noteStr = parts[0];
-            var mode = parts[1];
-
-            // Parse the note (e.g., "C", "F#", "Bb")
-            NoteName noteName;
-            Alteration alteration = Alteration.Natural;
-
-            if (noteStr.Length == 1)
+            NoteName noteName = parsed.NoteLetter switch
             {
-                noteName = ParseNoteName(noteStr[0]);
-            }
-            else if (noteStr.Length == 2)
-            {
-                noteName = ParseNoteName(noteStr[0]);
-                alteration = noteStr[1] switch
-                {
-                    '#' => Alteration.Sharp,
-                    'b' => Alteration.Flat,
-                    _ => throw new ArgumentException($"Invalid accidental: {noteStr[1]}")
-                };
-            }
-            else
-            {
-                throw new ArgumentException($"Invalid note format: '{noteStr}'");
-            }
+                'C' => NoteName.C,
+                'D' => NoteName.D,
+                'E' => NoteName.E,
+                'F' => NoteName.F,
+                'G' => NoteName.G,
+                'A' => NoteName.A,
+                'B' => NoteName.B,
+                _ => throw new ArgumentException($"Invalid note letter: {parsed.NoteLetter}")
+            };
 
-            return (new Note(noteName, alteration, 4), mode);
+            Alteration alteration = parsed.Alteration switch
+            {
+                -1 => Alteration.Flat,
+                0 => Alteration.Natural,
+                1 => Alteration.Sharp,
+                _ => throw new ArgumentException($"Unsupported alteration: {parsed.Alteration}")
+            };
+
+            return (new Note(noteName, alteration, 4), parsed.Mode);
         }
-
-        /// <summary>
-        /// Parses a character to NoteName.
-        /// </summary>
-        private static NoteName ParseNoteName(char c) => char.ToUpper(c) switch
-        {
-            'C' => NoteName.C,
-            'D' => NoteName.D,
-            'E' => NoteName.E,
-            'F' => NoteName.F,
-            'G' => NoteName.G,
-            'A' => NoteName.A,
-            'B' => NoteName.B,
-            _ => throw new ArgumentException($"Invalid note name: {c}")
-        };
 
         /// <summary>
         /// Maps quality strings from HarmonyEditorForm to MusicTheory ChordType.

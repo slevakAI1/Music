@@ -7,13 +7,24 @@ namespace Music.Writer
     public static class PitchClassUtils
     {
         /// <summary>
-        /// Converts a MIDI note number to its pitch class (0-11).
+        /// Parsed key components. Single source of truth for key parsing.
         /// </summary>
-        /// <param name="midiNoteNumber">MIDI note number (0-127)</param>
+        internal record struct ParsedKey(
+            char NoteLetter,
+            int Alteration,
+            string Mode
+        );
+
+        /// <summary>
+        /// Converts a MIDI note number to its pitch class (0-11).
+        /// Handles negative MIDI numbers defensively.
+        /// </summary>
+        /// <param name="midiNoteNumber">MIDI note number (typically 0-127)</param>
         /// <returns>Pitch class (0-11)</returns>
         public static int ToPitchClass(int midiNoteNumber)
         {
-            return midiNoteNumber % 12;
+            // Handle negative numbers correctly (double modulo wrap)
+            return (midiNoteNumber % 12 + 12) % 12;
         }
 
         /// <summary>
@@ -44,11 +55,13 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Parses a key string (e.g., "C major", "F# minor") and returns the root pitch class.
+        /// Parses a key string and returns all components.
+        /// Single source of truth to avoid drift between different key parsing methods.
         /// </summary>
         /// <param name="keyString">Key string in format "NoteName [#/b] mode"</param>
-        /// <returns>Root pitch class (0-11)</returns>
-        public static int ParseKeyToPitchClass(string keyString)
+        /// <returns>ParsedKey with note letter, alteration, and mode</returns>
+        /// <exception cref="ArgumentException">When key format is invalid</exception>
+        internal static ParsedKey ParseKey(string keyString)
         {
             if (string.IsNullOrWhiteSpace(keyString))
                 throw new ArgumentException("Key string cannot be empty", nameof(keyString));
@@ -58,9 +71,21 @@ namespace Music.Writer
                 throw new ArgumentException($"Invalid key format: '{keyString}'. Expected 'Note mode'", nameof(keyString));
 
             var noteStr = parts[0];
-            
+            var modeStr = parts[1].Trim();
+
+            // Validate mode (explicit check, not Contains)
+            var normalizedMode = modeStr.ToLowerInvariant();
+            if (normalizedMode != "major" && normalizedMode != "minor")
+                throw new ArgumentException($"Invalid mode: '{modeStr}'. Expected 'major' or 'minor'", nameof(keyString));
+
             // Parse note name
-            char noteName = char.ToUpper(noteStr[0]);
+            if (noteStr.Length == 0)
+                throw new ArgumentException($"Empty note name in key: '{keyString}'", nameof(keyString));
+
+            char noteLetter = char.ToUpper(noteStr[0]);
+            if (noteLetter < 'A' || noteLetter > 'G')
+                throw new ArgumentException($"Invalid note letter: '{noteLetter}'", nameof(keyString));
+
             int alteration = 0;
 
             // Parse alteration if present
@@ -70,15 +95,26 @@ namespace Music.Writer
                 {
                     '#' => 1,
                     'b' => -1,
-                    _ => throw new ArgumentException($"Invalid accidental: {noteStr[1]}")
+                    _ => throw new ArgumentException($"Invalid accidental: '{noteStr[1]}'. Expected '#' or 'b'")
                 };
             }
             else if (noteStr.Length > 2)
             {
-                throw new ArgumentException($"Invalid note format: '{noteStr}'");
+                throw new ArgumentException($"Invalid note format: '{noteStr}'. Expected single letter + optional accidental");
             }
 
-            return GetPitchClass(noteName, alteration);
+            return new ParsedKey(noteLetter, alteration, modeStr);
+        }
+
+        /// <summary>
+        /// Parses a key string (e.g., "C major", "F# minor") and returns the root pitch class.
+        /// </summary>
+        /// <param name="keyString">Key string in format "NoteName [#/b] mode"</param>
+        /// <returns>Root pitch class (0-11)</returns>
+        public static int ParseKeyToPitchClass(string keyString)
+        {
+            var parsed = ParseKey(keyString);
+            return GetPitchClass(parsed.NoteLetter, parsed.Alteration);
         }
 
         /// <summary>
@@ -124,10 +160,11 @@ namespace Music.Writer
         /// <returns>List of pitch classes in scale order</returns>
         public static IReadOnlyList<int> GetScalePitchClassesForKey(string keyString)
         {
-            int rootPitchClass = ParseKeyToPitchClass(keyString);
+            var parsed = ParseKey(keyString);
+            int rootPitchClass = GetPitchClass(parsed.NoteLetter, parsed.Alteration);
             
-            // Determine mode
-            bool isMajor = keyString.Contains("major", StringComparison.OrdinalIgnoreCase);
+            // Mode already validated in ParseKey
+            bool isMajor = parsed.Mode.Equals("major", StringComparison.OrdinalIgnoreCase);
             
             return isMajor 
                 ? GetMajorScalePitchClasses(rootPitchClass)
