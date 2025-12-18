@@ -178,7 +178,6 @@ namespace Music.Writer
                 // Adds
                 "add9" or "majoradd9" => ChordType.MajorAdd9,
                 "add11" or "majoradd11" => ChordType.MajorAdd11,
-                "add13" => throw new NotSupportedException($"Chord quality 'add13' is not currently supported by MusicTheory library"),
 
                 _ => throw new NotSupportedException($"Chord quality '{quality}' is not supported. Valid values include: maj, min, dim, aug, sus2, sus4, 5, maj6, min6, 6/9, dom7, maj7, min7, dim7, hdim7, minMaj7, 9, maj9, min9, 11, 13, add9, add11")
             };

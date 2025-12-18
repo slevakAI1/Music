@@ -59,7 +59,7 @@ namespace Music.Writer
         /// Single source of truth to avoid drift between different key parsing methods.
         /// </summary>
         /// <param name="keyString">Key string in format "NoteName [#/b] mode"</param>
-        /// <returns>ParsedKey with note letter, alteration, and mode</returns>
+        /// <returns>ParsedKey with note letter, alteration, and normalized mode</returns>
         /// <exception cref="ArgumentException">When key format is invalid</exception>
         internal static ParsedKey ParseKey(string keyString)
         {
@@ -73,7 +73,7 @@ namespace Music.Writer
             var noteStr = parts[0];
             var modeStr = parts[1].Trim();
 
-            // Validate mode (explicit check, not Contains)
+            // Validate mode and normalize to lowercase
             var normalizedMode = modeStr.ToLowerInvariant();
             if (normalizedMode != "major" && normalizedMode != "minor")
                 throw new ArgumentException($"Invalid mode: '{modeStr}'. Expected 'major' or 'minor'", nameof(keyString));
@@ -103,7 +103,8 @@ namespace Music.Writer
                 throw new ArgumentException($"Invalid note format: '{noteStr}'. Expected single letter + optional accidental");
             }
 
-            return new ParsedKey(noteLetter, alteration, modeStr);
+            // Return normalized mode (lowercase) to prevent drift
+            return new ParsedKey(noteLetter, alteration, normalizedMode);
         }
 
         /// <summary>

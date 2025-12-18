@@ -67,7 +67,7 @@ namespace Music.Designer
             // Extensions
             "9","maj9","min9","11","13",
             // Adds
-            "add9","add11","add13"
+            "add9","add11"
         };
 
         private static readonly string[] AllBassOptions = new[]
@@ -303,9 +303,7 @@ namespace Music.Designer
             return new ComboBox
             {
                 Anchor = AnchorStyles.Left | AnchorStyles.Right,
-                DropDownStyle = ComboBoxStyle.DropDown,
-                AutoCompleteMode = AutoCompleteMode.SuggestAppend,
-                AutoCompleteSource = AutoCompleteSource.ListItems
+                DropDownStyle = ComboBoxStyle.DropDownList
             };
         }
 
