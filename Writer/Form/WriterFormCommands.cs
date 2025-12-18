@@ -101,7 +101,7 @@ namespace Music.Writer
             foreach (var harmonyEvent in harmonyTimeline.Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat))
             {
                 // Convert the harmony event to chord notes
-                var chordNotes = ConvertHarmonicEventToListOfPhraseNotes.Convert(
+                var chordNotes = ConvertHarmonyEventToListOfPhraseNotes.Convert(
                     harmonyEvent.Key,
                     harmonyEvent.Degree,
                     harmonyEvent.Quality,
@@ -157,7 +157,7 @@ namespace Music.Writer
 
             foreach (var harmonyEvent in harmonyTimeline.Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat))
             {
-                var chordNotes = ConvertHarmonicEventToListOfPhraseNotes.Convert(
+                var chordNotes = ConvertHarmonyEventToListOfPhraseNotes.Convert(
                     harmonyEvent.Key,
                     harmonyEvent.Degree,
                     harmonyEvent.Quality,
@@ -209,7 +209,7 @@ namespace Music.Writer
 
             foreach (var harmonyEvent in harmonyTimeline.Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat))
             {
-                var chordNotes = ConvertHarmonicEventToListOfPhraseNotes.Convert(
+                var chordNotes = ConvertHarmonyEventToListOfPhraseNotes.Convert(
                     harmonyEvent.Key,
                     harmonyEvent.Degree,
                     harmonyEvent.Quality,

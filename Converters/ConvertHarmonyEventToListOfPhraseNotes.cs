@@ -4,30 +4,30 @@ using Music.Designer;
 namespace Music.Writer
 {
     /// <summary>
-    /// Converts HarmonicEvent objects to lists of WriterNote compatible with Writer.
+    /// Converts HarmonyEvent objects to lists of WriterNote compatible with Writer.
     /// Uses the MusicTheory library to generate chord voicings.
     /// </summary>
-    public static class ConvertHarmonicEventToListOfPhraseNotes
+    public static class ConvertHarmonyEventToListOfPhraseNotes
     {
         /// <summary>
-        /// Converts a HarmonicEvent to a list of notes representing the chord.
+        /// Converts a HarmonyEvent to a list of notes representing the chord.
         /// </summary>
-        /// <param name="harmonicEvent">The harmonic event containing key, degree, quality, and bass.</param>
+        /// <param name="harmonyEvent">The harmony event containing key, degree, quality, and bass.</param>
         /// <param name="baseOctave">The base octave for the root note (default: 4).</param>
         /// <param name="noteValue">The note value (duration) for all notes in the chord.</param>
         /// <returns>A list of WriterNote objects representing the chord voicing.</returns>
-        /// <exception cref="ArgumentNullException">When harmonicEvent is null.</exception>
+        /// <exception cref="ArgumentNullException">When harmonyEvent is null.</exception>
         /// <exception cref="InvalidOperationException">When the chord cannot be constructed.</exception>
-        public static List<PhraseNote> Convert(HarmonyEvent harmonicEvent, int baseOctave = 4, int noteValue = 4)
+        public static List<PhraseNote> Convert(HarmonyEvent harmonyEvent, int baseOctave = 4, int noteValue = 4)
         {
-            if (harmonicEvent == null)
-                throw new ArgumentNullException(nameof(harmonicEvent));
+            if (harmonyEvent == null)
+                throw new ArgumentNullException(nameof(harmonyEvent));
 
-            return Convert(harmonicEvent.Key, harmonicEvent.Degree, harmonicEvent.Quality, harmonicEvent.Bass, baseOctave, noteValue);
+            return Convert(harmonyEvent.Key, harmonyEvent.Degree, harmonyEvent.Quality, harmonyEvent.Bass, baseOctave, noteValue);
         }
 
         /// <summary>
-        /// Converts harmonic parameters to a list of notes representing the chord.
+        /// Converts harmony parameters to a list of notes representing the chord.
         /// </summary>
         /// <param name="key">The key (e.g., "C major", "F# minor").</param>
         /// <param name="degree">The scale degree (1-7).</param>

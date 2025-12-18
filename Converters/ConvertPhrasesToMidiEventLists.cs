@@ -75,14 +75,14 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Processes a chord note by expanding it to individual notes using ConvertHarmonicEventToListOfPhraseNotes.
+        /// Processes a chord note by expanding it to individual notes using ConvertHarmonyEventToListOfPhraseNotes.
         /// </summary>
         private static void ProcessChord(List<MetaMidiEvent> events, PhraseNote phraseNote)
         {
             var chord = phraseNote.phraseChord!;
 
-            // Use ConvertHarmonicEventToListOfPhraseNotes to generate individual chord notes
-            var chordNotes = ConvertHarmonicEventToListOfPhraseNotes.Convert(
+            // Use ConvertHarmonyEventToListOfPhraseNotes to generate individual chord notes
+            var chordNotes = ConvertHarmonyEventToListOfPhraseNotes.Convert(
                 chord.ChordKey!,
                 chord.ChordDegree!.Value,
                 chord.ChordQuality!,
