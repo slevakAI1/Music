@@ -1,3 +1,4 @@
+using Music.Writer;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -391,7 +392,7 @@ namespace Music.Designer
 
             if (!ValidateAndGetEditorValues(insertAt, out var type, out var bars, out var name, out var _, out var error))
             {
-                MessageBox.Show(this, error!, "Add Section", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show(error!, "Add Section", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -414,7 +415,7 @@ namespace Music.Designer
 
             if (!ValidateAndGetEditorValues(insertAt, out var type, out var bars, out var name, out var _, out var error))
             {
-                MessageBox.Show(this, error!, "Insert Section", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show(error!, "Insert Section", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 

@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using Music.Designer;
 using Music;
+using Music.Writer;
 
 namespace Music
 {
@@ -15,7 +16,7 @@ namespace Music
         {
             if (Globals.Designer != null) return true;
 
-            MessageBox.Show(owner,
+            MessageBoxHelper.Show(
                 "Create a new design first.",
                 "No Design",
                 MessageBoxButtons.OK,
@@ -33,7 +34,7 @@ namespace Music
         {
             if (Globals.Designer == null)
             {
-                MessageBox.Show(form,
+                MessageBoxHelper.Show(
                     "Create a new design first.",
                     "No Design",
                     MessageBoxButtons.OK,

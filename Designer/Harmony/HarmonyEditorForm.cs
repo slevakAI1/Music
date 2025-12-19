@@ -1,3 +1,4 @@
+using Music.Writer;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -558,7 +559,7 @@ namespace Music.Designer
 
             if (!ValidateAndGetEditorValues(insertAt, out int duration, out string key, out int degree, out string quality, out string bass, out var start, out string? error))
             {
-                MessageBox.Show(this, error!, "Add Event", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show(error!, "Add Event", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -585,7 +586,7 @@ namespace Music.Designer
 
             if (!ValidateAndGetEditorValues(insertAt, out int duration, out string key, out int degree, out string quality, out string bass, out var start, out string? error))
             {
-                MessageBox.Show(this, error!, "Insert Event", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show(error!, "Insert Event", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 

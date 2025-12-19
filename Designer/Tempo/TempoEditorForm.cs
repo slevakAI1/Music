@@ -1,3 +1,4 @@
+using Music.Writer;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -373,7 +374,7 @@ namespace Music.Designer
         {
             if (!ValidateEditorValues(out var error))
             {
-                MessageBox.Show(this, error!, "Add Tempo Event", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show(error!, "Add Tempo Event", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -402,7 +403,7 @@ namespace Music.Designer
         {
             if (!ValidateEditorValues(out var error))
             {
-                MessageBox.Show(this, error!, "Insert Tempo Event", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show(error!, "Insert Tempo Event", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
