@@ -103,7 +103,7 @@ namespace Music.Writer.Generator
             if (bassOnsets == null || bassOnsets.Count == 0)
                 return null;
 
-            var notes = new List<PhraseNote>();
+            var notes = new List<PartNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
             const int bassOctave = 2;
 
@@ -139,7 +139,7 @@ namespace Music.Writer.Generator
 
                     int midiNote = randomizer.SelectBassPitch(ctx, bar, onsetBeat);
 
-                    notes.Add(new PhraseNote(
+                    notes.Add(new PartNoteEvent(
                         noteNumber: midiNote,
                         absolutePositionTicks: onsetTick,
                         noteDurationTicks: duration,
@@ -157,7 +157,7 @@ namespace Music.Writer.Generator
             int ticksPerQuarterNote,
             RandomizationSettings settings)
         {
-            var notes = new List<PhraseNote>();
+            var notes = new List<PartNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
             int quarterNoteDuration = ticksPerQuarterNote;
 
@@ -180,7 +180,7 @@ namespace Music.Writer.Generator
                     decimal onsetBeat = beat + 1;
                     int midiNote = randomizer.SelectBassPitch(ctx, harmonyEvent.StartBar, onsetBeat);
 
-                    notes.Add(new PhraseNote(
+                    notes.Add(new PartNoteEvent(
                         noteNumber: midiNote,
                         absolutePositionTicks: absolutePosition + (beat * quarterNoteDuration),
                         noteDurationTicks: quarterNoteDuration,
@@ -203,7 +203,7 @@ namespace Music.Writer.Generator
             if (compOnsets == null || compOnsets.Count == 0)
                 return null;
 
-            var notes = new List<PhraseNote>();
+            var notes = new List<PartNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
             int? previousPitchClass = null;
             const int guitarOctave = 4;
@@ -240,7 +240,7 @@ namespace Music.Writer.Generator
 
                     var (midiNote, pitchClass) = randomizer.SelectGuitarPitch(ctx, bar, onsetBeat, previousPitchClass);
 
-                    notes.Add(new PhraseNote(
+                    notes.Add(new PartNoteEvent(
                         noteNumber: midiNote,
                         absolutePositionTicks: onsetTick,
                         noteDurationTicks: duration,
@@ -260,7 +260,7 @@ namespace Music.Writer.Generator
             int ticksPerQuarterNote,
             RandomizationSettings settings)
         {
-            var notes = new List<PhraseNote>();
+            var notes = new List<PartNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
             int eighthNoteDuration = ticksPerQuarterNote / 2;
             int? previousPitchClass = null;
@@ -288,7 +288,7 @@ namespace Music.Writer.Generator
                         onsetBeat, 
                         previousPitchClass);
 
-                    notes.Add(new PhraseNote(
+                    notes.Add(new PartNoteEvent(
                         noteNumber: midiNote,
                         absolutePositionTicks: absolutePosition + (eighth * eighthNoteDuration),
                         noteDurationTicks: eighthNoteDuration,
@@ -313,7 +313,7 @@ namespace Music.Writer.Generator
             if (padsOnsets == null || padsOnsets.Count == 0)
                 return null;
 
-            var notes = new List<PhraseNote>();
+            var notes = new List<PartNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
             const int keysOctave = 4;
 
@@ -357,7 +357,7 @@ namespace Music.Writer.Generator
 
                     foreach (int midiNote in chordMidiNotes)
                     {
-                        notes.Add(new PhraseNote(
+                        notes.Add(new PartNoteEvent(
                             noteNumber: midiNote,
                             absolutePositionTicks: onsetTick,
                             noteDurationTicks: duration,
@@ -378,7 +378,7 @@ namespace Music.Writer.Generator
             int ticksPerQuarterNote,
             RandomizationSettings settings)
         {
-            var notes = new List<PhraseNote>();
+            var notes = new List<PartNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
             int halfNoteDuration = ticksPerQuarterNote * 2;
 
@@ -413,7 +413,7 @@ namespace Music.Writer.Generator
 
                     foreach (var midiNote in chordMidiNotes)
                     {
-                        notes.Add(new PhraseNote(
+                        notes.Add(new PartNoteEvent(
                             noteNumber: midiNote,
                             absolutePositionTicks: absolutePosition + (half * halfNoteDuration),
                             noteDurationTicks: halfNoteDuration,
@@ -438,7 +438,7 @@ namespace Music.Writer.Generator
             int totalBars,
             RandomizationSettings settings)
         {
-            var notes = new List<PhraseNote>();
+            var notes = new List<PartNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
 
             // TO DO - There should be a map for the drum set notes - enum
@@ -462,7 +462,7 @@ namespace Music.Writer.Generator
                         // Apply slight velocity randomization for humanization
                         int velocity = randomizer.SelectDrumVelocity(bar, onsetBeat, "kick", baseVelocity: 100);
                         
-                        notes.Add(new PhraseNote(
+                        notes.Add(new PartNoteEvent(
                             noteNumber: kickNote,
                             absolutePositionTicks: onsetTick,
                             noteDurationTicks: ticksPerQuarterNote,
@@ -480,7 +480,7 @@ namespace Music.Writer.Generator
                         
                         int velocity = randomizer.SelectDrumVelocity(bar, onsetBeat, "snare", baseVelocity: 90);
                         
-                        notes.Add(new PhraseNote(
+                        notes.Add(new PartNoteEvent(
                             noteNumber: snareNote,
                             absolutePositionTicks: onsetTick,
                             noteDurationTicks: ticksPerQuarterNote,
@@ -498,7 +498,7 @@ namespace Music.Writer.Generator
                         
                         int velocity = randomizer.SelectDrumVelocity(bar, onsetBeat, "hat", baseVelocity: 70);
                         
-                        notes.Add(new PhraseNote(
+                        notes.Add(new PartNoteEvent(
                             noteNumber: closedHiHatNote,
                             absolutePositionTicks: onsetTick,
                             noteDurationTicks: ticksPerQuarterNote / 2, // shorter duration for hi-hat

@@ -504,7 +504,7 @@ namespace Music.Writer
 
             var harmonyEvent = _designer.HarmonyTimeline.Events[1];
 
-            List<PhraseNote> notes;
+            List<PartNoteEvent> notes;
             try
             {
                 notes = ConvertHarmonyEventToListOfPhraseNotes.Convert(
@@ -643,7 +643,7 @@ namespace Music.Writer
             var phraseNumber = row.Cells["colEventNumber"].Value?.ToString() ?? (e.RowIndex + 1).ToString();
 
             // Open the JSON viewer dialog
-            using var viewer = new PhraseJsonViewer(phrase, phraseNumber);
+            using var viewer = new PartJsonViewer(phrase, phraseNumber);
             viewer.ShowDialog(this);
         }
     }

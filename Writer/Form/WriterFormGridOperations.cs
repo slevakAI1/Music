@@ -10,7 +10,7 @@ namespace Music.Writer
         public void HandleAddPhrase()
         {
             // Create an empty Phrase and add it to the grid via the existing helper.
-            var emptyPhrase = new Phrase(new List<PhraseNote>())
+            var emptyPhrase = new Phrase(new List<PartNoteEvent>())
             {
                 MidiProgramNumber = -1  // "Select..."
             };
@@ -115,7 +115,7 @@ namespace Music.Writer
                 // Reset data to empty Phrase
                 var phraseDataCol = dgSong.Columns["colData"];
                 if (phraseDataCol != null)
-                    row.Cells[phraseDataCol.Index].Value = new Phrase(new List<PhraseNote>()) { MidiProgramNumber = -1 };
+                    row.Cells[phraseDataCol.Index].Value = new Phrase(new List<PartNoteEvent>()) { MidiProgramNumber = -1 };
 
                 // Clear the Part description
                 var descriptionCol = dgSong.Columns["colDescription"];
@@ -196,7 +196,7 @@ namespace Music.Writer
                 if (existingPhrase == null)
                 {
                     // No existing phrase, create new one with the notes (no offset needed)
-                    existingPhrase = new Phrase(new List<PhraseNote>(phrase.PhraseNotes));
+                    existingPhrase = new Phrase(new List<PartNoteEvent>(phrase.PhraseNotes));
                     selectedRow.Cells["colData"].Value = existingPhrase;
                 }
                 else
@@ -215,7 +215,7 @@ namespace Music.Writer
                     // Append new notes with adjusted absolutePositions
                     foreach (var note in phrase.PhraseNotes)
                     {
-                        var adjustedNote = new PhraseNote(
+                        var adjustedNote = new PartNoteEvent(
                             noteNumber: note.NoteNumber,
                             absolutePositionTicks: note.AbsolutePositionTicks + offset,
                             noteDurationTicks: note.NoteDurationTicks,

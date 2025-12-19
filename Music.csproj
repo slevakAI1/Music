@@ -45,6 +45,7 @@
     <EmbeddedResource Remove="Designer\TimeSignatureEditorForm.resx" />
     <EmbeddedResource Remove="Writer\Form\ConsoleTransform.resx" />
     <EmbeddedResource Remove="Writer\Form\WriterForm.DataBinder.resx" />
+    <EmbeddedResource Remove="Writer\Form\WriterFormEvents.resx" />
     <EmbeddedResource Remove="Writer\Form\WriterFormGridOperations.resx" />
   </ItemGroup>
 

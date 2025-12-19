@@ -23,12 +23,12 @@ namespace Music.Generator
             int noteOnVelocity = 100,
             bool isRest = false)
         {
-            var phraseNotes = new List<PhraseNote>();
+            var phraseNotes = new List<PartNoteEvent>();
             int currentPosition = 0;
 
             for (int i = 0; i < repeatCount; i++)
             {
-                var phraseNote = new PhraseNote(
+                var phraseNote = new PartNoteEvent(
                     noteNumber: noteNumber,
                     absolutePositionTicks: currentPosition,
                     noteDurationTicks: noteDurationTicks,

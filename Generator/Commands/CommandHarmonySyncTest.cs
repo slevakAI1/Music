@@ -63,7 +63,7 @@ namespace Music.Generator
 
         private static Phrase CreateRockOrganPhrase(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
         {
-            var notes = new List<PhraseNote>();
+            var notes = new List<PartNoteEvent>();
             int currentTick = 0;
 
             var timeSignature = timeSignatureTimeline.Events.FirstOrDefault();
@@ -97,7 +97,7 @@ namespace Music.Generator
                 {
                     foreach (var chordNote in chordNotes)
                     {
-                        notes.Add(new PhraseNote(
+                        notes.Add(new PartNoteEvent(
                             noteNumber: chordNote.NoteNumber,
                             absolutePositionTicks: currentTick,
                             noteDurationTicks: halfNoteDuration,
@@ -113,7 +113,7 @@ namespace Music.Generator
 
         private static Phrase CreateElectricGuitarPhrase(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
         {
-            var notes = new List<PhraseNote>();
+            var notes = new List<PartNoteEvent>();
             int currentTick = 0;
 
             var timeSignature = timeSignatureTimeline.Events.FirstOrDefault();
@@ -146,7 +146,7 @@ namespace Music.Generator
                 for (int eighthNote = 0; eighthNote < 8; eighthNote++)
                 {
                     var chordNote = chordNotes[eighthNote % chordNotes.Count];
-                    notes.Add(new PhraseNote(
+                    notes.Add(new PartNoteEvent(
                         noteNumber: chordNote.NoteNumber,
                         absolutePositionTicks: currentTick,
                         noteDurationTicks: eighthNoteDuration,
@@ -161,7 +161,7 @@ namespace Music.Generator
 
         private static Phrase CreateElectricBassPhrase(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
         {
-            var notes = new List<PhraseNote>();
+            var notes = new List<PartNoteEvent>();
             int currentTick = 0;
 
             var timeSignature = timeSignatureTimeline.Events.FirstOrDefault();
@@ -194,7 +194,7 @@ namespace Music.Generator
                 var rootNote = chordNotes[0];
                 for (int quarterNote = 0; quarterNote < 4; quarterNote++)
                 {
-                    notes.Add(new PhraseNote(
+                    notes.Add(new PartNoteEvent(
                         noteNumber: rootNote.NoteNumber,
                         absolutePositionTicks: currentTick,
                         noteDurationTicks: quarterNoteDuration,
@@ -209,7 +209,7 @@ namespace Music.Generator
 
         private static Phrase CreateDrumSetPhrase(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
         {
-            var notes = new List<PhraseNote>();
+            var notes = new List<PartNoteEvent>();
             int currentTick = 0;
 
             var timeSignature = timeSignatureTimeline.Events.FirstOrDefault();
@@ -228,14 +228,14 @@ namespace Music.Generator
             {
                 int measureStartTick = measure * ticksPerMeasure;
 
-                notes.Add(new PhraseNote(
+                notes.Add(new PartNoteEvent(
                     noteNumber: bassDrum,
                     absolutePositionTicks: measureStartTick,
                     noteDurationTicks: ticksPerQuarterNote,
                     noteOnVelocity: 100,
                     isRest: false));
 
-                notes.Add(new PhraseNote(
+                notes.Add(new PartNoteEvent(
                     noteNumber: bassDrum,
                     absolutePositionTicks: measureStartTick + (2 * ticksPerQuarterNote),
                     noteDurationTicks: ticksPerQuarterNote,
@@ -244,7 +244,7 @@ namespace Music.Generator
 
                 for (int beat = 0; beat < 4; beat++)
                 {
-                    notes.Add(new PhraseNote(
+                    notes.Add(new PartNoteEvent(
                         noteNumber: snareDrum,
                         absolutePositionTicks: measureStartTick + (beat * ticksPerQuarterNote),
                         noteDurationTicks: ticksPerQuarterNote,

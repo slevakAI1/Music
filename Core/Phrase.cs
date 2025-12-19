@@ -16,9 +16,9 @@ namespace Music.Writer
         //public string NotionPartName { get; set; }
         public int MidiProgramNumber { get; set; }
 
-        public List<PhraseNote> PhraseNotes { get; set; } = new();
+        public List<PartNoteEvent> PhraseNotes { get; set; } = new();
 
-        public Phrase(List<PhraseNote> phraseNotes)
+        public Phrase(List<PartNoteEvent> phraseNotes)
         {
             PhraseNotes = phraseNotes;
         }
@@ -27,12 +27,12 @@ namespace Music.Writer
     /// <summary>
     /// Encapsulates the intent and structure of a chord within a musical phrase.
     /// 
-    /// PhraseChord provides a high-level, declarative representation of a chord, including its key, degree, quality, and voicing type.
+    /// PartChord provides a high-level, declarative representation of a chord, including its key, degree, quality, and voicing type.
     /// This abstraction allows composers and algorithms to specify harmony content without committing to specific notes,
     /// enabling flexible rendering, transposition, and arrangement. It is primarily used to generate the actual notes of a chord
     /// during MIDI or notation conversion, supporting expressive and reusable harmonic patterns in music composition.
     /// </summary>
-    public sealed class PhraseChord
+    public sealed class PartChord
     {
         // Chords
         public bool IsChord { get; set; }
@@ -42,7 +42,7 @@ namespace Music.Writer
         public string? ChordBase { get; set; }
         public string? ChordType { get; set; } = "Straight"; // Just an idea. Straight, arppegiated, etc ???
 
-        public PhraseChord(
+        public PartChord(
             bool isChord,
             string? chordKey = null,
             int? chordDegree = null,
@@ -62,11 +62,11 @@ namespace Music.Writer
     /// <summary>
     /// Represents a single note within a phrase event, including pitch, timing, and velocity.
     /// 
-    /// PhraseNote is the atomic unit for musical playback and notation, capturing all necessary
+    /// PartNoteEvent is the atomic unit for musical playback and notation, capturing all necessary
     /// information for MIDI and MusicXML conversion. It supports both direct note entry and notes
     /// generated from chords, enabling precise control over musical expression and timing.
     /// </summary>
-    public sealed class PhraseNote
+    public sealed class PartNoteEvent
     {
         public bool IsRest { get; set; }
 
@@ -90,9 +90,9 @@ namespace Music.Writer
         // ... maybe need a tuplet class?
         public int? TupletActualNotes { get; set; }  // The 'm' in m:n (e.g., 3 in a triplet)
         public int? TupletNormalNotes { get; set; }  // The 'n' in m:n (e.g., 2 in a triplet)
-        public PhraseChord? phraseChord { get; set; } // Metadata only. Means the note is part of this type chord.
+        public PartChord? phraseChord { get; set; } // Metadata only. Means the note is part of this type chord.
 
-        public PhraseNote(
+        public PartNoteEvent(
             int noteNumber,
             int absolutePositionTicks,
             int noteDurationTicks,

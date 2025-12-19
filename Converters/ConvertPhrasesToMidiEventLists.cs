@@ -52,7 +52,7 @@ namespace Music.Writer
             events.Add(programChangeEvent);
 
             // Process each note in the phrase
-            foreach (var phraseNote in phrase.PhraseNotes ?? Enumerable.Empty<PhraseNote>())
+            foreach (var phraseNote in phrase.PhraseNotes ?? Enumerable.Empty<PartNoteEvent>())
             {
                 if (phraseNote.IsRest)
                 {
@@ -77,7 +77,7 @@ namespace Music.Writer
         /// <summary>
         /// Processes a chord note by expanding it to individual notes using ConvertHarmonyEventToListOfPhraseNotes.
         /// </summary>
-        private static void ProcessChord(List<MetaMidiEvent> events, PhraseNote phraseNote)
+        private static void ProcessChord(List<MetaMidiEvent> events, PartNoteEvent phraseNote)
         {
             var chord = phraseNote.phraseChord!;
 
@@ -115,7 +115,7 @@ namespace Music.Writer
         /// <summary>
         /// Processes a single note event.
         /// </summary>
-        private static void ProcessSingleNote(List<MetaMidiEvent> events, PhraseNote phraseNote)
+        private static void ProcessSingleNote(List<MetaMidiEvent> events, PartNoteEvent phraseNote)
         {
             // Create NoteOn event at the note's absolute position
             var noteOnEvent = MetaMidiEvent.CreateNoteOn(

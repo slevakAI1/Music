@@ -7,7 +7,7 @@ using Music.Generator;
 namespace Music.Writer
 {
     /// <summary>
-    /// Converts HarmonyEvent objects to lists of PhraseNote compatible with Writer.
+    /// Converts HarmonyEvent objects to lists of PartNoteEvent compatible with Writer.
     /// </summary>
     public static class ConvertHarmonyEventToListOfPhraseNotes
     {
@@ -20,7 +20,7 @@ namespace Music.Writer
         /// <returns>A list of WriterNote objects representing the chord voicing.</returns>
         /// <exception cref="ArgumentNullException">When harmonyEvent is null.</exception>
         /// <exception cref="InvalidOperationException">When the chord cannot be constructed.</exception>
-        public static List<PhraseNote> Convert(HarmonyEvent harmonyEvent, int baseOctave = 4, int noteValue = 4)
+        public static List<PartNoteEvent> Convert(HarmonyEvent harmonyEvent, int baseOctave = 4, int noteValue = 4)
         {
             if (harmonyEvent == null)
                 throw new ArgumentNullException(nameof(harmonyEvent));
@@ -40,7 +40,7 @@ namespace Music.Writer
         /// <returns>A list of WriterNote objects representing the chord voicing.</returns>
         /// <exception cref="ArgumentException">When parameters are invalid.</exception>
         /// <exception cref="InvalidOperationException">When the chord cannot be constructed.</exception>
-        public static List<PhraseNote> Convert(string key, int degree, string quality, string bass, int baseOctave = 4, int noteValue = 4)
+        public static List<PartNoteEvent> Convert(string key, int degree, string quality, string bass, int baseOctave = 4, int noteValue = 4)
         {
             // Use shared helper to generate chord MIDI notes
             var chordMidiNotes = ChordVoicingHelper.GenerateChordMidiNotes(key, degree, quality, bass, baseOctave);
@@ -48,8 +48,8 @@ namespace Music.Writer
             // Calculate note duration in ticks based on note value
             int noteDurationTicks = CalculateNoteDurationTicks(noteValue);
             
-            // Create PhraseChord metadata object
-            var phraseChord = new PhraseChord(
+            // Create PartChord metadata object
+            var phraseChord = new PartChord(
                 isChord: true,
                 chordKey: key,
                 chordDegree: degree,
@@ -57,10 +57,10 @@ namespace Music.Writer
                 chordBase: bass);
             
             // Convert MIDI notes to PhraseNotes
-            var result = new List<PhraseNote>();
+            var result = new List<PartNoteEvent>();
             foreach (var noteNumber in chordMidiNotes)
             {
-                var phraseNote = new PhraseNote(
+                var phraseNote = new PartNoteEvent(
                     noteNumber: noteNumber,
                     absolutePositionTicks: 0, // Will be set by the calling code
                     noteDurationTicks: noteDurationTicks,

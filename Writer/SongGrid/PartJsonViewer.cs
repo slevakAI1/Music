@@ -3,12 +3,12 @@ namespace Music.Writer
     /// <summary>
     /// A modal dialog that displays a Phrase object as formatted JSON.
     /// </summary>
-    public class PhraseJsonViewer : Form
+    public class PartJsonViewer : Form
     {
         private TextBox txtJson;
         private Button btnClose;
 
-        public PhraseJsonViewer(Phrase phrase, string phraseNumber)
+        public PartJsonViewer(Phrase phrase, string phraseNumber)
         {
             InitializeComponents(phraseNumber);
             LoadPhraseData(phrase);
@@ -17,7 +17,7 @@ namespace Music.Writer
         private void InitializeComponents(string phraseNumber)
         {
             // Form settings
-            this.Text = $"Phrase Viewer - #{phraseNumber}";
+            this.Text = $"Part Viewer - #{phraseNumber}";
             this.Size = new Size(800, 600);
             this.StartPosition = FormStartPosition.CenterParent;
             this.FormBorderStyle = FormBorderStyle.Sizable;

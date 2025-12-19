@@ -28,7 +28,7 @@ namespace Music.Writer
 
                 foreach (var segment in segmentedEvents)
                 {
-                    var phraseNotes = new List<PhraseNote>();
+                    var phraseNotes = new List<PartNoteEvent>();
                     var phrase = new Phrase(phraseNotes);
 
                     // Get instrument info from this segment's program change
@@ -165,12 +165,12 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Creates a PhraseNote from a NoteOn/NoteOff event pair.
+        /// Creates a PartNoteEvent from a NoteOn/NoteOff event pair.
         /// </summary>
         private static void CreatePhraseNoteFromPair(
             MetaMidiEvent noteOnEvent,
             MetaMidiEvent noteOffEvent,
-            List<PhraseNote> phraseNotes,
+            List<PartNoteEvent> phraseNotes,
             double tickScale)
         {
             if (!noteOnEvent.Parameters.TryGetValue("NoteNumber", out var noteNumObj) ||
@@ -186,7 +186,7 @@ namespace Music.Writer
             if (noteDurationTicks < 1)
                 noteDurationTicks = 1;
 
-            var phraseNote = new PhraseNote(
+            var phraseNote = new PartNoteEvent(
                 noteNumber,
                 absolutePositionTicks,
                 noteDurationTicks,
