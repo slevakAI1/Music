@@ -4,18 +4,23 @@ using Music.Generator;
 namespace Music.Writer.Generator
 {
     /// <summary>
-    /// Generates phrases for multiple parts based on groove patterns and harmony events.
+    /// Generates tracks for multiple parts based on groove patterns and harmony events.
     /// Story 7: Now supports controlled randomness for pitch variation.
     /// </summary>
     public static class GrooveDrivenGenerator
     {
         /// <summary>
-        /// Generates all phrases based on harmony timeline and groove preset.
+        /// Generates all tracks based on harmony timeline and groove preset.
         /// </summary>
         /// <param name="harmonyTimeline">The harmony events defining chords per bar.</param>
         /// <param name="timeSignatureTimeline">Time signature info for tick calculations.</param>
         /// <param name="groovePreset">The groove preset defining onset patterns.</param>
-        /// <returns>Generated phrases for each role.</returns>
+        /// <returns>Generated tracks for each role.</returns>
+        /// 
+
+        // WHY ARE THERE 2 GENERATES - DUPLICATES!
+
+
         public static GeneratorResult Generate(
             HarmonyTimeline harmonyTimeline,
             TimeSignatureTimeline timeSignatureTimeline,
@@ -43,20 +48,20 @@ namespace Music.Writer.Generator
 
             return new GeneratorResult
             {
-                BassPhrase = GenerateBassPhrase(harmonyTimeline, layer.BassOnsets, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
-                GuitarPhrase = GenerateGuitarPhrase(harmonyTimeline, layer.CompOnsets, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
-                KeysPhrase = GenerateKeysPhrase(harmonyTimeline, layer.PadsOnsets, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
-                DrumPhrase = GenerateDrumPhrase(layer, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings)
+                BassTrack = GenerateBassTrack(harmonyTimeline, layer.BassOnsets, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
+                GuitarTrack = GenerateGuitarTrack(harmonyTimeline, layer.CompOnsets, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
+                KeysTrack = GenerateKeysTrack(harmonyTimeline, layer.PadsOnsets, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
+                DrumTrack = GenerateDrumTrack(layer, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings)
             };
         }
 
         /// <summary>
-        /// Generates phrases for all parts in a groove-based arrangement.
+        /// Generates tracks for all parts in a groove-based arrangement.
         /// </summary>
         /// <param name="harmonyTimeline">Harmony events defining chord progression</param>
         /// <param name="timeSignatureTimeline">Time signature events</param>
         /// <param name="settings">Optional randomization settings (uses defaults if null)</param>
-        /// <returns>Dictionary of part name to generated phrase</returns>
+        /// <returns>Dictionary of part name to generated track</returns>
         public static Dictionary<string, SongTrack> GenerateAllParts(
             HarmonyTimeline harmonyTimeline,
             TimeSignatureTimeline timeSignatureTimeline,
@@ -74,25 +79,25 @@ namespace Music.Writer.Generator
             int ticksPerMeasure = (ticksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
 
             // Generate each part
-            result["Bass"] = GenerateBassPhrase(harmonyTimeline, ticksPerMeasure, ticksPerQuarterNote, randomSettings);
-            result["Guitar"] = GenerateGuitarPhrase(harmonyTimeline, ticksPerMeasure, ticksPerQuarterNote, randomSettings);
-            result["Keys"] = GenerateKeysPhrase(harmonyTimeline, ticksPerMeasure, ticksPerQuarterNote, randomSettings);
+            result["Bass"] = GenerateBassTrack(harmonyTimeline, ticksPerMeasure, ticksPerQuarterNote, randomSettings);
+            result["Guitar"] = GenerateGuitarTrack(harmonyTimeline, ticksPerMeasure, ticksPerQuarterNote, randomSettings);
+            result["Keys"] = GenerateKeysTrack(harmonyTimeline, ticksPerMeasure, ticksPerQuarterNote, randomSettings);
 
             return result;
         }
 
         /// <summary>
-        /// Result of generating all phrases for a groove preset.
+        /// Result of generating all tracks for a groove preset.
         /// </summary>
         public sealed class GeneratorResult
         {
-            public SongTrack? BassPhrase { get; init; }
-            public SongTrack? GuitarPhrase { get; init; }
-            public SongTrack? KeysPhrase { get; init; }
-            public SongTrack? DrumPhrase { get; init; }
+            public SongTrack? BassTrack { get; init; }
+            public SongTrack? GuitarTrack { get; init; }
+            public SongTrack? KeysTrack { get; init; }
+            public SongTrack? DrumTrack { get; init; }
         }
 
-        private static SongTrack? GenerateBassPhrase(
+        private static SongTrack? GenerateBassTrack(
             HarmonyTimeline harmonyTimeline,
             List<decimal> bassOnsets,
             int ticksPerQuarterNote,
@@ -151,7 +156,7 @@ namespace Music.Writer.Generator
             return new SongTrack(notes) { MidiProgramNumber = 33 }; // Electric Bass
         }
 
-        private static SongTrack GenerateBassPhrase(
+        private static SongTrack GenerateBassTrack(
             HarmonyTimeline harmonyTimeline,
             int ticksPerMeasure,
             int ticksPerQuarterNote,
@@ -192,7 +197,7 @@ namespace Music.Writer.Generator
             return new SongTrack(notes) { MidiProgramNumber = 33 }; // Electric Bass
         }
 
-        private static SongTrack? GenerateGuitarPhrase(
+        private static SongTrack? GenerateGuitarTrack(
             HarmonyTimeline harmonyTimeline,
             List<decimal> compOnsets,
             int ticksPerQuarterNote,
@@ -254,7 +259,7 @@ namespace Music.Writer.Generator
             return new SongTrack(notes) { MidiProgramNumber = 27 }; // Electric Guitar
         }
 
-        private static SongTrack GenerateGuitarPhrase(
+        private static SongTrack GenerateGuitarTrack(
             HarmonyTimeline harmonyTimeline,
             int ticksPerMeasure,
             int ticksPerQuarterNote,
@@ -302,7 +307,10 @@ namespace Music.Writer.Generator
             return new SongTrack(notes) { MidiProgramNumber = 27 }; // Electric Guitar (clean)
         }
 
-        private static SongTrack? GenerateKeysPhrase(
+
+        // TO DO WHY ARE THERE 2 of these methods????
+
+        private static SongTrack? GenerateKeysTrack(
             HarmonyTimeline harmonyTimeline,
             List<decimal> padsOnsets,
             int ticksPerQuarterNote,
@@ -372,7 +380,7 @@ namespace Music.Writer.Generator
             return new SongTrack(notes) { MidiProgramNumber = 18 }; // Rock Organ
         }
 
-        private static SongTrack GenerateKeysPhrase(
+        private static SongTrack GenerateKeysTrack(
             HarmonyTimeline harmonyTimeline,
             int ticksPerMeasure,
             int ticksPerQuarterNote,
@@ -429,9 +437,9 @@ namespace Music.Writer.Generator
         }
 
         /// <summary>
-        /// Generates drum phrase: kick, snare, hi-hat at groove onsets with controlled randomness.
+        /// Generates drum track: kick, snare, hi-hat at groove onsets with controlled randomness.
         /// </summary>
-        private static SongTrack? GenerateDrumPhrase(
+        private static SongTrack? GenerateDrumTrack(
             GrooveLayer layer,
             int ticksPerQuarterNote,
             int ticksPerMeasure,

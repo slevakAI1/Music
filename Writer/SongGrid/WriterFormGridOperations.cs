@@ -136,6 +136,8 @@ namespace Music.Writer
             dgSong.Refresh();
         }
 
+        // TODO DEAD CODE OR JUST DISCONNECTED OR REPLICATED?
+
         // ========== GRID VALIDATION HELPERS ==========
 
         /// <summary>
@@ -164,12 +166,14 @@ namespace Music.Writer
 
         // ========== GRID DATA MANIPULATION ==========
 
+        // TO DO  DEAD CODE??
+
         // KEEP THIS FOR FUTURE EXPANSION
         /// <summary>
         /// Writes a track object to the colData cell of all selected rows and updates measure display.
         /// </summary>
         /// <param name="track">The track to write to the grid.</param>
-        private void WritePhraseToSelectedRows(DataGridView dgSong, SongTrack track)
+        private void WriteTrackToSelectedRows(DataGridView dgSong, SongTrack track)
         {
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
@@ -193,7 +197,7 @@ namespace Music.Writer
         /// The appended notes' absolute positions are adjusted to start after the existing track ends.
         /// </summary>
         /// <param name="track">The track containing notes to append to the grid.</param>
-        private void AppendPhraseToSelectedRows(DataGridView dgSong, SongTrack track)
+        private void AppendTrackToSelectedRows(DataGridView dgSong, SongTrack track)
         {
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {

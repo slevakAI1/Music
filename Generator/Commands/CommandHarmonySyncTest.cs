@@ -11,7 +11,7 @@ namespace Music.Generator
         public static void HandleHarmonySyncTest(
             DataGridView dgSong,
             List<MidiInstrument> midiInstruments,
-            ref int phraseNumber,
+            ref int trackNumber,
             Form owner)
         {
             // Extract harmony timeline from the fixed harmony row
@@ -42,26 +42,26 @@ namespace Music.Generator
                 return;
             }
 
-            // Create 4 phrases for the test
-            var rockOrganPhrase = CreateRockOrganPhrase(harmonyTimeline, timeSignatureTimeline);
-            var electricGuitarPhrase = CreateElectricGuitarPhrase(harmonyTimeline, timeSignatureTimeline);
-            var electricBassPhrase = CreateElectricBassPhrase(harmonyTimeline, timeSignatureTimeline);
-            var drumSetPhrase = CreateDrumSetPhrase(harmonyTimeline, timeSignatureTimeline);
+            // Create 4 tracks for the test
+            var rockOrganTrack = CreateRockOrganTrack(harmonyTimeline, timeSignatureTimeline);
+            var electricGuitarTrack = CreateElectricGuitarTrack(harmonyTimeline, timeSignatureTimeline);
+            var electricBassTrack = CreateElectricBassTrack(harmonyTimeline, timeSignatureTimeline);
+            var drumSetTrack = CreateDrumSetTrack(harmonyTimeline, timeSignatureTimeline);
 
-            // Add phrases to the grid
-            SongGridManager.AddSongTrackToGrid(rockOrganPhrase, midiInstruments, dgSong, ref phraseNumber);
-            SongGridManager.AddSongTrackToGrid(electricGuitarPhrase, midiInstruments, dgSong, ref phraseNumber);
-            SongGridManager.AddSongTrackToGrid(electricBassPhrase, midiInstruments, dgSong, ref phraseNumber);
-            SongGridManager.AddSongTrackToGrid(drumSetPhrase, midiInstruments, dgSong, ref phraseNumber);
+            // Add tracks to the grid
+            SongGridManager.AddSongTrackToGrid(rockOrganTrack, midiInstruments, dgSong, ref trackNumber);
+            SongGridManager.AddSongTrackToGrid(electricGuitarTrack, midiInstruments, dgSong, ref trackNumber);
+            SongGridManager.AddSongTrackToGrid(electricBassTrack, midiInstruments, dgSong, ref trackNumber);
+            SongGridManager.AddSongTrackToGrid(drumSetTrack, midiInstruments, dgSong, ref trackNumber);
 
             MessageBox.Show(owner,
-                "Successfully created 4 synchronized phrases based on harmony timeline.",
+                "Successfully created 4 synchronized tracks based on harmony timeline.",
                 "Harmony Sync Test",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
         }
 
-        private static SongTrack CreateRockOrganPhrase(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
+        private static SongTrack CreateRockOrganTrack(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
         {
             var notes = new List<SongTrackNoteEvent>();
             int currentTick = 0;
@@ -111,7 +111,7 @@ namespace Music.Generator
             return new SongTrack(notes) { MidiProgramNumber = 18 };
         }
 
-        private static SongTrack CreateElectricGuitarPhrase(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
+        private static SongTrack CreateElectricGuitarTrack(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
         {
             var notes = new List<SongTrackNoteEvent>();
             int currentTick = 0;
@@ -159,7 +159,7 @@ namespace Music.Generator
             return new SongTrack(notes) { MidiProgramNumber = 27 };
         }
 
-        private static SongTrack CreateElectricBassPhrase(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
+        private static SongTrack CreateElectricBassTrack(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
         {
             var notes = new List<SongTrackNoteEvent>();
             int currentTick = 0;
@@ -207,7 +207,7 @@ namespace Music.Generator
             return new SongTrack(notes) { MidiProgramNumber = 33 };
         }
 
-        private static SongTrack CreateDrumSetPhrase(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
+        private static SongTrack CreateDrumSetTrack(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
         {
             var notes = new List<SongTrackNoteEvent>();
             int currentTick = 0;

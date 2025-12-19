@@ -13,7 +13,7 @@ namespace Music.Generator
     {
         /// <summary>
         /// Handles the Harmony Groove Sync Test command.
-        /// Generates synchronized phrases using a groove template.
+        /// Generates synchronized test tracks using a groove preset
         /// </summary>
         public static void HandleGrooveSyncTest(
             DataGridView dgSong,
@@ -64,32 +64,32 @@ namespace Music.Generator
                 int addedCount = 0;
 
                 // Add generated song tracks to grid
-                if (result.BassPhrase != null && result.BassPhrase.SongTrackNoteEvents.Count > 0)
+                if (result.BassTrack != null && result.BassTrack.SongTrackNoteEvents.Count > 0)
                 {
-                    SongGridManager.AddSongTrackToGrid(result.BassPhrase, midiInstruments, dgSong, ref songTrackNumber);
+                    SongGridManager.AddSongTrackToGrid(result.BassTrack, midiInstruments, dgSong, ref songTrackNumber);
                     addedCount++;
                 }
 
-                if (result.GuitarPhrase != null && result.GuitarPhrase.SongTrackNoteEvents.Count > 0)
+                if (result.GuitarTrack != null && result.GuitarTrack.SongTrackNoteEvents.Count > 0)
                 {
-                    SongGridManager.AddSongTrackToGrid(result.GuitarPhrase, midiInstruments, dgSong, ref songTrackNumber);
+                    SongGridManager.AddSongTrackToGrid(result.GuitarTrack, midiInstruments, dgSong, ref songTrackNumber);
                     addedCount++;
                 }
 
-                if (result.KeysPhrase != null && result.KeysPhrase.SongTrackNoteEvents.Count > 0)
+                if (result.KeysTrack != null && result.KeysTrack.SongTrackNoteEvents.Count > 0)
                 {
-                    SongGridManager.AddSongTrackToGrid(result.KeysPhrase, midiInstruments, dgSong, ref songTrackNumber);
+                    SongGridManager.AddSongTrackToGrid(result.KeysTrack, midiInstruments, dgSong, ref songTrackNumber);
                     addedCount++;
                 }
 
-                if (result.DrumPhrase != null && result.DrumPhrase.SongTrackNoteEvents.Count > 0)
+                if (result.DrumTrack != null && result.DrumTrack.SongTrackNoteEvents.Count > 0)
                 {
-                    SongGridManager.AddSongTrackToGrid(result.DrumPhrase, midiInstruments, dgSong, ref songTrackNumber);
+                    SongGridManager.AddSongTrackToGrid(result.DrumTrack, midiInstruments, dgSong, ref songTrackNumber);
                     addedCount++;
                 }
 
                 MessageBox.Show(owner,
-                    $"Successfully created {addedCount} synchronized phrases using '{groovePreset.Name}' groove with controlled randomness.",
+                    $"Successfully created {addedCount} synchronized tracks using '{groovePreset.Name}' groove with controlled randomness.",
                     "Groove Sync Test",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
@@ -97,7 +97,7 @@ namespace Music.Generator
             catch (Exception ex)
             {
                 MessageBox.Show(owner,
-                    $"Error generating groove phrases:\n{ex.Message}",
+                    $"Error generating groove tracks:\n{ex.Message}",
                     "Generation Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
