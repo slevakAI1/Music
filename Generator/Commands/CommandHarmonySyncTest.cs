@@ -4,7 +4,7 @@ using Music.Writer;
 namespace Music.Generator
 {
     /// <summary>
-    /// Handler(s) for Harmony Sync test commands extracted from CommandRepeatNote.
+    /// Handler(s) for Harmony Sync test commands extracted from HandleRepeatNoteCommand.
     /// </summary>
     public static class CommandHarmonySyncTest
     {

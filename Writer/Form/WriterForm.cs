@@ -183,7 +183,7 @@ namespace Music.Writer
             switch (command)
             {
                 case "Repeat Note":
-                    CommandRepeatNote.HandleRepeatNote(formData, dgSong, this);
+                    HandleRepeatNoteCommand.Execute(formData, dgSong, this);
                     break;
 
                 case "Harmony Sync Test":

@@ -45,7 +45,6 @@
     <EmbeddedResource Remove="Designer\TimeSignatureEditorForm.resx" />
     <EmbeddedResource Remove="Writer\Form\ConsoleTransform.resx" />
     <EmbeddedResource Remove="Writer\Form\WriterForm.DataBinder.resx" />
-    <EmbeddedResource Remove="Writer\Form\WriterFormEvents.resx" />
     <EmbeddedResource Remove="Writer\Form\WriterFormGridOperations.resx" />
   </ItemGroup>
 
@@ -77,7 +76,6 @@
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
-    <Folder Include="Writer\Generator\" />
   </ItemGroup>
 
   <ItemGroup>

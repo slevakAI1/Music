@@ -1,6 +1,4 @@
-﻿using Music.Designer;
-
-namespace Music.Writer
+﻿namespace Music.Writer
 {
     public class WriterFormTests
     {

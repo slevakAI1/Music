@@ -1,8 +1,4 @@
 using Music.Generator;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace Music.Writer
 {
@@ -10,12 +6,12 @@ namespace Music.Writer
     /// Static command execution logic for WriterForm.
     /// Each method accepts only the specific dependencies it needs.
     /// </summary>
-    public static class CommandRepeatNote
+    public static class HandleRepeatNoteCommand
     {
         /// <summary>
         /// Adds repeating notes to the phrases selected in the grid
         /// </summary>
-        public static void HandleRepeatNote(
+        public static void Execute(
             WriterFormData formData,
             DataGridView dgSong,
             Form owner)
