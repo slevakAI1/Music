@@ -16,8 +16,8 @@ namespace Music.Writer
             List<MidiInstrument> midiInstruments,
             ref int phraseNumber)
         {
-            // Create an empty Phrase and add it to the grid via the existing helper.
-            var emptyPhrase = new Phrase(new List<PartNoteEvent>())
+            // Create an empty SongTrack and add it to the grid via the existing helper.
+            var emptyPhrase = new SongTrack(new List<SongTrackNoteEvent>())
             {
                 MidiProgramNumber = -1  // "Select..."
             };
@@ -119,10 +119,10 @@ namespace Music.Writer
                 if (instrCol != null)
                     row.Cells[instrCol.Index].Value = -1;
 
-                // Reset data to empty Phrase
+                // Reset data to empty SongTrack
                 var phraseDataCol = dgSong.Columns["colData"];
                 if (phraseDataCol != null)
-                    row.Cells[phraseDataCol.Index].Value = new Phrase(new List<PartNoteEvent>()) { MidiProgramNumber = -1 };
+                    row.Cells[phraseDataCol.Index].Value = new SongTrack(new List<SongTrackNoteEvent>()) { MidiProgramNumber = -1 };
 
                 // Clear the Part description
                 var descriptionCol = dgSong.Columns["colDescription"];
@@ -169,7 +169,7 @@ namespace Music.Writer
         /// Writes a phrase object to the colData cell of all selected rows and updates measure display.
         /// </summary>
         /// <param name="phrase">The phrase to write to the grid.</param>
-        private void WritePhraseToSelectedRows(DataGridView dgSong, Phrase phrase)
+        private void WritePhraseToSelectedRows(DataGridView dgSong, SongTrack phrase)
         {
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
@@ -184,12 +184,16 @@ namespace Music.Writer
             }
         }
 
+
+        // TO DO - MANUALLY NOTES ARE NOT APPENDING AND DISPLAYING IN THE GRID RIGHT!!!
+        // FIX THIS NEXT!!!
+
         /// <summary>
-        /// Appends phrase notes to the existing Phrase objects in all selected rows.
+        /// Appends phrase notes to the existing SongTrack objects in all selected rows.
         /// The appended notes' absolute positions are adjusted to start after the existing phrase ends.
         /// </summary>
         /// <param name="phrase">The phrase containing notes to append to the grid.</param>
-        private void AppendPhraseNotesToSelectedRows(DataGridView dgSong, Phrase phrase)
+        private void AppendPhraseNotesToSelectedRows(DataGridView dgSong, SongTrack phrase)
         {
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
@@ -198,37 +202,37 @@ namespace Music.Writer
                     continue;
 
                 // Get existing phrase or create new one if null
-                var existingPhrase = selectedRow.Cells["colData"].Value as Phrase;
+                var existingPhrase = selectedRow.Cells["colData"].Value as SongTrack;
                 if (existingPhrase == null)
                 {
                     // No existing phrase, create new one with the notes (no offset needed)
-                    existingPhrase = new Phrase(new List<PartNoteEvent>(phrase.PhraseNotes));
+                    existingPhrase = new SongTrack(new List<SongTrackNoteEvent>(phrase.SongTrackNoteEvents));
                     selectedRow.Cells["colData"].Value = existingPhrase;
                 }
                 else
                 {
                     // Calculate offset: find where the existing phrase ends
                     int offset = 0;
-                    if (existingPhrase.PhraseNotes.Count > 0)
+                    if (existingPhrase.SongTrackNoteEvents.Count > 0)
                     {
                         // Find the last note's end time (absolute position + duration)
-                        var lastNote = existingPhrase.PhraseNotes
+                        var lastNote = existingPhrase.SongTrackNoteEvents
                             .OrderBy(n => n.AbsolutePositionTicks + n.NoteDurationTicks)
                             .Last();
                         offset = lastNote.AbsolutePositionTicks + lastNote.NoteDurationTicks;
                     }
 
                     // Append new notes with adjusted absolutePositions
-                    foreach (var note in phrase.PhraseNotes)
+                    foreach (var note in phrase.SongTrackNoteEvents)
                     {
-                        var adjustedNote = new PartNoteEvent(
+                        var adjustedNote = new SongTrackNoteEvent(
                             noteNumber: note.NoteNumber,
                             absolutePositionTicks: note.AbsolutePositionTicks + offset,
                             noteDurationTicks: note.NoteDurationTicks,
                             noteOnVelocity: note.NoteOnVelocity,
                             isRest: note.IsRest);
 
-                        existingPhrase.PhraseNotes.Add(adjustedNote);
+                        existingPhrase.SongTrackNoteEvents.Add(adjustedNote);
                     }
                 }
 

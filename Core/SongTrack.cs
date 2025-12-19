@@ -3,12 +3,12 @@ namespace Music.Writer
     /// <summary>
     /// Represents a musical phrase for composition and MIDI generation.
     /// 
-    /// A Phrase encapsulates a sequence of musical events (notes, chords, rests) for a single instrument or part.
+    /// A SongTrack encapsulates a sequence of musical events (notes, chords, rests) for a single instrument or part.
     /// It is designed to support flexible music writing, including overlapping notes and chords, and serves as the
     /// primary input for transformations into timed notes and MIDI events. This abstraction enables composers and
     /// algorithms to work with high-level musical ideas before rendering them into concrete playback or notation.
     /// </summary>
-    public sealed class Phrase
+    public sealed class SongTrack
     {
 
         // THESE GET SET BY GRID DROPDOWN CHANGE EVENT, WHAT ABOUT DEFAULT?
@@ -16,23 +16,27 @@ namespace Music.Writer
         //public string NotionPartName { get; set; }
         public int MidiProgramNumber { get; set; }
 
-        public List<PartNoteEvent> PhraseNotes { get; set; } = new();
+        public List<SongTrackNoteEvent> SongTrackNoteEvents { get; set; } = new();
 
-        public Phrase(List<PartNoteEvent> phraseNotes)
+        public SongTrack(List<SongTrackNoteEvent> phraseNotes)
         {
-            PhraseNotes = phraseNotes;
+            SongTrackNoteEvents = phraseNotes;
         }
     }
 
     /// <summary>
     /// Encapsulates the intent and structure of a chord within a musical phrase.
     /// 
-    /// PartChord provides a high-level, declarative representation of a chord, including its key, degree, quality, and voicing type.
+    /// SongTrackChord provides a high-level, declarative representation of a chord, including its key, degree, quality, and voicing type.
     /// This abstraction allows composers and algorithms to specify harmony content without committing to specific notes,
     /// enabling flexible rendering, transposition, and arrangement. It is primarily used to generate the actual notes of a chord
     /// during MIDI or notation conversion, supporting expressive and reusable harmonic patterns in music composition.
     /// </summary>
-    public sealed class PartChord
+    /// 
+
+    // TO DO this may not really be needed
+
+    public sealed class SongTrackChord
     {
         // Chords
         public bool IsChord { get; set; }
@@ -42,7 +46,7 @@ namespace Music.Writer
         public string? ChordBase { get; set; }
         public string? ChordType { get; set; } = "Straight"; // Just an idea. Straight, arppegiated, etc ???
 
-        public PartChord(
+        public SongTrackChord(
             bool isChord,
             string? chordKey = null,
             int? chordDegree = null,
@@ -62,11 +66,11 @@ namespace Music.Writer
     /// <summary>
     /// Represents a single note within a phrase event, including pitch, timing, and velocity.
     /// 
-    /// PartNoteEvent is the atomic unit for musical playback and notation, capturing all necessary
+    /// SongTrackNoteEvent is the atomic unit for musical playback and notation, capturing all necessary
     /// information for MIDI and MusicXML conversion. It supports both direct note entry and notes
     /// generated from chords, enabling precise control over musical expression and timing.
     /// </summary>
-    public sealed class PartNoteEvent
+    public sealed class SongTrackNoteEvent
     {
         public bool IsRest { get; set; }
 
@@ -90,9 +94,9 @@ namespace Music.Writer
         // ... maybe need a tuplet class?
         public int? TupletActualNotes { get; set; }  // The 'm' in m:n (e.g., 3 in a triplet)
         public int? TupletNormalNotes { get; set; }  // The 'n' in m:n (e.g., 2 in a triplet)
-        public PartChord? phraseChord { get; set; } // Metadata only. Means the note is part of this type chord.
+        public SongTrackChord? phraseChord { get; set; } // Metadata only. Means the note is part of this type chord.
 
-        public PartNoteEvent(
+        public SongTrackNoteEvent(
             int noteNumber,
             int absolutePositionTicks,
             int noteDurationTicks,

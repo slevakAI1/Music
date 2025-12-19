@@ -57,12 +57,12 @@ namespace Music.Writer.Generator
         /// <param name="timeSignatureTimeline">Time signature events</param>
         /// <param name="settings">Optional randomization settings (uses defaults if null)</param>
         /// <returns>Dictionary of part name to generated phrase</returns>
-        public static Dictionary<string, Phrase> GenerateAllParts(
+        public static Dictionary<string, SongTrack> GenerateAllParts(
             HarmonyTimeline harmonyTimeline,
             TimeSignatureTimeline timeSignatureTimeline,
             RandomizationSettings? settings = null)
         {
-            var result = new Dictionary<string, Phrase>(StringComparer.OrdinalIgnoreCase);
+            var result = new Dictionary<string, SongTrack>(StringComparer.OrdinalIgnoreCase);
             var randomSettings = settings ?? RandomizationSettings.Default;
 
             // Get time signature for timing calculations
@@ -86,13 +86,13 @@ namespace Music.Writer.Generator
         /// </summary>
         public sealed class GeneratorResult
         {
-            public Phrase? BassPhrase { get; init; }
-            public Phrase? GuitarPhrase { get; init; }
-            public Phrase? KeysPhrase { get; init; }
-            public Phrase? DrumPhrase { get; init; }
+            public SongTrack? BassPhrase { get; init; }
+            public SongTrack? GuitarPhrase { get; init; }
+            public SongTrack? KeysPhrase { get; init; }
+            public SongTrack? DrumPhrase { get; init; }
         }
 
-        private static Phrase? GenerateBassPhrase(
+        private static SongTrack? GenerateBassPhrase(
             HarmonyTimeline harmonyTimeline,
             List<decimal> bassOnsets,
             int ticksPerQuarterNote,
@@ -103,7 +103,7 @@ namespace Music.Writer.Generator
             if (bassOnsets == null || bassOnsets.Count == 0)
                 return null;
 
-            var notes = new List<PartNoteEvent>();
+            var notes = new List<SongTrackNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
             const int bassOctave = 2;
 
@@ -139,7 +139,7 @@ namespace Music.Writer.Generator
 
                     int midiNote = randomizer.SelectBassPitch(ctx, bar, onsetBeat);
 
-                    notes.Add(new PartNoteEvent(
+                    notes.Add(new SongTrackNoteEvent(
                         noteNumber: midiNote,
                         absolutePositionTicks: onsetTick,
                         noteDurationTicks: duration,
@@ -148,16 +148,16 @@ namespace Music.Writer.Generator
                 }
             }
 
-            return new Phrase(notes) { MidiProgramNumber = 33 }; // Electric Bass
+            return new SongTrack(notes) { MidiProgramNumber = 33 }; // Electric Bass
         }
 
-        private static Phrase GenerateBassPhrase(
+        private static SongTrack GenerateBassPhrase(
             HarmonyTimeline harmonyTimeline,
             int ticksPerMeasure,
             int ticksPerQuarterNote,
             RandomizationSettings settings)
         {
-            var notes = new List<PartNoteEvent>();
+            var notes = new List<SongTrackNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
             int quarterNoteDuration = ticksPerQuarterNote;
 
@@ -180,7 +180,7 @@ namespace Music.Writer.Generator
                     decimal onsetBeat = beat + 1;
                     int midiNote = randomizer.SelectBassPitch(ctx, harmonyEvent.StartBar, onsetBeat);
 
-                    notes.Add(new PartNoteEvent(
+                    notes.Add(new SongTrackNoteEvent(
                         noteNumber: midiNote,
                         absolutePositionTicks: absolutePosition + (beat * quarterNoteDuration),
                         noteDurationTicks: quarterNoteDuration,
@@ -189,10 +189,10 @@ namespace Music.Writer.Generator
                 }
             }
 
-            return new Phrase(notes) { MidiProgramNumber = 33 }; // Electric Bass
+            return new SongTrack(notes) { MidiProgramNumber = 33 }; // Electric Bass
         }
 
-        private static Phrase? GenerateGuitarPhrase(
+        private static SongTrack? GenerateGuitarPhrase(
             HarmonyTimeline harmonyTimeline,
             List<decimal> compOnsets,
             int ticksPerQuarterNote,
@@ -203,7 +203,7 @@ namespace Music.Writer.Generator
             if (compOnsets == null || compOnsets.Count == 0)
                 return null;
 
-            var notes = new List<PartNoteEvent>();
+            var notes = new List<SongTrackNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
             int? previousPitchClass = null;
             const int guitarOctave = 4;
@@ -240,7 +240,7 @@ namespace Music.Writer.Generator
 
                     var (midiNote, pitchClass) = randomizer.SelectGuitarPitch(ctx, bar, onsetBeat, previousPitchClass);
 
-                    notes.Add(new PartNoteEvent(
+                    notes.Add(new SongTrackNoteEvent(
                         noteNumber: midiNote,
                         absolutePositionTicks: onsetTick,
                         noteDurationTicks: duration,
@@ -251,16 +251,16 @@ namespace Music.Writer.Generator
                 }
             }
 
-            return new Phrase(notes) { MidiProgramNumber = 27 }; // Electric Guitar
+            return new SongTrack(notes) { MidiProgramNumber = 27 }; // Electric Guitar
         }
 
-        private static Phrase GenerateGuitarPhrase(
+        private static SongTrack GenerateGuitarPhrase(
             HarmonyTimeline harmonyTimeline,
             int ticksPerMeasure,
             int ticksPerQuarterNote,
             RandomizationSettings settings)
         {
-            var notes = new List<PartNoteEvent>();
+            var notes = new List<SongTrackNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
             int eighthNoteDuration = ticksPerQuarterNote / 2;
             int? previousPitchClass = null;
@@ -288,7 +288,7 @@ namespace Music.Writer.Generator
                         onsetBeat, 
                         previousPitchClass);
 
-                    notes.Add(new PartNoteEvent(
+                    notes.Add(new SongTrackNoteEvent(
                         noteNumber: midiNote,
                         absolutePositionTicks: absolutePosition + (eighth * eighthNoteDuration),
                         noteDurationTicks: eighthNoteDuration,
@@ -299,10 +299,10 @@ namespace Music.Writer.Generator
                 }
             }
 
-            return new Phrase(notes) { MidiProgramNumber = 27 }; // Electric Guitar (clean)
+            return new SongTrack(notes) { MidiProgramNumber = 27 }; // Electric Guitar (clean)
         }
 
-        private static Phrase? GenerateKeysPhrase(
+        private static SongTrack? GenerateKeysPhrase(
             HarmonyTimeline harmonyTimeline,
             List<decimal> padsOnsets,
             int ticksPerQuarterNote,
@@ -313,7 +313,7 @@ namespace Music.Writer.Generator
             if (padsOnsets == null || padsOnsets.Count == 0)
                 return null;
 
-            var notes = new List<PartNoteEvent>();
+            var notes = new List<SongTrackNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
             const int keysOctave = 4;
 
@@ -357,7 +357,7 @@ namespace Music.Writer.Generator
 
                     foreach (int midiNote in chordMidiNotes)
                     {
-                        notes.Add(new PartNoteEvent(
+                        notes.Add(new SongTrackNoteEvent(
                             noteNumber: midiNote,
                             absolutePositionTicks: onsetTick,
                             noteDurationTicks: duration,
@@ -369,16 +369,16 @@ namespace Music.Writer.Generator
                 previousHarmony = harmonyEvent;
             }
 
-            return new Phrase(notes) { MidiProgramNumber = 18 }; // Rock Organ
+            return new SongTrack(notes) { MidiProgramNumber = 18 }; // Rock Organ
         }
 
-        private static Phrase GenerateKeysPhrase(
+        private static SongTrack GenerateKeysPhrase(
             HarmonyTimeline harmonyTimeline,
             int ticksPerMeasure,
             int ticksPerQuarterNote,
             RandomizationSettings settings)
         {
-            var notes = new List<PartNoteEvent>();
+            var notes = new List<SongTrackNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
             int halfNoteDuration = ticksPerQuarterNote * 2;
 
@@ -413,7 +413,7 @@ namespace Music.Writer.Generator
 
                     foreach (var midiNote in chordMidiNotes)
                     {
-                        notes.Add(new PartNoteEvent(
+                        notes.Add(new SongTrackNoteEvent(
                             noteNumber: midiNote,
                             absolutePositionTicks: absolutePosition + (half * halfNoteDuration),
                             noteDurationTicks: halfNoteDuration,
@@ -425,20 +425,20 @@ namespace Music.Writer.Generator
                 previousHarmony = harmonyEvent;
             }
 
-            return new Phrase(notes) { MidiProgramNumber = 4 }; // Electric Piano
+            return new SongTrack(notes) { MidiProgramNumber = 4 }; // Electric Piano
         }
 
         /// <summary>
         /// Generates drum phrase: kick, snare, hi-hat at groove onsets with controlled randomness.
         /// </summary>
-        private static Phrase? GenerateDrumPhrase(
+        private static SongTrack? GenerateDrumPhrase(
             GrooveLayer layer,
             int ticksPerQuarterNote,
             int ticksPerMeasure,
             int totalBars,
             RandomizationSettings settings)
         {
-            var notes = new List<PartNoteEvent>();
+            var notes = new List<SongTrackNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
 
             // TO DO - There should be a map for the drum set notes - enum
@@ -462,7 +462,7 @@ namespace Music.Writer.Generator
                         // Apply slight velocity randomization for humanization
                         int velocity = randomizer.SelectDrumVelocity(bar, onsetBeat, "kick", baseVelocity: 100);
                         
-                        notes.Add(new PartNoteEvent(
+                        notes.Add(new SongTrackNoteEvent(
                             noteNumber: kickNote,
                             absolutePositionTicks: onsetTick,
                             noteDurationTicks: ticksPerQuarterNote,
@@ -480,7 +480,7 @@ namespace Music.Writer.Generator
                         
                         int velocity = randomizer.SelectDrumVelocity(bar, onsetBeat, "snare", baseVelocity: 90);
                         
-                        notes.Add(new PartNoteEvent(
+                        notes.Add(new SongTrackNoteEvent(
                             noteNumber: snareNote,
                             absolutePositionTicks: onsetTick,
                             noteDurationTicks: ticksPerQuarterNote,
@@ -498,7 +498,7 @@ namespace Music.Writer.Generator
                         
                         int velocity = randomizer.SelectDrumVelocity(bar, onsetBeat, "hat", baseVelocity: 70);
                         
-                        notes.Add(new PartNoteEvent(
+                        notes.Add(new SongTrackNoteEvent(
                             noteNumber: closedHiHatNote,
                             absolutePositionTicks: onsetTick,
                             noteDurationTicks: ticksPerQuarterNote / 2, // shorter duration for hi-hat
@@ -511,7 +511,7 @@ namespace Music.Writer.Generator
             if (notes.Count == 0)
                 return null;
 
-            return new Phrase(notes) { MidiProgramNumber = 255 }; // Drum Set
+            return new SongTrack(notes) { MidiProgramNumber = 255 }; // Drum Set
         }
 
         /// <summary>

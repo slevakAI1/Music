@@ -51,8 +51,8 @@ namespace Music.Writer
                 return;
             }
 
-            // Build list of Phrase from all selected phrase rows (skip fixed rows)
-            var phrases = new List<Phrase>();
+            // Build list of SongTrack from all selected phrase rows (skip fixed rows)
+            var phrases = new List<SongTrack>();
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
                 // Skip fixed rows - they contain control line data, not phrases
@@ -62,8 +62,8 @@ namespace Music.Writer
                 // Get the data object from the hidden column
                 var dataObj = selectedRow.Cells["colData"].Value;
                 
-                // Validate that it's actually a Phrase object (not null or wrong type)
-                if (dataObj is not Phrase phrase)
+                // Validate that it's actually a SongTrack object (not null or wrong type)
+                if (dataObj is not SongTrack phrase)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
                     MessageBoxHelper.Show(
@@ -75,7 +75,7 @@ namespace Music.Writer
                 }
 
                 // Validate phrase has notes
-                if (phrase.PhraseNotes.Count == 0)
+                if (phrase.SongTrackNoteEvents.Count == 0)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
                     MessageBoxHelper.Show(
@@ -172,8 +172,8 @@ namespace Music.Writer
                 return;
             }
 
-            // Build list of Phrase from all selected phrase rows (skip fixed rows)
-            var phrases = new List<Phrase>();
+            // Build list of SongTrack from all selected phrase rows (skip fixed rows)
+            var phrases = new List<SongTrack>();
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
                 // Skip fixed rows - they contain control line data, not phrases
@@ -183,8 +183,8 @@ namespace Music.Writer
                 // Get the data object from the hidden column
                 var dataObj = selectedRow.Cells["colData"].Value;
                 
-                // Validate that it's actually a Phrase object (not null or wrong type)
-                if (dataObj is not Phrase phrase)
+                // Validate that it's actually a SongTrack object (not null or wrong type)
+                if (dataObj is not SongTrack phrase)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
                     MessageBoxHelper.Show(
@@ -196,7 +196,7 @@ namespace Music.Writer
                 }
 
                 // Validate phrase has notes
-                if (phrase.PhraseNotes.Count == 0)
+                if (phrase.SongTrackNoteEvents.Count == 0)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
                     MessageBoxHelper.Show(
@@ -343,7 +343,7 @@ namespace Music.Writer
                     GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, timeSignatureTimeline);
                 }
 
-                // Convert MetaMidiEvent lists to Phrase objects, passing the source ticks per quarter note
+                // Convert MetaMidiEvent lists to SongTrack objects, passing the source ticks per quarter note
                 var phrases = ConvertMidiEventListsToPhraseLists.ConvertMidiEventListsToPhraseList(
                     midiEventLists,
                     midiInstruments,
@@ -503,7 +503,7 @@ namespace Music.Writer
 
             var harmonyEvent = designer.HarmonyTimeline.Events[1];
 
-            List<PartNoteEvent> notes;
+            List<SongTrackNoteEvent> notes;
             try
             {
                 notes = ConvertHarmonyEventToListOfPartNoteEvents.Convert(
@@ -580,8 +580,8 @@ namespace Music.Writer
             var row = dgSong.Rows[e.RowIndex];
             var phraseData = row.Cells["colData"].Value;
 
-            // Validate that we have a Phrase object
-            if (phraseData is not Phrase phrase)
+            // Validate that we have a SongTrack object
+            if (phraseData is not SongTrack phrase)
             {
                 MessageBoxHelper.Show(
                     "No phrase data available for this row.",

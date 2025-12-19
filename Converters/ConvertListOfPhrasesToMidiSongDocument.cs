@@ -14,7 +14,7 @@ namespace Music.Writer
     public static class ConvertListOfPhrasesToMidiSongDocument
     {
         public static MidiSongDocument Convert(
-            List<Phrase> phrases,
+            List<SongTrack> phrases,
             TempoTimeline tempoTimeline,
             TimeSignatureTimeline timeSignatureTimeline)
         {

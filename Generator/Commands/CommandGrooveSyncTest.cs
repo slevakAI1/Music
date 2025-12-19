@@ -64,25 +64,25 @@ namespace Music.Generator
                 int addedCount = 0;
 
                 // Add generated phrases to grid
-                if (result.BassPhrase != null && result.BassPhrase.PhraseNotes.Count > 0)
+                if (result.BassPhrase != null && result.BassPhrase.SongTrackNoteEvents.Count > 0)
                 {
                     SongGridManager.AddPhraseToGrid(result.BassPhrase, midiInstruments, dgSong, ref phraseNumber);
                     addedCount++;
                 }
 
-                if (result.GuitarPhrase != null && result.GuitarPhrase.PhraseNotes.Count > 0)
+                if (result.GuitarPhrase != null && result.GuitarPhrase.SongTrackNoteEvents.Count > 0)
                 {
                     SongGridManager.AddPhraseToGrid(result.GuitarPhrase, midiInstruments, dgSong, ref phraseNumber);
                     addedCount++;
                 }
 
-                if (result.KeysPhrase != null && result.KeysPhrase.PhraseNotes.Count > 0)
+                if (result.KeysPhrase != null && result.KeysPhrase.SongTrackNoteEvents.Count > 0)
                 {
                     SongGridManager.AddPhraseToGrid(result.KeysPhrase, midiInstruments, dgSong, ref phraseNumber);
                     addedCount++;
                 }
 
-                if (result.DrumPhrase != null && result.DrumPhrase.PhraseNotes.Count > 0)
+                if (result.DrumPhrase != null && result.DrumPhrase.SongTrackNoteEvents.Count > 0)
                 {
                     SongGridManager.AddPhraseToGrid(result.DrumPhrase, midiInstruments, dgSong, ref phraseNumber);
                     addedCount++;

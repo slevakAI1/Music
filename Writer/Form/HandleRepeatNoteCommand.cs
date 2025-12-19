@@ -59,7 +59,7 @@ namespace Music.Writer
         /// <summary>
         /// Appends phrase notes to all selected phrase rows in the grid.
         /// </summary>
-        private static void AppendPhraseNotesToSelectedRows(DataGridView dgSong, Phrase phrase)
+        private static void AppendPhraseNotesToSelectedRows(DataGridView dgSong, SongTrack phrase)
         {
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
@@ -69,11 +69,14 @@ namespace Music.Writer
 
                 // Get existing phrase data
                 var dataObj = selectedRow.Cells["colData"].Value;
-                if (dataObj is not Phrase existingPhrase)
+                if (dataObj is not SongTrack existingPhrase)
                     continue;
 
                 // Append the new notes
-                existingPhrase.PhraseNotes.AddRange(phrase.PhraseNotes);
+                existingPhrase.SongTrackNoteEvents.AddRange(phrase.SongTrackNoteEvents);
+
+                // Update the measure cells to reflect the new note counts
+                SongGridManager.PopulatePartMeasureNoteCount(dgSong, selectedRow.Index);
             }
         }
     }
