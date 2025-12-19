@@ -1,3 +1,8 @@
+
+
+// TO DO - standardize on a name for voices - instruments - parts - etc -- Should only be MidiVoice!
+
+
 namespace Music.MyMidi
 {
     /// <summary>
