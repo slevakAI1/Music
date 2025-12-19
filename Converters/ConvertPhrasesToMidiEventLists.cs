@@ -61,7 +61,7 @@ namespace Music.Writer
                 }
 
                 // Check if this note is part of a chord that needs expansion
-                if (phraseNote.phraseChord != null && phraseNote.phraseChord.IsChord)
+                if (phraseNote.songTrackChord != null && phraseNote.songTrackChord.IsChord)
                 {
                     ProcessChord(events, phraseNote);
                 }
@@ -79,7 +79,7 @@ namespace Music.Writer
         /// </summary>
         private static void ProcessChord(List<MetaMidiEvent> events, SongTrackNoteEvent phraseNote)
         {
-            var chord = phraseNote.phraseChord!;
+            var chord = phraseNote.songTrackChord!;
 
             // Use ConvertHarmonyEventToListOfPartNoteEvents to generate individual chord notes
             var chordNotes = ConvertHarmonyEventToListOfPartNoteEvents.Convert(

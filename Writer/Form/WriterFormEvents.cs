@@ -124,7 +124,7 @@ namespace Music.Writer
             }
 
             // Consolidated conversion: phrases -> midi document with tempo and time signature timelines
-            var midiDoc = ConvertListOfPhrasesToMidiSongDocument.Convert(
+            var midiDoc = ConvertSongTracksToMidiSongDocument.Convert(
                 phrases,
                 tempoTimeline,
                 timeSignatureTimeline);
@@ -258,7 +258,7 @@ namespace Music.Writer
             try
             {
                 // Consolidated conversion: phrases -> midi document with tempo and time signature timelines
-                var midiDoc = ConvertListOfPhrasesToMidiSongDocument.Convert(
+                var midiDoc = ConvertSongTracksToMidiSongDocument.Convert(
                     phrases,
                     tempoTimeline,
                     timeSignatureTimeline);

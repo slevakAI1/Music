@@ -49,7 +49,7 @@ namespace Music.Writer
             int noteDurationTicks = CalculateNoteDurationTicks(noteValue);
             
             // Create SongTrackChord metadata object
-            var phraseChord = new SongTrackChord(
+            var songTrackChord = new SongTrackChord(
                 isChord: true,
                 chordKey: key,
                 chordDegree: degree,
@@ -60,7 +60,7 @@ namespace Music.Writer
             var result = new List<SongTrackNoteEvent>();
             foreach (var noteNumber in chordMidiNotes)
             {
-                var phraseNote = new SongTrackNoteEvent(
+                var songTrackNoteEvent = new SongTrackNoteEvent(
                     noteNumber: noteNumber,
                     absolutePositionTicks: 0, // Will be set by the calling code
                     noteDurationTicks: noteDurationTicks,
@@ -68,9 +68,9 @@ namespace Music.Writer
                     isRest: false);
                 
                 // Attach chord metadata
-                phraseNote.phraseChord = phraseChord;
+                songTrackNoteEvent.songTrackChord = songTrackChord;
                 
-                result.Add(phraseNote);
+                result.Add(songTrackNoteEvent);
             }
             
             return result;
