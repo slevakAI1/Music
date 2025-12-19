@@ -1,9 +1,3 @@
-using Melanchall.DryWetMidi.Interaction;
-using Music.Designer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Music.Writer
 {
     public static class UpdateWriterFormDataFromDesigner

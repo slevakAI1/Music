@@ -1,13 +1,20 @@
 using System.Reflection;
+using Music.MyMidi;
 
 namespace Music.Writer
 {
-    // Grid-specific operations for WriterForm
-    public partial class WriterForm
+    /// <summary>
+    /// Grid operation handlers for WriterForm, now as a standalone class.
+    /// Each method receives only the dependencies it actually needs.
+    /// </summary>
+    public class WriterFormGridOperations
     {
         // ========== GRID ROW OPERATIONS ==========
 
-        public void HandleAddPhrase()
+        public void HandleAddPhrase(
+            DataGridView dgSong,
+            List<MidiInstrument> midiInstruments,
+            ref int phraseNumber)
         {
             // Create an empty Phrase and add it to the grid via the existing helper.
             var emptyPhrase = new Phrase(new List<PartNoteEvent>())
@@ -16,7 +23,7 @@ namespace Music.Writer
             };
 
             // Use SongGridManager to initialize the row consistently with other adds.
-            SongGridManager.AddPhraseToGrid(emptyPhrase, _midiInstruments, dgSong, ref phraseNumber);
+            SongGridManager.AddPhraseToGrid(emptyPhrase, midiInstruments, dgSong, ref phraseNumber);
 
             // Select the newly added row (last row)
             if (dgSong.Rows.Count > SongGridManager.FIXED_ROWS_COUNT)
@@ -34,11 +41,11 @@ namespace Music.Writer
             }
         }
 
-        public void HandleDeletePhrases()
+        public void HandleDeletePhrases(DataGridView dgSong)
         {
             if (dgSong.SelectedRows.Count == 0)
             {
-                MessageBoxHelper.Show(this,
+                MessageBoxHelper.Show(
                     "Please select one or more rows to delete.",
                     "Delete Phrases",
                     MessageBoxButtons.OK,
@@ -62,7 +69,7 @@ namespace Music.Writer
             }
         }
 
-        public void HandleClearAll()
+        public void HandleClearAll(DataGridView dgSong)
         {
             // Remove all phrase rows
             while (dgSong.Rows.Count > SongGridManager.FIXED_ROWS_COUNT)
@@ -82,11 +89,11 @@ namespace Music.Writer
             }
         }
 
-        public void HandleClearSelected()
+        public void HandleClearSelected(DataGridView dgSong)
         {
             if (dgSong.SelectedRows == null || dgSong.SelectedRows.Count == 0)
             {
-                MessageBoxHelper.Show(this, "Please select one or more rows to clear.", "Clear Rows", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show("Please select one or more rows to clear.", "Clear Rows", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -136,7 +143,7 @@ namespace Music.Writer
         /// Shows a message box if no rows are selected.
         /// </summary>
         /// <returns>True if at least one row is selected, false otherwise.</returns>
-        private bool ValidatePhrasesSelected()
+        private bool ValidatePhrasesSelected(DataGridView dgSong)
         {
             // Check if any non-fixed rows are selected
             var hasValidSelection = dgSong.SelectedRows
@@ -162,7 +169,7 @@ namespace Music.Writer
         /// Writes a phrase object to the colData cell of all selected rows and updates measure display.
         /// </summary>
         /// <param name="phrase">The phrase to write to the grid.</param>
-        private void WritePhraseToSelectedRows(Phrase phrase)
+        private void WritePhraseToSelectedRows(DataGridView dgSong, Phrase phrase)
         {
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
@@ -182,7 +189,7 @@ namespace Music.Writer
         /// The appended notes' absolute positions are adjusted to start after the existing phrase ends.
         /// </summary>
         /// <param name="phrase">The phrase containing notes to append to the grid.</param>
-        private void AppendPhraseNotesToSelectedRows(Phrase phrase)
+        private void AppendPhraseNotesToSelectedRows(DataGridView dgSong, Phrase phrase)
         {
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
@@ -236,24 +243,24 @@ namespace Music.Writer
         /// Handles Pause/Resume logic for the shared MidiPlaybackService.
         /// Extracted from the form event handler to keep grid/event logic together.
         /// </summary>
-        public void HandlePause()
+        public void HandlePause(MidiPlaybackService midiPlaybackService)
         {
             // If there is no playback service, nothing to do.
-            if (_midiPlaybackService == null)
+            if (midiPlaybackService == null)
                 return;
 
             try
             {
                 // Use the playback service's public API when available.
-                if (_midiPlaybackService.IsPlaying)
+                if (midiPlaybackService.IsPlaying)
                 {
-                    _midiPlaybackService.Pause();
+                    midiPlaybackService.Pause();
                     return;
                 }
 
-                if (_midiPlaybackService.IsPaused)
+                if (midiPlaybackService.IsPaused)
                 {
-                    _midiPlaybackService.Resume();
+                    midiPlaybackService.Resume();
                     return;
                 }
 
@@ -261,11 +268,11 @@ namespace Music.Writer
             }
             catch (TargetInvocationException tie)
             {
-                MessageBoxHelper.Show(this, $"Playback control failed: {tie.InnerException?.Message ?? tie.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxHelper.Show($"Playback control failed: {tie.InnerException?.Message ?? tie.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
-                MessageBoxHelper.Show(this, $"Playback control failed: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxHelper.Show($"Playback control failed: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

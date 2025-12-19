@@ -29,6 +29,9 @@ namespace Music.Writer
         // Event handlers instance
         private readonly WriterFormEventHandlers _eventHandlers = new();
 
+        // Grid operations instance
+        private readonly WriterFormGridOperations _gridOperations = new();
+
         //===========================   I N I T I A L I Z A T I O N   ===========================
         public WriterForm()
         {
@@ -212,7 +215,7 @@ namespace Music.Writer
 
         private void btnClearAll_Click(object sender, EventArgs e)
         {
-            HandleClearAll();
+            _gridOperations.HandleClearAll(dgSong);
         }
 
         private void btnNewScore_Click(object sender, EventArgs e)
@@ -223,12 +226,12 @@ namespace Music.Writer
         // New Add button handler: add an empty phrase row and select it.
         private void btnAddPhrase_Click(object? sender, EventArgs e)
         {
-            HandleAddPhrase();
+            _gridOperations.HandleAddPhrase(dgSong, _midiInstruments, ref phraseNumber);
         }
 
         private void btnDeletePhrases_Click(object sender, EventArgs e)
         {
-            HandleDeletePhrases();
+            _gridOperations.HandleDeletePhrases(dgSong);
         }
 
         private void btnImport_Click(object sender, EventArgs e)
@@ -248,13 +251,13 @@ namespace Music.Writer
 
         private void btnClearSelected_Click(object sender, EventArgs e)
         {
-            HandleClearSelected();
+            _gridOperations.HandleClearSelected(dgSong);
         }
 
         private void btnPause_Click(object sender, EventArgs e)
         {
             // Delegate pause/resume behavior to the grid/operations file for consistency.
-            HandlePause();
+            _gridOperations.HandlePause(_midiPlaybackService);
         }
     }
 }
