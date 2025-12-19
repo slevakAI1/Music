@@ -441,6 +441,8 @@ namespace Music.Writer.Generator
             var notes = new List<PhraseNote>();
             var randomizer = new PitchRandomizer(settings);
 
+            // TO DO - There should be a map for the drum set notes - enum
+
             // MIDI drum note numbers (General MIDI)
             const int kickNote = 36;
             const int snareNote = 38;
