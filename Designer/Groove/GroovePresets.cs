@@ -1,10 +1,4 @@
-
-// AI TO DO:
-//    If you want the next step to be immediately useful for permutation,
-//    the most leverage is adding a genre-specific �allowed offsets grid�
-//    (8ths only vs 16ths vs triplets) and density bounds per part�but that can
-//    live outside these preset objects, exactly as you planned.
-
+﻿
 namespace Music.Designer
 {
     // Factory for hardcoded groove presets
@@ -395,7 +389,7 @@ namespace Music.Designer
         /// <summary>
         /// Returns the "RapBasic" groove preset.
         /// Assumes 4/4 meter with 4 beats per bar.
-        /// Note: Conservative �rap� scaffold (boom-bap-ish backbone) intended for later swing/humanize + permutation.
+        /// Note: Conservative “rap” scaffold (boom-bap-ish backbone) intended for later swing/humanize + permutation.
         /// </summary>
         public static GroovePreset GetRapBasic()
         {
@@ -619,3 +613,34 @@ Potential missing groove capabilities (intentionally NOT added as properties per
 - Micro-timing/humanization constraints per genre (laid-back vs pushed, MPC swing, etc.).
 - Probability / density controls per instrument for controlled permutation while staying in-genre.
 */
+
+// AI TO DO:
+//    If you want the next step to be immediately useful for permutation,
+//    the most leverage is adding a genre-specific “allowed offsets grid”
+//    (8ths only vs 16ths vs triplets) and density bounds per part—but that can
+//    live outside these preset objects, exactly as you planned.
+
+/*
+ * 
+ * is it common for a song to change the groove one or more times during the song? Like maybe the intro is a different groove than the verse?
+
+Yes — it’s common, and in a lot of genres it’s basically expected. But most songs don’t “swap everything”; they usually keep the same tempo/meter and change the groove by density, subdivision, and accents so it still feels like the same track.
+Common ways songs change groove (without changing tempo)
+Intro vs verse: fewer elements (no kick, closed hat only, or half-time feel) → verse brings the full pocket.
+Verse → chorus “lift”: same kick/snare grid, but hats go 8ths → 16ths, or add open-hat on offbeats, or add extra kick pickups.
+Half-time / double-time illusion:
+Half-time feel: snare moves to beat 3 (common in trap, metal breakdowns).
+Double-time feel: hats/percussion subdivide faster while kick/snare anchors stay recognizable.
+Pre-chorus: groove “climbs” (more syncopation, more percussion, rising hat density).
+Bridge / breakdown: drop kick, change snare placement, or switch to toms/claps; sometimes a totally new pattern.
+EDM drop: the groove often is the section identity (build vs drop are different grooves).
+Hip-hop “beat switch”: sometimes a full groove change mid-song; super common in modern rap.
+
+What’s less common
+Hard groove changes that also change tempo and meter (happens, but it’s a bigger compositional move and can feel like two songs stitched together if not handled well).
+If you’re implementing this in your system
+A clean mental model is: one “section groove” per section (Intro/Verse/Chorus/Bridge), where each section groove is either:
+a variation of the same base preset (same anchors, different density/subdivision), or
+a deliberate alternate groove (beat switch), with transition help (fill, riser, break).
+If you want, tell me your section list (Intro/Verse/Chorus/etc.) and genre, and I’ll map a realistic “groove plan” (what changes where) using only your existing onset properties.
+ */
