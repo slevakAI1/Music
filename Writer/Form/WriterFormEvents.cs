@@ -15,19 +15,19 @@ namespace Music.Writer
             DataGridView dgSong,
             MidiPlaybackService midiPlaybackService)
         {
-            // Check if there are any phrase rows in the grid (excluding fixed rows)
+            // Check if there are any song tracks in the grid (excluding fixed rows)
             if (dgSong.Rows.Count <= SongGridManager.FIXED_ROWS_COUNT)
             {
                 MessageBoxHelper.Show("No pitch events to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            // Check if a phrase row is selected
-            var hasPhraseSelection = dgSong.SelectedRows
+            // Check if a song track is selected
+            var hasTrackSelection = dgSong.SelectedRows
                 .Cast<DataGridViewRow>()
                 .Any(r => r.Index >= SongGridManager.FIXED_ROWS_COUNT);
 
-            if (!hasPhraseSelection)
+            if (!hasTrackSelection)
             {
                 MessageBoxHelper.Show("Please select a pitch event to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -51,11 +51,11 @@ namespace Music.Writer
                 return;
             }
 
-            // Build list of SongTrack from all selected phrase rows (skip fixed rows)
-            var phrases = new List<SongTrack>();
+            // Build list of SongTrack from all selected songTrack rows (skip fixed rows)
+            var songTracks = new List<SongTrack>();
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
-                // Skip fixed rows - they contain control line data, not phrases
+                // Skip fixed rows - they contain control line data, not songTracks
                 if (selectedRow.Index < SongGridManager.FIXED_ROWS_COUNT)
                     continue;
 
@@ -63,24 +63,24 @@ namespace Music.Writer
                 var dataObj = selectedRow.Cells["colData"].Value;
                 
                 // Validate that it's actually a SongTrack object (not null or wrong type)
-                if (dataObj is not SongTrack phrase)
+                if (dataObj is not SongTrack songTrack)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
                     MessageBoxHelper.Show(
                         $"No phrase data for row #{eventNumber}. Please add or assign a phrase before playing.",
-                        "Missing Phrase",
+                        "Missing Track",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
                     return; // Abort playback
                 }
 
-                // Validate phrase has notes
-                if (phrase.SongTrackNoteEvents.Count == 0)
+                // Validate songTrack has notes
+                if (songTrack.SongTrackNoteEvents.Count == 0)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
                     MessageBoxHelper.Show(
                         $"No phrase data for row #{eventNumber}. Please add or assign a phrase before playing.",
-                        "Missing Phrase",
+                        "Missing Track",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
                     return; // Abort playback
@@ -112,20 +112,20 @@ namespace Music.Writer
                 }
 
                 // Valid program number (0-127 or 255 for drums) – safe to cast now
-                phrase.MidiProgramNumber = (int)programNumber;
-                phrases.Add(phrase);
+                songTrack.MidiProgramNumber = (int)programNumber;
+                songTracks.Add(songTrack);
             }
 
-            // Verify we actually have phrases to play
-            if (phrases.Count == 0)
+            // Verify we actually have songTracks to play
+            if (songTracks.Count == 0)
             {
                 MessageBoxHelper.Show("No valid phrase events selected to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            // Consolidated conversion: phrases -> midi document with tempo and time signature timelines
+            // Consolidated conversion: songTracks -> midi document with tempo and time signature timelines
             var midiDoc = ConvertSongTracksToMidiSongDocument.Convert(
-                phrases,
+                songTracks,
                 tempoTimeline,
                 timeSignatureTimeline);
 
@@ -136,14 +136,14 @@ namespace Music.Writer
             DataGridView dgSong,
             MidiIoService midiIoService)
         {
-            // Check if there are any phrase rows in the grid (excluding fixed rows)
+            // Check if there are any songTrack rows in the grid (excluding fixed rows)
             if (dgSong.Rows.Count <= SongGridManager.FIXED_ROWS_COUNT)
             {
                 MessageBoxHelper.Show("No pitch events to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            // Check if a phrase row is selected
+            // Check if a songTrack row is selected
             var hasPhraseSelection = dgSong.SelectedRows
                 .Cast<DataGridViewRow>()
                 .Any(r => r.Index >= SongGridManager.FIXED_ROWS_COUNT);
@@ -172,11 +172,11 @@ namespace Music.Writer
                 return;
             }
 
-            // Build list of SongTrack from all selected phrase rows (skip fixed rows)
+            // Build list of SongTrack from all selected songTrack rows (skip fixed rows)
             var phrases = new List<SongTrack>();
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
-                // Skip fixed rows - they contain control line data, not phrases
+                // Skip fixed rows - they contain control line data, not songTracks
                 if (selectedRow.Index < SongGridManager.FIXED_ROWS_COUNT)
                     continue;
 
@@ -195,7 +195,7 @@ namespace Music.Writer
                     return; // Abort export
                 }
 
-                // Validate phrase has notes
+                // Validate songTrack has notes
                 if (phrase.SongTrackNoteEvents.Count == 0)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
@@ -237,7 +237,7 @@ namespace Music.Writer
                 phrases.Add(phrase);
             }
 
-            // Verify we actually have phrases to export
+            // Verify we actually have songTracks to export
             if (phrases.Count == 0)
             {
                 MessageBoxHelper.Show("No valid phrase events selected to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -257,7 +257,7 @@ namespace Music.Writer
 
             try
             {
-                // Consolidated conversion: phrases -> midi document with tempo and time signature timelines
+                // Consolidated conversion: songTracks -> midi document with tempo and time signature timelines
                 var midiDoc = ConvertSongTracksToMidiSongDocument.Convert(
                     phrases,
                     tempoTimeline,
@@ -349,7 +349,7 @@ namespace Music.Writer
                     midiInstruments,
                     ticksPerQuarterNote);
 
-                // Add each phrase to the grid
+                // Add each songTrack to the grid
                 foreach (var phrase in phrases)
                 {
                     SongGridManager.AddSongTrackToGrid(
@@ -591,7 +591,7 @@ namespace Music.Writer
                 return;
             }
 
-            // Get the phrase number for the dialog title
+            // Get the songTrack number for the dialog title
             var phraseNumber = row.Cells["colEventNumber"].Value?.ToString() ?? (e.RowIndex + 1).ToString();
 
             // Open the JSON viewer dialog

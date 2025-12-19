@@ -252,12 +252,12 @@ namespace Music.Writer
         }
 
         // New Add button handler: add an empty track and select it.
-        private void btnAddPhrase_Click(object? sender, EventArgs e)
+        private void btnAddTrack_Click(object? sender, EventArgs e)
         {
             _gridOperations.HandleAddSongTrack(dgSong, _midiInstruments, ref trackNumber);
         }
 
-        private void btnDeletePhrases_Click(object sender, EventArgs e)
+        private void btnDeleteTracks_Click(object sender, EventArgs e)
         {
             _gridOperations.HandleDeleteSongTracks(dgSong);
         }

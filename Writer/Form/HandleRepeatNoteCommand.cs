@@ -35,7 +35,7 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Validates that phrases are selected in the grid.
+        /// Validates that song tracks are selected in the grid.
         /// </summary>
         private static bool ValidateSongTracksSelected(DataGridView dgSong, Form owner)
         {
@@ -59,7 +59,7 @@ namespace Music.Writer
         /// <summary>
         /// Appends songTrack notes to all selected songTrack rows in the grid.
         /// </summary>
-        private static void AppendSongTrackNoteEventsToSelectedRows(DataGridView dgSong, SongTrack phrase)
+        private static void AppendSongTrackNoteEventsToSelectedRows(DataGridView dgSong, SongTrack songTrack)
         {
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
@@ -69,11 +69,11 @@ namespace Music.Writer
 
                 // Get existing songTrack data
                 var dataObj = selectedRow.Cells["colData"].Value;
-                if (dataObj is not SongTrack existingPhrase)
+                if (dataObj is not SongTrack existingSongTrack)
                     continue;
 
                 // Append the new notes
-                existingPhrase.SongTrackNoteEvents.AddRange(phrase.SongTrackNoteEvents);
+                existingSongTrack.SongTrackNoteEvents.AddRange(songTrack.SongTrackNoteEvents);
 
                 // Update the measure cells to reflect the new note counts
                 SongGridManager.PopulatePartMeasureNoteCount(dgSong, selectedRow.Index);

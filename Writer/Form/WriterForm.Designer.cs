@@ -749,7 +749,7 @@ namespace Music.Writer
             btnAddTrack.TabIndex = 40;
             btnAddTrack.Text = "Add";
             btnAddTrack.UseVisualStyleBackColor = true;
-            btnAddTrack.Click += btnAddPhrase_Click;
+            btnAddTrack.Click += btnAddTrack_Click;
             // 
             // btnDeleteTrack
             // 
@@ -760,7 +760,7 @@ namespace Music.Writer
             btnDeleteTrack.TabIndex = 39;
             btnDeleteTrack.Text = "Delete";
             btnDeleteTrack.UseVisualStyleBackColor = true;
-            btnDeleteTrack.Click += btnDeletePhrases_Click;
+            btnDeleteTrack.Click += btnDeleteTracks_Click;
             // 
             // btnClearAll
             // 

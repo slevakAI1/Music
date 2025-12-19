@@ -64,7 +64,7 @@ namespace Music.Writer
     }
 
     /// <summary>
-    /// Represents a single note within a phrase event, including pitch, timing, and velocity.
+    /// Represents a single note within a song track note event, including pitch, timing, and velocity.
     /// 
     /// SongTrackNoteEvent is the atomic unit for musical playback and notation, capturing all necessary
     /// information for MIDI and MusicXML conversion. It supports both direct note entry and notes

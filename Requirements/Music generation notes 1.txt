@@ -94,7 +94,7 @@ Story/detail section. Same music repeats with new lyrics each time. Lower intens
 
 Refrain
 A short, repeating lyric line (often the hook) that returns at the end of each verse. In some traditions, the “refrain” is just a one- or two-line payoff, not a full separate section.
-Key point: refrain ≠ chorus. A chorus is a full repeated section; a refrain is a repeated line/phrase, often embedded in the verse.
+Key point: refrain ≠ chorus. A chorus is a full repeated section; a refrain is a repeated line/track, often embedded in the verse.
 
 Chorus
 The main payoff. Highest energy, clearest hook, repeated lyrics and melody each time. Typically broader than a refrain—8+ bars with its own chord loop/arrangement lift.
