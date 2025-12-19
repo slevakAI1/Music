@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using System.Text;
 
-namespace Music.Writer.Generator.Randomization
+namespace Music.Generator
 {
     /// <summary>
     /// Validates that randomized pitch generation follows all constraints.

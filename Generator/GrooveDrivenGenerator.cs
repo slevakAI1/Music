@@ -1,5 +1,5 @@
 using Music.Designer;
-using Music.Writer.Generator.Randomization;
+using Music.Generator;
 
 namespace Music.Writer.Generator
 {

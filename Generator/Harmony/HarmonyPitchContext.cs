@@ -1,4 +1,4 @@
-﻿namespace Music.Writer
+﻿namespace Music.Generator
 {
     /// <summary>
     /// Provides pitch information for a harmony event, including chord tones and scale tones.

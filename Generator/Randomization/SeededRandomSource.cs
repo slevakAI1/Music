@@ -1,4 +1,4 @@
-namespace Music.Writer.Generator.Randomization
+namespace Music.Generator
 {
     /// <summary>
     /// Deterministic random source using a fixed seed.

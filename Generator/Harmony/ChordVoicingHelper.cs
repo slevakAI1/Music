@@ -1,7 +1,6 @@
 using MusicTheory;
-using Music.Designer;
 
-namespace Music.Writer
+namespace Music.Generator
 {
     /// <summary>
     /// Internal helper for generating chord voicings from harmony parameters.

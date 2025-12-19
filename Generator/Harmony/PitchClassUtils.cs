@@ -1,4 +1,4 @@
-namespace Music.Writer
+namespace Music.Generator
 {
     /// <summary>
     /// Utility methods for working with pitch classes and scale construction.

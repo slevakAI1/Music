@@ -1,6 +1,7 @@
+using Music.Generator;
 using System.Collections.Generic;
 
-namespace Music.Writer.Generator.Randomization
+namespace Music.Generator
 {
     /// <summary>
     /// Helper methods for controlled randomness in pitch generation.

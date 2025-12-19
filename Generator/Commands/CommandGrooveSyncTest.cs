@@ -1,9 +1,9 @@
-using System.Windows.Forms;
 using Music.Designer;
 using Music.MyMidi;
-using Music.Writer.Generator.Randomization;
+using Music.Writer;
+using Music.Writer.Generator;
 
-namespace Music.Writer.Generator
+namespace Music.Generator
 {
     /// <summary>
     /// Command handler for the groove-driven generator test.

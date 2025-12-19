@@ -1,7 +1,7 @@
-using System.Collections.Generic;
+using Music.Generator;
 using System.Diagnostics;
 
-namespace Music.Writer.Generator.Randomization
+namespace Music.Generator
 {
     /// <summary>
     /// Applies controlled randomness to pitch selection for different instrument parts.

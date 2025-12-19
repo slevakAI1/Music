@@ -1,4 +1,4 @@
-namespace Music.Writer.Generator.Randomization
+namespace Music.Generator
 {
     /// <summary>
     /// Abstraction for random number generation to enable deterministic testing.

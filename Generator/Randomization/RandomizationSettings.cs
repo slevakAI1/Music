@@ -1,4 +1,4 @@
-namespace Music.Writer.Generator.Randomization
+namespace Music.Generator
 {
     /// <summary>
     /// Configuration for controlled randomness in pitch generation.

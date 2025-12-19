@@ -1,4 +1,6 @@
-namespace Music.Writer
+using Music.Writer;
+
+namespace Music.Generator
 {
     /// <summary>
     /// Transforms WriterFormData to Phrase objects with MIDI tick-based timing.

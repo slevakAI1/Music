@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 using Music.MyMidi;
+using Music.Writer;
 
-namespace Music.Writer
+namespace Music.Generator
 {
     /// <summary>
     /// Handler(s) for Harmony Sync test commands extracted from CommandRepeatNote.
