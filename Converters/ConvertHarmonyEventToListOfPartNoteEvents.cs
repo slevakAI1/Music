@@ -9,7 +9,7 @@ namespace Music.Writer
     /// <summary>
     /// Converts HarmonyEvent objects to lists of PartNoteEvent compatible with Writer.
     /// </summary>
-    public static class ConvertHarmonyEventToListOfPhraseNotes
+    public static class ConvertHarmonyEventToListOfPartNoteEvents
     {
         /// <summary>
         /// Converts a HarmonyEvent to a list of notes representing the chord.

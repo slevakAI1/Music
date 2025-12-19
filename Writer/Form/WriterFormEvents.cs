@@ -506,7 +506,7 @@ namespace Music.Writer
             List<PartNoteEvent> notes;
             try
             {
-                notes = ConvertHarmonyEventToListOfPhraseNotes.Convert(
+                notes = ConvertHarmonyEventToListOfPartNoteEvents.Convert(
                     harmonyEvent.Key,
                     harmonyEvent.Degree,
                     harmonyEvent.Quality,
