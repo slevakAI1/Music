@@ -38,7 +38,7 @@ namespace Music.Writer
         {
             if (dgSong.SelectedRows.Count == 0)
             {
-                MessageBox.Show(this,
+                MessageBoxHelper.Show(this,
                     "Please select one or more rows to delete.",
                     "Delete Phrases",
                     MessageBoxButtons.OK,
@@ -86,7 +86,7 @@ namespace Music.Writer
         {
             if (dgSong.SelectedRows == null || dgSong.SelectedRows.Count == 0)
             {
-                MessageBox.Show(this, "Please select one or more rows to clear.", "Clear Rows", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show(this, "Please select one or more rows to clear.", "Clear Rows", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -145,8 +145,7 @@ namespace Music.Writer
 
             if (!hasValidSelection)
             {
-                MessageBox.Show(
-                    this,
+                MessageBoxHelper.Show(
                     "Please select one or more phrase rows to apply this command.",
                     "No Selection",
                     MessageBoxButtons.OK,
@@ -262,11 +261,11 @@ namespace Music.Writer
             }
             catch (TargetInvocationException tie)
             {
-                MessageBox.Show(this, $"Playback control failed: {tie.InnerException?.Message ?? tie.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxHelper.Show(this, $"Playback control failed: {tie.InnerException?.Message ?? tie.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(this, $"Playback control failed: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxHelper.Show(this, $"Playback control failed: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
