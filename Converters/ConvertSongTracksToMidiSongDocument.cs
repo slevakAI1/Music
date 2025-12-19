@@ -23,7 +23,7 @@ namespace Music.Writer
             if (timeSignatureTimeline == null) throw new ArgumentNullException(nameof(timeSignatureTimeline));
 
             // Step 1 - convert songTracks to MIDI EVENTS - Absolute positions
-            var midiEventLists = ConvertPhrasesToMidiEventLists.Convert(songTracks);
+            var midiEventLists = ConvertSongTracksToMidiEventLists.Convert(songTracks);
 
             // Step 2 - Merge midiEventLists lists that are for the same instrument
             // and integrate tempo and time signature events

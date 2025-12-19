@@ -7,7 +7,7 @@ namespace Music.Writer
     /// This is stage 1 processing - creates NoteOn, NoteOff, and SequenceTrackName events only.
     /// Channel assignment and other processing happens in later stages.
     /// </summary>
-    public static class ConvertPhrasesToMidiEventLists
+    public static class ConvertSongTracksToMidiEventLists
     {
         /// <summary>
         /// Converts a list of phrases to lists of MIDI events (one list per phrase).

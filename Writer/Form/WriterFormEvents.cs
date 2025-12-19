@@ -344,7 +344,7 @@ namespace Music.Writer
                 }
 
                 // Convert MetaMidiEvent lists to SongTrack objects, passing the source ticks per quarter note
-                var phrases = ConvertMidiEventListsToPhraseLists.ConvertMidiEventListsToPhraseList(
+                var phrases = ConvertMidiEventListsToSongTracks.Convert(
                     midiEventLists,
                     midiInstruments,
                     ticksPerQuarterNote);

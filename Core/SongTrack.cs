@@ -25,7 +25,7 @@ namespace Music.Writer
     }
 
     /// <summary>
-    /// Encapsulates the intent and structure of a chord within a musical phrase.
+    /// Encapsulates the intent and structure of a chord within a song track.
     /// 
     /// SongTrackChord provides a high-level, declarative representation of a chord, including its key, degree, quality, and voicing type.
     /// This abstraction allows composers and algorithms to specify harmony content without committing to specific notes,

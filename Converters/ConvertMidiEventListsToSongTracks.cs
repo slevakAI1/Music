@@ -5,7 +5,7 @@ namespace Music.Writer
     /// <summary>
     /// Helper to convert lists of MetaMidiEvent objects to SongTrack objects.
     /// </summary>
-    internal static class ConvertMidiEventListsToPhraseLists
+    internal static class ConvertMidiEventListsToSongTracks
     {
         /// <summary>
         /// Converts lists of MetaMidiEvent objects to SongTrack objects.
@@ -14,7 +14,7 @@ namespace Music.Writer
         /// <param name="midiEventLists">Lists of MetaMidiEvent objects, one per track</param>
         /// <param name="midiInstruments">Available MIDI instruments for name lookup</param>
         /// <param name="sourceTicksPerQuarterNote">The ticks per quarter note from the source MIDI file (default 480)</param>
-        public static List<SongTrack> ConvertMidiEventListsToPhraseList(
+        public static List<SongTrack> Convert(
             List<List<MetaMidiEvent>> midiEventLists,
             List<MidiInstrument> midiInstruments,
             short sourceTicksPerQuarterNote)
@@ -37,8 +37,8 @@ namespace Music.Writer
 
                     // Determine if this is a drum track (channel 10/9)
                     bool isDrumTrack = segment.Events.Any(e => 
-                        e.Parameters.TryGetValue("Channel", out var ch) && 
-                        Convert.ToInt32(ch) == 9);
+                        e.Parameters.TryGetValue("Channel", out var ch) &&
+                        System.Convert.ToInt32(ch) == 9);
 
                     if (isDrumTrack)
                     {
@@ -49,7 +49,7 @@ namespace Music.Writer
                     else if (programChangeEvent != null &&
                              programChangeEvent.Parameters.TryGetValue("Program", out var programObj))
                     {
-                        int programNumber = Convert.ToInt32(programObj);
+                        int programNumber = System.Convert.ToInt32(programObj);
                         phrase.MidiProgramNumber = programNumber;
 
                         var instrument = midiInstruments
@@ -77,8 +77,8 @@ namespace Music.Writer
                                 !midiEvent.Parameters.TryGetValue("Velocity", out var velocityObj))
                                 continue;
 
-                            int noteNumber = Convert.ToInt32(noteNumObj);
-                            int velocity = Convert.ToInt32(velocityObj);
+                            int noteNumber = System.Convert.ToInt32(noteNumObj);
+                            int velocity = System.Convert.ToInt32(velocityObj);
 
                             if (velocity == 0)
                             {
@@ -98,7 +98,7 @@ namespace Music.Writer
                             if (!midiEvent.Parameters.TryGetValue("NoteNumber", out var noteNumObj))
                                 continue;
 
-                            int noteNumber = Convert.ToInt32(noteNumObj);
+                            int noteNumber = System.Convert.ToInt32(noteNumObj);
 
                             if (noteOnEvents.TryGetValue(noteNumber, out var noteOnEvent))
                             {
@@ -177,8 +177,8 @@ namespace Music.Writer
                 !noteOnEvent.Parameters.TryGetValue("Velocity", out var velocityObj))
                 return;
 
-            int noteNumber = Convert.ToInt32(noteNumObj);
-            int velocity = Convert.ToInt32(velocityObj);
+            int noteNumber = System.Convert.ToInt32(noteNumObj);
+            int velocity = System.Convert.ToInt32(velocityObj);
             
             int absolutePositionTicks = (int)Math.Round(noteOnEvent.AbsoluteTimeTicks * tickScale);
             int noteDurationTicks = (int)Math.Round((noteOffEvent.AbsoluteTimeTicks - noteOnEvent.AbsoluteTimeTicks) * tickScale);
