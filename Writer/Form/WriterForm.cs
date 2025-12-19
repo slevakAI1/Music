@@ -21,7 +21,7 @@ namespace Music.Writer
         // MIDI I/O service for importing/exporting MIDI files
         private MidiIoService _midiIoService;
 
-        private int phraseNumber = 0;
+        private int trackNumber = 0;
 
         // MIDI instrument list for dropdown
         private List<MidiInstrument> _midiInstruments;
@@ -110,7 +110,7 @@ namespace Music.Writer
         /// </summary>
         private void dgSong_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
         {
-            _eventHandlers.HandlePhraseDoubleClick(dgSong, e);
+            _eventHandlers.HandleTrackDoubleClick(dgSong, e);
         }
 
         protected override void OnShown(EventArgs e)
@@ -226,11 +226,11 @@ namespace Music.Writer
                     break;
 
                 case "Harmony Sync Test":
-                    CommandHarmonySyncTest.HandleHarmonySyncTest(dgSong, _midiInstruments, ref phraseNumber, this);
+                    CommandHarmonySyncTest.HandleHarmonySyncTest(dgSong, _midiInstruments, ref trackNumber, this);
                     break;
 
                 case "Harmony Groove Sync Test":
-                    CommandGrooveSyncTest.HandleGrooveSyncTest(dgSong, _midiInstruments, ref phraseNumber, this);
+                    CommandGrooveSyncTest.HandleGrooveSyncTest(dgSong, _midiInstruments, ref trackNumber, this);
                     break;
 
                 // Other cases will be added here later.
@@ -251,10 +251,10 @@ namespace Music.Writer
             _eventHandlers.HandleNewScore();
         }
 
-        // New Add button handler: add an empty phrase row and select it.
+        // New Add button handler: add an empty track and select it.
         private void btnAddPhrase_Click(object? sender, EventArgs e)
         {
-            _gridOperations.HandleAddSongTrack(dgSong, _midiInstruments, ref phraseNumber);
+            _gridOperations.HandleAddSongTrack(dgSong, _midiInstruments, ref trackNumber);
         }
 
         private void btnDeletePhrases_Click(object sender, EventArgs e)
@@ -264,7 +264,7 @@ namespace Music.Writer
 
         private void btnImport_Click(object sender, EventArgs e)
         {
-            _eventHandlers.HandleImport(dgSong, _midiIoService, _midiInstruments, ref phraseNumber);
+            _eventHandlers.HandleImport(dgSong, _midiIoService, _midiInstruments, ref trackNumber);
         }
 
         private void btnExport_Click(object sender, EventArgs e)

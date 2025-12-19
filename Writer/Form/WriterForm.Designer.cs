@@ -92,14 +92,14 @@ namespace Music.Writer
             btnExecute = new Button();
             gbSong = new GroupBox();
             btnPause = new Button();
-            btnClearSelected = new Button();
+            btnClearSelectedTracks = new Button();
             btnStop = new Button();
             btnExport = new Button();
             btnImport = new Button();
-            btnAddPhrase = new Button();
-            btnDeletePhrases = new Button();
+            btnAddTrack = new Button();
+            btnDeleteTrack = new Button();
             btnClearAll = new Button();
-            btnPlayPhrases = new Button();
+            btnPlayTracks = new Button();
             dgSong = new DataGridView();
             grbParts.SuspendLayout();
             grpPitch.SuspendLayout();
@@ -668,14 +668,14 @@ namespace Music.Writer
             // 
             gbSong.BackColor = Color.Black;
             gbSong.Controls.Add(btnPause);
-            gbSong.Controls.Add(btnClearSelected);
+            gbSong.Controls.Add(btnClearSelectedTracks);
             gbSong.Controls.Add(btnStop);
             gbSong.Controls.Add(btnExport);
             gbSong.Controls.Add(btnImport);
-            gbSong.Controls.Add(btnAddPhrase);
-            gbSong.Controls.Add(btnDeletePhrases);
+            gbSong.Controls.Add(btnAddTrack);
+            gbSong.Controls.Add(btnDeleteTrack);
             gbSong.Controls.Add(btnClearAll);
-            gbSong.Controls.Add(btnPlayPhrases);
+            gbSong.Controls.Add(btnPlayTracks);
             gbSong.Controls.Add(dgSong);
             gbSong.ForeColor = Color.White;
             gbSong.Location = new Point(12, 12);
@@ -696,16 +696,16 @@ namespace Music.Writer
             btnPause.UseVisualStyleBackColor = true;
             btnPause.Click += btnPause_Click;
             // 
-            // btnClearSelected
+            // btnClearSelectedTracks
             // 
-            btnClearSelected.ForeColor = Color.FromArgb(0, 192, 0);
-            btnClearSelected.Location = new Point(174, 544);
-            btnClearSelected.Name = "btnClearSelected";
-            btnClearSelected.Size = new Size(116, 23);
-            btnClearSelected.TabIndex = 44;
-            btnClearSelected.Text = "Clear Selected";
-            btnClearSelected.UseVisualStyleBackColor = true;
-            btnClearSelected.Click += btnClearSelected_Click;
+            btnClearSelectedTracks.ForeColor = Color.FromArgb(0, 192, 0);
+            btnClearSelectedTracks.Location = new Point(174, 544);
+            btnClearSelectedTracks.Name = "btnClearSelectedTracks";
+            btnClearSelectedTracks.Size = new Size(116, 23);
+            btnClearSelectedTracks.TabIndex = 44;
+            btnClearSelectedTracks.Text = "Clear Selected";
+            btnClearSelectedTracks.UseVisualStyleBackColor = true;
+            btnClearSelectedTracks.Click += btnClearSelected_Click;
             // 
             // btnStop
             // 
@@ -740,27 +740,27 @@ namespace Music.Writer
             btnImport.UseVisualStyleBackColor = true;
             btnImport.Click += btnImport_Click;
             // 
-            // btnAddPhrase
+            // btnAddTrack
             // 
-            btnAddPhrase.ForeColor = Color.FromArgb(0, 192, 0);
-            btnAddPhrase.Location = new Point(15, 544);
-            btnAddPhrase.Name = "btnAddPhrase";
-            btnAddPhrase.Size = new Size(72, 23);
-            btnAddPhrase.TabIndex = 40;
-            btnAddPhrase.Text = "Add";
-            btnAddPhrase.UseVisualStyleBackColor = true;
-            btnAddPhrase.Click += btnAddPhrase_Click;
+            btnAddTrack.ForeColor = Color.FromArgb(0, 192, 0);
+            btnAddTrack.Location = new Point(15, 544);
+            btnAddTrack.Name = "btnAddTrack";
+            btnAddTrack.Size = new Size(72, 23);
+            btnAddTrack.TabIndex = 40;
+            btnAddTrack.Text = "Add";
+            btnAddTrack.UseVisualStyleBackColor = true;
+            btnAddTrack.Click += btnAddPhrase_Click;
             // 
-            // btnDeletePhrases
+            // btnDeleteTrack
             // 
-            btnDeletePhrases.ForeColor = Color.FromArgb(0, 192, 0);
-            btnDeletePhrases.Location = new Point(95, 544);
-            btnDeletePhrases.Name = "btnDeletePhrases";
-            btnDeletePhrases.Size = new Size(72, 23);
-            btnDeletePhrases.TabIndex = 39;
-            btnDeletePhrases.Text = "Delete";
-            btnDeletePhrases.UseVisualStyleBackColor = true;
-            btnDeletePhrases.Click += btnDeletePhrases_Click;
+            btnDeleteTrack.ForeColor = Color.FromArgb(0, 192, 0);
+            btnDeleteTrack.Location = new Point(95, 544);
+            btnDeleteTrack.Name = "btnDeleteTrack";
+            btnDeleteTrack.Size = new Size(72, 23);
+            btnDeleteTrack.TabIndex = 39;
+            btnDeleteTrack.Text = "Delete";
+            btnDeleteTrack.UseVisualStyleBackColor = true;
+            btnDeleteTrack.Click += btnDeletePhrases_Click;
             // 
             // btnClearAll
             // 
@@ -773,16 +773,16 @@ namespace Music.Writer
             btnClearAll.UseVisualStyleBackColor = true;
             btnClearAll.Click += btnClearAll_Click;
             // 
-            // btnPlayPhrases
+            // btnPlayTracks
             // 
-            btnPlayPhrases.ForeColor = Color.FromArgb(0, 192, 0);
-            btnPlayPhrases.Location = new Point(703, 544);
-            btnPlayPhrases.Name = "btnPlayPhrases";
-            btnPlayPhrases.Size = new Size(72, 23);
-            btnPlayPhrases.TabIndex = 32;
-            btnPlayPhrases.Text = "Play";
-            btnPlayPhrases.UseVisualStyleBackColor = true;
-            btnPlayPhrases.Click += btnPlay_Click;
+            btnPlayTracks.ForeColor = Color.FromArgb(0, 192, 0);
+            btnPlayTracks.Location = new Point(703, 544);
+            btnPlayTracks.Name = "btnPlayTracks";
+            btnPlayTracks.Size = new Size(72, 23);
+            btnPlayTracks.TabIndex = 32;
+            btnPlayTracks.Text = "Play";
+            btnPlayTracks.UseVisualStyleBackColor = true;
+            btnPlayTracks.Click += btnPlay_Click;
             // 
             // dgSong
             // 
@@ -871,14 +871,14 @@ namespace Music.Writer
         private GroupBox gbSong;
         private Button btnExecute;
         private DataGridView dgSong;
-        private Button btnPlayPhrases;
-        private Button btnDeletePhrases;
+        private Button btnPlayTracks;
+        private Button btnDeleteTrack;
         private Button btnClearAll;
-        private Button btnAddPhrase;
+        private Button btnAddTrack;
         private Button btnImport;
         private Button btnExport;
         private Button btnStop;
-        private Button btnClearSelected;
+        private Button btnClearSelectedTracks;
         private Button btnPause;
     }
 }

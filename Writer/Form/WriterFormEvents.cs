@@ -567,7 +567,7 @@ namespace Music.Writer
 
         // ========== GRID CELL EVENT HANDLERS ==========
 
-        public void HandlePhraseDoubleClick(DataGridView dgSong, DataGridViewCellEventArgs e)
+        public void HandleTrackDoubleClick(DataGridView dgSong, DataGridViewCellEventArgs e)
         {
             // Skip fixed rows
             if (e.RowIndex < SongGridManager.FIXED_ROWS_COUNT)
