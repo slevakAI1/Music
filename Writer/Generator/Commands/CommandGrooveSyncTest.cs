@@ -1,6 +1,7 @@
 using System.Windows.Forms;
 using Music.Designer;
 using Music.MyMidi;
+using Music.Writer.Generator.Randomization;
 
 namespace Music.Writer.Generator
 {
@@ -53,7 +54,7 @@ namespace Music.Writer.Generator
                 // Use the PopRockBasic groove preset from Designer
                 var groovePreset = GroovePresets.GetPopRockBasic();
 
-                // Generate all phrases
+                // Generate all phrases using the Generate method (which includes drums)
                 var result = GrooveDrivenGenerator.Generate(
                     harmonyTimeline,
                     timeSignatureTimeline,
@@ -87,7 +88,7 @@ namespace Music.Writer.Generator
                 }
 
                 MessageBox.Show(owner,
-                    $"Successfully created {addedCount} synchronized phrases using '{groovePreset.Name}' groove.",
+                    $"Successfully created {addedCount} synchronized phrases using '{groovePreset.Name}' groove with controlled randomness.",
                     "Groove Sync Test",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
