@@ -14,16 +14,16 @@ namespace Music.Writer
         public void HandleAddSongTrack(
             DataGridView dgSong,
             List<MidiInstrument> midiInstruments,
-            ref int phraseNumber)
+            ref int trackNumber)
         {
             // Create an empty SongTrack and add it to the grid via the existing helper.
-            var emptyPhrase = new SongTrack(new List<SongTrackNoteEvent>())
+            var emptyTrack = new SongTrack(new List<SongTrackNoteEvent>())
             {
                 MidiProgramNumber = -1  // "Select..."
             };
 
             // Use SongGridManager to initialize the row consistently with other adds.
-            SongGridManager.AddSongTrackToGrid(emptyPhrase, midiInstruments, dgSong, ref phraseNumber);
+            SongGridManager.AddSongTrackToGrid(emptyTrack, midiInstruments, dgSong, ref trackNumber);
 
             // Select the newly added row (last row)
             if (dgSong.Rows.Count > SongGridManager.FIXED_ROWS_COUNT)
@@ -47,7 +47,7 @@ namespace Music.Writer
             {
                 MessageBoxHelper.Show(
                     "Please select one or more rows to delete.",
-                    "Delete Phrases",
+                    "Delete Tracks",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
                 return;
@@ -71,7 +71,7 @@ namespace Music.Writer
 
         public void HandleClearAll(DataGridView dgSong)
         {
-            // Remove all phrase rows
+            // Remove all design and music track data
             while (dgSong.Rows.Count > SongGridManager.FIXED_ROWS_COUNT)
             {
                 dgSong.Rows.RemoveAt(SongGridManager.FIXED_ROWS_COUNT);
@@ -113,23 +113,23 @@ namespace Music.Writer
                     continue;
                 }
 
-                // Handle phrase rows
+                // Handle Tracks
                 // Reset instrument to "Select..." (-1)
                 var instrCol = dgSong.Columns["colType"];
                 if (instrCol != null)
                     row.Cells[instrCol.Index].Value = -1;
 
                 // Reset data to empty SongTrack
-                var phraseDataCol = dgSong.Columns["colData"];
-                if (phraseDataCol != null)
-                    row.Cells[phraseDataCol.Index].Value = new SongTrack(new List<SongTrackNoteEvent>()) { MidiProgramNumber = -1 };
+                var trackDataCol = dgSong.Columns["colData"];
+                if (trackDataCol != null)
+                    row.Cells[trackDataCol.Index].Value = new SongTrack(new List<SongTrackNoteEvent>()) { MidiProgramNumber = -1 };
 
                 // Clear the Part description
                 var descriptionCol = dgSong.Columns["colDescription"];
                 if (descriptionCol != null)
                     row.Cells[descriptionCol.Index].Value = string.Empty;
 
-                // Clear all measure cells for phrase row
+                // Clear all measure cells for track
                 SongGridManager.ClearMeasureCellsForRow(dgSong, row.Index);
             }
 
@@ -139,11 +139,11 @@ namespace Music.Writer
         // ========== GRID VALIDATION HELPERS ==========
 
         /// <summary>
-        /// Validates that one or more phrase rows are selected in the grid.
+        /// Validates that one or more tracks are selected in the grid.
         /// Shows a message box if no rows are selected.
         /// </summary>
         /// <returns>True if at least one row is selected, false otherwise.</returns>
-        private bool ValidatePhrasesSelected(DataGridView dgSong)
+        private bool ValidateTracksSelected(DataGridView dgSong)
         {
             // Check if any non-fixed rows are selected
             var hasValidSelection = dgSong.SelectedRows
@@ -153,7 +153,7 @@ namespace Music.Writer
             if (!hasValidSelection)
             {
                 MessageBoxHelper.Show(
-                    "Please select one or more phrase rows to apply this command.",
+                    "Please select one or more tracks to apply this command.",
                     "No Selection",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
@@ -166,10 +166,10 @@ namespace Music.Writer
 
         // KEEP THIS FOR FUTURE EXPANSION
         /// <summary>
-        /// Writes a phrase object to the colData cell of all selected rows and updates measure display.
+        /// Writes a track object to the colData cell of all selected rows and updates measure display.
         /// </summary>
-        /// <param name="phrase">The phrase to write to the grid.</param>
-        private void WritePhraseToSelectedRows(DataGridView dgSong, SongTrack phrase)
+        /// <param name="track">The track to write to the grid.</param>
+        private void WritePhraseToSelectedRows(DataGridView dgSong, SongTrack track)
         {
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
@@ -177,7 +177,7 @@ namespace Music.Writer
                 if (selectedRow.Index < SongGridManager.FIXED_ROWS_COUNT)
                     continue;
 
-                selectedRow.Cells["colData"].Value = phrase;
+                selectedRow.Cells["colData"].Value = track;
                 
                 // Update measure cells to show note distribution
                 SongGridManager.PopulatePartMeasureNoteCount(dgSong, selectedRow.Index);
@@ -189,11 +189,11 @@ namespace Music.Writer
         // FIX THIS NEXT!!!
 
         /// <summary>
-        /// Appends phrase notes to the existing SongTrack objects in all selected rows.
-        /// The appended notes' absolute positions are adjusted to start after the existing phrase ends.
+        /// Appends track notes to the existing SongTrack objects in all selected rows.
+        /// The appended notes' absolute positions are adjusted to start after the existing track ends.
         /// </summary>
-        /// <param name="phrase">The phrase containing notes to append to the grid.</param>
-        private void AppendPhraseNotesToSelectedRows(DataGridView dgSong, SongTrack phrase)
+        /// <param name="track">The track containing notes to append to the grid.</param>
+        private void AppendPhraseToSelectedRows(DataGridView dgSong, SongTrack track)
         {
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
@@ -201,29 +201,29 @@ namespace Music.Writer
                 if (selectedRow.Index < SongGridManager.FIXED_ROWS_COUNT)
                     continue;
 
-                // Get existing phrase or create new one if null
-                var existingPhrase = selectedRow.Cells["colData"].Value as SongTrack;
-                if (existingPhrase == null)
+                // Get existing track or create new one if null
+                var existingTrack = selectedRow.Cells["colData"].Value as SongTrack;
+                if (existingTrack == null)
                 {
-                    // No existing phrase, create new one with the notes (no offset needed)
-                    existingPhrase = new SongTrack(new List<SongTrackNoteEvent>(phrase.SongTrackNoteEvents));
-                    selectedRow.Cells["colData"].Value = existingPhrase;
+                    // No existing track, create new one with the notes (no offset needed)
+                    existingTrack = new SongTrack(new List<SongTrackNoteEvent>(track.SongTrackNoteEvents));
+                    selectedRow.Cells["colData"].Value = existingTrack;
                 }
                 else
                 {
-                    // Calculate offset: find where the existing phrase ends
+                    // Calculate offset: find where the existing track ends
                     int offset = 0;
-                    if (existingPhrase.SongTrackNoteEvents.Count > 0)
+                    if (existingTrack.SongTrackNoteEvents.Count > 0)
                     {
                         // Find the last note's end time (absolute position + duration)
-                        var lastNote = existingPhrase.SongTrackNoteEvents
+                        var lastNote = existingTrack.SongTrackNoteEvents
                             .OrderBy(n => n.AbsolutePositionTicks + n.NoteDurationTicks)
                             .Last();
                         offset = lastNote.AbsolutePositionTicks + lastNote.NoteDurationTicks;
                     }
 
                     // Append new notes with adjusted absolutePositions
-                    foreach (var note in phrase.SongTrackNoteEvents)
+                    foreach (var note in track.SongTrackNoteEvents)
                     {
                         var adjustedNote = new SongTrackNoteEvent(
                             noteNumber: note.NoteNumber,
@@ -232,7 +232,7 @@ namespace Music.Writer
                             noteOnVelocity: note.NoteOnVelocity,
                             isRest: note.IsRest);
 
-                        existingPhrase.SongTrackNoteEvents.Add(adjustedNote);
+                        existingTrack.SongTrackNoteEvents.Add(adjustedNote);
                     }
                 }
 

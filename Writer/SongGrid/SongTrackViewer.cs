@@ -81,7 +81,7 @@ namespace Music.Writer
             }
             catch (Exception ex)
             {
-                txtJson.Text = $"Error loading phrase data:\r\n{ex.Message}";
+                txtJson.Text = $"Error loading track data:\r\n{ex.Message}";
             }
         }
     }
