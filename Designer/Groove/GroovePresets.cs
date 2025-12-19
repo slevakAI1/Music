@@ -1,3 +1,10 @@
+
+// AI TO DO:
+//    If you want the next step to be immediately useful for permutation,
+//    the most leverage is adding a genre-specific “allowed offsets grid”
+//    (8ths only vs 16ths vs triplets) and density bounds per part—but that can
+//    live outside these preset objects, exactly as you planned.
+
 namespace Music.Designer
 {
     // Factory for hardcoded groove presets
