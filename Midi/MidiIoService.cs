@@ -2,7 +2,7 @@ using Melanchall.DryWetMidi.Core;
 
 namespace Music.MyMidi
 {
-    internal class MidiIoService 
+    public class MidiIoService 
     {
         public MidiSongDocument ImportFromFile(string path)
         {

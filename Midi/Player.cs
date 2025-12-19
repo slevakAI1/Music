@@ -1,3 +1,5 @@
+using Music.Writer;
+
 namespace Music.MyMidi
 {
     // Helper class extracted from WriterForm for non-event, non-lifecycle logic.
@@ -9,8 +11,7 @@ namespace Music.MyMidi
         /// </summary>
         internal static async Task PlayMidiFromPhrasesAsync(
             MidiPlaybackService playbackService,
-            MidiSongDocument midiDoc,
-            Form owner)
+            MidiSongDocument midiDoc)
         {
             if (midiDoc == null)
                 throw new ArgumentNullException(nameof(midiDoc));
@@ -28,7 +29,7 @@ namespace Music.MyMidi
             }
             if (first == null)
             {
-                MessageBox.Show(owner, "No MIDI output device found.", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxHelper.Show("No MIDI output device found.", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 

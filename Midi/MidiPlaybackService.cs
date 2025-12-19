@@ -2,7 +2,7 @@ using Melanchall.DryWetMidi.Multimedia;
 
 namespace Music.MyMidi
 {
-    internal class MidiPlaybackService
+    public class MidiPlaybackService
     {
         private OutputDevice? _outputDevice;
         private Playback? _playback;

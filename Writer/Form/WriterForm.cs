@@ -26,6 +26,9 @@ namespace Music.Writer
         // MIDI instrument list for dropdown
         private List<MidiInstrument> _midiInstruments;
 
+        // Event handlers instance
+        private readonly WriterFormEventHandlers _eventHandlers = new();
+
         //===========================   I N I T I A L I Z A T I O N   ===========================
         public WriterForm()
         {
@@ -99,7 +102,7 @@ namespace Music.Writer
         /// </summary>
         private void dgSong_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
         {
-            HandlePhraseDoubleClick(e);
+            _eventHandlers.HandlePhraseDoubleClick(dgSong, e);
         }
 
         protected override void OnShown(EventArgs e)
@@ -143,32 +146,37 @@ namespace Music.Writer
 
         private async void btnPlay_Click(object sender, EventArgs e)
         {
-            await HandlePlayAsync();
+            await _eventHandlers.HandlePlayAsync(dgSong, _midiPlaybackService);
         }
 
         private void btnUpdateFormFromDesigner_Click(object sender, EventArgs e)
         {
-            HandleUpdateFormFromDesigner();
+            if (_writer != null && _designer != null)
+            {
+                _eventHandlers.HandleUpdateFormFromDesigner(_writer, _designer);
+            }
         }
 
         private void btnSetDesignTestScenarioD1_Click(object sender, EventArgs e)
         {
-            HandleSetDesignTestScenarioD1();
+            _designer ??= new Designer.Designer();
+            _eventHandlers.HandleSetDesignTestScenarioD1(dgSong, _designer);
         }
 
         private void btnSetWriterTestScenarioG1_Click(object sender, EventArgs e)
         {
-            HandleSetWriterTestScenarioG1();
+            _writer = _eventHandlers.HandleSetWriterTestScenarioG1(_designer);
+            ApplyFormData(_writer);
         }
 
         private void btnChordTest_Click(object sender, EventArgs e)
         {
-            HandleChordTest();
+            _eventHandlers.HandleChordTest(_designer);
         }
 
         private void btnExportToNotion_Click(object sender, EventArgs e)
         {
-            HandleExportToNotion();
+            _eventHandlers.HandleExportToNotion();
         }
 
         private void btnExecute_Click(object sender, EventArgs e)
@@ -209,7 +217,7 @@ namespace Music.Writer
 
         private void btnNewScore_Click(object sender, EventArgs e)
         {
-            HandleNewScore();
+            _eventHandlers.HandleNewScore();
         }
 
         // New Add button handler: add an empty phrase row and select it.
@@ -225,12 +233,12 @@ namespace Music.Writer
 
         private void btnImport_Click(object sender, EventArgs e)
         {
-            HandleImport();
+            _eventHandlers.HandleImport(dgSong, _midiIoService, _midiInstruments, ref phraseNumber);
         }
 
         private void btnExport_Click(object sender, EventArgs e)
         {
-            HandleExport();
+            WriterFormEventHandlers.HandleExport(dgSong, _midiIoService);
         }
 
         private void btnStop_Click(object sender, EventArgs e)

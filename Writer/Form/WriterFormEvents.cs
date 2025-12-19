@@ -3,19 +3,22 @@ using Music.MyMidi;
 
 namespace Music.Writer
 {
-    // Event handler logic extracted from WriterForm into a partial class
-    // This file contains only direct UI event handlers
-    public partial class WriterForm
+    /// <summary>
+    /// Event handler logic for WriterForm, now as a standalone class.
+    /// Each method receives only the dependencies it actually needs.
+    /// </summary>
+    public class WriterFormEventHandlers
     {
         // ========== PLAYBACK & EXPORT EVENT HANDLERS ==========
 
-        // This creates a midi document from the selected phrases and plays them (simultaneously)
-        public async Task HandlePlayAsync()
+        public async Task HandlePlayAsync(
+            DataGridView dgSong,
+            MidiPlaybackService midiPlaybackService)
         {
             // Check if there are any phrase rows in the grid (excluding fixed rows)
             if (dgSong.Rows.Count <= SongGridManager.FIXED_ROWS_COUNT)
             {
-                MessageBox.Show(this, "No pitch events to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show("No pitch events to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -26,7 +29,7 @@ namespace Music.Writer
 
             if (!hasPhraseSelection)
             {
-                MessageBox.Show(this, "Please select a pitch event to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show("Please select a pitch event to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -35,7 +38,7 @@ namespace Music.Writer
             var tempoTimeline = tempoRow.Cells["colData"].Value as Music.Designer.TempoTimeline;
             if (tempoTimeline == null || tempoTimeline.Events.Count == 0)
             {
-                MessageBox.Show(this, "No tempo events defined. Please add at least one tempo event.", "Missing Tempo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBoxHelper.Show("No tempo events defined. Please add at least one tempo event.", "Missing Tempo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -44,7 +47,7 @@ namespace Music.Writer
             var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Designer.TimeSignatureTimeline;
             if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
             {
-                MessageBox.Show(this, "No time signature events defined. Please add at least one time signature event.", "Missing Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBoxHelper.Show("No time signature events defined. Please add at least one time signature event.", "Missing Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -63,8 +66,7 @@ namespace Music.Writer
                 if (dataObj is not Phrase phrase)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
-                    MessageBox.Show(
-                        this,
+                    MessageBoxHelper.Show(
                         $"No phrase data for row #{eventNumber}. Please add or assign a phrase before playing.",
                         "Missing Phrase",
                         MessageBoxButtons.OK,
@@ -76,8 +78,7 @@ namespace Music.Writer
                 if (phrase.PhraseNotes.Count == 0)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
-                    MessageBox.Show(
-                        this,
+                    MessageBoxHelper.Show(
                         $"No phrase data for row #{eventNumber}. Please add or assign a phrase before playing.",
                         "Missing Phrase",
                         MessageBoxButtons.OK,
@@ -90,8 +91,7 @@ namespace Music.Writer
                 if (instrObj == null || instrObj == DBNull.Value)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
-                    MessageBox.Show(
-                        this,
+                    MessageBoxHelper.Show(
                         $"No instrument selected for row #{eventNumber}. Please select an instrument before playing.",
                         "Missing Instrument",
                         MessageBoxButtons.OK,
@@ -103,8 +103,7 @@ namespace Music.Writer
                 if (programNumber == -1)  // -1 = placeholder "Select..." -> treat as missing selection
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
-                    MessageBox.Show(
-                        this,
+                    MessageBoxHelper.Show(
                         $"No instrument selected for row #{eventNumber}. Please select an instrument before playing.",
                         "Missing Instrument",
                         MessageBoxButtons.OK,
@@ -120,7 +119,7 @@ namespace Music.Writer
             // Verify we actually have phrases to play
             if (phrases.Count == 0)
             {
-                MessageBox.Show(this, "No valid phrase events selected to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show("No valid phrase events selected to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -130,15 +129,17 @@ namespace Music.Writer
                 tempoTimeline,
                 timeSignatureTimeline);
 
-            await Player.PlayMidiFromPhrasesAsync(_midiPlaybackService, midiDoc, this);
+            await Player.PlayMidiFromPhrasesAsync(midiPlaybackService, midiDoc);
         }
 
-        public void HandleExport()
+        public static void HandleExport(
+            DataGridView dgSong,
+            MidiIoService midiIoService)
         {
             // Check if there are any phrase rows in the grid (excluding fixed rows)
             if (dgSong.Rows.Count <= SongGridManager.FIXED_ROWS_COUNT)
             {
-                MessageBox.Show(this, "No pitch events to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show("No pitch events to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -149,7 +150,7 @@ namespace Music.Writer
 
             if (!hasPhraseSelection)
             {
-                MessageBox.Show(this, "Please select a pitch event to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show("Please select a pitch event to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -158,7 +159,7 @@ namespace Music.Writer
             var tempoTimeline = tempoRow.Cells["colData"].Value as Music.Designer.TempoTimeline;
             if (tempoTimeline == null || tempoTimeline.Events.Count == 0)
             {
-                MessageBox.Show(this, "No tempo events defined. Please add at least one tempo event.", "Missing Tempo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBoxHelper.Show("No tempo events defined. Please add at least one tempo event.", "Missing Tempo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -167,7 +168,7 @@ namespace Music.Writer
             var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Designer.TimeSignatureTimeline;
             if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
             {
-                MessageBox.Show(this, "No time signature events defined. Please add at least one time signature event.", "Missing Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBoxHelper.Show("No time signature events defined. Please add at least one time signature event.", "Missing Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -186,8 +187,7 @@ namespace Music.Writer
                 if (dataObj is not Phrase phrase)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
-                    MessageBox.Show(
-                        this,
+                    MessageBoxHelper.Show(
                         $"No phrase data for row #{eventNumber}. Please add or assign a phrase before exporting.",
                         "Missing Phrase",
                         MessageBoxButtons.OK,
@@ -199,8 +199,7 @@ namespace Music.Writer
                 if (phrase.PhraseNotes.Count == 0)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
-                    MessageBox.Show(
-                        this,
+                    MessageBoxHelper.Show(
                         $"No phrase data for row #{eventNumber}. Please add or assign a phrase before exporting.",
                         "Missing Phrase",
                         MessageBoxButtons.OK,
@@ -213,8 +212,7 @@ namespace Music.Writer
                 if (instrObj == null || instrObj == DBNull.Value)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
-                    MessageBox.Show(
-                        this,
+                    MessageBoxHelper.Show(
                         $"No instrument selected for row #{eventNumber}. Please select an instrument before exporting.",
                         "Missing Instrument",
                         MessageBoxButtons.OK,
@@ -226,8 +224,7 @@ namespace Music.Writer
                 if (programNumber == -1)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
-                    MessageBox.Show(
-                        this,
+                    MessageBoxHelper.Show(
                         $"No instrument selected for row #{eventNumber}. Please select an instrument before exporting.",
                         "Missing Instrument",
                         MessageBoxButtons.OK,
@@ -243,7 +240,7 @@ namespace Music.Writer
             // Verify we actually have phrases to export
             if (phrases.Count == 0)
             {
-                MessageBox.Show(this, "No valid phrase events selected to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show("No valid phrase events selected to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -255,7 +252,7 @@ namespace Music.Writer
                 AddExtension = true
             };
 
-            if (sfd.ShowDialog(this) != DialogResult.OK)
+            if (sfd.ShowDialog() != DialogResult.OK)
                 return;
 
             try
@@ -267,10 +264,9 @@ namespace Music.Writer
                     timeSignatureTimeline);
 
                 // Export to file
-                _midiIoService.ExportToFile(sfd.FileName, midiDoc);
+                midiIoService.ExportToFile(sfd.FileName, midiDoc);
 
-                MessageBox.Show(
-                    this,
+                MessageBoxHelper.Show(
                     $"Successfully exported to:\n{Path.GetFileName(sfd.FileName)}",
                     "Export Successful",
                     MessageBoxButtons.OK,
@@ -278,11 +274,15 @@ namespace Music.Writer
             }
             catch (Exception ex)
             {
-                MessageBox.Show(this, $"Error exporting MIDI: {ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxHelper.Show($"Error exporting MIDI: {ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        public void HandleImport()
+        public void HandleImport(
+            DataGridView dgSong,
+            MidiIoService midiIoService,
+            List<MidiInstrument> midiInstruments,
+            ref int phraseNumber)
         {
             using var ofd = new OpenFileDialog
             {
@@ -291,13 +291,13 @@ namespace Music.Writer
                 CheckFileExists = true
             };
 
-            if (ofd.ShowDialog(this) != DialogResult.OK)
+            if (ofd.ShowDialog() != DialogResult.OK)
                 return;
 
             try
             {
                 // Import the MIDI file using the existing service
-                var midiDoc = _midiIoService.ImportFromFile(ofd.FileName);
+                var midiDoc = midiIoService.ImportFromFile(ofd.FileName);
 
                 // Resolve project root (same approach used elsewhere in the solution)
                 var projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
@@ -313,8 +313,7 @@ namespace Music.Writer
                 catch (NotSupportedException ex)
                 {
                     // Show detailed error about unsupported MIDI event
-                    MessageBox.Show(
-                        this,
+                    MessageBoxHelper.Show(
                         ex.Message,
                         "Unsupported MIDI Event",
                         MessageBoxButtons.OK,
@@ -347,7 +346,7 @@ namespace Music.Writer
                 // Convert MetaMidiEvent lists to Phrase objects, passing the source ticks per quarter note
                 var phrases = ConvertMidiEventListsToPhraseLists.ConvertMidiEventListsToPhraseList(
                     midiEventLists,
-                    _midiInstruments,
+                    midiInstruments,
                     ticksPerQuarterNote);
 
                 // Add each phrase to the grid
@@ -355,13 +354,12 @@ namespace Music.Writer
                 {
                     SongGridManager.AddPhraseToGrid(
                         phrase,
-                        _midiInstruments,
+                        midiInstruments,
                         dgSong,
                         ref phraseNumber);
                 }
 
-                MessageBox.Show(
-                    this,
+                MessageBoxHelper.Show(
                     $"Successfully imported {phrases.Count} track(s) from:\n{Path.GetFileName(ofd.FileName)}",
                     "Import Successful",
                     MessageBoxButtons.OK,
@@ -369,8 +367,7 @@ namespace Music.Writer
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    this,
+                MessageBoxHelper.Show(
                     $"Error importing MIDI file:\n{ex.Message}\n\n{ex.InnerException?.Message}",
                     "Import Error",
                     MessageBoxButtons.OK,
@@ -465,36 +462,38 @@ namespace Music.Writer
 
         // ========== DESIGNER & FORM SYNC EVENT HANDLERS ==========
 
-        public void HandleUpdateFormFromDesigner()
+        public void HandleUpdateFormFromDesigner(
+            WriterFormData writer,
+            Designer.Designer designer)
         {
             // Update the form to take into account any changes to Designer
-            UpdateWriterFormDataFromDesigner.Update(_writer, _designer);
+            UpdateWriterFormDataFromDesigner.Update(writer, designer);
         }
 
         // ========== TEST SCENARIO EVENT HANDLERS ==========
 
-        public void HandleSetDesignTestScenarioD1()
+        public void HandleSetDesignTestScenarioD1(
+            DataGridView dgSong,
+            Designer.Designer designer)
         {
-            _designer ??= new Designer.Designer();
-            DesignerTests.SetTestDesignD1(_designer);
+            DesignerTests.SetTestDesignD1(designer);
 
-            GridControlLinesManager.AttachSectionTimeline(dgSong, _designer.SectionTimeline);
-            GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, _designer.TimeSignatureTimeline);
-            GridControlLinesManager.AttachTempoTimeline(dgSong, _designer.TempoTimeline);
-            GridControlLinesManager.AttachHarmonyTimeline(dgSong, _designer.HarmonyTimeline);
+            GridControlLinesManager.AttachSectionTimeline(dgSong, designer.SectionTimeline);
+            GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, designer.TimeSignatureTimeline);
+            GridControlLinesManager.AttachTempoTimeline(dgSong, designer.TempoTimeline);
+            GridControlLinesManager.AttachHarmonyTimeline(dgSong, designer.HarmonyTimeline);
         }
 
-        public void HandleSetWriterTestScenarioG1()
+        public WriterFormData HandleSetWriterTestScenarioG1(Designer.Designer designer)
         {
-            _writer = WriterFormTests.SetTestWriterG1(_designer);
-            ApplyFormData(_writer);
+            return WriterFormTests.SetTestWriterG1(designer);
         }
 
-        public void HandleChordTest()
+        public void HandleChordTest(Designer.Designer? designer)
         {
-            if (_designer?.HarmonyTimeline == null || _designer.HarmonyTimeline.Events.Count == 0)
+            if (designer?.HarmonyTimeline == null || designer.HarmonyTimeline.Events.Count == 0)
             {
-                MessageBox.Show(this,
+                MessageBoxHelper.Show(
                     "No harmony events available in the current design.",
                     "Chord Test",
                     MessageBoxButtons.OK,
@@ -502,7 +501,7 @@ namespace Music.Writer
                 return;
             }
 
-            var harmonyEvent = _designer.HarmonyTimeline.Events[1];
+            var harmonyEvent = designer.HarmonyTimeline.Events[1];
 
             List<PartNoteEvent> notes;
             try
@@ -516,7 +515,7 @@ namespace Music.Writer
             }
             catch (Exception ex)
             {
-                MessageBox.Show(this,
+                MessageBoxHelper.Show(
                     $"Failed to build chord: {ex.Message}",
                     "Chord Test",
                     MessageBoxButtons.OK,
@@ -526,7 +525,7 @@ namespace Music.Writer
 
             if (notes == null || notes.Count == 0)
             {
-                MessageBox.Show(this,
+                MessageBoxHelper.Show(
                     "Chord conversion returned no notes.",
                     "Chord Test",
                     MessageBoxButtons.OK,
@@ -547,7 +546,7 @@ namespace Music.Writer
             }
 
             var title = $"Chord: {harmonyEvent.Key} (Deg {harmonyEvent.Degree}, {harmonyEvent.Quality})";
-            MessageBox.Show(this,
+            MessageBoxHelper.Show(
                 string.Join(Environment.NewLine, lines),
                 title,
                 MessageBoxButtons.OK,
@@ -558,64 +557,17 @@ namespace Music.Writer
 
         public void HandleExportToNotion()
         {
-        //    // Ensure score list exists and has at least one score
-        //    if (_scoreList == null || _scoreList.Count == 0)
-        //    {
-        //        MessageBox.Show(this, "No score to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //        return;
-        //    }
-
-        //    try
-        //    {
-        //        var path = Path.Combine("..", "..", "..", "Files", "NotionExchange", "Score.musicxml");
-        //        var fullPath = Path.GetFullPath(path);
-        //        var dir = Path.GetDirectoryName(fullPath);
-        //        if (!string.IsNullOrEmpty(dir))
-        //            Directory.CreateDirectory(dir);
-
-        //        var xml = MusicXmlScoreSerializer.Serialize(_scoreList[0]);
-        //        File.WriteAllText(fullPath, xml, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-
-        //        MessageBox.Show(this, $"Exported to {fullPath}", "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(this, $"Error exporting MusicXML:\n{ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //    }
+            // Implementation placeholder
         }
 
         public void HandleNewScore()
         {
-            //// Resolve Movement Title to use for the new score
-            //var movementTitle = txtMovementTitle.Text;
-            //if (movementTitle == "")
-            //{
-            //    var now = System.DateTime.Now;
-            //    movementTitle = now.ToString("dddd, MMM d, yyyy h:mm'.'ss tt");
-            //}
-
-            //var newScore = ScoreHelper.CreateNewScore(
-            //    _designer,
-            //    ref _measureMeta,
-            //    movementTitle);
-
-            //// Set current score to newly created score and update 
-            //if (newScore != null)
-            //{
-            //    if (_scoreList.Count > 0)
-            //        _scoreList[0] = newScore;
-            //    else
-            //        _scoreList.Add(newScore);
-            //    txtScoreReport.Text = ScoreReport.Run(_scoreList[0]);
-            //}
-
-            //// Clear the movement title textbox
-            //txtMovementTitle.Text = "";
+            // Implementation placeholder
         }
 
         // ========== GRID CELL EVENT HANDLERS ==========
 
-        public void HandlePhraseDoubleClick(DataGridViewCellEventArgs e)
+        public void HandlePhraseDoubleClick(DataGridView dgSong, DataGridViewCellEventArgs e)
         {
             // Skip fixed rows
             if (e.RowIndex < SongGridManager.FIXED_ROWS_COUNT)
@@ -631,7 +583,7 @@ namespace Music.Writer
             // Validate that we have a Phrase object
             if (phraseData is not Phrase phrase)
             {
-                MessageBox.Show(this,
+                MessageBoxHelper.Show(
                     "No phrase data available for this row.",
                     "View Phrase",
                     MessageBoxButtons.OK,
@@ -644,7 +596,7 @@ namespace Music.Writer
 
             // Open the JSON viewer dialog
             using var viewer = new PartJsonViewer(phrase, phraseNumber);
-            viewer.ShowDialog(this);
+            viewer.ShowDialog();
         }
     }
 }
