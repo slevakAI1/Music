@@ -4,6 +4,341 @@ namespace Music.Designer
     public static class GroovePresets
     {
         /// <summary>
+        /// Returns the "BossaNovaBasic" groove preset.
+        /// Assumes 4/4 meter with 4 beats per bar.
+        /// Note: Bossa is often taught with steady 8th-note timekeeping; bass drum motion can be more syncopated.
+        /// </summary>
+        public static GroovePreset GetBossaNovaBasic()
+        {
+            return new GroovePreset
+            {
+                Name = "BossaNovaBasic",
+
+                AnchorLayer = new GrooveLayer
+                {
+                    // Foundation pulse (simple, DAW-friendly approximation)
+                    HatOnsets = new List<decimal>
+                    {
+                        1m, 1.5m, 2m, 2.5m, 3m, 3.5m, 4m, 4.5m
+                    },
+
+                    // Surdo-like / bass-drum motion (lightly syncopated base)
+                    KickOnsets = new List<decimal> { 1m, 1.5m, 2.5m, 3m, 3.5m, 4.5m },
+
+                    // Cross-stick / rim-click feel often sits on 2 & 4 in basic bossa teaching
+                    SnareOnsets = new List<decimal> { 2m, 4m },
+
+                    // Bass aligns with the main low-end motion
+                    BassOnsets = new List<decimal> { 1m, 3m },
+
+                    // Guitar/keys comp: light offbeat pushes
+                    CompOnsets = new List<decimal> { 1.5m, 2.5m, 3.5m, 4.5m },
+
+                    // Pads: sustained harmony on bar anchors
+                    PadsOnsets = new List<decimal> { 1m, 3m }
+                },
+
+                TensionLayer = new GrooveLayer
+                {
+                    KickOnsets = new List<decimal>(),
+                    SnareOnsets = new List<decimal>(),
+                    HatOnsets = new List<decimal>(),
+                    BassOnsets = new List<decimal>(),
+                    CompOnsets = new List<decimal>(),
+                    PadsOnsets = new List<decimal>()
+                }
+            };
+        }
+
+        /// <summary>
+        /// Returns the "CountryTrain" groove preset.
+        /// Assumes 4/4 meter with 4 beats per bar.
+        /// Note: Train beat is commonly taught with an ongoing driving subdivision (often snare/brushes).
+        /// </summary>
+        public static GroovePreset GetCountryTrain()
+        {
+            return new GroovePreset
+            {
+                Name = "CountryTrain",
+
+                AnchorLayer = new GrooveLayer
+                {
+                    // Kick commonly anchors 1 & 3 in many train feels
+                    KickOnsets = new List<decimal> { 1m, 3m },
+
+                    // Train feel: continuous "chug" subdivision (base: 8ths on snare/brushes)
+                    SnareOnsets = new List<decimal>
+                    {
+                        1m, 1.5m, 2m, 2.5m, 3m, 3.5m, 4m, 4.5m
+                    },
+
+                    // Timekeeper (hat/shaker) also rides 8ths in a basic approximation
+                    HatOnsets = new List<decimal>
+                    {
+                        1m, 1.5m, 2m, 2.5m, 3m, 3.5m, 4m, 4.5m
+                    },
+
+                    // Bass: simple lock to the big downbeats
+                    BassOnsets = new List<decimal> { 1m, 3m },
+
+                    // Acoustic guitar strum often feels like steady 8ths; use offbeats for "train" momentum
+                    CompOnsets = new List<decimal> { 1.5m, 2.5m, 3.5m, 4.5m },
+
+                    // Pads: light anchors
+                    PadsOnsets = new List<decimal> { 1m, 3m }
+                },
+
+                TensionLayer = new GrooveLayer
+                {
+                    KickOnsets = new List<decimal>(),
+                    SnareOnsets = new List<decimal>(),
+                    HatOnsets = new List<decimal>(),
+                    BassOnsets = new List<decimal>(),
+                    CompOnsets = new List<decimal>(),
+                    PadsOnsets = new List<decimal>()
+                }
+            };
+        }
+
+        /// <summary>
+        /// Returns the "DanceEDMFourOnFloor" groove preset.
+        /// Assumes 4/4 meter with 4 beats per bar.
+        /// </summary>
+        public static GroovePreset GetDanceEDMFourOnFloor()
+        {
+            return new GroovePreset
+            {
+                Name = "DanceEDMFourOnFloor",
+
+                AnchorLayer = new GrooveLayer
+                {
+                    // Four-on-the-floor: kick on every quarter note
+                    KickOnsets = new List<decimal> { 1m, 2m, 3m, 4m },
+
+                    // Common clap/snare on 2 and 4
+                    SnareOnsets = new List<decimal> { 2m, 4m },
+
+                    // Offbeat hats are a common starting point (energy can be added later with 16ths)
+                    HatOnsets = new List<decimal> { 1.5m, 2.5m, 3.5m, 4.5m },
+
+                    // Bass often reinforces the quarter-note pulse in simple EDM
+                    BassOnsets = new List<decimal> { 1m, 2m, 3m, 4m },
+
+                    // Comp/synth rhythm commonly pushes offbeats
+                    CompOnsets = new List<decimal> { 1.5m, 2.5m, 3.5m, 4.5m },
+
+                    // Pads: long harmonic anchors
+                    PadsOnsets = new List<decimal> { 1m, 3m }
+                },
+
+                TensionLayer = new GrooveLayer
+                {
+                    KickOnsets = new List<decimal>(),
+                    SnareOnsets = new List<decimal>(),
+                    HatOnsets = new List<decimal>(),
+                    BassOnsets = new List<decimal>(),
+                    CompOnsets = new List<decimal>(),
+                    PadsOnsets = new List<decimal>()
+                }
+            };
+        }
+
+        /// <summary>
+        /// Returns the "FunkSyncopated" groove preset.
+        /// Assumes 4/4 meter with 4 beats per bar.
+        /// Note: Funk often leans on steady 16th hats + backbeat + syncopated kick; ghost notes/accents come later.
+        /// </summary>
+        public static GroovePreset GetFunkSyncopated()
+        {
+            return new GroovePreset
+            {
+                Name = "FunkSyncopated",
+
+                AnchorLayer = new GrooveLayer
+                {
+                    // Backbeat anchors
+                    SnareOnsets = new List<decimal> { 2m, 4m },
+
+                    // 16th-note hat grid (base funk timekeeping)
+                    HatOnsets = new List<decimal>
+                    {
+                        1m, 1.25m, 1.5m, 1.75m,
+                        2m, 2.25m, 2.5m, 2.75m,
+                        3m, 3.25m, 3.5m, 3.75m,
+                        4m, 4.25m, 4.5m, 4.75m
+                    },
+
+                    // Syncopated kick (starter pattern; you'll permute heavily later)
+                    KickOnsets = new List<decimal> { 1m, 1.5m, 1.75m, 3m, 3.5m },
+
+                    // Bass follows the kick for a tight pocket
+                    BassOnsets = new List<decimal> { 1m, 1.5m, 1.75m, 3m, 3.5m },
+
+                    // Rhythm guitar comp often lives in 16th/offbeat space; keep it sparse initially
+                    CompOnsets = new List<decimal> { 1.5m, 2.5m, 3.5m, 4.5m },
+
+                    // Pads: minimal in classic funk; keep just the bar anchors
+                    PadsOnsets = new List<decimal> { 1m, 3m }
+                },
+
+                TensionLayer = new GrooveLayer
+                {
+                    KickOnsets = new List<decimal>(),
+                    SnareOnsets = new List<decimal>(),
+                    HatOnsets = new List<decimal>(),
+                    BassOnsets = new List<decimal>(),
+                    CompOnsets = new List<decimal>(),
+                    PadsOnsets = new List<decimal>()
+                }
+            };
+        }
+
+        /// <summary>
+        /// Returns the "HipHopBoomBap" groove preset.
+        /// Assumes 4/4 meter with 4 beats per bar.
+        /// Note: Boom bap commonly uses a strong backbeat with kick anchoring downbeats; swing/humanization is essential later.
+        /// </summary>
+        public static GroovePreset GetHipHopBoomBap()
+        {
+            return new GroovePreset
+            {
+                Name = "HipHopBoomBap",
+
+                AnchorLayer = new GrooveLayer
+                {
+                    // Core anchors (common starting point)
+                    KickOnsets = new List<decimal> { 1m, 3m },
+
+                    // Classic backbeat
+                    SnareOnsets = new List<decimal> { 2m, 4m },
+
+                    // Simple 8th hat scaffold (shuffle/swing can be applied later via timing variance)
+                    HatOnsets = new List<decimal>
+                    {
+                        1m, 1.5m, 2m, 2.5m, 3m, 3.5m, 4m, 4.5m
+                    },
+
+                    // Bass typically reinforces kick anchors
+                    BassOnsets = new List<decimal> { 1m, 3m },
+
+                    // Sparse comp/chops on offbeats
+                    CompOnsets = new List<decimal> { 2.5m, 4.5m },
+
+                    // Pads: slow bed
+                    PadsOnsets = new List<decimal> { 1m }
+                },
+
+                TensionLayer = new GrooveLayer
+                {
+                    KickOnsets = new List<decimal>(),
+                    SnareOnsets = new List<decimal>(),
+                    HatOnsets = new List<decimal>(),
+                    BassOnsets = new List<decimal>(),
+                    CompOnsets = new List<decimal>(),
+                    PadsOnsets = new List<decimal>()
+                }
+            };
+        }
+
+        /// <summary>
+        /// Returns the "JazzSwing" groove preset.
+        /// Assumes 4/4 meter with 4 beats per bar.
+        /// Note: Jazz swing is triplet-based; we approximate the ride pattern with triplet offsets.
+        /// </summary>
+        public static GroovePreset GetJazzSwing()
+        {
+            return new GroovePreset
+            {
+                Name = "JazzSwing",
+
+                AnchorLayer = new GrooveLayer
+                {
+                    // Feathering concept: light kick on all quarters (feel > loudness; velocity later)
+                    KickOnsets = new List<decimal> { 1m, 2m, 3m, 4m },
+
+                    // Jazz comping snare is not a strict backbeat; keep empty as a base scaffold
+                    SnareOnsets = new List<decimal>(),
+
+                    // Using HatOnsets to represent the *ride* swing pattern (no separate ride property exists).
+                    // "Ding (1), Ding (2), Da (2 + 2/3), Ding (3), Ding (4), Da (4 + 2/3)"
+                    HatOnsets = new List<decimal> { 1m, 2m, 2.6667m, 3m, 4m, 4.6667m },
+
+                    // Walking bass: quarters
+                    BassOnsets = new List<decimal> { 1m, 2m, 3m, 4m },
+
+                    // Comping (piano/guitar) tends to hit upbeats; keep a sparse baseline
+                    CompOnsets = new List<decimal> { 2.5m, 4.5m },
+
+                    // Pads: typically minimal; leave empty
+                    PadsOnsets = new List<decimal>()
+                },
+
+                TensionLayer = new GrooveLayer
+                {
+                    KickOnsets = new List<decimal>(),
+                    SnareOnsets = new List<decimal>(),
+                    HatOnsets = new List<decimal>(),
+                    BassOnsets = new List<decimal>(),
+                    CompOnsets = new List<decimal>(),
+                    PadsOnsets = new List<decimal>()
+                }
+            };
+        }
+
+        /// <summary>
+        /// Returns the "MetalDoubleKick" groove preset.
+        /// Assumes 4/4 meter with 4 beats per bar.
+        /// Note: This is a conservative "double-kick bed" (8ths) you can intensify later (16ths, blasts, etc.).
+        /// </summary>
+        public static GroovePreset GetMetalDoubleKick()
+        {
+            return new GroovePreset
+            {
+                Name = "MetalDoubleKick",
+
+                AnchorLayer = new GrooveLayer
+                {
+                    // Double-kick bed (8ths)
+                    KickOnsets = new List<decimal>
+                    {
+                        1m, 1.5m, 2m, 2.5m, 3m, 3.5m, 4m, 4.5m
+                    },
+
+                    // Backbeat anchors (common in many metal grooves; variations later)
+                    SnareOnsets = new List<decimal> { 2m, 4m },
+
+                    // Timekeeper (hat/ride) 8ths as a base scaffold
+                    HatOnsets = new List<decimal>
+                    {
+                        1m, 1.5m, 2m, 2.5m, 3m, 3.5m, 4m, 4.5m
+                    },
+
+                    // Bass locks to double-kick bed
+                    BassOnsets = new List<decimal>
+                    {
+                        1m, 1.5m, 2m, 2.5m, 3m, 3.5m, 4m, 4.5m
+                    },
+
+                    // Rhythm guitars often chug in 8ths/16ths; keep 8th offbeats for lock
+                    CompOnsets = new List<decimal> { 1.5m, 2.5m, 3.5m, 4.5m },
+
+                    // Pads: uncommon; leave empty
+                    PadsOnsets = new List<decimal>()
+                },
+
+                TensionLayer = new GrooveLayer
+                {
+                    KickOnsets = new List<decimal>(),
+                    SnareOnsets = new List<decimal>(),
+                    HatOnsets = new List<decimal>(),
+                    BassOnsets = new List<decimal>(),
+                    CompOnsets = new List<decimal>(),
+                    PadsOnsets = new List<decimal>()
+                }
+            };
+        }
+
+        /// <summary>
         /// Returns the "PopRockBasic" groove preset.
         /// Assumes 4/4 meter with 4 beats per bar.
         /// </summary>
@@ -12,34 +347,180 @@ namespace Music.Designer
             return new GroovePreset
             {
                 Name = "PopRockBasic",
-                
+
                 AnchorLayer = new GrooveLayer
                 {
                     // Kick on beats 1 and 3 (driving the downbeats)
                     KickOnsets = new List<decimal> { 1m, 3m },
-                    
+
                     // Snare on beats 2 and 4 (classic backbeat)
                     SnareOnsets = new List<decimal> { 2m, 4m },
-                    
+
                     // Hi-hat on 8th notes (1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5)
-                    HatOnsets = new List<decimal> 
-                    { 
-                        1m, 1.5m, 2m, 2.5m, 3m, 3.5m, 4m, 4.5m 
+                    HatOnsets = new List<decimal>
+                    {
+                        1m, 1.5m, 2m, 2.5m, 3m, 3.5m, 4m, 4.5m
                     },
-                    
+
                     // Bass locks to kick on 1 and 3, adds root movement
                     BassOnsets = new List<decimal> { 1m, 3m },
-                    
+
                     // Rhythm guitar on offbeat 8ths (typical pop/rock strumming)
                     CompOnsets = new List<decimal> { 1.5m, 2.5m, 3.5m, 4.5m },
-                    
+
                     // Pads on downbeats or half notes (sustained chords)
                     PadsOnsets = new List<decimal> { 1m, 3m }
                 },
-                
+
                 TensionLayer = new GrooveLayer
                 {
                     // Empty for now (disabled)
+                    KickOnsets = new List<decimal>(),
+                    SnareOnsets = new List<decimal>(),
+                    HatOnsets = new List<decimal>(),
+                    BassOnsets = new List<decimal>(),
+                    CompOnsets = new List<decimal>(),
+                    PadsOnsets = new List<decimal>()
+                }
+            };
+        }
+
+        /// <summary>
+        /// Returns the "ReggaeOneDrop" groove preset.
+        /// Assumes 4/4 meter with 4 beats per bar.
+        /// Note: One-drop places kick + snare on beat 3; beat 1 is intentionally empty ("dropped").
+        /// </summary>
+        public static GroovePreset GetReggaeOneDrop()
+        {
+            return new GroovePreset
+            {
+                Name = "ReggaeOneDrop",
+
+                AnchorLayer = new GrooveLayer
+                {
+                    // One-drop: kick on 3
+                    KickOnsets = new List<decimal> { 3m },
+
+                    // One-drop: snare/rimshot also on 3
+                    SnareOnsets = new List<decimal> { 3m },
+
+                    // Hat commonly holds steady subdivisions; use 8ths as base
+                    HatOnsets = new List<decimal>
+                    {
+                        1m, 1.5m, 2m, 2.5m, 3m, 3.5m, 4m, 4.5m
+                    },
+
+                    // Bass often anchors the phrase strongly (simple: 1 & 3)
+                    BassOnsets = new List<decimal> { 1m, 3m },
+
+                    // Skank guitar/keys tends to hit the offbeats
+                    CompOnsets = new List<decimal> { 1.5m, 2.5m, 3.5m, 4.5m },
+
+                    // Pads: sustained harmony
+                    PadsOnsets = new List<decimal> { 1m }
+                },
+
+                TensionLayer = new GrooveLayer
+                {
+                    KickOnsets = new List<decimal>(),
+                    SnareOnsets = new List<decimal>(),
+                    HatOnsets = new List<decimal>(),
+                    BassOnsets = new List<decimal>(),
+                    CompOnsets = new List<decimal>(),
+                    PadsOnsets = new List<decimal>()
+                }
+            };
+        }
+
+        /// <summary>
+        /// Returns the "ReggaetonDembow" groove preset.
+        /// Assumes 4/4 meter with 4 beats per bar.
+        /// Note: This is a minimal "dembow-style" scaffold using 16th-grid placements for the backbeat elements.
+        /// </summary>
+        public static GroovePreset GetReggaetonDembow()
+        {
+            return new GroovePreset
+            {
+                Name = "ReggaetonDembow",
+
+                AnchorLayer = new GrooveLayer
+                {
+                    // Foundation kick anchors
+                    KickOnsets = new List<decimal> { 1m, 3m },
+
+                    // Dembow-style backbeat elements:
+                    // - "last 1/16th of beats 1 and 3" => 1.75, 3.75
+                    // - "halfway through beats 2 and 4" => 2.5, 4.5
+                    SnareOnsets = new List<decimal> { 1.75m, 2.5m, 3.75m, 4.5m },
+
+                    // Hat: 8ths as a base (you'll add syncopation/rolls later)
+                    HatOnsets = new List<decimal>
+                    {
+                        1m, 1.5m, 2m, 2.5m, 3m, 3.5m, 4m, 4.5m
+                    },
+
+                    // Bass locks to kick anchors in a conservative base
+                    BassOnsets = new List<decimal> { 1m, 3m },
+
+                    // Comp often pushes offbeats; keep it simple
+                    CompOnsets = new List<decimal> { 1.5m, 2.5m, 3.5m, 4.5m },
+
+                    // Pads: bar anchor
+                    PadsOnsets = new List<decimal> { 1m }
+                },
+
+                TensionLayer = new GrooveLayer
+                {
+                    KickOnsets = new List<decimal>(),
+                    SnareOnsets = new List<decimal>(),
+                    HatOnsets = new List<decimal>(),
+                    BassOnsets = new List<decimal>(),
+                    CompOnsets = new List<decimal>(),
+                    PadsOnsets = new List<decimal>()
+                }
+            };
+        }
+
+        /// <summary>
+        /// Returns the "TrapModern" groove preset.
+        /// Assumes 4/4 meter with 4 beats per bar.
+        /// Note: Trap is commonly taught with a halftime backbone (snare on 3), with hats often running 16ths (plus rolls later).
+        /// </summary>
+        public static GroovePreset GetTrapModern()
+        {
+            return new GroovePreset
+            {
+                Name = "TrapModern",
+
+                AnchorLayer = new GrooveLayer
+                {
+                    // Simplest halftime backbone: snare/clap on 3
+                    SnareOnsets = new List<decimal> { 3m },
+
+                    // Sparse kick anchors (starter pattern)
+                    KickOnsets = new List<decimal> { 1m, 1.5m, 2.75m, 4m },
+
+                    // 16th hat grid as a base (rolls/tuplets later via permutation)
+                    HatOnsets = new List<decimal>
+                    {
+                        1m, 1.25m, 1.5m, 1.75m,
+                        2m, 2.25m, 2.5m, 2.75m,
+                        3m, 3.25m, 3.5m, 3.75m,
+                        4m, 4.25m, 4.5m, 4.75m
+                    },
+
+                    // 808/bass commonly follows kick rhythm
+                    BassOnsets = new List<decimal> { 1m, 1.5m, 2.75m, 4m },
+
+                    // Minimal melodic chops; keep offbeat pushes
+                    CompOnsets = new List<decimal> { 2.5m, 4.5m },
+
+                    // Pads: optional, keep minimal
+                    PadsOnsets = new List<decimal> { 1m }
+                },
+
+                TensionLayer = new GrooveLayer
+                {
                     KickOnsets = new List<decimal>(),
                     SnareOnsets = new List<decimal>(),
                     HatOnsets = new List<decimal>(),
@@ -57,9 +538,29 @@ namespace Music.Designer
         {
             return name.Trim() switch
             {
+                "BossaNovaBasic" => GetBossaNovaBasic(),
+                "CountryTrain" => GetCountryTrain(),
+                "DanceEDMFourOnFloor" => GetDanceEDMFourOnFloor(),
+                "FunkSyncopated" => GetFunkSyncopated(),
+                "HipHopBoomBap" => GetHipHopBoomBap(),
+                "JazzSwing" => GetJazzSwing(),
+                "MetalDoubleKick" => GetMetalDoubleKick(),
                 "PopRockBasic" => GetPopRockBasic(),
+                "ReggaeOneDrop" => GetReggaeOneDrop(),
+                "ReggaetonDembow" => GetReggaetonDembow(),
+                "TrapModern" => GetTrapModern(),
                 _ => null
             };
         }
     }
 }
+
+/*
+Potential missing groove capabilities (intentionally NOT added as properties per your instruction):
+- Swing/shuffle feel parameter (e.g., swing percentage) separate from onset positions (especially for BoomBap/Jazz/R&B/Neo-soul feels).
+- Multi-bar pattern length support (needed for many genre-defining clave/dembow variations, 2-bar phrases, call/response).
+- Explicit ride cymbal lane separate from hi-hat lane (Jazz especially).
+- Accent/velocity lanes (genre-defining dynamics: ghost notes in funk, train-beat accents, reggae rimshot vs snare, etc.).
+- Micro-timing/humanization constraints per genre (laid-back vs pushed, MPC swing, etc.).
+- Probability / density controls per instrument for controlled permutation while staying in-genre.
+*/

@@ -51,8 +51,9 @@ namespace Music.Writer.Generator
 
             try
             {
-                // Use the PopRockBasic groove preset from Designer
-                var groovePreset = GroovePresets.GetPopRockBasic();
+                // Use a groove preset from Designer
+                //var groovePreset = GroovePresets.GetPopRockBasic();
+                var groovePreset = GroovePresets.GetReggaeOneDrop();
 
                 // Generate all phrases using the Generate method (which includes drums)
                 var result = GrooveDrivenGenerator.Generate(
