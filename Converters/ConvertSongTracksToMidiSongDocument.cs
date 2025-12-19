@@ -23,17 +23,17 @@ namespace Music.Writer
             if (timeSignatureTimeline == null) throw new ArgumentNullException(nameof(timeSignatureTimeline));
 
             // Step 1 - convert songTracks to MIDI EVENTS - Absolute positions
-            var midiEventLists = ConvertSongTracksToMidiEventLists.Convert(songTracks);
+            var midiEventLists = ConvertSongTracksToMidiEvents.Convert(songTracks);
 
             // Step 2 - Merge midiEventLists lists that are for the same instrument
             // and integrate tempo and time signature events
-            var mergedMidiEventLists = MergeMidiEventListsByInstrument.Convert(
+            var mergedMidiEventLists = MergeMidiEventsByVoice.Convert(
                 midiEventLists,
                 tempoTimeline,
                 timeSignatureTimeline);
 
             // Step 3 - Execute merged timed notes to MIDI document
-            var midiDoc = ConvertMidiEventsToMidiSongDocument.Convert(mergedMidiEventLists);
+            var midiDoc = ConvertMetaMidiEventsToMidiSongDocument.Convert(mergedMidiEventLists);
 
             return midiDoc;
         }

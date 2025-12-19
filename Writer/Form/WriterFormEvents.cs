@@ -308,7 +308,7 @@ namespace Music.Writer
                 List<List<MetaMidiEvent>> midiEventLists;
                 try
                 {
-                    midiEventLists = ConvertMidiSongDocumentToMidiEventLists.Convert(midiDoc);
+                    midiEventLists = ConvertMidiSongDocumentToMidiEvents.Convert(midiDoc);
                 }
                 catch (NotSupportedException ex)
                 {
@@ -344,7 +344,7 @@ namespace Music.Writer
                 }
 
                 // Convert MetaMidiEvent lists to SongTrack objects, passing the source ticks per quarter note
-                var tracks = ConvertMidiEventListsToSongTracks.Convert(
+                var tracks = ConvertMetaMidiEventsToSongTracks.Convert(
                     midiEventLists,
                     midiInstruments,
                     ticksPerQuarterNote);
@@ -506,7 +506,7 @@ namespace Music.Writer
             List<SongTrackNoteEvent> notes;
             try
             {
-                notes = ConvertHarmonyEventToListOfPartNoteEvents.Convert(
+                notes = ConvertHarmonyEventToSongTrackNoteEvents.Convert(
                     harmonyEvent.Key,
                     harmonyEvent.Degree,
                     harmonyEvent.Quality,

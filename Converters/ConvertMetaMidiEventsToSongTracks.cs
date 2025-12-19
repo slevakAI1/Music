@@ -5,7 +5,7 @@ namespace Music.Writer
     /// <summary>
     /// Helper to convert lists of MetaMidiEvent objects to SongTrack objects.
     /// </summary>
-    internal static class ConvertMidiEventListsToSongTracks
+    internal static class ConvertMetaMidiEventsToSongTracks
     {
         /// <summary>
         /// Converts lists of MetaMidiEvent objects to SongTrack objects.

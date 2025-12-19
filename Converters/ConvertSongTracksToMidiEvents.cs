@@ -7,7 +7,7 @@ namespace Music.Writer
     /// This is stage 1 processing - creates NoteOn, NoteOff, and SequenceTrackName events only.
     /// Channel assignment and other processing happens in later stages.
     /// </summary>
-    public static class ConvertSongTracksToMidiEventLists
+    public static class ConvertSongTracksToMidiEvents
     {
         /// <summary>
         /// Converts a list of songTracks to lists of MIDI events (one list per songTrack).
@@ -75,14 +75,14 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Processes a chord note by expanding it to individual notes using ConvertHarmonyEventToListOfPartNoteEvents.
+        /// Processes a chord note by expanding it to individual notes using ConvertHarmonyEventToSongTrackNoteEvents.
         /// </summary>
         private static void ProcessChord(List<MetaMidiEvent> events, SongTrackNoteEvent songTrackNoteEvent)
         {
             var chord = songTrackNoteEvent.songTrackChord!;
 
-            // Use ConvertHarmonyEventToListOfPartNoteEvents to generate individual chord notes
-            var chordNotes = ConvertHarmonyEventToListOfPartNoteEvents.Convert(
+            // Use ConvertHarmonyEventToSongTrackNoteEvents to generate individual chord notes
+            var chordNotes = ConvertHarmonyEventToSongTrackNoteEvents.Convert(
                 chord.ChordKey!,
                 chord.ChordDegree!.Value,
                 chord.ChordQuality!,

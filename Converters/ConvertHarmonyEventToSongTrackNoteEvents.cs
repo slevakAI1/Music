@@ -9,7 +9,7 @@ namespace Music.Writer
     /// <summary>
     /// Converts HarmonyEvent objects to lists of SongTrackNoteEvent compatible with Writer.
     /// </summary>
-    public static class ConvertHarmonyEventToListOfPartNoteEvents
+    public static class ConvertHarmonyEventToSongTrackNoteEvents
     {
         /// <summary>
         /// Converts a HarmonyEvent to a list of notes representing the chord.
@@ -20,6 +20,11 @@ namespace Music.Writer
         /// <returns>A list of WriterNote objects representing the chord voicing.</returns>
         /// <exception cref="ArgumentNullException">When harmonyEvent is null.</exception>
         /// <exception cref="InvalidOperationException">When the chord cannot be constructed.</exception>
+        /// 
+
+
+        // TO DO - this should not have note durations - depend on what's calling it - find out
+
         public static List<SongTrackNoteEvent> Convert(HarmonyEvent harmonyEvent, int baseOctave = 4, int noteValue = 4)
         {
             if (harmonyEvent == null)

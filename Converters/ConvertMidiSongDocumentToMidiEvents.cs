@@ -8,7 +8,7 @@ namespace Music.Writer
     /// Each track in the MIDI file produces one List&lt;MetaMidiEvent&gt;.
     /// Handles conversion of DryWetMidi events to our domain MetaMidiEvent format.
     /// </summary>
-    public static class ConvertMidiSongDocumentToMidiEventLists
+    public static class ConvertMidiSongDocumentToMidiEvents
     {
         /// <summary>
         /// Converts all tracks in a MIDI document to lists of MetaMidiEvent objects.
