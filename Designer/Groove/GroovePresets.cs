@@ -386,6 +386,53 @@ namespace Music.Designer
         }
 
         /// <summary>
+        /// Returns the "RapBasic" groove preset.
+        /// Assumes 4/4 meter with 4 beats per bar.
+        /// Note: Conservative “rap” scaffold (boom-bap-ish backbone) intended for later swing/humanize + permutation.
+        /// </summary>
+        public static GroovePreset GetRapBasic()
+        {
+            return new GroovePreset
+            {
+                Name = "RapBasic",
+
+                AnchorLayer = new GrooveLayer
+                {
+                    // Solid downbeat + a couple common syncopation spots
+                    KickOnsets = new List<decimal> { 1m, 1.75m, 3m },
+
+                    // Classic backbeat (works for a lot of rap)
+                    SnareOnsets = new List<decimal> { 2m, 4m },
+
+                    // Simple timekeeper (add swing/rolls later via permutation)
+                    HatOnsets = new List<decimal>
+                    {
+                        1m, 1.5m, 2m, 2.5m, 3m, 3.5m, 4m, 4.5m
+                    },
+
+                    // Bass/808 follows the kick as a safe default
+                    BassOnsets = new List<decimal> { 1m, 1.75m, 3m },
+
+                    // Sparse chops/stabs
+                    CompOnsets = new List<decimal> { 2.5m, 4.5m },
+
+                    // Minimal pad anchor
+                    PadsOnsets = new List<decimal> { 1m }
+                },
+
+                TensionLayer = new GrooveLayer
+                {
+                    KickOnsets = new List<decimal>(),
+                    SnareOnsets = new List<decimal>(),
+                    HatOnsets = new List<decimal>(),
+                    BassOnsets = new List<decimal>(),
+                    CompOnsets = new List<decimal>(),
+                    PadsOnsets = new List<decimal>()
+                }
+            };
+        }
+
+        /// <summary>
         /// Returns the "ReggaeOneDrop" groove preset.
         /// Assumes 4/4 meter with 4 beats per bar.
         /// Note: One-drop places kick + snare on beat 3; beat 1 is intentionally empty ("dropped").
@@ -546,6 +593,7 @@ namespace Music.Designer
                 "JazzSwing" => GetJazzSwing(),
                 "MetalDoubleKick" => GetMetalDoubleKick(),
                 "PopRockBasic" => GetPopRockBasic(),
+                "RapBasic" => GetRapBasic(),
                 "ReggaeOneDrop" => GetReggaeOneDrop(),
                 "ReggaetonDembow" => GetReggaetonDembow(),
                 "TrapModern" => GetTrapModern(),
