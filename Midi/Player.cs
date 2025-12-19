@@ -7,9 +7,8 @@ namespace Music.MyMidi
     {
         /// <summary>
         /// Plays a MIDI document and releases the MIDI device after playback completes.
-        /// (Moved from WriterForm.PlayMidiFromPhrasesAsync)
         /// </summary>
-        internal static async Task PlayMidiFromPhrasesAsync(
+        internal static async Task PlayMidiFromSongTracksAsync(
             MidiPlaybackService playbackService,
             MidiSongDocument midiDoc)
         {

@@ -254,12 +254,12 @@ namespace Music.Writer
         // New Add button handler: add an empty phrase row and select it.
         private void btnAddPhrase_Click(object? sender, EventArgs e)
         {
-            _gridOperations.HandleAddPhrase(dgSong, _midiInstruments, ref phraseNumber);
+            _gridOperations.HandleAddSongTrack(dgSong, _midiInstruments, ref phraseNumber);
         }
 
         private void btnDeletePhrases_Click(object sender, EventArgs e)
         {
-            _gridOperations.HandleDeletePhrases(dgSong);
+            _gridOperations.HandleDeleteSongTracks(dgSong);
         }
 
         private void btnImport_Click(object sender, EventArgs e)

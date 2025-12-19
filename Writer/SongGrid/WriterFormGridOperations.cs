@@ -11,7 +11,7 @@ namespace Music.Writer
     {
         // ========== GRID ROW OPERATIONS ==========
 
-        public void HandleAddPhrase(
+        public void HandleAddSongTrack(
             DataGridView dgSong,
             List<MidiInstrument> midiInstruments,
             ref int phraseNumber)
@@ -41,7 +41,7 @@ namespace Music.Writer
             }
         }
 
-        public void HandleDeletePhrases(DataGridView dgSong)
+        public void HandleDeleteSongTracks(DataGridView dgSong)
         {
             if (dgSong.SelectedRows.Count == 0)
             {

@@ -129,7 +129,7 @@ namespace Music.Writer
                 tempoTimeline,
                 timeSignatureTimeline);
 
-            await Player.PlayMidiFromPhrasesAsync(midiPlaybackService, midiDoc);
+            await Player.PlayMidiFromSongTracksAsync(midiPlaybackService, midiDoc);
         }
 
         public static void HandleExport(
