@@ -23,24 +23,24 @@ namespace Music.Generator
             int noteOnVelocity = 100,
             bool isRest = false)
         {
-            var phraseNotes = new List<SongTrackNoteEvent>();
+            var SongTrackNoteEvents = new List<SongTrackNoteEvent>();
             int currentPosition = 0;
 
             for (int i = 0; i < repeatCount; i++)
             {
-                var phraseNote = new SongTrackNoteEvent(
+                var songTrackNoteEvent = new SongTrackNoteEvent(
                     noteNumber: noteNumber,
                     absolutePositionTicks: currentPosition,
                     noteDurationTicks: noteDurationTicks,
                     noteOnVelocity: noteOnVelocity,
                     isRest: isRest);
 
-                phraseNotes.Add(phraseNote);
+                SongTrackNoteEvents.Add(songTrackNoteEvent);
                 currentPosition += noteDurationTicks;
             }
 
-            var phrase = new SongTrack(phraseNotes);
-            return phrase;
+            var songTrack = new SongTrack(SongTrackNoteEvents);
+            return songTrack;
         }
     }
 }

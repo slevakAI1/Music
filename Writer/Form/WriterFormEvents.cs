@@ -352,7 +352,7 @@ namespace Music.Writer
                 // Add each phrase to the grid
                 foreach (var phrase in phrases)
                 {
-                    SongGridManager.AddPhraseToGrid(
+                    SongGridManager.AddSongTrackToGrid(
                         phrase,
                         midiInstruments,
                         dgSong,

@@ -23,7 +23,7 @@ namespace Music.Writer
             };
 
             // Use SongGridManager to initialize the row consistently with other adds.
-            SongGridManager.AddPhraseToGrid(emptyPhrase, midiInstruments, dgSong, ref phraseNumber);
+            SongGridManager.AddSongTrackToGrid(emptyPhrase, midiInstruments, dgSong, ref phraseNumber);
 
             // Select the newly added row (last row)
             if (dgSong.Rows.Count > SongGridManager.FIXED_ROWS_COUNT)

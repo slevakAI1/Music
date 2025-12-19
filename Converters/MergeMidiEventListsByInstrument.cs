@@ -37,7 +37,7 @@ namespace Music.Writer
                     tsEvent.Denominator));
             }
 
-            // Merge phrase events by program number
+            // Merge song track events by program number
             // FIXED: Get program number from each event list, not from individual events
             var grouped = midiEventLists
                 .Select((list, index) => new 

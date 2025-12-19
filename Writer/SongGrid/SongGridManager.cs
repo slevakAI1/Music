@@ -325,7 +325,7 @@ namespace Music.Writer
         /// <param name="midiInstruments">List of available MIDI instruments</param>
         /// <param name="dgSong">The DataGridView to add to</param>
         /// <param name="rowNumber">Reference to the row counter (will be incremented)</param>
-        internal static void AddPhraseToGrid(
+        internal static void AddSongTrackToGrid(
             SongTrack phrase,
             List<MidiInstrument> midiInstruments,
             DataGridView dgSong,

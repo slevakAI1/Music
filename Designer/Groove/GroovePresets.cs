@@ -458,7 +458,7 @@ namespace Music.Designer
                         1m, 1.5m, 2m, 2.5m, 3m, 3.5m, 4m, 4.5m
                     },
 
-                    // Bass often anchors the phrase strongly (simple: 1 & 3)
+                    // Bass often anchors the song track strongly (simple: 1 & 3)
                     BassOnsets = new List<decimal> { 1m, 3m },
 
                     // Skank guitar/keys tends to hit the offbeats

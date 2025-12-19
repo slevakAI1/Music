@@ -7,7 +7,7 @@ namespace Music.Generator
 {
     /// <summary>
     /// Command handler for the groove-driven generator test.
-    /// Replaces the fixed test generator with groove-based phrase generation.
+    /// Replaces the fixed test generator with groove-based song track generation.
     /// </summary>
     public static class CommandGrooveSyncTest
     {
@@ -18,7 +18,7 @@ namespace Music.Generator
         public static void HandleGrooveSyncTest(
             DataGridView dgSong,
             List<MidiInstrument> midiInstruments,
-            ref int phraseNumber,
+            ref int songTrackNumber,
             Form owner)
         {
             // Extract harmony timeline from the fixed harmony row
@@ -55,7 +55,7 @@ namespace Music.Generator
                 //var groovePreset = GroovePresets.GetPopRockBasic();
                 var groovePreset = GroovePresets.GetRapBasic();
 
-                // Generate all phrases using the Generate method (which includes drums)
+                // Generate all song tracks using the Generate method (which includes drums)
                 var result = GrooveDrivenGenerator.Generate(
                     harmonyTimeline,
                     timeSignatureTimeline,
@@ -63,28 +63,28 @@ namespace Music.Generator
 
                 int addedCount = 0;
 
-                // Add generated phrases to grid
+                // Add generated song tracks to grid
                 if (result.BassPhrase != null && result.BassPhrase.SongTrackNoteEvents.Count > 0)
                 {
-                    SongGridManager.AddPhraseToGrid(result.BassPhrase, midiInstruments, dgSong, ref phraseNumber);
+                    SongGridManager.AddSongTrackToGrid(result.BassPhrase, midiInstruments, dgSong, ref songTrackNumber);
                     addedCount++;
                 }
 
                 if (result.GuitarPhrase != null && result.GuitarPhrase.SongTrackNoteEvents.Count > 0)
                 {
-                    SongGridManager.AddPhraseToGrid(result.GuitarPhrase, midiInstruments, dgSong, ref phraseNumber);
+                    SongGridManager.AddSongTrackToGrid(result.GuitarPhrase, midiInstruments, dgSong, ref songTrackNumber);
                     addedCount++;
                 }
 
                 if (result.KeysPhrase != null && result.KeysPhrase.SongTrackNoteEvents.Count > 0)
                 {
-                    SongGridManager.AddPhraseToGrid(result.KeysPhrase, midiInstruments, dgSong, ref phraseNumber);
+                    SongGridManager.AddSongTrackToGrid(result.KeysPhrase, midiInstruments, dgSong, ref songTrackNumber);
                     addedCount++;
                 }
 
                 if (result.DrumPhrase != null && result.DrumPhrase.SongTrackNoteEvents.Count > 0)
                 {
-                    SongGridManager.AddPhraseToGrid(result.DrumPhrase, midiInstruments, dgSong, ref phraseNumber);
+                    SongGridManager.AddSongTrackToGrid(result.DrumPhrase, midiInstruments, dgSong, ref songTrackNumber);
                     addedCount++;
                 }
 

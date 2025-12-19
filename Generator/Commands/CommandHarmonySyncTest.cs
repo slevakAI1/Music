@@ -49,10 +49,10 @@ namespace Music.Generator
             var drumSetPhrase = CreateDrumSetPhrase(harmonyTimeline, timeSignatureTimeline);
 
             // Add phrases to the grid
-            SongGridManager.AddPhraseToGrid(rockOrganPhrase, midiInstruments, dgSong, ref phraseNumber);
-            SongGridManager.AddPhraseToGrid(electricGuitarPhrase, midiInstruments, dgSong, ref phraseNumber);
-            SongGridManager.AddPhraseToGrid(electricBassPhrase, midiInstruments, dgSong, ref phraseNumber);
-            SongGridManager.AddPhraseToGrid(drumSetPhrase, midiInstruments, dgSong, ref phraseNumber);
+            SongGridManager.AddSongTrackToGrid(rockOrganPhrase, midiInstruments, dgSong, ref phraseNumber);
+            SongGridManager.AddSongTrackToGrid(electricGuitarPhrase, midiInstruments, dgSong, ref phraseNumber);
+            SongGridManager.AddSongTrackToGrid(electricBassPhrase, midiInstruments, dgSong, ref phraseNumber);
+            SongGridManager.AddSongTrackToGrid(drumSetPhrase, midiInstruments, dgSong, ref phraseNumber);
 
             MessageBox.Show(owner,
                 "Successfully created 4 synchronized phrases based on harmony timeline.",

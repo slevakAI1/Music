@@ -1,7 +1,7 @@
 namespace Music.Writer
 {
     /// <summary>
-    /// Represents a musical phrase for composition and MIDI generation.
+    /// Represents a song track for composition and MIDI generation.
     /// 
     /// A SongTrack encapsulates a sequence of musical events (notes, chords, rests) for a single instrument or part.
     /// It is designed to support flexible music writing, including overlapping notes and chords, and serves as the
@@ -18,9 +18,9 @@ namespace Music.Writer
 
         public List<SongTrackNoteEvent> SongTrackNoteEvents { get; set; } = new();
 
-        public SongTrack(List<SongTrackNoteEvent> phraseNotes)
+        public SongTrack(List<SongTrackNoteEvent> songTrackNoteEvent)
         {
-            SongTrackNoteEvents = phraseNotes;
+            SongTrackNoteEvents = songTrackNoteEvent;
         }
     }
 

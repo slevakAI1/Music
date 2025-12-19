@@ -52,22 +52,22 @@ namespace Music.Writer
             events.Add(programChangeEvent);
 
             // Process each note in the songTrack
-            foreach (var phraseNote in songTrack.SongTrackNoteEvents ?? Enumerable.Empty<SongTrackNoteEvent>())
+            foreach (var songTrackNoteEvent in songTrack.SongTrackNoteEvents ?? Enumerable.Empty<SongTrackNoteEvent>())
             {
-                if (phraseNote.IsRest)
+                if (songTrackNoteEvent.IsRest)
                 {
                     // Rests don't create MIDI events, timing is already handled by AbsolutePositionTicks
                     continue;
                 }
 
                 // Check if this note is part of a chord that needs expansion
-                if (phraseNote.songTrackChord != null && phraseNote.songTrackChord.IsChord)
+                if (songTrackNoteEvent.songTrackChord != null && songTrackNoteEvent.songTrackChord.IsChord)
                 {
-                    ProcessChord(events, phraseNote);
+                    ProcessChord(events, songTrackNoteEvent);
                 }
                 else
                 {
-                    ProcessSingleNote(events, phraseNote);
+                    ProcessSingleNote(events, songTrackNoteEvent);
                 }
             }
 
@@ -77,9 +77,9 @@ namespace Music.Writer
         /// <summary>
         /// Processes a chord note by expanding it to individual notes using ConvertHarmonyEventToListOfPartNoteEvents.
         /// </summary>
-        private static void ProcessChord(List<MetaMidiEvent> events, SongTrackNoteEvent phraseNote)
+        private static void ProcessChord(List<MetaMidiEvent> events, SongTrackNoteEvent songTrackNoteEvent)
         {
-            var chord = phraseNote.songTrackChord!;
+            var chord = songTrackNoteEvent.songTrackChord!;
 
             // Use ConvertHarmonyEventToListOfPartNoteEvents to generate individual chord notes
             var chordNotes = ConvertHarmonyEventToListOfPartNoteEvents.Convert(
@@ -87,8 +87,8 @@ namespace Music.Writer
                 chord.ChordDegree!.Value,
                 chord.ChordQuality!,
                 chord.ChordBase!,
-                baseOctave: phraseNote.Octave,
-                noteValue: phraseNote.Duration);
+                baseOctave: songTrackNoteEvent.Octave,
+                noteValue: songTrackNoteEvent.Duration);
 
             // Create NoteOn and NoteOff events for all chord notes
             foreach (var cn in chordNotes)
@@ -97,15 +97,15 @@ namespace Music.Writer
 
                 // NoteOn at the songTrack note's absolute position
                 var noteOnEvent = MetaMidiEvent.CreateNoteOn(
-                    phraseNote.AbsolutePositionTicks, 
+                    songTrackNoteEvent.AbsolutePositionTicks, 
                     0, 
                     noteNumber, 
-                    phraseNote.NoteOnVelocity);
+                    songTrackNoteEvent.NoteOnVelocity);
                 noteOnEvent.Parameters.Remove("Channel");
                 events.Add(noteOnEvent);
 
                 // NoteOff at absolute position + duration
-                long noteOffTime = phraseNote.AbsolutePositionTicks + phraseNote.NoteDurationTicks;
+                long noteOffTime = songTrackNoteEvent.AbsolutePositionTicks + songTrackNoteEvent.NoteDurationTicks;
                 var noteOffEvent = MetaMidiEvent.CreateNoteOff(noteOffTime, 0, noteNumber, 0);
                 noteOffEvent.Parameters.Remove("Channel");
                 events.Add(noteOffEvent);
@@ -115,20 +115,20 @@ namespace Music.Writer
         /// <summary>
         /// Processes a single note event.
         /// </summary>
-        private static void ProcessSingleNote(List<MetaMidiEvent> events, SongTrackNoteEvent phraseNote)
+        private static void ProcessSingleNote(List<MetaMidiEvent> events, SongTrackNoteEvent songTrackNoteEvent)
         {
             // Create NoteOn event at the note's absolute position
             var noteOnEvent = MetaMidiEvent.CreateNoteOn(
-                phraseNote.AbsolutePositionTicks, 
+                songTrackNoteEvent.AbsolutePositionTicks, 
                 0, 
-                phraseNote.NoteNumber, 
-                phraseNote.NoteOnVelocity);
+                songTrackNoteEvent.NoteNumber, 
+                songTrackNoteEvent.NoteOnVelocity);
             noteOnEvent.Parameters.Remove("Channel");
             events.Add(noteOnEvent);
 
             // Create NoteOff event at absolute position + duration
-            long noteOffTime = phraseNote.AbsolutePositionTicks + phraseNote.NoteDurationTicks;
-            var noteOffEvent = MetaMidiEvent.CreateNoteOff(noteOffTime, 0, phraseNote.NoteNumber, 0);
+            long noteOffTime = songTrackNoteEvent.AbsolutePositionTicks + songTrackNoteEvent.NoteDurationTicks;
+            var noteOffEvent = MetaMidiEvent.CreateNoteOff(noteOffTime, 0, songTrackNoteEvent.NoteNumber, 0);
             noteOffEvent.Parameters.Remove("Channel");
             events.Add(noteOffEvent);
         }
