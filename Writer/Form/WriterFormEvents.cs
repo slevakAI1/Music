@@ -67,7 +67,7 @@ namespace Music.Writer
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
                     MessageBoxHelper.Show(
-                        $"No phrase data for row #{eventNumber}. Please add or assign a phrase before playing.",
+                        $"No track data for row #{eventNumber}. Please add or assign a track before playing.",
                         "Missing Track",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
@@ -79,7 +79,7 @@ namespace Music.Writer
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
                     MessageBoxHelper.Show(
-                        $"No phrase data for row #{eventNumber}. Please add or assign a phrase before playing.",
+                        $"No phrase data for row #{eventNumber}. Please add or assign a track before playing.",
                         "Missing Track",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
@@ -119,7 +119,7 @@ namespace Music.Writer
             // Verify we actually have songTracks to play
             if (songTracks.Count == 0)
             {
-                MessageBoxHelper.Show("No valid phrase events selected to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show("No valid track events selected to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -173,7 +173,7 @@ namespace Music.Writer
             }
 
             // Build list of SongTrack from all selected songTrack rows (skip fixed rows)
-            var phrases = new List<SongTrack>();
+            var tracks = new List<SongTrack>();
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
                 // Skip fixed rows - they contain control line data, not songTracks
@@ -184,24 +184,24 @@ namespace Music.Writer
                 var dataObj = selectedRow.Cells["colData"].Value;
                 
                 // Validate that it's actually a SongTrack object (not null or wrong type)
-                if (dataObj is not SongTrack phrase)
+                if (dataObj is not SongTrack track)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
                     MessageBoxHelper.Show(
-                        $"No phrase data for row #{eventNumber}. Please add or assign a phrase before exporting.",
-                        "Missing Phrase",
+                        $"No track data for row #{eventNumber}. Please add or assign a track before exporting.",
+                        "Missing Track",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
                     return; // Abort export
                 }
 
                 // Validate songTrack has notes
-                if (phrase.SongTrackNoteEvents.Count == 0)
+                if (track.SongTrackNoteEvents.Count == 0)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
                     MessageBoxHelper.Show(
-                        $"No phrase data for row #{eventNumber}. Please add or assign a phrase before exporting.",
-                        "Missing Phrase",
+                        $"No track data for row #{eventNumber}. Please add or assign a track before exporting.",
+                        "Missing Track",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
                     return; // Abort export
@@ -233,14 +233,14 @@ namespace Music.Writer
                 }
 
                 // Preserve drum track indicator (255) or use selected program number
-                phrase.MidiProgramNumber = (byte)programNumber;
-                phrases.Add(phrase);
+                track.MidiProgramNumber = (byte)programNumber;
+                tracks.Add(track);
             }
 
             // Verify we actually have songTracks to export
-            if (phrases.Count == 0)
+            if (tracks.Count == 0)
             {
-                MessageBoxHelper.Show("No valid phrase events selected to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show("No valid tracks selected to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -259,7 +259,7 @@ namespace Music.Writer
             {
                 // Consolidated conversion: songTracks -> midi document with tempo and time signature timelines
                 var midiDoc = ConvertSongTracksToMidiSongDocument.Convert(
-                    phrases,
+                    tracks,
                     tempoTimeline,
                     timeSignatureTimeline);
 
