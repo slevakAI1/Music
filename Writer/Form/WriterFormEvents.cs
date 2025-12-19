@@ -79,7 +79,7 @@ namespace Music.Writer
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
                     MessageBoxHelper.Show(
-                        $"No phrase data for row #{eventNumber}. Please add or assign a track before playing.",
+                        $"No track data for row #{eventNumber}. Please add or assign a track before playing.",
                         "Missing Track",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
@@ -144,11 +144,11 @@ namespace Music.Writer
             }
 
             // Check if a songTrack row is selected
-            var hasPhraseSelection = dgSong.SelectedRows
+            var hasTrackSelection = dgSong.SelectedRows
                 .Cast<DataGridViewRow>()
                 .Any(r => r.Index >= SongGridManager.FIXED_ROWS_COUNT);
 
-            if (!hasPhraseSelection)
+            if (!hasTrackSelection)
             {
                 MessageBoxHelper.Show("Please select a pitch event to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -282,7 +282,7 @@ namespace Music.Writer
             DataGridView dgSong,
             MidiIoService midiIoService,
             List<MidiInstrument> midiInstruments,
-            ref int phraseNumber)
+            ref int trackNumber)
         {
             using var ofd = new OpenFileDialog
             {
@@ -344,23 +344,23 @@ namespace Music.Writer
                 }
 
                 // Convert MetaMidiEvent lists to SongTrack objects, passing the source ticks per quarter note
-                var phrases = ConvertMidiEventListsToSongTracks.Convert(
+                var tracks = ConvertMidiEventListsToSongTracks.Convert(
                     midiEventLists,
                     midiInstruments,
                     ticksPerQuarterNote);
 
                 // Add each songTrack to the grid
-                foreach (var phrase in phrases)
+                foreach (var track in tracks)
                 {
                     SongGridManager.AddSongTrackToGrid(
-                        phrase,
+                        track,
                         midiInstruments,
                         dgSong,
-                        ref phraseNumber);
+                        ref trackNumber);
                 }
 
                 MessageBoxHelper.Show(
-                    $"Successfully imported {phrases.Count} track(s) from:\n{Path.GetFileName(ofd.FileName)}",
+                    $"Successfully imported {tracks.Count} track(s) from:\n{Path.GetFileName(ofd.FileName)}",
                     "Import Successful",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
@@ -578,24 +578,24 @@ namespace Music.Writer
                 return;
 
             var row = dgSong.Rows[e.RowIndex];
-            var phraseData = row.Cells["colData"].Value;
+            var trackData = row.Cells["colData"].Value;
 
             // Validate that we have a SongTrack object
-            if (phraseData is not SongTrack phrase)
+            if (trackData is not SongTrack songTrack)
             {
                 MessageBoxHelper.Show(
-                    "No phrase data available for this row.",
-                    "View Phrase",
+                    "No track data available for this row.",
+                    "View Track",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
                 return;
             }
 
             // Get the songTrack number for the dialog title
-            var phraseNumber = row.Cells["colEventNumber"].Value?.ToString() ?? (e.RowIndex + 1).ToString();
+            var trackNumber = row.Cells["colEventNumber"].Value?.ToString() ?? (e.RowIndex + 1).ToString();
 
             // Open the JSON viewer dialog
-            using var viewer = new PartJsonViewer(phrase, phraseNumber);
+            using var viewer = new SongTrackViewer(songTrack, trackNumber);
             viewer.ShowDialog();
         }
     }

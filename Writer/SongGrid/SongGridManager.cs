@@ -195,7 +195,7 @@ namespace Music.Writer
                 return;
 
             var row = dgSong.Rows[rowIndex];
-            var phrase = row.Cells["colData"].Value as SongTrack;
+            var track = row.Cells["colData"].Value as SongTrack;
 
             // Clear existing measure cells first
             for (int colIndex = MEASURE_START_COLUMN_INDEX; colIndex < dgSong.Columns.Count; colIndex++)
@@ -203,14 +203,14 @@ namespace Music.Writer
                 row.Cells[colIndex].Value = string.Empty;
             }
 
-            if (phrase == null || phrase.SongTrackNoteEvents.Count == 0)
+            if (track == null || track.SongTrackNoteEvents.Count == 0)
                 return;
 
             // Calculate ticks per measure (4/4 time: 4 quarter notes per measure)
             int ticksPerMeasure = MusicConstants.TicksPerQuarterNote * 4;
 
             // Group notes by measure based on their absolute position
-            var notesByMeasure = phrase.SongTrackNoteEvents
+            var notesByMeasure = track.SongTrackNoteEvents
                 .GroupBy(note => note.AbsolutePositionTicks / ticksPerMeasure)
                 .OrderBy(g => g.Key)
                 .ToList();
@@ -252,7 +252,7 @@ namespace Music.Writer
 
         /// <summary>
         /// Clears the measure display cells (columns MEASURE_START_COLUMN_INDEX and onward) for the specified row.
-        /// Safe to call for both fixed rows and phrase rows.
+        /// Safe to call for both fixed rows and track rows.
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
         /// <param name="rowIndex">Row index whose measure cells should be cleared</param>
@@ -302,7 +302,7 @@ namespace Music.Writer
             var cellValue = row.Cells["colData"].Value;
 
             // Check if the hidden data cell contains a SongTrack object
-            if (cellValue is SongTrack phrase)
+            if (cellValue is SongTrack songTrack)
             {
                 // Get the selected instrument name
                 var selectedInstrumentName = row.Cells["colType"].FormattedValue?.ToString();
@@ -310,7 +310,7 @@ namespace Music.Writer
                 if (!string.IsNullOrEmpty(selectedInstrumentName))
                 {
                     // Update the SongTrack object's MidiProgramName property
-                    phrase.MidiProgramName = selectedInstrumentName;
+                    songTrack.MidiProgramName = selectedInstrumentName;
 
                     // Optionally update the description column to reflect the change
                     row.Cells["colDescription"].Value = $"Part: {selectedInstrumentName}";
@@ -319,14 +319,14 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Adds a phrase to the phrase grid with instrument information from the phrase itself.
+        /// Adds a track to the song grid with instrument information from the track itself.
         /// </summary>
-        /// <param name="phrase">The phrase to add</param>
+        /// <param name="track">The track to add</param>
         /// <param name="midiInstruments">List of available MIDI instruments</param>
         /// <param name="dgSong">The DataGridView to add to</param>
         /// <param name="rowNumber">Reference to the row counter (will be incremented)</param>
         internal static void AddSongTrackToGrid(
-            SongTrack phrase,
+            SongTrack track,
             List<MidiInstrument> midiInstruments,
             DataGridView dgSong,
             ref int rowNumber)
@@ -335,8 +335,8 @@ namespace Music.Writer
             rowNumber++;
             var rowName = rowNumber.ToString();
 
-            // Get part name from the phrase
-            var partName = phrase.MidiProgramName ?? "Select...";
+            // Get part name from the track
+            var voiceName = track.MidiProgramName ?? "Select...";
 
             // Add new row
             int newRowIndex = dgSong.Rows.Add();
@@ -355,14 +355,14 @@ namespace Music.Writer
             row.Cells["colType"] = comboBoxCell;
 
             // Column 1: Hidden data (SongTrack object)
-            row.Cells["colData"].Value = phrase;
+            row.Cells["colData"].Value = track;
 
             // Set MIDI Instrument dropdown value
             int programNumberToSet = -1;
 
-            if (phrase.MidiProgramNumber <= 127 || phrase.MidiProgramNumber == 255)
+            if (track.MidiProgramNumber <= 127 || track.MidiProgramNumber == 255)
             {
-                programNumberToSet = phrase.MidiProgramNumber;
+                programNumberToSet = track.MidiProgramNumber;
             }
 
             row.Cells["colType"].Value = programNumberToSet;
@@ -371,9 +371,9 @@ namespace Music.Writer
             row.Cells["colEventNumber"].Value = rowName;
 
             // Column 3: Description
-            if (!string.IsNullOrEmpty(partName) && partName != "Select...")
+            if (!string.IsNullOrEmpty(voiceName) && voiceName != "Select...")
             {
-                row.Cells["colDescription"].Value = $"Part: {partName}";
+                row.Cells["colDescription"].Value = $"Part: {voiceName}";
             }
             else
             {

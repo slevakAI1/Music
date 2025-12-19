@@ -3,21 +3,21 @@ namespace Music.Writer
     /// <summary>
     /// A modal dialog that displays a SongTrack object as formatted JSON.
     /// </summary>
-    public class PartJsonViewer : Form
+    public class SongTrackViewer : Form
     {
         private TextBox txtJson;
         private Button btnClose;
 
-        public PartJsonViewer(SongTrack phrase, string phraseNumber)
+        public SongTrackViewer(SongTrack track, string trackNumber)
         {
-            InitializeComponents(phraseNumber);
-            LoadPhraseData(phrase);
+            InitializeComponents(trackNumber);
+            LoadTrackData(track);
         }
 
-        private void InitializeComponents(string phraseNumber)
+        private void InitializeComponents(string trackNumber)
         {
             // Form settings
-            this.Text = $"Part Viewer - #{phraseNumber}";
+            this.Text = $"Part Viewer - #{trackNumber}";
             this.Size = new Size(800, 600);
             this.StartPosition = FormStartPosition.CenterParent;
             this.FormBorderStyle = FormBorderStyle.Sizable;
@@ -71,12 +71,12 @@ namespace Music.Writer
             this.Controls.Add(buttonPanel);
         }
 
-        private void LoadPhraseData(SongTrack phrase)
+        private void LoadTrackData(SongTrack track)
         {
             try
             {
                 // Use the existing Helpers.Json method to convert to JSON
-                string json = ObjectViewer.Json(phrase);
+                string json = ObjectViewer.Json(track);
                 txtJson.Text = json;
             }
             catch (Exception ex)
