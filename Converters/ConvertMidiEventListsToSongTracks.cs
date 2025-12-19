@@ -9,7 +9,7 @@ namespace Music.Writer
     {
         /// <summary>
         /// Converts lists of MetaMidiEvent objects to SongTrack objects.
-        /// Splits tracks by program changes - each program change segment becomes a separate phrase.
+        /// Splits tracks by program changes - each program change segment becomes a separate songTrack.
         /// </summary>
         /// <param name="midiEventLists">Lists of MetaMidiEvent objects, one per track</param>
         /// <param name="midiInstruments">Available MIDI instruments for name lookup</param>
@@ -19,7 +19,7 @@ namespace Music.Writer
             List<MidiInstrument> midiInstruments,
             short sourceTicksPerQuarterNote)
         {
-            var phrases = new List<SongTrack>();
+            var songTracks = new List<SongTrack>();
 
             foreach (var midiEventList in midiEventLists)
             {
@@ -28,8 +28,8 @@ namespace Music.Writer
 
                 foreach (var segment in segmentedEvents)
                 {
-                    var phraseNotes = new List<SongTrackNoteEvent>();
-                    var phrase = new SongTrack(phraseNotes);
+                    var songTrackNoteEvents = new List<SongTrackNoteEvent>();
+                    var songTrack = new SongTrack(songTrackNoteEvents);
 
                     // Get instrument info from this segment's program change
                     var programChangeEvent = segment.Events
@@ -43,24 +43,24 @@ namespace Music.Writer
                     if (isDrumTrack)
                     {
                         // Drums use channel 10 (index 9) and don't have program changes
-                        phrase.MidiProgramNumber = 255; // Sentinel value for drums
-                        phrase.MidiProgramName = "Drum Set";
+                        songTrack.MidiProgramNumber = 255; // Sentinel value for drums
+                        songTrack.MidiProgramName = "Drum Set";
                     }
                     else if (programChangeEvent != null &&
                              programChangeEvent.Parameters.TryGetValue("Program", out var programObj))
                     {
                         int programNumber = System.Convert.ToInt32(programObj);
-                        phrase.MidiProgramNumber = programNumber;
+                        songTrack.MidiProgramNumber = programNumber;
 
                         var instrument = midiInstruments
                             .FirstOrDefault(i => i.ProgramNumber == programNumber);
-                        phrase.MidiProgramName = instrument?.Name ?? $"Program {programNumber}";
+                        songTrack.MidiProgramName = instrument?.Name ?? $"Program {programNumber}";
                     }
                     else
                     {
                         // No program change found - use default
-                        phrase.MidiProgramNumber = 0;
-                        phrase.MidiProgramName = "Acoustic Grand Piano";
+                        songTrack.MidiProgramNumber = 0;
+                        songTrack.MidiProgramName = "Acoustic Grand Piano";
                     }
 
                     // Calculate tick scaling factor
@@ -84,7 +84,7 @@ namespace Music.Writer
                             {
                                 if (noteOnEvents.TryGetValue(noteNumber, out var noteOnEvent))
                                 {
-                                    CreatePhraseNoteFromPair(noteOnEvent, midiEvent, phraseNotes, tickScale);
+                                    CreateSongTrackNoteFromPair(noteOnEvent, midiEvent, songTrackNoteEvents, tickScale);
                                     noteOnEvents.Remove(noteNumber);
                                 }
                             }
@@ -102,21 +102,21 @@ namespace Music.Writer
 
                             if (noteOnEvents.TryGetValue(noteNumber, out var noteOnEvent))
                             {
-                                CreatePhraseNoteFromPair(noteOnEvent, midiEvent, phraseNotes, tickScale);
+                                CreateSongTrackNoteFromPair(noteOnEvent, midiEvent, songTrackNoteEvents, tickScale);
                                 noteOnEvents.Remove(noteNumber);
                             }
                         }
                     }
 
-                    // Only add phrase if it has notes
-                    if (phraseNotes.Count > 0)
+                    // Only add songTrack if it has notes
+                    if (songTrackNoteEvents.Count > 0)
                     {
-                        phrases.Add(phrase);
+                        songTracks.Add(songTrack);
                     }
                 }
             }
 
-            return phrases;
+            return songTracks;
         }
 
         /// <summary>
@@ -165,12 +165,12 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Creates a SongTrackNoteEvent from a NoteOn/NoteOff event pair.
+        /// Creates a songTrackNoteEvent from a NoteOn/NoteOff event pair.
         /// </summary>
-        private static void CreatePhraseNoteFromPair(
+        private static void CreateSongTrackNoteFromPair(
             MetaMidiEvent noteOnEvent,
             MetaMidiEvent noteOffEvent,
-            List<SongTrackNoteEvent> phraseNotes,
+            List<SongTrackNoteEvent> songTrackNotes,
             double tickScale)
         {
             if (!noteOnEvent.Parameters.TryGetValue("NoteNumber", out var noteNumObj) ||
@@ -186,14 +186,14 @@ namespace Music.Writer
             if (noteDurationTicks < 1)
                 noteDurationTicks = 1;
 
-            var phraseNote = new SongTrackNoteEvent(
+            var songTrackNoteEvent = new SongTrackNoteEvent(
                 noteNumber,
                 absolutePositionTicks,
                 noteDurationTicks,
                 velocity,
                 isRest: false);
 
-            phraseNotes.Add(phraseNote);
+            songTrackNotes.Add(songTrackNoteEvent);
         }
     }
 }

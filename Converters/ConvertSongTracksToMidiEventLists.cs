@@ -10,49 +10,49 @@ namespace Music.Writer
     public static class ConvertSongTracksToMidiEventLists
     {
         /// <summary>
-        /// Converts a list of phrases to lists of MIDI events (one list per phrase).
-        /// Each phrase is processed independently with its own event list.
+        /// Converts a list of songTracks to lists of MIDI events (one list per songTrack).
+        /// Each songTrack is processed independently with its own event list.
         /// </summary>
-        /// <param name="phrases">List of phrases to convert</param>
+        /// <param name="songTracks">List of songTracks to convert</param>
         /// <param name="ticksPerQuarterNote">MIDI time resolution (default 480 ticks per quarter note)</param>
-        /// <returns>List of MetaMidiEvent lists, one per input phrase</returns>
+        /// <returns>List of MetaMidiEvent lists, one per input song track</returns>
         public static List<List<MetaMidiEvent>> Convert(
-            List<SongTrack> phrases)
+            List<SongTrack> songTracks)
         {
-            if (phrases == null)
-                throw new ArgumentNullException(nameof(phrases));
+            if (songTracks == null)
+                throw new ArgumentNullException(nameof(songTracks));
 
             var result = new List<List<MetaMidiEvent>>();
-            foreach (var phrase in phrases)
+            foreach (var songTrack in songTracks)
             {
-                result.Add(ConvertSinglePhrase(phrase));
+                result.Add(ConvertSingleSongTrack(songTrack));
             }
 
             return result;
         }
 
         /// <summary>
-        /// Converts a single phrase to a list of MIDI events with absolute time positioning.
+        /// Converts a single songTrack to a list of MIDI events with absolute time positioning.
         /// </summary>
-        private static List<MetaMidiEvent> ConvertSinglePhrase(SongTrack phrase)
+        private static List<MetaMidiEvent> ConvertSingleSongTrack(SongTrack songTrack)
         {
             var events = new List<MetaMidiEvent>();
 
             // Add track name event at the beginning (using instrument name)
-            var trackName = string.IsNullOrWhiteSpace(phrase.MidiProgramName) 
+            var trackName = string.IsNullOrWhiteSpace(songTrack.MidiProgramName) 
                 ? "Unnamed Track" 
-                : phrase.MidiProgramName;
+                : songTrack.MidiProgramName;
             events.Add(MetaMidiEvent.CreateSequenceTrackName(0, trackName));
 
             // Add program change event at the beginning to set the instrument
             // Channel is null and will be assigned in Phase 2
-            var programChangeEvent = MetaMidiEvent.CreateProgramChange(0, 0, phrase.MidiProgramNumber);
+            var programChangeEvent = MetaMidiEvent.CreateProgramChange(0, 0, songTrack.MidiProgramNumber);
             // Remove the channel parameter temporarily (will be assigned in Phase 2)
             programChangeEvent.Parameters.Remove("Channel");
             events.Add(programChangeEvent);
 
-            // Process each note in the phrase
-            foreach (var phraseNote in phrase.SongTrackNoteEvents ?? Enumerable.Empty<SongTrackNoteEvent>())
+            // Process each note in the songTrack
+            foreach (var phraseNote in songTrack.SongTrackNoteEvents ?? Enumerable.Empty<SongTrackNoteEvent>())
             {
                 if (phraseNote.IsRest)
                 {
@@ -95,7 +95,7 @@ namespace Music.Writer
             {
                 var noteNumber = CalculateMidiNoteNumber(cn.Step, cn.Alter, cn.Octave);
 
-                // NoteOn at the phrase note's absolute position
+                // NoteOn at the songTrack note's absolute position
                 var noteOnEvent = MetaMidiEvent.CreateNoteOn(
                     phraseNote.AbsolutePositionTicks, 
                     0, 
