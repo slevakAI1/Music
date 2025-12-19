@@ -1,11 +1,31 @@
 ﻿namespace Music.Writer
 {
-    // Converted helper into a partial class so it can access designer controls directly
-    public partial class WriterForm
+    // Converted helper into a separate class that receives control references as parameters
+    public class WriterFormTransform
     {
         // Capture current control values into a class object.
-        // No form parameter required because this is now a partial of Writer.
-        public WriterFormData CaptureFormData()
+        public WriterFormData CaptureFormData(
+            ComboBox? cbCommand,
+            CheckedListBox? clbParts,
+            CheckedListBox? clbStaffs,
+            RadioButton rbIsRest,
+            RadioButton rbChord,
+            ComboBox? cbStep,
+            RadioButton? rbPitchAbsolute,
+            RadioButton? rbPitchKeyRelative,
+            ComboBox? cbAccidental,
+            NumericUpDown? numOctaveAbs,
+            NumericUpDown? numDegree,
+            ComboBox? cbChordKey,
+            NumericUpDown? numChordDegree,
+            ComboBox? cbChordQuality,
+            ComboBox? cbChordBase,
+            ComboBox? cbNoteValue,
+            NumericUpDown numDots,
+            TextBox? txtTupletNumber,
+            NumericUpDown? numTupletCount,
+            NumericUpDown? numTupletOf,
+            NumericUpDown? numNumberOfNotes)
         {
             // Capture parts items and their checked state into a dictionary
             var partsState = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -93,9 +113,30 @@
             return data;
         }
 
-        // Apply a WriterData object back to the private form controls.
-        // No form parameter required because this is a partial of Writer.
-        public void ApplyFormData(WriterFormData data)
+        // Apply a WriterData object back to the form controls.
+        public void ApplyFormData(
+            WriterFormData? data,
+            ComboBox? cbCommand,
+            CheckedListBox? clbParts,
+            CheckedListBox? clbStaffs,
+            RadioButton rbIsRest,
+            RadioButton rbChord,
+            ComboBox? cbStep,
+            RadioButton? rbPitchAbsolute,
+            RadioButton? rbPitchKeyRelative,
+            ComboBox? cbAccidental,
+            NumericUpDown? numOctaveAbs,
+            NumericUpDown? numDegree,
+            ComboBox? cbChordKey,
+            NumericUpDown? numChordDegree,
+            ComboBox? cbChordQuality,
+            ComboBox? cbChordBase,
+            ComboBox? cbNoteValue,
+            NumericUpDown numDots,
+            TextBox? txtTupletNumber,
+            NumericUpDown? numTupletCount,
+            NumericUpDown? numTupletOf,
+            NumericUpDown? numNumberOfNotes)
         {
             if (data == null) return;
 

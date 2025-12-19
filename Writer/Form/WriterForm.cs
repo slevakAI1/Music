@@ -81,7 +81,12 @@ namespace Music.Writer
 
             // Capture form control values manually set in the form designer
             // This will only be done once, at form construction time.
-            _writer ??= CaptureFormData();
+            var transform = new WriterFormTransform();
+            _writer ??= transform.CaptureFormData(
+                cbCommand, clbParts, clbStaffs, rbIsRest, rbChord, cbStep,
+                rbPitchAbsolute, rbPitchKeyRelative, cbAccidental, numOctaveAbs,
+                numDegree, cbChordKey, numChordDegree, cbChordQuality, cbChordBase,
+                cbNoteValue, numDots, txtTupletNumber, numTupletCount, numTupletOf, numNumberOfNotes);
         }
 
         /// <summary>
@@ -131,7 +136,12 @@ namespace Music.Writer
             if (Globals.Writer != null)
                 _writer = Globals.Writer;
 
-            ApplyFormData(_writer);
+            var transform = new WriterFormTransform();
+            transform.ApplyFormData(_writer,
+                cbCommand, clbParts, clbStaffs, rbIsRest, rbChord, cbStep,
+                rbPitchAbsolute, rbPitchKeyRelative, cbAccidental, numOctaveAbs,
+                numDegree, cbChordKey, numChordDegree, cbChordQuality, cbChordBase,
+                cbNoteValue, numDots, txtTupletNumber, numTupletCount, numTupletOf, numNumberOfNotes);
         }
 
         // Persist current control state whenever the form loses activation (user switches to another MDI child)
@@ -141,7 +151,12 @@ namespace Music.Writer
 
             // Save on the way out
             Globals.Designer = _designer;
-            _writer = Globals.Writer = CaptureFormData();
+            var transform = new WriterFormTransform();
+            _writer = Globals.Writer = transform.CaptureFormData(
+                cbCommand, clbParts, clbStaffs, rbIsRest, rbChord, cbStep,
+                rbPitchAbsolute, rbPitchKeyRelative, cbAccidental, numOctaveAbs,
+                numDegree, cbChordKey, numChordDegree, cbChordQuality, cbChordBase,
+                cbNoteValue, numDots, txtTupletNumber, numTupletCount, numTupletOf, numNumberOfNotes);
             Globals.Writer = _writer;
         }
 
@@ -169,7 +184,12 @@ namespace Music.Writer
         private void btnSetWriterTestScenarioG1_Click(object sender, EventArgs e)
         {
             _writer = _eventHandlers.HandleSetWriterTestScenarioG1(_designer);
-            ApplyFormData(_writer);
+            var transform = new WriterFormTransform();
+            transform.ApplyFormData(_writer,
+                cbCommand, clbParts, clbStaffs, rbIsRest, rbChord, cbStep,
+                rbPitchAbsolute, rbPitchKeyRelative, cbAccidental, numOctaveAbs,
+                numDegree, cbChordKey, numChordDegree, cbChordQuality, cbChordBase,
+                cbNoteValue, numDots, txtTupletNumber, numTupletCount, numTupletOf, numNumberOfNotes);
         }
 
         private void btnChordTest_Click(object sender, EventArgs e)
@@ -189,7 +209,12 @@ namespace Music.Writer
                 return;
 
             // Capture form data once at the higher level and pass to command handlers
-            var formData = CaptureFormData();
+            var transform = new WriterFormTransform();
+            var formData = transform.CaptureFormData(
+                cbCommand, clbParts, clbStaffs, rbIsRest, rbChord, cbStep,
+                rbPitchAbsolute, rbPitchKeyRelative, cbAccidental, numOctaveAbs,
+                numDegree, cbChordKey, numChordDegree, cbChordQuality, cbChordBase,
+                cbNoteValue, numDots, txtTupletNumber, numTupletCount, numTupletOf, numNumberOfNotes);
 
             switch (command)
             {
