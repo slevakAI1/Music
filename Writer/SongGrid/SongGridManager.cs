@@ -188,7 +188,7 @@ namespace Music.Writer
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
         /// <param name="rowIndex">Index of the row to populate</param>
-        public static void PopulateMeasureCells(DataGridView dgSong, int rowIndex)
+        public static void PopulatePartMeasureNoteCount(DataGridView dgSong, int rowIndex)
         {
             // Skip fixed rows
             if (rowIndex < FIXED_ROWS_COUNT || rowIndex >= dgSong.Rows.Count)
@@ -381,7 +381,7 @@ namespace Music.Writer
             }
 
             // Populate measure cells (columns 4+) with note counts per measure
-            PopulateMeasureCells(dgSong, newRowIndex);
+            PopulatePartMeasureNoteCount(dgSong, newRowIndex);
         }
     }
 }

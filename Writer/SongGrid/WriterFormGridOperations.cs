@@ -180,7 +180,7 @@ namespace Music.Writer
                 selectedRow.Cells["colData"].Value = phrase;
                 
                 // Update measure cells to show note distribution
-                SongGridManager.PopulateMeasureCells(dgSong, selectedRow.Index);
+                SongGridManager.PopulatePartMeasureNoteCount(dgSong, selectedRow.Index);
             }
         }
 
@@ -233,7 +233,7 @@ namespace Music.Writer
                 }
 
                 // Update measure cell display
-                SongGridManager.PopulateMeasureCells(dgSong, selectedRow.Index);
+                SongGridManager.PopulatePartMeasureNoteCount(dgSong, selectedRow.Index);
             }
         }
 

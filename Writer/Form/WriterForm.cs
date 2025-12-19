@@ -218,6 +218,9 @@ namespace Music.Writer
 
             switch (command)
             {
+
+                // TO DO this is not running the note count per measure routine. call must have got lost!!!!
+
                 case "Repeat Note":
                     HandleRepeatNoteCommand.Execute(formData, dgSong, this);
                     break;
