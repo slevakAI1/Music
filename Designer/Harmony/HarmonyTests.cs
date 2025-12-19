@@ -8,7 +8,7 @@ namespace Music.Designer
             var timeline = new HarmonyTimeline();
             timeline.ConfigureGlobal(DesignerTests.GlobalTimeSignature);
 
-            // Common 4-chord loop: I – V – vi – IV, one chord per bar across 48 bars.
+            // Common 4-chord loop: I – V – vi – IV, two bars per chord across 48 bars.
             var pattern = new (int degree, string quality)[]
             {
                 (1, "Major"),
@@ -19,7 +19,7 @@ namespace Music.Designer
 
             for (int bar = 1; bar <= DesignerTests.TotalBars; bar++)
             {
-                var p = pattern[(bar - 1) % pattern.Length];
+                var p = pattern[((bar - 1) / 2) % pattern.Length];
                 Add(timeline, bar, key: "C major", degree: p.degree, quality: p.quality);
             }
 
