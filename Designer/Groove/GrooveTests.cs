@@ -17,6 +17,14 @@ namespace Music.Designer
                 StartBeat = 1,
                 GroovePresetName = "PopRockBasic"
             });
+
+            groove.Add(new GrooveEvent
+            {
+                StartBar = 3,
+                StartBeat = 1,
+                GroovePresetName = "FunkSyncopated"
+            });
+
             return groove;
         }
     }
