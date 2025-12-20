@@ -179,6 +179,10 @@ namespace Music.Writer
         {
             _designer ??= new Designer.Designer();
             _eventHandlers.HandleSetDesignTestScenarioD1(dgSong, _designer);
+
+            Globals.Designer = _designer;  // TO DO ... currently test groove track is pulling from globals, should get from local
+            // copy
+
         }
 
         private void btnSetWriterTestScenarioG1_Click(object sender, EventArgs e)

@@ -6,32 +6,28 @@ namespace Music.Writer.Generator
     /// <summary>
     /// Generates tracks for multiple parts based on groove patterns and harmony events.
     /// Story 7: Now supports controlled randomness for pitch variation.
+    /// Updated to support groove timeline with multiple groove changes throughout the song.
     /// </summary>
     public static class GrooveDrivenGenerator
     {
         /// <summary>
-        /// Generates all tracks based on harmony timeline and groove preset.
+        /// Generates all tracks based on harmony timeline and groove track timeline.
         /// </summary>
         /// <param name="harmonyTimeline">The harmony events defining chords per bar.</param>
         /// <param name="timeSignatureTimeline">Time signature info for tick calculations.</param>
-        /// <param name="groovePreset">The groove preset defining onset patterns.</param>
+        /// <param name="grooveTrack">The groove track timeline defining which groove preset is active at each bar.</param>
         /// <returns>Generated tracks for each role.</returns>
-        /// 
-
-        // WHY ARE THERE 2 GENERATES - DUPLICATES!
-
-
         public static GeneratorResult Generate(
             HarmonyTrack harmonyTimeline,
             TimeSignatureTrack timeSignatureTimeline,
-            GroovePreset groovePreset)
+            GrooveTrack grooveTrack)
         {
             if (harmonyTimeline == null || harmonyTimeline.Events.Count == 0)
                 throw new ArgumentException("Harmony timeline must have events", nameof(harmonyTimeline));
             if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
                 throw new ArgumentException("Time signature timeline must have events", nameof(timeSignatureTimeline));
-            if (groovePreset == null)
-                throw new ArgumentNullException(nameof(groovePreset));
+            if (grooveTrack == null || grooveTrack.Events.Count == 0)
+                throw new ArgumentException("Groove track must have events", nameof(grooveTrack));
 
             var timeSignature = timeSignatureTimeline.Events.First();
             int ticksPerQuarterNote = MusicConstants.TicksPerQuarterNote;
@@ -43,47 +39,16 @@ namespace Music.Writer.Generator
             // Use default randomization settings
             var settings = RandomizationSettings.Default;
 
-            // Use only the anchor layer
-            var layer = groovePreset.AnchorLayer;
+            // Ensure groove track is indexed for fast lookups
+            grooveTrack.EnsureIndexed();
 
             return new GeneratorResult
             {
-                BassTrack = GenerateBassTrack(harmonyTimeline, layer.BassOnsets, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
-                GuitarTrack = GenerateGuitarTrack(harmonyTimeline, layer.CompOnsets, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
-                KeysTrack = GenerateKeysTrack(harmonyTimeline, layer.PadsOnsets, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
-                DrumTrack = GenerateDrumTrack(layer, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings)
+                BassTrack = GenerateBassTrack(harmonyTimeline, grooveTrack, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
+                GuitarTrack = GenerateGuitarTrack(harmonyTimeline, grooveTrack, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
+                KeysTrack = GenerateKeysTrack(harmonyTimeline, grooveTrack, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
+                DrumTrack = GenerateDrumTrack(harmonyTimeline, grooveTrack, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings)
             };
-        }
-
-        /// <summary>
-        /// Generates tracks for all parts in a groove-based arrangement.
-        /// </summary>
-        /// <param name="harmonyTimeline">Harmony events defining chord progression</param>
-        /// <param name="timeSignatureTimeline">Time signature events</param>
-        /// <param name="settings">Optional randomization settings (uses defaults if null)</param>
-        /// <returns>Dictionary of part name to generated track</returns>
-        public static Dictionary<string, SongTrack> GenerateAllParts(
-            HarmonyTrack harmonyTimeline,
-            TimeSignatureTrack timeSignatureTimeline,
-            RandomizationSettings? settings = null)
-        {
-            var result = new Dictionary<string, SongTrack>(StringComparer.OrdinalIgnoreCase);
-            var randomSettings = settings ?? RandomizationSettings.Default;
-
-            // Get time signature for timing calculations
-            var timeSignature = timeSignatureTimeline.Events.FirstOrDefault();
-            if (timeSignature == null)
-                return result;
-
-            int ticksPerQuarterNote = MusicConstants.TicksPerQuarterNote;
-            int ticksPerMeasure = (ticksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
-
-            // Generate each part
-            result["Bass"] = GenerateBassTrack(harmonyTimeline, ticksPerMeasure, ticksPerQuarterNote, randomSettings);
-            result["Guitar"] = GenerateGuitarTrack(harmonyTimeline, ticksPerMeasure, ticksPerQuarterNote, randomSettings);
-            result["Keys"] = GenerateKeysTrack(harmonyTimeline, ticksPerMeasure, ticksPerQuarterNote, randomSettings);
-
-            return result;
         }
 
         /// <summary>
@@ -97,17 +62,30 @@ namespace Music.Writer.Generator
             public SongTrack? DrumTrack { get; init; }
         }
 
+        /// <summary>
+        /// Helper method to get the active groove preset for a given bar.
+        /// </summary>
+        private static GroovePreset? GetActiveGroovePreset(GrooveTrack grooveTrack, int bar)
+        {
+            if (grooveTrack.TryGetAtBar(bar, out var grooveEvent) && grooveEvent != null)
+            {
+                var preset = GroovePresets.GetByName(grooveEvent.GroovePresetName);
+                if (preset != null)
+                    return preset;
+            }
+
+            // Fallback to PopRockBasic if no groove found or preset name is invalid
+            return GroovePresets.GetPopRockBasic();
+        }
+
         private static SongTrack? GenerateBassTrack(
             HarmonyTrack harmonyTimeline,
-            List<decimal> bassOnsets,
+            GrooveTrack grooveTrack,
             int ticksPerQuarterNote,
             int ticksPerMeasure,
             int totalBars,
             RandomizationSettings settings)
         {
-            if (bassOnsets == null || bassOnsets.Count == 0)
-                return null;
-
             var notes = new List<SongTrackNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
             const int bassOctave = 2;
@@ -121,6 +99,15 @@ namespace Music.Writer.Generator
             {
                 var harmonyEvent = GetActiveHarmonyForBar(harmonyByBar, bar);
                 if (harmonyEvent == null)
+                    continue;
+
+                // Get the active groove preset for this bar
+                var groovePreset = GetActiveGroovePreset(grooveTrack, bar);
+                if (groovePreset == null)
+                    continue;
+
+                var bassOnsets = groovePreset.AnchorLayer.BassOnsets;
+                if (bassOnsets == null || bassOnsets.Count == 0)
                     continue;
 
                 var ctx = HarmonyPitchContextBuilder.Build(
@@ -153,61 +140,20 @@ namespace Music.Writer.Generator
                 }
             }
 
-            return new SongTrack(notes) { MidiProgramNumber = 33 }; // Electric Bass
-        }
-
-        private static SongTrack GenerateBassTrack(
-            HarmonyTrack harmonyTimeline,
-            int ticksPerMeasure,
-            int ticksPerQuarterNote,
-            RandomizationSettings settings)
-        {
-            var notes = new List<SongTrackNoteEvent>();
-            var randomizer = new PitchRandomizer(settings);
-            int quarterNoteDuration = ticksPerQuarterNote;
-
-            foreach (var harmonyEvent in harmonyTimeline.Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat))
-            {
-                var ctx = HarmonyPitchContextBuilder.Build(
-                    harmonyEvent.Key,
-                    harmonyEvent.Degree,
-                    harmonyEvent.Quality,
-                    harmonyEvent.Bass,
-                    baseOctave: 2);
-
-                int measureTick = (harmonyEvent.StartBar - 1) * ticksPerMeasure;
-                int beatTick = (harmonyEvent.StartBeat - 1) * ticksPerQuarterNote;
-                int absolutePosition = measureTick + beatTick;
-
-                // Generate 4 quarter notes per harmony event (standard bass pattern)
-                for (int beat = 0; beat < 4; beat++)
-                {
-                    decimal onsetBeat = beat + 1;
-                    int midiNote = randomizer.SelectBassPitch(ctx, harmonyEvent.StartBar, onsetBeat);
-
-                    notes.Add(new SongTrackNoteEvent(
-                        noteNumber: midiNote,
-                        absolutePositionTicks: absolutePosition + (beat * quarterNoteDuration),
-                        noteDurationTicks: quarterNoteDuration,
-                        noteOnVelocity: 90,
-                        isRest: false));
-                }
-            }
+            if (notes.Count == 0)
+                return null;
 
             return new SongTrack(notes) { MidiProgramNumber = 33 }; // Electric Bass
         }
 
         private static SongTrack? GenerateGuitarTrack(
             HarmonyTrack harmonyTimeline,
-            List<decimal> compOnsets,
+            GrooveTrack grooveTrack,
             int ticksPerQuarterNote,
             int ticksPerMeasure,
             int totalBars,
             RandomizationSettings settings)
         {
-            if (compOnsets == null || compOnsets.Count == 0)
-                return null;
-
             var notes = new List<SongTrackNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
             int? previousPitchClass = null;
@@ -222,6 +168,15 @@ namespace Music.Writer.Generator
             {
                 var harmonyEvent = GetActiveHarmonyForBar(harmonyByBar, bar);
                 if (harmonyEvent == null)
+                    continue;
+
+                // Get the active groove preset for this bar
+                var groovePreset = GetActiveGroovePreset(grooveTrack, bar);
+                if (groovePreset == null)
+                    continue;
+
+                var compOnsets = groovePreset.AnchorLayer.CompOnsets;
+                if (compOnsets == null || compOnsets.Count == 0)
                     continue;
 
                 var ctx = HarmonyPitchContextBuilder.Build(
@@ -256,71 +211,20 @@ namespace Music.Writer.Generator
                 }
             }
 
+            if (notes.Count == 0)
+                return null;
+
             return new SongTrack(notes) { MidiProgramNumber = 27 }; // Electric Guitar
         }
 
-        private static SongTrack GenerateGuitarTrack(
-            HarmonyTrack harmonyTimeline,
-            int ticksPerMeasure,
-            int ticksPerQuarterNote,
-            RandomizationSettings settings)
-        {
-            var notes = new List<SongTrackNoteEvent>();
-            var randomizer = new PitchRandomizer(settings);
-            int eighthNoteDuration = ticksPerQuarterNote / 2;
-            int? previousPitchClass = null;
-
-            foreach (var harmonyEvent in harmonyTimeline.Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat))
-            {
-                var ctx = HarmonyPitchContextBuilder.Build(
-                    harmonyEvent.Key,
-                    harmonyEvent.Degree,
-                    harmonyEvent.Quality,
-                    harmonyEvent.Bass,
-                    baseOctave: 4);
-
-                int measureTick = (harmonyEvent.StartBar - 1) * ticksPerMeasure;
-                int beatTick = (harmonyEvent.StartBeat - 1) * ticksPerQuarterNote;
-                int absolutePosition = measureTick + beatTick;
-
-                // Generate 8 eighth notes per harmony event
-                for (int eighth = 0; eighth < 8; eighth++)
-                {
-                    decimal onsetBeat = 1m + (eighth * 0.5m);
-                    var (midiNote, pitchClass) = randomizer.SelectGuitarPitch(
-                        ctx, 
-                        harmonyEvent.StartBar, 
-                        onsetBeat, 
-                        previousPitchClass);
-
-                    notes.Add(new SongTrackNoteEvent(
-                        noteNumber: midiNote,
-                        absolutePositionTicks: absolutePosition + (eighth * eighthNoteDuration),
-                        noteDurationTicks: eighthNoteDuration,
-                        noteOnVelocity: 85,
-                        isRest: false));
-
-                    previousPitchClass = pitchClass;
-                }
-            }
-
-            return new SongTrack(notes) { MidiProgramNumber = 27 }; // Electric Guitar (clean)
-        }
-
-
-        // TO DO WHY ARE THERE 2 of these methods????
-
         private static SongTrack? GenerateKeysTrack(
             HarmonyTrack harmonyTimeline,
-            List<decimal> padsOnsets,
+            GrooveTrack grooveTrack,
             int ticksPerQuarterNote,
             int ticksPerMeasure,
             int totalBars,
             RandomizationSettings settings)
         {
-            if (padsOnsets == null || padsOnsets.Count == 0)
-                return null;
-
             var notes = new List<SongTrackNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
             const int keysOctave = 4;
@@ -336,6 +240,15 @@ namespace Music.Writer.Generator
             {
                 var harmonyEvent = GetActiveHarmonyForBar(harmonyByBar, bar);
                 if (harmonyEvent == null)
+                    continue;
+
+                // Get the active groove preset for this bar
+                var groovePreset = GetActiveGroovePreset(grooveTrack, bar);
+                if (groovePreset == null)
+                    continue;
+
+                var padsOnsets = groovePreset.AnchorLayer.PadsOnsets;
+                if (padsOnsets == null || padsOnsets.Count == 0)
                     continue;
 
                 var ctx = HarmonyPitchContextBuilder.Build(
@@ -377,70 +290,19 @@ namespace Music.Writer.Generator
                 previousHarmony = harmonyEvent;
             }
 
-            return new SongTrack(notes) { MidiProgramNumber = 18 }; // Rock Organ
-        }
+            if (notes.Count == 0)
+                return null;
 
-        private static SongTrack GenerateKeysTrack(
-            HarmonyTrack harmonyTimeline,
-            int ticksPerMeasure,
-            int ticksPerQuarterNote,
-            RandomizationSettings settings)
-        {
-            var notes = new List<SongTrackNoteEvent>();
-            var randomizer = new PitchRandomizer(settings);
-            int halfNoteDuration = ticksPerQuarterNote * 2;
-
-            HarmonyEvent? previousHarmony = null;
-
-            foreach (var harmonyEvent in harmonyTimeline.Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat))
-            {
-                var ctx = HarmonyPitchContextBuilder.Build(
-                    harmonyEvent.Key,
-                    harmonyEvent.Degree,
-                    harmonyEvent.Quality,
-                    harmonyEvent.Bass,
-                    baseOctave: 4);
-
-                int measureTick = (harmonyEvent.StartBar - 1) * ticksPerMeasure;
-                int beatTick = (harmonyEvent.StartBeat - 1) * ticksPerQuarterNote;
-                int absolutePosition = measureTick + beatTick;
-
-                // Two half-note hits per harmony event
-                for (int half = 0; half < 2; half++)
-                {
-                    decimal onsetBeat = 1m + (half * 2m);
-                    bool isFirstOnset = half == 0 && (previousHarmony == null || 
-                        harmonyEvent.StartBar != previousHarmony.StartBar ||
-                        harmonyEvent.StartBeat != previousHarmony.StartBeat);
-
-                    var chordMidiNotes = randomizer.SelectKeysVoicing(
-                        ctx, 
-                        harmonyEvent.StartBar, 
-                        onsetBeat, 
-                        isFirstOnset);
-
-                    foreach (var midiNote in chordMidiNotes)
-                    {
-                        notes.Add(new SongTrackNoteEvent(
-                            noteNumber: midiNote,
-                            absolutePositionTicks: absolutePosition + (half * halfNoteDuration),
-                            noteDurationTicks: halfNoteDuration,
-                            noteOnVelocity: 75,
-                            isRest: false));
-                    }
-                }
-
-                previousHarmony = harmonyEvent;
-            }
-
-            return new SongTrack(notes) { MidiProgramNumber = 4 }; // Electric Piano
+            return new SongTrack(notes) { MidiProgramNumber = 4 }; // Electric Piano 1
         }
 
         /// <summary>
         /// Generates drum track: kick, snare, hi-hat at groove onsets with controlled randomness.
+        /// Updated to support groove timeline changes.
         /// </summary>
         private static SongTrack? GenerateDrumTrack(
-            GrooveLayer layer,
+            HarmonyTrack harmonyTimeline,
+            GrooveTrack grooveTrack,
             int ticksPerQuarterNote,
             int ticksPerMeasure,
             int totalBars,
@@ -449,8 +311,6 @@ namespace Music.Writer.Generator
             var notes = new List<SongTrackNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
 
-            // TO DO - There should be a map for the drum set notes - enum
-
             // MIDI drum note numbers (General MIDI)
             const int kickNote = 36;
             const int snareNote = 38;
@@ -458,6 +318,12 @@ namespace Music.Writer.Generator
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
+                // Get the active groove preset for this bar
+                var groovePreset = GetActiveGroovePreset(grooveTrack, bar);
+                if (groovePreset == null)
+                    continue;
+
+                var layer = groovePreset.AnchorLayer;
                 int measureStartTick = (bar - 1) * ticksPerMeasure;
 
                 // Kick pattern

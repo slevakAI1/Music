@@ -67,7 +67,7 @@ namespace Music.Generator
 
             var timeSignature = timeSignatureTimeline.Events.FirstOrDefault();
             if (timeSignature == null)
-                return new SongTrack(notes) { MidiProgramNumber = 18 }; // Rock Organ
+                return new SongTrack(notes) { MidiProgramNumber = 4 }; // Electric Piano 1
 
             int ticksPerQuarterNote = MusicConstants.TicksPerQuarterNote;
             int ticksPerMeasure = (ticksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
@@ -117,7 +117,7 @@ namespace Music.Generator
 
             var timeSignature = timeSignatureTimeline.Events.FirstOrDefault();
             if (timeSignature == null)
-                return new SongTrack(notes) { MidiProgramNumber = 27 }; // Electric Guitar
+                return new SongTrack(notes) { MidiProgramNumber = 27 }; // Electric Guitar (clean)
 
             int ticksPerQuarterNote = MusicConstants.TicksPerQuarterNote;
             int ticksPerMeasure = (ticksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
@@ -165,7 +165,7 @@ namespace Music.Generator
 
             var timeSignature = timeSignatureTimeline.Events.FirstOrDefault();
             if (timeSignature == null)
-                return new SongTrack(notes) { MidiProgramNumber = 33 }; // Electric Bass
+                return new SongTrack(notes) { MidiProgramNumber = 33 }; // Electric Bass (finger)
 
             int ticksPerQuarterNote = MusicConstants.TicksPerQuarterNote;
             int ticksPerMeasure = (ticksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;

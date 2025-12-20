@@ -13,7 +13,7 @@ namespace Music.Generator
     {
         /// <summary>
         /// Handles the Harmony Groove Sync Test command.
-        /// Generates synchronized test tracks using a groove preset
+        /// Generates synchronized test tracks using groove presets from the GrooveTrack timeline.
         /// </summary>
         public static void HandleGrooveSyncTest(
             DataGridView dgSong,
@@ -48,17 +48,26 @@ namespace Music.Generator
                 return;
             }
 
+            // Get the GrooveTrack from the designer
+            var grooveTrack = Globals.Designer?.GrooveTrack;
+
+            if (grooveTrack == null || grooveTrack.Events.Count == 0)
+            {
+                MessageBoxHelper.Show(
+                    "No groove events defined. Please add at least one groove event first.",
+                    "Missing Groove",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
             try
             {
-                // Use a groove preset from Designer
-                //var groovePreset = GroovePresets.GetPopRockBasic();
-                var groovePreset = GroovePresets.GetRapBasic();
-
-                // Generate all song tracks using the Generate method (which includes drums)
+                // Generate all song tracks using the GrooveTrack timeline
                 var result = GrooveDrivenGenerator.Generate(
                     harmonyTimeline,
                     timeSignatureTimeline,
-                    groovePreset);
+                    grooveTrack);
 
                 int addedCount = 0;
 
@@ -88,7 +97,7 @@ namespace Music.Generator
                 }
 
                 MessageBoxHelper.Show(
-                    $"Successfully created {addedCount} synchronized tracks using '{groovePreset.Name}' groove with controlled randomness.",
+                    $"Successfully created {addedCount} synchronized tracks using groove timeline with controlled randomness.",
                     "Groove Sync Test",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
