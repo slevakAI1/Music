@@ -1,3 +1,4 @@
+using Music.Writer;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -370,7 +371,7 @@ namespace Music.Designer
         {
             if (!ValidateEditorValues(out var error))
             {
-                MessageBox.Show(this, error!, "Add Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show(error!, "Add Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -396,7 +397,7 @@ namespace Music.Designer
         {
             if (!ValidateEditorValues(out var error))
             {
-                MessageBox.Show(this, error!, "Insert Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show(error!, "Insert Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 

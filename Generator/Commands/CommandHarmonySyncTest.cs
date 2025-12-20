@@ -11,8 +11,7 @@ namespace Music.Generator
         public static void HandleHarmonySyncTest(
             DataGridView dgSong,
             List<MidiInstrument> midiInstruments,
-            ref int trackNumber,
-            Form owner)
+            ref int trackNumber)
         {
             // Extract harmony timeline from the fixed harmony row
             var harmonyRow = dgSong.Rows[SongGridManager.FIXED_ROW_HARMONY];
@@ -20,7 +19,7 @@ namespace Music.Generator
             
             if (harmonyTimeline == null || harmonyTimeline.Events.Count == 0)
             {
-                MessageBox.Show(owner,
+                MessageBoxHelper.Show(
                     "No harmony events defined. Please add harmony events first.",
                     "Missing Harmony",
                     MessageBoxButtons.OK,
@@ -34,7 +33,7 @@ namespace Music.Generator
             
             if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
             {
-                MessageBox.Show(owner,
+                MessageBoxHelper.Show(
                     "No time signature events defined. Please add at least one time signature event.",
                     "Missing Time Signature",
                     MessageBoxButtons.OK,
@@ -54,7 +53,7 @@ namespace Music.Generator
             SongGridManager.AddSongTrackToGrid(electricBassTrack, midiInstruments, dgSong, ref trackNumber);
             SongGridManager.AddSongTrackToGrid(drumSetTrack, midiInstruments, dgSong, ref trackNumber);
 
-            MessageBox.Show(owner,
+            MessageBoxHelper.Show(
                 "Successfully created 4 synchronized tracks based on harmony timeline.",
                 "Harmony Sync Test",
                 MessageBoxButtons.OK,

@@ -13,11 +13,10 @@ namespace Music.Writer
         /// </summary>
         public static void Execute(
             WriterFormData formData,
-            DataGridView dgSong,
-            Form owner)
+            DataGridView dgSong)
         {
             // Validate that song tracks are selected before executing
-            if (!ValidateSongTracksSelected(dgSong, owner))
+            if (!ValidateSongTracksSelected(dgSong))
                 return;
 
             var (noteNumber, noteDurationTicks, repeatCount, isRest) =
@@ -37,7 +36,7 @@ namespace Music.Writer
         /// <summary>
         /// Validates that song tracks are selected in the grid.
         /// </summary>
-        private static bool ValidateSongTracksSelected(DataGridView dgSong, Form owner)
+        private static bool ValidateSongTracksSelected(DataGridView dgSong)
         {
             var hasSongTrackSelection = dgSong.SelectedRows
                 .Cast<DataGridViewRow>()
@@ -45,7 +44,7 @@ namespace Music.Writer
 
             if (!hasSongTrackSelection)
             {
-                MessageBox.Show(owner,
+                MessageBoxHelper.Show(
                     "Please select one or more tracks to apply the command.",
                     "No Tracks Selected",
                     MessageBoxButtons.OK,

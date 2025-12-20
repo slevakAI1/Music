@@ -222,15 +222,15 @@ namespace Music.Writer
                 // TO DO this is not running the note count per measure routine. call must have got lost!!!!
 
                 case "Repeat Note":
-                    HandleRepeatNoteCommand.Execute(formData, dgSong, this);
+                    HandleRepeatNoteCommand.Execute(formData, dgSong);
                     break;
 
                 case "Harmony Sync Test":
-                    CommandHarmonySyncTest.HandleHarmonySyncTest(dgSong, _midiInstruments, ref trackNumber, this);
+                    CommandHarmonySyncTest.HandleHarmonySyncTest(dgSong, _midiInstruments, ref trackNumber);
                     break;
 
                 case "Harmony Groove Sync Test":
-                    CommandGrooveSyncTest.HandleGrooveSyncTest(dgSong, _midiInstruments, ref trackNumber, this);
+                    CommandGrooveSyncTest.HandleGrooveSyncTest(dgSong, _midiInstruments, ref trackNumber);
                     break;
 
                 // Other cases will be added here later.

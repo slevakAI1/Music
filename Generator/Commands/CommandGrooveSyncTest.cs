@@ -18,8 +18,7 @@ namespace Music.Generator
         public static void HandleGrooveSyncTest(
             DataGridView dgSong,
             List<MidiInstrument> midiInstruments,
-            ref int songTrackNumber,
-            Form owner)
+            ref int songTrackNumber)
         {
             // Extract harmony timeline from the fixed harmony row
             var harmonyRow = dgSong.Rows[SongGridManager.FIXED_ROW_HARMONY];
@@ -27,7 +26,7 @@ namespace Music.Generator
 
             if (harmonyTimeline == null || harmonyTimeline.Events.Count == 0)
             {
-                MessageBox.Show(owner,
+                MessageBoxHelper.Show(
                     "No harmony events defined. Please add harmony events first.",
                     "Missing Harmony",
                     MessageBoxButtons.OK,
@@ -41,7 +40,7 @@ namespace Music.Generator
 
             if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
             {
-                MessageBox.Show(owner,
+                MessageBoxHelper.Show(
                     "No time signature events defined. Please add at least one time signature event.",
                     "Missing Time Signature",
                     MessageBoxButtons.OK,
@@ -88,7 +87,7 @@ namespace Music.Generator
                     addedCount++;
                 }
 
-                MessageBox.Show(owner,
+                MessageBoxHelper.Show(
                     $"Successfully created {addedCount} synchronized tracks using '{groovePreset.Name}' groove with controlled randomness.",
                     "Groove Sync Test",
                     MessageBoxButtons.OK,
@@ -96,7 +95,7 @@ namespace Music.Generator
             }
             catch (Exception ex)
             {
-                MessageBox.Show(owner,
+                MessageBoxHelper.Show(
                     $"Error generating groove tracks:\n{ex.Message}",
                     "Generation Error",
                     MessageBoxButtons.OK,
