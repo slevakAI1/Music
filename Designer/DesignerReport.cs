@@ -30,7 +30,7 @@ namespace Music.Designer
             // SECTIONS
             sb.Append("SECTIONS:\r\n");
             first = true;
-            foreach (var s in designer.SectionTimeline.Sections)
+            foreach (var s in designer.SectionTrack.Sections)
             {
                 if (!first) sb.Append("\r\n");
                 if (s == null)
@@ -53,7 +53,7 @@ namespace Music.Designer
             // HARMONY TIMELINE
             sb.Append("HARMONY TIMELINE:\r\n");
             first = true;
-            var timeline = designer.HarmonyTimeline;
+            var timeline = designer.HarmonyTrack;
             if (timeline != null)
             {
                 foreach (var he in timeline.Events)
@@ -74,7 +74,7 @@ namespace Music.Designer
             else
             {
                 int bpb = timeline.BeatsPerBar;
-                foreach (var s in designer.SectionTimeline.Sections)
+                foreach (var s in designer.SectionTrack.Sections)
                 {
                     if (s == null) continue;
 
@@ -129,7 +129,7 @@ namespace Music.Designer
             // TIME SIGNATURES
             sb.Append("\r\n\r\n");
             sb.Append("TIME SIGNATURES:\r\n");
-            var tsTimeline = designer.TimeSignatureTimeline;
+            var tsTimeline = designer.TimeSignatureTrack;
             if (tsTimeline == null || tsTimeline.Events.Count == 0)
             {
                 sb.Append("(no time signature timeline)");
@@ -149,7 +149,7 @@ namespace Music.Designer
             // TEMPO
             sb.Append("\r\n\r\n");
             sb.Append("TEMPO:\r\n");
-            var tempoTimeline = designer.TempoTimeline;
+            var tempoTimeline = designer.TempoTrack;
             if (tempoTimeline == null || tempoTimeline.Events.Count == 0)
             {
                 sb.Append("(no tempo timeline)");

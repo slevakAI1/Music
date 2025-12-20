@@ -1,7 +1,7 @@
 namespace Music.Designer
 {
     // Global bar/beat-aligned tempo timeline
-    public class TempoTimeline
+    public class TempoTrack
     {
         private readonly Dictionary<int, TempoEvent> _barHeads = new(); // bar -> event active at beat 1
 

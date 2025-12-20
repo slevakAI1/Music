@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Windows.Forms;
 using Music.Designer;
-using Music;
 using Music.Writer;
+using System.Reflection;
 
 namespace Music
 {
@@ -83,11 +78,11 @@ namespace Music
         {
             if (!EnsureDesignOrNotify(form)) return;
 
-            using var dlg = new SectionEditorForm(Globals.Designer!.SectionTimeline);
+            using var dlg = new SectionEditorForm(Globals.Designer!.SectionTrack);
             if (dlg.ShowDialog(form) == DialogResult.OK)
             {
                 // Copy back into the existing Sections instance to preserve references
-                var target = Globals.Designer!.SectionTimeline;
+                var target = Globals.Designer!.SectionTrack;
                 target.Reset();
                 foreach (var s in dlg.ResultSections.Sections)
                 {
@@ -141,11 +136,11 @@ namespace Music
         {
             if (!EnsureDesignOrNotify(form)) return;
 
-            var existing = Globals.Designer!.HarmonyTimeline;
+            var existing = Globals.Designer!.HarmonyTrack;
             using var dlg = new HarmonyEditorForm(existing);
             if (dlg.ShowDialog(form) == DialogResult.OK)
             {
-                Globals.Designer!.HarmonyTimeline = dlg.ResultTimeline;
+                Globals.Designer!.HarmonyTrack = dlg.ResultTimeline;
                 UpdateDesignerReport(form);
             }
         }
@@ -154,11 +149,11 @@ namespace Music
         {
             if (!EnsureDesignOrNotify(form)) return;
 
-            var existing = Globals.Designer!.TimeSignatureTimeline;
+            var existing = Globals.Designer!.TimeSignatureTrack;
             using var dlg = new TimeSignatureEditorForm(existing);
             if (dlg.ShowDialog(form) == DialogResult.OK)
             {
-                Globals.Designer!.TimeSignatureTimeline = dlg.ResultTimeline;
+                Globals.Designer!.TimeSignatureTrack = dlg.ResultTimeline;
                 UpdateDesignerReport(form);
             }
         }
@@ -167,11 +162,11 @@ namespace Music
         {
             if (!EnsureDesignOrNotify(form)) return;
 
-            var existing = Globals.Designer!.TempoTimeline;
+            var existing = Globals.Designer!.TempoTrack;
             using var dlg = new TempoEditorForm(existing);
             if (dlg.ShowDialog(form) == DialogResult.OK)
             {
-                Globals.Designer!.TempoTimeline = dlg.ResultTimeline;
+                Globals.Designer!.TempoTrack = dlg.ResultTimeline;
                 UpdateDesignerReport(form);
             }
         }

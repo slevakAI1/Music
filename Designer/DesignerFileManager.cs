@@ -1,10 +1,5 @@
-using System;
-using System.IO;
-using System.Text.Json;
-using System.Windows.Forms;
-using Music;
-using Music.Designer;
 using Music.Writer;
+using System.Text.Json;
 
 namespace Music.Designer
 {
@@ -18,15 +13,15 @@ namespace Music.Designer
             {
                 var design = Globals.Designer!;
 
-                // Explicit snapshot to ensure TempoTimeline and TimeSignatureTimeline (and their Events) are serialized.
+                // Explicit snapshot to ensure TempoTrack and TimeSignatureTrack (and their Events) are serialized.
                 var snapshot = new
                 {
                     design.DesignId,
                     design.Voices,
-                    design.SectionTimeline,
-                    design.HarmonyTimeline,
-                    design.TempoTimeline,
-                    design.TimeSignatureTimeline
+                    design.SectionTrack,
+                    design.HarmonyTrack,
+                    design.TempoTrack,
+                    design.TimeSignatureTrack
                 };
 
                 var json = JsonSerializer.Serialize(

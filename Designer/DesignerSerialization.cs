@@ -27,12 +27,12 @@ namespace Music.Designer
             }
 
             // Sections: preserve StartBar and order from JSON (no recalculation)
-            design.SectionTimeline.Reset();
+            design.SectionTrack.Reset();
             if (dto.SectionSet?.Sections != null)
             {
                 foreach (var s in dto.SectionSet.Sections)
                 {
-                    design.SectionTimeline.Sections.Add(new Section
+                    design.SectionTrack.Sections.Add(new Section
                     {
                         SectionType = (MusicConstants.eSectionType)s.SectionType,
                         StartBar = s.StartBar > 0 ? s.StartBar : 1,
@@ -42,16 +42,16 @@ namespace Music.Designer
                     });
                 }
                 // Sync internal state based on existing StartBar/BarCount without changing them
-                design.SectionTimeline.SyncAfterExternalLoad();
+                design.SectionTrack.SyncAfterExternalLoad();
             }
 
             // Harmony timeline: preserve order and values
             if (dto.HarmonyTimeline != null)
             {
-                var tl = new HarmonyTimeline
+                var tl = new HarmonyTrack
                 {
                     BeatsPerBar = dto.HarmonyTimeline.BeatsPerBar > 0 ? dto.HarmonyTimeline.BeatsPerBar : 4
-                    // TempoBpm removed from HarmonyTimeline; dto.HarmonyTimeline.TempoBpm is ignored (migrated to TempoTimeline separately)
+                    // TempoBpm removed from HarmonyTrack; dto.HarmonyTrack.TempoBpm is ignored (migrated to TempoTrack separately)
                 };
                 if (dto.HarmonyTimeline.Events != null)
                 {
@@ -71,7 +71,7 @@ namespace Music.Designer
                 }
                 // Build index without changing the list or StartBar values
                 tl.EnsureIndexed();
-                design.HarmonyTimeline = tl;
+                design.HarmonyTrack = tl;
             }
 
             return design;

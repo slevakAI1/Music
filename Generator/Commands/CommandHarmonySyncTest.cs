@@ -15,7 +15,7 @@ namespace Music.Generator
         {
             // Extract harmony timeline from the fixed harmony row
             var harmonyRow = dgSong.Rows[SongGridManager.FIXED_ROW_HARMONY];
-            var harmonyTimeline = harmonyRow.Cells["colData"].Value as Music.Designer.HarmonyTimeline;
+            var harmonyTimeline = harmonyRow.Cells["colData"].Value as Music.Designer.HarmonyTrack;
             
             if (harmonyTimeline == null || harmonyTimeline.Events.Count == 0)
             {
@@ -29,7 +29,7 @@ namespace Music.Generator
 
             // Extract time signature timeline to determine beats per measure
             var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
-            var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Designer.TimeSignatureTimeline;
+            var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Designer.TimeSignatureTrack;
             
             if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
             {
@@ -60,7 +60,7 @@ namespace Music.Generator
                 MessageBoxIcon.Information);
         }
 
-        private static SongTrack CreateRockOrganTrack(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
+        private static SongTrack CreateRockOrganTrack(Music.Designer.HarmonyTrack harmonyTimeline, Music.Designer.TimeSignatureTrack timeSignatureTimeline)
         {
             var notes = new List<SongTrackNoteEvent>();
             int currentTick = 0;
@@ -110,7 +110,7 @@ namespace Music.Generator
             return new SongTrack(notes) { MidiProgramNumber = 18 };
         }
 
-        private static SongTrack CreateElectricGuitarTrack(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
+        private static SongTrack CreateElectricGuitarTrack(Music.Designer.HarmonyTrack harmonyTimeline, Music.Designer.TimeSignatureTrack timeSignatureTimeline)
         {
             var notes = new List<SongTrackNoteEvent>();
             int currentTick = 0;
@@ -158,7 +158,7 @@ namespace Music.Generator
             return new SongTrack(notes) { MidiProgramNumber = 27 };
         }
 
-        private static SongTrack CreateElectricBassTrack(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
+        private static SongTrack CreateElectricBassTrack(Music.Designer.HarmonyTrack harmonyTimeline, Music.Designer.TimeSignatureTrack timeSignatureTimeline)
         {
             var notes = new List<SongTrackNoteEvent>();
             int currentTick = 0;
@@ -206,7 +206,7 @@ namespace Music.Generator
             return new SongTrack(notes) { MidiProgramNumber = 33 };
         }
 
-        private static SongTrack CreateDrumSetTrack(Music.Designer.HarmonyTimeline harmonyTimeline, Music.Designer.TimeSignatureTimeline timeSignatureTimeline)
+        private static SongTrack CreateDrumSetTrack(Music.Designer.HarmonyTrack harmonyTimeline, Music.Designer.TimeSignatureTrack timeSignatureTimeline)
         {
             var notes = new List<SongTrackNoteEvent>();
             int currentTick = 0;

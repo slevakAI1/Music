@@ -1,7 +1,7 @@
 namespace Music.Designer
 {
     // Global bar/beat-aligned harmony timeline
-    public class HarmonyTimeline
+    public class HarmonyTrack
     {
         private readonly Dictionary<int, HarmonyEvent> _barHeads = new(); // bar -> event active at beat 1
 

@@ -29,7 +29,7 @@ namespace Music.Writer
         /// <param name="midiInstruments">List of available MIDI instruments</param>
         /// <param name="cellValueChangedHandler">Event handler for cell value changes</param>
         /// <param name="currentCellDirtyStateChangedHandler">Event handler for dirty state changes</param>
-        /// <param name="tempoTimeline">Optional TempoTimeline to place into the fixed Tempo row hidden data cell</param>
+        /// <param name="tempoTimeline">Optional TempoTrack to place into the fixed Tempo row hidden data cell</param>
         internal static void ConfigureSongGridView(
             DataGridView dgSong,
             List<MidiVoices> midiInstruments,
@@ -128,7 +128,7 @@ namespace Music.Writer
         /// <summary>
         /// Initializes the fixed rows at the top of the grid.
         /// Entire fixed rows are set to ReadOnly so users cannot edit them.
-        /// If a TempoTimeline is provided it will be stored in the fixed Tempo row's hidden data cell.
+        /// If a TempoTrack is provided it will be stored in the fixed Tempo row's hidden data cell.
         /// The separator row is styled with black background and white foreground.
         /// </summary>
         private static void InitializeFixedRows(
@@ -175,10 +175,10 @@ namespace Music.Writer
             // Delegate attaching the control lines to the control line manager class
             if (designer != null)
             {
-                GridControlLinesManager.AttachSectionTimeline(dgSong, designer.SectionTimeline);
-                GridControlLinesManager.AttachHarmonyTimeline(dgSong, designer.HarmonyTimeline);
-                GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, designer.TimeSignatureTimeline);
-                GridControlLinesManager.AttachTempoTimeline(dgSong, designer.TempoTimeline);
+                GridControlLinesManager.AttachSectionTimeline(dgSong, designer.SectionTrack);
+                GridControlLinesManager.AttachHarmonyTimeline(dgSong, designer.HarmonyTrack);
+                GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, designer.TimeSignatureTrack);
+                GridControlLinesManager.AttachTempoTimeline(dgSong, designer.TempoTrack);
             }
         }
 

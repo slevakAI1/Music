@@ -11,12 +11,12 @@ namespace Music.Writer
         #region AttachSectionTimeline
 
         /// <summary>
-        /// Public helper to attach a SectionTimeline instance to the fixed Section row's hidden data cell.
+        /// Public helper to attach a SectionTrack instance to the fixed Section row's hidden data cell.
         /// Safe to call anytime after the grid's columns and rows have been created.
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="sectionTimeline">SectionTimeline to store in the hidden data cell (null to skip)</param>
-        public static void AttachSectionTimeline(DataGridView dgSong, SectionTimeline? sectionTimeline)
+        /// <param name="sectionTimeline">SectionTrack to store in the hidden data cell (null to skip)</param>
+        public static void AttachSectionTimeline(DataGridView dgSong, SectionTrack? sectionTimeline)
         {
             if (sectionTimeline == null)
                 return;
@@ -35,8 +35,8 @@ namespace Music.Writer
         /// Populates the fixed Section row with section numbers at their respective measure positions.
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="sectionTimeline">SectionTimeline containing section events</param>
-        private static void PopulateSectionRow(DataGridView dgSong, SectionTimeline sectionTimeline)
+        /// <param name="sectionTimeline">SectionTrack containing section events</param>
+        private static void PopulateSectionRow(DataGridView dgSong, SectionTrack sectionTimeline)
         {
             // Store the timeline in the hidden data cell
             dgSong.Rows[SongGridManager.FIXED_ROW_SECTION].Cells["colData"].Value = sectionTimeline;
@@ -104,12 +104,12 @@ namespace Music.Writer
         #region AttachHarmonyTimeline
 
         /// <summary>
-        /// Public helper to attach a HarmonyTimeline instance to the fixed Harmony row's hidden data cell.
+        /// Public helper to attach a HarmonyTrack instance to the fixed Harmony row's hidden data cell.
         /// Safe to call anytime after the grid's columns and rows have been created.
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="harmonyTimeline">HarmonyTimeline to store in the hidden data cell (null to skip)</param>
-        public static void AttachHarmonyTimeline(DataGridView dgSong, HarmonyTimeline? harmonyTimeline)
+        /// <param name="harmonyTimeline">HarmonyTrack to store in the hidden data cell (null to skip)</param>
+        public static void AttachHarmonyTimeline(DataGridView dgSong, HarmonyTrack? harmonyTimeline)
         {
             if (harmonyTimeline == null)
                 return;
@@ -129,8 +129,8 @@ namespace Music.Writer
         /// Multiple chords per measure are separated by line breaks.
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="harmonyTimeline">HarmonyTimeline containing harmony events</param>
-        private static void PopulateHarmonyRow(DataGridView dgSong, HarmonyTimeline harmonyTimeline)
+        /// <param name="harmonyTimeline">HarmonyTrack containing harmony events</param>
+        private static void PopulateHarmonyRow(DataGridView dgSong, HarmonyTrack harmonyTimeline)
         {
             // Store the timeline in the hidden data cell
             dgSong.Rows[SongGridManager.FIXED_ROW_HARMONY].Cells["colData"].Value = harmonyTimeline;
@@ -203,12 +203,12 @@ namespace Music.Writer
         #region AttachTimeSignatureTimeline
 
         /// <summary>
-        /// Public helper to attach a TimeSignatureTimeline instance to the fixed Time Signature row's hidden data cell.
+        /// Public helper to attach a TimeSignatureTrack instance to the fixed Time Signature row's hidden data cell.
         /// Safe to call anytime after the grid's columns and rows have been created.
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="timeSignatureTimeline">TimeSignatureTimeline to store in the hidden data cell (null to skip)</param>
-        public static void AttachTimeSignatureTimeline(DataGridView dgSong, TimeSignatureTimeline? timeSignatureTimeline)
+        /// <param name="timeSignatureTimeline">TimeSignatureTrack to store in the hidden data cell (null to skip)</param>
+        public static void AttachTimeSignatureTimeline(DataGridView dgSong, TimeSignatureTrack? timeSignatureTimeline)
         {
             if (timeSignatureTimeline == null)
                 return;
@@ -227,8 +227,8 @@ namespace Music.Writer
         /// Populates the fixed Time Signature row with time signature values at their respective measure positions.
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="timeSignatureTimeline">TimeSignatureTimeline containing time signature events</param>
-        private static void PopulateTimeSignatureRow(DataGridView dgSong, TimeSignatureTimeline timeSignatureTimeline)
+        /// <param name="timeSignatureTimeline">TimeSignatureTrack containing time signature events</param>
+        private static void PopulateTimeSignatureRow(DataGridView dgSong, TimeSignatureTrack timeSignatureTimeline)
         {
             // Store the timeline in the hidden data cell
             dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE].Cells["colData"].Value = timeSignatureTimeline;
@@ -283,12 +283,12 @@ namespace Music.Writer
         #region AttachTempoTimeline
 
         /// <summary>
-        /// Public helper to attach a TempoTimeline instance to the fixed Tempo row's hidden data cell.
+        /// Public helper to attach a TempoTrack instance to the fixed Tempo row's hidden data cell.
         /// Safe to call anytime after the grid's columns and rows have been created.
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="tempoTimeline">TempoTimeline to store in the hidden data cell (null to skip)</param>
-        public static void AttachTempoTimeline(DataGridView dgSong, TempoTimeline? tempoTimeline)
+        /// <param name="tempoTimeline">TempoTrack to store in the hidden data cell (null to skip)</param>
+        public static void AttachTempoTimeline(DataGridView dgSong, TempoTrack? tempoTimeline)
         {
             if (tempoTimeline == null)
                 return;
@@ -307,8 +307,8 @@ namespace Music.Writer
         /// Populates the fixed Tempo row with BPM values at their respective measure positions.
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="tempoTimeline">TempoTimeline containing tempo events</param>
-        private static void PopulateTempoRow(DataGridView dgSong, TempoTimeline tempoTimeline)
+        /// <param name="tempoTimeline">TempoTrack containing tempo events</param>
+        private static void PopulateTempoRow(DataGridView dgSong, TempoTrack tempoTimeline)
         {
             // Store the timeline in the hidden data cell
             dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO].Cells["colData"].Value = tempoTimeline;

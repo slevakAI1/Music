@@ -1,7 +1,7 @@
 namespace Music.Designer
 {
     // Global bar/beat-aligned time signature timeline
-    public class TimeSignatureTimeline
+    public class TimeSignatureTrack
     {
         private readonly Dictionary<int, TimeSignatureEvent> _barHeads = new(); // bar -> event active at beat 1
 

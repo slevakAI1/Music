@@ -15,8 +15,8 @@ namespace Music.Writer
     {
         public static MidiSongDocument Convert(
             List<SongTrack> songTracks,
-            TempoTimeline tempoTimeline,
-            TimeSignatureTimeline timeSignatureTimeline)
+            TempoTrack tempoTimeline,
+            TimeSignatureTrack timeSignatureTimeline)
         {
             if (songTracks == null) throw new ArgumentNullException(nameof(songTracks));
             if (tempoTimeline == null) throw new ArgumentNullException(nameof(tempoTimeline));

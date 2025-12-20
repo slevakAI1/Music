@@ -10,14 +10,14 @@
         // Design Space
         public VoiceSet Voices { get; set; } = new();
 
-        public SectionTimeline SectionTimeline { get; set; } = new();
+        public SectionTrack SectionTrack { get; set; } = new();
 
         // Harmony timeline persisted with the design
-        public HarmonyTimeline? HarmonyTimeline { get; set; }
+        public HarmonyTrack? HarmonyTrack { get; set; }
 
         // New: independent timelines for tempo and time signature
-        public TempoTimeline? TempoTimeline { get; set; }
-        public TimeSignatureTimeline? TimeSignatureTimeline { get; set; }
+        public TempoTrack? TempoTrack { get; set; }
+        public TimeSignatureTrack? TimeSignatureTrack { get; set; }
 
         public Designer(string? designId = null)
         {

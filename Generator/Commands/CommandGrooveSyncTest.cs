@@ -22,7 +22,7 @@ namespace Music.Generator
         {
             // Extract harmony timeline from the fixed harmony row
             var harmonyRow = dgSong.Rows[SongGridManager.FIXED_ROW_HARMONY];
-            var harmonyTimeline = harmonyRow.Cells["colData"].Value as HarmonyTimeline;
+            var harmonyTimeline = harmonyRow.Cells["colData"].Value as HarmonyTrack;
 
             if (harmonyTimeline == null || harmonyTimeline.Events.Count == 0)
             {
@@ -36,7 +36,7 @@ namespace Music.Generator
 
             // Extract time signature timeline
             var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
-            var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as TimeSignatureTimeline;
+            var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as TimeSignatureTrack;
 
             if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
             {

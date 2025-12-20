@@ -35,9 +35,9 @@ namespace Music.Designer
         // Prevent programmatic editor changes from writing back into the model
         private bool _suppressEditorApply;
 
-        public SectionTimeline ResultSections { get; private set; } = new SectionTimeline();
+        public SectionTrack ResultSections { get; private set; } = new SectionTrack();
 
-        public SectionEditorForm(SectionTimeline? initial = null)
+        public SectionEditorForm(SectionTrack? initial = null)
         {
             Text = "Edit Sections";
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -225,7 +225,7 @@ namespace Music.Designer
             };
         }
 
-        private void LoadInitial(SectionTimeline? initial)
+        private void LoadInitial(SectionTrack? initial)
         {
             _working.Clear();
 
@@ -587,9 +587,9 @@ namespace Music.Designer
             UpdateButtonsEnabled();
         }
 
-        private SectionTimeline BuildResult()
+        private SectionTrack BuildResult()
         {
-            var result = new SectionTimeline();
+            var result = new SectionTrack();
             foreach (var s in _working)
             {
                 result.Add(s.SectionType, s.BarCount, s.Name);
@@ -600,7 +600,7 @@ namespace Music.Designer
 
         private void ApplyDefaultSections()
         {
-            var defaults = new SectionTimeline();
+            var defaults = new SectionTrack();
             var defBuilder = new SectionTests();
             defBuilder.SetTestSectionsD1(defaults);
 

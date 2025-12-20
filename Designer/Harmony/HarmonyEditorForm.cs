@@ -44,7 +44,7 @@ namespace Music.Designer
         // Current global settings
         private int _beatsPerBar = 4;
 
-        public HarmonyTimeline ResultTimeline { get; private set; } = new HarmonyTimeline();
+        public HarmonyTrack ResultTimeline { get; private set; } = new HarmonyTrack();
 
         // Predefined values
         private static readonly string[] AllKeys = new[]
@@ -98,7 +98,7 @@ namespace Music.Designer
             };
         }
 
-        public HarmonyEditorForm(HarmonyTimeline? initial = null)
+        public HarmonyEditorForm(HarmonyTrack? initial = null)
         {
             Text = "Edit Harmony Timeline";
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -328,7 +328,7 @@ namespace Music.Designer
             cb.EndUpdate();
         }
 
-        private void LoadInitial(HarmonyTimeline? initial)
+        private void LoadInitial(HarmonyTrack? initial)
         {
             _working.Clear();
 
@@ -400,9 +400,9 @@ namespace Music.Designer
             UpdateButtonsEnabled();
         }
 
-        private HarmonyTimeline BuildResult()
+        private HarmonyTrack BuildResult()
         {
-            var tl = new HarmonyTimeline();
+            var tl = new HarmonyTrack();
             tl.ConfigureGlobal($"{_beatsPerBar}/4");
             foreach (var w in _working)
             {

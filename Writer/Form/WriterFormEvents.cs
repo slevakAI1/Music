@@ -35,7 +35,7 @@ namespace Music.Writer
 
             // Extract tempo timeline from fixed row
             var tempoRow = dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO];
-            var tempoTimeline = tempoRow.Cells["colData"].Value as Music.Designer.TempoTimeline;
+            var tempoTimeline = tempoRow.Cells["colData"].Value as Music.Designer.TempoTrack;
             if (tempoTimeline == null || tempoTimeline.Events.Count == 0)
             {
                 MessageBoxHelper.Show("No tempo events defined. Please add at least one tempo event.", "Missing Tempo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -44,7 +44,7 @@ namespace Music.Writer
 
             // Extract time signature timeline from fixed row
             var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
-            var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Designer.TimeSignatureTimeline;
+            var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Designer.TimeSignatureTrack;
             if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
             {
                 MessageBoxHelper.Show("No time signature events defined. Please add at least one time signature event.", "Missing Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -156,7 +156,7 @@ namespace Music.Writer
 
             // Extract tempo timeline from fixed row
             var tempoRow = dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO];
-            var tempoTimeline = tempoRow.Cells["colData"].Value as Music.Designer.TempoTimeline;
+            var tempoTimeline = tempoRow.Cells["colData"].Value as Music.Designer.TempoTrack;
             if (tempoTimeline == null || tempoTimeline.Events.Count == 0)
             {
                 MessageBoxHelper.Show("No tempo events defined. Please add at least one tempo event.", "Missing Tempo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -165,7 +165,7 @@ namespace Music.Writer
 
             // Extract time signature timeline from fixed row
             var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
-            var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Designer.TimeSignatureTimeline;
+            var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Designer.TimeSignatureTrack;
             if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
             {
                 MessageBoxHelper.Show("No time signature events defined. Please add at least one time signature event.", "Missing Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -378,12 +378,12 @@ namespace Music.Writer
         /// <summary>
         /// Extracts tempo and time signature events from MIDI event lists and converts them to timelines.
         /// </summary>
-        private static (TempoTimeline?, TimeSignatureTimeline?) ExtractTimelinesFromMidiEvents(
+        private static (TempoTrack?, TimeSignatureTrack?) ExtractTimelinesFromMidiEvents(
             List<List<MetaMidiEvent>> midiEventLists,
             short ticksPerQuarterNote)
         {
-            var tempoTimeline = new TempoTimeline();
-            var timeSignatureTimeline = new TimeSignatureTimeline();
+            var tempoTimeline = new TempoTrack();
+            var timeSignatureTimeline = new TimeSignatureTrack();
 
             // Assume 4/4 time signature initially for bar calculation
             int beatsPerBar = 4;
@@ -478,10 +478,10 @@ namespace Music.Writer
         {
             DesignerTests.SetTestDesignD1(designer);
 
-            GridControlLinesManager.AttachSectionTimeline(dgSong, designer.SectionTimeline);
-            GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, designer.TimeSignatureTimeline);
-            GridControlLinesManager.AttachTempoTimeline(dgSong, designer.TempoTimeline);
-            GridControlLinesManager.AttachHarmonyTimeline(dgSong, designer.HarmonyTimeline);
+            GridControlLinesManager.AttachSectionTimeline(dgSong, designer.SectionTrack);
+            GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, designer.TimeSignatureTrack);
+            GridControlLinesManager.AttachTempoTimeline(dgSong, designer.TempoTrack);
+            GridControlLinesManager.AttachHarmonyTimeline(dgSong, designer.HarmonyTrack);
         }
 
         public WriterFormData HandleSetWriterTestScenarioG1(Designer.Designer designer)
@@ -491,7 +491,7 @@ namespace Music.Writer
 
         public void HandleChordTest(Designer.Designer? designer)
         {
-            if (designer?.HarmonyTimeline == null || designer.HarmonyTimeline.Events.Count == 0)
+            if (designer?.HarmonyTrack == null || designer.HarmonyTrack.Events.Count == 0)
             {
                 MessageBoxHelper.Show(
                     "No harmony events available in the current design.",
@@ -501,7 +501,7 @@ namespace Music.Writer
                 return;
             }
 
-            var harmonyEvent = designer.HarmonyTimeline.Events[1];
+            var harmonyEvent = designer.HarmonyTrack.Events[1];
 
             List<SongTrackNoteEvent> notes;
             try

@@ -1,7 +1,7 @@
 namespace Music.Designer
 {
     // Global bar/beat-aligned groove timeline
-    public class GrooveTimeline
+    public class GrooveTrack
     {
         private readonly Dictionary<int, GrooveEvent> _barHeads = new(); // bar -> event active at beat 1
 

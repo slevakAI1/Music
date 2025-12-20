@@ -1,8 +1,8 @@
 namespace Music.Designer
 {
-    // The SectionTimeline contains an order list of Sections that constitutes an entire song.
+    // The SectionTrack contains an order list of Sections that constitutes an entire song.
 
-    public class SectionTimeline
+    public class SectionTrack
     {
         public List<Section> Sections { get; set; } = new();
 

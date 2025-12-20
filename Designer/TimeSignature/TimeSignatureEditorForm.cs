@@ -35,7 +35,7 @@ namespace Music.Designer
         // Suppress feedback updates while programmatically changing editor controls
         private bool _suppressEditorApply;
 
-        public TimeSignatureTimeline ResultTimeline { get; private set; } = new TimeSignatureTimeline();
+        public TimeSignatureTrack ResultTimeline { get; private set; } = new TimeSignatureTrack();
 
         private sealed class WorkingEvent
         {
@@ -45,7 +45,7 @@ namespace Music.Designer
             public int Denominator { get; set; } = 4;
         }
 
-        public TimeSignatureEditorForm(TimeSignatureTimeline? initial = null)
+        public TimeSignatureEditorForm(TimeSignatureTrack? initial = null)
         {
             Text = "Edit Time Signatures";
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -229,7 +229,7 @@ namespace Music.Designer
             };
         }
 
-        private void LoadInitial(TimeSignatureTimeline? initial)
+        private void LoadInitial(TimeSignatureTrack? initial)
         {
             _working.Clear();
 
@@ -545,9 +545,9 @@ namespace Music.Designer
             _dragItem = null;
         }
 
-        private TimeSignatureTimeline BuildResult()
+        private TimeSignatureTrack BuildResult()
         {
-            var tl = new TimeSignatureTimeline();
+            var tl = new TimeSignatureTrack();
             tl.ConfigureGlobal("4/4");
 
             foreach (var w in _working)

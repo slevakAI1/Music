@@ -22,8 +22,8 @@ namespace Music.Writer.Generator
 
 
         public static GeneratorResult Generate(
-            HarmonyTimeline harmonyTimeline,
-            TimeSignatureTimeline timeSignatureTimeline,
+            HarmonyTrack harmonyTimeline,
+            TimeSignatureTrack timeSignatureTimeline,
             GroovePreset groovePreset)
         {
             if (harmonyTimeline == null || harmonyTimeline.Events.Count == 0)
@@ -63,8 +63,8 @@ namespace Music.Writer.Generator
         /// <param name="settings">Optional randomization settings (uses defaults if null)</param>
         /// <returns>Dictionary of part name to generated track</returns>
         public static Dictionary<string, SongTrack> GenerateAllParts(
-            HarmonyTimeline harmonyTimeline,
-            TimeSignatureTimeline timeSignatureTimeline,
+            HarmonyTrack harmonyTimeline,
+            TimeSignatureTrack timeSignatureTimeline,
             RandomizationSettings? settings = null)
         {
             var result = new Dictionary<string, SongTrack>(StringComparer.OrdinalIgnoreCase);
@@ -98,7 +98,7 @@ namespace Music.Writer.Generator
         }
 
         private static SongTrack? GenerateBassTrack(
-            HarmonyTimeline harmonyTimeline,
+            HarmonyTrack harmonyTimeline,
             List<decimal> bassOnsets,
             int ticksPerQuarterNote,
             int ticksPerMeasure,
@@ -157,7 +157,7 @@ namespace Music.Writer.Generator
         }
 
         private static SongTrack GenerateBassTrack(
-            HarmonyTimeline harmonyTimeline,
+            HarmonyTrack harmonyTimeline,
             int ticksPerMeasure,
             int ticksPerQuarterNote,
             RandomizationSettings settings)
@@ -198,7 +198,7 @@ namespace Music.Writer.Generator
         }
 
         private static SongTrack? GenerateGuitarTrack(
-            HarmonyTimeline harmonyTimeline,
+            HarmonyTrack harmonyTimeline,
             List<decimal> compOnsets,
             int ticksPerQuarterNote,
             int ticksPerMeasure,
@@ -260,7 +260,7 @@ namespace Music.Writer.Generator
         }
 
         private static SongTrack GenerateGuitarTrack(
-            HarmonyTimeline harmonyTimeline,
+            HarmonyTrack harmonyTimeline,
             int ticksPerMeasure,
             int ticksPerQuarterNote,
             RandomizationSettings settings)
@@ -311,7 +311,7 @@ namespace Music.Writer.Generator
         // TO DO WHY ARE THERE 2 of these methods????
 
         private static SongTrack? GenerateKeysTrack(
-            HarmonyTimeline harmonyTimeline,
+            HarmonyTrack harmonyTimeline,
             List<decimal> padsOnsets,
             int ticksPerQuarterNote,
             int ticksPerMeasure,
@@ -381,7 +381,7 @@ namespace Music.Writer.Generator
         }
 
         private static SongTrack GenerateKeysTrack(
-            HarmonyTimeline harmonyTimeline,
+            HarmonyTrack harmonyTimeline,
             int ticksPerMeasure,
             int ticksPerQuarterNote,
             RandomizationSettings settings)

@@ -35,7 +35,7 @@ namespace Music.Designer
         // Suppress feedback updates while programmatically changing editor controls
         private bool _suppressEditorApply;
 
-        public TempoTimeline ResultTimeline { get; private set; } = new TempoTimeline();
+        public TempoTrack ResultTimeline { get; private set; } = new TempoTrack();
 
         private sealed class WorkingEvent
         {
@@ -44,7 +44,7 @@ namespace Music.Designer
             public int Bpm { get; set; } = 118;
         }
 
-        public TempoEditorForm(TempoTimeline? initial = null)
+        public TempoEditorForm(TempoTrack? initial = null)
         {
             Text = "Edit Tempo";
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -231,7 +231,7 @@ namespace Music.Designer
             };
         }
 
-        private void LoadInitial(TempoTimeline? initial)
+        private void LoadInitial(TempoTrack? initial)
         {
             _working.Clear();
 
@@ -553,9 +553,9 @@ namespace Music.Designer
             _dragItem = null;
         }
 
-        private TempoTimeline BuildResult()
+        private TempoTrack BuildResult()
         {
-            var tl = new TempoTimeline();
+            var tl = new TempoTrack();
 
             foreach (var w in _working)
             {

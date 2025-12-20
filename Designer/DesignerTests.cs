@@ -12,19 +12,19 @@ namespace Music.Designer
         {
             // 1) Sections: apply default/test structure
             var sectionTestData = new SectionTests();
-            sectionTestData.SetTestSectionsD1(design.SectionTimeline);
+            sectionTestData.SetTestSectionsD1(design.SectionTrack);
 
             // 2) Voices: apply default voices
             design.Voices.SetTestVoicesD1();    // TODO - the others have separate classes!
 
             // 3) Harmony timeline: use the same defaults as the Harmony Editor's "Set Defaults"
-            design.HarmonyTimeline = HarmonyTests.CreateTestTimelineD1();
+            design.HarmonyTrack = HarmonyTests.CreateTestTimelineD1();
 
             // 4) Time signature timeline: apply default (4/4 starting at bar 1)
-            design.TimeSignatureTimeline = TimeSignatureTests.CreateTestTimelineD1();
+            design.TimeSignatureTrack = TimeSignatureTests.CreateTestTimelineD1();
 
             // 5) Tempo timeline: include default tempo (112 BPM starting at bar 1)
-            design.TempoTimeline = TempoTests.CreateTestTimelineD1();
+            design.TempoTrack = TempoTests.CreateTestTimelineD1();
         }
     }
 }
