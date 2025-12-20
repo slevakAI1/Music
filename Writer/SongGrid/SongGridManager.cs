@@ -32,7 +32,7 @@ namespace Music.Writer
         /// <param name="tempoTimeline">Optional TempoTimeline to place into the fixed Tempo row hidden data cell</param>
         internal static void ConfigureSongGridView(
             DataGridView dgSong,
-            List<MidiInstrument> midiInstruments,
+            List<MidiVoices> midiInstruments,
             DataGridViewCellEventHandler cellValueChangedHandler,
             EventHandler currentCellDirtyStateChangedHandler,
             Designer.Designer? designer = null)
@@ -133,7 +133,7 @@ namespace Music.Writer
         /// </summary>
         private static void InitializeFixedRows(
             DataGridView dgSong,
-            List<MidiInstrument> midiInstruments,
+            List<MidiVoices> midiInstruments,
             Designer.Designer? designer = null)
         {
             // Add fixed rows
@@ -327,7 +327,7 @@ namespace Music.Writer
         /// <param name="rowNumber">Reference to the row counter (will be incremented)</param>
         internal static void AddSongTrackToGrid(
             SongTrack track,
-            List<MidiInstrument> midiInstruments,
+            List<MidiVoices> midiInstruments,
             DataGridView dgSong,
             ref int rowNumber)
         {
@@ -346,7 +346,7 @@ namespace Music.Writer
             // Replace the text box cell with a combo box cell
             var comboBoxCell = new DataGridViewComboBoxCell
             {
-                DataSource = new List<MidiInstrument>(midiInstruments),
+                DataSource = new List<MidiVoices>(midiInstruments),
                 DisplayMember = "Name",
                 ValueMember = "ProgramNumber",
                 DisplayStyle = DataGridViewComboBoxDisplayStyle.DropDownButton,

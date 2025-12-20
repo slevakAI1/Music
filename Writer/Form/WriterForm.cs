@@ -24,7 +24,7 @@ namespace Music.Writer
         private int trackNumber = 0;
 
         // MIDI instrument list for dropdown
-        private List<MidiInstrument> _midiInstruments;
+        private List<MidiVoices> _midiInstruments;
 
         // Event handlers instance
         private readonly WriterFormEventHandlers _eventHandlers = new();
@@ -44,7 +44,7 @@ namespace Music.Writer
             _midiIoService = new MidiIoService();
 
             // Initialize MIDI instruments list
-            _midiInstruments = MidiInstrument.GetGeneralMidiInstruments();
+            _midiInstruments = MidiVoices.GetMidiVoices();
 
             // Window behavior similar to other forms
             this.FormBorderStyle = FormBorderStyle.Sizable;

@@ -13,7 +13,7 @@ namespace Music.Writer
 
         public void HandleAddSongTrack(
             DataGridView dgSong,
-            List<MidiInstrument> midiInstruments,
+            List<MidiVoices> midiInstruments,
             ref int trackNumber)
         {
             // Create an empty SongTrack and add it to the grid via the existing helper.

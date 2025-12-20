@@ -16,7 +16,7 @@ namespace Music.Writer
         /// <param name="sourceTicksPerQuarterNote">The ticks per quarter note from the source MIDI file (default 480)</param>
         public static List<SongTrack> Convert(
             List<List<MetaMidiEvent>> midiEventLists,
-            List<MidiInstrument> midiInstruments,
+            List<MidiVoices> midiInstruments,
             short sourceTicksPerQuarterNote)
         {
             var songTracks = new List<SongTrack>();

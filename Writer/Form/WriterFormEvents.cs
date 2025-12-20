@@ -281,7 +281,7 @@ namespace Music.Writer
         public void HandleImport(
             DataGridView dgSong,
             MidiIoService midiIoService,
-            List<MidiInstrument> midiInstruments,
+            List<MidiVoices> midiInstruments,
             ref int trackNumber)
         {
             using var ofd = new OpenFileDialog

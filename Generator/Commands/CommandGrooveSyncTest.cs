@@ -17,7 +17,7 @@ namespace Music.Generator
         /// </summary>
         public static void HandleGrooveSyncTest(
             DataGridView dgSong,
-            List<MidiInstrument> midiInstruments,
+            List<MidiVoices> midiInstruments,
             ref int songTrackNumber)
         {
             // Extract harmony timeline from the fixed harmony row

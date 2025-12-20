@@ -1,19 +1,14 @@
-
-
-// TO DO - standardize on a name for voices - instruments - parts - etc -- Should only be MidiVoice!
-
-
 namespace Music.MyMidi
 {
     /// <summary>
-    /// Represents a General MIDI instrument with its program number and display name.
+    /// Represents a General MIDI Voice with its program number and display name.
     /// </summary>
-    public sealed class MidiInstrument
+    public sealed class MidiVoices
     {
         public int ProgramNumber { get; }
         public string Name { get; }
 
-        public MidiInstrument(int programNumber, string name)
+        public MidiVoices(int programNumber, string name)
         {
             ProgramNumber = programNumber;
             Name = name;
@@ -22,13 +17,13 @@ namespace Music.MyMidi
         public override string ToString() => Name;
 
         /// <summary>
-        /// Returns the complete General MIDI instrument set (0-127),
+        /// Returns the complete General MIDI Voice set (ProgramNumber 0-127),
         /// plus a pseudo-entry for the GM Drum Set (Channel 10) using a sentinel program number (255).
-        /// Note: In GM, drums use Channel 10 and ignore program changes; 255 here is for UI/round-tripping only.
+        /// Drum Set uses Channel 10 and ignores program changes.
         /// </summary>
-        public static List<MidiInstrument> GetGeneralMidiInstruments()
+        public static List<MidiVoices> GetMidiVoices()
         {
-            return new List<MidiInstrument>
+            return new List<MidiVoices>
             {
                 new (-1, "Select..."),
 
@@ -192,7 +187,7 @@ namespace Music.MyMidi
                 new(126, "Applause"),
                 new(127, "Gunshot"),
 
-                // GM Drums (Channel 10, program ignored) - sentinel entry for UI and data round-tripping
+                // Drums (Channel 10, program ignored) - sentinel entry for UI
                 new(255, "Drum Set")
             };
         }
