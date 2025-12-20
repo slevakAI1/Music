@@ -18,5 +18,20 @@ namespace Music.Designer
 
             return timeline;
         }
+
+        // Adds a minimal GrooveTrack for test/default designs.
+        // One groove event at bar 1 beat 1 using the PopRockBasic preset.
+        public static GrooveTrack CreateTestGrooveD1()
+        {
+            var groove = new GrooveTrack();
+            groove.BeatsPerBar = 4;
+            groove.Add(new GrooveEvent
+            {
+                StartBar = 1,
+                StartBeat = 1,
+                GroovePresetName = "PopRockBasic"
+            });
+            return groove;
+        }
     }
 }
