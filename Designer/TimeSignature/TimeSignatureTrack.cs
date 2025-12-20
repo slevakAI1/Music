@@ -1,5 +1,6 @@
 namespace Music.Designer
 {
+    // This is a design track for time signature
     // Global bar/beat-aligned time signature timeline
     public class TimeSignatureTrack
     {

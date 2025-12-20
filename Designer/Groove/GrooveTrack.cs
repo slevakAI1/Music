@@ -1,5 +1,6 @@
 namespace Music.Designer
 {
+    // This is a design track for Groove
     // Global bar/beat-aligned groove timeline
     public class GrooveTrack
     {

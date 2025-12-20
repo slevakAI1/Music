@@ -1,6 +1,8 @@
 namespace Music.Designer
 {
+    // This is a design track for Harmony
     // Global bar/beat-aligned harmony timeline
+
     public class HarmonyTrack
     {
         private readonly Dictionary<int, HarmonyEvent> _barHeads = new(); // bar -> event active at beat 1

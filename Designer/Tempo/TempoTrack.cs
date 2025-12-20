@@ -1,5 +1,6 @@
 namespace Music.Designer
 {
+    // This is a design track for tempo
     // Global bar/beat-aligned tempo timeline
     public class TempoTrack
     {
