@@ -110,5 +110,10 @@ namespace Music
             Music.Designer.DesignerTests.SetTestDesignD1(design);
             DesignerFormHandler.UpdateDesignerReport(this);
         }
+
+        private void btnEditGroove_Click(object sender, EventArgs e)
+        {
+            DesignerFormHandler.EditGroove(this);
+        }
     }
 }

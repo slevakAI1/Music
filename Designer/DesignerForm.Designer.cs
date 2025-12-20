@@ -22,11 +22,13 @@ namespace Music
             panel1 = new Panel();
             panel2 = new Panel();
             label2 = new Label();
+            btnEditGroove = new Button();
+            panel2.SuspendLayout();
             SuspendLayout();
             // 
             // btnEditSections
             // 
-            btnEditSections.Location = new Point(41, 349);
+            btnEditSections.Location = new Point(41, 381);
             btnEditSections.Name = "btnEditSections";
             btnEditSections.Size = new Size(96, 23);
             btnEditSections.TabIndex = 0;
@@ -75,7 +77,7 @@ namespace Music
             // 
             // btnEditHarmony
             // 
-            btnEditHarmony.Location = new Point(41, 384);
+            btnEditHarmony.Location = new Point(14, 148);
             btnEditHarmony.Name = "btnEditHarmony";
             btnEditHarmony.Size = new Size(96, 23);
             btnEditHarmony.TabIndex = 15;
@@ -105,7 +107,7 @@ namespace Music
             // 
             // btnEditTimeSignature
             // 
-            btnEditTimeSignature.Location = new Point(41, 419);
+            btnEditTimeSignature.Location = new Point(14, 45);
             btnEditTimeSignature.Name = "btnEditTimeSignature";
             btnEditTimeSignature.Size = new Size(96, 23);
             btnEditTimeSignature.TabIndex = 18;
@@ -115,7 +117,7 @@ namespace Music
             // 
             // btnEditTempo
             // 
-            btnEditTempo.Location = new Point(41, 454);
+            btnEditTempo.Location = new Point(41, 415);
             btnEditTempo.Name = "btnEditTempo";
             btnEditTempo.Size = new Size(96, 23);
             btnEditTempo.TabIndex = 19;
@@ -162,9 +164,12 @@ namespace Music
             // panel2
             // 
             panel2.BorderStyle = BorderStyle.FixedSingle;
+            panel2.Controls.Add(btnEditGroove);
+            panel2.Controls.Add(btnEditHarmony);
+            panel2.Controls.Add(btnEditTimeSignature);
             panel2.Location = new Point(26, 301);
             panel2.Name = "panel2";
-            panel2.Size = new Size(138, 191);
+            panel2.Size = new Size(138, 220);
             panel2.TabIndex = 24;
             // 
             // label2
@@ -177,6 +182,16 @@ namespace Music
             label2.TabIndex = 25;
             label2.Text = "Designer Report";
             // 
+            // btnEditGroove
+            // 
+            btnEditGroove.Location = new Point(14, 183);
+            btnEditGroove.Name = "btnEditGroove";
+            btnEditGroove.Size = new Size(96, 23);
+            btnEditGroove.TabIndex = 19;
+            btnEditGroove.Text = "Groove";
+            btnEditGroove.UseVisualStyleBackColor = true;
+            btnEditGroove.Click += btnEditGroove_Click;
+            // 
             // DesignerForm
             // 
             ClientSize = new Size(1085, 804);
@@ -186,10 +201,8 @@ namespace Music
             Controls.Add(lblDesign);
             Controls.Add(lblEdit);
             Controls.Add(btnEditTempo);
-            Controls.Add(btnEditTimeSignature);
             Controls.Add(btnLoad);
             Controls.Add(btnSetDefault);
-            Controls.Add(btnEditHarmony);
             Controls.Add(txtDesignerReport);
             Controls.Add(btnNew);
             Controls.Add(btnSave);
@@ -199,6 +212,7 @@ namespace Music
             Name = "DesignerForm";
             WindowState = FormWindowState.Maximized;
             Load += MusicForm_Load;
+            panel2.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -219,5 +233,6 @@ namespace Music
         private Panel panel1;
         private Panel panel2;
         private Label label2;
+        private Button btnEditGroove;
     }
 }

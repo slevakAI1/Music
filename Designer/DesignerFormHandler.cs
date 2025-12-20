@@ -1,5 +1,6 @@
 using Music.Designer;
 using Music.Writer;
+using System.ComponentModel.Design;
 using System.Reflection;
 
 namespace Music
@@ -144,6 +145,23 @@ namespace Music
                 UpdateDesignerReport(form);
             }
         }
+
+        public static void EditGroove(DesignerForm form)
+        {
+            if (!EnsureDesignOrNotify(form)) return;
+
+            var existing = Globals.Designer!.GrooveTrack;
+            using var dlg = new GrooveEditorForm(existing);
+            if (dlg.ShowDialog(form) == DialogResult.OK)
+            {
+                Globals.Designer!.GrooveTrack = dlg.ResultTimeline;
+                Globals.Designer!.GrooveTrack?.EnsureIndexed();
+                // UpdateDesignerReport(form); -- may be deprecated soon
+            }
+        }
+
+
+
 
         public static void EditTimeSignature(DesignerForm form)
         {
