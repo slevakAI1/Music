@@ -26,12 +26,8 @@ namespace Music.Designer
             // 5) Tempo timeline: include default tempo (112 BPM starting at bar 1)
             design.TempoTrack = TempoTests.CreateTestTimelineD1();
 
-            // TO DO - finish this:
             // 6) Groove timeline: set one event at bar 1 beat one for PopRockBasic preset
-            design.GrooveTrack = TempoTests.CreateTestGrooveD1();
-
-
-
+            design.GrooveTrack = GrooveTests.CreateTestGrooveD1();
         }
     }
 }
