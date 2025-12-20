@@ -1,24 +1,24 @@
-namespace Music
+namespace Music.Generator
 {
     /// <summary>
     /// Centralized chord quality definitions. Single source of truth for all chord quality strings.
-    /// Short names (e.g., "maj", "min7") are used internally; long names (e.g., "Major", "Minor7") are for UI display.
+    /// Short names use standard chord symbol notation (e.g., "", "m7", "7"); long names are for UI display (e.g., "Major", "Minor7").
     /// </summary>
     public static class ChordQuality
     {
         /// <summary>
-        /// Represents a chord quality with short and long name variants.
+        /// Represents a chord quality with short (standard chord symbol) and long name variants.
         /// </summary>
         public readonly record struct Quality(string ShortName, string LongName);
 
         /// <summary>
-        /// All supported chord qualities. Short names are the canonical internal format.
+        /// All supported chord qualities. Short names use standard chord symbol notation.
         /// </summary>
         public static readonly IReadOnlyList<Quality> All = new Quality[]
         {
             // Triads
-            new("maj", "Major"),
-            new("min", "Minor"),
+            new("", "Major"),
+            new("m", "Minor"),
             new("dim", "Diminished"),
             new("aug", "Augmented"),
             new("sus2", "Sus2"),
@@ -26,22 +26,22 @@ namespace Music
             new("5", "Power5"),
 
             // 6ths
-            new("maj6", "Major6"),
-            new("min6", "Minor6"),
+            new("6", "Major6"),
+            new("m6", "Minor6"),
             new("6/9", "Major6Add9"),
 
             // 7ths
-            new("dom7", "Dominant7"),
+            new("7", "Dominant7"),
             new("maj7", "Major7"),
-            new("min7", "Minor7"),
+            new("m7", "Minor7"),
             new("dim7", "Diminished7"),
-            new("hdim7", "HalfDiminished7"),
-            new("minMaj7", "MinorMajor7"),
+            new("m7b5", "HalfDiminished7"),
+            new("m(maj7)", "MinorMajor7"),
 
             // Extensions
             new("9", "Dominant9"),
             new("maj9", "Major9"),
-            new("min9", "Minor9"),
+            new("m9", "Minor9"),
             new("11", "Dominant11"),
             new("13", "Dominant13"),
 
@@ -51,7 +51,7 @@ namespace Music
         };
 
         /// <summary>
-        /// All short names for dropdowns and lookups.
+        /// All short names (standard chord symbols) for internal use.
         /// </summary>
         public static readonly IReadOnlyList<string> ShortNames = All.Select(q => q.ShortName).ToList();
 
@@ -60,14 +60,14 @@ namespace Music
         /// </summary>
         public static readonly IReadOnlyList<string> LongNames = All.Select(q => q.LongName).ToList();
 
-        private static readonly Dictionary<string, string> _shortToLong = 
+        private static readonly Dictionary<string, string> _shortToLong =
             All.ToDictionary(q => q.ShortName, q => q.LongName, StringComparer.OrdinalIgnoreCase);
 
-        private static readonly Dictionary<string, string> _longToShort = 
+        private static readonly Dictionary<string, string> _longToShort =
             All.ToDictionary(q => q.LongName, q => q.ShortName, StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
-        /// Converts a short name to its long name equivalent.
+        /// Converts a short name (chord symbol) to its long name equivalent.
         /// Returns the input unchanged if not found (for forward compatibility).
         /// </summary>
         public static string ToLongName(string shortName)
@@ -78,7 +78,7 @@ namespace Music
         }
 
         /// <summary>
-        /// Converts a long name to its short name equivalent.
+        /// Converts a long name to its short name (chord symbol) equivalent.
         /// Returns the input unchanged if not found (for forward compatibility).
         /// </summary>
         public static string ToShortName(string longName)
@@ -89,18 +89,18 @@ namespace Music
         }
 
         /// <summary>
-        /// Normalizes any quality string (short or long) to its canonical short name.
+        /// Normalizes any quality string (short or long) to its canonical short name (chord symbol).
         /// </summary>
         public static string Normalize(string quality)
         {
             if (string.IsNullOrWhiteSpace(quality))
-                return "maj"; // Default
+                return ""; // Default to Major
 
             var trimmed = quality.Trim();
 
             // Already a short name?
             if (_shortToLong.ContainsKey(trimmed))
-                return _shortToLong.First(kvp => 
+                return _shortToLong.First(kvp =>
                     kvp.Key.Equals(trimmed, StringComparison.OrdinalIgnoreCase)).Key;
 
             // Long name?

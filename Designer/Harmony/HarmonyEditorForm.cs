@@ -1,9 +1,5 @@
+using Music.Generator;
 using Music.Writer;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace Music.Designer
 {
@@ -57,19 +53,8 @@ namespace Music.Designer
             "D minor","G minor","C minor","F minor","Bb minor","Eb minor","Ab minor"
         };
 
-        private static readonly string[] AllQualities = new[]
-        {
-            // Triads
-            "maj","min","dim","aug","sus2","sus4","5",
-            // 6ths
-            "maj6","min6","6/9",
-            // 7ths
-            "dom7","maj7","min7","dim7","hdim7","minMaj7",
-            // Extensions
-            "9","maj9","min9","11","13",
-            // Adds
-            "add9","add11"
-        };
+        // Use centralized chord quality long names for UI display
+        private static readonly string[] AllQualities = ChordQuality.LongNames.ToArray();
 
         private static readonly string[] AllBassOptions = new[]
         {
@@ -83,7 +68,7 @@ namespace Music.Designer
             public int DurationBeats { get; set; } = 4;
             public string Key { get; set; } = "C major";
             public int Degree { get; set; } = 1; // 1..7
-            public string Quality { get; set; } = "maj";
+            public string Quality { get; set; } = "maj"; // Always stored as short name
             public string Bass { get; set; } = "root";
 
             public WorkingEvent Clone() => new WorkingEvent
@@ -260,14 +245,14 @@ namespace Music.Designer
             editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
             editor.Controls.Add(new Label { Text = "Quality:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) }, 0, row);
             _cbQuality = CreateSelectorCombo();
-            _cbQuality.TextChanged += (s, e) => ApplyEditorToSelected();
+            _cbQuality.SelectedIndexChanged += (s, e) => ApplyEditorToSelected(); // Changed from TextChanged
             editor.Controls.Add(_cbQuality, 1, row);
             row++;
 
             editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
             editor.Controls.Add(new Label { Text = "Bass:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) }, 0, row);
             _cbBass = CreateSelectorCombo();
-            _cbBass.TextChanged += (s, e) => ApplyEditorToSelected();
+            _cbBass.SelectedIndexChanged += (s, e) => ApplyEditorToSelected(); // Changed from TextChanged
             editor.Controls.Add(_cbBass, 1, row);
             row++;
 
@@ -315,7 +300,7 @@ namespace Music.Designer
             FillCombo(_cbBass, AllBassOptions);
 
             if (string.IsNullOrWhiteSpace(_cbKey.Text)) _cbKey.Text = "C major";
-            if (string.IsNullOrWhiteSpace(_cbQuality.Text)) _cbQuality.Text = "maj";
+            if (string.IsNullOrWhiteSpace(_cbQuality.Text)) _cbQuality.Text = ChordQuality.LongNames[0]; // "Major"
             if (string.IsNullOrWhiteSpace(_cbBass.Text)) _cbBass.Text = "root";
         }
 
@@ -354,7 +339,7 @@ namespace Music.Designer
                     DurationBeats = he.DurationBeats,
                     Key = he.Key,
                     Degree = he.Degree,
-                    Quality = he.Quality,
+                    Quality = ChordQuality.Normalize(he.Quality), // Normalize to short name
                     Bass = he.Bass
                 });
             }
@@ -413,7 +398,7 @@ namespace Music.Designer
                     DurationBeats = w.DurationBeats,
                     Key = w.Key,
                     Degree = w.Degree,
-                    Quality = w.Quality,
+                    Quality = w.Quality, // Already stored as short name
                     Bass = w.Bass
                 });
             }
@@ -433,7 +418,7 @@ namespace Music.Designer
                 item.SubItems.Add(w.DurationBeats.ToString());
                 item.SubItems.Add(w.Key);
                 item.SubItems.Add(w.Degree.ToString());
-                item.SubItems.Add(w.Quality);
+                item.SubItems.Add(w.Quality); // Display short name in list
                 item.SubItems.Add(w.Bass);
                 item.Tag = w;
                 _lv.Items.Add(item);
@@ -516,7 +501,8 @@ namespace Music.Designer
                 _numDuration.Value = Math.Max(_numDuration.Minimum, Math.Min(_numDuration.Maximum, w.DurationBeats));
                 _cbKey.Text = w.Key ?? string.Empty;
                 _numDegree.Value = Math.Max(_numDegree.Minimum, Math.Min(_numDegree.Maximum, w.Degree));
-                _cbQuality.Text = w.Quality ?? string.Empty;
+                // Convert short name to long name for UI display
+                _cbQuality.Text = ChordQuality.ToLongName(w.Quality) ?? string.Empty;
                 _cbBass.Text = w.Bass ?? string.Empty;
                 _lblStart.Text = $"{w.StartBar}:{w.StartBeat}";
             }
@@ -544,11 +530,13 @@ namespace Music.Designer
             w.DurationBeats = (int)_numDuration.Value;
             w.Key = string.IsNullOrWhiteSpace(_cbKey.Text) ? "C major" : _cbKey.Text.Trim();
             w.Degree = (int)_numDegree.Value;
-            w.Quality = string.IsNullOrWhiteSpace(_cbQuality.Text) ? "maj" : _cbQuality.Text.Trim();
+            // Convert long name from UI to short name for storage
+            w.Quality = ChordQuality.ToShortName(
+                string.IsNullOrWhiteSpace(_cbQuality.Text) ? "Major" : _cbQuality.Text.Trim());
             w.Bass = string.IsNullOrWhiteSpace(_cbBass.Text) ? "root" : _cbBass.Text.Trim();
 
             RecalculateStartPositions();
-            UpdateRowVisuals(_lv.SelectedIndices[0]);
+            UpdateRowVisuals(_lv.SelectedIndices[0]); // This line was missing!
             UpdateButtonsEnabled();
         }
 
@@ -570,7 +558,7 @@ namespace Music.Designer
                 DurationBeats = duration,
                 Key = key,
                 Degree = degree,
-                Quality = quality,
+                Quality = quality, // Already converted to short name in ValidateAndGetEditorValues
                 Bass = bass
             };
 
@@ -741,7 +729,7 @@ namespace Music.Designer
                     DurationBeats = he.DurationBeats,
                     Key = he.Key,
                     Degree = he.Degree,
-                    Quality = he.Quality,
+                    Quality = ChordQuality.Normalize(he.Quality), // Normalize to short name
                     Bass = he.Bass
                 });
             }
@@ -761,15 +749,10 @@ namespace Music.Designer
                 w.StartBar = bar;
                 w.StartBeat = beat;
 
-                // advance by duration in beats
-                int remaining = w.DurationBeats;
-                int localBeatIndex = beat - 1; // 0-based index within bar
-                remaining += localBeatIndex;
-
-                // compute new bar/beat after advancing
+                // advance to next event position
+                int remaining = w.DurationBeats + (beat - 1);
                 bar += remaining / _beatsPerBar;
-                int newBeatIndex = remaining % _beatsPerBar;
-                beat = newBeatIndex + 1;
+                beat = (remaining % _beatsPerBar) + 1;
             }
 
             // Update visible rows that exist
@@ -825,7 +808,9 @@ namespace Music.Designer
             error = null;
             key = string.IsNullOrWhiteSpace(_cbKey.Text) ? "C major" : _cbKey.Text.Trim();
             degree = (int)_numDegree.Value;
-            quality = string.IsNullOrWhiteSpace(_cbQuality.Text) ? "maj" : _cbQuality.Text.Trim();
+            // Convert long name from UI to short name
+            quality = ChordQuality.ToShortName(
+                string.IsNullOrWhiteSpace(_cbQuality.Text) ? "Major" : _cbQuality.Text.Trim());
             bass = string.IsNullOrWhiteSpace(_cbBass.Text) ? "root" : _cbBass.Text.Trim();
             duration = (int)_numDuration.Value;
 

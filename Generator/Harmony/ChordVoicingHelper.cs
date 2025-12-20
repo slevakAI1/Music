@@ -13,7 +13,7 @@ namespace Music.Generator
         /// </summary>
         /// <param name="key">The key (e.g., "C major", "F# minor")</param>
         /// <param name="degree">The scale degree (1-7)</param>
-        /// <param name="quality">The chord quality (e.g., "maj", "min7")</param>
+        /// <param name="quality">The chord quality (standard chord symbol, e.g., "", "m7", "7")</param>
         /// <param name="bass">The bass note option (e.g., "root", "3rd", "5th")</param>
         /// <param name="baseOctave">The base octave for chord voicing</param>
         /// <returns>List of MIDI note numbers representing the chord</returns>
@@ -28,8 +28,8 @@ namespace Music.Generator
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException("Key cannot be null or empty", nameof(key));
-            if (string.IsNullOrWhiteSpace(quality))
-                throw new ArgumentException("Quality cannot be null or empty", nameof(quality));
+            if (quality == null)
+                throw new ArgumentException("Quality cannot be null", nameof(quality));
             if (string.IsNullOrWhiteSpace(bass))
                 throw new ArgumentException("Bass cannot be null or empty", nameof(bass));
 
@@ -52,8 +52,9 @@ namespace Music.Generator
                 
                 var degreeNote = scaleNotes[degree - 1];
                 
-                // Step 4: Map quality string to ChordType
-                var chordType = MapQualityToChordType(quality);
+                // Step 4: Map quality string to ChordType (normalize first)
+                var normalizedQuality = ChordQuality.Normalize(quality);
+                var chordType = MapQualityToChordType(normalizedQuality);
                 
                 // Step 5: Create the chord using the degree note's pitch class with the specified quality
                 var chordRoot = new Note(degreeNote.Name, degreeNote.Alteration, baseOctave);
@@ -135,50 +136,47 @@ namespace Music.Generator
         }
 
         /// <summary>
-        /// Maps quality strings from HarmonyEditorForm to MusicTheory ChordType.
-        /// Handles normalization of quality strings used in HarmonyEvent.
+        /// Maps normalized standard chord symbols to MusicTheory ChordType.
+        /// Expects input to already be normalized via ChordQuality.Normalize().
         /// </summary>
         private static ChordType MapQualityToChordType(string quality)
         {
-            // Normalize: trim and handle variations
-            var normalized = quality?.Trim().ToLowerInvariant() ?? string.Empty;
-
-            return normalized switch
+            return quality switch
             {
                 // Triads
-                "maj" or "major" => ChordType.Major,
-                "min" or "minor" => ChordType.Minor,
-                "dim" or "diminished" => ChordType.Diminished,
-                "aug" or "augmented" => ChordType.Augmented,
+                "" => ChordType.Major,
+                "m" => ChordType.Minor,
+                "dim" => ChordType.Diminished,
+                "aug" => ChordType.Augmented,
                 "sus2" => ChordType.Sus2,
                 "sus4" => ChordType.Sus4,
-                "5" or "power5" => ChordType.Power5,
+                "5" => ChordType.Power5,
 
                 // 6ths
-                "maj6" or "major6" => ChordType.Major6,
-                "min6" or "minor6" => ChordType.Minor6,
-                "6/9" or "major6add9" => ChordType.Major6Add9,
+                "6" => ChordType.Major6,
+                "m6" => ChordType.Minor6,
+                "6/9" => ChordType.Major6Add9,
 
                 // 7ths
-                "dom7" or "dominant7" => ChordType.Dominant7,
-                "maj7" or "major7" => ChordType.Major7,
-                "min7" or "minor7" => ChordType.Minor7,
-                "dim7" or "diminished7" => ChordType.Diminished7,
-                "hdim7" or "halfdiminished7" => ChordType.HalfDiminished7,
-                "minmaj7" or "minormajor7" => ChordType.MinorMajor7,
+                "7" => ChordType.Dominant7,
+                "maj7" => ChordType.Major7,
+                "m7" => ChordType.Minor7,
+                "dim7" => ChordType.Diminished7,
+                "m7b5" => ChordType.HalfDiminished7,
+                "m(maj7)" => ChordType.MinorMajor7,
 
                 // Extensions
-                "9" or "dominant9" => ChordType.Dominant9,
-                "maj9" or "major9" => ChordType.Major9,
-                "min9" or "minor9" => ChordType.Minor9,
-                "11" or "dominant11" => ChordType.Dominant11,
-                "13" or "dominant13" => ChordType.Dominant13,
+                "9" => ChordType.Dominant9,
+                "maj9" => ChordType.Major9,
+                "m9" => ChordType.Minor9,
+                "11" => ChordType.Dominant11,
+                "13" => ChordType.Dominant13,
 
                 // Adds
-                "add9" or "majoradd9" => ChordType.MajorAdd9,
-                "add11" or "majoradd11" => ChordType.MajorAdd11,
+                "add9" => ChordType.MajorAdd9,
+                "add11" => ChordType.MajorAdd11,
 
-                _ => throw new NotSupportedException($"Chord quality '{quality}' is not supported. Valid values include: maj, min, dim, aug, sus2, sus4, 5, maj6, min6, 6/9, dom7, maj7, min7, dim7, hdim7, minMaj7, 9, maj9, min9, 11, 13, add9, add11")
+                _ => throw new NotSupportedException($"Chord quality '{quality}' is not supported. Valid chord symbols: {string.Join(", ", ChordQuality.ShortNames)}")
             };
         }
 

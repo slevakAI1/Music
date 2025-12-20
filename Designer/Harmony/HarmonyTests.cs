@@ -8,13 +8,14 @@ namespace Music.Designer
             var timeline = new HarmonyTrack();
             timeline.ConfigureGlobal(DesignerTests.GlobalTimeSignature);
 
-            // Common 4-chord loop: I – V – vi – IV, two bars per chord across 48 bars.
+            // Common 4-chord loop: I – V – vi – IV, two bars per 48 bars.
+            // Using standard chord symbols
             var pattern = new (int degree, string quality)[]
             {
-                (1, "Major"),
-                (5, "Dominant7"),
-                (6, "Minor7"),
-                (4, "Major")
+                (1, ""),      // Major
+                (5, "7"),     // Dominant7
+                (6, "m7"),    // Minor7
+                (4, "")       // Major
             };
 
             for (int bar = 1; bar <= DesignerTests.TotalBars; bar++)

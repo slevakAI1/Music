@@ -1,3 +1,5 @@
+using Music.Generator;
+
 namespace Music.Writer
 {
     /// <summary>
@@ -37,10 +39,11 @@ namespace Music.Writer
 
         /// <summary>
         /// Converts chord parameters to standard chord notation symbol (e.g., "Cmaj7", "Am", "G7/B").
+        /// Input quality should already be a standard chord symbol ("", "m7", "7", etc.).
         /// </summary>
         /// <param name="key">The key (e.g., "C major", "F# minor")</param>
         /// <param name="degree">The scale degree (1-7)</param>
-        /// <param name="quality">The chord quality (e.g., "Major", "Minor7", "Dominant7")</param>
+        /// <param name="quality">The chord quality (standard chord symbol, e.g., "", "m7", "7")</param>
         /// <param name="bass">The bass note (e.g., "root", "3rd", "5th")</param>
         /// <returns>Chord symbol notation string</returns>
         public static string ConvertToChordNotation(string key, int degree, string quality, string bass)
@@ -59,46 +62,20 @@ namespace Music.Writer
             var rootSemitones = intervals[degree - 1];
             var chordRoot = TransposeNote(keyRoot, rootSemitones);
 
-            // Map quality to chord symbol suffix
-            var suffix = quality switch
-            {
-                "Major" => "",
-                "Minor" => "m",
-                "Diminished" => "dim",
-                "Augmented" => "aug",
-                "Dominant7" => "7",
-                "Major7" => "maj7",
-                "Minor7" => "m7",
-                "Diminished7" => "dim7",
-                "HalfDiminished7" => "m7b5",
-                "MinorMajor7" => "m(maj7)",
-                "Major6" => "6",
-                "Minor6" => "m6",
-                "Sus2" => "sus2",
-                "Sus4" => "sus4",
-                "Power5" => "5",
-                "Dominant9" => "9",
-                "Major9" => "maj9",
-                "Minor9" => "m9",
-                "Dominant11" => "11",
-                "Dominant13" => "13",
-                "MajorAdd9" => "add9",
-                "MajorAdd11" => "add11",
-                "Major6Add9" => "6/9",
-                _ => ""
-            };
+            // Normalize quality to standard chord symbol (in case it's a long name)
+            var normalizedQuality = ChordQuality.Normalize(quality);
 
-            // Build base chord symbol
-            var symbol = $"{chordRoot}{suffix}";
+            // Build chord symbol by appending the quality suffix to the root
+            var symbol = $"{chordRoot}{normalizedQuality}";
 
             // Add slash chord notation if not root position
             if (!bass.Equals("root", StringComparison.OrdinalIgnoreCase))
             {
                 var bassInterval = bass.ToLowerInvariant() switch
                 {
-                    "3rd" => GetChordInterval(quality, 1),
-                    "5th" => GetChordInterval(quality, 2),
-                    "7th" => GetChordInterval(quality, 3),
+                    "3rd" => GetChordInterval(normalizedQuality, 1),
+                    "5th" => GetChordInterval(normalizedQuality, 2),
+                    "7th" => GetChordInterval(normalizedQuality, 3),
                     _ => 0
                 };
                 if (bassInterval > 0)
@@ -135,17 +112,17 @@ namespace Music.Writer
 
         private static int GetChordInterval(string quality, int noteIndex)
         {
-            // Get semitones for 3rd, 5th, 7th, etc. based on chord quality
+            // Get semitones for 3rd, 5th, 7th, etc. based on chord quality (uses standard chord symbols)
             return (quality, noteIndex) switch
             {
                 (_, 0) => 0, // Root
-                ("Major", 1) or ("Major7", 1) or ("Major6", 1) or ("Dominant7", 1) or ("Dominant9", 1) => 4, // Major 3rd
-                ("Minor", 1) or ("Minor7", 1) or ("Minor6", 1) or ("Diminished", 1) or ("HalfDiminished7", 1) => 3, // Minor 3rd
-                ("Diminished", 2) or ("Diminished7", 2) or ("HalfDiminished7", 2) => 6, // Diminished 5th
+                ("", 1) or ("maj7", 1) or ("6", 1) or ("7", 1) or ("9", 1) => 4, // Major 3rd
+                ("m", 1) or ("m7", 1) or ("m6", 1) or ("dim", 1) or ("m7b5", 1) => 3, // Minor 3rd
+                ("dim", 2) or ("dim7", 2) or ("m7b5", 2) => 6, // Diminished 5th
                 (_, 2) => 7, // Perfect 5th (most common)
-                ("Major7", 3) => 11, // Major 7th
-                ("Dominant7", 3) or ("Minor7", 3) or ("HalfDiminished7", 3) => 10, // Minor 7th
-                ("Diminished7", 3) => 9, // Diminished 7th
+                ("maj7", 3) => 11, // Major 7th
+                ("7", 3) or ("m7", 3) or ("m7b5", 3) => 10, // Minor 7th
+                ("dim7", 3) => 9, // Diminished 7th
                 _ => 0
             };
         }
@@ -291,6 +268,7 @@ namespace Music.Writer
 
             return dottedTicks;
         }
+
         /// <summary>
         /// Calculates the pitch properties (Step, Alter, Octave) from MIDI note number.
         /// </summary>
@@ -424,6 +402,5 @@ namespace Music.Writer
 
             return (calculatedDuration, 0, null, null);
         }
-
     }
 }
