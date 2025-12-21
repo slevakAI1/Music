@@ -64,12 +64,6 @@ namespace Music
             //_fileManager.ExportMusicXml(this);
         }
 
-        // Your top-level menu item handlers (wired via designer)
-        private void designToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ShowChildForm(typeof(DesignerForm));
-        }
-
         private void generateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Launch the new Writer form.

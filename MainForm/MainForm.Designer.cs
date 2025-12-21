@@ -38,21 +38,20 @@
             MenuImportMusicXml = new ToolStripMenuItem();
             MenuExportMusicXml = new ToolStripMenuItem();
             viewMusicXmlToolStripMenuItem = new ToolStripMenuItem();
-            designToolStripMenuItem = new ToolStripMenuItem();
+            importMidiToolStripMenuItem = new ToolStripMenuItem();
+            playMidiFileToolStripMenuItem = new ToolStripMenuItem();
             generateToolStripMenuItem = new ToolStripMenuItem();
             arrangerToolStripMenuItem = new ToolStripMenuItem();
             writerToolStripMenuItem = new ToolStripMenuItem();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
-            importMidiToolStripMenuItem = new ToolStripMenuItem();
-            playMidiFileToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { MenuFile, designToolStripMenuItem, generateToolStripMenuItem, arrangerToolStripMenuItem, writerToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { MenuFile, generateToolStripMenuItem, arrangerToolStripMenuItem, writerToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(796, 24);
@@ -69,30 +68,37 @@
             // MenuImportMusicXml
             // 
             MenuImportMusicXml.Name = "MenuImportMusicXml";
-            MenuImportMusicXml.Size = new Size(180, 22);
+            MenuImportMusicXml.Size = new Size(166, 22);
             MenuImportMusicXml.Text = "Import MusicXml";
             MenuImportMusicXml.Click += MenuImportMusicXml_Click;
             // 
             // MenuExportMusicXml
             // 
             MenuExportMusicXml.Name = "MenuExportMusicXml";
-            MenuExportMusicXml.Size = new Size(180, 22);
+            MenuExportMusicXml.Size = new Size(166, 22);
             MenuExportMusicXml.Text = "Export MusicXML";
             MenuExportMusicXml.Click += MenuExportMusicXml_Click;
             // 
             // viewMusicXmlToolStripMenuItem
             // 
             viewMusicXmlToolStripMenuItem.Name = "viewMusicXmlToolStripMenuItem";
-            viewMusicXmlToolStripMenuItem.Size = new Size(180, 22);
+            viewMusicXmlToolStripMenuItem.Size = new Size(166, 22);
             viewMusicXmlToolStripMenuItem.Text = "View MusicXml";
             viewMusicXmlToolStripMenuItem.Click += viewMusicXmlToolStripMenuItem_Click;
             // 
-            // designToolStripMenuItem
+            // importMidiToolStripMenuItem
             // 
-            designToolStripMenuItem.Name = "designToolStripMenuItem";
-            designToolStripMenuItem.Size = new Size(55, 20);
-            designToolStripMenuItem.Text = "Design";
-            designToolStripMenuItem.Click += designToolStripMenuItem_Click;
+            importMidiToolStripMenuItem.Name = "importMidiToolStripMenuItem";
+            importMidiToolStripMenuItem.Size = new Size(166, 22);
+            importMidiToolStripMenuItem.Text = "Import Midi File";
+            importMidiToolStripMenuItem.Click += importMidiToolStripMenuItem_Click;
+            // 
+            // playMidiFileToolStripMenuItem
+            // 
+            playMidiFileToolStripMenuItem.Name = "playMidiFileToolStripMenuItem";
+            playMidiFileToolStripMenuItem.Size = new Size(166, 22);
+            playMidiFileToolStripMenuItem.Text = "Play Midi File";
+            playMidiFileToolStripMenuItem.Click += playMidiFileToolStripMenuItem_Click;
             // 
             // generateToolStripMenuItem
             // 
@@ -130,20 +136,6 @@
             toolStripStatusLabel1.Size = new Size(63, 17);
             toolStripStatusLabel1.Text = "Status Info";
             // 
-            // importMidiToolStripMenuItem
-            // 
-            importMidiToolStripMenuItem.Name = "importMidiToolStripMenuItem";
-            importMidiToolStripMenuItem.Size = new Size(180, 22);
-            importMidiToolStripMenuItem.Text = "Import Midi File";
-            importMidiToolStripMenuItem.Click += importMidiToolStripMenuItem_Click;
-            // 
-            // playMidiFileToolStripMenuItem
-            // 
-            playMidiFileToolStripMenuItem.Name = "playMidiFileToolStripMenuItem";
-            playMidiFileToolStripMenuItem.Size = new Size(180, 22);
-            playMidiFileToolStripMenuItem.Text = "Play Midi File";
-            playMidiFileToolStripMenuItem.Click += playMidiFileToolStripMenuItem_Click;
-            // 
             // MainForm
             // 
             ClientSize = new Size(796, 374);
@@ -166,7 +158,6 @@
         #endregion
 
         private ToolStripMenuItem MenuImportMusicXml;
-        private ToolStripMenuItem designToolStripMenuItem;
         private ToolStripMenuItem generateToolStripMenuItem;
         private ToolStripMenuItem writerToolStripMenuItem;
         private ToolStripMenuItem viewMusicXmlToolStripMenuItem;

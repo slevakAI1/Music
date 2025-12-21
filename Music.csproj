@@ -72,7 +72,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Archives\" />
     <Folder Include="Designer\Designs\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
