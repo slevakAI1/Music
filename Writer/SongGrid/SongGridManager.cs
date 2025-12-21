@@ -78,13 +78,17 @@ namespace Music.Writer
             };
             dgSong.Columns.Add(colData);
 
-            // Column 3: Description (read-only for now)
+            // Column 3: Description
             var colDescription = new DataGridViewTextBoxColumn
             {
                 Name = "colDescription",
                 HeaderText = "", // Changed from "Description" to empty string
-                Width = 300,
-                ReadOnly = true
+                Width = 150,
+                ReadOnly = true,
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Alignment = DataGridViewContentAlignment.MiddleCenter
+                }
             };
             dgSong.Columns.Add(colDescription);
 
@@ -163,7 +167,7 @@ namespace Music.Writer
 
             // Separator row: style black background and white foreground across entire row
             var sepRow0 = dgSong.Rows[FIXED_ROW_SEPARATOR0];
-            sepRow0.Cells["colData"].Value = "Design"; // Changed from string.Empty to "Design"
+            sepRow0.Cells["colDescription"].Value = "Design"; // Changed from string.Empty to "Design"
             sepRow0.Cells["colType"].ReadOnly = true;
             sepRow0.ReadOnly = true;
 
@@ -178,7 +182,7 @@ namespace Music.Writer
             // Separator row: style black background and white foreground across entire row
             var sepRow1 = dgSong.Rows[FIXED_ROW_SEPARATOR1];
             // ensure the Type cell exists and is readonly
-            sepRow1.Cells["colData"].Value = "Midi"; // Changed from string.Empty to "Midi"
+            sepRow1.Cells["colDescription"].Value = "Midi"; // Changed from string.Empty to "Midi"
             sepRow1.Cells["colType"].ReadOnly = true;
             sepRow1.ReadOnly = true;
 
