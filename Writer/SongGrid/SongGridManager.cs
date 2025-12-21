@@ -10,13 +10,15 @@ namespace Music.Writer
     {
         // Constants for the four fixed rows at the top of the grid
         public const int FIXED_ROW_SEPARATOR_1 = 0;
-        public const int FIXED_ROW_SECTION = 1;
-        public const int FIXED_ROW_HARMONY = 2;
-        public const int FIXED_ROW_TIME_SIGNATURE = 3;
-        public const int FIXED_ROW_SEPARATOR_2 = 4;
-        public const int FIXED_ROW_TEMPO = 5;
-        public const int FIXED_ROW_SEPARATOR_3 = 6;
-        public const int FIXED_ROWS_COUNT = 7;
+        public const int FIXED_ROW_VOICE = 1;
+        public const int FIXED_ROW_SECTION = 2;
+        public const int FIXED_ROW_HARMONY = 3;
+        public const int FIXED_ROW_GROOVE = 4;
+        public const int FIXED_ROW_TIME_SIGNATURE = 5;
+        public const int FIXED_ROW_SEPARATOR_2 = 6;
+        public const int FIXED_ROW_TEMPO = 7;
+        public const int FIXED_ROW_SEPARATOR_3 = 8;
+        public const int FIXED_ROWS_COUNT = 9;
 
         // Index where measure columns begin (adjusted because the Stave column was removed)
         public const int MEASURE_START_COLUMN_INDEX = 4;
@@ -149,6 +151,13 @@ namespace Music.Writer
             }
 
             // Set Type column values for the fixed rows and mark each row read-only
+
+
+            // Set Type column values for the fixed rows and mark each row read-only
+            dgSong.Rows[FIXED_ROW_VOICE].Cells["colType"].Value = "Voice";
+            dgSong.Rows[FIXED_ROW_VOICE].Cells["colType"].ReadOnly = true;
+            dgSong.Rows[FIXED_ROW_VOICE].ReadOnly = true;
+
             dgSong.Rows[FIXED_ROW_SECTION].Cells["colType"].Value = "Section";
             dgSong.Rows[FIXED_ROW_SECTION].Cells["colType"].ReadOnly = true;
             dgSong.Rows[FIXED_ROW_SECTION].ReadOnly = true;
@@ -160,6 +169,11 @@ namespace Music.Writer
             dgSong.Rows[FIXED_ROW_HARMONY].Cells["colType"].Value = "Harmony";
             dgSong.Rows[FIXED_ROW_HARMONY].Cells["colType"].ReadOnly = true;
             dgSong.Rows[FIXED_ROW_HARMONY].ReadOnly = true;
+
+            dgSong.Rows[FIXED_ROW_GROOVE].Cells["colType"].Value = "Groove";
+            dgSong.Rows[FIXED_ROW_HARMONY].Cells["colType"].ReadOnly = true;
+            dgSong.Rows[FIXED_ROW_HARMONY].ReadOnly = true;
+
 
             dgSong.Rows[FIXED_ROW_TEMPO].Cells["colType"].Value = "Tempo";
             dgSong.Rows[FIXED_ROW_TEMPO].Cells["colType"].ReadOnly = true;
