@@ -80,12 +80,6 @@ namespace Music
             DesignerFormHandler.EditSections(this);
         }
 
-        // Populate voices via popup selector
-        private void btnSelectVoices_Click(object sender, EventArgs e)
-        {
-            DesignerFormHandler.SelectVoices(this);
-        }
-
         private void btnEditHarmony_Click(object sender, EventArgs e)
         {
             DesignerFormHandler.EditHarmony(this);

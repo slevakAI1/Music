@@ -107,6 +107,46 @@ namespace Music.Writer
         /// </summary>
         private void dgSong_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
         {
+            // If the fixed Voice row was double-clicked, open the Voice selector and write back to the local _designer
+            if (e.RowIndex == SongGridManager.FIXED_ROW_VOICE)
+            {
+                if (_designer == null)
+                    _designer = new Music.Designer.Designer();
+
+                using var voiceForm = new Music.Designer.VoiceSelectorForm();
+
+                // Initialize with existing voices from the designer
+                var existingVoices = _designer.Voices?.Voices?
+                    .Where(v => !string.IsNullOrWhiteSpace(v.VoiceName))
+                    .ToDictionary(
+                        v => v.VoiceName,
+                        v => string.IsNullOrWhiteSpace(v.GrooveRole) ? "Select..." : v.GrooveRole,
+                        StringComparer.OrdinalIgnoreCase);
+
+                if (existingVoices?.Count > 0)
+                {
+                    voiceForm.SetExistingVoices(existingVoices);
+                }
+
+                if (voiceForm.ShowDialog(this) == DialogResult.OK)
+                {
+                    var selected = voiceForm.SelectedVoicesWithRoles;
+                    if (selected?.Count > 0)
+                    {
+                        _designer.Voices ??= new Music.Designer.VoiceSet();
+                        _designer.Voices.Reset();
+
+                        foreach (var kvp in selected)
+                        {
+                            var role = kvp.Value == "Select..." ? "" : kvp.Value;
+                            _designer.Voices.AddVoice(kvp.Key, role);
+                        }
+                    }
+                }
+
+                return;
+            }
+
             // If the fixed Section row was double-clicked, open the Section editor and write back to the local _designer
             if (e.RowIndex == SongGridManager.FIXED_ROW_SECTION)
             {

@@ -50,13 +50,14 @@ namespace Music
             // 
             // btnEditVoices
             // 
+            btnEditVoices.Enabled = false;
+            btnEditVoices.ForeColor = Color.Red;
             btnEditVoices.Location = new Point(41, 314);
             btnEditVoices.Name = "btnEditVoices";
             btnEditVoices.Size = new Size(96, 23);
             btnEditVoices.TabIndex = 4;
             btnEditVoices.Text = "Voices";
             btnEditVoices.UseVisualStyleBackColor = true;
-            btnEditVoices.Click += btnSelectVoices_Click;
             // 
             // btnNew
             // 

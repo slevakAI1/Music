@@ -94,45 +94,6 @@ namespace Music
             }
         }
 
-        public static void SelectVoices(DesignerForm form)
-        {
-            using var voiceForm = new VoiceSelectorForm();
-            
-            // Initialize with existing voices from the designer
-            var existingVoices = Globals.Designer?.Voices?.Voices?
-                .Where(v => !string.IsNullOrWhiteSpace(v.VoiceName))
-                .ToDictionary(
-                    v => v.VoiceName, 
-                    v => string.IsNullOrWhiteSpace(v.GrooveRole) ? "Select..." : v.GrooveRole,
-                    StringComparer.OrdinalIgnoreCase);
-            
-            if (existingVoices?.Count > 0)
-            {
-                voiceForm.SetExistingVoices(existingVoices);
-            }
-
-            if (voiceForm.ShowDialog(form) == DialogResult.OK)
-            {
-                var selected = voiceForm.SelectedVoicesWithRoles;
-                if (selected?.Count > 0)
-                {
-                    if (Globals.Designer == null)
-                        Globals.Designer = new Designer.Designer();
-
-                    Globals.Designer.Voices ??= new VoiceSet();
-                    Globals.Designer.Voices.Reset();
-
-                    foreach (var kvp in selected)
-                    {
-                        var role = kvp.Value == "Select..." ? "" : kvp.Value;
-                        Globals.Designer.Voices.AddVoice(kvp.Key, role);
-                    }
-
-                    UpdateDesignerReport(form);
-                }
-            }
-        }
-
         public static void EditHarmony(DesignerForm form)
         {
             if (!EnsureDesignOrNotify(form)) return;
