@@ -128,14 +128,30 @@ namespace Music.Writer
                 return;
             }
 
-            // If the fixed Tempo row was double-clicked, open the Tempo editor and write back to the local _designer
-            if (e.RowIndex == SongGridManager.FIXED_ROW_TEMPO)
+            // If the fixed Harmony row was double-clicked, open the Harmony editor and write back to the local _designer
+            if (e.RowIndex == SongGridManager.FIXED_ROW_HARMONY)
             {
-                // Ensure we have a Designer instance to read/write the TempoTrack
                 if (_designer == null)
                     _designer = new Music.Designer.Designer();
 
-                // Provide the current tempo timeline (may be null)
+                var initialHarmony = _designer.HarmonyTrack;
+
+                using var dlg = new Music.Designer.HarmonyEditorForm(initialHarmony);
+                if (dlg.ShowDialog(this) == DialogResult.OK)
+                {
+                    _designer.HarmonyTrack = dlg.ResultTimeline;
+                    GridControlLinesManager.AttachHarmonyTimeline(dgSong, _designer.HarmonyTrack);
+                }
+
+                return;
+            }
+
+            // If the fixed Tempo row was double-clicked, open the Tempo editor and write back to the local _designer
+            if (e.RowIndex == SongGridManager.FIXED_ROW_TEMPO)
+            {
+                if (_designer == null)
+                    _designer = new Music.Designer.Designer();
+
                 var initialTempo = _designer.TempoTrack;
 
                 using var dlg = new Music.Designer.TempoEditorForm(initialTempo);

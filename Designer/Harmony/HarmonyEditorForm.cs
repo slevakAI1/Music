@@ -231,7 +231,7 @@ namespace Music.Designer
             editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
             editor.Controls.Add(new Label { Text = "Key:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) }, 0, row);
             _cbKey = CreateSelectorCombo();
-            _cbKey.TextChanged += (s, e) => ApplyEditorToSelected();
+            _cbKey.SelectedIndexChanged += (s, e) => ApplyEditorToSelected(); // Changed from TextChanged
             editor.Controls.Add(_cbKey, 1, row);
             row++;
 
@@ -499,7 +499,14 @@ namespace Music.Designer
             try
             {
                 _numDuration.Value = Math.Max(_numDuration.Minimum, Math.Min(_numDuration.Maximum, w.DurationBeats));
-                _cbKey.Text = w.Key ?? string.Empty;
+                
+                // Select key by finding matching item in the dropdown
+                int keyIndex = Array.IndexOf(AllKeys, w.Key ?? "C major");
+                if (keyIndex >= 0)
+                    _cbKey.SelectedIndex = keyIndex;
+                else
+                    _cbKey.SelectedIndex = 0; // Default to C major
+                
                 _numDegree.Value = Math.Max(_numDegree.Minimum, Math.Min(_numDegree.Maximum, w.Degree));
                 // Convert short name to long name for UI display
                 _cbQuality.Text = ChordQuality.ToLongName(w.Quality) ?? string.Empty;
@@ -528,7 +535,12 @@ namespace Music.Designer
 
             var w = (WorkingEvent)_lv.SelectedItems[0].Tag!;
             w.DurationBeats = (int)_numDuration.Value;
-            w.Key = string.IsNullOrWhiteSpace(_cbKey.Text) ? "C major" : _cbKey.Text.Trim();
+            
+            // Get key from selected index instead of Text
+            w.Key = _cbKey.SelectedIndex >= 0 && _cbKey.SelectedIndex < AllKeys.Length
+                ? AllKeys[_cbKey.SelectedIndex]
+                : "C major";
+            
             w.Degree = (int)_numDegree.Value;
             // Convert long name from UI to short name for storage
             w.Quality = ChordQuality.ToShortName(
@@ -536,7 +548,7 @@ namespace Music.Designer
             w.Bass = string.IsNullOrWhiteSpace(_cbBass.Text) ? "root" : _cbBass.Text.Trim();
 
             RecalculateStartPositions();
-            UpdateRowVisuals(_lv.SelectedIndices[0]); // This line was missing!
+            UpdateRowVisuals(_lv.SelectedIndices[0]);
             UpdateButtonsEnabled();
         }
 
@@ -806,7 +818,12 @@ namespace Music.Designer
             out string? error)
         {
             error = null;
-            key = string.IsNullOrWhiteSpace(_cbKey.Text) ? "C major" : _cbKey.Text.Trim();
+            
+            // Get key from selected index
+            key = _cbKey.SelectedIndex >= 0 && _cbKey.SelectedIndex < AllKeys.Length
+                ? AllKeys[_cbKey.SelectedIndex]
+                : "C major";
+            
             degree = (int)_numDegree.Value;
             // Convert long name from UI to short name
             quality = ChordQuality.ToShortName(
