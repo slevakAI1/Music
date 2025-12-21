@@ -110,17 +110,14 @@ namespace Music.Writer
             // If the fixed Section row was double-clicked, open the Section editor and write back to the local _designer
             if (e.RowIndex == SongGridManager.FIXED_ROW_SECTION)
             {
-                // Ensure we have a Designer instance to read/write the SectionTrack
                 if (_designer == null)
                     _designer = new Music.Designer.Designer();
 
-                // Provide the current sections timeline (may be null)
                 var initialSections = _designer.SectionTrack;
 
                 using var dlg = new Music.Designer.SectionEditorForm(initialSections);
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
-                    // Store edited result back into the local designer and update the grid's section control line
                     _designer.SectionTrack = dlg.ResultSections;
                     GridControlLinesManager.AttachSectionTimeline(dgSong, _designer.SectionTrack);
                 }
@@ -146,6 +143,24 @@ namespace Music.Writer
                 return;
             }
 
+            // If the fixed Time Signature row was double-clicked, open the Time Signature editor and write back to the local _designer
+            if (e.RowIndex == SongGridManager.FIXED_ROW_TIME_SIGNATURE)
+            {
+                if (_designer == null)
+                    _designer = new Music.Designer.Designer();
+
+                var initialTimeSignature = _designer.TimeSignatureTrack;
+
+                using var dlg = new Music.Designer.TimeSignatureEditorForm(initialTimeSignature);
+                if (dlg.ShowDialog(this) == DialogResult.OK)
+                {
+                    _designer.TimeSignatureTrack = dlg.ResultTimeline;
+                    GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, _designer.TimeSignatureTrack);
+                }
+
+                return;
+            }
+
             // If the fixed Tempo row was double-clicked, open the Tempo editor and write back to the local _designer
             if (e.RowIndex == SongGridManager.FIXED_ROW_TEMPO)
             {
@@ -157,7 +172,6 @@ namespace Music.Writer
                 using var dlg = new Music.Designer.TempoEditorForm(initialTempo);
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
-                    // Store edited result back into the local designer and update the grid's tempo control line
                     _designer.TempoTrack = dlg.ResultTimeline;
                     GridControlLinesManager.AttachTempoTimeline(dgSong, _designer.TempoTrack);
                 }

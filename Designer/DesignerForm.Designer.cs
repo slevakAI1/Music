@@ -79,6 +79,8 @@ namespace Music
             // 
             // btnEditHarmony
             // 
+            btnEditHarmony.Enabled = false;
+            btnEditHarmony.ForeColor = Color.Red;
             btnEditHarmony.Location = new Point(14, 148);
             btnEditHarmony.Name = "btnEditHarmony";
             btnEditHarmony.Size = new Size(96, 23);
@@ -109,6 +111,8 @@ namespace Music
             // 
             // btnEditTimeSignature
             // 
+            btnEditTimeSignature.Enabled = false;
+            btnEditTimeSignature.ForeColor = Color.Red;
             btnEditTimeSignature.Location = new Point(14, 45);
             btnEditTimeSignature.Name = "btnEditTimeSignature";
             btnEditTimeSignature.Size = new Size(96, 23);
