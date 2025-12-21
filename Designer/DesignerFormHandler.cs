@@ -26,21 +26,6 @@ namespace Music
             UpdateDesignerReport(form);
         }
 
-        public static void SaveDesign(DesignerForm form)
-        {
-            if (Globals.Designer == null)
-            {
-                MessageBoxHelper.Show(
-                    "Create a new design first.",
-                    "No Design",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-                return;
-            }
-
-            DesignerFileManager.SaveDesign(form);
-        }
-
         public static void LoadDesign(DesignerForm form)
         {
             var loaded = DesignerFileManager.LoadDesign(form);

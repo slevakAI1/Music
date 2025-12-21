@@ -2,6 +2,7 @@
 #pragma warning disable CS8605 // Unboxing a possibly null value.
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 
+using Music.Designer;
 using Music.Generator;
 using Music.MyMidi;
 
@@ -418,6 +419,43 @@ namespace Music.Writer
         {
             // Delegate pause/resume behavior to the grid/operations file for consistency.
             _gridOperations.HandlePause(_midiPlaybackService);
+        }
+
+        private void btnSaveDesign_Click(object sender, EventArgs e)
+        {
+            if (_designer == null)
+            {
+                MessageBoxHelper.Show(
+                    "Create a new design first.",
+                    "No Design",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            DesignerFileManager.SaveDesign(this, _designer);
+        }
+
+        private void btnLoadDesign_Click(object sender, EventArgs e)
+        {
+            var loaded = DesignerFileManager.LoadDesign(this, out bool success);
+            if (success && loaded != null)
+            {
+                _designer = loaded;
+
+                // Refresh grid control lines with the newly loaded design
+                SongGridManager.ConfigureSongGridView(
+                    dgSong,
+                    _midiInstruments,
+                    dgSong_CellValueChanged,
+                    dgSong_CurrentCellDirtyStateChanged,
+                    _designer);
+            }
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

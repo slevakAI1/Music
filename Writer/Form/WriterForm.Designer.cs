@@ -91,6 +91,8 @@ namespace Music.Writer
             groupBox3 = new GroupBox();
             btnExecute = new Button();
             gbSong = new GroupBox();
+            btnLoadDesign = new Button();
+            btnSaveDesign = new Button();
             btnPause = new Button();
             btnClearSelectedTracks = new Button();
             btnStop = new Button();
@@ -101,6 +103,8 @@ namespace Music.Writer
             btnClearAll = new Button();
             btnPlayTracks = new Button();
             dgSong = new DataGridView();
+            btnLoad = new Button();
+            btnSave = new Button();
             grbParts.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -136,7 +140,7 @@ namespace Music.Writer
             grbParts.Controls.Add(lblStaff);
             grbParts.Controls.Add(clbStaffs);
             grbParts.ForeColor = Color.FromArgb(255, 128, 0);
-            grbParts.Location = new Point(978, 664);
+            grbParts.Location = new Point(1184, 656);
             grbParts.Name = "grbParts";
             grbParts.Size = new Size(322, 174);
             grbParts.TabIndex = 2;
@@ -667,6 +671,8 @@ namespace Music.Writer
             // gbSong
             // 
             gbSong.BackColor = Color.Black;
+            gbSong.Controls.Add(btnLoadDesign);
+            gbSong.Controls.Add(btnSaveDesign);
             gbSong.Controls.Add(btnPause);
             gbSong.Controls.Add(btnClearSelectedTracks);
             gbSong.Controls.Add(btnStop);
@@ -684,6 +690,28 @@ namespace Music.Writer
             gbSong.TabIndex = 36;
             gbSong.TabStop = false;
             gbSong.Text = "Song";
+            // 
+            // btnLoadDesign
+            // 
+            btnLoadDesign.ForeColor = Color.FromArgb(0, 192, 0);
+            btnLoadDesign.Location = new Point(1089, 542);
+            btnLoadDesign.Name = "btnLoadDesign";
+            btnLoadDesign.Size = new Size(89, 23);
+            btnLoadDesign.TabIndex = 47;
+            btnLoadDesign.Text = "Load Design";
+            btnLoadDesign.UseVisualStyleBackColor = true;
+            btnLoadDesign.Click += btnLoadDesign_Click;
+            // 
+            // btnSaveDesign
+            // 
+            btnSaveDesign.ForeColor = Color.FromArgb(0, 192, 0);
+            btnSaveDesign.Location = new Point(994, 542);
+            btnSaveDesign.Name = "btnSaveDesign";
+            btnSaveDesign.Size = new Size(85, 23);
+            btnSaveDesign.TabIndex = 46;
+            btnSaveDesign.Text = "Save Design";
+            btnSaveDesign.UseVisualStyleBackColor = true;
+            btnSaveDesign.Click += btnSaveDesign_Click;
             // 
             // btnPause
             // 
@@ -796,10 +824,31 @@ namespace Music.Writer
             dgSong.TabIndex = 37;
             dgSong.CellDoubleClick += dgSong_CellDoubleClick;
             // 
+            // btnLoad
+            // 
+            btnLoad.Location = new Point(1019, 926);
+            btnLoad.Name = "btnLoad";
+            btnLoad.Size = new Size(96, 23);
+            btnLoad.TabIndex = 39;
+            btnLoad.Text = "Load";
+            btnLoad.UseVisualStyleBackColor = true;
+            // 
+            // btnSave
+            // 
+            btnSave.Location = new Point(1019, 893);
+            btnSave.Name = "btnSave";
+            btnSave.Size = new Size(96, 23);
+            btnSave.TabIndex = 37;
+            btnSave.Text = "Save";
+            btnSave.UseVisualStyleBackColor = true;
+            btnSave.Click += btnSave_Click;
+            // 
             // WriterForm
             // 
             BackColor = Color.White;
             ClientSize = new Size(1924, 991);
+            Controls.Add(btnLoad);
+            Controls.Add(btnSave);
             Controls.Add(btnSetDesignTestScenarioD1);
             Controls.Add(btnExportToNotion);
             Controls.Add(btnSetWriterTestScenarioG1);
@@ -880,5 +929,9 @@ namespace Music.Writer
         private Button btnStop;
         private Button btnClearSelectedTracks;
         private Button btnPause;
+        private Button btnLoadDesign;
+        private Button btnSaveDesign;
+        private Button btnLoad;
+        private Button btnSave;
     }
 }

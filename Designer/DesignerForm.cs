@@ -62,11 +62,6 @@ namespace Music
             DesignerFormHandler.NewDesign(this);
         }
 
-        private void btnSave_Click(object sender, EventArgs e)
-        {
-            DesignerFormHandler.SaveDesign(this);
-        }
-
         private void btnLoad_Click(object sender, EventArgs e)
         {
             DesignerFormHandler.LoadDesign(this);
