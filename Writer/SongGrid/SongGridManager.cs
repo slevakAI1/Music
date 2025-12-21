@@ -12,9 +12,10 @@ namespace Music.Writer
         public const int FIXED_ROW_SECTION = 0;
         public const int FIXED_ROW_HARMONY = 1;
         public const int FIXED_ROW_TIME_SIGNATURE = 2;
-        public const int FIXED_ROW_TEMPO = 3;
-        public const int FIXED_ROW_SEPARATOR = 4;
-        public const int FIXED_ROWS_COUNT = 5;
+        public const int FIXED_ROW_SEPARATOR1 = 3;
+        public const int FIXED_ROW_TEMPO = 4;
+        public const int FIXED_ROW_SEPARATOR2 = 5;
+        public const int FIXED_ROWS_COUNT = 6;
 
         // Index where measure columns begin (adjusted because the Stave column was removed)
         public const int MEASURE_START_COLUMN_INDEX = 4;
@@ -160,17 +161,30 @@ namespace Music.Writer
             dgSong.Rows[FIXED_ROW_TEMPO].ReadOnly = true;
 
             // Separator row: style black background and white foreground across entire row
-            var sepRow = dgSong.Rows[FIXED_ROW_SEPARATOR];
+            var sepRow2 = dgSong.Rows[FIXED_ROW_SEPARATOR2];
             // ensure the Type cell exists and is readonly
-            sepRow.Cells["colType"].Value = string.Empty;
-            sepRow.Cells["colType"].ReadOnly = true;
-            sepRow.ReadOnly = true;
+            sepRow2.Cells["colType"].Value = string.Empty;
+            sepRow2.Cells["colType"].ReadOnly = true;
+            sepRow2.ReadOnly = true;
 
             // Apply row styling (including selection colors so selection doesn't hide the appearance)
-            sepRow.DefaultCellStyle.BackColor = Color.Black;
-            sepRow.DefaultCellStyle.ForeColor = Color.White;
-            sepRow.DefaultCellStyle.SelectionBackColor = Color.Black;
-            sepRow.DefaultCellStyle.SelectionForeColor = Color.White;
+            sepRow2.DefaultCellStyle.BackColor = Color.Black;
+            sepRow2.DefaultCellStyle.ForeColor = Color.White;
+            sepRow2.DefaultCellStyle.SelectionBackColor = Color.Black;
+            sepRow2.DefaultCellStyle.SelectionForeColor = Color.White;
+
+            // Separator row: style black background and white foreground across entire row
+            var sepRow1 = dgSong.Rows[FIXED_ROW_SEPARATOR1];
+            // ensure the Type cell exists and is readonly
+            sepRow1.Cells["colType"].Value = string.Empty;
+            sepRow1.Cells["colType"].ReadOnly = true;
+            sepRow1.ReadOnly = true;
+
+            // Apply row styling (including selection colors so selection doesn't hide the appearance)
+            sepRow1.DefaultCellStyle.BackColor = Color.Black;
+            sepRow1.DefaultCellStyle.ForeColor = Color.White;
+            sepRow1.DefaultCellStyle.SelectionBackColor = Color.Black;
+            sepRow1.DefaultCellStyle.SelectionForeColor = Color.White;
 
             // Delegate attaching the control lines to the control line manager class
             if (designer != null)

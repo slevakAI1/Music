@@ -1,5 +1,3 @@
-using Music.Designer;
-
 namespace Music.Designer
 {
     // Builds minimal groove test timelines used by default/test designs.
@@ -18,12 +16,13 @@ namespace Music.Designer
                 GroovePresetName = "PopRockBasic"
             });
 
-            groove.Add(new GrooveEvent
-            {
-                StartBar = 3,
-                StartBeat = 1,
-                GroovePresetName = "FunkSyncopated"
-            });
+            // Multiple event test case:
+            //groove.Add(new GrooveEvent
+            //{
+            //    StartBar = 3,
+            //    StartBeat = 1,
+            //    GroovePresetName = "FunkSyncopated"
+            //});
 
             return groove;
         }
