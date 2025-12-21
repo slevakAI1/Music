@@ -9,13 +9,14 @@ namespace Music.Writer
     internal static class SongGridManager
     {
         // Constants for the four fixed rows at the top of the grid
-        public const int FIXED_ROW_SECTION = 0;
-        public const int FIXED_ROW_HARMONY = 1;
-        public const int FIXED_ROW_TIME_SIGNATURE = 2;
-        public const int FIXED_ROW_SEPARATOR1 = 3;
-        public const int FIXED_ROW_TEMPO = 4;
-        public const int FIXED_ROW_SEPARATOR2 = 5;
-        public const int FIXED_ROWS_COUNT = 6;
+        public const int FIXED_ROW_SEPARATOR0 = 0;
+        public const int FIXED_ROW_SECTION = 1;
+        public const int FIXED_ROW_HARMONY = 2;
+        public const int FIXED_ROW_TIME_SIGNATURE = 3;
+        public const int FIXED_ROW_SEPARATOR1 = 4;
+        public const int FIXED_ROW_TEMPO = 5;
+        public const int FIXED_ROW_SEPARATOR2 = 6;
+        public const int FIXED_ROWS_COUNT = 7;
 
         // Index where measure columns begin (adjusted because the Stave column was removed)
         public const int MEASURE_START_COLUMN_INDEX = 4;
@@ -60,7 +61,7 @@ namespace Music.Writer
             var colType = new DataGridViewTextBoxColumn
             {
                 Name = "colType",
-                HeaderText = "Type",
+                HeaderText = "", // Changed from "Type" to empty string
                 Width = 200,
                 ReadOnly = false // Will be set per-cell basis in InitializeFixedRows
             };
@@ -81,7 +82,7 @@ namespace Music.Writer
             var colDescription = new DataGridViewTextBoxColumn
             {
                 Name = "colDescription",
-                HeaderText = "Description",
+                HeaderText = "", // Changed from "Description" to empty string
                 Width = 300,
                 ReadOnly = true
             };
@@ -161,6 +162,32 @@ namespace Music.Writer
             dgSong.Rows[FIXED_ROW_TEMPO].ReadOnly = true;
 
             // Separator row: style black background and white foreground across entire row
+            var sepRow0 = dgSong.Rows[FIXED_ROW_SEPARATOR0];
+            sepRow0.Cells["colData"].Value = "Design"; // Changed from string.Empty to "Design"
+            sepRow0.Cells["colType"].ReadOnly = true;
+            sepRow0.ReadOnly = true;
+
+            // Apply row styling (including selection colors so selection doesn't hide the appearance)
+            sepRow0.DefaultCellStyle.BackColor = Color.Black;
+            sepRow0.DefaultCellStyle.ForeColor = Color.White;
+            sepRow0.DefaultCellStyle.SelectionBackColor = Color.Black;
+            sepRow0.DefaultCellStyle.SelectionForeColor = Color.White;
+
+            //  ====================================================================================
+
+            // Separator row: style black background and white foreground across entire row
+            var sepRow1 = dgSong.Rows[FIXED_ROW_SEPARATOR1];
+            // ensure the Type cell exists and is readonly
+            sepRow1.Cells["colData"].Value = "Midi"; // Changed from string.Empty to "Midi"
+            sepRow1.Cells["colType"].ReadOnly = true;
+            sepRow1.ReadOnly = true;
+
+            // Apply row styling (including selection colors so selection doesn't hide the appearance)
+            sepRow1.DefaultCellStyle.BackColor = Color.Black;
+            sepRow1.DefaultCellStyle.ForeColor = Color.White;
+            sepRow1.DefaultCellStyle.SelectionBackColor = Color.Black;
+            sepRow1.DefaultCellStyle.SelectionForeColor = Color.White;
+
             var sepRow2 = dgSong.Rows[FIXED_ROW_SEPARATOR2];
             // ensure the Type cell exists and is readonly
             sepRow2.Cells["colType"].Value = string.Empty;
@@ -172,19 +199,6 @@ namespace Music.Writer
             sepRow2.DefaultCellStyle.ForeColor = Color.White;
             sepRow2.DefaultCellStyle.SelectionBackColor = Color.Black;
             sepRow2.DefaultCellStyle.SelectionForeColor = Color.White;
-
-            // Separator row: style black background and white foreground across entire row
-            var sepRow1 = dgSong.Rows[FIXED_ROW_SEPARATOR1];
-            // ensure the Type cell exists and is readonly
-            sepRow1.Cells["colType"].Value = string.Empty;
-            sepRow1.Cells["colType"].ReadOnly = true;
-            sepRow1.ReadOnly = true;
-
-            // Apply row styling (including selection colors so selection doesn't hide the appearance)
-            sepRow1.DefaultCellStyle.BackColor = Color.Black;
-            sepRow1.DefaultCellStyle.ForeColor = Color.White;
-            sepRow1.DefaultCellStyle.SelectionBackColor = Color.Black;
-            sepRow1.DefaultCellStyle.SelectionForeColor = Color.White;
 
             // Delegate attaching the control lines to the control line manager class
             if (designer != null)
