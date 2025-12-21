@@ -183,6 +183,24 @@ namespace Music.Writer
                 return;
             }
 
+            // If the fixed Groove row was double-clicked, open the Groove editor and write back to the local _designer
+            if (e.RowIndex == SongGridManager.FIXED_ROW_GROOVE)
+            {
+                if (_designer == null)
+                    _designer = new Music.Designer.Designer();
+
+                var initialGroove = _designer.GrooveTrack;
+
+                using var dlg = new Music.Designer.GrooveEditorForm(initialGroove);
+                if (dlg.ShowDialog(this) == DialogResult.OK)
+                {
+                    _designer.GrooveTrack = dlg.ResultTimeline;
+                    _designer.GrooveTrack?.EnsureIndexed();
+                }
+
+                return;
+            }
+
             // If the fixed Time Signature row was double-clicked, open the Time Signature editor and write back to the local _designer
             if (e.RowIndex == SongGridManager.FIXED_ROW_TIME_SIGNATURE)
             {

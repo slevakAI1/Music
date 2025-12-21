@@ -183,6 +183,8 @@ namespace Music
             // 
             // btnEditGroove
             // 
+            btnEditGroove.Enabled = false;
+            btnEditGroove.ForeColor = Color.Red;
             btnEditGroove.Location = new Point(14, 183);
             btnEditGroove.Name = "btnEditGroove";
             btnEditGroove.Size = new Size(96, 23);
