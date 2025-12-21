@@ -28,6 +28,8 @@ namespace Music
             // 
             // btnEditSections
             // 
+            btnEditSections.Enabled = false;
+            btnEditSections.ForeColor = Color.Red;
             btnEditSections.Location = new Point(41, 381);
             btnEditSections.Name = "btnEditSections";
             btnEditSections.Size = new Size(96, 23);

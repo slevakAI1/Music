@@ -107,6 +107,27 @@ namespace Music.Writer
         /// </summary>
         private void dgSong_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
         {
+            // If the fixed Section row was double-clicked, open the Section editor and write back to the local _designer
+            if (e.RowIndex == SongGridManager.FIXED_ROW_SECTION)
+            {
+                // Ensure we have a Designer instance to read/write the SectionTrack
+                if (_designer == null)
+                    _designer = new Music.Designer.Designer();
+
+                // Provide the current sections timeline (may be null)
+                var initialSections = _designer.SectionTrack;
+
+                using var dlg = new Music.Designer.SectionEditorForm(initialSections);
+                if (dlg.ShowDialog(this) == DialogResult.OK)
+                {
+                    // Store edited result back into the local designer and update the grid's section control line
+                    _designer.SectionTrack = dlg.ResultSections;
+                    GridControlLinesManager.AttachSectionTimeline(dgSong, _designer.SectionTrack);
+                }
+
+                return;
+            }
+
             // If the fixed Tempo row was double-clicked, open the Tempo editor and write back to the local _designer
             if (e.RowIndex == SongGridManager.FIXED_ROW_TEMPO)
             {
