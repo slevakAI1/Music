@@ -107,6 +107,28 @@ namespace Music.Writer
         /// </summary>
         private void dgSong_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
         {
+            // If the fixed Tempo row was double-clicked, open the Tempo editor and write back to the local _designer
+            if (e.RowIndex == SongGridManager.FIXED_ROW_TEMPO)
+            {
+                // Ensure we have a Designer instance to read/write the TempoTrack
+                if (_designer == null)
+                    _designer = new Music.Designer.Designer();
+
+                // Provide the current tempo timeline (may be null)
+                var initialTempo = _designer.TempoTrack;
+
+                using var dlg = new Music.Designer.TempoEditorForm(initialTempo);
+                if (dlg.ShowDialog(this) == DialogResult.OK)
+                {
+                    // Store edited result back into the local designer and update the grid's tempo control line
+                    _designer.TempoTrack = dlg.ResultTimeline;
+                    GridControlLinesManager.AttachTempoTimeline(dgSong, _designer.TempoTrack);
+                }
+
+                return;
+            }
+
+            // Default behavior: delegate to existing track double-click handler
             _eventHandlers.HandleTrackDoubleClick(dgSong, e);
         }
 

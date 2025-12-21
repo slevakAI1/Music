@@ -21,8 +21,8 @@ namespace Music
             label1 = new Label();
             panel1 = new Panel();
             panel2 = new Panel();
-            label2 = new Label();
             btnEditGroove = new Button();
+            label2 = new Label();
             panel2.SuspendLayout();
             SuspendLayout();
             // 
@@ -117,6 +117,8 @@ namespace Music
             // 
             // btnEditTempo
             // 
+            btnEditTempo.Enabled = false;
+            btnEditTempo.ForeColor = Color.Red;
             btnEditTempo.Location = new Point(41, 415);
             btnEditTempo.Name = "btnEditTempo";
             btnEditTempo.Size = new Size(96, 23);
@@ -172,16 +174,6 @@ namespace Music
             panel2.Size = new Size(138, 220);
             panel2.TabIndex = 24;
             // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Font = new Font("Segoe UI", 15F);
-            label2.Location = new Point(493, 96);
-            label2.Name = "label2";
-            label2.Size = new Size(153, 28);
-            label2.TabIndex = 25;
-            label2.Text = "Designer Report";
-            // 
             // btnEditGroove
             // 
             btnEditGroove.Location = new Point(14, 183);
@@ -191,6 +183,16 @@ namespace Music
             btnEditGroove.Text = "Groove";
             btnEditGroove.UseVisualStyleBackColor = true;
             btnEditGroove.Click += btnEditGroove_Click;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Font = new Font("Segoe UI", 15F);
+            label2.Location = new Point(493, 96);
+            label2.Name = "label2";
+            label2.Size = new Size(153, 28);
+            label2.TabIndex = 25;
+            label2.Text = "Designer Report";
             // 
             // DesignerForm
             // 
