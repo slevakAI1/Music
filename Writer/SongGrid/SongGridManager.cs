@@ -9,13 +9,13 @@ namespace Music.Writer
     internal static class SongGridManager
     {
         // Constants for the four fixed rows at the top of the grid
-        public const int FIXED_ROW_SEPARATOR0 = 0;
+        public const int FIXED_ROW_SEPARATOR_1 = 0;
         public const int FIXED_ROW_SECTION = 1;
         public const int FIXED_ROW_HARMONY = 2;
         public const int FIXED_ROW_TIME_SIGNATURE = 3;
-        public const int FIXED_ROW_SEPARATOR1 = 4;
+        public const int FIXED_ROW_SEPARATOR_2 = 4;
         public const int FIXED_ROW_TEMPO = 5;
-        public const int FIXED_ROW_SEPARATOR2 = 6;
+        public const int FIXED_ROW_SEPARATOR_3 = 6;
         public const int FIXED_ROWS_COUNT = 7;
 
         // Index where measure columns begin (adjusted because the Stave column was removed)
@@ -166,23 +166,8 @@ namespace Music.Writer
             dgSong.Rows[FIXED_ROW_TEMPO].ReadOnly = true;
 
             // Separator row: style black background and white foreground across entire row
-            var sepRow0 = dgSong.Rows[FIXED_ROW_SEPARATOR0];
-            sepRow0.Cells["colDescription"].Value = "Design"; // Changed from string.Empty to "Design"
-            sepRow0.Cells["colType"].ReadOnly = true;
-            sepRow0.ReadOnly = true;
-
-            // Apply row styling (including selection colors so selection doesn't hide the appearance)
-            sepRow0.DefaultCellStyle.BackColor = Color.Black;
-            sepRow0.DefaultCellStyle.ForeColor = Color.White;
-            sepRow0.DefaultCellStyle.SelectionBackColor = Color.Black;
-            sepRow0.DefaultCellStyle.SelectionForeColor = Color.White;
-
-            //  ====================================================================================
-
-            // Separator row: style black background and white foreground across entire row
-            var sepRow1 = dgSong.Rows[FIXED_ROW_SEPARATOR1];
-            // ensure the Type cell exists and is readonly
-            sepRow1.Cells["colDescription"].Value = "Midi"; // Changed from string.Empty to "Midi"
+            var sepRow1 = dgSong.Rows[FIXED_ROW_SEPARATOR_1];
+            sepRow1.Cells["colDescription"].Value = "Design"; // Changed from string.Empty to "Design"
             sepRow1.Cells["colType"].ReadOnly = true;
             sepRow1.ReadOnly = true;
 
@@ -192,9 +177,12 @@ namespace Music.Writer
             sepRow1.DefaultCellStyle.SelectionBackColor = Color.Black;
             sepRow1.DefaultCellStyle.SelectionForeColor = Color.White;
 
-            var sepRow2 = dgSong.Rows[FIXED_ROW_SEPARATOR2];
+            //  ====================================================================================
+
+            // Separator row: style black background and white foreground across entire row
+            var sepRow2 = dgSong.Rows[FIXED_ROW_SEPARATOR_2];
             // ensure the Type cell exists and is readonly
-            sepRow2.Cells["colType"].Value = string.Empty;
+            sepRow2.Cells["colDescription"].Value = "Midi"; // Changed from string.Empty to "Midi"
             sepRow2.Cells["colType"].ReadOnly = true;
             sepRow2.ReadOnly = true;
 
@@ -203,6 +191,18 @@ namespace Music.Writer
             sepRow2.DefaultCellStyle.ForeColor = Color.White;
             sepRow2.DefaultCellStyle.SelectionBackColor = Color.Black;
             sepRow2.DefaultCellStyle.SelectionForeColor = Color.White;
+
+            var sepRow3 = dgSong.Rows[FIXED_ROW_SEPARATOR_3];
+            // ensure the Type cell exists and is readonly
+            sepRow3.Cells["colType"].Value = string.Empty;
+            sepRow3.Cells["colType"].ReadOnly = true;
+            sepRow3.ReadOnly = true;
+
+            // Apply row styling (including selection colors so selection doesn't hide the appearance)
+            sepRow3.DefaultCellStyle.BackColor = Color.Black;
+            sepRow3.DefaultCellStyle.ForeColor = Color.White;
+            sepRow3.DefaultCellStyle.SelectionBackColor = Color.Black;
+            sepRow3.DefaultCellStyle.SelectionForeColor = Color.White;
 
             // Delegate attaching the control lines to the control line manager class
             if (designer != null)
