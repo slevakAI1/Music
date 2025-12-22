@@ -19,7 +19,7 @@ namespace Music.Designer
 
 
         // WIP
-        public List<GrooveInstance> GrooveInstances { get; set; }
+        public GrooveTrack? GrooveInstances { get; set; }
 
 
 
