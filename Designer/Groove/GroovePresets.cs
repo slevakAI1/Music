@@ -14,7 +14,7 @@
             {
                 Name = "BossaNovaBasic",
 
-                AnchorLayer = new GrooveLayer
+                AnchorLayer = new GrooveInstanceLayer
                 {
                     // Foundation pulse (simple, DAW-friendly approximation)
                     HatOnsets = new List<decimal>
@@ -38,7 +38,7 @@
                     PadsOnsets = new List<decimal> { 1m, 3m }
                 },
 
-                TensionLayer = new GrooveLayer
+                TensionLayer = new GrooveInstanceLayer
                 {
                     KickOnsets = new List<decimal>(),
                     SnareOnsets = new List<decimal>(),
@@ -61,7 +61,7 @@
             {
                 Name = "CountryTrain",
 
-                AnchorLayer = new GrooveLayer
+                AnchorLayer = new GrooveInstanceLayer
                 {
                     // Kick commonly anchors 1 & 3 in many train feels
                     KickOnsets = new List<decimal> { 1m, 3m },
@@ -88,7 +88,7 @@
                     PadsOnsets = new List<decimal> { 1m, 3m }
                 },
 
-                TensionLayer = new GrooveLayer
+                TensionLayer = new GrooveInstanceLayer
                 {
                     KickOnsets = new List<decimal>(),
                     SnareOnsets = new List<decimal>(),
@@ -110,7 +110,7 @@
             {
                 Name = "DanceEDMFourOnFloor",
 
-                AnchorLayer = new GrooveLayer
+                AnchorLayer = new GrooveInstanceLayer
                 {
                     // Four-on-the-floor: kick on every quarter note
                     KickOnsets = new List<decimal> { 1m, 2m, 3m, 4m },
@@ -131,7 +131,7 @@
                     PadsOnsets = new List<decimal> { 1m, 3m }
                 },
 
-                TensionLayer = new GrooveLayer
+                TensionLayer = new GrooveInstanceLayer
                 {
                     KickOnsets = new List<decimal>(),
                     SnareOnsets = new List<decimal>(),
@@ -154,7 +154,7 @@
             {
                 Name = "FunkSyncopated",
 
-                AnchorLayer = new GrooveLayer
+                AnchorLayer = new GrooveInstanceLayer
                 {
                     // Backbeat anchors
                     SnareOnsets = new List<decimal> { 2m, 4m },
@@ -181,7 +181,7 @@
                     PadsOnsets = new List<decimal> { 1m, 3m }
                 },
 
-                TensionLayer = new GrooveLayer
+                TensionLayer = new GrooveInstanceLayer
                 {
                     KickOnsets = new List<decimal>(),
                     SnareOnsets = new List<decimal>(),
@@ -204,7 +204,7 @@
             {
                 Name = "HipHopBoomBap",
 
-                AnchorLayer = new GrooveLayer
+                AnchorLayer = new GrooveInstanceLayer
                 {
                     // Core anchors (common starting point)
                     KickOnsets = new List<decimal> { 1m, 3m },
@@ -228,7 +228,7 @@
                     PadsOnsets = new List<decimal> { 1m }
                 },
 
-                TensionLayer = new GrooveLayer
+                TensionLayer = new GrooveInstanceLayer
                 {
                     KickOnsets = new List<decimal>(),
                     SnareOnsets = new List<decimal>(),
@@ -251,7 +251,7 @@
             {
                 Name = "JazzSwing",
 
-                AnchorLayer = new GrooveLayer
+                AnchorLayer = new GrooveInstanceLayer
                 {
                     // Feathering concept: light kick on all quarters (feel > loudness; velocity later)
                     KickOnsets = new List<decimal> { 1m, 2m, 3m, 4m },
@@ -273,7 +273,7 @@
                     PadsOnsets = new List<decimal>()
                 },
 
-                TensionLayer = new GrooveLayer
+                TensionLayer = new GrooveInstanceLayer
                 {
                     KickOnsets = new List<decimal>(),
                     SnareOnsets = new List<decimal>(),
@@ -296,7 +296,7 @@
             {
                 Name = "MetalDoubleKick",
 
-                AnchorLayer = new GrooveLayer
+                AnchorLayer = new GrooveInstanceLayer
                 {
                     // Double-kick bed (8ths)
                     KickOnsets = new List<decimal>
@@ -326,7 +326,7 @@
                     PadsOnsets = new List<decimal>()
                 },
 
-                TensionLayer = new GrooveLayer
+                TensionLayer = new GrooveInstanceLayer
                 {
                     KickOnsets = new List<decimal>(),
                     SnareOnsets = new List<decimal>(),
@@ -348,7 +348,7 @@
             {
                 Name = "PopRockBasic",
 
-                AnchorLayer = new GrooveLayer
+                AnchorLayer = new GrooveInstanceLayer
                 {
                     // Kick on beats 1 and 3 (driving the downbeats)
                     KickOnsets = new List<decimal> { 1m, 3m },
@@ -372,7 +372,7 @@
                     PadsOnsets = new List<decimal> { 1m, 3m }
                 },
 
-                TensionLayer = new GrooveLayer
+                TensionLayer = new GrooveInstanceLayer
                 {
                     // Empty for now (disabled)
                     KickOnsets = new List<decimal>(),
@@ -396,7 +396,7 @@
             {
                 Name = "RapBasic",
 
-                AnchorLayer = new GrooveLayer
+                AnchorLayer = new GrooveInstanceLayer
                 {
                     // Solid downbeat + a couple common syncopation spots
                     KickOnsets = new List<decimal> { 1m, 1.75m, 3m },
@@ -420,7 +420,7 @@
                     PadsOnsets = new List<decimal> { 1m }
                 },
 
-                TensionLayer = new GrooveLayer
+                TensionLayer = new GrooveInstanceLayer
                 {
                     KickOnsets = new List<decimal>(),
                     SnareOnsets = new List<decimal>(),
@@ -443,7 +443,7 @@
             {
                 Name = "ReggaeOneDrop",
 
-                AnchorLayer = new GrooveLayer
+                AnchorLayer = new GrooveInstanceLayer
                 {
                     // One-drop: kick on 3
                     KickOnsets = new List<decimal> { 3m },
@@ -467,7 +467,7 @@
                     PadsOnsets = new List<decimal> { 1m }
                 },
 
-                TensionLayer = new GrooveLayer
+                TensionLayer = new GrooveInstanceLayer
                 {
                     KickOnsets = new List<decimal>(),
                     SnareOnsets = new List<decimal>(),
@@ -490,7 +490,7 @@
             {
                 Name = "ReggaetonDembow",
 
-                AnchorLayer = new GrooveLayer
+                AnchorLayer = new GrooveInstanceLayer
                 {
                     // Foundation kick anchors
                     KickOnsets = new List<decimal> { 1m, 3m },
@@ -516,7 +516,7 @@
                     PadsOnsets = new List<decimal> { 1m }
                 },
 
-                TensionLayer = new GrooveLayer
+                TensionLayer = new GrooveInstanceLayer
                 {
                     KickOnsets = new List<decimal>(),
                     SnareOnsets = new List<decimal>(),
@@ -539,7 +539,7 @@
             {
                 Name = "TrapModern",
 
-                AnchorLayer = new GrooveLayer
+                AnchorLayer = new GrooveInstanceLayer
                 {
                     // Simplest halftime backbone: snare/clap on 3
                     SnareOnsets = new List<decimal> { 3m },
@@ -566,7 +566,7 @@
                     PadsOnsets = new List<decimal> { 1m }
                 },
 
-                TensionLayer = new GrooveLayer
+                TensionLayer = new GrooveInstanceLayer
                 {
                     KickOnsets = new List<decimal>(),
                     SnareOnsets = new List<decimal>(),
