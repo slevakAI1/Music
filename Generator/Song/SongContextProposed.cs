@@ -4,7 +4,7 @@ namespace Music.Generator
     /// Context object passed through the generation pipeline.
     /// Contains all the state needed for generators and critics to operate.
     /// </summary>
-    public sealed class SongContext
+    public sealed class SongContextProposed
     {
         /// <summary>
         /// The song being generated.
@@ -51,7 +51,7 @@ namespace Music.Generator
         /// </summary>
         public int BeatsPerBar { get; set; }
 
-        public SongContext()
+        public SongContextProposed()
         {
             Song = new Song();
             PatternLibrary = new PatternLibrary();

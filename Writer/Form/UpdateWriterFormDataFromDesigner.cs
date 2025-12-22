@@ -5,12 +5,12 @@ namespace Music.Writer
         // Applies design-driven defaults into an existing Writer instance.
         // Accept a nullable receiver so callers holding a `Writer?` (e.g. Globals.GenerationData)
         // can call this extension directly without a null-forgiving operator.
-        public static void Update(this WriterFormData? data, Designer.SongContext_Legacy? design)
+        public static void Update(this WriterFormData? data, Designer.SongContext? design)
         {
             if (data == null) return;
 
             // ========== PARTS SYNCHRONIZATION ==========
-            // Update the Writer parts to be in sync with the SongContext_Legacy parts if there are differences.
+            // Update the Writer parts to be in sync with the SongContext parts if there are differences.
             // Preserve existing checked states
 
             var availableParts = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -48,7 +48,7 @@ namespace Music.Writer
             data.PartsState = newPartsState;
 
             // ========== SECTIONS SYNCHRONIZATION ==========
-            // Update the Writer sections to be in sync with the SongContext_Legacy sections if there are differences.
+            // Update the Writer sections to be in sync with the SongContext sections if there are differences.
             // Preserve existing checked states for sections
 
             var availableSections = new List<string>();

@@ -28,7 +28,7 @@
         #region Windows Form Designer generated code
 
         /// <summary>
-        ///  Required method for SongContext_Legacy support - do not modify
+        ///  Required method for SongContext support - do not modify
         ///  the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()

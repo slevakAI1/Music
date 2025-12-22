@@ -4,7 +4,7 @@
     {
         // ==================================   T E S T   H E L P E R S   ==================================
   
-        public static WriterFormData SetTestWriterG1(Designer.SongContext_Legacy? designer)
+        public static WriterFormData SetTestWriterG1(Designer.SongContext? designer)
         {
             var data = new WriterFormData();
 

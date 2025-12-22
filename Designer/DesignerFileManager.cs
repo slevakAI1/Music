@@ -49,8 +49,8 @@ namespace Music.Designer
             }
         }
 
-        // Overload: Save a specific SongContext_Legacy instance
-        public static void SaveDesign(Form owner, SongContext_Legacy designer)
+        // Overload: Save a specific SongContext instance
+        public static void SaveDesign(Form owner, SongContext designer)
         {
             if (designer == null) return;
 
@@ -131,8 +131,8 @@ namespace Music.Designer
             }
         }
 
-        // Overload: Load into a specific SongContext_Legacy instance (returns the loaded designer)
-        public static SongContext_Legacy? LoadDesign(Form owner, out bool success)
+        // Overload: Load into a specific SongContext instance (returns the loaded designer)
+        public static SongContext? LoadDesign(Form owner, out bool success)
         {
             try
             {

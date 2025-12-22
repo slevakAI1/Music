@@ -8,7 +8,7 @@ namespace Music.Designer
         public const int DefaultTempoBpm = 120;  // per ai, 120 is acutually an industry default
 
         // Apply all defaults so the timelines end on the same beat
-        public static void SetTestDesignD1(SongContext_Legacy design)
+        public static void SetTestDesignD1(SongContext design)
         {
             // 1) Sections: apply default/test structure
             var sectionTestData = new SectionTests();

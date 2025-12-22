@@ -464,9 +464,9 @@ namespace Music.Writer
 
         public void HandleUpdateFormFromDesigner(
             WriterFormData writer,
-            Designer.SongContext_Legacy designer)
+            Designer.SongContext designer)
         {
-            // Update the form to take into account any changes to SongContext_Legacy
+            // Update the form to take into account any changes to SongContext
             UpdateWriterFormDataFromDesigner.Update(writer, designer);
         }
 
@@ -474,7 +474,7 @@ namespace Music.Writer
 
         public void HandleSetDesignTestScenarioD1(
             DataGridView dgSong,
-            Designer.SongContext_Legacy designer)
+            Designer.SongContext designer)
         {
             DesignerTests.SetTestDesignD1(designer);
 
@@ -484,12 +484,12 @@ namespace Music.Writer
             GridControlLinesManager.AttachHarmonyTimeline(dgSong, designer.HarmonyTrack);
         }
 
-        public WriterFormData HandleSetWriterTestScenarioG1(Designer.SongContext_Legacy designer)
+        public WriterFormData HandleSetWriterTestScenarioG1(Designer.SongContext designer)
         {
             return WriterFormTests.SetTestWriterG1(designer);
         }
 
-        public void HandleChordTest(Designer.SongContext_Legacy? designer)
+        public void HandleChordTest(Designer.SongContext? designer)
         {
             if (designer?.HarmonyTrack == null || designer.HarmonyTrack.Events.Count == 0)
             {
