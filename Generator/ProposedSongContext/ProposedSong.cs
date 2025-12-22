@@ -4,7 +4,7 @@ namespace Music.Generator
     /// The complete generated song, containing all tracks and temporal data.
     /// This is the runtime representation of a composed piece, separate from design templates.
     /// </summary>
-    public sealed class Song
+    public sealed class ProposedSong
     {
         /// <summary>
         /// Unique identifier for this song instance.
@@ -59,7 +59,7 @@ namespace Music.Generator
         /// </summary>
         public int TicksPerQuarterNote { get; init; }
 
-        public Song()
+        public ProposedSong()
         {
             SongId = Guid.NewGuid().ToString("N");
             TicksPerQuarterNote = 480;

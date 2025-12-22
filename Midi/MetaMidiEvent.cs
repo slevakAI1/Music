@@ -140,13 +140,13 @@ namespace Music.MyMidi
         MtcQuarterFrame,
 
         /// <summary>
-        /// Song Position Pointer (0xF2).
+        /// ProposedSong Position Pointer (0xF2).
         /// Specifies the song position in 16th notes.
         /// </summary>
         SongPositionPointer,
 
         /// <summary>
-        /// Song Select (0xF3).
+        /// ProposedSong Select (0xF3).
         /// Selects a song/sequence number.
         /// </summary>
         SongSelect,

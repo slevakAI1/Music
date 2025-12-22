@@ -229,7 +229,7 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Populates the measure columns for a song row based on the Song object's notes.
+        /// Populates the measure columns for a song row based on the ProposedSong object's notes.
         /// Assumes 4/4 time signature (4 quarter notes per measure).
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
@@ -329,7 +329,7 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Handles the CellValueChanged event to update Song objects when instrument selection changes.
+        /// Handles the CellValueChanged event to update ProposedSong objects when instrument selection changes.
         /// </summary>
         /// <param name="dgSong">The DataGridView</param>
         /// <param name="sender">Event sender</param>

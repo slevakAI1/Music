@@ -9,7 +9,7 @@ namespace Music.Generator
         /// <summary>
         /// The song being generated.
         /// </summary>
-        public Song Song { get; set; }
+        public ProposedSong Song { get; set; }
 
         /// <summary>
         /// Pattern library for the current generation.
@@ -53,7 +53,7 @@ namespace Music.Generator
 
         public SongContextProposed()
         {
-            Song = new Song();
+            Song = new ProposedSong();
             PatternLibrary = new PatternLibrary();
             GrooveInstances = new List<GrooveInstance>();
             VariationSettings = new VariationSettings();
