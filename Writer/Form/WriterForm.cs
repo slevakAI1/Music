@@ -184,23 +184,26 @@ namespace Music.Writer
                 return;
             }
 
+            // TO DO - GROOVE EDITOR FORM NEEDS TO WORK WITH LIST<GROOVEINSTANCES>
+            //         IN THE SONGCONTEXT object
+
             // If the fixed Groove row was double-clicked, open the Groove editor and write back to the local _designer
-            if (e.RowIndex == SongGridManager.FIXED_ROW_GROOVE)
-            {
-                if (_designer == null)
-                    _designer = new Music.Designer.SongContext();
+            //if (e.RowIndex == SongGridManager.FIXED_ROW_GROOVE)
+            //{
+            //    if (_designer == null)
+            //        _designer = new Music.Designer.SongContext();
 
-                var initialGroove = _designer.GrooveInstances;
+            //    var initialGroove = _designer.GrooveInstances;
 
-                using var dlg = new Music.Designer.GrooveEditorForm(initialGroove);
-                if (dlg.ShowDialog(this) == DialogResult.OK)
-                {
-                    _designer.GrooveInstances = dlg.ResultTimeline;
-                    _designer.GrooveInstances?.EnsureIndexed();
-                }
+            //    using var dlg = new Music.Designer.GrooveEditorForm(initialGroove);
+            //    if (dlg.ShowDialog(this) == DialogResult.OK)
+            //    {
+            //        _designer.GrooveInstances = dlg.ResultTimeline;
+            //        _designer.GrooveInstances?.EnsureIndexed();
+            //    }
 
-                return;
-            }
+            //    return;
+            //}
 
             // If the fixed Time Signature row was double-clicked, open the Time Signature editor and write back to the local _designer
             if (e.RowIndex == SongGridManager.FIXED_ROW_TIME_SIGNATURE)
