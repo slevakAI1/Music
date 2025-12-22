@@ -4,11 +4,11 @@ namespace Music.Generator
     // Global bar/beat-aligned groove timeline
     public class GrooveTrack
     {
-        private readonly Dictionary<int, GrooveEvent> _barHeads = new(); // bar -> event active at beat 1
+        private readonly Dictionary<int, GrooveInstance> _barHeads = new(); // bar -> event active at beat 1
 
         public int BeatsPerBar { get; set; } = 4;
 
-        public List<GrooveEvent> Events { get; set; } = new();
+        public List<GrooveInstance> Events { get; set; } = new();
 
         public void Reset()
         {
@@ -16,14 +16,14 @@ namespace Music.Generator
             _barHeads.Clear();
         }
 
-        public void Add(GrooveEvent evt)
+        public void Add(GrooveInstance evt)
         {
             Events.Add(evt);
             IndexEventForBars(evt);
         }
 
         // Fast lookup of the groove active at the start of a bar (beat 1).
-        public bool TryGetAtBar(int bar, out GrooveEvent? evt)
+        public bool TryGetAtBar(int bar, out GrooveInstance? evt)
         {
             if (_barHeads.TryGetValue(bar, out var e))
             {
@@ -33,13 +33,14 @@ namespace Music.Generator
 
             // Fallback: find the most recent event at or before this bar
             var targetAbs = (bar - 1) * BeatsPerBar;
-            
-            GrooveEvent? bestMatch = null;
+
+            GrooveInstance? bestMatch = null;
             int bestStartAbs = -1;
 
             foreach (var ge in Events)
             {
-                var startAbs = (ge.StartBar - 1) * BeatsPerBar + (ge.StartBeat - 1);
+                // GrooveInstance always starts at beat 1 of StartBar, so no beat offset needed
+                var startAbs = (ge.StartBar - 1) * BeatsPerBar;
                 if (startAbs <= targetAbs && startAbs > bestStartAbs)
                 {
                     bestMatch = ge;
@@ -58,14 +59,10 @@ namespace Music.Generator
             return false;
         }
 
-        private void IndexEventForBars(GrooveEvent evt)
+        private void IndexEventForBars(GrooveInstance evt)
         {
-            // Only index events at a bar head (StartBeat == 1).
-            // Events that start mid-bar should not overwrite the bar-head mapping
-            // because TryGetAtBar is intended to answer "which groove is active at beat 1 of this bar".
-            if (evt.StartBeat != 1)
-                return;
-
+            // GrooveInstance always starts at beat 1 of StartBar (spans entire bars).
+            // Index it at its starting bar for fast lookup.
             _barHeads[evt.StartBar] = evt;
         }
 

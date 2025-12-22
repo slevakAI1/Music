@@ -265,7 +265,6 @@ namespace Music.Designer
             // Sort events by start position
             var sorted = initial.Events
                 .OrderBy(e => e.StartBar)
-                .ThenBy(e => e.StartBeat)
                 .ToList();
 
             foreach (var ev in sorted)
@@ -273,8 +272,7 @@ namespace Music.Designer
                 _working.Add(new WorkingEvent
                 {
                     StartBar = ev.StartBar,
-                    StartBeat = ev.StartBeat,
-                    GroovePresetName = ev.GroovePresetName
+                    GroovePresetName = ev.SourcePresetName
                 });
             }
         }
@@ -581,11 +579,10 @@ namespace Music.Designer
 
             foreach (var w in _working)
             {
-                tl.Add(new GrooveEvent
+                tl.Add(new GrooveInstance
                 {
                     StartBar = w.StartBar,
-                    StartBeat = w.StartBeat,
-                    GroovePresetName = w.GroovePresetName
+                    SourcePresetName = w.GroovePresetName
                 });
             }
 

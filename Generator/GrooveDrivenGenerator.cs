@@ -69,7 +69,7 @@ namespace Music.Writer.Generator
         {
             if (grooveTrack.TryGetAtBar(bar, out var grooveEvent) && grooveEvent != null)
             {
-                var preset = GroovePresets.GetByName(grooveEvent.GroovePresetName);
+                var preset = GroovePresets.GetByName(grooveEvent.SourcePresetName);
                 if (preset != null)
                     return preset;
             }

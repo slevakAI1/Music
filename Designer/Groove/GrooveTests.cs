@@ -9,11 +9,10 @@ namespace Music.Generator
         {
             var groove = new GrooveTrack();
             groove.BeatsPerBar = 4;
-            groove.Add(new GrooveEvent
+            groove.Add(new GrooveInstance
             {
                 StartBar = 1,
-                StartBeat = 1,
-                GroovePresetName = "PopRockBasic"
+                SourcePresetName = "PopRockBasic"
             });
 
             // Multiple event test case:
