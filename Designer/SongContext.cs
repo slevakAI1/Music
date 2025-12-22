@@ -9,6 +9,12 @@ namespace Music.Designer
     {
         public string DesignId { get; }
 
+        // WIP
+        public GrooveTrack? GrooveInstances { get; set; }
+
+
+        //=======================================================================
+
         // Design Space
         public VoiceSet Voices { get; set; } = new();
 
@@ -18,10 +24,7 @@ namespace Music.Designer
         public HarmonyTrack? HarmonyTrack { get; set; }
 
 
-        // WIP
-        public GrooveTrack? GrooveInstances { get; set; }
-
-
+        
 
         // New: independent timelines for tempo and time signature
         public TempoTrack? TempoTrack { get; set; }
