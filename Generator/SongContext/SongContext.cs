@@ -7,9 +7,8 @@ namespace Music.Designer
     /// </summary>
     public sealed class SongContext
     {
-        public SongContext(string? designId = null)
+        public SongContext()
         {
-            // designId intentionally retained for future use
         }
 
         /// <summary>
@@ -23,7 +22,7 @@ namespace Music.Designer
         public GrooveTrack GrooveTrack { get; set; } = new();
 
         // Harmony timeline persisted with the design (optional)
-        public HarmonyTrack? HarmonyTrack { get; set; }
+        public HarmonyTrack HarmonyTrack { get; set; } = new();
 
         public SectionTrack SectionTrack { get; set; } = new();
 
@@ -32,9 +31,9 @@ namespace Music.Designer
         /// </summary>
         public Song Song { get; set; } = new();
 
-        public TempoTrack? TempoTrack { get; set; }
+        public TempoTrack TempoTrack { get; set; } = new();
 
-        public TimeSignatureTrack? TimeSignatureTrack { get; set; }
+        public TimeSignatureTrack TimeSignatureTrack { get; set; } = new();
 
         // Design space
         public VoiceSet Voices { get; set; } = new();
