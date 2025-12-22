@@ -13,7 +13,7 @@ namespace Music.Generator
     {
         /// <summary>
         /// Handles the Harmony Groove Sync Test command.
-        /// Generates synchronized test tracks using groove presets from the GrooveInstances timeline.
+        /// Generates synchronized test tracks using groove presets from the GrooveTrack timeline.
         /// </summary>
         public static void HandleGrooveSyncTest(
             DataGridView dgSong,
@@ -48,8 +48,8 @@ namespace Music.Generator
                 return;
             }
 
-            // Get the GrooveInstances from the designer
-            var grooveTrack = Globals.Designer?.GrooveInstances;
+            // Get the GrooveTrack from the designer
+            var grooveTrack = Globals.Designer?.GrooveTrack;
 
             if (grooveTrack == null || grooveTrack.Events.Count == 0)
             {
@@ -63,7 +63,7 @@ namespace Music.Generator
 
             try
             {
-                // Generate all song tracks using the GrooveInstances timeline
+                // Generate all song tracks using the GrooveTrack timeline
                 var result = GrooveDrivenGenerator.Generate(
                     harmonyTimeline,
                     timeSignatureTimeline,

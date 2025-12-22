@@ -190,13 +190,13 @@ namespace Music.Writer
                 if (_designer == null)
                     _designer = new Music.Designer.SongContext();
 
-                var initialGroove = _designer.GrooveInstances;
+                var initialGroove = _designer.GrooveTrack;
 
                 using var dlg = new Music.Designer.GrooveEditorForm(initialGroove);
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
-                    _designer.GrooveInstances = dlg.ResultTimeline;
-                    _designer.GrooveInstances?.EnsureIndexed();
+                    _designer.GrooveTrack = dlg.ResultTimeline;
+                    _designer.GrooveTrack?.EnsureIndexed();
                 }
 
                 return;
@@ -433,24 +433,24 @@ namespace Music.Writer
                 return;
             }
 
-            DesignerFileManager.SaveDesign(this, _designer);
+            //DesignerFileManager.SaveDesign(this, _designer);
         }
 
         private void btnLoadDesign_Click(object sender, EventArgs e)
         {
-            var loaded = DesignerFileManager.LoadDesign(this, out bool success);
-            if (success && loaded != null)
-            {
-                _designer = loaded;
+           // var loaded = DesignerFileManager.LoadDesign(this, out bool success);
+           // if (success && loaded != null)
+            //{
+            //    _designer = loaded;
 
-                // Refresh grid control lines with the newly loaded design
-                SongGridManager.ConfigureSongGridView(
-                    dgSong,
-                    _midiInstruments,
-                    dgSong_CellValueChanged,
-                    dgSong_CurrentCellDirtyStateChanged,
-                    _designer);
-            }
+            //    // Refresh grid control lines with the newly loaded design
+            //    SongGridManager.ConfigureSongGridView(
+            //        dgSong,
+            //        _midiInstruments,
+            //        dgSong_CellValueChanged,
+            //        dgSong_CurrentCellDirtyStateChanged,
+            //        _designer);
+            //}
         }
 
         private void btnSave_Click(object sender, EventArgs e)

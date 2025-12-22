@@ -6,6 +6,9 @@ namespace Music.Generator
     {
         private readonly Dictionary<int, GrooveInstance> _barHeads = new(); // bar -> event active at beat 1
 
+
+        //TO DO - this may change per instance right? Why is it up here?
+
         public int BeatsPerBar { get; set; } = 4;
 
         public List<GrooveInstance> Events { get; set; } = new();

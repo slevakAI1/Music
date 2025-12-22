@@ -11,15 +11,12 @@
   <ItemGroup>
     <Compile Remove="Archives\Arranger\**" />
     <Compile Remove="Archives\MusicXml\**" />
-    <Compile Remove="Designer\MusicXmlFiles\**" />
     <Compile Remove="Files\OutputSamples\**" />
     <EmbeddedResource Remove="Archives\Arranger\**" />
     <EmbeddedResource Remove="Archives\MusicXml\**" />
-    <EmbeddedResource Remove="Designer\MusicXmlFiles\**" />
     <EmbeddedResource Remove="Files\OutputSamples\**" />
     <None Remove="Archives\Arranger\**" />
     <None Remove="Archives\MusicXml\**" />
-    <None Remove="Designer\MusicXmlFiles\**" />
     <None Remove="Files\OutputSamples\**" />
   </ItemGroup>
 
@@ -41,8 +38,6 @@
 
   <ItemGroup>
     <EmbeddedResource Remove="Archives\SerializerTestForm.resx" />
-    <EmbeddedResource Remove="Designer\DesignerFrom.DataBinder.resx" />
-    <EmbeddedResource Remove="Designer\TimeSignatureEditorForm.resx" />
     <EmbeddedResource Remove="Writer\Form\ConsoleTransform.resx" />
     <EmbeddedResource Remove="Writer\Form\WriterForm.DataBinder.resx" />
     <EmbeddedResource Remove="Writer\Form\WriterFormEvents.resx" />
@@ -72,7 +67,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Designer\Designs\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
@@ -83,7 +77,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Designer\Voices\Voices.Notion.json">
+    <None Update="Generator\SongContext\Voices\Voices.Notion.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
