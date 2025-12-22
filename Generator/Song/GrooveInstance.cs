@@ -28,6 +28,7 @@ namespace Music.Generator
         public GrooveInstanceLayer AnchorLayer { get; set; }
 
         /// <summary>
+        /// For future use. Empty for now!
         /// Tension layer onsets per role (sampled variations).
         /// </summary>
         public GrooveInstanceLayer TensionLayer { get; set; }

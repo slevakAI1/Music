@@ -1,4 +1,4 @@
-namespace Music.Designer
+namespace Music.Generator
 {
     // Definition of a groove pattern that can produce onsets for each role
     public sealed class GroovePreset

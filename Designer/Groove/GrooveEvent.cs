@@ -1,4 +1,4 @@
-namespace Music.Designer
+namespace Music.Generator
 {
     // One groove event at a specific bar/beat position
     public sealed class GrooveEvent

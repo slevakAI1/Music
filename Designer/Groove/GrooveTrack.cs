@@ -1,4 +1,4 @@
-namespace Music.Designer
+namespace Music.Generator
 {
     // This is a design track for Groove
     // Global bar/beat-aligned groove timeline

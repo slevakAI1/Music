@@ -1,4 +1,4 @@
-﻿namespace Music.Designer
+﻿namespace Music.Generator
 {
     // Factory for hardcoded groove presets
     public static class GroovePresets

@@ -1,3 +1,5 @@
+using Music.Generator;
+
 namespace Music.Designer
 {
     // Central defaults to keep timelines aligned
