@@ -3,7 +3,7 @@ namespace Music
 {
     public static class Globals
     {
-        public static Designer.Designer? Designer { get; set; }
+        public static Designer.SongContext_Legacy? Designer { get; set; }
 
         // Holds a list of MusicXML scores for application-wide access
         // Index 0 is used as the primary/current score for backward compatibility

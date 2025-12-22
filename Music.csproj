@@ -76,7 +76,6 @@
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
-    <Folder Include="Generator\Song\" />
   </ItemGroup>
 
   <ItemGroup>

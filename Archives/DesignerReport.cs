@@ -1,6 +1,6 @@
 //using System.Text;
 
-//namespace Music.Designer
+//namespace Music.SongContext_Legacy
 //{
 //    /// <summary>
 //    /// THIS IS BASICALLY A REPORT FOR THE DESIGN DATA STRUCTURE.
@@ -8,7 +8,7 @@
 //    public static class DesignerReport
 //    {
 //        // Builds: VOICES + 2 newlines + SECTIONS + 2 newlines + HARMONY TIMELINE + 2 newlines + ALIGNMENT + 2 newlines + TIME SIGNATURES + 2 newlines + TEMPO
-//        public static string CreateDesignerReport(Designer designer)
+//        public static string CreateDesignerReport(SongContext_Legacy designer)
 //        {
 //            if (designer == null)
 //                return "(no design loaded)";

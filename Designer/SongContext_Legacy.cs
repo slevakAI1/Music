@@ -3,7 +3,7 @@
     /// <summary>
     /// Design structure for a song
     /// </summary>
-    public sealed class Designer
+    public sealed class SongContext_Legacy
     {
         public string DesignId { get; }
 
@@ -21,7 +21,7 @@
         public TempoTrack? TempoTrack { get; set; }
         public TimeSignatureTrack? TimeSignatureTrack { get; set; }
 
-        public Designer(string? designId = null)
+        public SongContext_Legacy(string? designId = null)
         {
             DesignId = designId ?? Guid.NewGuid().ToString("N");
         }
