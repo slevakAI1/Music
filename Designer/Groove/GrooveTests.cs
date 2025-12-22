@@ -3,7 +3,7 @@ namespace Music.Generator
     // Builds minimal groove test timelines used by default/test designs.
     public static class GrooveTests
     {
-        // Adds a minimal GrooveTrack for test/default designs.
+        // Adds a minimal GrooveInstances for test/default designs.
         // One groove event at bar 1 beat 1 using the PopRockBasic preset.
         public static GrooveTrack CreateTestGrooveD1()
         {

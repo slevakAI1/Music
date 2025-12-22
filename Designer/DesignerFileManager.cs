@@ -63,7 +63,7 @@ namespace Music.Designer
                     designer.Voices,
                     designer.SectionTrack,
                     designer.HarmonyTrack,
-                    designer.GrooveTrack,
+                    designer.GrooveInstances,
                     designer.TempoTrack,
                     designer.TimeSignatureTrack
                 };

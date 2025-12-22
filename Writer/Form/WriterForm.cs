@@ -190,13 +190,13 @@ namespace Music.Writer
                 if (_designer == null)
                     _designer = new Music.Designer.SongContext();
 
-                var initialGroove = _designer.GrooveTrack;
+                var initialGroove = _designer.GrooveInstances;
 
                 using var dlg = new Music.Designer.GrooveEditorForm(initialGroove);
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
-                    _designer.GrooveTrack = dlg.ResultTimeline;
-                    _designer.GrooveTrack?.EnsureIndexed();
+                    _designer.GrooveInstances = dlg.ResultTimeline;
+                    _designer.GrooveInstances?.EnsureIndexed();
                 }
 
                 return;

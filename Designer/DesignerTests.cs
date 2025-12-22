@@ -29,7 +29,7 @@ namespace Music.Designer
             design.TempoTrack = TempoTests.CreateTestTimelineD1();
 
             // 6) Groove timeline: set one event at bar 1 beat one for PopRockBasic preset
-            design.GrooveTrack = GrooveTests.CreateTestGrooveD1();
+            design.GrooveInstances = GrooveTests.CreateTestGrooveD1();
         }
     }
 }

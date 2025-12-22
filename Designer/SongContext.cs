@@ -17,7 +17,11 @@ namespace Music.Designer
         // Harmony timeline persisted with the design
         public HarmonyTrack? HarmonyTrack { get; set; }
 
-        public GrooveTrack? GrooveTrack { get; set; }
+
+        // WIP
+        public GrooveTrack? GrooveInstances { get; set; }
+
+
 
         // New: independent timelines for tempo and time signature
         public TempoTrack? TempoTrack { get; set; }
