@@ -20,7 +20,6 @@ namespace Music.Designer
 
         // Event editor controls
         private readonly NumericUpDown _numStartBar;
-        private readonly NumericUpDown _numStartBeat;
         private readonly ComboBox _cbPresetName;
 
         // Working list mirroring the ListView
@@ -37,7 +36,6 @@ namespace Music.Designer
         private sealed class WorkingEvent
         {
             public int StartBar { get; set; } = 1;
-            public int StartBeat { get; set; } = 1;
             public string GroovePresetName { get; set; } = string.Empty;
         }
 
@@ -85,8 +83,7 @@ namespace Music.Designer
                 AllowDrop = true
             };
             _lv.Columns.Add("#", 40, HorizontalAlignment.Right);
-            _lv.Columns.Add("Start Bar", 80, HorizontalAlignment.Right);
-            _lv.Columns.Add("Start Beat", 80, HorizontalAlignment.Right);
+            _lv.Columns.Add("Start Bar", 120, HorizontalAlignment.Right);
             _lv.Columns.Add("Preset Name", 200, HorizontalAlignment.Left);
 
             _lv.SelectedIndexChanged += OnListSelectionChanged;
@@ -139,7 +136,7 @@ namespace Music.Designer
             {
                 Dock = DockStyle.Fill,
                 ColumnCount = 2,
-                RowCount = 5,
+                RowCount = 4,
                 Padding = new Padding(6)
             };
             editor.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 120));
@@ -147,7 +144,6 @@ namespace Music.Designer
             right.Controls.Add(editor, 0, 0);
 
             var lblStartBar = new Label { Text = "Start Bar:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) };
-            var lblStartBeat = new Label { Text = "Start Beat:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) };
             var lblPresetName = new Label { Text = "Preset Name:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) };
 
             _numStartBar = new NumericUpDown
@@ -159,16 +155,6 @@ namespace Music.Designer
                 Width = 80
             };
             _numStartBar.ValueChanged += (s, e) => ApplyEditorToSelected();
-
-            _numStartBeat = new NumericUpDown
-            {
-                Minimum = 1,
-                Maximum = 32,
-                Value = 1,
-                Anchor = AnchorStyles.Left,
-                Width = 80
-            };
-            _numStartBeat.ValueChanged += (s, e) => ApplyEditorToSelected();
 
             _cbPresetName = new ComboBox
             {
@@ -190,11 +176,6 @@ namespace Music.Designer
             editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
             editor.Controls.Add(lblStartBar, 0, row);
             editor.Controls.Add(_numStartBar, 1, row);
-            row++;
-
-            editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
-            editor.Controls.Add(lblStartBeat, 0, row);
-            editor.Controls.Add(_numStartBeat, 1, row);
             row++;
 
             editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
@@ -287,7 +268,6 @@ namespace Music.Designer
                 var w = _working[i];
                 var item = new ListViewItem((i + 1).ToString());
                 item.SubItems.Add(w.StartBar.ToString());
-                item.SubItems.Add(w.StartBeat.ToString());
                 item.SubItems.Add(w.GroovePresetName);
                 item.Tag = w;
                 _lv.Items.Add(item);
@@ -312,8 +292,7 @@ namespace Music.Designer
             var it = _lv.Items[index];
             it.Text = (index + 1).ToString();
             it.SubItems[1].Text = w.StartBar.ToString();
-            it.SubItems[2].Text = w.StartBeat.ToString();
-            it.SubItems[3].Text = w.GroovePresetName;
+            it.SubItems[2].Text = w.GroovePresetName;
         }
 
         private void UpdateButtonsEnabled()
@@ -342,7 +321,7 @@ namespace Music.Designer
         {
             bool hasSel = _lv.SelectedIndices.Count > 0;
 
-            _numStartBar.Enabled = _numStartBeat.Enabled = _cbPresetName.Enabled = true;
+            _numStartBar.Enabled = _cbPresetName.Enabled = true;
 
             if (!hasSel)
             {
@@ -357,7 +336,6 @@ namespace Music.Designer
             try
             {
                 _numStartBar.Value = Math.Max(_numStartBar.Minimum, Math.Min(_numStartBar.Maximum, w.StartBar));
-                _numStartBeat.Value = Math.Max(_numStartBeat.Minimum, Math.Min(_numStartBeat.Maximum, w.StartBeat));
                 _cbPresetName.Text = w.GroovePresetName ?? string.Empty;
             }
             finally
@@ -381,7 +359,6 @@ namespace Music.Designer
             var w = (WorkingEvent)_lv.SelectedItems[0].Tag!;
 
             w.StartBar = (int)_numStartBar.Value;
-            w.StartBeat = (int)_numStartBeat.Value;
             w.GroovePresetName = _cbPresetName.Text?.Trim() ?? string.Empty;
 
             UpdateRowVisuals(_lv.SelectedIndices[0]);
@@ -399,18 +376,13 @@ namespace Music.Designer
             var w = new WorkingEvent
             {
                 StartBar = (int)_numStartBar.Value,
-                StartBeat = (int)_numStartBeat.Value,
                 GroovePresetName = _cbPresetName.Text?.Trim() ?? string.Empty
             };
 
             _working.Add(w);
 
             // Sort by start position
-            _working.Sort((a, b) =>
-            {
-                int cmp = a.StartBar.CompareTo(b.StartBar);
-                return cmp != 0 ? cmp : a.StartBeat.CompareTo(b.StartBeat);
-            });
+            _working.Sort((a, b) => a.StartBar.CompareTo(b.StartBar));
 
             int newIndex = _working.IndexOf(w);
             RefreshListView(newIndex);
@@ -430,18 +402,13 @@ namespace Music.Designer
             var w = new WorkingEvent
             {
                 StartBar = (int)_numStartBar.Value,
-                StartBeat = (int)_numStartBeat.Value,
                 GroovePresetName = _cbPresetName.Text?.Trim() ?? string.Empty
             };
 
             _working.Insert(insertAt, w);
 
             // Sort by start position
-            _working.Sort((a, b) =>
-            {
-                int cmp = a.StartBar.CompareTo(b.StartBar);
-                return cmp != 0 ? cmp : a.StartBeat.CompareTo(b.StartBeat);
-            });
+            _working.Sort((a, b) => a.StartBar.CompareTo(b.StartBar));
 
             int newIndex = _working.IndexOf(w);
             RefreshListView(newIndex);
@@ -460,7 +427,6 @@ namespace Music.Designer
                     : 1;
 
                 _numStartBar.Value = Math.Max(_numStartBar.Minimum, Math.Min(_numStartBar.Maximum, nextBar));
-                _numStartBeat.Value = 1;
                 if (_cbPresetName.Items.Count > 0 && string.IsNullOrEmpty(_cbPresetName.Text))
                 {
                     _cbPresetName.SelectedIndex = 0;
@@ -491,7 +457,6 @@ namespace Music.Designer
             var clone = new WorkingEvent
             {
                 StartBar = src.StartBar + 1,
-                StartBeat = src.StartBeat,
                 GroovePresetName = src.GroovePresetName
             };
             _working.Insert(idx + 1, clone);
@@ -597,7 +562,6 @@ namespace Music.Designer
             _working.Add(new WorkingEvent
             {
                 StartBar = 1,
-                StartBeat = 1,
                 GroovePresetName = _cbPresetName.Items.Count > 0 ? _cbPresetName.Items[0].ToString()! : string.Empty
             });
 
@@ -608,13 +572,10 @@ namespace Music.Designer
         {
             error = null;
             int startBar = (int)_numStartBar.Value;
-            int startBeat = (int)_numStartBeat.Value;
             string presetName = _cbPresetName.Text?.Trim() ?? string.Empty;
 
             if (startBar < 1)
                 error = "Start Bar must be at least 1.";
-            if (startBeat < 1)
-                error = (error == null) ? "Start Beat must be at least 1." : error + " Start Beat must be at least 1.";
             if (string.IsNullOrWhiteSpace(presetName))
                 error = (error == null) ? "Preset Name is required." : error + " Preset Name is required.";
 
