@@ -26,11 +26,6 @@
         /// </summary>
         public int TotalBars { get; set; }
 
-        /// <summary>
-        /// Ticks per quarter note (standard: 480).
-        /// </summary>
-        public int TicksPerQuarterNote { get; init; }
-
         public Song()
         {
             TempoTrack = new SongTempoTrack();
