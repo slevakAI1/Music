@@ -1,3 +1,8 @@
+
+
+// TO DO - What about drum set - pseudo midi number 255? Is it handled/allowed here?
+
+
 namespace Music.Generator
 {
     /// <summary>
