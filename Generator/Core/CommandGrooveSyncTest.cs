@@ -71,6 +71,12 @@ namespace Music.Generator
 
                 int addedCount = 0;
 
+
+
+                // TO DO NEXT!  This needs to write to the Song and the Song needs to write to the grid!
+
+
+
                 // Add generated song tracks to grid
                 if (result.BassTrack != null && result.BassTrack.SongTrackNoteEvents.Count > 0)
                 {
@@ -95,6 +101,15 @@ namespace Music.Generator
                     SongGridManager.AddSongTrackToGrid(result.DrumTrack, midiInstruments, dgSong, ref songTrackNumber);
                     addedCount++;
                 }
+
+
+
+
+
+
+
+
+
 
                 MessageBoxHelper.Show(
                     $"Successfully created {addedCount} synchronized tracks using groove timeline with controlled randomness.",
