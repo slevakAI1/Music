@@ -126,7 +126,7 @@ namespace Music.Writer
             // cbCommand
             // 
             cbCommand.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbCommand.Items.AddRange(new object[] { "Repeat Note", "Harmony Sync Test", "Harmony Groove Sync Test" });
+            cbCommand.Items.AddRange(new object[] { "Repeat Note", "Harmony Groove Sync Test" });
             cbCommand.Location = new Point(13, 22);
             cbCommand.Name = "cbCommand";
             cbCommand.Size = new Size(250, 23);

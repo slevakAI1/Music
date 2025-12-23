@@ -57,7 +57,7 @@ namespace Music.Writer
             if (clbStaffs != null && clbStaffs.Items.Count > 0)
                 clbStaffs.SetItemChecked(0, true); // Check staff "1"
 
-            cbCommand.SelectedIndex = 2; // harmony groove sync test
+            cbCommand.SelectedIndex = 1; // harmony groove sync test
 
             // Configure dgSong with MIDI instrument dropdown
             SongGridManager.ConfigureSongGridView(
@@ -347,10 +347,6 @@ namespace Music.Writer
 
                 case "Repeat Note":
                     HandleRepeatNoteCommand.Execute(formData, dgSong);
-                    break;
-
-                case "Harmony Sync Test":
-                    CommandHarmonySyncTest.HandleHarmonySyncTest(dgSong);
                     break;
 
                 case "Harmony Groove Sync Test":
