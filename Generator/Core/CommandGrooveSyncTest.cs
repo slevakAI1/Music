@@ -4,7 +4,6 @@ namespace Music.Generator
 {
     /// <summary>
     /// Command handler for the groove-driven generator test.
-    /// Replaces the fixed test generator with groove-based song track generation.
     /// </summary>
     public static class CommandGrooveSyncTest
     {
