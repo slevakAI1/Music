@@ -27,7 +27,7 @@ namespace Music.Designer
         public SectionTrack SectionTrack { get; set; } = new();
 
         /// <summary>
-        /// Design-space Song object (template).
+        /// Song being generated
         /// </summary>
         public Song Song { get; set; } = new();
 

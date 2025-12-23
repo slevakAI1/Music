@@ -10,7 +10,7 @@ namespace Music.Writer
 {
     public partial class WriterForm : Form
     {
-        private Designer.SongContext? _designer;
+        private Designer.SongContext? _songContext;
         private WriterFormData? _writer;
 
         // playback service (reused for multiple play calls)
@@ -50,7 +50,7 @@ namespace Music.Writer
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.Manual;
 
-            _designer = Globals.Designer;
+            _songContext = Globals.Designer;
 
             dgSong.DefaultCellStyle.ForeColor = Color.Black; // had trouble setting this in the forms designer
             dgSong.DefaultCellStyle.BackColor = Color.White;
@@ -73,7 +73,7 @@ namespace Music.Writer
                 _midiInstruments,
                 dgSong_CellValueChanged,
                 dgSong_CurrentCellDirtyStateChanged,
-                _designer);
+                _songContext);
 
             // ====================   T H I S   H A S   T O   B E   L A S T  !   =================
 
@@ -108,16 +108,16 @@ namespace Music.Writer
         /// </summary>
         private void dgSong_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
         {
-            // If the fixed Voice row was double-clicked, open the Voice selector and write back to the local _designer
+            // If the fixed Voice row was double-clicked, open the Voice selector and write back to the local _songContext
             if (e.RowIndex == SongGridManager.FIXED_ROW_VOICE)
             {
-                if (_designer == null)
-                    _designer = new Music.Designer.SongContext();
+                if (_songContext == null)
+                    _songContext = new Music.Designer.SongContext();
 
                 using var voiceForm = new Music.Designer.VoiceSelectorForm();
 
                 // Initialize with existing voices from the designer
-                var existingVoices = _designer.Voices?.Voices?
+                var existingVoices = _songContext.Voices?.Voices?
                     .Where(v => !string.IsNullOrWhiteSpace(v.VoiceName))
                     .ToDictionary(
                         v => v.VoiceName,
@@ -134,13 +134,13 @@ namespace Music.Writer
                     var selected = voiceForm.SelectedVoicesWithRoles;
                     if (selected?.Count > 0)
                     {
-                        _designer.Voices ??= new Music.Designer.VoiceSet();
-                        _designer.Voices.Reset();
+                        _songContext.Voices ??= new Music.Designer.VoiceSet();
+                        _songContext.Voices.Reset();
 
                         foreach (var kvp in selected)
                         {
                             var role = kvp.Value == "Select..." ? "" : kvp.Value;
-                            _designer.Voices.AddVoice(kvp.Key, role);
+                            _songContext.Voices.AddVoice(kvp.Key, role);
                         }
                     }
                 }
@@ -148,91 +148,91 @@ namespace Music.Writer
                 return;
             }
 
-            // If the fixed Section row was double-clicked, open the Section editor and write back to the local _designer
+            // If the fixed Section row was double-clicked, open the Section editor and write back to the local _songContext
             if (e.RowIndex == SongGridManager.FIXED_ROW_SECTION)
             {
-                if (_designer == null)
-                    _designer = new Music.Designer.SongContext();
+                if (_songContext == null)
+                    _songContext = new Music.Designer.SongContext();
 
-                var initialSections = _designer.SectionTrack;
+                var initialSections = _songContext.SectionTrack;
 
                 using var dlg = new Music.Designer.SectionEditorForm(initialSections);
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
-                    _designer.SectionTrack = dlg.ResultSections;
-                    GridControlLinesManager.AttachSectionTimeline(dgSong, _designer.SectionTrack);
+                    _songContext.SectionTrack = dlg.ResultSections;
+                    GridControlLinesManager.AttachSectionTimeline(dgSong, _songContext.SectionTrack);
                 }
 
                 return;
             }
 
-            // If the fixed Harmony row was double-clicked, open the Harmony editor and write back to the local _designer
+            // If the fixed Harmony row was double-clicked, open the Harmony editor and write back to the local _songContext
             if (e.RowIndex == SongGridManager.FIXED_ROW_HARMONY)
             {
-                if (_designer == null)
-                    _designer = new Music.Designer.SongContext();
+                if (_songContext == null)
+                    _songContext = new Music.Designer.SongContext();
 
-                var initialHarmony = _designer.HarmonyTrack;
+                var initialHarmony = _songContext.HarmonyTrack;
 
                 using var dlg = new Music.Designer.HarmonyEditorForm(initialHarmony);
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
-                    _designer.HarmonyTrack = dlg.ResultTimeline;
-                    GridControlLinesManager.AttachHarmonyTimeline(dgSong, _designer.HarmonyTrack);
+                    _songContext.HarmonyTrack = dlg.ResultTimeline;
+                    GridControlLinesManager.AttachHarmonyTimeline(dgSong, _songContext.HarmonyTrack);
                 }
 
                 return;
             }
 
-            // If the fixed Groove row was double-clicked, open the Groove editor and write back to the local _designer
+            // If the fixed Groove row was double-clicked, open the Groove editor and write back to the local _songContext
             if (e.RowIndex == SongGridManager.FIXED_ROW_GROOVE)
             {
-                if (_designer == null)
-                    _designer = new Music.Designer.SongContext();
+                if (_songContext == null)
+                    _songContext = new Music.Designer.SongContext();
 
-                var initialGroove = _designer.GrooveTrack;
+                var initialGroove = _songContext.GrooveTrack;
 
                 using var dlg = new Music.Designer.GrooveEditorForm(initialGroove);
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
-                    _designer.GrooveTrack = dlg.ResultTimeline;
-                    _designer.GrooveTrack?.EnsureIndexed();
+                    _songContext.GrooveTrack = dlg.ResultTimeline;
+                    _songContext.GrooveTrack?.EnsureIndexed();
                 }
 
                 return;
             }
 
-            // If the fixed Time Signature row was double-clicked, open the Time Signature editor and write back to the local _designer
+            // If the fixed Time Signature row was double-clicked, open the Time Signature editor and write back to the local _songContext
             if (e.RowIndex == SongGridManager.FIXED_ROW_TIME_SIGNATURE)
             {
-                if (_designer == null)
-                    _designer = new Music.Designer.SongContext();
+                if (_songContext == null)
+                    _songContext = new Music.Designer.SongContext();
 
-                var initialTimeSignature = _designer.TimeSignatureTrack;
+                var initialTimeSignature = _songContext.TimeSignatureTrack;
 
                 using var dlg = new Music.Designer.TimeSignatureEditorForm(initialTimeSignature);
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
-                    _designer.TimeSignatureTrack = dlg.ResultTimeline;
-                    GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, _designer.TimeSignatureTrack);
+                    _songContext.TimeSignatureTrack = dlg.ResultTimeline;
+                    GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, _songContext.TimeSignatureTrack);
                 }
 
                 return;
             }
 
-            // If the fixed Tempo row was double-clicked, open the Tempo editor and write back to the local _designer
+            // If the fixed Tempo row was double-clicked, open the Tempo editor and write back to the local _songContext
             if (e.RowIndex == SongGridManager.FIXED_ROW_TEMPO)
             {
-                if (_designer == null)
-                    _designer = new Music.Designer.SongContext();
+                if (_songContext == null)
+                    _songContext = new Music.Designer.SongContext();
 
-                var initialTempo = _designer.TempoTrack;
+                var initialTempo = _songContext.TempoTrack;
 
                 using var dlg = new Music.Designer.TempoEditorForm(initialTempo);
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
-                    _designer.TempoTrack = dlg.ResultTimeline;
-                    GridControlLinesManager.AttachTempoTimeline(dgSong, _designer.TempoTrack);
+                    _songContext.TempoTrack = dlg.ResultTimeline;
+                    GridControlLinesManager.AttachTempoTimeline(dgSong, _songContext.TempoTrack);
                 }
 
                 return;
@@ -260,7 +260,7 @@ namespace Music.Writer
 
             if (Globals.Designer != null)
             {
-                _designer = Globals.Designer;
+                _songContext = Globals.Designer;
             }
             if (Globals.Writer != null)
                 _writer = Globals.Writer;
@@ -279,7 +279,7 @@ namespace Music.Writer
             base.OnDeactivate(e);
 
             // Save on the way out
-            Globals.Designer = _designer;
+            Globals.Designer = _songContext;
             var transform = new WriterFormTransform();
             _writer = Globals.Writer = transform.CaptureFormData(
                 cbCommand, clbParts, clbStaffs, rbIsRest, rbChord, cbStep,
@@ -298,25 +298,25 @@ namespace Music.Writer
 
         private void btnUpdateFormFromDesigner_Click(object sender, EventArgs e)
         {
-            if (_writer != null && _designer != null)
+            if (_writer != null && _songContext != null)
             {
-                _eventHandlers.HandleUpdateFormFromDesigner(_writer, _designer);
+                _eventHandlers.HandleUpdateFormFromDesigner(_writer, _songContext);
             }
         }
 
         private void btnSetDesignTestScenarioD1_Click(object sender, EventArgs e)
         {
-            _designer ??= new Designer.SongContext();
-            _eventHandlers.HandleSetDesignTestScenarioD1(dgSong, _designer);
+            _songContext ??= new Designer.SongContext();
+            _eventHandlers.HandleSetDesignTestScenarioD1(dgSong, _songContext);
 
-            Globals.Designer = _designer;  // TO DO ... currently test groove track is pulling from globals, should get from local
+            Globals.Designer = _songContext;  // TO DO ... currently test groove track is pulling from globals, should get from local
             // copy
 
         }
 
         private void btnSetWriterTestScenarioG1_Click(object sender, EventArgs e)
         {
-            _writer = _eventHandlers.HandleSetWriterTestScenarioG1(_designer);
+            _writer = _eventHandlers.HandleSetWriterTestScenarioG1(_songContext);
             var transform = new WriterFormTransform();
             transform.ApplyFormData(_writer,
                 cbCommand, clbParts, clbStaffs, rbIsRest, rbChord, cbStep,
@@ -327,7 +327,7 @@ namespace Music.Writer
 
         private void btnChordTest_Click(object sender, EventArgs e)
         {
-            _eventHandlers.HandleChordTest(_designer);
+            _eventHandlers.HandleChordTest(_songContext);
         }
 
         private void btnExportToNotion_Click(object sender, EventArgs e)
@@ -423,7 +423,7 @@ namespace Music.Writer
 
         private void btnSaveDesign_Click(object sender, EventArgs e)
         {
-            if (_designer == null)
+            if (_songContext == null)
             {
                 MessageBoxHelper.Show(
                     "Create a new design first.",
@@ -433,7 +433,7 @@ namespace Music.Writer
                 return;
             }
 
-            //DesignerFileManager.SaveDesign(this, _designer);
+            //DesignerFileManager.SaveDesign(this, _songContext);
         }
 
         private void btnLoadDesign_Click(object sender, EventArgs e)
@@ -441,7 +441,7 @@ namespace Music.Writer
            // var loaded = DesignerFileManager.LoadDesign(this, out bool success);
            // if (success && loaded != null)
             //{
-            //    _designer = loaded;
+            //    _songContext = loaded;
 
             //    // Refresh grid control lines with the newly loaded design
             //    SongGridManager.ConfigureSongGridView(
@@ -449,7 +449,7 @@ namespace Music.Writer
             //        _midiInstruments,
             //        dgSong_CellValueChanged,
             //        dgSong_CurrentCellDirtyStateChanged,
-            //        _designer);
+            //        _songContext);
             //}
         }
 
