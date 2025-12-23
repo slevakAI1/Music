@@ -21,17 +21,17 @@
         /// <summary>
         /// Global tempo track for the song.
         /// </summary>
-        public SongTempoTrack TempoTrack { get; set; }
+        public ProposedSongTempoTrack TempoTrack { get; set; }
 
         /// <summary>
         /// Global time signature track for the song.
         /// </summary>
-        public SongTimeSignatureTrack TimeSignatureTrack { get; set; }
+        public ProposedSongTimeSignatureTrack TimeSignatureTrack { get; set; }
 
         /// <summary>
         /// All part/instrument tracks in the song.
         /// </summary>
-        public List<SongPartTrack> PartTracks { get; set; }
+        public List<ProposedSongPartTrack> PartTracks { get; set; }
 
         /// <summary>
         /// Total number of bars in the song.
@@ -40,9 +40,9 @@
 
         public Song()
         {
-            TempoTrack = new SongTempoTrack();
-            TimeSignatureTrack = new SongTimeSignatureTrack();
-            PartTracks = new List<SongPartTrack>();
+            TempoTrack = new ProposedSongTempoTrack();
+            TimeSignatureTrack = new ProposedSongTimeSignatureTrack();
+            PartTracks = new List<ProposedSongPartTrack>();
         }
     }
 }

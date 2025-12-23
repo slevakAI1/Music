@@ -3,14 +3,14 @@ namespace Music.Generator
     /// <summary>
     /// Harmony events for the song timeline.
     /// </summary>
-    public sealed class SongHarmonyTrack
+    public sealed class ProposedSongHarmonyTrack
     {
         /// <summary>
         /// Ordered list of harmony events.
         /// </summary>
         public List<SongHarmonyEvent> Events { get; set; }
 
-        public SongHarmonyTrack()
+        public ProposedSongHarmonyTrack()
         {
             Events = new List<SongHarmonyEvent>();
         }

@@ -75,7 +75,7 @@
 
             var data = new WriterFormData
             {
-                // Pattern
+                // ProposedPattern
                 Pattern = cbCommand?.SelectedItem?.ToString(),
 
                 // New: store the full items -> checked state map
@@ -140,7 +140,7 @@
         {
             if (data == null) return;
 
-            // Pattern
+            // ProposedPattern
             if (data.Pattern != null && cbCommand != null && cbCommand.Items.Contains(data.Pattern))
                 cbCommand.SelectedItem = data.Pattern;
 

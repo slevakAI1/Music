@@ -4,7 +4,7 @@ namespace Music.Generator
     /// Collection of patterns available for use in song generation.
     /// Can be populated from design, generated during composition, or loaded from storage.
     /// </summary>
-    public sealed class PatternLibrary
+    public sealed class ProposedPatternLibrary
     {
         /// <summary>
         /// Unique identifier for this library.
@@ -14,17 +14,17 @@ namespace Music.Generator
         /// <summary>
         /// All patterns in the library.
         /// </summary>
-        public List<Pattern> Patterns { get; set; }
+        public List<ProposedPattern> Patterns { get; set; }
 
         /// <summary>
         /// Patterns designated as identity tokens (main hooks).
         /// </summary>
         public List<string> IdentityTokenIds { get; set; }
 
-        public PatternLibrary()
+        public ProposedPatternLibrary()
         {
             LibraryId = Guid.NewGuid().ToString("N");
-            Patterns = new List<Pattern>();
+            Patterns = new List<ProposedPattern>();
             IdentityTokenIds = new List<string>();
         }
     }

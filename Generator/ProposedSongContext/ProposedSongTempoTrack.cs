@@ -3,14 +3,14 @@ namespace Music.Generator
     /// <summary>
     /// Tempo events for the song timeline.
     /// </summary>
-    public sealed class SongTempoTrack
+    public sealed class ProposedSongTempoTrack
     {
         /// <summary>
         /// Ordered list of tempo events.
         /// </summary>
         public List<SongTempoEvent> Events { get; set; }
 
-        public SongTempoTrack()
+        public ProposedSongTempoTrack()
         {
             Events = new List<SongTempoEvent>();
         }

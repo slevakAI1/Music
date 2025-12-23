@@ -3,14 +3,14 @@ namespace Music.Generator
     /// <summary>
     /// Time signature events for the song timeline.
     /// </summary>
-    public sealed class SongTimeSignatureTrack
+    public sealed class ProposedSongTimeSignatureTrack
     {
         /// <summary>
         /// Ordered list of time signature events.
         /// </summary>
         public List<SongTimeSignatureEvent> Events { get; set; }
 
-        public SongTimeSignatureTrack()
+        public ProposedSongTimeSignatureTrack()
         {
             Events = new List<SongTimeSignatureEvent>();
         }

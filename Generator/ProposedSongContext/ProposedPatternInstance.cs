@@ -4,7 +4,7 @@ namespace Music.Generator
     /// An instance of a pattern placed at a specific location in the song.
     /// Tracks transformations applied and enables pattern reuse analysis.
     /// </summary>
-    public sealed class PatternInstance
+    public sealed class ProposedPatternInstance
     {
         /// <summary>
         /// Unique identifier for this instance.
@@ -31,7 +31,7 @@ namespace Music.Generator
         /// </summary>
         public List<long> GeneratedNoteEventIds { get; set; }
 
-        public PatternInstance()
+        public ProposedPatternInstance()
         {
             InstanceId = Guid.NewGuid().ToString("N");
             SourcePatternId = string.Empty;

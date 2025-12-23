@@ -4,7 +4,7 @@ namespace Music.Generator
     /// A reusable musical pattern (hook, phrase, groove variation, etc.).
     /// Patterns are templates that can be instantiated at different positions in the song.
     /// </summary>
-    public sealed class Pattern
+    public sealed class ProposedPattern
     {
         /// <summary>
         /// Unique identifier for this pattern.
@@ -51,7 +51,7 @@ namespace Music.Generator
         /// </summary>
         public double EnergyLevel { get; set; }
 
-        public Pattern()
+        public ProposedPattern()
         {
             PatternId = Guid.NewGuid().ToString("N");
             PatternType = PatternType.Phrase;

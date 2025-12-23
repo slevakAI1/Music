@@ -4,7 +4,7 @@ namespace Music.Generator
     /// Context object passed through the generation pipeline.
     /// Contains all the state needed for generators and critics to operate.
     /// </summary>
-    public sealed class SongContextProposed
+    public sealed class ProposedSongContext
     {
         /// <summary>
         /// The song being generated.
@@ -12,9 +12,9 @@ namespace Music.Generator
         public ProposedSong Song { get; set; }
 
         /// <summary>
-        /// Pattern library for the current generation.
+        /// ProposedPattern library for the current generation.
         /// </summary>
-        public PatternLibrary PatternLibrary { get; set; }
+        public ProposedPatternLibrary PatternLibrary { get; set; }
 
         /// <summary>
         /// Active groove instances by bar range.
@@ -51,10 +51,10 @@ namespace Music.Generator
         /// </summary>
         public int BeatsPerBar { get; set; }
 
-        public SongContextProposed()
+        public ProposedSongContext()
         {
             Song = new ProposedSong();
-            PatternLibrary = new PatternLibrary();
+            PatternLibrary = new ProposedPatternLibrary();
             GrooveInstances = new List<GrooveInstance>();
             VariationSettings = new VariationSettings();
             TicksPerQuarterNote = 480;

@@ -6,7 +6,7 @@ namespace Music.Writer
     //   so callers can rely on the property value without repeating the same fallback logic.
     public sealed class WriterFormData
     {
-        // General / Pattern
+        // General / ProposedPattern
         private string? _pattern;
         private string? _sectionsText;
 
@@ -43,7 +43,7 @@ namespace Music.Writer
         private bool? _fermata;
         private int? _numberOfNotes;
 
-        // General / Pattern
+        // General / ProposedPattern
         public string? Pattern
         {
             get => _pattern;

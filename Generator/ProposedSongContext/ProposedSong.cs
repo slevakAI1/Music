@@ -27,27 +27,27 @@ namespace Music.Generator
         /// <summary>
         /// Global tempo track for the song.
         /// </summary>
-        public SongTempoTrack TempoTrack { get; set; }
+        public ProposedSongTempoTrack TempoTrack { get; set; }
 
         /// <summary>
         /// Global time signature track for the song.
         /// </summary>
-        public SongTimeSignatureTrack TimeSignatureTrack { get; set; }
+        public ProposedSongTimeSignatureTrack TimeSignatureTrack { get; set; }
 
         /// <summary>
         /// Harmony track reflecting the actual chords used in the song.
         /// </summary>
-        public SongHarmonyTrack HarmonyTrack { get; set; }
+        public ProposedSongHarmonyTrack HarmonyTrack { get; set; }
 
         /// <summary>
         /// Section layout of the song (verse, chorus, etc. with bar positions).
         /// </summary>
-        public SongSectionTrack SectionTrack { get; set; }
+        public ProposedSongSectionTrack SectionTrack { get; set; }
 
         /// <summary>
         /// All part/instrument tracks in the song.
         /// </summary>
-        public List<SongPartTrack> PartTracks { get; set; }
+        public List<ProposedSongPartTrack> PartTracks { get; set; }
 
         /// <summary>
         /// Total number of bars in the song.
@@ -63,11 +63,11 @@ namespace Music.Generator
         {
             SongId = Guid.NewGuid().ToString("N");
             TicksPerQuarterNote = 480;
-            TempoTrack = new SongTempoTrack();
-            TimeSignatureTrack = new SongTimeSignatureTrack();
-            HarmonyTrack = new SongHarmonyTrack();
-            SectionTrack = new SongSectionTrack();
-            PartTracks = new List<SongPartTrack>();
+            TempoTrack = new ProposedSongTempoTrack();
+            TimeSignatureTrack = new ProposedSongTimeSignatureTrack();
+            HarmonyTrack = new ProposedSongHarmonyTrack();
+            SectionTrack = new ProposedSongSectionTrack();
+            PartTracks = new List<ProposedSongPartTrack>();
         }
     }
 }

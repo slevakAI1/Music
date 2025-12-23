@@ -9,7 +9,7 @@ namespace Music.Generator
     /// A single instrument/voice track within a song.
     /// Contains all note events and references to patterns used.
     /// </summary>
-    public sealed class SongPartTrack
+    public sealed class ProposedSongPartTrack
     {
         /// <summary>
         /// Unique identifier for this track.
@@ -39,25 +39,25 @@ namespace Music.Generator
         /// <summary>
         /// All note events in this track, ordered by absolute position.
         /// </summary>
-        public List<SongNoteEvent> NoteEvents { get; set; }
+        public List<ProposedSongNoteEvent> NoteEvents { get; set; }
 
         /// <summary>
-        /// Pattern instances used in this track (for analysis and regeneration).
+        /// ProposedPattern instances used in this track (for analysis and regeneration).
         /// </summary>
-        public List<PatternInstance> PatternInstances { get; set; }
+        public List<ProposedPatternInstance> PatternInstances { get; set; }
 
         /// <summary>
         /// Register constraints for this part.
         /// </summary>
         public RegisterConstraint RegisterConstraint { get; set; }
 
-        public SongPartTrack()
+        public ProposedSongPartTrack()
         {
             TrackId = Guid.NewGuid().ToString("N");
             GrooveRole = string.Empty;
             MidiProgramName = string.Empty;
-            NoteEvents = new List<SongNoteEvent>();
-            PatternInstances = new List<PatternInstance>();
+            NoteEvents = new List<ProposedSongNoteEvent>();
+            PatternInstances = new List<ProposedPatternInstance>();
             RegisterConstraint = new RegisterConstraint();
         }
     }

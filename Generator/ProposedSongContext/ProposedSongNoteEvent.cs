@@ -4,7 +4,7 @@ namespace Music.Generator
     /// A single note event within a song part track.
     /// Contains MIDI data plus metadata for analysis and display.
     /// </summary>
-    public sealed class SongNoteEvent
+    public sealed class ProposedSongNoteEvent
     {
         // ============ Core MIDI Properties ============
 
@@ -61,7 +61,7 @@ namespace Music.Generator
         /// </summary>
         public bool IsStrongBeat { get; set; }
 
-        // ============ Pattern/Origin Metadata ============
+        // ============ ProposedPattern/Origin Metadata ============
 
         /// <summary>
         /// ID of the pattern instance this note belongs to (null if not from a pattern).
@@ -78,7 +78,7 @@ namespace Music.Generator
         /// </summary>
         public SongChordMetadata? ChordMetadata { get; set; }
 
-        public SongNoteEvent()
+        public ProposedSongNoteEvent()
         {
             Velocity = 100;
             SelectionType = NoteSelectionType.Direct;

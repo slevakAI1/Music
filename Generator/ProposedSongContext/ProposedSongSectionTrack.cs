@@ -3,14 +3,14 @@ namespace Music.Generator
     /// <summary>
     /// Section layout of the song.
     /// </summary>
-    public sealed class SongSectionTrack
+    public sealed class ProposedSongSectionTrack
     {
         /// <summary>
         /// Ordered list of sections in the song.
         /// </summary>
         public List<SongSection> Sections { get; set; }
 
-        public SongSectionTrack()
+        public ProposedSongSectionTrack()
         {
             Sections = new List<SongSection>();
         }
