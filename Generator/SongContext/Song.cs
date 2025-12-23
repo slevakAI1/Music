@@ -1,4 +1,7 @@
-﻿namespace Music.Generator
+﻿using Music.Designer;
+using Music.MyMidi;
+
+namespace Music.Generator
 {
     /// <summary>
     /// The complete generated song, containing all tracks and temporal data.
@@ -13,25 +16,24 @@
     //      Then can generate to the song object and send to the grid, and vica versa when the grid is updated.
     //          this may be tricky :-(
 
-
-
-
     public sealed class Song
     {
         /// <summary>
         /// Global tempo track for the song.
         /// </summary>
-        public ProposedSongTempoTrack TempoTrack { get; set; }
+        public TempoTrack TempoTrack { get; set; }
 
         /// <summary>
         /// Global time signature track for the song.
         /// </summary>
-        public ProposedSongTimeSignatureTrack TimeSignatureTrack { get; set; }
+        public TimeSignatureTrack TimeSignatureTrack { get; set; }
 
+
+        // TO DO This needs to be a List of Tracks...make this List<MetaMidiEvent> a PartTrack!
         /// <summary>
         /// All part/instrument tracks in the song.
         /// </summary>
-        public List<ProposedSongPartTrack> PartTracks { get; set; }
+        public List<List<MetaMidiEvent>> PartTracks { get; set; }
 
         /// <summary>
         /// Total number of bars in the song.
@@ -40,9 +42,9 @@
 
         public Song()
         {
-            TempoTrack = new ProposedSongTempoTrack();
-            TimeSignatureTrack = new ProposedSongTimeSignatureTrack();
-            PartTracks = new List<ProposedSongPartTrack>();
+            TempoTrack = new TempoTrack();
+            TimeSignatureTrack = new TimeSignatureTrack();
+            PartTracks = new List<List<MetaMidiEvent>>();
         }
     }
 }
