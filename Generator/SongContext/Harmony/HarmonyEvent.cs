@@ -1,4 +1,4 @@
-namespace Music.Designer
+namespace Music.Generator
 {
     // One harmony event, potentially spanning multiple bars
     // A harmony event is assumed to be active until the next harmony event starts.

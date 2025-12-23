@@ -9,7 +9,7 @@
         /// <summary>
         /// The source harmony event (optional, useful for debugging).
         /// </summary>
-        public Music.Designer.HarmonyEvent? SourceEvent { get; init; }
+        public Music.Generator.HarmonyEvent? SourceEvent { get; init; }
 
         /// <summary>
         /// The root pitch class of the key (0-11, where 0=C).

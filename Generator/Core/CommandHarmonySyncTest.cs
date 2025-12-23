@@ -1,4 +1,3 @@
-using Music.MyMidi;
 using Music.Writer;
 
 namespace Music.Generator
@@ -10,25 +9,25 @@ namespace Music.Generator
     {
         public static void HandleHarmonySyncTest(DataGridView dgSong)
         {
-            // Extract harmony timeline from the fixed harmony row
+            // Extract harmony track from the fixed harmony row
             var harmonyRow = dgSong.Rows[SongGridManager.FIXED_ROW_HARMONY];
-            var harmonyTimeline = harmonyRow.Cells["colData"].Value as Music.Designer.HarmonyTrack;
+            var harmonyTrack = harmonyRow.Cells["colData"].Value as HarmonyTrack;
             
-            if (!ValidateHarmonyTimeline(harmonyTimeline))
+            if (!ValidateHarmonyTrack(harmonyTrack))
                 return;
 
-            // Extract time signature timeline to determine beats per measure
+            // Extract time signature track to determine beats per measure
             var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
-            var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Designer.TimeSignatureTrack;
+            var timeSignatureTrack = timeSignatureRow.Cells["colData"].Value as Designer.TimeSignatureTrack;
             
-            if (!ValidateTimeSignatureTimeline(timeSignatureTimeline))
+            if (!ValidateTimeSignatureTrack(timeSignatureTrack))
                 return;
 
             // Create 4 tracks for the test
-            var rockOrganTrack = CreateRockOrganTrack(harmonyTimeline, timeSignatureTimeline);
-            var electricGuitarTrack = CreateElectricGuitarTrack(harmonyTimeline, timeSignatureTimeline);
-            var electricBassTrack = CreateElectricBassTrack(harmonyTimeline, timeSignatureTimeline);
-            var drumSetTrack = CreateDrumSetTrack(harmonyTimeline, timeSignatureTimeline);
+            var rockOrganTrack = CreateRockOrganTrack(harmonyTrack, timeSignatureTrack);
+            var electricGuitarTrack = CreateElectricGuitarTrack(harmonyTrack, timeSignatureTrack);
+            var electricBassTrack = CreateElectricBassTrack(harmonyTrack, timeSignatureTrack);
+            var drumSetTrack = CreateDrumSetTrack(harmonyTrack, timeSignatureTrack);
 
             // Add tracks to the grid - no need to track trackNumber anymore
             SongGridManager.AddNewTrack(rockOrganTrack, dgSong);
@@ -39,12 +38,12 @@ namespace Music.Generator
             ShowSuccessMessage();
         }
 
-        private static PartTrack CreateRockOrganTrack(Music.Designer.HarmonyTrack harmonyTimeline, Music.Designer.TimeSignatureTrack timeSignatureTimeline)
+        private static PartTrack CreateRockOrganTrack(HarmonyTrack harmonyTrack, Designer.TimeSignatureTrack timeSignatureTrack)
         {
             var notes = new List<PartTrackNoteEvent>();
             int currentTick = 0;
 
-            var timeSignature = timeSignatureTimeline.Events.FirstOrDefault();
+            var timeSignature = timeSignatureTrack.Events.FirstOrDefault();
             if (timeSignature == null)
                 return new PartTrack(notes) { MidiProgramNumber = 4 }; // Electric Piano 1
 
@@ -52,7 +51,7 @@ namespace Music.Generator
             int ticksPerMeasure = (ticksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
             int halfNoteDuration = ticksPerMeasure / 2; // Two half notes per measure
 
-            foreach (var harmonyEvent in harmonyTimeline.Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat))
+            foreach (var harmonyEvent in harmonyTrack.Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat))
             {
                 var chordNotes = ConvertHarmonyEventToSongTrackNoteEvents.Convert(
                     harmonyEvent.Key,
@@ -89,12 +88,12 @@ namespace Music.Generator
             return new PartTrack(notes) { MidiProgramNumber = 18 };
         }
 
-        private static PartTrack CreateElectricGuitarTrack(Music.Designer.HarmonyTrack harmonyTimeline, Music.Designer.TimeSignatureTrack timeSignatureTimeline)
+        private static PartTrack CreateElectricGuitarTrack(HarmonyTrack harmonyTimeTrack, Designer.TimeSignatureTrack timeSignatureTrack)
         {
             var notes = new List<PartTrackNoteEvent>();
             int currentTick = 0;
 
-            var timeSignature = timeSignatureTimeline.Events.FirstOrDefault();
+            var timeSignature = timeSignatureTrack.Events.FirstOrDefault();
             if (timeSignature == null)
                 return new PartTrack(notes) { MidiProgramNumber = 27 }; // Electric Guitar (clean)
 
@@ -102,7 +101,7 @@ namespace Music.Generator
             int ticksPerMeasure = (ticksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
             int eighthNoteDuration = ticksPerMeasure / 8;
 
-            foreach (var harmonyEvent in harmonyTimeline.Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat))
+            foreach (var harmonyEvent in harmonyTimeTrack.Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat))
             {
                 var chordNotes = ConvertHarmonyEventToSongTrackNoteEvents.Convert(
                     harmonyEvent.Key,
@@ -137,12 +136,12 @@ namespace Music.Generator
             return new PartTrack(notes) { MidiProgramNumber = 27 };
         }
 
-        private static PartTrack CreateElectricBassTrack(Music.Designer.HarmonyTrack harmonyTimeline, Music.Designer.TimeSignatureTrack timeSignatureTimeline)
+        private static PartTrack CreateElectricBassTrack(HarmonyTrack harmonyTrack, Designer.TimeSignatureTrack timeSignatureTrack)
         {
             var notes = new List<PartTrackNoteEvent>();
             int currentTick = 0;
 
-            var timeSignature = timeSignatureTimeline.Events.FirstOrDefault();
+            var timeSignature = timeSignatureTrack.Events.FirstOrDefault();
             if (timeSignature == null)
                 return new PartTrack(notes) { MidiProgramNumber = 33 }; // Electric Bass (finger)
 
@@ -150,7 +149,7 @@ namespace Music.Generator
             int ticksPerMeasure = (ticksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
             int quarterNoteDuration = ticksPerQuarterNote;
 
-            foreach (var harmonyEvent in harmonyTimeline.Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat))
+            foreach (var harmonyEvent in harmonyTrack.Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat))
             {
                 var chordNotes = ConvertHarmonyEventToSongTrackNoteEvents.Convert(
                     harmonyEvent.Key,
@@ -185,12 +184,12 @@ namespace Music.Generator
             return new PartTrack(notes) { MidiProgramNumber = 33 };
         }
 
-        private static PartTrack CreateDrumSetTrack(Music.Designer.HarmonyTrack harmonyTimeline, Music.Designer.TimeSignatureTrack timeSignatureTimeline)
+        private static PartTrack CreateDrumSetTrack(HarmonyTrack harmonyTrack, Designer.TimeSignatureTrack timeSignatureTrack)
         {
             var notes = new List<PartTrackNoteEvent>();
             int currentTick = 0;
 
-            var timeSignature = timeSignatureTimeline.Events.FirstOrDefault();
+            var timeSignature = timeSignatureTrack.Events.FirstOrDefault();
             if (timeSignature == null)
                 return new PartTrack(notes) { MidiProgramNumber = 255 }; // Drum Set
 
@@ -200,7 +199,7 @@ namespace Music.Generator
             const int bassDrum = 36;
             const int snareDrum = 38;
 
-            int totalMeasures = harmonyTimeline.Events.Max(e => e.StartBar);
+            int totalMeasures = harmonyTrack.Events.Max(e => e.StartBar);
 
             for (int measure = 0; measure < totalMeasures; measure++)
             {
@@ -235,9 +234,9 @@ namespace Music.Generator
         }
 
         #region Message Box Handlers
-        private static bool ValidateHarmonyTimeline(Music.Designer.HarmonyTrack harmonyTimeline)
+        private static bool ValidateHarmonyTrack(HarmonyTrack harmonyTrack)
         {
-            if (harmonyTimeline == null || harmonyTimeline.Events.Count == 0)
+            if (harmonyTrack == null || harmonyTrack.Events.Count == 0)
             {
                 MessageBoxHelper.Show(
                     "No harmony events defined. Please add harmony events first.",
@@ -249,9 +248,9 @@ namespace Music.Generator
             return true;
         }
 
-        private static bool ValidateTimeSignatureTimeline(Music.Designer.TimeSignatureTrack timeSignatureTimeline)
+        private static bool ValidateTimeSignatureTrack(Music.Designer.TimeSignatureTrack timeSignatureTrack)
         {
-            if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
+            if (timeSignatureTrack == null || timeSignatureTrack.Events.Count == 0)
             {
                 MessageBoxHelper.Show(
                     "No time signature events defined. Please add at least one time signature event.",
@@ -266,7 +265,7 @@ namespace Music.Generator
         private static void ShowSuccessMessage()
         {
             MessageBoxHelper.Show(
-                "Successfully created 4 synchronized tracks based on harmony timeline.",
+                "Successfully created 4 synchronized tracks based on harmony track.",
                 "Harmony Sync Test",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);

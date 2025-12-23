@@ -1,7 +1,4 @@
-using Music.Designer;
-using Music.Generator;
-
-namespace Music.Writer
+namespace Music.Generator
 {
     /// <summary>
     /// Builds a HarmonyPitchContext from a HarmonyEvent.

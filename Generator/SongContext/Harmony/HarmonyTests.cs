@@ -1,4 +1,6 @@
-namespace Music.Designer
+using Music.Designer;
+
+namespace Music.Generator
 {
     // Builds the app's default harmony timeline (48 bars).
     public static class HarmonyTests
