@@ -1,17 +1,17 @@
 //using Music.Writer;
 //using System.Text.Json;
 
-//namespace Music.Designer
+//namespace Music.SongContext
 //{
 //    internal static class DesignerFileManager
 //    {
 //        public static void SaveDesign(Form owner)
 //        {
-//            if (Globals.Designer == null) return;
+//            if (Globals.SongContext == null) return;
 
 //            try
 //            {
-//                var design = Globals.Designer!;
+//                var design = Globals.SongContext!;
 
 //                // Explicit snapshot to ensure TempoTrack and TimeSignatureTrack (and their Events) are serialized.
 //                var snapshot = new
@@ -116,7 +116,7 @@
 //                // Robust manual deserialization to rebuild computed fields
 //                var loaded = DesignerSerialization.DeserializeDesign(json);
 
-//                Globals.Designer = loaded;
+//                Globals.SongContext = loaded;
 
 //                MessageBoxHelper.Show(owner, $"Design loaded from:\n{ofd.FileName}", "Loaded",
 //                    MessageBoxButtons.OK, MessageBoxIcon.Information);

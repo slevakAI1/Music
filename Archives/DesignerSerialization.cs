@@ -1,6 +1,6 @@
 //using System.Text.Json;
 
-//namespace Music.Designer
+//namespace Music.SongContext
 //{
 //    internal static class DesignerSerialization
 //    {

@@ -44,7 +44,7 @@ namespace Music.Writer
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.Manual;
 
-            _songContext = Globals.Designer;
+            _songContext = Globals.SongContext;
 
             dgSong.DefaultCellStyle.ForeColor = Color.Black; // had trouble setting this in the forms designer
             dgSong.DefaultCellStyle.BackColor = Color.White;
@@ -251,9 +251,9 @@ namespace Music.Writer
 
             // Get from globals on the way in but not if null, would overwrite current state
 
-            if (Globals.Designer != null)
+            if (Globals.SongContext != null)
             {
-                _songContext = Globals.Designer;
+                _songContext = Globals.SongContext;
             }
             if (Globals.Writer != null)
                 _writer = Globals.Writer;
@@ -272,7 +272,7 @@ namespace Music.Writer
             base.OnDeactivate(e);
 
             // Save on the way out
-            Globals.Designer = _songContext;
+            Globals.SongContext = _songContext;
             var transform = new WriterFormTransform();
             _writer = Globals.Writer = transform.CaptureFormData(
                 cbCommand, clbParts, clbStaffs, rbIsRest, rbChord, cbStep,
@@ -302,7 +302,7 @@ namespace Music.Writer
             _songContext ??= new Designer.SongContext();
             _eventHandlers.HandleSetDesignTestScenarioD1(dgSong, _songContext);
 
-            Globals.Designer = _songContext;  // TO DO ... currently test groove track is pulling from globals, should get from local
+            Globals.SongContext = _songContext;  // TO DO ... currently test groove track is pulling from globals, should get from local
             // copy
 
         }
@@ -356,7 +356,7 @@ namespace Music.Writer
                     break;
 
                 case "Harmony Groove Sync Test":
-                    CommandGrooveSyncTest.HandleGrooveSyncTest(dgSong, ref trackNumber);
+                    CommandGrooveSyncTest.HandleGrooveSyncTest(_songContext, dgSong, ref trackNumber);
                     break;
 
                 // Other cases will be added here later.

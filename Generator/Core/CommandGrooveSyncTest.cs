@@ -14,8 +14,10 @@ namespace Music.Generator
         /// <summary>
         /// Handles the Harmony Groove Sync Test command.
         /// Generates synchronized test tracks using groove presets from the GrooveTrack timeline.
+        /// SongTrackNumber is the next open/unused midi track number
         /// </summary>
         public static void HandleGrooveSyncTest(
+            SongContext songContext,
             DataGridView dgSong,
             ref int songTrackNumber)
         {
@@ -48,7 +50,7 @@ namespace Music.Generator
             }
 
             // Get the GrooveTrack from the designer
-            var grooveTrack = Globals.Designer?.GrooveTrack;
+            var grooveTrack = Globals.SongContext?.GrooveTrack;
 
             if (grooveTrack == null || grooveTrack.Events.Count == 0)
             {
@@ -73,6 +75,10 @@ namespace Music.Generator
 
 
                 // TO DO NEXT!  This needs to write to the Song and the Song needs to write to the grid!
+
+
+
+
 
 
 
