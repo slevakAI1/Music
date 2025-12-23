@@ -77,6 +77,9 @@ namespace Music.Generator
                 songContext.Song.PartTracks.Add(result.KeysTrack);
                 songContext.Song.PartTracks.Add(result.DrumTrack);
 
+
+
+
                 // Update Grid with song tracks!
                 SongGridManager.AddSongTrackToGrid(result.BassTrack, dgSong, ref songTrackNumber);
                 addedCount++;
@@ -89,6 +92,9 @@ namespace Music.Generator
 
                 SongGridManager.AddSongTrackToGrid(result.DrumTrack, dgSong, ref songTrackNumber);
                 addedCount++;
+
+
+
 
 
                 MessageBoxHelper.Show(

@@ -22,15 +22,15 @@ namespace Music.Writer
             var (noteNumber, noteDurationTicks, repeatCount, isRest) =
                 MusicCalculations.GetRepeatingNotesParameters(formData);
 
-            var songTrack = CreateRepeatingNotes.Execute(
+            var partTrack = CreateRepeatingNotes.Execute(
                 noteNumber: noteNumber,
                 noteDurationTicks: noteDurationTicks,
                 repeatCount: repeatCount,
                 noteOnVelocity: 100,
                 isRest: isRest);
 
-            // Append the songTrack notes to all selected rows
-            AppendSongTrackNoteEventsToSelectedRows(dgSong, songTrack);
+            // Append the partTrack notes to all selected rows
+            AppendSongTrackNoteEventsToSelectedRows(dgSong, partTrack);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Appends songTrack notes to all selected songTrack rows in the grid.
+        /// Appends partTrack notes to all selected partTrack rows in the grid.
         /// </summary>
         private static void AppendSongTrackNoteEventsToSelectedRows(DataGridView dgSong, PartTrack songTrack)
         {
@@ -66,7 +66,7 @@ namespace Music.Writer
                 if (selectedRow.Index < SongGridManager.FIXED_ROWS_COUNT)
                     continue;
 
-                // Get existing songTrack data
+                // Get existing partTrack data
                 var dataObj = selectedRow.Cells["colData"].Value;
                 if (dataObj is not PartTrack existingSongTrack)
                     continue;
