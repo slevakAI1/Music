@@ -1,6 +1,7 @@
-﻿using Music.Generator;
+﻿
+using Music.Designer;
 
-namespace Music.Designer
+namespace Music.Generator
 {
     /// <summary>
     /// Design structure for a song.

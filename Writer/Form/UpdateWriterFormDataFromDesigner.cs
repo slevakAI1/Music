@@ -1,3 +1,5 @@
+using Music.Generator;
+
 namespace Music.Writer
 {
     public static class UpdateWriterFormDataFromDesigner
@@ -5,7 +7,7 @@ namespace Music.Writer
         // Applies design-driven defaults into an existing Writer instance.
         // Accept a nullable receiver so callers holding a `Writer?` (e.g. Globals.GenerationData)
         // can call this extension directly without a null-forgiving operator.
-        public static void Update(this WriterFormData? data, Designer.SongContext? design)
+        public static void Update(this WriterFormData? data, SongContext? design)
         {
             if (data == null) return;
 

@@ -10,7 +10,7 @@ namespace Music.Writer
 {
     public partial class WriterForm : Form
     {
-        private Designer.SongContext? _songContext;
+        private SongContext? _songContext;
         private WriterFormData? _writer;
 
         // playback service (reused for multiple play calls)
@@ -103,7 +103,7 @@ namespace Music.Writer
             if (e.RowIndex == SongGridManager.FIXED_ROW_VOICE)
             {
                 if (_songContext == null)
-                    _songContext = new Music.Designer.SongContext();
+                    _songContext = new SongContext();
 
                 using var voiceForm = new Music.Designer.VoiceSelectorForm();
 
@@ -143,7 +143,7 @@ namespace Music.Writer
             if (e.RowIndex == SongGridManager.FIXED_ROW_SECTION)
             {
                 if (_songContext == null)
-                    _songContext = new Music.Designer.SongContext();
+                    _songContext = new SongContext();
 
                 var initialSections = _songContext.SectionTrack;
 
@@ -161,7 +161,7 @@ namespace Music.Writer
             if (e.RowIndex == SongGridManager.FIXED_ROW_HARMONY)
             {
                 if (_songContext == null)
-                    _songContext = new Music.Designer.SongContext();
+                    _songContext = new SongContext();
 
                 var initialHarmony = _songContext.HarmonyTrack;
 
@@ -179,7 +179,7 @@ namespace Music.Writer
             if (e.RowIndex == SongGridManager.FIXED_ROW_GROOVE)
             {
                 if (_songContext == null)
-                    _songContext = new Music.Designer.SongContext();
+                    _songContext = new SongContext();
 
                 var initialGroove = _songContext.GrooveTrack;
 
@@ -197,7 +197,7 @@ namespace Music.Writer
             if (e.RowIndex == SongGridManager.FIXED_ROW_TIME_SIGNATURE)
             {
                 if (_songContext == null)
-                    _songContext = new Music.Designer.SongContext();
+                    _songContext = new SongContext();
 
                 var initialTimeSignature = _songContext.Song.TimeSignatureTrack;
 
@@ -215,7 +215,7 @@ namespace Music.Writer
             if (e.RowIndex == SongGridManager.FIXED_ROW_TEMPO)
             {
                 if (_songContext == null)
-                    _songContext = new Music.Designer.SongContext();
+                    _songContext = new SongContext();
 
                 var initialTempo = _songContext.Song.TempoTrack;
 
@@ -297,7 +297,7 @@ namespace Music.Writer
 
         private void btnSetDesignTestScenarioD1_Click(object sender, EventArgs e)
         {
-            _songContext ??= new Designer.SongContext();
+            _songContext ??= new SongContext();
             _eventHandlers.HandleSetDesignTestScenarioD1(dgSong, _songContext);
 
             Globals.SongContext = _songContext;  // TO DO ... currently test groove track is pulling from globals, should get from local

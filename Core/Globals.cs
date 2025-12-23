@@ -1,9 +1,11 @@
 
+using Music.Generator;
+
 namespace Music
 {
     public static class Globals
     {
-        public static Designer.SongContext? SongContext { get; set; }
+        public static SongContext? SongContext { get; set; }
 
         // Holds a list of MusicXML scores for application-wide access
         // Index 0 is used as the primary/current score for backward compatibility

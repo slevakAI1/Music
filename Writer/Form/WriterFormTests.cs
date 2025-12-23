@@ -1,10 +1,12 @@
-﻿namespace Music.Writer
+﻿using Music.Generator;
+
+namespace Music.Writer
 {
     public class WriterFormTests
     {
         // ==================================   T E S T   H E L P E R S   ==================================
   
-        public static WriterFormData SetTestWriterG1(Designer.SongContext? designer)
+        public static WriterFormData SetTestWriterG1(SongContext? designer)
         {
             var data = new WriterFormData();
 

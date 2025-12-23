@@ -50,7 +50,7 @@ namespace Music.Writer
             DataGridView dgSong,
             DataGridViewCellEventHandler cellValueChangedHandler,
             EventHandler currentCellDirtyStateChangedHandler,
-            Designer.SongContext? designer = null)
+            SongContext? designer = null)
         {
             dgSong.AllowUserToAddRows = false;
             dgSong.AllowUserToResizeColumns = true;
@@ -152,7 +152,7 @@ namespace Music.Writer
         /// </summary>
         private static void InitializeFixedRows(
             DataGridView dgSong,
-            Designer.SongContext? songContext = null)
+            SongContext? songContext = null)
         {
             // Add fixed rows
             for (int i = 0; i < FIXED_ROWS_COUNT; i++)
