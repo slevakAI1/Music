@@ -56,10 +56,10 @@ namespace Music.Writer.Generator
         /// </summary>
         public sealed class GeneratorResult
         {
-            public PartTrack? BassTrack { get; init; }
-            public PartTrack? GuitarTrack { get; init; }
-            public PartTrack? KeysTrack { get; init; }
-            public PartTrack? DrumTrack { get; init; }
+            public PartTrack BassTrack { get; init; }
+            public PartTrack GuitarTrack { get; init; }
+            public PartTrack KeysTrack { get; init; }
+            public PartTrack DrumTrack { get; init; }
         }
 
         /// <summary>

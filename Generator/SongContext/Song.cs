@@ -20,7 +20,6 @@ namespace Music.Generator
         /// </summary>
         public TimeSignatureTrack TimeSignatureTrack { get; set; }
 
-
         /// <summary>
         /// All part/instrument tracks in the song.
         /// </summary>

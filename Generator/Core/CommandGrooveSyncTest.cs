@@ -72,48 +72,23 @@ namespace Music.Generator
 
                 int addedCount = 0;
 
+                songContext.Song.PartTracks.Add(result.BassTrack);
+                songContext.Song.PartTracks.Add(result.GuitarTrack);
+                songContext.Song.PartTracks.Add(result.KeysTrack);
+                songContext.Song.PartTracks.Add(result.DrumTrack);
 
+                // Update Grid with song tracks!
+                SongGridManager.AddSongTrackToGrid(result.BassTrack, dgSong, ref songTrackNumber);
+                addedCount++;
 
-                // TO DO NEXT!  This needs to write to the Song and the Song needs to write to the grid!
+                SongGridManager.AddSongTrackToGrid(result.GuitarTrack, dgSong, ref songTrackNumber);
+                addedCount++;
 
+                SongGridManager.AddSongTrackToGrid(result.KeysTrack, dgSong, ref songTrackNumber);
+                addedCount++;
 
-
-
-
-
-
-                // Add generated song tracks to grid
-                if (result.BassTrack != null && result.BassTrack.PartTrackNoteEvents.Count > 0)
-                {
-                    SongGridManager.AddSongTrackToGrid(result.BassTrack, dgSong, ref songTrackNumber);
-                    addedCount++;
-                }
-
-                if (result.GuitarTrack != null && result.GuitarTrack.PartTrackNoteEvents.Count > 0)
-                {
-                    SongGridManager.AddSongTrackToGrid(result.GuitarTrack, dgSong, ref songTrackNumber);
-                    addedCount++;
-                }
-
-                if (result.KeysTrack != null && result.KeysTrack.PartTrackNoteEvents.Count > 0)
-                {
-                    SongGridManager.AddSongTrackToGrid(result.KeysTrack, dgSong, ref songTrackNumber);
-                    addedCount++;
-                }
-
-                if (result.DrumTrack != null && result.DrumTrack.PartTrackNoteEvents.Count > 0)
-                {
-                    SongGridManager.AddSongTrackToGrid(result.DrumTrack, dgSong, ref songTrackNumber);
-                    addedCount++;
-                }
-
-
-
-
-
-
-
-
+                SongGridManager.AddSongTrackToGrid(result.DrumTrack, dgSong, ref songTrackNumber);
+                addedCount++;
 
 
                 MessageBoxHelper.Show(
