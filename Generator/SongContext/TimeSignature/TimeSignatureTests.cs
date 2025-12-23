@@ -1,4 +1,6 @@
-namespace Music.Designer
+using Music.Designer;
+
+namespace Music.Generator
 {
     // Builds the app's default time signature timeline (single 4/4 event starting at bar 1).
     public static class TimeSignatureTests

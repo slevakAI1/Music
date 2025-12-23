@@ -36,7 +36,7 @@ namespace Music.Writer
 
             // Extract tempo timeline from fixed row
             var tempoRow = dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO];
-            var tempoTimeline = tempoRow.Cells["colData"].Value as Music.Designer.TempoTrack;
+            var tempoTimeline = tempoRow.Cells["colData"].Value as Music.Generator.TempoTrack;
             if (tempoTimeline == null || tempoTimeline.Events.Count == 0)
             {
                 MessageBoxHelper.Show("No tempo events defined. Please add at least one tempo event.", "Missing Tempo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -45,7 +45,7 @@ namespace Music.Writer
 
             // Extract time signature timeline from fixed row
             var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
-            var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Designer.TimeSignatureTrack;
+            var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Generator.TimeSignatureTrack;
             if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
             {
                 MessageBoxHelper.Show("No time signature events defined. Please add at least one time signature event.", "Missing Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -157,7 +157,7 @@ namespace Music.Writer
 
             // Extract tempo timeline from fixed row
             var tempoRow = dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO];
-            var tempoTimeline = tempoRow.Cells["colData"].Value as Music.Designer.TempoTrack;
+            var tempoTimeline = tempoRow.Cells["colData"].Value as Music.Generator.TempoTrack;
             if (tempoTimeline == null || tempoTimeline.Events.Count == 0)
             {
                 MessageBoxHelper.Show("No tempo events defined. Please add at least one tempo event.", "Missing Tempo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -166,7 +166,7 @@ namespace Music.Writer
 
             // Extract time signature timeline from fixed row
             var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
-            var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Designer.TimeSignatureTrack;
+            var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Generator.TimeSignatureTrack;
             if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
             {
                 MessageBoxHelper.Show("No time signature events defined. Please add at least one time signature event.", "Missing Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Warning);

@@ -1,6 +1,7 @@
+using Music.Designer;
 using Music.Generator;
 
-namespace Music.Designer
+namespace Music.Generator
 {
     // Central defaults to keep timelines aligned
     public static class DesignerTests

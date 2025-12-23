@@ -9,8 +9,8 @@ namespace Music.Writer
         /// </summary>
         public static List<List<MetaMidiEvent>> Convert(
             List<List<MetaMidiEvent>> midiEventLists,
-            Music.Designer.TempoTrack tempoTimeline,
-            Music.Designer.TimeSignatureTrack timeSignatureTimeline)
+            Music.Generator.TempoTrack tempoTimeline,
+            Music.Generator.TimeSignatureTrack timeSignatureTimeline)
         {
             if (midiEventLists == null) throw new ArgumentNullException(nameof(midiEventLists));
             if (tempoTimeline == null) throw new ArgumentNullException(nameof(tempoTimeline));

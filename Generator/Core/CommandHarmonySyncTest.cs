@@ -18,7 +18,7 @@ namespace Music.Generator
 
             // Extract time signature track to determine beats per measure
             var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
-            var timeSignatureTrack = timeSignatureRow.Cells["colData"].Value as Designer.TimeSignatureTrack;
+            var timeSignatureTrack = timeSignatureRow.Cells["colData"].Value as Generator.TimeSignatureTrack;
             
             if (!ValidateTimeSignatureTrack(timeSignatureTrack))
                 return;
@@ -38,7 +38,7 @@ namespace Music.Generator
             ShowSuccessMessage();
         }
 
-        private static PartTrack CreateRockOrganTrack(HarmonyTrack harmonyTrack, Designer.TimeSignatureTrack timeSignatureTrack)
+        private static PartTrack CreateRockOrganTrack(HarmonyTrack harmonyTrack, Generator.TimeSignatureTrack timeSignatureTrack)
         {
             var notes = new List<PartTrackNoteEvent>();
             int currentTick = 0;
@@ -88,7 +88,7 @@ namespace Music.Generator
             return new PartTrack(notes) { MidiProgramNumber = 18 };
         }
 
-        private static PartTrack CreateElectricGuitarTrack(HarmonyTrack harmonyTimeTrack, Designer.TimeSignatureTrack timeSignatureTrack)
+        private static PartTrack CreateElectricGuitarTrack(HarmonyTrack harmonyTimeTrack, Generator.TimeSignatureTrack timeSignatureTrack)
         {
             var notes = new List<PartTrackNoteEvent>();
             int currentTick = 0;
@@ -136,7 +136,7 @@ namespace Music.Generator
             return new PartTrack(notes) { MidiProgramNumber = 27 };
         }
 
-        private static PartTrack CreateElectricBassTrack(HarmonyTrack harmonyTrack, Designer.TimeSignatureTrack timeSignatureTrack)
+        private static PartTrack CreateElectricBassTrack(HarmonyTrack harmonyTrack, Generator.TimeSignatureTrack timeSignatureTrack)
         {
             var notes = new List<PartTrackNoteEvent>();
             int currentTick = 0;
@@ -184,7 +184,7 @@ namespace Music.Generator
             return new PartTrack(notes) { MidiProgramNumber = 33 };
         }
 
-        private static PartTrack CreateDrumSetTrack(HarmonyTrack harmonyTrack, Designer.TimeSignatureTrack timeSignatureTrack)
+        private static PartTrack CreateDrumSetTrack(HarmonyTrack harmonyTrack, Generator.TimeSignatureTrack timeSignatureTrack)
         {
             var notes = new List<PartTrackNoteEvent>();
             int currentTick = 0;
@@ -248,7 +248,7 @@ namespace Music.Generator
             return true;
         }
 
-        private static bool ValidateTimeSignatureTrack(Music.Designer.TimeSignatureTrack timeSignatureTrack)
+        private static bool ValidateTimeSignatureTrack(Music.Generator.TimeSignatureTrack timeSignatureTrack)
         {
             if (timeSignatureTrack == null || timeSignatureTrack.Events.Count == 0)
             {

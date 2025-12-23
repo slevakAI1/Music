@@ -1,4 +1,4 @@
-namespace Music.Designer
+namespace Music.Generator
 {
     // This is a design track for tempo
     // Global bar/beat-aligned tempo timeline

@@ -1,4 +1,5 @@
-namespace Music.Designer
+
+namespace Music.Generator
 {
     // This is a design track for time signature
     // Global bar/beat-aligned time signature timeline

@@ -125,7 +125,7 @@ namespace Music.Writer
                     var selected = voiceForm.SelectedVoicesWithRoles;
                     if (selected?.Count > 0)
                     {
-                        _songContext.Voices ??= new Music.Designer.VoiceSet();
+                        _songContext.Voices ??= new Music.Generator.VoiceSet();
                         _songContext.Voices.Reset();
 
                         foreach (var kvp in selected)

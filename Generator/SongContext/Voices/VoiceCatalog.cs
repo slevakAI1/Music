@@ -1,10 +1,7 @@
-using System;
-using System.IO;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Music.Designer
+namespace Music.Generator
 {
     // Loads voices from Voices.Notion.json and exposes them grouped by category.
     internal static class VoiceCatalog

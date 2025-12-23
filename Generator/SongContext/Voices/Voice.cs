@@ -1,4 +1,4 @@
-﻿namespace Music.Designer
+﻿namespace Music.Generator
 {
     public class Voice
     {
