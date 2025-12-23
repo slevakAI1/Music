@@ -16,29 +16,15 @@ namespace Music.Generator
             var harmonyRow = dgSong.Rows[SongGridManager.FIXED_ROW_HARMONY];
             var harmonyTimeline = harmonyRow.Cells["colData"].Value as Music.Designer.HarmonyTrack;
             
-            if (harmonyTimeline == null || harmonyTimeline.Events.Count == 0)
-            {
-                MessageBoxHelper.Show(
-                    "No harmony events defined. Please add harmony events first.",
-                    "Missing Harmony",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
+            if (!ValidateHarmonyTimeline(harmonyTimeline))
                 return;
-            }
 
             // Extract time signature timeline to determine beats per measure
             var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
             var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Designer.TimeSignatureTrack;
             
-            if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
-            {
-                MessageBoxHelper.Show(
-                    "No time signature events defined. Please add at least one time signature event.",
-                    "Missing Time Signature",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
+            if (!ValidateTimeSignatureTimeline(timeSignatureTimeline))
                 return;
-            }
 
             // Create 4 tracks for the test
             var rockOrganTrack = CreateRockOrganTrack(harmonyTimeline, timeSignatureTimeline);
@@ -47,16 +33,12 @@ namespace Music.Generator
             var drumSetTrack = CreateDrumSetTrack(harmonyTimeline, timeSignatureTimeline);
 
             // Add tracks to the grid
-            SongGridManager.AddSongTrackToGrid(rockOrganTrack, dgSong, ref trackNumber);
-            SongGridManager.AddSongTrackToGrid(electricGuitarTrack, dgSong, ref trackNumber);
-            SongGridManager.AddSongTrackToGrid(electricBassTrack, dgSong, ref trackNumber);
-            SongGridManager.AddSongTrackToGrid(drumSetTrack, dgSong, ref trackNumber);
+            SongGridManager.AddNewTrack(rockOrganTrack, dgSong, ref trackNumber);
+            SongGridManager.AddNewTrack(electricGuitarTrack, dgSong, ref trackNumber);
+            SongGridManager.AddNewTrack(electricBassTrack, dgSong, ref trackNumber);
+            SongGridManager.AddNewTrack(drumSetTrack, dgSong, ref trackNumber);
 
-            MessageBoxHelper.Show(
-                "Successfully created 4 synchronized tracks based on harmony timeline.",
-                "Harmony Sync Test",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Information);
+            ShowSuccessMessage();
         }
 
         private static PartTrack CreateRockOrganTrack(Music.Designer.HarmonyTrack harmonyTimeline, Music.Designer.TimeSignatureTrack timeSignatureTimeline)
@@ -253,5 +235,44 @@ namespace Music.Generator
 
             return new PartTrack(notes) { MidiProgramNumber = 255 };
         }
+
+        #region Message Box Handlers
+        private static bool ValidateHarmonyTimeline(Music.Designer.HarmonyTrack harmonyTimeline)
+        {
+            if (harmonyTimeline == null || harmonyTimeline.Events.Count == 0)
+            {
+                MessageBoxHelper.Show(
+                    "No harmony events defined. Please add harmony events first.",
+                    "Missing Harmony",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return false;
+            }
+            return true;
+        }
+
+        private static bool ValidateTimeSignatureTimeline(Music.Designer.TimeSignatureTrack timeSignatureTimeline)
+        {
+            if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
+            {
+                MessageBoxHelper.Show(
+                    "No time signature events defined. Please add at least one time signature event.",
+                    "Missing Time Signature",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return false;
+            }
+            return true;
+        }
+
+        private static void ShowSuccessMessage()
+        {
+            MessageBoxHelper.Show(
+                "Successfully created 4 synchronized tracks based on harmony timeline.",
+                "Harmony Sync Test",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+        #endregion
     }
 }

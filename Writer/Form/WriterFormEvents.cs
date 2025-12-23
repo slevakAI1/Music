@@ -351,7 +351,7 @@ namespace Music.Writer
                 // Add each songTrack to the grid
                 foreach (var track in tracks)
                 {
-                    SongGridManager.AddSongTrackToGrid(
+                    SongGridManager.AddNewTrack(
                         track,
                         dgSong,
                         ref trackNumber);

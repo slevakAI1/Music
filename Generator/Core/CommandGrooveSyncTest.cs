@@ -1,5 +1,4 @@
 using Music.Designer;
-using Music.MyMidi;
 using Music.Writer;
 using Music.Writer.Generator;
 
@@ -21,50 +20,21 @@ namespace Music.Generator
             DataGridView dgSong,
             ref int songTrackNumber)
         {
-            // Extract harmony timeline from the fixed harmony row
-            var harmonyRow = dgSong.Rows[SongGridManager.FIXED_ROW_HARMONY];
-            var harmonyTimeline = harmonyRow.Cells["colData"].Value as HarmonyTrack;
-
-            if (harmonyTimeline == null || harmonyTimeline.Events.Count == 0)
-            {
-                MessageBoxHelper.Show(
-                    "No harmony events defined. Please add harmony events first.",
-                    "Missing Harmony",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
+            if (!ValidateHarmonyTrack(songContext.HarmonyTrack))
                 return;
-            }
 
-            // Extract time signature timeline
-            var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
-            var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as TimeSignatureTrack;
-
-            if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
-            {
-                MessageBoxHelper.Show(
-                    "No time signature events defined. Please add at least one time signature event.",
-                    "Missing Time Signature",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
+            if (!ValidateTimeSignatureTrack(songContext.Song.TimeSignatureTrack))
                 return;
-            }
 
-            if (songContext.GrooveTrack == null || songContext.GrooveTrack.Events.Count == 0)
-            {
-                MessageBoxHelper.Show(
-                    "No groove events defined. Please add at least one groove event first.",
-                    "Missing Groove",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
+            if (!ValidateGrooveTrack(songContext.GrooveTrack))
                 return;
-            }
 
             try
             {
-                // Generate all song tracks using the GrooveTrack timeline
+                // Generate all song tracks using the GrooveTrack
                 var result = GrooveDrivenGenerator.Generate(
-                    harmonyTimeline,
-                    timeSignatureTimeline,
+                    songContext.HarmonyTrack,
+                    songContext.Song.TimeSignatureTrack,
                     songContext.GrooveTrack);
 
                 int addedCount = 0;
@@ -74,44 +44,91 @@ namespace Music.Generator
                 songContext.Song.PartTracks.Add(result.KeysTrack);
                 songContext.Song.PartTracks.Add(result.DrumTrack);
 
-
-
-
                 // Update Grid with song tracks!
-                SongGridManager.AddSongTrackToGrid(result.BassTrack, dgSong, ref songTrackNumber);
+                SongGridManager.AddNewTrack(result.BassTrack, dgSong, ref songTrackNumber);
                 addedCount++;
 
-                SongGridManager.AddSongTrackToGrid(result.GuitarTrack, dgSong, ref songTrackNumber);
+                SongGridManager.AddNewTrack(result.GuitarTrack, dgSong, ref songTrackNumber);
                 addedCount++;
 
-                SongGridManager.AddSongTrackToGrid(result.KeysTrack, dgSong, ref songTrackNumber);
+                SongGridManager.AddNewTrack(result.KeysTrack, dgSong, ref songTrackNumber);
                 addedCount++;
 
-                SongGridManager.AddSongTrackToGrid(result.DrumTrack, dgSong, ref songTrackNumber);
+                SongGridManager.AddNewTrack(result.DrumTrack, dgSong, ref songTrackNumber);
                 addedCount++;
 
-
-
-
-
-                MessageBoxHelper.Show(
-                    $"Successfully created {addedCount} synchronized tracks using groove timeline with controlled randomness.",
-                    "Groove Sync Test",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+                ShowGrooveSuccess(addedCount);
             }
             catch (Exception ex)
             {
-                MessageBoxHelper.Show(
-                    $"Error generating groove tracks:\n{ex.Message}",
-                    "Generation Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                ShowGrooveError(ex);
             }
         }
 
         // Validation / Messagebox helpers
 
+        #region Validation / Messagebox helpers
 
+        private static bool ValidateHarmonyTrack(HarmonyTrack harmonyTimeline)
+        {
+            if (harmonyTimeline == null || harmonyTimeline.Events.Count == 0)
+            {
+                MessageBoxHelper.Show(
+                    "No harmony events defined. Please add harmony events first.",
+                    "Missing Harmony",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return false;
+            }
+            return true;
+        }
+
+        private static bool ValidateTimeSignatureTrack(TimeSignatureTrack timeSignatureTimeline)
+        {
+            if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
+            {
+                MessageBoxHelper.Show(
+                    "No time signature events defined. Please add at least one time signature event.",
+                    "Missing Time Signature",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return false;
+            }
+            return true;
+        }
+
+        private static bool ValidateGrooveTrack(GrooveTrack grooveTrack)
+        {
+            if (grooveTrack == null || grooveTrack.Events.Count == 0)
+            {
+                MessageBoxHelper.Show(
+                    "No groove events defined. Please add at least one groove event first.",
+                    "Missing Groove",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return false;
+            }
+            return true;
+        }
+
+        private static void ShowGrooveSuccess(int addedCount)
+        {
+            MessageBoxHelper.Show(
+                $"Successfully created {addedCount} synchronized tracks using groove timeline with controlled randomness.",
+                "Groove Sync Test",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+
+        private static void ShowGrooveError(Exception ex)
+        {
+            MessageBoxHelper.Show(
+                $"Error generating groove tracks:\n{ex.Message}",
+                "Generation Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+        }
+
+        #endregion
     }
 }
