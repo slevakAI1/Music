@@ -1,7 +1,4 @@
-using Music.Designer;
-using Music.Generator;
-
-namespace Music.Writer.Generator
+namespace Music.Generator
 {
     /// <summary>
     /// Generates tracks for multiple parts based on groove patterns and harmony events.

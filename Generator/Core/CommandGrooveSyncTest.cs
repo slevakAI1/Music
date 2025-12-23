@@ -1,6 +1,4 @@
-using Music.Designer;
 using Music.Writer;
-using Music.Writer.Generator;
 
 namespace Music.Generator
 {
@@ -22,13 +20,12 @@ namespace Music.Generator
             {
                 // Generate all song tracks using the GrooveTrack
                 var result = GrooveDrivenGenerator.Generate(songContext);
-
                 songContext.Song.PartTracks.Add(result.BassTrack);
                 songContext.Song.PartTracks.Add(result.GuitarTrack);
                 songContext.Song.PartTracks.Add(result.KeysTrack);
                 songContext.Song.PartTracks.Add(result.DrumTrack);
 
-                // Update Grid with song tracks - no need to track songTrackNumber anymore
+                // Update Grid with song tracks
                 SongGridManager.AddNewTrack(result.BassTrack, dgSong);
                 SongGridManager.AddNewTrack(result.GuitarTrack, dgSong);
                 SongGridManager.AddNewTrack(result.KeysTrack, dgSong);
