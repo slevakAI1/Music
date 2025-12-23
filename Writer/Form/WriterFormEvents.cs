@@ -474,14 +474,14 @@ namespace Music.Writer
 
         public void HandleSetDesignTestScenarioD1(
             DataGridView dgSong,
-            Designer.SongContext designer)
+            Designer.SongContext songContext)
         {
-            DesignerTests.SetTestDesignD1(designer);
+            DesignerTests.SetTestDesignD1(songContext);
 
-            GridControlLinesManager.AttachSectionTimeline(dgSong, designer.SectionTrack);
-            GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, designer.TimeSignatureTrack);
-            GridControlLinesManager.AttachTempoTimeline(dgSong, designer.TempoTrack);
-            GridControlLinesManager.AttachHarmonyTimeline(dgSong, designer.HarmonyTrack);
+            GridControlLinesManager.AttachSectionTimeline(dgSong, songContext.SectionTrack);
+            GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, songContext.TimeSignatureTrack);
+            GridControlLinesManager.AttachTempoTimeline(dgSong, songContext.Song.TempoTrack);
+            GridControlLinesManager.AttachHarmonyTimeline(dgSong, songContext.HarmonyTrack);
         }
 
         public WriterFormData HandleSetWriterTestScenarioG1(Designer.SongContext designer)

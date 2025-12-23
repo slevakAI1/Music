@@ -142,7 +142,7 @@ namespace Music.Writer
         private static void InitializeFixedRows(
             DataGridView dgSong,
             List<MidiVoices> midiInstruments,
-            Designer.SongContext? designer = null)
+            Designer.SongContext? songContext = null)
         {
             // Add fixed rows
             for (int i = 0; i < FIXED_ROWS_COUNT; i++)
@@ -219,12 +219,12 @@ namespace Music.Writer
             sepRow3.DefaultCellStyle.SelectionForeColor = Color.White;
 
             // Delegate attaching the control lines to the control line manager class
-            if (designer != null)
+            if (songContext != null)
             {
-                GridControlLinesManager.AttachSectionTimeline(dgSong, designer.SectionTrack);
-                GridControlLinesManager.AttachHarmonyTimeline(dgSong, designer.HarmonyTrack);
-                GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, designer.TimeSignatureTrack);
-                GridControlLinesManager.AttachTempoTimeline(dgSong, designer.TempoTrack);
+                GridControlLinesManager.AttachSectionTimeline(dgSong, songContext.SectionTrack);
+                GridControlLinesManager.AttachHarmonyTimeline(dgSong, songContext.HarmonyTrack);
+                GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, songContext.TimeSignatureTrack);
+                GridControlLinesManager.AttachTempoTimeline(dgSong, songContext.Song.TempoTrack);
             }
         }
 

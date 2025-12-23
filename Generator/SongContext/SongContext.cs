@@ -31,7 +31,7 @@ namespace Music.Designer
         /// </summary>
         public Song Song { get; set; } = new();
 
-        public TempoTrack TempoTrack { get; set; } = new();
+        //public TempoTrack TempoTrack { get; set; } = new();
 
         public TimeSignatureTrack TimeSignatureTrack { get; set; } = new();
 

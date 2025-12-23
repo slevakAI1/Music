@@ -226,13 +226,13 @@ namespace Music.Writer
                 if (_songContext == null)
                     _songContext = new Music.Designer.SongContext();
 
-                var initialTempo = _songContext.TempoTrack;
+                var initialTempo = _songContext.Song.TempoTrack;
 
                 using var dlg = new Music.Designer.TempoEditorForm(initialTempo);
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
-                    _songContext.TempoTrack = dlg.ResultTimeline;
-                    GridControlLinesManager.AttachTempoTimeline(dgSong, _songContext.TempoTrack);
+                    _songContext.Song.TempoTrack = dlg.ResultTimeline;
+                    GridControlLinesManager.AttachTempoTimeline(dgSong, _songContext.Song.TempoTrack);
                 }
 
                 return;
