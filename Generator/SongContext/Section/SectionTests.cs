@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Windows.Forms;
+﻿using Music.Designer;
 
-namespace Music.Designer
+namespace Music.Generator
 {
     public sealed class SectionTests
     {

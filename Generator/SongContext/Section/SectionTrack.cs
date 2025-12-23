@@ -1,3 +1,5 @@
+using Music.Generator;
+
 namespace Music.Designer
 {
     // This is a design track for song sections

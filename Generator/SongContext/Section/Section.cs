@@ -1,4 +1,4 @@
-﻿namespace Music.Designer
+﻿namespace Music.Generator
 {
     // This class represents one section of a song. A song is composed of a List<Section>.
     // The sections are assumed to be in order.
