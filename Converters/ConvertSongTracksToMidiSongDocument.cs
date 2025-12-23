@@ -5,7 +5,7 @@ namespace Music.Writer
 {
     /// <summary>
     /// Thin wrapper that executes the existing three-stage pipeline:
-    /// 1) Convert SongTracks -> midi event lists
+    /// 1) Convert PartTrack -> midi event lists
     /// 2) Merge midi event lists by instrument
     /// 3) Convert merged events -> Midi document
     /// 
@@ -14,7 +14,7 @@ namespace Music.Writer
     public static class ConvertSongTracksToMidiSongDocument
     {
         public static MidiSongDocument Convert(
-            List<SongTrack> songTracks,
+            List<PartTrack> songTracks,
             TempoTrack tempoTimeline,
             TimeSignatureTrack timeSignatureTimeline)
         {

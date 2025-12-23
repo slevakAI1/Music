@@ -1,5 +1,6 @@
 ﻿using Music.Designer;
 using Music.MyMidi;
+using Music.Writer;
 
 namespace Music.Generator
 {
@@ -20,11 +21,10 @@ namespace Music.Generator
         public TimeSignatureTrack TimeSignatureTrack { get; set; }
 
 
-        // TO DO This needs to be a List of Tracks...make this List<MetaMidiEvent> a PartTrack!
         /// <summary>
         /// All part/instrument tracks in the song.
         /// </summary>
-        public List<List<MetaMidiEvent>> PartTracks { get; set; }
+        public List<PartTrack> PartTracks { get; set; }
 
         /// <summary>
         /// Total number of bars in the song.
@@ -35,7 +35,7 @@ namespace Music.Generator
         {
             TempoTrack = new TempoTrack();
             TimeSignatureTrack = new TimeSignatureTrack();
-            PartTracks = new List<List<MetaMidiEvent>>();
+            PartTracks = new List<PartTrack>();
         }
     }
 }

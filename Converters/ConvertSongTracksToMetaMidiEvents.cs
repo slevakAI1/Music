@@ -3,7 +3,7 @@ using Music.MyMidi;
 namespace Music.Writer
 {
     /// <summary>
-    /// Converts SongTrack objects to lists of MetaMidiEvent objects with absolute time positioning.
+    /// Converts PartTrack objects to lists of MetaMidiEvent objects with absolute time positioning.
     /// This is stage 1 processing - creates NoteOn, NoteOff, and SequenceTrackName events only.
     /// Channel assignment and other processing happens in later stages.
     /// </summary>
@@ -17,7 +17,7 @@ namespace Music.Writer
         /// <param name="ticksPerQuarterNote">MIDI time resolution (default 480 ticks per quarter note)</param>
         /// <returns>List of MetaMidiEvent lists, one per input song track</returns>
         public static List<List<MetaMidiEvent>> Convert(
-            List<SongTrack> songTracks)
+            List<PartTrack> songTracks)
         {
             if (songTracks == null)
                 throw new ArgumentNullException(nameof(songTracks));
@@ -34,7 +34,7 @@ namespace Music.Writer
         /// <summary>
         /// Converts a single songTrack to a list of MIDI events with absolute time positioning.
         /// </summary>
-        private static List<MetaMidiEvent> ConvertSingleSongTrack(SongTrack songTrack)
+        private static List<MetaMidiEvent> ConvertSingleSongTrack(PartTrack songTrack)
         {
             var events = new List<MetaMidiEvent>();
 
@@ -52,7 +52,7 @@ namespace Music.Writer
             events.Add(programChangeEvent);
 
             // Process each note in the songTrack
-            foreach (var songTrackNoteEvent in songTrack.SongTrackNoteEvents ?? Enumerable.Empty<SongTrackNoteEvent>())
+            foreach (var songTrackNoteEvent in songTrack.PartTrackNoteEvents ?? Enumerable.Empty<PartTrackNoteEvent>())
             {
                 if (songTrackNoteEvent.IsRest)
                 {
@@ -77,7 +77,7 @@ namespace Music.Writer
         /// <summary>
         /// Processes a chord note by expanding it to individual notes using ConvertHarmonyEventToSongTrackNoteEvents.
         /// </summary>
-        private static void ProcessChord(List<MetaMidiEvent> events, SongTrackNoteEvent songTrackNoteEvent)
+        private static void ProcessChord(List<MetaMidiEvent> events, PartTrackNoteEvent songTrackNoteEvent)
         {
             var chord = songTrackNoteEvent.songTrackChord!;
 
@@ -115,7 +115,7 @@ namespace Music.Writer
         /// <summary>
         /// Processes a single note event.
         /// </summary>
-        private static void ProcessSingleNote(List<MetaMidiEvent> events, SongTrackNoteEvent songTrackNoteEvent)
+        private static void ProcessSingleNote(List<MetaMidiEvent> events, PartTrackNoteEvent songTrackNoteEvent)
         {
             // Create NoteOn event at the note's absolute position
             var noteOnEvent = MetaMidiEvent.CreateNoteOn(

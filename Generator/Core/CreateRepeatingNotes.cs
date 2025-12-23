@@ -3,32 +3,32 @@ using Music.Writer;
 namespace Music.Generator
 {
     /// <summary>
-    /// Transforms WriterFormData to SongTrack objects with MIDI tick-based timing.
+    /// Transforms WriterFormData to PartTrack objects with MIDI tick-based timing.
     /// </summary>
     public static class CreateRepeatingNotes
     {
         /// <summary>
-        /// Creates a SongTrack with a repeating set of the specified MIDI note number.
+        /// Creates a PartTrack with a repeating set of the specified MIDI note number.
         /// </summary>
         /// <param name="noteNumber">The MIDI note number (0-127). Use 60 for Middle C.</param>
         /// <param name="repeatCount">Number of times to repeat the note.</param>
         /// <param name="noteDurationTicks">Duration of each note in MIDI ticks. Default is 480 (quarter note).</param>
         /// <param name="noteOnVelocity">MIDI velocity (0-127). Default is 100.</param>
         /// <param name="isRest">Whether the note should be treated as a rest. Default is false.</param>
-        /// <returns>A SongTrack object containing the repeating notes.</returns>
-        public static SongTrack Execute(
+        /// <returns>A PartTrack object containing the repeating notes.</returns>
+        public static PartTrack Execute(
             int noteNumber,
             int noteDurationTicks,
             int repeatCount,
             int noteOnVelocity = 100,
             bool isRest = false)
         {
-            var SongTrackNoteEvents = new List<SongTrackNoteEvent>();
+            var SongTrackNoteEvents = new List<PartTrackNoteEvent>();
             int currentPosition = 0;
 
             for (int i = 0; i < repeatCount; i++)
             {
-                var songTrackNoteEvent = new SongTrackNoteEvent(
+                var songTrackNoteEvent = new PartTrackNoteEvent(
                     noteNumber: noteNumber,
                     absolutePositionTicks: currentPosition,
                     noteDurationTicks: noteDurationTicks,
@@ -39,7 +39,7 @@ namespace Music.Generator
                 currentPosition += noteDurationTicks;
             }
 
-            var songTrack = new SongTrack(SongTrackNoteEvents);
+            var songTrack = new PartTrack(SongTrackNoteEvents);
             return songTrack;
         }
     }

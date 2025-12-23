@@ -15,8 +15,8 @@ namespace Music.Writer
             DataGridView dgSong,
             ref int trackNumber)
         {
-            // Create an empty SongTrack and add it to the grid via the existing helper.
-            var emptyTrack = new SongTrack(new List<SongTrackNoteEvent>())
+            // Create an empty PartTrack and add it to the grid via the existing helper.
+            var emptyTrack = new PartTrack(new List<PartTrackNoteEvent>())
             {
                 MidiProgramNumber = -1  // "Select..."
             };
@@ -118,10 +118,10 @@ namespace Music.Writer
                 if (instrCol != null)
                     row.Cells[instrCol.Index].Value = -1;
 
-                // Reset data to empty SongTrack
+                // Reset data to empty PartTrack
                 var trackDataCol = dgSong.Columns["colData"];
                 if (trackDataCol != null)
-                    row.Cells[trackDataCol.Index].Value = new SongTrack(new List<SongTrackNoteEvent>()) { MidiProgramNumber = -1 };
+                    row.Cells[trackDataCol.Index].Value = new PartTrack(new List<PartTrackNoteEvent>()) { MidiProgramNumber = -1 };
 
                 // Clear the Part description
                 var descriptionCol = dgSong.Columns["colDescription"];
@@ -172,7 +172,7 @@ namespace Music.Writer
         /// Writes a track object to the colData cell of all selected rows and updates measure display.
         /// </summary>
         /// <param name="track">The track to write to the grid.</param>
-        private void WriteTrackToSelectedRows(DataGridView dgSong, SongTrack track)
+        private void WriteTrackToSelectedRows(DataGridView dgSong, PartTrack track)
         {
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
@@ -192,11 +192,11 @@ namespace Music.Writer
         // FIX THIS NEXT!!!
 
         /// <summary>
-        /// Appends track notes to the existing SongTrack objects in all selected rows.
+        /// Appends track notes to the existing PartTrack objects in all selected rows.
         /// The appended notes' absolute positions are adjusted to start after the existing track ends.
         /// </summary>
         /// <param name="track">The track containing notes to append to the grid.</param>
-        private void AppendTrackToSelectedRows(DataGridView dgSong, SongTrack track)
+        private void AppendTrackToSelectedRows(DataGridView dgSong, PartTrack track)
         {
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
@@ -205,37 +205,37 @@ namespace Music.Writer
                     continue;
 
                 // Get existing track or create new one if null
-                var existingTrack = selectedRow.Cells["colData"].Value as SongTrack;
+                var existingTrack = selectedRow.Cells["colData"].Value as PartTrack;
                 if (existingTrack == null)
                 {
                     // No existing track, create new one with the notes (no offset needed)
-                    existingTrack = new SongTrack(new List<SongTrackNoteEvent>(track.SongTrackNoteEvents));
+                    existingTrack = new PartTrack(new List<PartTrackNoteEvent>(track.PartTrackNoteEvents));
                     selectedRow.Cells["colData"].Value = existingTrack;
                 }
                 else
                 {
                     // Calculate offset: find where the existing track ends
                     int offset = 0;
-                    if (existingTrack.SongTrackNoteEvents.Count > 0)
+                    if (existingTrack.PartTrackNoteEvents.Count > 0)
                     {
                         // Find the last note's end time (absolute position + duration)
-                        var lastNote = existingTrack.SongTrackNoteEvents
+                        var lastNote = existingTrack.PartTrackNoteEvents
                             .OrderBy(n => n.AbsolutePositionTicks + n.NoteDurationTicks)
                             .Last();
                         offset = lastNote.AbsolutePositionTicks + lastNote.NoteDurationTicks;
                     }
 
                     // Append new notes with adjusted absolutePositions
-                    foreach (var note in track.SongTrackNoteEvents)
+                    foreach (var note in track.PartTrackNoteEvents)
                     {
-                        var adjustedNote = new SongTrackNoteEvent(
+                        var adjustedNote = new PartTrackNoteEvent(
                             noteNumber: note.NoteNumber,
                             absolutePositionTicks: note.AbsolutePositionTicks + offset,
                             noteDurationTicks: note.NoteDurationTicks,
                             noteOnVelocity: note.NoteOnVelocity,
                             isRest: note.IsRest);
 
-                        existingTrack.SongTrackNoteEvents.Add(adjustedNote);
+                        existingTrack.PartTrackNoteEvents.Add(adjustedNote);
                     }
                 }
 

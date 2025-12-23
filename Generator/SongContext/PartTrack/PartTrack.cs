@@ -1,26 +1,25 @@
 namespace Music.Writer
 {
     /// <summary>
-    /// Represents a song track for composition and MIDI generation.
+    /// Represents a single part/track for composition and MIDI generation.
     /// 
-    /// A SongTrack encapsulates a sequence of musical events (notes, chords, rests) for a single instrument or part.
+    /// PartTrack encapsulates a sequence of musical events (notes, chords, rests) for a single instrument or part.
     /// It is designed to support flexible music writing, including overlapping notes and chords, and serves as the
     /// primary input for transformations into timed notes and MIDI events. This abstraction enables composers and
     /// algorithms to work with high-level musical ideas before rendering them into concrete playback or notation.
     /// </summary>
-    public sealed class SongTrack
+    public sealed class PartTrack
     {
-
         // THESE GET SET BY GRID DROPDOWN CHANGE EVENT, WHAT ABOUT DEFAULT?
         public string MidiProgramName { get; set; }
         //public string NotionPartName { get; set; }
         public int MidiProgramNumber { get; set; }
 
-        public List<SongTrackNoteEvent> SongTrackNoteEvents { get; set; } = new();
+        public List<PartTrackNoteEvent> PartTrackNoteEvents { get; set; } = new();
 
-        public SongTrack(List<SongTrackNoteEvent> songTrackNoteEvent)
+        public PartTrack(List<PartTrackNoteEvent> songTrackNoteEvent)
         {
-            SongTrackNoteEvents = songTrackNoteEvent;
+            PartTrackNoteEvents = songTrackNoteEvent;
         }
     }
 
@@ -66,11 +65,11 @@ namespace Music.Writer
     /// <summary>
     /// Represents a single note within a song track note event, including pitch, timing, and velocity.
     /// 
-    /// SongTrackNoteEvent is the atomic unit for musical playback and notation, capturing all necessary
+    /// PartTrackNoteEvent is the atomic unit for musical playback and notation, capturing all necessary
     /// information for MIDI conversion. It supports both direct note entry and notes
     /// generated from chords, enabling precise control over musical expression and timing.
     /// </summary>
-    public sealed class SongTrackNoteEvent
+    public sealed class PartTrackNoteEvent
     {
         public bool IsRest { get; set; }
 
@@ -95,7 +94,7 @@ namespace Music.Writer
         public int? TupletNormalNotes { get; set; }  // The 'n' in m:n (e.g., 2 in a triplet)
         public SongTrackChord? songTrackChord { get; set; } // Metadata only. Means the note is part of this type chord.
 
-        public SongTrackNoteEvent(
+        public PartTrackNoteEvent(
             int noteNumber,
             int absolutePositionTicks,
             int noteDurationTicks,

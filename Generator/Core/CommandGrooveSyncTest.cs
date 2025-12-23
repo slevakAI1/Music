@@ -83,25 +83,25 @@ namespace Music.Generator
 
 
                 // Add generated song tracks to grid
-                if (result.BassTrack != null && result.BassTrack.SongTrackNoteEvents.Count > 0)
+                if (result.BassTrack != null && result.BassTrack.PartTrackNoteEvents.Count > 0)
                 {
                     SongGridManager.AddSongTrackToGrid(result.BassTrack, dgSong, ref songTrackNumber);
                     addedCount++;
                 }
 
-                if (result.GuitarTrack != null && result.GuitarTrack.SongTrackNoteEvents.Count > 0)
+                if (result.GuitarTrack != null && result.GuitarTrack.PartTrackNoteEvents.Count > 0)
                 {
                     SongGridManager.AddSongTrackToGrid(result.GuitarTrack, dgSong, ref songTrackNumber);
                     addedCount++;
                 }
 
-                if (result.KeysTrack != null && result.KeysTrack.SongTrackNoteEvents.Count > 0)
+                if (result.KeysTrack != null && result.KeysTrack.PartTrackNoteEvents.Count > 0)
                 {
                     SongGridManager.AddSongTrackToGrid(result.KeysTrack, dgSong, ref songTrackNumber);
                     addedCount++;
                 }
 
-                if (result.DrumTrack != null && result.DrumTrack.SongTrackNoteEvents.Count > 0)
+                if (result.DrumTrack != null && result.DrumTrack.PartTrackNoteEvents.Count > 0)
                 {
                     SongGridManager.AddSongTrackToGrid(result.DrumTrack, dgSong, ref songTrackNumber);
                     addedCount++;

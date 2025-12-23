@@ -3,22 +3,22 @@ using Music.MyMidi;
 namespace Music.Writer
 {
     /// <summary>
-    /// Helper to convert lists of MetaMidiEvent objects to SongTrack objects.
+    /// Helper to convert lists of MetaMidiEvent objects to PartTrack objects.
     /// </summary>
     internal static class ConvertMetaMidiEventsToSongTracks
     {
         /// <summary>
-        /// Converts lists of MetaMidiEvent objects to SongTrack objects.
+        /// Converts lists of MetaMidiEvent objects to PartTrack objects.
         /// Splits tracks by program changes - each program change segment becomes a separate songTrack.
         /// </summary>
         /// <param name="midiEventLists">Lists of MetaMidiEvent objects, one per track</param>
         /// <param name="midiInstruments">Available MIDI instruments for name lookup</param>
         /// <param name="sourceTicksPerQuarterNote">The ticks per quarter note from the source MIDI file (default 480)</param>
-        public static List<SongTrack> Convert(
+        public static List<PartTrack> Convert(
             List<List<MetaMidiEvent>> midiEventLists,
             short sourceTicksPerQuarterNote)
         {
-            var songTracks = new List<SongTrack>();
+            var songTracks = new List<PartTrack>();
 
             foreach (var midiEventList in midiEventLists)
             {
@@ -27,8 +27,8 @@ namespace Music.Writer
 
                 foreach (var segment in segmentedEvents)
                 {
-                    var songTrackNoteEvents = new List<SongTrackNoteEvent>();
-                    var songTrack = new SongTrack(songTrackNoteEvents);
+                    var songTrackNoteEvents = new List<PartTrackNoteEvent>();
+                    var songTrack = new PartTrack(songTrackNoteEvents);
 
                     // Get instrument info from this segment's program change
                     var programChangeEvent = segment.Events
@@ -169,7 +169,7 @@ namespace Music.Writer
         private static void CreateSongTrackNoteFromPair(
             MetaMidiEvent noteOnEvent,
             MetaMidiEvent noteOffEvent,
-            List<SongTrackNoteEvent> songTrackNotes,
+            List<PartTrackNoteEvent> songTrackNotes,
             double tickScale)
         {
             if (!noteOnEvent.Parameters.TryGetValue("NoteNumber", out var noteNumObj) ||
@@ -185,7 +185,7 @@ namespace Music.Writer
             if (noteDurationTicks < 1)
                 noteDurationTicks = 1;
 
-            var songTrackNoteEvent = new SongTrackNoteEvent(
+            var songTrackNoteEvent = new PartTrackNoteEvent(
                 noteNumber,
                 absolutePositionTicks,
                 noteDurationTicks,

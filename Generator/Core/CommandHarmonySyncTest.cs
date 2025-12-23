@@ -59,14 +59,14 @@ namespace Music.Generator
                 MessageBoxIcon.Information);
         }
 
-        private static SongTrack CreateRockOrganTrack(Music.Designer.HarmonyTrack harmonyTimeline, Music.Designer.TimeSignatureTrack timeSignatureTimeline)
+        private static PartTrack CreateRockOrganTrack(Music.Designer.HarmonyTrack harmonyTimeline, Music.Designer.TimeSignatureTrack timeSignatureTimeline)
         {
-            var notes = new List<SongTrackNoteEvent>();
+            var notes = new List<PartTrackNoteEvent>();
             int currentTick = 0;
 
             var timeSignature = timeSignatureTimeline.Events.FirstOrDefault();
             if (timeSignature == null)
-                return new SongTrack(notes) { MidiProgramNumber = 4 }; // Electric Piano 1
+                return new PartTrack(notes) { MidiProgramNumber = 4 }; // Electric Piano 1
 
             int ticksPerQuarterNote = MusicConstants.TicksPerQuarterNote;
             int ticksPerMeasure = (ticksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
@@ -95,7 +95,7 @@ namespace Music.Generator
                 {
                     foreach (var chordNote in chordNotes)
                     {
-                        notes.Add(new SongTrackNoteEvent(
+                        notes.Add(new PartTrackNoteEvent(
                             noteNumber: chordNote.NoteNumber,
                             absolutePositionTicks: currentTick,
                             noteDurationTicks: halfNoteDuration,
@@ -106,17 +106,17 @@ namespace Music.Generator
                 }
             }
 
-            return new SongTrack(notes) { MidiProgramNumber = 18 };
+            return new PartTrack(notes) { MidiProgramNumber = 18 };
         }
 
-        private static SongTrack CreateElectricGuitarTrack(Music.Designer.HarmonyTrack harmonyTimeline, Music.Designer.TimeSignatureTrack timeSignatureTimeline)
+        private static PartTrack CreateElectricGuitarTrack(Music.Designer.HarmonyTrack harmonyTimeline, Music.Designer.TimeSignatureTrack timeSignatureTimeline)
         {
-            var notes = new List<SongTrackNoteEvent>();
+            var notes = new List<PartTrackNoteEvent>();
             int currentTick = 0;
 
             var timeSignature = timeSignatureTimeline.Events.FirstOrDefault();
             if (timeSignature == null)
-                return new SongTrack(notes) { MidiProgramNumber = 27 }; // Electric Guitar (clean)
+                return new PartTrack(notes) { MidiProgramNumber = 27 }; // Electric Guitar (clean)
 
             int ticksPerQuarterNote = MusicConstants.TicksPerQuarterNote;
             int ticksPerMeasure = (ticksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
@@ -144,7 +144,7 @@ namespace Music.Generator
                 for (int eighthNote = 0; eighthNote < 8; eighthNote++)
                 {
                     var chordNote = chordNotes[eighthNote % chordNotes.Count];
-                    notes.Add(new SongTrackNoteEvent(
+                    notes.Add(new PartTrackNoteEvent(
                         noteNumber: chordNote.NoteNumber,
                         absolutePositionTicks: currentTick,
                         noteDurationTicks: eighthNoteDuration,
@@ -154,17 +154,17 @@ namespace Music.Generator
                 }
             }
 
-            return new SongTrack(notes) { MidiProgramNumber = 27 };
+            return new PartTrack(notes) { MidiProgramNumber = 27 };
         }
 
-        private static SongTrack CreateElectricBassTrack(Music.Designer.HarmonyTrack harmonyTimeline, Music.Designer.TimeSignatureTrack timeSignatureTimeline)
+        private static PartTrack CreateElectricBassTrack(Music.Designer.HarmonyTrack harmonyTimeline, Music.Designer.TimeSignatureTrack timeSignatureTimeline)
         {
-            var notes = new List<SongTrackNoteEvent>();
+            var notes = new List<PartTrackNoteEvent>();
             int currentTick = 0;
 
             var timeSignature = timeSignatureTimeline.Events.FirstOrDefault();
             if (timeSignature == null)
-                return new SongTrack(notes) { MidiProgramNumber = 33 }; // Electric Bass (finger)
+                return new PartTrack(notes) { MidiProgramNumber = 33 }; // Electric Bass (finger)
 
             int ticksPerQuarterNote = MusicConstants.TicksPerQuarterNote;
             int ticksPerMeasure = (ticksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
@@ -192,7 +192,7 @@ namespace Music.Generator
                 var rootNote = chordNotes[0];
                 for (int quarterNote = 0; quarterNote < 4; quarterNote++)
                 {
-                    notes.Add(new SongTrackNoteEvent(
+                    notes.Add(new PartTrackNoteEvent(
                         noteNumber: rootNote.NoteNumber,
                         absolutePositionTicks: currentTick,
                         noteDurationTicks: quarterNoteDuration,
@@ -202,17 +202,17 @@ namespace Music.Generator
                 }
             }
 
-            return new SongTrack(notes) { MidiProgramNumber = 33 };
+            return new PartTrack(notes) { MidiProgramNumber = 33 };
         }
 
-        private static SongTrack CreateDrumSetTrack(Music.Designer.HarmonyTrack harmonyTimeline, Music.Designer.TimeSignatureTrack timeSignatureTimeline)
+        private static PartTrack CreateDrumSetTrack(Music.Designer.HarmonyTrack harmonyTimeline, Music.Designer.TimeSignatureTrack timeSignatureTimeline)
         {
-            var notes = new List<SongTrackNoteEvent>();
+            var notes = new List<PartTrackNoteEvent>();
             int currentTick = 0;
 
             var timeSignature = timeSignatureTimeline.Events.FirstOrDefault();
             if (timeSignature == null)
-                return new SongTrack(notes) { MidiProgramNumber = 255 }; // Drum Set
+                return new PartTrack(notes) { MidiProgramNumber = 255 }; // Drum Set
 
             int ticksPerQuarterNote = MusicConstants.TicksPerQuarterNote;
             int ticksPerMeasure = (ticksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
@@ -226,14 +226,14 @@ namespace Music.Generator
             {
                 int measureStartTick = measure * ticksPerMeasure;
 
-                notes.Add(new SongTrackNoteEvent(
+                notes.Add(new PartTrackNoteEvent(
                     noteNumber: bassDrum,
                     absolutePositionTicks: measureStartTick,
                     noteDurationTicks: ticksPerQuarterNote,
                     noteOnVelocity: 100,
                     isRest: false));
 
-                notes.Add(new SongTrackNoteEvent(
+                notes.Add(new PartTrackNoteEvent(
                     noteNumber: bassDrum,
                     absolutePositionTicks: measureStartTick + (2 * ticksPerQuarterNote),
                     noteDurationTicks: ticksPerQuarterNote,
@@ -242,7 +242,7 @@ namespace Music.Generator
 
                 for (int beat = 0; beat < 4; beat++)
                 {
-                    notes.Add(new SongTrackNoteEvent(
+                    notes.Add(new PartTrackNoteEvent(
                         noteNumber: snareDrum,
                         absolutePositionTicks: measureStartTick + (beat * ticksPerQuarterNote),
                         noteDurationTicks: ticksPerQuarterNote,
@@ -251,7 +251,7 @@ namespace Music.Generator
                 }
             }
 
-            return new SongTrack(notes) { MidiProgramNumber = 255 };
+            return new PartTrack(notes) { MidiProgramNumber = 255 };
         }
     }
 }

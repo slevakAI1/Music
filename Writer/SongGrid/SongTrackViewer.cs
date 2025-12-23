@@ -1,14 +1,14 @@
 namespace Music.Writer
 {
     /// <summary>
-    /// A modal dialog that displays a SongTrack object as formatted JSON.
+    /// A modal dialog that displays a PartTrack object as formatted JSON.
     /// </summary>
     public class SongTrackViewer : Form
     {
         private TextBox txtJson;
         private Button btnClose;
 
-        public SongTrackViewer(SongTrack track, string trackNumber)
+        public SongTrackViewer(PartTrack track, string trackNumber)
         {
             InitializeComponents(trackNumber);
             LoadTrackData(track);
@@ -71,7 +71,7 @@ namespace Music.Writer
             this.Controls.Add(buttonPanel);
         }
 
-        private void LoadTrackData(SongTrack track)
+        private void LoadTrackData(PartTrack track)
         {
             try
             {

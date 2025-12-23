@@ -7,7 +7,7 @@ using Music.Generator;
 namespace Music.Writer
 {
     /// <summary>
-    /// Converts HarmonyEvent objects to lists of SongTrackNoteEvent compatible with Writer.
+    /// Converts HarmonyEvent objects to lists of PartTrackNoteEvent compatible with Writer.
     /// </summary>
     public static class ConvertHarmonyEventToSongTrackNoteEvents
     {
@@ -25,7 +25,7 @@ namespace Music.Writer
 
         // TO DO - this should not have note durations - depend on what's calling it - find out
 
-        public static List<SongTrackNoteEvent> Convert(HarmonyEvent harmonyEvent, int baseOctave = 4, int noteValue = 4)
+        public static List<PartTrackNoteEvent> Convert(HarmonyEvent harmonyEvent, int baseOctave = 4, int noteValue = 4)
         {
             if (harmonyEvent == null)
                 throw new ArgumentNullException(nameof(harmonyEvent));
@@ -45,7 +45,7 @@ namespace Music.Writer
         /// <returns>A list of WriterNote objects representing the chord voicing.</returns>
         /// <exception cref="ArgumentException">When parameters are invalid.</exception>
         /// <exception cref="InvalidOperationException">When the chord cannot be constructed.</exception>
-        public static List<SongTrackNoteEvent> Convert(string key, int degree, string quality, string bass, int baseOctave = 4, int noteValue = 4)
+        public static List<PartTrackNoteEvent> Convert(string key, int degree, string quality, string bass, int baseOctave = 4, int noteValue = 4)
         {
             // Use shared helper to generate chord MIDI notes
             var chordMidiNotes = ChordVoicingHelper.GenerateChordMidiNotes(key, degree, quality, bass, baseOctave);
@@ -61,11 +61,11 @@ namespace Music.Writer
                 chordQuality: quality,
                 chordBase: bass);
             
-            // Convert MIDI notes to SongTrackNoteEvents
-            var result = new List<SongTrackNoteEvent>();
+            // Convert MIDI notes to PartTrackNoteEvents
+            var result = new List<PartTrackNoteEvent>();
             foreach (var noteNumber in chordMidiNotes)
             {
-                var songTrackNoteEvent = new SongTrackNoteEvent(
+                var songTrackNoteEvent = new PartTrackNoteEvent(
                     noteNumber: noteNumber,
                     absolutePositionTicks: 0, // Will be set by the calling code
                     noteDurationTicks: noteDurationTicks,

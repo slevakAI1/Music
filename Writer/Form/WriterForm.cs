@@ -89,7 +89,7 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Updates the SongTrack object's MidiProgramName when the user changes the instrument selection.
+        /// Updates the PartTrack object's MidiProgramName when the user changes the instrument selection.
         /// </summary>
         private void dgSong_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
         {
@@ -97,7 +97,7 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Opens a JSON viewer when the user double-clicks on the SongTrack column.
+        /// Opens a JSON viewer when the user double-clicks on the PartTrack column.
         /// </summary>
         private void dgSong_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
         {

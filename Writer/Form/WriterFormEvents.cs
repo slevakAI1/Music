@@ -51,8 +51,8 @@ namespace Music.Writer
                 return;
             }
 
-            // Build list of SongTrack from all selected songTrack rows (skip fixed rows)
-            var songTracks = new List<SongTrack>();
+            // Build list of PartTrack from all selected songTrack rows (skip fixed rows)
+            var songTracks = new List<PartTrack>();
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
                 // Skip fixed rows - they contain control line data, not songTracks
@@ -62,8 +62,8 @@ namespace Music.Writer
                 // Get the data object from the hidden column
                 var dataObj = selectedRow.Cells["colData"].Value;
                 
-                // Validate that it's actually a SongTrack object (not null or wrong type)
-                if (dataObj is not SongTrack songTrack)
+                // Validate that it's actually a PartTrack object (not null or wrong type)
+                if (dataObj is not PartTrack songTrack)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
                     MessageBoxHelper.Show(
@@ -75,7 +75,7 @@ namespace Music.Writer
                 }
 
                 // Validate songTrack has notes
-                if (songTrack.SongTrackNoteEvents.Count == 0)
+                if (songTrack.PartTrackNoteEvents.Count == 0)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
                     MessageBoxHelper.Show(
@@ -172,8 +172,8 @@ namespace Music.Writer
                 return;
             }
 
-            // Build list of SongTrack from all selected songTrack rows (skip fixed rows)
-            var tracks = new List<SongTrack>();
+            // Build list of PartTrack from all selected songTrack rows (skip fixed rows)
+            var tracks = new List<PartTrack>();
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
             {
                 // Skip fixed rows - they contain control line data, not songTracks
@@ -183,8 +183,8 @@ namespace Music.Writer
                 // Get the data object from the hidden column
                 var dataObj = selectedRow.Cells["colData"].Value;
                 
-                // Validate that it's actually a SongTrack object (not null or wrong type)
-                if (dataObj is not SongTrack track)
+                // Validate that it's actually a PartTrack object (not null or wrong type)
+                if (dataObj is not PartTrack track)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
                     MessageBoxHelper.Show(
@@ -196,7 +196,7 @@ namespace Music.Writer
                 }
 
                 // Validate songTrack has notes
-                if (track.SongTrackNoteEvents.Count == 0)
+                if (track.PartTrackNoteEvents.Count == 0)
                 {
                     var eventNumber = selectedRow.Cells["colEventNumber"].Value?.ToString() ?? (selectedRow.Index + 1).ToString();
                     MessageBoxHelper.Show(
@@ -342,7 +342,7 @@ namespace Music.Writer
                     GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, timeSignatureTimeline);
                 }
 
-                // Convert MetaMidiEvent lists to SongTrack objects, passing the source ticks per quarter note
+                // Convert MetaMidiEvent lists to PartTrack objects, passing the source ticks per quarter note
                 var tracks = ConvertMetaMidiEventsToSongTracks.Convert(
                     midiEventLists,
                     ticksPerQuarterNote);
@@ -500,7 +500,7 @@ namespace Music.Writer
 
             var harmonyEvent = designer.HarmonyTrack.Events[1];
 
-            List<SongTrackNoteEvent> notes;
+            List<PartTrackNoteEvent> notes;
             try
             {
                 notes = ConvertHarmonyEventToSongTrackNoteEvents.Convert(
@@ -577,8 +577,8 @@ namespace Music.Writer
             var row = dgSong.Rows[e.RowIndex];
             var trackData = row.Cells["colData"].Value;
 
-            // Validate that we have a SongTrack object
-            if (trackData is not SongTrack songTrack)
+            // Validate that we have a PartTrack object
+            if (trackData is not PartTrack songTrack)
             {
                 MessageBoxHelper.Show(
                     "No track data available for this row.",

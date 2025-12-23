@@ -4,7 +4,7 @@ namespace Music.Writer
 {
     /// <summary>
     /// Manages adding song components to the dgSong DataGridView control
-    /// on the WriterForm form. Components include Sections, Harmonies, Time Signatures, Tempos, SongTrackNoteEvents
+    /// on the WriterForm form. Components include Sections, Harmonies, Time Signatures, Tempos, PartTrackNoteEvents
     /// </summary>
     internal static class SongGridManager
     {
@@ -239,7 +239,7 @@ namespace Music.Writer
                 return;
 
             var row = dgSong.Rows[rowIndex];
-            var track = row.Cells["colData"].Value as SongTrack;
+            var track = row.Cells["colData"].Value as PartTrack;
 
             // Clear existing measure cells first
             for (int colIndex = MEASURE_START_COLUMN_INDEX; colIndex < dgSong.Columns.Count; colIndex++)
@@ -247,14 +247,14 @@ namespace Music.Writer
                 row.Cells[colIndex].Value = string.Empty;
             }
 
-            if (track == null || track.SongTrackNoteEvents.Count == 0)
+            if (track == null || track.PartTrackNoteEvents.Count == 0)
                 return;
 
             // Calculate ticks per measure (4/4 time: 4 quarter notes per measure)
             int ticksPerMeasure = MusicConstants.TicksPerQuarterNote * 4;
 
             // Group notes by measure based on their absolute position
-            var notesByMeasure = track.SongTrackNoteEvents
+            var notesByMeasure = track.PartTrackNoteEvents
                 .GroupBy(note => note.AbsolutePositionTicks / ticksPerMeasure)
                 .OrderBy(g => g.Key)
                 .ToList();
@@ -345,15 +345,15 @@ namespace Music.Writer
             var row = dgSong.Rows[e.RowIndex];
             var cellValue = row.Cells["colData"].Value;
 
-            // Check if the hidden data cell contains a SongTrack object
-            if (cellValue is SongTrack songTrack)
+            // Check if the hidden data cell contains a PartTrack object
+            if (cellValue is PartTrack songTrack)
             {
                 // Get the selected instrument name
                 var selectedInstrumentName = row.Cells["colType"].FormattedValue?.ToString();
 
                 if (!string.IsNullOrEmpty(selectedInstrumentName))
                 {
-                    // Update the SongTrack object's MidiProgramName property
+                    // Update the PartTrack object's MidiProgramName property
                     songTrack.MidiProgramName = selectedInstrumentName;
 
                     // Optionally update the description column to reflect the change
@@ -370,7 +370,7 @@ namespace Music.Writer
         /// <param name="dgSong">The DataGridView to add to</param>
         /// <param name="rowNumber">Reference to the row counter (will be incremented)</param>
         internal static void AddSongTrackToGrid(
-            SongTrack track,
+            PartTrack track,
             DataGridView dgSong,
             ref int rowNumber)
         {
@@ -397,7 +397,7 @@ namespace Music.Writer
             };
             row.Cells["colType"] = comboBoxCell;
 
-            // Column 1: Hidden data (SongTrack object)
+            // Column 1: Hidden data (PartTrack object)
             row.Cells["colData"].Value = track;
 
             // Set MIDI Instrument dropdown value
