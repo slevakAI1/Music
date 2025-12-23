@@ -1,5 +1,3 @@
-using Music.Designer;
-
 namespace Music.Generator
 {
     // Builds the app's default tempo timeline (single 90 BPM event starting at bar 1).

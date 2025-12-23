@@ -1,6 +1,4 @@
-﻿using Music.Designer;
-
-namespace Music.Generator
+﻿namespace Music.Generator
 {
     public sealed class SectionTests
     {

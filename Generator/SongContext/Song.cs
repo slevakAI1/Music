@@ -1,7 +1,4 @@
-﻿using Music.Designer;
-using Music.Writer;
-
-namespace Music.Generator
+﻿namespace Music.Generator
 {
     /// <summary>
     /// The complete generated song, containing all tracks and temporal data.

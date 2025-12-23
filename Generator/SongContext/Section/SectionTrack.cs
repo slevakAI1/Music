@@ -1,6 +1,4 @@
-using Music.Generator;
-
-namespace Music.Designer
+namespace Music.Generator
 {
     // This is a design track for song sections
     // The SectionTrack contains an ordered list of Sections that constitutes an entire song.
