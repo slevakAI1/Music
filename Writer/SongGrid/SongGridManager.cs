@@ -27,6 +27,17 @@ namespace Music.Writer
         // Default number of measure columns to create initially
         public const int DEFAULT_MEASURE_COLUMNS = 32;
 
+        // Track the next available track number for display purposes
+        private static int _nextTrackNumber = 0;
+
+        /// <summary>
+        /// Resets the track number counter (useful when clearing all tracks or starting fresh).
+        /// </summary>
+        public static void ResetTrackNumber()
+        {
+            _nextTrackNumber = 0;
+        }
+
         /// <summary>
         /// Configures the dgSong DataGridView with proper columns including MIDI instrument dropdown.
         /// </summary>
@@ -365,19 +376,17 @@ namespace Music.Writer
 
         /// <summary>
         /// Adds a track to the song grid with instrument information from the track itself.
+        /// Automatically assigns the next available track number.
         /// </summary>
         /// <param name="track">The track to add</param>
-        /// <param name="midiInstruments">List of available MIDI instruments</param>
         /// <param name="dgSong">The DataGridView to add to</param>
-        /// <param name="rowNumber">Reference to the row counter (will be incremented)</param>
         internal static void AddNewTrack(
             PartTrack track,
-            DataGridView dgSong,
-            ref int rowNumber)
+            DataGridView dgSong)
         {
-            // Set row name/number
-            rowNumber++;
-            var rowName = rowNumber.ToString();
+            // Automatically assign and increment track number
+            _nextTrackNumber++;
+            var rowName = _nextTrackNumber.ToString();
 
             // Get part name from the track
             var voiceName = track.MidiProgramName ?? "Select...";

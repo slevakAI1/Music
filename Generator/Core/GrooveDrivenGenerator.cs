@@ -11,23 +11,19 @@ namespace Music.Writer.Generator
     public static class GrooveDrivenGenerator
     {
         /// <summary>
-        /// Generates all tracks based on harmony timeline and groove track timeline.
+        /// Generates all tracks based on SongContext.
         /// </summary>
-        /// <param name="harmonyTimeline">The harmony events defining chords per bar.</param>
-        /// <param name="timeSignatureTimeline">Time signature info for tick calculations.</param>
-        /// <param name="grooveTrack">The groove track timeline defining which groove preset is active at each bar.</param>
+        /// <param name="songContext">The song context containing harmony, time signature, and groove tracks.</param>
         /// <returns>Generated tracks for each role.</returns>
-        public static GeneratorResult Generate(
-            HarmonyTrack harmonyTimeline,
-            TimeSignatureTrack timeSignatureTimeline,
-            GrooveTrack grooveTrack)
+        public static GeneratorResult Generate(SongContext songContext)
         {
-            if (harmonyTimeline == null || harmonyTimeline.Events.Count == 0)
-                throw new ArgumentException("Harmony timeline must have events", nameof(harmonyTimeline));
-            if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
-                throw new ArgumentException("Time signature timeline must have events", nameof(timeSignatureTimeline));
-            if (grooveTrack == null || grooveTrack.Events.Count == 0)
-                throw new ArgumentException("Groove track must have events", nameof(grooveTrack));
+            ValidateHarmonyTrack(songContext.HarmonyTrack);
+            ValidateTimeSignatureTrack(songContext.Song.TimeSignatureTrack);
+            ValidateGrooveTrack(songContext.GrooveTrack);
+
+            var harmonyTimeline = songContext.HarmonyTrack;
+            var timeSignatureTimeline = songContext.Song.TimeSignatureTrack;
+            var grooveTrack = songContext.GrooveTrack;
 
             var timeSignature = timeSignatureTimeline.Events.First();
             int ticksPerQuarterNote = MusicConstants.TicksPerQuarterNote;
@@ -404,5 +400,27 @@ namespace Music.Writer.Generator
             }
             return active;
         }
+        #region Validation
+
+        private static void ValidateHarmonyTrack(HarmonyTrack harmonyTrack)
+        {
+            if (harmonyTrack == null || harmonyTrack.Events.Count == 0)
+                throw new ArgumentException("Harmony timeline must have events", nameof(harmonyTrack));
+        }
+
+        private static void ValidateTimeSignatureTrack(TimeSignatureTrack timeSignatureTrack)
+        {
+            if (timeSignatureTrack == null || timeSignatureTrack.Events.Count == 0)
+                throw new ArgumentException("Time signature timeline must have events", nameof(timeSignatureTrack));
+        }
+
+        private static void ValidateGrooveTrack(GrooveTrack grooveTrack)
+        {
+            if (grooveTrack == null || grooveTrack.Events.Count == 0)
+                throw new ArgumentException("Groove track must have events", nameof(grooveTrack));
+        }
+
+        #endregion
+
     }
 }

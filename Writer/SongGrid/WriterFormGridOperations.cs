@@ -12,9 +12,7 @@ namespace Music.Writer
     {
         // ========== GRID ROW OPERATIONS ==========
 
-        public void HandleAddSongTrack(
-            DataGridView dgSong,
-            ref int trackNumber)
+        public void HandleAddSongTrack(DataGridView dgSong)
         {
             // Create an empty PartTrack and add it to the grid via the existing helper.
             var emptyTrack = new PartTrack(new List<PartTrackNoteEvent>())
@@ -23,7 +21,7 @@ namespace Music.Writer
             };
 
             // Use SongGridManager to initialize the row consistently with other adds.
-            SongGridManager.AddNewTrack(emptyTrack, dgSong, ref trackNumber);
+            SongGridManager.AddNewTrack(emptyTrack, dgSong);
 
             // Select the newly added row (last row)
             if (dgSong.Rows.Count > SongGridManager.FIXED_ROWS_COUNT)
@@ -87,6 +85,9 @@ namespace Music.Writer
                 if (dataCol != null)
                     dgSong.Rows[rowIndex].Cells[dataCol.Index].Value = null;
             }
+            
+            // Reset the track number counter since we've cleared all tracks
+            SongGridManager.ResetTrackNumber();
         }
 
         public void HandleClearSelected(DataGridView dgSong)

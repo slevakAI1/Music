@@ -13,29 +13,15 @@ namespace Music.Generator
         /// <summary>
         /// Handles the Harmony Groove Sync Test command.
         /// Generates synchronized test tracks using groove presets from the GrooveTrack timeline.
-        /// SongTrackNumber is the next open/unused midi track number
         /// </summary>
         public static void HandleGrooveSyncTest(
             SongContext songContext,
-            DataGridView dgSong,
-            ref int songTrackNumber)
+            DataGridView dgSong)
         {
-            if (!ValidateHarmonyTrack(songContext.HarmonyTrack))
-                return;
-
-            if (!ValidateTimeSignatureTrack(songContext.Song.TimeSignatureTrack))
-                return;
-
-            if (!ValidateGrooveTrack(songContext.GrooveTrack))
-                return;
-
             try
             {
                 // Generate all song tracks using the GrooveTrack
-                var result = GrooveDrivenGenerator.Generate(
-                    songContext.HarmonyTrack,
-                    songContext.Song.TimeSignatureTrack,
-                    songContext.GrooveTrack);
+                var result = GrooveDrivenGenerator.Generate(songContext);
 
                 int addedCount = 0;
 
@@ -44,17 +30,20 @@ namespace Music.Generator
                 songContext.Song.PartTracks.Add(result.KeysTrack);
                 songContext.Song.PartTracks.Add(result.DrumTrack);
 
-                // Update Grid with song tracks!
-                SongGridManager.AddNewTrack(result.BassTrack, dgSong, ref songTrackNumber);
+
+
+
+                // Update Grid with song tracks - no need to track songTrackNumber anymore
+                SongGridManager.AddNewTrack(result.BassTrack, dgSong);
                 addedCount++;
 
-                SongGridManager.AddNewTrack(result.GuitarTrack, dgSong, ref songTrackNumber);
+                SongGridManager.AddNewTrack(result.GuitarTrack, dgSong);
                 addedCount++;
 
-                SongGridManager.AddNewTrack(result.KeysTrack, dgSong, ref songTrackNumber);
+                SongGridManager.AddNewTrack(result.KeysTrack, dgSong);
                 addedCount++;
 
-                SongGridManager.AddNewTrack(result.DrumTrack, dgSong, ref songTrackNumber);
+                SongGridManager.AddNewTrack(result.DrumTrack, dgSong);
                 addedCount++;
 
                 ShowGrooveSuccess(addedCount);
@@ -65,51 +54,7 @@ namespace Music.Generator
             }
         }
 
-        // Validation / Messagebox helpers
-
-        #region Validation / Messagebox helpers
-
-        private static bool ValidateHarmonyTrack(HarmonyTrack harmonyTimeline)
-        {
-            if (harmonyTimeline == null || harmonyTimeline.Events.Count == 0)
-            {
-                MessageBoxHelper.Show(
-                    "No harmony events defined. Please add harmony events first.",
-                    "Missing Harmony",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-                return false;
-            }
-            return true;
-        }
-
-        private static bool ValidateTimeSignatureTrack(TimeSignatureTrack timeSignatureTimeline)
-        {
-            if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
-            {
-                MessageBoxHelper.Show(
-                    "No time signature events defined. Please add at least one time signature event.",
-                    "Missing Time Signature",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-                return false;
-            }
-            return true;
-        }
-
-        private static bool ValidateGrooveTrack(GrooveTrack grooveTrack)
-        {
-            if (grooveTrack == null || grooveTrack.Events.Count == 0)
-            {
-                MessageBoxHelper.Show(
-                    "No groove events defined. Please add at least one groove event first.",
-                    "Missing Groove",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-                return false;
-            }
-            return true;
-        }
+        #region MessageBox
 
         private static void ShowGrooveSuccess(int addedCount)
         {

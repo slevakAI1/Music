@@ -8,9 +8,7 @@ namespace Music.Generator
     /// </summary>
     public static class CommandHarmonySyncTest
     {
-        public static void HandleHarmonySyncTest(
-            DataGridView dgSong,
-            ref int trackNumber)
+        public static void HandleHarmonySyncTest(DataGridView dgSong)
         {
             // Extract harmony timeline from the fixed harmony row
             var harmonyRow = dgSong.Rows[SongGridManager.FIXED_ROW_HARMONY];
@@ -32,11 +30,11 @@ namespace Music.Generator
             var electricBassTrack = CreateElectricBassTrack(harmonyTimeline, timeSignatureTimeline);
             var drumSetTrack = CreateDrumSetTrack(harmonyTimeline, timeSignatureTimeline);
 
-            // Add tracks to the grid
-            SongGridManager.AddNewTrack(rockOrganTrack, dgSong, ref trackNumber);
-            SongGridManager.AddNewTrack(electricGuitarTrack, dgSong, ref trackNumber);
-            SongGridManager.AddNewTrack(electricBassTrack, dgSong, ref trackNumber);
-            SongGridManager.AddNewTrack(drumSetTrack, dgSong, ref trackNumber);
+            // Add tracks to the grid - no need to track trackNumber anymore
+            SongGridManager.AddNewTrack(rockOrganTrack, dgSong);
+            SongGridManager.AddNewTrack(electricGuitarTrack, dgSong);
+            SongGridManager.AddNewTrack(electricBassTrack, dgSong);
+            SongGridManager.AddNewTrack(drumSetTrack, dgSong);
 
             ShowSuccessMessage();
         }

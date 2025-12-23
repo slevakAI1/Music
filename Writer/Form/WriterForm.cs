@@ -19,8 +19,6 @@ namespace Music.Writer
         // MIDI I/O service for importing/exporting MIDI files
         private MidiIoService _midiIoService;
 
-        private int trackNumber = 0;
-
         // Event handlers instance
         private readonly WriterFormEventHandlers _eventHandlers = new();
 
@@ -352,11 +350,11 @@ namespace Music.Writer
                     break;
 
                 case "Harmony Sync Test":
-                    CommandHarmonySyncTest.HandleHarmonySyncTest(dgSong, ref trackNumber);
+                    CommandHarmonySyncTest.HandleHarmonySyncTest(dgSong);
                     break;
 
                 case "Harmony Groove Sync Test":
-                    CommandGrooveSyncTest.HandleGrooveSyncTest(_songContext, dgSong, ref trackNumber);
+                    CommandGrooveSyncTest.HandleGrooveSyncTest(_songContext, dgSong);
                     break;
 
                 // Other cases will be added here later.
@@ -380,7 +378,7 @@ namespace Music.Writer
         // New Add button handler: add an empty track and select it.
         private void btnAddTrack_Click(object? sender, EventArgs e)
         {
-            _gridOperations.HandleAddSongTrack(dgSong, ref trackNumber);
+            _gridOperations.HandleAddSongTrack(dgSong);
         }
 
         private void btnDeleteTracks_Click(object sender, EventArgs e)
@@ -390,7 +388,7 @@ namespace Music.Writer
 
         private void btnImport_Click(object sender, EventArgs e)
         {
-            _eventHandlers.HandleImport(dgSong, _midiIoService, ref trackNumber);
+            _eventHandlers.HandleImport(dgSong, _midiIoService);
         }
 
         private void btnExport_Click(object sender, EventArgs e)

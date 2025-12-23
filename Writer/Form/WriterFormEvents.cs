@@ -281,8 +281,7 @@ namespace Music.Writer
 
         public void HandleImport(
             DataGridView dgSong,
-            MidiIoService midiIoService,
-            ref int trackNumber)
+            MidiIoService midiIoService)
         {
             using var ofd = new OpenFileDialog
             {
@@ -348,13 +347,10 @@ namespace Music.Writer
                     midiEventLists,
                     ticksPerQuarterNote);
 
-                // Add each songTrack to the grid
+                // Add each songTrack to the grid - no need to pass trackNumber anymore
                 foreach (var track in tracks)
                 {
-                    SongGridManager.AddNewTrack(
-                        track,
-                        dgSong,
-                        ref trackNumber);
+                    SongGridManager.AddNewTrack(track, dgSong);
                 }
 
                 MessageBoxHelper.Show(
