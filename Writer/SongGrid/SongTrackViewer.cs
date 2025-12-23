@@ -1,3 +1,5 @@
+using Music.Generator;
+
 namespace Music.Writer
 {
     /// <summary>

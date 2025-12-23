@@ -1,5 +1,4 @@
 ﻿using Music.Designer;
-using Music.MyMidi;
 using Music.Writer;
 
 namespace Music.Generator

@@ -1,4 +1,6 @@
-namespace Music.Writer
+using Music.Writer;
+
+namespace Music.Generator
 {
     /// <summary>
     /// Represents a single part/track for composition and MIDI generation.
