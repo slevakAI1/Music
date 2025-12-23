@@ -281,7 +281,6 @@ namespace Music.Writer
         public void HandleImport(
             DataGridView dgSong,
             MidiIoService midiIoService,
-            List<MidiVoices> midiInstruments,
             ref int trackNumber)
         {
             using var ofd = new OpenFileDialog
@@ -346,7 +345,6 @@ namespace Music.Writer
                 // Convert MetaMidiEvent lists to SongTrack objects, passing the source ticks per quarter note
                 var tracks = ConvertMetaMidiEventsToSongTracks.Convert(
                     midiEventLists,
-                    midiInstruments,
                     ticksPerQuarterNote);
 
                 // Add each songTrack to the grid
@@ -354,7 +352,6 @@ namespace Music.Writer
                 {
                     SongGridManager.AddSongTrackToGrid(
                         track,
-                        midiInstruments,
                         dgSong,
                         ref trackNumber);
                 }

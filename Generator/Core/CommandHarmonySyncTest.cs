@@ -10,7 +10,6 @@ namespace Music.Generator
     {
         public static void HandleHarmonySyncTest(
             DataGridView dgSong,
-            List<MidiVoices> midiInstruments,
             ref int trackNumber)
         {
             // Extract harmony timeline from the fixed harmony row
@@ -48,10 +47,10 @@ namespace Music.Generator
             var drumSetTrack = CreateDrumSetTrack(harmonyTimeline, timeSignatureTimeline);
 
             // Add tracks to the grid
-            SongGridManager.AddSongTrackToGrid(rockOrganTrack, midiInstruments, dgSong, ref trackNumber);
-            SongGridManager.AddSongTrackToGrid(electricGuitarTrack, midiInstruments, dgSong, ref trackNumber);
-            SongGridManager.AddSongTrackToGrid(electricBassTrack, midiInstruments, dgSong, ref trackNumber);
-            SongGridManager.AddSongTrackToGrid(drumSetTrack, midiInstruments, dgSong, ref trackNumber);
+            SongGridManager.AddSongTrackToGrid(rockOrganTrack, dgSong, ref trackNumber);
+            SongGridManager.AddSongTrackToGrid(electricGuitarTrack, dgSong, ref trackNumber);
+            SongGridManager.AddSongTrackToGrid(electricBassTrack, dgSong, ref trackNumber);
+            SongGridManager.AddSongTrackToGrid(drumSetTrack, dgSong, ref trackNumber);
 
             MessageBoxHelper.Show(
                 "Successfully created 4 synchronized tracks based on harmony timeline.",

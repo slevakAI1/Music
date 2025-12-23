@@ -17,7 +17,6 @@ namespace Music.Generator
         /// </summary>
         public static void HandleGrooveSyncTest(
             DataGridView dgSong,
-            List<MidiVoices> midiInstruments,
             ref int songTrackNumber)
         {
             // Extract harmony timeline from the fixed harmony row
@@ -80,25 +79,25 @@ namespace Music.Generator
                 // Add generated song tracks to grid
                 if (result.BassTrack != null && result.BassTrack.SongTrackNoteEvents.Count > 0)
                 {
-                    SongGridManager.AddSongTrackToGrid(result.BassTrack, midiInstruments, dgSong, ref songTrackNumber);
+                    SongGridManager.AddSongTrackToGrid(result.BassTrack, dgSong, ref songTrackNumber);
                     addedCount++;
                 }
 
                 if (result.GuitarTrack != null && result.GuitarTrack.SongTrackNoteEvents.Count > 0)
                 {
-                    SongGridManager.AddSongTrackToGrid(result.GuitarTrack, midiInstruments, dgSong, ref songTrackNumber);
+                    SongGridManager.AddSongTrackToGrid(result.GuitarTrack, dgSong, ref songTrackNumber);
                     addedCount++;
                 }
 
                 if (result.KeysTrack != null && result.KeysTrack.SongTrackNoteEvents.Count > 0)
                 {
-                    SongGridManager.AddSongTrackToGrid(result.KeysTrack, midiInstruments, dgSong, ref songTrackNumber);
+                    SongGridManager.AddSongTrackToGrid(result.KeysTrack, dgSong, ref songTrackNumber);
                     addedCount++;
                 }
 
                 if (result.DrumTrack != null && result.DrumTrack.SongTrackNoteEvents.Count > 0)
                 {
-                    SongGridManager.AddSongTrackToGrid(result.DrumTrack, midiInstruments, dgSong, ref songTrackNumber);
+                    SongGridManager.AddSongTrackToGrid(result.DrumTrack, dgSong, ref songTrackNumber);
                     addedCount++;
                 }
 

@@ -13,7 +13,6 @@ namespace Music.Writer
 
         public void HandleAddSongTrack(
             DataGridView dgSong,
-            List<MidiVoices> midiInstruments,
             ref int trackNumber)
         {
             // Create an empty SongTrack and add it to the grid via the existing helper.
@@ -23,7 +22,7 @@ namespace Music.Writer
             };
 
             // Use SongGridManager to initialize the row consistently with other adds.
-            SongGridManager.AddSongTrackToGrid(emptyTrack, midiInstruments, dgSong, ref trackNumber);
+            SongGridManager.AddSongTrackToGrid(emptyTrack, dgSong, ref trackNumber);
 
             // Select the newly added row (last row)
             if (dgSong.Rows.Count > SongGridManager.FIXED_ROWS_COUNT)
