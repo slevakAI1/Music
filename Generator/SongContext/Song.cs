@@ -7,16 +7,7 @@ namespace Music.Generator
     /// The complete generated song, containing all tracks and temporal data.
     /// This is the runtime representation of a composed piece, separate from design templates.
     /// </summary>
-    /// 
-
-
-
-    // TO DO - 
-    //      I NEED (1) SONG TO GRID AND (2) GRID TO SONG CONVERTER METHODS
-    //      Then can generate to the song object and send to the grid, and vica versa when the grid is updated.
-    //          this may be tricky :-(
-
-    public sealed class Song
+     public sealed class Song
     {
         /// <summary>
         /// Global tempo track for the song.
