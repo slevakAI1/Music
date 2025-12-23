@@ -223,7 +223,7 @@ namespace Music.Writer
             {
                 GridControlLinesManager.AttachSectionTimeline(dgSong, songContext.SectionTrack);
                 GridControlLinesManager.AttachHarmonyTimeline(dgSong, songContext.HarmonyTrack);
-                GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, songContext.TimeSignatureTrack);
+                GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, songContext.Song.TimeSignatureTrack);
                 GridControlLinesManager.AttachTempoTimeline(dgSong, songContext.Song.TempoTrack);
             }
         }

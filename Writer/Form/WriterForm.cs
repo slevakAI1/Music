@@ -208,13 +208,13 @@ namespace Music.Writer
                 if (_songContext == null)
                     _songContext = new Music.Designer.SongContext();
 
-                var initialTimeSignature = _songContext.TimeSignatureTrack;
+                var initialTimeSignature = _songContext.Song.TimeSignatureTrack;
 
                 using var dlg = new Music.Designer.TimeSignatureEditorForm(initialTimeSignature);
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
-                    _songContext.TimeSignatureTrack = dlg.ResultTimeline;
-                    GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, _songContext.TimeSignatureTrack);
+                    _songContext.Song.TimeSignatureTrack = dlg.ResultTimeline;
+                    GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, _songContext.Song.TimeSignatureTrack);
                 }
 
                 return;

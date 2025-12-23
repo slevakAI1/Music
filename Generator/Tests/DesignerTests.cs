@@ -23,7 +23,7 @@ namespace Music.Designer
             songContext.HarmonyTrack = HarmonyTests.CreateTestTimelineD1();
 
             // 4) Time signature timeline: apply default (4/4 starting at bar 1)
-            songContext.TimeSignatureTrack = TimeSignatureTests.CreateTestTimelineD1();
+            songContext.Song.TimeSignatureTrack = TimeSignatureTests.CreateTestTimelineD1();
 
             // 5) Tempo timeline: include default tempo (112 BPM starting at bar 1)
             songContext.Song.TempoTrack = TempoTests.CreateTestTimelineD1();

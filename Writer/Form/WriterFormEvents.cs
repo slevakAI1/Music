@@ -479,7 +479,7 @@ namespace Music.Writer
             DesignerTests.SetTestDesignD1(songContext);
 
             GridControlLinesManager.AttachSectionTimeline(dgSong, songContext.SectionTrack);
-            GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, songContext.TimeSignatureTrack);
+            GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, songContext.Song.TimeSignatureTrack);
             GridControlLinesManager.AttachTempoTimeline(dgSong, songContext.Song.TempoTrack);
             GridControlLinesManager.AttachHarmonyTimeline(dgSong, songContext.HarmonyTrack);
         }

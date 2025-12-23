@@ -33,7 +33,7 @@ namespace Music.Designer
 
         //public TempoTrack TempoTrack { get; set; } = new();
 
-        public TimeSignatureTrack TimeSignatureTrack { get; set; } = new();
+        //public TimeSignatureTrack TimeSignatureTrack { get; set; } = new();
 
         // Design space
         public VoiceSet Voices { get; set; } = new();
