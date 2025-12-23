@@ -23,30 +23,17 @@ namespace Music.Generator
                 // Generate all song tracks using the GrooveTrack
                 var result = GrooveDrivenGenerator.Generate(songContext);
 
-                int addedCount = 0;
-
                 songContext.Song.PartTracks.Add(result.BassTrack);
                 songContext.Song.PartTracks.Add(result.GuitarTrack);
                 songContext.Song.PartTracks.Add(result.KeysTrack);
                 songContext.Song.PartTracks.Add(result.DrumTrack);
 
-
-
-
                 // Update Grid with song tracks - no need to track songTrackNumber anymore
                 SongGridManager.AddNewTrack(result.BassTrack, dgSong);
-                addedCount++;
-
                 SongGridManager.AddNewTrack(result.GuitarTrack, dgSong);
-                addedCount++;
-
                 SongGridManager.AddNewTrack(result.KeysTrack, dgSong);
-                addedCount++;
-
                 SongGridManager.AddNewTrack(result.DrumTrack, dgSong);
-                addedCount++;
-
-                ShowGrooveSuccess(addedCount);
+                ShowGrooveSuccess(4);
             }
             catch (Exception ex)
             {
