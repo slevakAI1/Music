@@ -49,10 +49,7 @@ namespace Music.Generator
                 return;
             }
 
-            // Get the GrooveTrack from the designer
-            var grooveTrack = Globals.SongContext?.GrooveTrack;
-
-            if (grooveTrack == null || grooveTrack.Events.Count == 0)
+            if (songContext.GrooveTrack == null || songContext.GrooveTrack.Events.Count == 0)
             {
                 MessageBoxHelper.Show(
                     "No groove events defined. Please add at least one groove event first.",
@@ -68,7 +65,7 @@ namespace Music.Generator
                 var result = GrooveDrivenGenerator.Generate(
                     harmonyTimeline,
                     timeSignatureTimeline,
-                    grooveTrack);
+                    songContext.GrooveTrack);
 
                 int addedCount = 0;
 
@@ -112,5 +109,9 @@ namespace Music.Generator
                     MessageBoxIcon.Error);
             }
         }
+
+        // Validation / Messagebox helpers
+
+
     }
 }
