@@ -54,7 +54,7 @@
 //            sb.Append("HARMONY track:\r\n");
 //            first = true;
 //            var track = designer.HarmonyTrack;
-//            if (timeline != null)
+//            if (track != null)
 //            {
 //                foreach (var he in track.Events)
 //                {
@@ -67,7 +67,7 @@
 //            // ALIGNMENT VIEW (Sections vs Harmony)
 //            sb.Append("\r\n\r\n");
 //            sb.Append("ALIGNMENT (Sections vs Harmony):\r\n");
-//            if (timeline == null || track.Events.Count == 0)
+//            if (track == null || track.Events.Count == 0)
 //            {
 //                sb.Append("(no harmony track)\r\n");
 //            }
