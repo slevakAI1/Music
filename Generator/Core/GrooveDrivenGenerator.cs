@@ -33,9 +33,9 @@ namespace Music.Generator
                     songContext.HarmonyTrack, 
                     songContext.GrooveTrack, 
                     songContext.Song.TimeSignatureTrack,
-                    ticksPerMeasure, 
-                    totalBars, 
-                    settings),
+                    ticksPerMeasure,      //  This needs to go - see to do about it 
+                    totalBars,            //  Ok - for test parameter
+                    settings),            //  Randomization settings 
 
                 GuitarTrack = GenerateGuitarTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.Song.TimeSignatureTrack, ticksPerMeasure, totalBars, settings),
                 KeysTrack = GenerateKeysTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.Song.TimeSignatureTrack, ticksPerMeasure, totalBars, settings),
@@ -54,7 +54,7 @@ namespace Music.Generator
             public PartTrack DrumTrack { get; init; }
         }
 
-        private static PartTrack? GenerateBassTrack(
+        private static PartTrack GenerateBassTrack(
             HarmonyTrack harmonyTimeline,
             GrooveTrack grooveTrack,
             TimeSignatureTrack timeSignatureTrack,
@@ -114,13 +114,10 @@ namespace Music.Generator
                 }
             }
 
-            if (notes.Count == 0)
-                return null;
-
             return new PartTrack(notes) { MidiProgramNumber = 33 }; // Electric Bass
         }
 
-        private static PartTrack? GenerateGuitarTrack(
+        private static PartTrack GenerateGuitarTrack(
             HarmonyTrack harmonyTimeline,
             GrooveTrack grooveTrack,
             TimeSignatureTrack timeSignatureTrack,
@@ -191,13 +188,10 @@ namespace Music.Generator
                 }
             }
 
-            if (notes.Count == 0)
-                return null;
-
             return new PartTrack(notes) { MidiProgramNumber = 27 }; // Electric Guitar
         }
 
-        private static PartTrack? GenerateKeysTrack(
+        private static PartTrack GenerateKeysTrack(
             HarmonyTrack harmonyTimeline,
             GrooveTrack grooveTrack,
             TimeSignatureTrack timeSignatureTrack,
@@ -268,9 +262,6 @@ namespace Music.Generator
                 previousHarmony = harmonyEvent;
             }
 
-            if (notes.Count == 0)
-                return null;
-
             return new PartTrack(notes) { MidiProgramNumber = 4 }; // Electric Piano 1
         }
 
@@ -278,7 +269,7 @@ namespace Music.Generator
         /// Generates drum track: kick, snare, hi-hat at groove onsets with controlled randomness.
         /// Updated to support groove timeline changes.
         /// </summary>
-        private static PartTrack? GenerateDrumTrack(
+        private static PartTrack GenerateDrumTrack(
             HarmonyTrack harmonyTimeline,
             GrooveTrack grooveTrack,
             TimeSignatureTrack timeSignatureTrack,
@@ -357,9 +348,6 @@ namespace Music.Generator
                     }
                 }
             }
-
-            if (notes.Count == 0)
-                return null;
 
             return new PartTrack(notes) { MidiProgramNumber = 255 }; // Drum Set
         }
