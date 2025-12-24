@@ -54,6 +54,9 @@ namespace Music.Generator
             public required PartTrack DrumTrack { get; init; }
         }
 
+
+        // TO DO - STEP THRU THIS TO SEE HOW IT WORKS EXACTLY
+
         private static PartTrack GenerateBassTrack(
             HarmonyTrack harmonyTimeline,
             GrooveTrack grooveTrack,
@@ -376,13 +379,13 @@ namespace Music.Generator
         private static void ValidateHarmonyTrack(HarmonyTrack harmonyTrack)
         {
             if (harmonyTrack == null || harmonyTrack.Events.Count == 0)
-                throw new ArgumentException("Harmony timeline must have events", nameof(harmonyTrack));
+                throw new ArgumentException("Harmony track must have events", nameof(harmonyTrack));
         }
 
         private static void ValidateTimeSignatureTrack(TimeSignatureTrack timeSignatureTrack)
         {
             if (timeSignatureTrack == null || timeSignatureTrack.Events.Count == 0)
-                throw new ArgumentException("Time signature timeline must have events", nameof(timeSignatureTrack));
+                throw new ArgumentException("Time signature track must have events", nameof(timeSignatureTrack));
         }
 
         private static void ValidateGrooveTrack(GrooveTrack grooveTrack)
