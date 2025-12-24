@@ -58,7 +58,7 @@ namespace Music.Generator
         // TO DO - STEP THRU THIS TO SEE HOW IT WORKS EXACTLY
 
         private static PartTrack GenerateBassTrack(
-            HarmonyTrack harmonyTimeline,
+            HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
             TimeSignatureTrack timeSignatureTrack,
             int ticksPerMeasure,
@@ -69,7 +69,7 @@ namespace Music.Generator
             var randomizer = new PitchRandomizer(settings);
             const int bassOctave = 2;
 
-            var harmonyByBar = harmonyTimeline.Events
+            var harmonyByBar = harmonyTrack.Events
                 .OrderBy(e => e.StartBar)
                 .ThenBy(e => e.StartBeat)
                 .ToList();
@@ -121,7 +121,7 @@ namespace Music.Generator
         }
 
         private static PartTrack GenerateGuitarTrack(
-            HarmonyTrack harmonyTimeline,
+            HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
             TimeSignatureTrack timeSignatureTrack,
             int ticksPerMeasure,
@@ -133,7 +133,7 @@ namespace Music.Generator
             int? previousPitchClass = null;
             const int guitarOctave = 4;
 
-            var harmonyByBar = harmonyTimeline.Events
+            var harmonyByBar = harmonyTrack.Events
                 .OrderBy(e => e.StartBar)
                 .ThenBy(e => e.StartBeat)
                 .ToList();
@@ -273,7 +273,7 @@ namespace Music.Generator
         /// Updated to support groove timeline changes.
         /// </summary>
         private static PartTrack GenerateDrumTrack(
-            HarmonyTrack harmonyTimeline,
+            HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
             TimeSignatureTrack timeSignatureTrack,
             int ticksPerMeasure,

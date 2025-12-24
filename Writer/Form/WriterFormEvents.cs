@@ -475,7 +475,7 @@ namespace Music.Writer
             GridControlLinesManager.AttachSectionTimeline(dgSong, songContext.SectionTrack);
             GridControlLinesManager.AttachTimeSignatureTrack(dgSong, songContext.Song.TimeSignatureTrack);
             GridControlLinesManager.AttachTempoTimeline(dgSong, songContext.Song.TempoTrack);
-            GridControlLinesManager.AttachHarmonyTimeline(dgSong, songContext.HarmonyTrack);
+            GridControlLinesManager.AttachharmonyTrack(dgSong, songContext.HarmonyTrack);
         }
 
         public WriterFormData HandleSetWriterTestScenarioG1(SongContext designer)

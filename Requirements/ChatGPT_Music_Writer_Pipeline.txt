@@ -1451,7 +1451,7 @@ and outputs from the step as a whole (completed before starting step 2).
 
 Define an input class for step 1 and an output class for step 1. Just the field definitions / class hierarchies. No methods. Comment each line. The classes may reference other classes when needed for example Tones class contains List<Tone> tones;
 
-Note: My application has some inputs now SectionTimeline and HarmonyTimeline and they already work together to synchronize multiple parts to the same chord changes in a sample test song. They can be used in the pipeline and/or may need to be modified.
+Note: My application has some inputs now SectionTimeline and harmonyTrack and they already work together to synchronize multiple parts to the same chord changes in a sample test song. They can be used in the pipeline and/or may need to be modified.
 
 Generate the C# code
 ChatGPT said:
@@ -1476,7 +1476,7 @@ namespace MusicGen.Pipeline.Step1_FormEnergy
 
         public SectionTimeline ExistingSectionTimeline; // Optional: if provided, Step 1 can refine/validate instead of generating from scratch.
 
-        public HarmonyTimeline ExistingHarmonyTimeline; // Optional: if provided, Step 1 can align form decisions to known harmonic landmarks.
+        public harmonyTrack ExistingharmonyTrack; // Optional: if provided, Step 1 can align form decisions to known harmonic landmarks.
 
         public TimeGridSpec TimeGrid; // Defines meter/subdivision assumptions for "bar-based" planning (even though harmony is step 2+).
 
@@ -1822,7 +1822,7 @@ namespace MusicGen.Pipeline.Step1_FormEnergy
     /// Existing class in your application (placeholder reference).
     /// Represents chord changes aligned to bars/beats/steps.
     /// </summary>
-    public class HarmonyTimeline
+    public class harmonyTrack
     {
         public List<HarmonySpan> Chords; // Ordered chord spans aligned to timeline positions.
     }
@@ -3047,7 +3047,7 @@ You need the same style helper for harmony so generators can do:
 
 “At bar X beat Y, what harmony event is active?”
 
-You may or may not already have a HarmonyTimeline class—if not, create it in the same style as TempoTimeline/GrooveTimeline.
+You may or may not already have a harmonyTrack class—if not, create it in the same style as TempoTimeline/GrooveTimeline.
 
 Requirements
 Functional requirements
@@ -3069,8 +3069,8 @@ Keep data stored as List<HarmonyEvent> to match your current editing forms.
 Do not introduce chord parsing or chord objects in this story.
 
 Proposed Technical Design
-A) Add/extend HarmonyTimeline
-Create a new HarmonyTimeline class (if you don’t have one already), or extend the existing one, with:
+A) Add/extend harmonyTrack
+Create a new harmonyTrack class (if you don’t have one already), or extend the existing one, with:
 
 Fields
 
@@ -3145,7 +3145,7 @@ throw.
 For agile compatibility, “last one wins” is safer and avoids breaking UI editing.
 
 Implementation Checklist (for the coder)
-Add new file HarmonyTimeline.cs under Music.Designer (or update existing).
+Add new file harmonyTrack.cs under Music.Designer (or update existing).
 
 Implement:
 
@@ -3205,7 +3205,7 @@ Efficient indexing by absolute beat positions if you start querying per 16th not
 
 But for Story 4, keep it minimal: correctness + simple caching.
 
-If you want, I can also provide a “drop-in” story variant that assumes you already have a HarmonyTimeline class (and only adds TryGetAt(bar, beat) + cache fixes) to minimize file churn.
+If you want, I can also provide a “drop-in” story variant that assumes you already have a harmonyTrack class (and only adds TryGetAt(bar, beat) + cache fixes) to minimize file churn.
 
 You said:
 reminder:
@@ -3487,13 +3487,13 @@ The acceptance criteria you corrected is important: the helper returns HarmonyEv
 
 If you want to keep moving in the smallest non-breaking increments, the next 3 stories to implement in order should be:
 
-Story 4: HarmonyTimeline.TryGetAt(bar, beat) returning HarmonyEvent with correct mid-bar behavior + safe caching
+Story 4: harmonyTrack.TryGetAt(bar, beat) returning HarmonyEvent with correct mid-bar behavior + safe caching
 
 GrooveTimeline caching fix: only cache bar-head when StartBeat == 1 (or change to a beat-aware lookup)
 
 Story 5: KeyScale helper that turns the HarmonyEvent into chord tones in key (major only)
 
-When you’re ready, paste your current HarmonyTimeline (if it exists) or the place where HarmonyEvents are stored/queried today, and I’ll adapt the Story 4 spec to match your actual file/class layout exactly (namespaces, patterns, how you’re storing events) so Claude can implement it without guessing.
+When you’re ready, paste your current harmonyTrack (if it exists) or the place where HarmonyEvents are stored/queried today, and I’ll adapt the Story 4 spec to match your actual file/class layout exactly (namespaces, patterns, how you’re storing events) so Claude can implement it without guessing.
 
 You said:
 Regarding story 5:
@@ -3556,7 +3556,7 @@ namespace Music.Designer
         public SectionTimeline SectionTimeline { get; set; } = new();
 
         // Harmony timeline persisted with the design
-        public HarmonyTimeline? HarmonyTimeline { get; set; }
+        public harmonyTrack? harmonyTrack { get; set; }
 
         // New: independent timelines for tempo and time signature
         public TempoTimeline? TempoTimeline { get; set; }
@@ -3797,7 +3797,7 @@ namespace Music.Designer
 namespace Music.Designer
 {
     // Global bar/beat-aligned harmony timeline
-    public class HarmonyTimeline
+    public class harmonyTrack
     {
         private readonly Dictionary<int, HarmonyEvent> _barHeads = new(); // bar -> event active at beat 1
 
@@ -4500,7 +4500,7 @@ namespace Music.Writer
             if (designer != null)
             {
                 GridControlLinesManager.AttachSectionTimeline(dgSong, designer.SectionTimeline);
-                GridControlLinesManager.AttachHarmonyTimeline(dgSong, designer.HarmonyTimeline);
+                GridControlLinesManager.AttachharmonyTrack(dgSong, designer.harmonyTrack);
                 GridControlLinesManager.AttachTimeSignatureTrack(dgSong, designer.TimeSignatureTrack);
                 GridControlLinesManager.AttachTempoTimeline(dgSong, designer.TempoTimeline);
             }
@@ -8351,7 +8351,7 @@ namespace Music.Designer
         // Current global settings
         private int _beatsPerBar = 4;
 
-        public HarmonyTimeline ResultTimeline { get; private set; } = new HarmonyTimeline();
+        public harmonyTrack ResultTimeline { get; private set; } = new harmonyTrack();
 
         // Predefined values
         private static readonly string[] AllKeys = new[]
@@ -8405,7 +8405,7 @@ namespace Music.Designer
             };
         }
 
-        public HarmonyEditorForm(HarmonyTimeline? initial = null)
+        public HarmonyEditorForm(harmonyTrack? initial = null)
         {
             Text = "Edit Harmony Timeline";
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -8637,7 +8637,7 @@ namespace Music.Designer
             cb.EndUpdate();
         }
 
-        private void LoadInitial(HarmonyTimeline? initial)
+        private void LoadInitial(harmonyTrack? initial)
         {
             _working.Clear();
 
@@ -8709,9 +8709,9 @@ namespace Music.Designer
             UpdateButtonsEnabled();
         }
 
-        private HarmonyTimeline BuildResult()
+        private harmonyTrack BuildResult()
         {
-            var tl = new HarmonyTimeline();
+            var tl = new harmonyTrack();
             tl.ConfigureGlobal($"{_beatsPerBar}/4");
             foreach (var w in _working)
             {

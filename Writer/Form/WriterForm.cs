@@ -169,7 +169,7 @@ namespace Music.Writer
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
                     _songContext.HarmonyTrack = dlg.ResultTimeline;
-                    GridControlLinesManager.AttachHarmonyTimeline(dgSong, _songContext.HarmonyTrack);
+                    GridControlLinesManager.AttachharmonyTrack(dgSong, _songContext.HarmonyTrack);
                 }
 
                 return;

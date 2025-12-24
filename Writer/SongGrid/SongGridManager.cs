@@ -232,7 +232,7 @@ namespace Music.Writer
             if (songContext != null)
             {
                 GridControlLinesManager.AttachSectionTimeline(dgSong, songContext.SectionTrack);
-                GridControlLinesManager.AttachHarmonyTimeline(dgSong, songContext.HarmonyTrack);
+                GridControlLinesManager.AttachharmonyTrack(dgSong, songContext.HarmonyTrack);
                 GridControlLinesManager.AttachTimeSignatureTrack(dgSong, songContext.Song.TimeSignatureTrack);
                 GridControlLinesManager.AttachTempoTimeline(dgSong, songContext.Song.TempoTrack);
             }

@@ -46,16 +46,16 @@
 //            }
 
 //            // Harmony timeline: preserve order and values
-//            if (dto.HarmonyTimeline != null)
+//            if (dto.harmonyTrack != null)
 //            {
 //                var tl = new HarmonyTrack
 //                {
-//                    BeatsPerBar = dto.HarmonyTimeline.BeatsPerBar > 0 ? dto.HarmonyTimeline.BeatsPerBar : 4
+//                    BeatsPerBar = dto.harmonyTrack.BeatsPerBar > 0 ? dto.harmonyTrack.BeatsPerBar : 4
 //                    // TempoBpm removed from HarmonyTrack; dto.HarmonyTrack.TempoBpm is ignored (migrated to TempoTrack separately)
 //                };
-//                if (dto.HarmonyTimeline.Events != null)
+//                if (dto.harmonyTrack.Events != null)
 //                {
-//                    foreach (var e in dto.HarmonyTimeline.Events)
+//                    foreach (var e in dto.harmonyTrack.Events)
 //                    {
 //                        tl.Events.Add(new HarmonyEvent
 //                        {
@@ -83,7 +83,7 @@
 //            public string? DesignId { get; set; }
 //            public VoiceSetDto? VoiceSet { get; set; }
 //            public SectionSetDto? SectionSet { get; set; }
-//            public HarmonyTimelineDto? HarmonyTimeline { get; set; }
+//            public harmonyTrackDto? harmonyTrack { get; set; }
 //        }
 
 //        private sealed class VoiceSetDto
@@ -106,7 +106,7 @@
 //            public Guid Id { get; set; }
 //        }
 
-//        private sealed class HarmonyTimelineDto
+//        private sealed class harmonyTrackDto
 //        {
 //            public int BeatsPerBar { get; set; }
 //            // Deprecated: was stored alongside Harmony; retained for back-compat but ignored here.

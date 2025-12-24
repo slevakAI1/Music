@@ -102,17 +102,17 @@ namespace Music.Writer
 
         #endregion
 
-        #region AttachHarmonyTimeline
+        #region AttachharmonyTrack
 
         /// <summary>
         /// Public helper to attach a HarmonyTrack instance to the fixed Harmony row's hidden data cell.
         /// Safe to call anytime after the grid's columns and rows have been created.
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="harmonyTimeline">HarmonyTrack to store in the hidden data cell (null to skip)</param>
-        public static void AttachHarmonyTimeline(DataGridView dgSong, HarmonyTrack? harmonyTimeline)
+        /// <param name="harmonyTrack">HarmonyTrack to store in the hidden data cell (null to skip)</param>
+        public static void AttachharmonyTrack(DataGridView dgSong, HarmonyTrack? harmonyTrack)
         {
-            if (harmonyTimeline == null)
+            if (harmonyTrack == null)
                 return;
 
             if (!dgSong.Columns.Contains("colData"))
@@ -122,7 +122,7 @@ namespace Music.Writer
                 return;
 
             // Populate the harmony row with the timeline data
-            PopulateHarmonyRow(dgSong, harmonyTimeline);
+            PopulateHarmonyRow(dgSong, harmonyTrack);
         }
 
         /// <summary>
@@ -130,11 +130,11 @@ namespace Music.Writer
         /// Multiple chords per measure are separated by line breaks.
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="harmonyTimeline">HarmonyTrack containing harmony events</param>
-        private static void PopulateHarmonyRow(DataGridView dgSong, HarmonyTrack harmonyTimeline)
+        /// <param name="harmonyTrack">HarmonyTrack containing harmony events</param>
+        private static void PopulateHarmonyRow(DataGridView dgSong, HarmonyTrack harmonyTrack)
         {
             // Store the timeline in the hidden data cell
-            dgSong.Rows[SongGridManager.FIXED_ROW_HARMONY].Cells["colData"].Value = harmonyTimeline;
+            dgSong.Rows[SongGridManager.FIXED_ROW_HARMONY].Cells["colData"].Value = harmonyTrack;
 
             // Clear all existing measure cells in the harmony row
             for (int colIndex = SongGridManager.MEASURE_START_COLUMN_INDEX; colIndex < dgSong.Columns.Count; colIndex++)
@@ -142,11 +142,11 @@ namespace Music.Writer
                 dgSong.Rows[SongGridManager.FIXED_ROW_HARMONY].Cells[colIndex].Value = string.Empty;
             }
 
-            if (harmonyTimeline.Events.Count == 0)
+            if (harmonyTrack.Events.Count == 0)
                 return;
 
             // Group harmony events by the bar they start in
-            var eventsByBar = harmonyTimeline.Events
+            var eventsByBar = harmonyTrack.Events
                 .GroupBy(evt => evt.StartBar)
                 .OrderBy(g => g.Key)
                 .ToList();
