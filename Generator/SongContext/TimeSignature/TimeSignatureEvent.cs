@@ -10,5 +10,9 @@ namespace Music.Generator
         // Time signature numerator/denominator
         public int Numerator { get; init; } = 4;
         public int Denominator { get; init; } = 4;
+
+        // Computed properties
+        
+        // int ticksPerMeasure = (MusicConstants.ticksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
     }
 }
