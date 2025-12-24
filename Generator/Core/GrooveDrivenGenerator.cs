@@ -161,9 +161,9 @@ namespace Music.Generator
 
 
                 // NOTE TO DO - ticks per measure can vary based on the time signature events
-                // The loop that writes notes will need to get this value from the time signature active in each bar as it loops
+                // The loops that write notes will need to get this value from the time signature active in each bar as it loops
                 // this could be tricky. Example ticksPerMeasure will be different for 3/4 vs 4/4 time signatures
-                // that can occur in the same track.
+                // that can occur in the same track. Same goes for all these tracks.
                 //
 
                 int measureStartTick = (bar - 1) * ticksPerMeasure;
