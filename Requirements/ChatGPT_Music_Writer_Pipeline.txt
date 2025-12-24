@@ -1451,7 +1451,7 @@ and outputs from the step as a whole (completed before starting step 2).
 
 Define an input class for step 1 and an output class for step 1. Just the field definitions / class hierarchies. No methods. Comment each line. The classes may reference other classes when needed for example Tones class contains List<Tone> tones;
 
-Note: My application has some inputs now SectionTimeline and harmonyTrack and they already work together to synchronize multiple parts to the same chord changes in a sample test song. They can be used in the pipeline and/or may need to be modified.
+Note: My application has some inputs now sectionTrack and harmonyTrack and they already work together to synchronize multiple parts to the same chord changes in a sample test song. They can be used in the pipeline and/or may need to be modified.
 
 Generate the C# code
 ChatGPT said:
@@ -1474,7 +1474,7 @@ namespace MusicGen.Pipeline.Step1_FormEnergy
 
         public GenreProfile Genre; // Genre priors (ranges + preferences) used to sample form and energy behaviors.
 
-        public SectionTimeline ExistingSectionTimeline; // Optional: if provided, Step 1 can refine/validate instead of generating from scratch.
+        public sectionTrack ExistingsectionTrack; // Optional: if provided, Step 1 can refine/validate instead of generating from scratch.
 
         public harmonyTrack ExistingharmonyTrack; // Optional: if provided, Step 1 can align form decisions to known harmonic landmarks.
 
@@ -1662,7 +1662,7 @@ namespace MusicGen.Pipeline.Step1_FormEnergy
     {
         public int SeedUsed; // Seed actually used (useful if Step 1 re-seeds internally).
 
-        public SectionTimeline SectionTimeline; // The generated/validated section plan with bar ranges per section.
+        public sectionTrack sectionTrack; // The generated/validated section plan with bar ranges per section.
 
         public EnergyTimeline EnergyTimeline; // Energy curves indexed over the timeline (bar/beat/step resolution).
 
@@ -1756,7 +1756,7 @@ namespace MusicGen.Pipeline.Step1_FormEnergy
     // =========================
 
     /// <summary>
-    /// Section type enumeration used by SectionTimeline.
+    /// Section type enumeration used by sectionTrack.
     /// </summary>
     public enum SectionType
     {
@@ -1802,7 +1802,7 @@ namespace MusicGen.Pipeline.Step1_FormEnergy
     /// Existing class in your application (placeholder reference).
     /// Represents section boundaries and ordering aligned to bars.
     /// </summary>
-    public class SectionTimeline
+    public class sectionTrack
     {
         public List<SectionSpan> Sections; // Ordered sections with start/end in bars (and optionally beats/steps).
     }
@@ -1906,9 +1906,9 @@ namespace Music.Designer
 
 namespace Music.Designer
 {
-    // The SectionTimeline contains an order list of Sections that constitutes an entire song.
+    // The sectionTrack contains an order list of Sections that constitutes an entire song.
 
-    public class SectionTimeline
+    public class sectionTrack
     {
         public List<Section> Sections { get; set; } = new();
 
@@ -2488,7 +2488,7 @@ Implementation approach
 
 For each SectionType, build a SectionPattern object that stores generated notes relative to section start (bar offsets).
 
-For each Section instance in SectionTimeline:
+For each Section instance in sectionTrack:
 
 Copy the pattern notes into absolute time positions (bar = section.StartBar + offset).
 
@@ -3041,7 +3041,7 @@ You already have:
 
 HarmonyEvent with StartBar, StartBeat, and musical fields (Key, Degree, Quality, Bass)
 
-SectionTimeline and TempoTrack with a fast bar-head lookup cache pattern
+sectionTrack and TempoTrack with a fast bar-head lookup cache pattern
 
 You need the same style helper for harmony so generators can do:
 
@@ -3380,7 +3380,7 @@ Implementation approach
 
 For each SectionType, build a SectionPattern object that stores generated notes relative to section start (bar offsets).
 
-For each Section instance in SectionTimeline:
+For each Section instance in sectionTrack:
 
 Copy the pattern notes into absolute time positions (bar = section.StartBar + offset).
 
@@ -3553,7 +3553,7 @@ namespace Music.Designer
         // Design Space
         public VoiceSet Voices { get; set; } = new();
 
-        public SectionTimeline SectionTimeline { get; set; } = new();
+        public sectionTrack sectionTrack { get; set; } = new();
 
         // Harmony timeline persisted with the design
         public harmonyTrack? harmonyTrack { get; set; }
@@ -3920,9 +3920,9 @@ namespace Music.Designer
 
 namespace Music.Designer
 {
-    // The SectionTimeline contains an order list of Sections that constitutes an entire song.
+    // The sectionTrack contains an order list of Sections that constitutes an entire song.
 
-    public class SectionTimeline
+    public class sectionTrack
     {
         public List<Section> Sections { get; set; } = new();
 
@@ -4499,7 +4499,7 @@ namespace Music.Writer
             // Delegate attaching the control lines to the control line manager class
             if (designer != null)
             {
-                GridControlLinesManager.AttachSectionTimeline(dgSong, designer.SectionTimeline);
+                GridControlLinesManager.AttachsectionTrack(dgSong, designer.sectionTrack);
                 GridControlLinesManager.AttachharmonyTrack(dgSong, designer.harmonyTrack);
                 GridControlLinesManager.AttachTimeSignatureTrack(dgSong, designer.TimeSignatureTrack);
                 GridControlLinesManager.AttachTempoTrack(dgSong, designer.TempoTrack);

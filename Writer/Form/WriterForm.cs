@@ -151,7 +151,7 @@ namespace Music.Writer
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
                     _songContext.SectionTrack = dlg.ResultSections;
-                    GridControlLinesManager.AttachSectionTimeline(dgSong, _songContext.SectionTrack);
+                    GridControlLinesManager.AttachsectionTrack(dgSong, _songContext.SectionTrack);
                 }
 
                 return;

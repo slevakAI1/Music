@@ -231,7 +231,7 @@ namespace Music.Writer
             // Delegate attaching the control lines to the control line manager class
             if (songContext != null)
             {
-                GridControlLinesManager.AttachSectionTimeline(dgSong, songContext.SectionTrack);
+                GridControlLinesManager.AttachsectionTrack(dgSong, songContext.SectionTrack);
                 GridControlLinesManager.AttachharmonyTrack(dgSong, songContext.HarmonyTrack);
                 GridControlLinesManager.AttachTimeSignatureTrack(dgSong, songContext.Song.TimeSignatureTrack);
                 GridControlLinesManager.AttachTempoTrack(dgSong, songContext.Song.TempoTrack);

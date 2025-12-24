@@ -9,17 +9,17 @@ namespace Music.Writer
     internal static class GridControlLinesManager
     {
 
-        #region AttachSectionTimeline
+        #region AttachsectionTrack
 
         /// <summary>
         /// Public helper to attach a SectionTrack instance to the fixed Section row's hidden data cell.
         /// Safe to call anytime after the grid's columns and rows have been created.
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="sectionTimeline">SectionTrack to store in the hidden data cell (null to skip)</param>
-        public static void AttachSectionTimeline(DataGridView dgSong, SectionTrack? sectionTimeline)
+        /// <param name="sectionTrack">SectionTrack to store in the hidden data cell (null to skip)</param>
+        public static void AttachsectionTrack(DataGridView dgSong, SectionTrack? sectionTrack)
         {
-            if (sectionTimeline == null)
+            if (sectionTrack == null)
                 return;
 
             if (!dgSong.Columns.Contains("colData"))
@@ -29,18 +29,18 @@ namespace Music.Writer
                 return;
 
             // Populate the section row with the timeline data
-            PopulateSectionRow(dgSong, sectionTimeline);
+            PopulateSectionRow(dgSong, sectionTrack);
         }
 
         /// <summary>
         /// Populates the fixed Section row with section numbers at their respective measure positions.
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="sectionTimeline">SectionTrack containing section events</param>
-        private static void PopulateSectionRow(DataGridView dgSong, SectionTrack sectionTimeline)
+        /// <param name="sectionTrack">SectionTrack containing section events</param>
+        private static void PopulateSectionRow(DataGridView dgSong, SectionTrack sectionTrack)
         {
             // Store the timeline in the hidden data cell
-            dgSong.Rows[SongGridManager.FIXED_ROW_SECTION].Cells["colData"].Value = sectionTimeline;
+            dgSong.Rows[SongGridManager.FIXED_ROW_SECTION].Cells["colData"].Value = sectionTrack;
 
             // Clear all existing measure cells in the section row
             for (int colIndex = SongGridManager.MEASURE_START_COLUMN_INDEX; colIndex < dgSong.Columns.Count; colIndex++)
@@ -48,11 +48,11 @@ namespace Music.Writer
                 dgSong.Rows[SongGridManager.FIXED_ROW_SECTION].Cells[colIndex].Value = string.Empty;
             }
 
-            if (sectionTimeline.Sections.Count == 0)
+            if (sectionTrack.Sections.Count == 0)
                 return;
 
             // Calculate total measures needed
-            int totalMeasures = sectionTimeline.TotalBars;
+            int totalMeasures = sectionTrack.TotalBars;
 
             // Ensure we have enough columns for all measures
             int requiredColumns = SongGridManager.MEASURE_START_COLUMN_INDEX + totalMeasures;
@@ -74,9 +74,9 @@ namespace Music.Writer
             }
 
             // Populate measure cells with section numbers
-            for (int sectionIndex = 0; sectionIndex < sectionTimeline.Sections.Count; sectionIndex++)
+            for (int sectionIndex = 0; sectionIndex < sectionTrack.Sections.Count; sectionIndex++)
             {
-                var section = sectionTimeline.Sections[sectionIndex];
+                var section = sectionTrack.Sections[sectionIndex];
                 int sectionNumber = sectionIndex + 1; // 1-based section number
 
                 // Iterate through each bar in this section
