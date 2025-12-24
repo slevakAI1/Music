@@ -11,14 +11,11 @@ namespace Music.Writer
         /// <summary>
         /// Extracts all repeating note parameters from form data.
         /// </summary>
-        public static (int noteNumber, int noteDurationTicks, int repeatCount, bool isRest)
+        public static (int noteNumber, int noteDurationTicks, int repeatCount)
             GetRepeatingNotesParameters(WriterFormData formData)
         {
             // Extract repeat count
             var repeatCount = formData.NumberOfNotes ?? 1;
-
-            // Extract rest flag
-            var isRest = formData.IsRest ?? false;
 
             // Calculate MIDI note number from step, accidental, and octave
             var noteNumber = CalculateMidiNoteNumber(
@@ -34,7 +31,7 @@ namespace Music.Writer
                 formData.TupletCount ?? 0,
                 formData.TupletOf ?? 0);
 
-            return (noteNumber, noteDurationTicks, repeatCount, isRest);
+            return (noteNumber, noteDurationTicks, repeatCount);
         }
 
         /// <summary>

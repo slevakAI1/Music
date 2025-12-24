@@ -19,15 +19,14 @@ namespace Music.Writer
             if (!ValidateSongTracksSelected(dgSong))
                 return;
 
-            var (noteNumber, noteDurationTicks, repeatCount, isRest) =
+            var (noteNumber, noteDurationTicks, repeatCount) =
                 MusicCalculations.GetRepeatingNotesParameters(formData);
 
             var partTrack = CreateRepeatingNotes.Execute(
                 noteNumber: noteNumber,
                 noteDurationTicks: noteDurationTicks,
                 repeatCount: repeatCount,
-                noteOnVelocity: 100,
-                isRest: isRest);
+                noteOnVelocity: 100);
 
             // Append the partTrack notes to all selected rows
             AppendSongTrackNoteEventsToSelectedRows(dgSong, partTrack);

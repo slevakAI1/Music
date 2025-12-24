@@ -58,7 +58,6 @@ namespace Music.Writer
             lblOctaveAbs = new Label();
             numOctaveAbs = new NumericUpDown();
             rbChord = new RadioButton();
-            rbIsRest = new RadioButton();
             rbPitchAbsolute = new RadioButton();
             rbPitchKeyRelative = new RadioButton();
             grpAbsolute = new GroupBox();
@@ -193,7 +192,6 @@ namespace Music.Writer
             grpPitch.Controls.Add(lblOctaveAbs);
             grpPitch.Controls.Add(numOctaveAbs);
             grpPitch.Controls.Add(rbChord);
-            grpPitch.Controls.Add(rbIsRest);
             grpPitch.Controls.Add(rbPitchAbsolute);
             grpPitch.Controls.Add(rbPitchKeyRelative);
             grpPitch.Controls.Add(grpAbsolute);
@@ -327,16 +325,6 @@ namespace Music.Writer
             rbChord.Size = new Size(58, 19);
             rbChord.TabIndex = 5;
             rbChord.Text = "Chord";
-            // 
-            // rbIsRest
-            // 
-            rbIsRest.AutoSize = true;
-            rbIsRest.ForeColor = Color.FromArgb(0, 192, 0);
-            rbIsRest.Location = new Point(14, 21);
-            rbIsRest.Name = "rbIsRest";
-            rbIsRest.Size = new Size(47, 19);
-            rbIsRest.TabIndex = 4;
-            rbIsRest.Text = "Rest";
             // 
             // rbPitchAbsolute
             // 
@@ -900,7 +888,6 @@ namespace Music.Writer
         private NumericUpDown numNumberOfNotes;
         private Button btnSetWriterTestScenarioG1;
         private Button btnSetDesignTestScenarioD1;
-        private RadioButton rbIsRest;
         private Button btnChordTest;
         private RadioButton rbChord;
         private Label lblQuality;

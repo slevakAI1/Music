@@ -234,8 +234,7 @@ namespace Music.Writer
                             noteNumber: note.NoteNumber,
                             absolutePositionTicks: note.AbsolutePositionTicks + offset,
                             noteDurationTicks: note.NoteDurationTicks,
-                            noteOnVelocity: note.NoteOnVelocity,
-                            isRest: note.IsRest);
+                            noteOnVelocity: note.NoteOnVelocity);
 
                         existingTrack.PartTrackNoteEvents.Add(adjustedNote);
                     }

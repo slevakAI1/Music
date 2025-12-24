@@ -69,8 +69,7 @@ namespace Music.Writer
                     noteNumber: noteNumber,
                     absolutePositionTicks: 0, // Will be set by the calling code
                     noteDurationTicks: noteDurationTicks,
-                    noteOnVelocity: 100,
-                    isRest: false);
+                    noteOnVelocity: 100);
                 
                 // Attach chord metadata
                 songTrackNoteEvent.songTrackChord = songTrackChord;

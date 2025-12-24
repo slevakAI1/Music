@@ -73,8 +73,6 @@ namespace Music.Generator
     /// </summary>
     public sealed class PartTrackNoteEvent
     {
-        public bool IsRest { get; set; }
-
         // MIDI-related.  480 ticks / quarter note is standard
         public int NoteNumber { get; set; } // note volume
         public int AbsolutePositionTicks { get; set; } //  note start
@@ -100,20 +98,15 @@ namespace Music.Generator
             int noteNumber,
             int absolutePositionTicks,
             int noteDurationTicks,
-            int noteOnVelocity = 100,
-            bool isRest = false)
+            int noteOnVelocity = 100)
         {
             NoteNumber = noteNumber;
             AbsolutePositionTicks = absolutePositionTicks;
             NoteDurationTicks = noteDurationTicks;
             NoteOnVelocity = noteOnVelocity;
-            IsRest = isRest;
 
             // Calculate metadata fields from MIDI properties
-            if (!isRest)
-            {
-                (Step, Alter, Octave) = MusicCalculations.CalculatePitch(noteNumber);
-            }
+            (Step, Alter, Octave) = MusicCalculations.CalculatePitch(noteNumber);
             (Duration, Dots, TupletActualNotes, TupletNormalNotes) = MusicCalculations.CalculateRhythm(noteDurationTicks);
         }
     }

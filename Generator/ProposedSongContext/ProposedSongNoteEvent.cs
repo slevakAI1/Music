@@ -28,12 +28,6 @@ namespace Music.Generator
         /// </summary>
         public int Velocity { get; set; }
 
-        // TO DO - CHECK WITH AI IF THIS IS REALLY NEEDED. HAS NO MIDI EQUIVALENT. ONLY NOTES EXIST.
-        /// <summary>
-        /// Whether this is a rest (placeholder for timing).
-        /// </summary>
-        public bool IsRest { get; set; }
-
         // ============ Musical Context Metadata ============
 
         /// <summary>

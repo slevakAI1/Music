@@ -190,8 +190,7 @@ namespace Music.Writer
                 noteNumber,
                 absolutePositionTicks,
                 noteDurationTicks,
-                velocity,
-                isRest: false);
+                velocity);
 
             songTrackNotes.Add(songTrackNoteEvent);
         }

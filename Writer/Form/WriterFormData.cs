@@ -26,7 +26,6 @@ namespace Music.Writer
         private int? _octaveAbsolute;
         private int? _degreeKeyRelative;
         private int? _octaveKeyRelative;
-        private bool? _isRest;
         private bool? _isChord; // new backing field
         private string? _chordKey;
         private int? _chordDegree;
@@ -105,18 +104,10 @@ namespace Music.Writer
             set => _pitchAbsolute = value;
         } // true = Absolute, false = Key-relative
 
-        // Changed from char? to char. Default to '\0' when IsRest is true.
         public char Step
         {
             get => _step;
             set => _step = value;
-        }
-
-        // Single added field: track IsRest radiobutton state
-        public bool? IsRest
-        {
-            get => _isRest;
-            set => _isRest = value;
         }
 
         // New: track whether Chord radio button is selected

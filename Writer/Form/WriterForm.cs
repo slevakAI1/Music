@@ -72,7 +72,7 @@ namespace Music.Writer
             // This will only be done once, at form construction time.
             var transform = new WriterFormTransform();
             _writer ??= transform.CaptureFormData(
-                cbCommand, clbParts, clbStaffs, rbIsRest, rbChord, cbStep,
+                cbCommand, clbParts, clbStaffs, rbChord, cbStep,
                 rbPitchAbsolute, rbPitchKeyRelative, cbAccidental, numOctaveAbs,
                 numDegree, cbChordKey, numChordDegree, cbChordQuality, cbChordBase,
                 cbNoteValue, numDots, txtTupletNumber, numTupletCount, numTupletOf, numNumberOfNotes);
@@ -257,7 +257,7 @@ namespace Music.Writer
 
             var transform = new WriterFormTransform();
             transform.ApplyFormData(_writer,
-                cbCommand, clbParts, clbStaffs, rbIsRest, rbChord, cbStep,
+                cbCommand, clbParts, clbStaffs, rbChord, cbStep,
                 rbPitchAbsolute, rbPitchKeyRelative, cbAccidental, numOctaveAbs,
                 numDegree, cbChordKey, numChordDegree, cbChordQuality, cbChordBase,
                 cbNoteValue, numDots, txtTupletNumber, numTupletCount, numTupletOf, numNumberOfNotes);
@@ -272,7 +272,7 @@ namespace Music.Writer
             Globals.SongContext = _songContext;
             var transform = new WriterFormTransform();
             _writer = Globals.Writer = transform.CaptureFormData(
-                cbCommand, clbParts, clbStaffs, rbIsRest, rbChord, cbStep,
+                cbCommand, clbParts, clbStaffs, rbChord, cbStep,
                 rbPitchAbsolute, rbPitchKeyRelative, cbAccidental, numOctaveAbs,
                 numDegree, cbChordKey, numChordDegree, cbChordQuality, cbChordBase,
                 cbNoteValue, numDots, txtTupletNumber, numTupletCount, numTupletOf, numNumberOfNotes);
@@ -309,7 +309,7 @@ namespace Music.Writer
             _writer = _eventHandlers.HandleSetWriterTestScenarioG1(_songContext);
             var transform = new WriterFormTransform();
             transform.ApplyFormData(_writer,
-                cbCommand, clbParts, clbStaffs, rbIsRest, rbChord, cbStep,
+                cbCommand, clbParts, clbStaffs, rbChord, cbStep,
                 rbPitchAbsolute, rbPitchKeyRelative, cbAccidental, numOctaveAbs,
                 numDegree, cbChordKey, numChordDegree, cbChordQuality, cbChordBase,
                 cbNoteValue, numDots, txtTupletNumber, numTupletCount, numTupletOf, numNumberOfNotes);
@@ -334,7 +334,7 @@ namespace Music.Writer
             // Capture form data once at the higher level and pass to command handlers
             var transform = new WriterFormTransform();
             var formData = transform.CaptureFormData(
-                cbCommand, clbParts, clbStaffs, rbIsRest, rbChord, cbStep,
+                cbCommand, clbParts, clbStaffs, rbChord, cbStep,
                 rbPitchAbsolute, rbPitchKeyRelative, cbAccidental, numOctaveAbs,
                 numDegree, cbChordKey, numChordDegree, cbChordQuality, cbChordBase,
                 cbNoteValue, numDots, txtTupletNumber, numTupletCount, numTupletOf, numNumberOfNotes);

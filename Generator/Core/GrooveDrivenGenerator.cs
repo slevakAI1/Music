@@ -112,8 +112,7 @@ namespace Music.Generator
                         noteNumber: midiNote,
                         absolutePositionTicks: onsetTick,
                         noteDurationTicks: duration,
-                        noteOnVelocity: 95,
-                        isRest: false));
+                        noteOnVelocity: 95));
                 }
             }
 
@@ -184,8 +183,7 @@ namespace Music.Generator
                         noteNumber: midiNote,
                         absolutePositionTicks: onsetTick,
                         noteDurationTicks: duration,
-                        noteOnVelocity: 85,
-                        isRest: false));
+                        noteOnVelocity: 85));
 
                     previousPitchClass = pitchClass;
                 }
@@ -257,8 +255,7 @@ namespace Music.Generator
                             noteNumber: midiNote,
                             absolutePositionTicks: onsetTick,
                             noteDurationTicks: duration,
-                            noteOnVelocity: 75,
-                            isRest: false));
+                            noteOnVelocity: 75));
                     }
                 }
 
@@ -310,8 +307,7 @@ namespace Music.Generator
                             noteNumber: kickNote,
                             absolutePositionTicks: onsetTick,
                             noteDurationTicks: MusicConstants.TicksPerQuarterNote,
-                            noteOnVelocity: velocity,
-                            isRest: false));
+                            noteOnVelocity: velocity));
                     }
                 }
 
@@ -328,8 +324,7 @@ namespace Music.Generator
                             noteNumber: snareNote,
                             absolutePositionTicks: onsetTick,
                             noteDurationTicks: MusicConstants.TicksPerQuarterNote,
-                            noteOnVelocity: velocity,
-                            isRest: false));
+                            noteOnVelocity: velocity));
                     }
                 }
 
@@ -346,8 +341,7 @@ namespace Music.Generator
                             noteNumber: closedHiHatNote,
                             absolutePositionTicks: onsetTick,
                             noteDurationTicks: MusicConstants.TicksPerQuarterNote / 2, // shorter duration for hi-hat
-                            noteOnVelocity: velocity,
-                            isRest: false));
+                            noteOnVelocity: velocity));
                     }
                 }
             }

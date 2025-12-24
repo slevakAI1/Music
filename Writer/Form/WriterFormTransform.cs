@@ -8,7 +8,6 @@
             ComboBox? cbCommand,
             CheckedListBox? clbParts,
             CheckedListBox? clbStaffs,
-            RadioButton rbIsRest,
             RadioButton rbChord,
             ComboBox? cbStep,
             RadioButton? rbPitchAbsolute,
@@ -54,19 +53,18 @@
                 }
             }
 
-            // Determine step selection and Rest handling
+            // Determine step selection
             string? stepSelected = cbStep?.SelectedItem?.ToString();
-            // Assume IsRest radiobutton exists; read its checked state directly.
-            var isRest = rbIsRest.Checked;
             // Capture chord radio button state
             var isChord = rbChord.Checked;
 
+            // TO DO stepchar = " " at program startup. is there a better way?
+            // I think this whole class needs to go.
+
             // Execute step string to char (use '\0' for Rest)
-            char stepChar = '\0';
-            if (!isRest && !string.IsNullOrWhiteSpace(stepSelected))
-            {
+            char stepChar = ' ';
+            if (!string.IsNullOrWhiteSpace(stepSelected))
                 stepChar = stepSelected[0];
-            }
 
             // Capture tuplet number from textbox; map empty string to null
             string? tupletNumber = txtTupletNumber?.Text;
@@ -89,7 +87,6 @@
                 PitchAbsolute = rbPitchAbsolute?.Checked ?? true,
                 // Step is now char type; '\0' when Rest is selected
                 Step = stepChar,
-                IsRest = isRest,
                 IsChord = isChord,
                 Accidental = cbAccidental?.SelectedItem?.ToString(),
                 OctaveAbsolute = (int?)(numOctaveAbs?.Value ?? 4),
@@ -119,7 +116,6 @@
             ComboBox? cbCommand,
             CheckedListBox? clbParts,
             CheckedListBox? clbStaffs,
-            RadioButton rbIsRest,
             RadioButton rbChord,
             ComboBox? cbStep,
             RadioButton? rbPitchAbsolute,
@@ -207,29 +203,14 @@
                 rbPitchKeyRelative.Checked = !data.PitchAbsolute.Value;
             }
 
-            // Set IsRest radiobutton state from data
-            if (data.IsRest.HasValue)
-                rbIsRest.Checked = data.IsRest.Value;
-
             // Restore chord radiobutton state from data
             if (data.IsChord.HasValue)
                 rbChord.Checked = data.IsChord.Value;
+            //  convert the char Step to string for selection.
 
-            // If IsRest is true (assume "Rest" exists in cbStep items), select it directly.
-            // Otherwise, convert the char Step to string for selection.
-            if (cbStep != null)
-            {
-                if (data.IsRest == true)
-                {
-                    cbStep.SelectedItem = "Rest";
-                }
-                else if (data.Step != '\0')
-                {
-                    string stepString = data.Step.ToString();
-                    if (cbStep.Items.Contains(stepString))
-                        cbStep.SelectedItem = stepString;
-                }
-            }
+            string stepString = data.Step.ToString();
+            if (cbStep.Items.Contains(stepString))
+                cbStep.SelectedItem = stepString;
 
             if (data.Accidental != null && cbAccidental != null && cbAccidental.Items.Contains(data.Accidental))
                 cbAccidental.SelectedItem = data.Accidental;

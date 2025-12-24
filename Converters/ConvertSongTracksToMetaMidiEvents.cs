@@ -55,12 +55,6 @@ namespace Music.Writer
             // Process each note in the songTrack
             foreach (var songTrackNoteEvent in songTrack.PartTrackNoteEvents ?? Enumerable.Empty<PartTrackNoteEvent>())
             {
-                if (songTrackNoteEvent.IsRest)
-                {
-                    // Rests don't create MIDI events, timing is already handled by AbsolutePositionTicks
-                    continue;
-                }
-
                 // Check if this note is part of a chord that needs expansion
                 if (songTrackNoteEvent.songTrackChord != null && songTrackNoteEvent.songTrackChord.IsChord)
                 {

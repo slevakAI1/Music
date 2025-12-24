@@ -12,14 +12,12 @@ namespace Music.Generator
         /// <param name="repeatCount">Number of times to repeat the note.</param>
         /// <param name="noteDurationTicks">Duration of each note in MIDI ticks. Default is 480 (quarter note).</param>
         /// <param name="noteOnVelocity">MIDI velocity (0-127). Default is 100.</param>
-        /// <param name="isRest">Whether the note should be treated as a rest. Default is false.</param>
         /// <returns>A PartTrack object containing the repeating notes.</returns>
         public static PartTrack Execute(
             int noteNumber,
             int noteDurationTicks,
             int repeatCount,
-            int noteOnVelocity = 100,
-            bool isRest = false)
+            int noteOnVelocity = 100)
         {
             var SongTrackNoteEvents = new List<PartTrackNoteEvent>();
             int currentPosition = 0;
@@ -30,8 +28,7 @@ namespace Music.Generator
                     noteNumber: noteNumber,
                     absolutePositionTicks: currentPosition,
                     noteDurationTicks: noteDurationTicks,
-                    noteOnVelocity: noteOnVelocity,
-                    isRest: isRest);
+                    noteOnVelocity: noteOnVelocity);
 
                 SongTrackNoteEvents.Add(songTrackNoteEvent);
                 currentPosition += noteDurationTicks;
