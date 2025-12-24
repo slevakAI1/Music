@@ -30,7 +30,13 @@ namespace Music.Generator
 
             return new GeneratorResult
             {
-                BassTrack = GenerateBassTrack(songContext.HarmonyTrack, songContext.GrooveTrack, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
+                BassTrack = GenerateBassTrack(songContext.HarmonyTrack, 
+                    songContext.GrooveTrack, 
+                    ticksPerQuarterNote,
+                    ticksPerMeasure, 
+                    totalBars, 
+                    settings),
+
                 GuitarTrack = GenerateGuitarTrack(songContext.HarmonyTrack, songContext.GrooveTrack, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
                 KeysTrack = GenerateKeysTrack(songContext.HarmonyTrack, songContext.GrooveTrack, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
                 DrumTrack = GenerateDrumTrack(songContext.HarmonyTrack, songContext.GrooveTrack, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings)
