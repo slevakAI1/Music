@@ -12,7 +12,12 @@ namespace Music.Generator
         public int Denominator { get; init; } = 4;
 
         // Computed properties
-        
-        // int ticksPerMeasure = (MusicConstants.ticksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
+        private int? _ticksPerMeasure;
+
+        /// <summary>
+        /// Ticks per measure calculated once and cached.
+        /// Formula: ticksPerQuarterNote * (numerator * 4 / denominator)
+        /// </summary>
+        public int TicksPerMeasure => _ticksPerMeasure ??= (MusicConstants.TicksPerQuarterNote * 4 * Numerator) / Denominator;
     }
 }
