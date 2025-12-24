@@ -36,7 +36,7 @@ namespace Music.Designer
         // Suppress feedback updates while programmatically changing editor controls
         private bool _suppressEditorApply;
 
-        public TimeSignatureTrack ResultTimeline { get; private set; } = new TimeSignatureTrack();
+        public TimeSignatureTrack ResultTrack { get; private set; } = new TimeSignatureTrack();
 
         private sealed class WorkingEvent
         {
@@ -124,7 +124,7 @@ namespace Music.Designer
             _btnDuplicate.Click += (s, e) => DuplicateSelected();
             _btnUp.Click += (s, e) => MoveSelected(-1);
             _btnDown.Click += (s, e) => MoveSelected(1);
-            _btnDefaults.Click += (s, e) => ApplyDefaultTimeline();
+            _btnDefaults.Click += (s, e) => ApplyDefaultTrack();
 
             rowButtons.Controls.AddRange(new Control[] { _btnAdd, _btnInsert, _btnDelete, _btnDuplicate, _btnUp, _btnDown });
 
@@ -221,10 +221,10 @@ namespace Music.Designer
             LoadInitial(initial);
             RefreshListView(selectIndex: _working.Count > 0 ? 0 : -1);
 
-            // Build ResultTimeline only when OK
+            // Build ResultTrack only when OK
             _btnOk.Click += (s, e) =>
             {
-                ResultTimeline = BuildResult();
+                ResultTrack = BuildResult();
                 DialogResult = DialogResult.OK;
                 Close();
             };
@@ -565,9 +565,9 @@ namespace Music.Designer
             return tl;
         }
 
-        private void ApplyDefaultTimeline()
+        private void ApplyDefaultTrack()
         {
-            var defaults = TimeSignatureTests.CreateTestTimelineD1();
+            var defaults = TimeSignatureTests.CreateTestTrackD1();
 
             _working.Clear();
             

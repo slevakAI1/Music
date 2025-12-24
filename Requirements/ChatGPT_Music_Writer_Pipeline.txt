@@ -1664,7 +1664,7 @@ namespace MusicGen.Pipeline.Step1_FormEnergy
 
         public sectionTrack sectionTrack; // The generated/validated section plan with bar ranges per section.
 
-        public EnergyTimeline EnergyTimeline; // Energy curves indexed over the track (bar/beat/step resolution).
+        public EnergyTrack EnergyTrack; // Energy curves indexed over the track (bar/beat/step resolution).
 
         public EnergyLandmarks Landmarks; // Named points like "first chorus start", "big lift start", "bridge start".
 
@@ -1677,7 +1677,7 @@ namespace MusicGen.Pipeline.Step1_FormEnergy
     /// Per-time energy plan produced by Step 1.
     /// Designed so later steps can read "targets" rather than guess.
     /// </summary>
-    public class EnergyTimeline
+    public class EnergyTrack
     {
         public EnergyResolution Resolution; // Whether the curve is per-bar, per-beat, or per-step.
 
@@ -2328,7 +2328,7 @@ No code. Just give me an agile plan to implement these requirements. If there ar
 ChatGPT said:
 Here’s an agile plan that keeps your current structure, adds only what you need (harmony + groove), and stays testable at every step. I’m going to assume you already have a Song object somewhere that holds tracks + parts/voices + generated notes, and you have a “test generator” method that currently writes the fixed patterns you described.
 
-The key move: introduce a GrooveTimeline and GroovePattern objects that emit rhythmic onsets, then reuse your existing harmony lookup to pick pitches in-key at those onsets. No critics, no fancy form/hook system beyond “section reuse.”
+The key move: introduce a GrooveTrack and GroovePattern objects that emit rhythmic onsets, then reuse your existing harmony lookup to pick pitches in-key at those onsets. No critics, no fancy form/hook system beyond “section reuse.”
 
 Guiding constraints for all stories
 No breaking changes: keep existing test song generator working until the new one replaces it.
@@ -2347,7 +2347,7 @@ Add new objects
 
 GrooveEvent: StartBar/StartBeat (like TempoEvent), plus a GrooveId or GroovePresetName.
 
-GrooveTimeline: list of GrooveEvents + lookup “active groove at bar” like your TempoTrack.
+GrooveTrack: list of GrooveEvents + lookup “active groove at bar” like your TempoTrack.
 
 GroovePreset / GroovePattern: a definition that can produce onsets for each role.
 
@@ -2511,7 +2511,7 @@ Goal: Groove can change by section or mid-song if user adds groove events later.
 
 Rules
 
-GrooveTimeline returns active groove at each bar.
+GrooveTrack returns active groove at each bar.
 
 When generating a section pattern, it should read groove onsets using the groove active at those bars.
 
@@ -2747,7 +2747,7 @@ namespace Music.Designer
 namespace Music.Designer
 {
     // Global bar/beat-aligned groove track
-    public class GrooveTimeline
+    public class GrooveTrack
     {
         private readonly Dictionary<int, GrooveEvent> _barHeads = new(); // bar -> event active at beat 1
 
@@ -2855,8 +2855,8 @@ absBeats = (bar-1)*BeatsPerBar + (onset-1) (conceptually).
 
 If you later support 16ths, you’ll want 1.25, 1.5, 1.75, etc. That’s where decimal becomes annoying but still usable for MVP.
 
-2) GrooveTimeline: mostly fine, but there’s a real bug with StartBeat
-Your GrooveTimeline is modeled like TempoTrack (“active at bar head”). Good.
+2) GrooveTrack: mostly fine, but there’s a real bug with StartBeat
+Your GrooveTrack is modeled like TempoTrack (“active at bar head”). Good.
 
 But: IndexEventForBars currently indexes _barHeads[evt.StartBar] = evt even if StartBeat != 1.
 That means: if a groove change starts at bar 9 beat 3, asking “what groove is active at bar 9 beat 1?” will incorrectly return the new groove.
@@ -2976,7 +2976,7 @@ That creates predictability + surprise structure without any critic.
 5) Agile plan to add groove randomness (no scope creep)
 Small, non-breaking steps:
 
-Fix GrooveTimeline StartBeat indexing
+Fix GrooveTrack StartBeat indexing
 
 Ensure mid-bar groove events don’t override bar-head lookups.
 
@@ -3047,7 +3047,7 @@ You need the same style helper for harmony so generators can do:
 
 “At bar X beat Y, what harmony event is active?”
 
-You may or may not already have a harmonyTrack class—if not, create it in the same style as TempoTrack/GrooveTimeline.
+You may or may not already have a harmonyTrack class—if not, create it in the same style as TempoTrack/GrooveTrack.
 
 Requirements
 Functional requirements
@@ -3211,7 +3211,7 @@ You said:
 reminder:
 Here’s an agile plan that keeps your current structure, adds only what you need (harmony + groove), and stays testable at every step. I’m going to assume you already have a Song object somewhere that holds tracks + parts/voices + generated notes, and you have a “test generator” method that currently writes the fixed patterns you described.
 
-The key move: introduce a GrooveTimeline and GroovePattern objects that emit rhythmic onsets, then reuse your existing harmony lookup to pick pitches in-key at those onsets. No critics, no fancy form/hook system beyond “section reuse.”
+The key move: introduce a GrooveTrack and GroovePattern objects that emit rhythmic onsets, then reuse your existing harmony lookup to pick pitches in-key at those onsets. No critics, no fancy form/hook system beyond “section reuse.”
 
 Guiding constraints for all stories
 
@@ -3232,7 +3232,7 @@ Add new objects
 
 GrooveEvent: StartBar/StartBeat (like TempoEvent), plus a GrooveId or GroovePresetName.
 
-GrooveTimeline: list of GrooveEvents + lookup “active groove at bar” like your TempoTrack.
+GrooveTrack: list of GrooveEvents + lookup “active groove at bar” like your TempoTrack.
 
 GroovePreset / GroovePattern: a definition that can produce onsets for each role.
 
@@ -3404,7 +3404,7 @@ Goal: Groove can change by section or mid-song if user adds groove events later.
 
 Rules
 
-GrooveTimeline returns active groove at each bar.
+GrooveTrack returns active groove at each bar.
 
 When generating a section pattern, it should read groove onsets using the groove active at those bars.
 
@@ -3479,7 +3479,7 @@ Got it. I’ll treat that plan as the “baseline backlog” we’re working fro
 
 A couple of concrete clarifications (so you and Claude don’t get tripped up later):
 
-Epic 1 is basically done in your current state: you already have GroovePreset, GrooveLayer, GrooveTimeline, and a PopRockBasic preset. The only real fix pending is the StartBeat caching bug in GrooveTimeline (same issue as I called out earlier).
+Epic 1 is basically done in your current state: you already have GroovePreset, GrooveLayer, GrooveTrack, and a PopRockBasic preset. The only real fix pending is the StartBeat caching bug in GrooveTrack (same issue as I called out earlier).
 
 Epic 2 Story 4 is the next critical blocker (Harmony lookup helper) because every generator step needs “what HarmonyEvent is active right now?” and you don’t want every generator re-implementing that logic.
 
@@ -3489,7 +3489,7 @@ If you want to keep moving in the smallest non-breaking increments, the next 3 s
 
 Story 4: harmonyTrack.TryGetAt(bar, beat) returning HarmonyEvent with correct mid-bar behavior + safe caching
 
-GrooveTimeline caching fix: only cache bar-head when StartBeat == 1 (or change to a beat-aware lookup)
+GrooveTrack caching fix: only cache bar-head when StartBeat == 1 (or change to a beat-aware lookup)
 
 Story 5: KeyScale helper that turns the HarmonyEvent into chord tones in key (major only)
 
@@ -3688,7 +3688,7 @@ namespace Music.Designer
 namespace Music.Designer
 {
     // Global bar/beat-aligned groove track
-    public class GrooveTimeline
+    public class GrooveTrack
     {
         private readonly Dictionary<int, GrooveEvent> _barHeads = new(); // bar -> event active at beat 1
 
@@ -6311,7 +6311,7 @@ RootPitchClass mismatch (key tonic vs chord root) — still present here.
 
 Quality string mismatch ("maj" vs "Major") causing converter failures — still present here.
 
-GrooveTimeline StartBeat caching bug (mid-bar events incorrectly overriding bar-head lookup) — you already fixed this correctly by only indexing when StartBeat == 1.
+GrooveTrack StartBeat caching bug (mid-bar events incorrectly overriding bar-head lookup) — you already fixed this correctly by only indexing when StartBeat == 1.
 
 If you want, paste your current PitchClassUtils and the actual list of Quality values your UI produces, and I’ll give you an exact minimal normalization function that won’t break existing saved designs.
 
@@ -7006,7 +7006,7 @@ Bug: Quality mismatch (maj/min/dom7) causing NotSupportedException → ✅ fixed
 
 Bug: Duplicate HarmonyPitchContextBuilder class defined twice → ✅ not present in this updated paste.
 
-Bug (elsewhere): GrooveTimeline caching StartBeat mid-bar → ✅ previously fixed in your GrooveTimeline code.
+Bug (elsewhere): GrooveTrack caching StartBeat mid-bar → ✅ previously fixed in your GrooveTrack code.
 
 Bottom line
 Yes, this version meets the needs of the generators for MVP and will work as intended assuming your key strings are consistently like "C major" / "F# minor".
@@ -8351,7 +8351,7 @@ namespace Music.Designer
         // Current global settings
         private int _beatsPerBar = 4;
 
-        public harmonyTrack ResultTimeline { get; private set; } = new harmonyTrack();
+        public harmonyTrack ResultTrack { get; private set; } = new harmonyTrack();
 
         // Predefined values
         private static readonly string[] AllKeys = new[]
@@ -8486,7 +8486,7 @@ namespace Music.Designer
             _btnDuplicate.Click += (s, e) => DuplicateSelected();
             _btnUp.Click += (s, e) => MoveSelected(-1);
             _btnDown.Click += (s, e) => MoveSelected(1);
-            _btnDefaults.Click += (s, e) => ApplyDefaultTimeline();
+            _btnDefaults.Click += (s, e) => ApplyDefaultTrack();
 
             rowButtons.Controls.AddRange(new Control[] { _btnAdd, _btnInsert, _btnDelete, _btnDuplicate, _btnUp, _btnDown });
 
@@ -8600,7 +8600,7 @@ namespace Music.Designer
 
             _btnOk.Click += (s, e) =>
             {
-                ResultTimeline = BuildResult();
+                ResultTrack = BuildResult();
                 DialogResult = DialogResult.OK;
                 Close();
             };
@@ -9033,9 +9033,9 @@ namespace Music.Designer
             _dragItem = null;
         }
 
-        private void ApplyDefaultTimeline()
+        private void ApplyDefaultTrack()
         {
-            var defaults = HarmonyTests.CreateTestTimelineD1();
+            var defaults = HarmonyTests.CreateTestTrackD1();
 
             _working.Clear();
             _beatsPerBar = Math.Max(1, defaults.BeatsPerBar);
@@ -9926,7 +9926,7 @@ a sustained pad wash (that’s your “Pads” role)
 a drum/percussion pattern
 
 What a “Comp” generator should do in your system
-Given your current architecture (GrooveTimeline + HarmonyPitchContext), Comp should be a generator that turns:
+Given your current architecture (GrooveTrack + HarmonyPitchContext), Comp should be a generator that turns:
 
 groove onsets (CompOnsets)
 

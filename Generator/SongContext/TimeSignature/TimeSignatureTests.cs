@@ -3,7 +3,7 @@ namespace Music.Generator
     // Builds the app's default time signature track (single 4/4 event starting at bar 1).
     public static class TimeSignatureTests
     {
-        public static TimeSignatureTrack CreateTestTimelineD1()
+        public static TimeSignatureTrack CreateTestTrackD1()
         {
             var track = new TimeSignatureTrack();
             track.ConfigureGlobal(TestDesigns.GlobalTimeSignature);

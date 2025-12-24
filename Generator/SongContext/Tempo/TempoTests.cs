@@ -3,7 +3,7 @@ namespace Music.Generator
     // Builds the app's default tempo track (single 90 BPM event starting at bar 1).
     public static class TempoTests
     {
-        public static TempoTrack CreateTestTimelineD1()
+        public static TempoTrack CreateTestTrackD1()
         {
             var track = new TempoTrack();
             // Single event covering the entire song length

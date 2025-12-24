@@ -129,15 +129,15 @@
 //            // TIME SIGNATURES
 //            sb.Append("\r\n\r\n");
 //            sb.Append("TIME SIGNATURES:\r\n");
-//            var tsTimeline = designer.TimeSignatureTrack;
-//            if (tsTimeline == null || tsTimeline.Events.Count == 0)
+//            var tsTrack = designer.TimeSignatureTrack;
+//            if (tsTrack == null || tsTrack.Events.Count == 0)
 //            {
 //                sb.Append("(no time signature track)");
 //            }
 //            else
 //            {
 //                var firstTs = true;
-//                foreach (var se in tsTimeline.Events)
+//                foreach (var se in tsTrack.Events)
 //                {
 //                    if (!firstTs) sb.Append("\r\n");
 //                    // List event placement and span in beats. Meter detail (e.g., 4/4) can be added later if needed.

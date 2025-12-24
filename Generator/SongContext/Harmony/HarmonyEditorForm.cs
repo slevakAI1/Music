@@ -40,7 +40,7 @@ namespace Music.Designer
         // Current global settings
         private int _beatsPerBar = 4;
 
-        public HarmonyTrack ResultTimeline { get; private set; } = new HarmonyTrack();
+        public HarmonyTrack ResultTrack { get; private set; } = new HarmonyTrack();
 
         // Predefined values
         private static readonly string[] AllKeys = new[]
@@ -164,7 +164,7 @@ namespace Music.Designer
             _btnDuplicate.Click += (s, e) => DuplicateSelected();
             _btnUp.Click += (s, e) => MoveSelected(-1);
             _btnDown.Click += (s, e) => MoveSelected(1);
-            _btnDefaults.Click += (s, e) => ApplyDefaultTimeline();
+            _btnDefaults.Click += (s, e) => ApplyDefaultTrack();
 
             rowButtons.Controls.AddRange(new Control[] { _btnAdd, _btnInsert, _btnDelete, _btnDuplicate, _btnUp, _btnDown });
 
@@ -278,7 +278,7 @@ namespace Music.Designer
 
             _btnOk.Click += (s, e) =>
             {
-                ResultTimeline = BuildResult();
+                ResultTrack = BuildResult();
                 DialogResult = DialogResult.OK;
                 Close();
             };
@@ -724,9 +724,9 @@ namespace Music.Designer
             _dragItem = null;
         }
 
-        private void ApplyDefaultTimeline()
+        private void ApplyDefaultTrack()
         {
-            var defaults = HarmonyTests.CreateTestTimelineD1();
+            var defaults = HarmonyTests.CreateTestTrackD1();
 
             _working.Clear();
             _beatsPerBar = Math.Max(1, defaults.BeatsPerBar);

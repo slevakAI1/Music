@@ -3,7 +3,7 @@ namespace Music.Generator
     // Builds the app's default harmony track (48 bars).
     public static class HarmonyTests
     {
-        public static HarmonyTrack CreateTestTimelineD1()
+        public static HarmonyTrack CreateTestTrackD1()
         {
             var track = new HarmonyTrack();
             track.ConfigureGlobal(TestDesigns.GlobalTimeSignature);

@@ -328,7 +328,7 @@ namespace Music.Writer
                 }
 
                 // Extract tempo and time signature events from MIDI and attach to grid
-                var (tempoTrack, timeSignatureTrack) = ExtractTimelinesFromMidiEvents(
+                var (tempoTrack, timeSignatureTrack) = ExtractTracksFromMidiEvents(
                     midiEventLists, 
                     ticksPerQuarterNote);
 
@@ -372,7 +372,7 @@ namespace Music.Writer
         /// <summary>
         /// Extracts tempo and time signature events from MIDI event lists and converts them to tracks.
         /// </summary>
-        private static (TempoTrack?, TimeSignatureTrack?) ExtractTimelinesFromMidiEvents(
+        private static (TempoTrack?, TimeSignatureTrack?) ExtractTracksFromMidiEvents(
             List<List<MetaMidiEvent>> midiEventLists,
             short ticksPerQuarterNote)
         {

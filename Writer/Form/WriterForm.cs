@@ -168,7 +168,7 @@ namespace Music.Writer
                 using var dlg = new Music.Designer.HarmonyEditorForm(initialHarmony);
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
-                    _songContext.HarmonyTrack = dlg.ResultTimeline;
+                    _songContext.HarmonyTrack = dlg.ResultTrack;
                     GridControlLinesManager.AttachharmonyTrack(dgSong, _songContext.HarmonyTrack);
                 }
 
@@ -186,7 +186,7 @@ namespace Music.Writer
                 using var dlg = new Music.Designer.GrooveEditorForm(initialGroove);
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
-                    _songContext.GrooveTrack = dlg.ResultTimeline;
+                    _songContext.GrooveTrack = dlg.ResultTrack;
                 }
 
                 return;
@@ -203,7 +203,7 @@ namespace Music.Writer
                 using var dlg = new Music.Designer.TimeSignatureEditorForm(initialTimeSignature);
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
-                    _songContext.Song.TimeSignatureTrack = dlg.ResultTimeline;
+                    _songContext.Song.TimeSignatureTrack = dlg.ResultTrack;
                     GridControlLinesManager.AttachTimeSignatureTrack(dgSong, _songContext.Song.TimeSignatureTrack);
                 }
 
@@ -221,7 +221,7 @@ namespace Music.Writer
                 using var dlg = new Music.Designer.TempoEditorForm(initialTempo);
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
-                    _songContext.Song.TempoTrack = dlg.ResultTimeline;
+                    _songContext.Song.TempoTrack = dlg.ResultTrack;
                     GridControlLinesManager.AttachTempoTrack(dgSong, _songContext.Song.TempoTrack);
                 }
 
