@@ -286,14 +286,6 @@ namespace Music.Writer
             await _eventHandlers.HandlePlayAsync(dgSong, _midiPlaybackService);
         }
 
-        private void btnUpdateFormFromDesigner_Click(object sender, EventArgs e)
-        {
-            if (_writer != null && _songContext != null)
-            {
-                _eventHandlers.HandleUpdateFormFromDesigner(_writer, _songContext);
-            }
-        }
-
         private void btnSetDesignTestScenarioD1_Click(object sender, EventArgs e)
         {
             _songContext ??= new SongContext();
@@ -313,11 +305,6 @@ namespace Music.Writer
                 rbPitchAbsolute, rbPitchKeyRelative, cbAccidental, numOctaveAbs,
                 numDegree, cbChordKey, numChordDegree, cbChordQuality, cbChordBase,
                 cbNoteValue, numDots, txtTupletNumber, numTupletCount, numTupletOf, numNumberOfNotes);
-        }
-
-        private void btnExportToNotion_Click(object sender, EventArgs e)
-        {
-            _eventHandlers.HandleExportToNotion();
         }
 
         private void btnExecute_Click(object sender, EventArgs e)
@@ -358,11 +345,6 @@ namespace Music.Writer
         private void btnClearAll_Click(object sender, EventArgs e)
         {
             _gridOperations.HandleClearAll(dgSong);
-        }
-
-        private void btnNewScore_Click(object sender, EventArgs e)
-        {
-            _eventHandlers.HandleNewScore();
         }
 
         // New Add button handler: add an empty track and select it.
@@ -419,8 +401,8 @@ namespace Music.Writer
 
         private void btnLoadDesign_Click(object sender, EventArgs e)
         {
-           // var loaded = DesignerFileManager.LoadDesign(this, out bool success);
-           // if (success && loaded != null)
+            // var loaded = DesignerFileManager.LoadDesign(this, out bool success);
+            // if (success && loaded != null)
             //{
             //    _songContext = loaded;
 
@@ -432,11 +414,6 @@ namespace Music.Writer
             //        dgSong_CurrentCellDirtyStateChanged,
             //        _songContext);
             //}
-        }
-
-        private void btnSave_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }

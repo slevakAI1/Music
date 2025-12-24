@@ -218,10 +218,9 @@ namespace Music.Writer
             {
                 DeltaTime = deltaTime
             };
-        }
+        } 
 
         // TO DO look at this. Looks like overkill.
-
         private static TimeSignatureEvent CreateTimeSignatureEvent(MetaMidiEvent midiEvent, long deltaTime)
         {
             var numerator = (byte)GetIntParam(midiEvent, "Numerator");
@@ -253,6 +252,7 @@ namespace Music.Writer
                 }
 
                 denominatorExponent = (byte)exp;
+
             }
 
             var clocksPerMetronomeClick = midiEvent.Parameters.TryGetValue("ClocksPerMetronomeClick", out var cpm) 

@@ -84,8 +84,6 @@ namespace Music.Writer
             numTupletOf = new NumericUpDown();
             btnSetWriterTestScenarioG1 = new Button();
             btnSetDesignTestScenarioD1 = new Button();
-            btnUpdateFormFromDesigner = new Button();
-            btnExportToNotion = new Button();
             groupBox3 = new GroupBox();
             btnExecute = new Button();
             gbSong = new GroupBox();
@@ -101,8 +99,6 @@ namespace Music.Writer
             btnClearAll = new Button();
             btnPlayTracks = new Button();
             dgSong = new DataGridView();
-            btnLoad = new Button();
-            btnSave = new Button();
             grbParts.SuspendLayout();
             grpPitch.SuspendLayout();
             grpChord.SuspendLayout();
@@ -138,7 +134,7 @@ namespace Music.Writer
             grbParts.Controls.Add(lblStaff);
             grbParts.Controls.Add(clbStaffs);
             grbParts.ForeColor = Color.FromArgb(255, 128, 0);
-            grbParts.Location = new Point(1184, 656);
+            grbParts.Location = new Point(1006, 664);
             grbParts.Name = "grbParts";
             grbParts.Size = new Size(322, 174);
             grbParts.TabIndex = 2;
@@ -596,29 +592,6 @@ namespace Music.Writer
             btnSetDesignTestScenarioD1.UseVisualStyleBackColor = false;
             btnSetDesignTestScenarioD1.Click += btnSetDesignTestScenarioD1_Click;
             // 
-            // btnUpdateFormFromDesigner
-            // 
-            btnUpdateFormFromDesigner.Enabled = false;
-            btnUpdateFormFromDesigner.ForeColor = Color.Red;
-            btnUpdateFormFromDesigner.Location = new Point(1786, 970);
-            btnUpdateFormFromDesigner.Name = "btnUpdateFormFromDesigner";
-            btnUpdateFormFromDesigner.Size = new Size(136, 23);
-            btnUpdateFormFromDesigner.TabIndex = 13;
-            btnUpdateFormFromDesigner.Text = "Update From Designer";
-            btnUpdateFormFromDesigner.UseVisualStyleBackColor = true;
-            btnUpdateFormFromDesigner.Click += btnUpdateFormFromDesigner_Click;
-            // 
-            // btnExportToNotion
-            // 
-            btnExportToNotion.ForeColor = Color.FromArgb(0, 192, 0);
-            btnExportToNotion.Location = new Point(1804, 946);
-            btnExportToNotion.Name = "btnExportToNotion";
-            btnExportToNotion.Size = new Size(114, 23);
-            btnExportToNotion.TabIndex = 30;
-            btnExportToNotion.Text = "Export to Notion";
-            btnExportToNotion.UseVisualStyleBackColor = true;
-            btnExportToNotion.Click += btnExportToNotion_Click;
-            // 
             // groupBox3
             // 
             groupBox3.BackColor = SystemColors.ActiveCaptionText;
@@ -799,35 +772,12 @@ namespace Music.Writer
             dgSong.TabIndex = 37;
             dgSong.CellDoubleClick += dgSong_CellDoubleClick;
             // 
-            // btnLoad
-            // 
-            btnLoad.Location = new Point(1019, 926);
-            btnLoad.Name = "btnLoad";
-            btnLoad.Size = new Size(96, 23);
-            btnLoad.TabIndex = 39;
-            btnLoad.Text = "Load";
-            btnLoad.UseVisualStyleBackColor = true;
-            // 
-            // btnSave
-            // 
-            btnSave.Location = new Point(1019, 893);
-            btnSave.Name = "btnSave";
-            btnSave.Size = new Size(96, 23);
-            btnSave.TabIndex = 37;
-            btnSave.Text = "Save";
-            btnSave.UseVisualStyleBackColor = true;
-            btnSave.Click += btnSave_Click;
-            // 
             // WriterForm
             // 
             BackColor = Color.White;
             ClientSize = new Size(1924, 991);
-            Controls.Add(btnLoad);
-            Controls.Add(btnSave);
             Controls.Add(btnSetDesignTestScenarioD1);
-            Controls.Add(btnExportToNotion);
             Controls.Add(btnSetWriterTestScenarioG1);
-            Controls.Add(btnUpdateFormFromDesigner);
             Controls.Add(groupBox1);
             Controls.Add(grbParts);
             Controls.Add(grpPitch);
@@ -884,8 +834,6 @@ namespace Music.Writer
         private NumericUpDown numChordDegree;
         private ComboBox cbChordQuality;
         private ComboBox cbChordBase;
-        private Button btnUpdateFormFromDesigner;
-        private Button btnExportToNotion;
         private Label lblTupletNumber;
         private TextBox txtTupletNumber;
         private GroupBox groupBox3;
@@ -903,7 +851,5 @@ namespace Music.Writer
         private Button btnPause;
         private Button btnLoadDesign;
         private Button btnSaveDesign;
-        private Button btnLoad;
-        private Button btnSave;
     }
 }

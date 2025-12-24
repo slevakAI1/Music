@@ -454,16 +454,6 @@ namespace Music.Writer
             );
         }
 
-        // ========== DESIGNER & FORM SYNC EVENT HANDLERS ==========
-
-        public void HandleUpdateFormFromDesigner(
-            WriterFormData writer,
-            SongContext designer)
-        {
-            // Update the form to take into account any changes to SongContext
-            UpdateWriterFormDataFromDesigner.Update(writer, designer);
-        }
-
         // ========== TEST SCENARIO EVENT HANDLERS ==========
 
         public void HandleSetDesignTestScenarioD1(
@@ -481,18 +471,6 @@ namespace Music.Writer
         public WriterFormData HandleSetWriterTestScenarioG1(SongContext designer)
         {
             return WriterFormTests.SetTestWriterG1(designer);
-        }
-
-        // ========== SCORE EVENT HANDLERS ==========
-
-        public void HandleExportToNotion()
-        {
-            // Implementation placeholder
-        }
-
-        public void HandleNewScore()
-        {
-            // Implementation placeholder
         }
 
         // ========== GRID CELL EVENT HANDLERS ==========
