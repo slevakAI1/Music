@@ -32,13 +32,14 @@ namespace Music.Generator
                 BassTrack = GenerateBassTrack(
                     songContext.HarmonyTrack, 
                     songContext.GrooveTrack, 
+                    songContext.Song.TimeSignatureTrack,
                     ticksPerMeasure, 
                     totalBars, 
                     settings),
 
-                GuitarTrack = GenerateGuitarTrack(songContext.HarmonyTrack, songContext.GrooveTrack,  ticksPerMeasure, totalBars, settings),
-                KeysTrack = GenerateKeysTrack(songContext.HarmonyTrack, songContext.GrooveTrack, ticksPerMeasure, totalBars, settings),
-                DrumTrack = GenerateDrumTrack(songContext.HarmonyTrack, songContext.GrooveTrack,  ticksPerMeasure, totalBars, settings)
+                GuitarTrack = GenerateGuitarTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.Song.TimeSignatureTrack, ticksPerMeasure, totalBars, settings),
+                KeysTrack = GenerateKeysTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.Song.TimeSignatureTrack, ticksPerMeasure, totalBars, settings),
+                DrumTrack = GenerateDrumTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.Song.TimeSignatureTrack, ticksPerMeasure, totalBars, settings)
             };
         }
 
@@ -56,6 +57,7 @@ namespace Music.Generator
         private static PartTrack? GenerateBassTrack(
             HarmonyTrack harmonyTimeline,
             GrooveTrack grooveTrack,
+            TimeSignatureTrack timeSignatureTrack,
             int ticksPerMeasure,
             int totalBars,
             RandomizationSettings settings)
@@ -121,6 +123,7 @@ namespace Music.Generator
         private static PartTrack? GenerateGuitarTrack(
             HarmonyTrack harmonyTimeline,
             GrooveTrack grooveTrack,
+            TimeSignatureTrack timeSignatureTrack,
             int ticksPerMeasure,
             int totalBars,
             RandomizationSettings settings)
@@ -189,6 +192,7 @@ namespace Music.Generator
         private static PartTrack? GenerateKeysTrack(
             HarmonyTrack harmonyTimeline,
             GrooveTrack grooveTrack,
+            TimeSignatureTrack timeSignatureTrack,
             int ticksPerMeasure,
             int totalBars,
             RandomizationSettings settings)
@@ -269,6 +273,7 @@ namespace Music.Generator
         private static PartTrack? GenerateDrumTrack(
             HarmonyTrack harmonyTimeline,
             GrooveTrack grooveTrack,
+            TimeSignatureTrack timeSignatureTrack,
             int ticksPerMeasure,
             int totalBars,
             RandomizationSettings settings)
@@ -350,6 +355,9 @@ namespace Music.Generator
 
             return new PartTrack(notes) { MidiProgramNumber = 255 }; // Drum Set
         }
+
+
+        // TO DO MOVE THIS TO HARMONYTRACK CLASS! IT SHOULD WORK LIKE GROOVE DOES! then wont need in every bar
 
         /// <summary>
         /// Gets the active harmony event for a given bar.
