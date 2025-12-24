@@ -3560,7 +3560,7 @@ namespace Music.Designer
 
         // New: independent timelines for tempo and time signature
         public TempoTimeline? TempoTimeline { get; set; }
-        public TimeSignatureTimeline? TimeSignatureTimeline { get; set; }
+        public TimeSignatureTrack? TimeSignatureTrack { get; set; }
 
         public Designer(string? designId = null)
         {
@@ -4117,7 +4117,7 @@ namespace Music.Designer
 namespace Music.Designer
 {
     // Global bar/beat-aligned time signature timeline
-    public class TimeSignatureTimeline
+    public class TimeSignatureTrack
     {
         private readonly Dictionary<int, TimeSignatureEvent> _barHeads = new(); // bar -> event active at beat 1
 
@@ -4501,7 +4501,7 @@ namespace Music.Writer
             {
                 GridControlLinesManager.AttachSectionTimeline(dgSong, designer.SectionTimeline);
                 GridControlLinesManager.AttachHarmonyTimeline(dgSong, designer.HarmonyTimeline);
-                GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, designer.TimeSignatureTimeline);
+                GridControlLinesManager.AttachTimeSignatureTrack(dgSong, designer.TimeSignatureTrack);
                 GridControlLinesManager.AttachTempoTimeline(dgSong, designer.TempoTimeline);
             }
         }

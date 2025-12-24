@@ -45,8 +45,8 @@ namespace Music.Writer
 
             // Extract time signature timeline from fixed row
             var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
-            var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Generator.TimeSignatureTrack;
-            if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
+            var timeSignatureTrack = timeSignatureRow.Cells["colData"].Value as Music.Generator.TimeSignatureTrack;
+            if (timeSignatureTrack == null || timeSignatureTrack.Events.Count == 0)
             {
                 MessageBoxHelper.Show("No time signature events defined. Please add at least one time signature event.", "Missing Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -128,7 +128,7 @@ namespace Music.Writer
             var midiDoc = ConvertSongTracksToMidiSongDocument.Convert(
                 songTracks,
                 tempoTimeline,
-                timeSignatureTimeline);
+                timeSignatureTrack);
 
             await Player.PlayMidiFromSongTracksAsync(midiPlaybackService, midiDoc);
         }
@@ -166,8 +166,8 @@ namespace Music.Writer
 
             // Extract time signature timeline from fixed row
             var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
-            var timeSignatureTimeline = timeSignatureRow.Cells["colData"].Value as Music.Generator.TimeSignatureTrack;
-            if (timeSignatureTimeline == null || timeSignatureTimeline.Events.Count == 0)
+            var timeSignatureTrack = timeSignatureRow.Cells["colData"].Value as Music.Generator.TimeSignatureTrack;
+            if (timeSignatureTrack == null || timeSignatureTrack.Events.Count == 0)
             {
                 MessageBoxHelper.Show("No time signature events defined. Please add at least one time signature event.", "Missing Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -262,7 +262,7 @@ namespace Music.Writer
                 var midiDoc = ConvertSongTracksToMidiSongDocument.Convert(
                     tracks,
                     tempoTimeline,
-                    timeSignatureTimeline);
+                    timeSignatureTrack);
 
                 // Export to file
                 midiIoService.ExportToFile(sfd.FileName, midiDoc);
@@ -328,7 +328,7 @@ namespace Music.Writer
                 }
 
                 // Extract tempo and time signature events from MIDI and attach to grid
-                var (tempoTimeline, timeSignatureTimeline) = ExtractTimelinesFromMidiEvents(
+                var (tempoTimeline, timeSignatureTrack) = ExtractTimelinesFromMidiEvents(
                     midiEventLists, 
                     ticksPerQuarterNote);
 
@@ -337,9 +337,9 @@ namespace Music.Writer
                     GridControlLinesManager.AttachTempoTimeline(dgSong, tempoTimeline);
                 }
 
-                if (timeSignatureTimeline != null && timeSignatureTimeline.Events.Count > 0)
+                if (timeSignatureTrack != null && timeSignatureTrack.Events.Count > 0)
                 {
-                    GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, timeSignatureTimeline);
+                    GridControlLinesManager.AttachTimeSignatureTrack(dgSong, timeSignatureTrack);
                 }
 
                 // Convert MetaMidiEvent lists to PartTrack objects, passing the source ticks per quarter note
@@ -377,7 +377,7 @@ namespace Music.Writer
             short ticksPerQuarterNote)
         {
             var tempoTimeline = new TempoTrack();
-            var timeSignatureTimeline = new TimeSignatureTrack();
+            var timeSignatureTrack = new TimeSignatureTrack();
 
             // Assume 4/4 time signature initially for bar calculation
             int beatsPerBar = 4;
@@ -407,7 +407,7 @@ namespace Music.Writer
                             Denominator = denominator
                         };
 
-                        timeSignatureTimeline.Add(timeSignatureEvent);
+                        timeSignatureTrack.Add(timeSignatureEvent);
 
                         // Update beatsPerBar for subsequent calculations
                         beatsPerBar = numerator;
@@ -450,7 +450,7 @@ namespace Music.Writer
 
             return (
                 tempoTimeline.Events.Count > 0 ? tempoTimeline : null,
-                timeSignatureTimeline.Events.Count > 0 ? timeSignatureTimeline : null
+                timeSignatureTrack.Events.Count > 0 ? timeSignatureTrack : null
             );
         }
 
@@ -473,7 +473,7 @@ namespace Music.Writer
             TestDesigns.SetTestDesignD1(songContext);
 
             GridControlLinesManager.AttachSectionTimeline(dgSong, songContext.SectionTrack);
-            GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, songContext.Song.TimeSignatureTrack);
+            GridControlLinesManager.AttachTimeSignatureTrack(dgSong, songContext.Song.TimeSignatureTrack);
             GridControlLinesManager.AttachTempoTimeline(dgSong, songContext.Song.TempoTrack);
             GridControlLinesManager.AttachHarmonyTimeline(dgSong, songContext.HarmonyTrack);
         }

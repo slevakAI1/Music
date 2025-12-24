@@ -201,17 +201,17 @@ namespace Music.Writer
 
         #endregion
 
-        #region AttachTimeSignatureTimeline
+        #region AttachTimeSignatureTrack
 
         /// <summary>
         /// Public helper to attach a TimeSignatureTrack instance to the fixed Time Signature row's hidden data cell.
         /// Safe to call anytime after the grid's columns and rows have been created.
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="timeSignatureTimeline">TimeSignatureTrack to store in the hidden data cell (null to skip)</param>
-        public static void AttachTimeSignatureTimeline(DataGridView dgSong, TimeSignatureTrack? timeSignatureTimeline)
+        /// <param name="timeSignatureTrack">TimeSignatureTrack to store in the hidden data cell (null to skip)</param>
+        public static void AttachTimeSignatureTrack(DataGridView dgSong, TimeSignatureTrack? timeSignatureTrack)
         {
-            if (timeSignatureTimeline == null)
+            if (timeSignatureTrack == null)
                 return;
 
             if (!dgSong.Columns.Contains("colData"))
@@ -221,18 +221,18 @@ namespace Music.Writer
                 return;
 
             // Populate the time signature row with the timeline data
-            PopulateTimeSignatureRow(dgSong, timeSignatureTimeline);
+            PopulateTimeSignatureRow(dgSong, timeSignatureTrack);
         }
 
         /// <summary>
         /// Populates the fixed Time Signature row with time signature values at their respective measure positions.
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="timeSignatureTimeline">TimeSignatureTrack containing time signature events</param>
-        private static void PopulateTimeSignatureRow(DataGridView dgSong, TimeSignatureTrack timeSignatureTimeline)
+        /// <param name="timeSignatureTrack">TimeSignatureTrack containing time signature events</param>
+        private static void PopulateTimeSignatureRow(DataGridView dgSong, TimeSignatureTrack timeSignatureTrack)
         {
             // Store the timeline in the hidden data cell
-            dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE].Cells["colData"].Value = timeSignatureTimeline;
+            dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE].Cells["colData"].Value = timeSignatureTrack;
 
             // Clear all existing measure cells in the time signature row
             for (int colIndex = SongGridManager.MEASURE_START_COLUMN_INDEX; colIndex < dgSong.Columns.Count; colIndex++)
@@ -240,11 +240,11 @@ namespace Music.Writer
                 dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE].Cells[colIndex].Value = string.Empty;
             }
 
-            if (timeSignatureTimeline.Events.Count == 0)
+            if (timeSignatureTrack.Events.Count == 0)
                 return;
 
             // Populate measure cells with time signature at the starting bar of each time signature event
-            foreach (var timeSignatureEvent in timeSignatureTimeline.Events)
+            foreach (var timeSignatureEvent in timeSignatureTrack.Events)
             {
                 // Convert 1-based bar number to 0-based measure index
                 int measureIndex = timeSignatureEvent.StartBar - 1;

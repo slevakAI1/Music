@@ -204,7 +204,7 @@ namespace Music.Writer
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
                     _songContext.Song.TimeSignatureTrack = dlg.ResultTimeline;
-                    GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, _songContext.Song.TimeSignatureTrack);
+                    GridControlLinesManager.AttachTimeSignatureTrack(dgSong, _songContext.Song.TimeSignatureTrack);
                 }
 
                 return;
