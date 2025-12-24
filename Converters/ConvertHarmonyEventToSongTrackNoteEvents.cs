@@ -71,9 +71,6 @@ namespace Music.Writer
                     noteDurationTicks: noteDurationTicks,
                     noteOnVelocity: 100);
                 
-                // Attach chord metadata
-                songTrackNoteEvent.songTrackChord = songTrackChord;
-                
                 result.Add(songTrackNoteEvent);
             }
             

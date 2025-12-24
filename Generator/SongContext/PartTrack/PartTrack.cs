@@ -92,7 +92,6 @@ namespace Music.Generator
 
         public int? TupletActualNotes { get; set; }  // The 'm' in m:n (e.g., 3 in a triplet)
         public int? TupletNormalNotes { get; set; }  // The 'n' in m:n (e.g., 2 in a triplet)
-        public SongTrackChord? songTrackChord { get; set; } // Metadata only. Means the note is part of this type chord.
 
         public PartTrackNoteEvent(
             int noteNumber,
