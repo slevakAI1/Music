@@ -84,7 +84,6 @@ namespace Music.Writer
             numTupletOf = new NumericUpDown();
             btnSetWriterTestScenarioG1 = new Button();
             btnSetDesignTestScenarioD1 = new Button();
-            btnChordTest = new Button();
             btnUpdateFormFromDesigner = new Button();
             btnExportToNotion = new Button();
             groupBox3 = new GroupBox();
@@ -597,18 +596,6 @@ namespace Music.Writer
             btnSetDesignTestScenarioD1.UseVisualStyleBackColor = false;
             btnSetDesignTestScenarioD1.Click += btnSetDesignTestScenarioD1_Click;
             // 
-            // btnChordTest
-            // 
-            btnChordTest.Enabled = false;
-            btnChordTest.ForeColor = Color.Red;
-            btnChordTest.Location = new Point(1839, 921);
-            btnChordTest.Name = "btnChordTest";
-            btnChordTest.Size = new Size(78, 23);
-            btnChordTest.TabIndex = 11;
-            btnChordTest.Text = "Chord Test";
-            btnChordTest.UseVisualStyleBackColor = true;
-            btnChordTest.Click += btnChordTest_Click;
-            // 
             // btnUpdateFormFromDesigner
             // 
             btnUpdateFormFromDesigner.Enabled = false;
@@ -841,7 +828,6 @@ namespace Music.Writer
             Controls.Add(btnExportToNotion);
             Controls.Add(btnSetWriterTestScenarioG1);
             Controls.Add(btnUpdateFormFromDesigner);
-            Controls.Add(btnChordTest);
             Controls.Add(groupBox1);
             Controls.Add(grbParts);
             Controls.Add(grpPitch);
@@ -888,7 +874,6 @@ namespace Music.Writer
         private NumericUpDown numNumberOfNotes;
         private Button btnSetWriterTestScenarioG1;
         private Button btnSetDesignTestScenarioD1;
-        private Button btnChordTest;
         private RadioButton rbChord;
         private Label lblQuality;
         private Label lblDegree2;

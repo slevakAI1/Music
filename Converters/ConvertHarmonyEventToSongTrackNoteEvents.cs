@@ -25,12 +25,12 @@ namespace Music.Writer
 
         // TO DO - this should not have note durations - depend on what's calling it - find out
 
-        public static List<PartTrackNoteEvent> Convert(HarmonyEvent harmonyEvent, int baseOctave = 4, int noteValue = 4)
+        public static List<PartTrackNoteEvent> Convert(HarmonyEvent harmonyEvent, int baseOctave = 4)
         {
             if (harmonyEvent == null)
                 throw new ArgumentNullException(nameof(harmonyEvent));
 
-            return Convert(harmonyEvent.Key, harmonyEvent.Degree, harmonyEvent.Quality, harmonyEvent.Bass, baseOctave, noteValue);
+            return Convert(harmonyEvent.Key, harmonyEvent.Degree, harmonyEvent.Quality, harmonyEvent.Bass, baseOctave);
         }
 
         /// <summary>

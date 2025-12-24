@@ -315,11 +315,6 @@ namespace Music.Writer
                 cbNoteValue, numDots, txtTupletNumber, numTupletCount, numTupletOf, numNumberOfNotes);
         }
 
-        private void btnChordTest_Click(object sender, EventArgs e)
-        {
-            _eventHandlers.HandleChordTest(_songContext);
-        }
-
         private void btnExportToNotion_Click(object sender, EventArgs e)
         {
             _eventHandlers.HandleExportToNotion();
