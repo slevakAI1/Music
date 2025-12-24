@@ -45,7 +45,7 @@ namespace Music.Writer
         /// <param name="midiInstruments">List of available MIDI instruments</param>
         /// <param name="cellValueChangedHandler">Event handler for cell value changes</param>
         /// <param name="currentCellDirtyStateChangedHandler">Event handler for dirty state changes</param>
-        /// <param name="tempoTimeline">Optional TempoTrack to place into the fixed Tempo row hidden data cell</param>
+        /// <param name="tempoTrack">Optional TempoTrack to place into the fixed Tempo row hidden data cell</param>
         internal static void ConfigureSongGridView(
             DataGridView dgSong,
             DataGridViewCellEventHandler cellValueChangedHandler,
@@ -140,7 +140,7 @@ namespace Music.Writer
             dgSong.CellValueChanged += cellValueChangedHandler;
             dgSong.CurrentCellDirtyStateChanged += currentCellDirtyStateChangedHandler;
 
-            // Add the fixed rows at the top and optionally attach tempoTimeline to the hidden data cell
+            // Add the fixed rows at the top and optionally attach tempoTrack to the hidden data cell
             InitializeFixedRows(dgSong, designer);
         }
 
@@ -234,7 +234,7 @@ namespace Music.Writer
                 GridControlLinesManager.AttachSectionTimeline(dgSong, songContext.SectionTrack);
                 GridControlLinesManager.AttachharmonyTrack(dgSong, songContext.HarmonyTrack);
                 GridControlLinesManager.AttachTimeSignatureTrack(dgSong, songContext.Song.TimeSignatureTrack);
-                GridControlLinesManager.AttachTempoTimeline(dgSong, songContext.Song.TempoTrack);
+                GridControlLinesManager.AttachTempoTrack(dgSong, songContext.Song.TempoTrack);
             }
         }
 

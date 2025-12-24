@@ -1978,7 +1978,7 @@ namespace Music.Designer
 namespace Music.Designer
 {
     // Global bar/beat-aligned tempo timeline
-    public class TempoTimeline
+    public class TempoTrack
     {
         private readonly Dictionary<int, TempoEvent> _barHeads = new(); // bar -> event active at beat 1
 
@@ -2347,7 +2347,7 @@ Add new objects
 
 GrooveEvent: StartBar/StartBeat (like TempoEvent), plus a GrooveId or GroovePresetName.
 
-GrooveTimeline: list of GrooveEvents + lookup “active groove at bar” like your TempoTimeline.
+GrooveTimeline: list of GrooveEvents + lookup “active groove at bar” like your TempoTrack.
 
 GroovePreset / GroovePattern: a definition that can produce onsets for each role.
 
@@ -2364,7 +2364,7 @@ Goal: A single preset that corresponds to your current drum/bass feel but slight
 
 Define the preset contents
 
-Meter assumption: use your existing global meter setting (from TempoTimeline or wherever you store time sig).
+Meter assumption: use your existing global meter setting (from TempoTrack or wherever you store time sig).
 
 “PopRockBasic” with:
 
@@ -2856,7 +2856,7 @@ absBeats = (bar-1)*BeatsPerBar + (onset-1) (conceptually).
 If you later support 16ths, you’ll want 1.25, 1.5, 1.75, etc. That’s where decimal becomes annoying but still usable for MVP.
 
 2) GrooveTimeline: mostly fine, but there’s a real bug with StartBeat
-Your GrooveTimeline is modeled like TempoTimeline (“active at bar head”). Good.
+Your GrooveTimeline is modeled like TempoTrack (“active at bar head”). Good.
 
 But: IndexEventForBars currently indexes _barHeads[evt.StartBar] = evt even if StartBeat != 1.
 That means: if a groove change starts at bar 9 beat 3, asking “what groove is active at bar 9 beat 1?” will incorrectly return the new groove.
@@ -3041,13 +3041,13 @@ You already have:
 
 HarmonyEvent with StartBar, StartBeat, and musical fields (Key, Degree, Quality, Bass)
 
-SectionTimeline and TempoTimeline with a fast bar-head lookup cache pattern
+SectionTimeline and TempoTrack with a fast bar-head lookup cache pattern
 
 You need the same style helper for harmony so generators can do:
 
 “At bar X beat Y, what harmony event is active?”
 
-You may or may not already have a harmonyTrack class—if not, create it in the same style as TempoTimeline/GrooveTimeline.
+You may or may not already have a harmonyTrack class—if not, create it in the same style as TempoTrack/GrooveTimeline.
 
 Requirements
 Functional requirements
@@ -3062,7 +3062,7 @@ Fast enough: Common usage is “query once per bar (or per onset)” during gene
 No breaking changes: Existing test song generation and designer UI must still run.
 
 Non-functional requirements
-Keep code consistent with TempoTimeline patterns.
+Keep code consistent with TempoTrack patterns.
 
 Keep data stored as List<HarmonyEvent> to match your current editing forms.
 
@@ -3075,7 +3075,7 @@ Create a new harmonyTrack class (if you don’t have one already), or extend the
 Fields
 
 public int BeatsPerBar { get; set; } = 4;
-(mirrors TempoTimeline; read from global meter config later)
+(mirrors TempoTrack; read from global meter config later)
 
 public List<HarmonyEvent> Events { get; set; } = new();
 
@@ -3199,7 +3199,7 @@ Pass condition: In every case, the returned object is the correct HarmonyEvent i
 Notes for future stories (not part of this one)
 Later you’ll likely add:
 
-GetEventDurationBeats(evt, totalBars) similar to TempoTimeline.GetEventDuration
+GetEventDurationBeats(evt, totalBars) similar to TempoTrack.GetEventDuration
 
 Efficient indexing by absolute beat positions if you start querying per 16th note
 
@@ -3232,7 +3232,7 @@ Add new objects
 
 GrooveEvent: StartBar/StartBeat (like TempoEvent), plus a GrooveId or GroovePresetName.
 
-GrooveTimeline: list of GrooveEvents + lookup “active groove at bar” like your TempoTimeline.
+GrooveTimeline: list of GrooveEvents + lookup “active groove at bar” like your TempoTrack.
 
 GroovePreset / GroovePattern: a definition that can produce onsets for each role.
 
@@ -3250,7 +3250,7 @@ Goal: A single preset that corresponds to your current drum/bass feel but slight
 
 Define the preset contents
 
-Meter assumption: use your existing global meter setting (from TempoTimeline or wherever you store time sig).
+Meter assumption: use your existing global meter setting (from TempoTrack or wherever you store time sig).
 
 “PopRockBasic” with:
 
@@ -3559,7 +3559,7 @@ namespace Music.Designer
         public harmonyTrack? harmonyTrack { get; set; }
 
         // New: independent timelines for tempo and time signature
-        public TempoTimeline? TempoTimeline { get; set; }
+        public TempoTrack? TempoTrack { get; set; }
         public TimeSignatureTrack? TimeSignatureTrack { get; set; }
 
         public Designer(string? designId = null)
@@ -3991,7 +3991,7 @@ namespace Music.Designer
 namespace Music.Designer
 {
     // Global bar/beat-aligned tempo timeline
-    public class TempoTimeline
+    public class TempoTrack
     {
         private readonly Dictionary<int, TempoEvent> _barHeads = new(); // bar -> event active at beat 1
 
@@ -4353,7 +4353,7 @@ namespace Music.Writer
         /// <param name="midiInstruments">List of available MIDI instruments</param>
         /// <param name="cellValueChangedHandler">Event handler for cell value changes</param>
         /// <param name="currentCellDirtyStateChangedHandler">Event handler for dirty state changes</param>
-        /// <param name="tempoTimeline">Optional TempoTimeline to place into the fixed Tempo row hidden data cell</param>
+        /// <param name="tempoTrack">Optional TempoTrack to place into the fixed Tempo row hidden data cell</param>
         internal static void ConfigureSongGridView(
             DataGridView dgSong,
             List<MidiInstrument> midiInstruments,
@@ -4445,14 +4445,14 @@ namespace Music.Writer
             dgSong.CellValueChanged += cellValueChangedHandler;
             dgSong.CurrentCellDirtyStateChanged += currentCellDirtyStateChangedHandler;
 
-            // Add the fixed rows at the top and optionally attach tempoTimeline to the hidden data cell
+            // Add the fixed rows at the top and optionally attach tempoTrack to the hidden data cell
             InitializeFixedRows(dgSong, midiInstruments, designer);
         }
 
         /// <summary>
         /// Initializes the fixed rows at the top of the grid.
         /// Entire fixed rows are set to ReadOnly so users cannot edit them.
-        /// If a TempoTimeline is provided it will be stored in the fixed Tempo row's hidden data cell.
+        /// If a TempoTrack is provided it will be stored in the fixed Tempo row's hidden data cell.
         /// The separator row is styled with black background and white foreground.
         /// </summary>
         private static void InitializeFixedRows(
@@ -4502,7 +4502,7 @@ namespace Music.Writer
                 GridControlLinesManager.AttachSectionTimeline(dgSong, designer.SectionTimeline);
                 GridControlLinesManager.AttachharmonyTrack(dgSong, designer.harmonyTrack);
                 GridControlLinesManager.AttachTimeSignatureTrack(dgSong, designer.TimeSignatureTrack);
-                GridControlLinesManager.AttachTempoTimeline(dgSong, designer.TempoTimeline);
+                GridControlLinesManager.AttachTempoTrack(dgSong, designer.TempoTrack);
             }
         }
 

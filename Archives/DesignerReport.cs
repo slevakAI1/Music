@@ -149,15 +149,15 @@
 //            // TEMPO
 //            sb.Append("\r\n\r\n");
 //            sb.Append("TEMPO:\r\n");
-//            var tempoTimeline = designer.TempoTrack;
-//            if (tempoTimeline == null || tempoTimeline.Events.Count == 0)
+//            var tempoTrack = designer.TempoTrack;
+//            if (tempoTrack == null || tempoTrack.Events.Count == 0)
 //            {
 //                sb.Append("(no tempo timeline)");
 //            }
 //            else
 //            {
 //                var firstTempo = true;
-//                foreach (var te in tempoTimeline.Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat))
+//                foreach (var te in tempoTrack.Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat))
 //                {
 //                    if (!firstTempo) sb.Append("\r\n");
 //                    sb.Append($"Bar {te.StartBar} Beat {te.StartBeat}, | {te.TempoBpm} BPM");

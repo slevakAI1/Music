@@ -281,17 +281,17 @@ namespace Music.Writer
         
         #endregion
 
-        #region AttachTempoTimeline
+        #region AttachTempoTrack
 
         /// <summary>
         /// Public helper to attach a TempoTrack instance to the fixed Tempo row's hidden data cell.
         /// Safe to call anytime after the grid's columns and rows have been created.
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="tempoTimeline">TempoTrack to store in the hidden data cell (null to skip)</param>
-        public static void AttachTempoTimeline(DataGridView dgSong, TempoTrack? tempoTimeline)
+        /// <param name="tempoTrack">TempoTrack to store in the hidden data cell (null to skip)</param>
+        public static void AttachTempoTrack(DataGridView dgSong, TempoTrack? tempoTrack)
         {
-            if (tempoTimeline == null)
+            if (tempoTrack == null)
                 return;
 
             if (!dgSong.Columns.Contains("colData"))
@@ -301,18 +301,18 @@ namespace Music.Writer
                 return;
 
             // Populate the tempo row with the timeline data
-            PopulateTempoRow(dgSong, tempoTimeline);
+            PopulateTempoRow(dgSong, tempoTrack);
         }
 
         /// <summary>
         /// Populates the fixed Tempo row with BPM values at their respective measure positions.
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="tempoTimeline">TempoTrack containing tempo events</param>
-        private static void PopulateTempoRow(DataGridView dgSong, TempoTrack tempoTimeline)
+        /// <param name="tempoTrack">TempoTrack containing tempo events</param>
+        private static void PopulateTempoRow(DataGridView dgSong, TempoTrack tempoTrack)
         {
             // Store the timeline in the hidden data cell
-            dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO].Cells["colData"].Value = tempoTimeline;
+            dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO].Cells["colData"].Value = tempoTrack;
 
             // Clear all existing measure cells in the tempo row
             for (int colIndex = SongGridManager.MEASURE_START_COLUMN_INDEX; colIndex < dgSong.Columns.Count; colIndex++)
@@ -320,11 +320,11 @@ namespace Music.Writer
                 dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO].Cells[colIndex].Value = string.Empty;
             }
 
-            if (tempoTimeline.Events.Count == 0)
+            if (tempoTrack.Events.Count == 0)
                 return;
 
             // Populate measure cells with BPM at the starting bar of each tempo event
-            foreach (var tempoEvent in tempoTimeline.Events)
+            foreach (var tempoEvent in tempoTrack.Events)
             {
                 // Convert 1-based bar number to 0-based measure index
                 int measureIndex = tempoEvent.StartBar - 1;

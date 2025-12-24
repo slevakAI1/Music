@@ -222,7 +222,7 @@ namespace Music.Writer
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
                     _songContext.Song.TempoTrack = dlg.ResultTimeline;
-                    GridControlLinesManager.AttachTempoTimeline(dgSong, _songContext.Song.TempoTrack);
+                    GridControlLinesManager.AttachTempoTrack(dgSong, _songContext.Song.TempoTrack);
                 }
 
                 return;

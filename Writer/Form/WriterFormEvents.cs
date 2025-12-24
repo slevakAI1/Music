@@ -36,8 +36,8 @@ namespace Music.Writer
 
             // Extract tempo timeline from fixed row
             var tempoRow = dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO];
-            var tempoTimeline = tempoRow.Cells["colData"].Value as Music.Generator.TempoTrack;
-            if (tempoTimeline == null || tempoTimeline.Events.Count == 0)
+            var tempoTrack = tempoRow.Cells["colData"].Value as Music.Generator.TempoTrack;
+            if (tempoTrack == null || tempoTrack.Events.Count == 0)
             {
                 MessageBoxHelper.Show("No tempo events defined. Please add at least one tempo event.", "Missing Tempo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -127,7 +127,7 @@ namespace Music.Writer
             // Consolidated conversion: songTracks -> midi document with tempo and time signature timelines
             var midiDoc = ConvertSongTracksToMidiSongDocument.Convert(
                 songTracks,
-                tempoTimeline,
+                tempoTrack,
                 timeSignatureTrack);
 
             await Player.PlayMidiFromSongTracksAsync(midiPlaybackService, midiDoc);
@@ -157,8 +157,8 @@ namespace Music.Writer
 
             // Extract tempo timeline from fixed row
             var tempoRow = dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO];
-            var tempoTimeline = tempoRow.Cells["colData"].Value as Music.Generator.TempoTrack;
-            if (tempoTimeline == null || tempoTimeline.Events.Count == 0)
+            var tempoTrack = tempoRow.Cells["colData"].Value as Music.Generator.TempoTrack;
+            if (tempoTrack == null || tempoTrack.Events.Count == 0)
             {
                 MessageBoxHelper.Show("No tempo events defined. Please add at least one tempo event.", "Missing Tempo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -261,7 +261,7 @@ namespace Music.Writer
                 // Consolidated conversion: songTracks -> midi document with tempo and time signature timelines
                 var midiDoc = ConvertSongTracksToMidiSongDocument.Convert(
                     tracks,
-                    tempoTimeline,
+                    tempoTrack,
                     timeSignatureTrack);
 
                 // Export to file
@@ -328,13 +328,13 @@ namespace Music.Writer
                 }
 
                 // Extract tempo and time signature events from MIDI and attach to grid
-                var (tempoTimeline, timeSignatureTrack) = ExtractTimelinesFromMidiEvents(
+                var (tempoTrack, timeSignatureTrack) = ExtractTimelinesFromMidiEvents(
                     midiEventLists, 
                     ticksPerQuarterNote);
 
-                if (tempoTimeline != null && tempoTimeline.Events.Count > 0)
+                if (tempoTrack != null && tempoTrack.Events.Count > 0)
                 {
-                    GridControlLinesManager.AttachTempoTimeline(dgSong, tempoTimeline);
+                    GridControlLinesManager.AttachTempoTrack(dgSong, tempoTrack);
                 }
 
                 if (timeSignatureTrack != null && timeSignatureTrack.Events.Count > 0)
@@ -376,7 +376,7 @@ namespace Music.Writer
             List<List<MetaMidiEvent>> midiEventLists,
             short ticksPerQuarterNote)
         {
-            var tempoTimeline = new TempoTrack();
+            var tempoTrack = new TempoTrack();
             var timeSignatureTrack = new TimeSignatureTrack();
 
             // Assume 4/4 time signature initially for bar calculation
@@ -444,12 +444,12 @@ namespace Music.Writer
                         TempoBpm = bpm
                     };
 
-                    tempoTimeline.Add(tempoEvent);
+                    tempoTrack.Add(tempoEvent);
                 }
             }
 
             return (
-                tempoTimeline.Events.Count > 0 ? tempoTimeline : null,
+                tempoTrack.Events.Count > 0 ? tempoTrack : null,
                 timeSignatureTrack.Events.Count > 0 ? timeSignatureTrack : null
             );
         }
@@ -474,7 +474,7 @@ namespace Music.Writer
 
             GridControlLinesManager.AttachSectionTimeline(dgSong, songContext.SectionTrack);
             GridControlLinesManager.AttachTimeSignatureTrack(dgSong, songContext.Song.TimeSignatureTrack);
-            GridControlLinesManager.AttachTempoTimeline(dgSong, songContext.Song.TempoTrack);
+            GridControlLinesManager.AttachTempoTrack(dgSong, songContext.Song.TempoTrack);
             GridControlLinesManager.AttachharmonyTrack(dgSong, songContext.HarmonyTrack);
         }
 
