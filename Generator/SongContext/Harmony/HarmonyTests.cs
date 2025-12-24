@@ -1,12 +1,12 @@
 namespace Music.Generator
 {
-    // Builds the app's default harmony timeline (48 bars).
+    // Builds the app's default harmony track (48 bars).
     public static class HarmonyTests
     {
         public static HarmonyTrack CreateTestTimelineD1()
         {
-            var timeline = new HarmonyTrack();
-            timeline.ConfigureGlobal(TestDesigns.GlobalTimeSignature);
+            var track = new HarmonyTrack();
+            track.ConfigureGlobal(TestDesigns.GlobalTimeSignature);
 
             // Common 4-chord loop: I – V – vi – IV, two bars per 48 bars.
             // Using standard chord symbols
@@ -21,15 +21,15 @@ namespace Music.Generator
             for (int bar = 1; bar <= TestDesigns.TotalBars; bar++)
             {
                 var p = pattern[((bar - 1) / 2) % pattern.Length];
-                Add(timeline, bar, key: "C major", degree: p.degree, quality: p.quality);
+                Add(track, bar, key: "C major", degree: p.degree, quality: p.quality);
             }
 
-            return timeline;
+            return track;
         }
 
-        private static void Add(HarmonyTrack timeline, int bar, string key, int degree, string quality)
+        private static void Add(HarmonyTrack track, int bar, string key, int degree, string quality)
         {
-            timeline.Add(new HarmonyEvent
+            track.Add(new HarmonyEvent
             {
                 StartBar = bar,
                 StartBeat = 1,

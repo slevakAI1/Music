@@ -19,7 +19,7 @@
         /// </summary>
         public GrooveTrack GrooveTrack { get; set; } = new();
 
-        // Harmony timeline persisted with the design (optional)
+        // Harmony track persisted with the design (optional)
         public HarmonyTrack HarmonyTrack { get; set; } = new();
 
         public SectionTrack SectionTrack { get; set; } = new();

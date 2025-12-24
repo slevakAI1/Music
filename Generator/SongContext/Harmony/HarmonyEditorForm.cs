@@ -3,7 +3,7 @@ using Music.Writer;
 
 namespace Music.Designer
 {
-    // Popup editor for arranging Harmony Events and configuring the timeline
+    // Popup editor for arranging Harmony Events and configuring the track
     public sealed class HarmonyEditorForm : Form
     {
         private readonly ListView _lv;
@@ -17,7 +17,7 @@ namespace Music.Designer
         private readonly Button _btnOk;
         private readonly Button _btnCancel;
 
-        // Global timeline controls
+        // Global track controls
         private readonly TextBox _txtMeter;   // e.g., 4/4 (only numerator used)
 
         // Event editor controls
@@ -85,7 +85,7 @@ namespace Music.Designer
 
         public HarmonyEditorForm(HarmonyTrack? initial = null)
         {
-            Text = "Edit Harmony Timeline";
+            Text = "Edit Harmony track";
             FormBorderStyle = FormBorderStyle.FixedDialog;
             StartPosition = FormStartPosition.CenterParent;
             MinimizeBox = false;

@@ -3,7 +3,7 @@ namespace Music.Generator
     /// <summary>
     /// Generates tracks for multiple parts based on groove patterns and harmony events.
     /// Story 7: Now supports controlled randomness for pitch variation.
-    /// Updated to support groove timeline with multiple groove changes throughout the song.
+    /// Updated to support groove track with multiple groove changes throughout the song.
     /// </summary>
     public static class GrooveDrivenGenerator
     {
@@ -270,7 +270,7 @@ namespace Music.Generator
 
         /// <summary>
         /// Generates drum track: kick, snare, hi-hat at groove onsets with controlled randomness.
-        /// Updated to support groove timeline changes.
+        /// Updated to support groove track changes.
         /// </summary>
         private static PartTrack GenerateDrumTrack(
             HarmonyTrack harmonyTrack,

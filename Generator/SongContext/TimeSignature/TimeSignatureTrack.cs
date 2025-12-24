@@ -2,7 +2,7 @@
 namespace Music.Generator
 {
     // This is a design track for time signature
-    // Global bar/beat-aligned time signature timeline
+    // Global bar/beat-aligned time signature track
     public class TimeSignatureTrack
     {
         private readonly Dictionary<int, TimeSignatureEvent> _barHeads = new(); // bar -> event active at beat 1

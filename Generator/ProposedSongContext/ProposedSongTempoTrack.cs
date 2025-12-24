@@ -1,7 +1,7 @@
 namespace Music.Generator
 {
     /// <summary>
-    /// Tempo events for the song timeline.
+    /// Tempo events for the song track.
     /// </summary>
     public sealed class ProposedSongTempoTrack
     {

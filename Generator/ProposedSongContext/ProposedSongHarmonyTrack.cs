@@ -1,7 +1,7 @@
 namespace Music.Generator
 {
     /// <summary>
-    /// Harmony events for the song timeline.
+    /// Harmony events for the song track.
     /// </summary>
     public sealed class ProposedSongHarmonyTrack
     {

@@ -1,6 +1,6 @@
 namespace Music.Generator
 {
-    // Builds minimal groove test timelines used by default/test designs.
+    // Builds minimal groove test tracks used by default/test designs.
     public static class GrooveTests
     {
         // Adds a minimal GrooveTrack for test/default designs.

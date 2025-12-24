@@ -16,7 +16,7 @@ namespace Music.Writer
             if (tempoTrack == null) throw new ArgumentNullException(nameof(tempoTrack));
             if (timeSignatureTrack == null) throw new ArgumentNullException(nameof(timeSignatureTrack));
 
-            // Create tempo events from timeline
+            // Create tempo events from track
             var tempoEvents = new List<MetaMidiEvent>();
             foreach (var tempoEvent in tempoTrack.Events)
             {
@@ -25,7 +25,7 @@ namespace Music.Writer
                 tempoEvents.Add(MetaMidiEvent.CreateSetTempo(absoluteTicks, bpm: tempoEvent.TempoBpm));
             }
 
-            // Create time signature events from timeline
+            // Create time signature events from track
             var timeSignatureEvents = new List<MetaMidiEvent>();
             foreach (var tsEvent in timeSignatureTrack.Events)
             {

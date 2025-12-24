@@ -7,7 +7,7 @@
 //    /// </summary>
 //    public static class DesignerReport
 //    {
-//        // Builds: VOICES + 2 newlines + SECTIONS + 2 newlines + HARMONY TIMELINE + 2 newlines + ALIGNMENT + 2 newlines + TIME SIGNATURES + 2 newlines + TEMPO
+//        // Builds: VOICES + 2 newlines + SECTIONS + 2 newlines + HARMONY track + 2 newlines + ALIGNMENT + 2 newlines + TIME SIGNATURES + 2 newlines + TEMPO
 //        public static string CreateDesignerReport(SongContext designer)
 //        {
 //            if (designer == null)
@@ -50,13 +50,13 @@
 
 //            sb.Append("\r\n\r\n");
 
-//            // HARMONY TIMELINE
-//            sb.Append("HARMONY TIMELINE:\r\n");
+//            // HARMONY track
+//            sb.Append("HARMONY track:\r\n");
 //            first = true;
-//            var timeline = designer.HarmonyTrack;
+//            var track = designer.HarmonyTrack;
 //            if (timeline != null)
 //            {
-//                foreach (var he in timeline.Events)
+//                foreach (var he in track.Events)
 //                {
 //                    if (!first) sb.Append("\r\n");
 //                    sb.Append($"Bar {he.StartBar} Beat {he.StartBeat}, {he.DurationBeats} beats | Key: {he.Key} | Degree: {he.Degree} | Quality: {he.Quality} | Bass: {he.Bass}");
@@ -67,13 +67,13 @@
 //            // ALIGNMENT VIEW (Sections vs Harmony)
 //            sb.Append("\r\n\r\n");
 //            sb.Append("ALIGNMENT (Sections vs Harmony):\r\n");
-//            if (timeline == null || timeline.Events.Count == 0)
+//            if (timeline == null || track.Events.Count == 0)
 //            {
-//                sb.Append("(no harmony timeline)\r\n");
+//                sb.Append("(no harmony track)\r\n");
 //            }
 //            else
 //            {
-//                int bpb = timeline.BeatsPerBar;
+//                int bpb = track.BeatsPerBar;
 //                foreach (var s in designer.SectionTrack.Sections)
 //                {
 //                    if (s == null) continue;
@@ -89,7 +89,7 @@
 
 //                    // Find overlapping event segments within this section
 //                    bool any = false;
-//                    foreach (var he in timeline.Events)
+//                    foreach (var he in track.Events)
 //                    {
 //                        var evStartAbs = (he.StartBar - 1) * bpb + (he.StartBeat - 1);
 //                        var evEndAbsExcl = evStartAbs + he.DurationBeats;
@@ -132,7 +132,7 @@
 //            var tsTimeline = designer.TimeSignatureTrack;
 //            if (tsTimeline == null || tsTimeline.Events.Count == 0)
 //            {
-//                sb.Append("(no time signature timeline)");
+//                sb.Append("(no time signature track)");
 //            }
 //            else
 //            {
@@ -152,7 +152,7 @@
 //            var tempoTrack = designer.TempoTrack;
 //            if (tempoTrack == null || tempoTrack.Events.Count == 0)
 //            {
-//                sb.Append("(no tempo timeline)");
+//                sb.Append("(no tempo track)");
 //            }
 //            else
 //            {

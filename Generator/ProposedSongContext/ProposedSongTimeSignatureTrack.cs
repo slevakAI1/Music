@@ -1,7 +1,7 @@
 namespace Music.Generator
 {
     /// <summary>
-    /// Time signature events for the song timeline.
+    /// Time signature events for the song track.
     /// </summary>
     public sealed class ProposedSongTimeSignatureTrack
     {

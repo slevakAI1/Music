@@ -28,7 +28,7 @@
         {
             sections.Reset();
 
-            // Durations sum to 48 bars to align with default timelines
+            // Durations sum to 48 bars to align with default tracks
             sections.Add(MusicConstants.eSectionType.Intro, 4, "Intro");
             sections.Add(MusicConstants.eSectionType.Verse, 8, "Verse 1");
             sections.Add(MusicConstants.eSectionType.Chorus, 8, "Chorus 1");

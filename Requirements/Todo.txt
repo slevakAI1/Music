@@ -135,7 +135,7 @@ Content domains not represented:
 •	Articulations (staccato, accents) integrity across splice.
 •	Ornaments (trills, mordents), technical markings (fingering, bowing).
 •	Lyrics alignment (syllable shifting if rhythm differs).
-•	Chord symbols / harmony timeline alignment when splicing melody-only or harmony-only materials.
+•	Chord symbols / harmony track alignment when splicing melody-only or harmony-only materials.
 •	Expression / MIDI controller data (if performance layer exists).
 Conflict resolution options:
 •	Overwrite vs overlay vs skip empty measures.

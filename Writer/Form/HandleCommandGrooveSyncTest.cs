@@ -9,7 +9,7 @@ namespace Music.Writer
     {
         /// <summary>
         /// Handles the Harmony Groove Sync Test command.
-        /// Generates synchronized test tracks using groove presets from the GrooveTrack timeline.
+        /// Generates synchronized test tracks using groove presets from the GrooveTrack track.
         /// </summary>
         public static void HandleGrooveSyncTest(
             SongContext songContext,
@@ -42,7 +42,7 @@ namespace Music.Writer
         private static void ShowGrooveSuccess(int addedCount)
         {
             MessageBoxHelper.Show(
-                $"Successfully created {addedCount} synchronized tracks using groove timeline with controlled randomness.",
+                $"Successfully created {addedCount} synchronized tracks using groove track with controlled randomness.",
                 "Groove Sync Test",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);

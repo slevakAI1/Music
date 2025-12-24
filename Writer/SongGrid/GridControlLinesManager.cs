@@ -28,7 +28,7 @@ namespace Music.Writer
             if (dgSong.Rows.Count <= SongGridManager.FIXED_ROW_SECTION)
                 return;
 
-            // Populate the section row with the timeline data
+            // Populate the section row with the track data
             PopulateSectionRow(dgSong, sectionTrack);
         }
 
@@ -39,7 +39,7 @@ namespace Music.Writer
         /// <param name="sectionTrack">SectionTrack containing section events</param>
         private static void PopulateSectionRow(DataGridView dgSong, SectionTrack sectionTrack)
         {
-            // Store the timeline in the hidden data cell
+            // Store the track in the hidden data cell
             dgSong.Rows[SongGridManager.FIXED_ROW_SECTION].Cells["colData"].Value = sectionTrack;
 
             // Clear all existing measure cells in the section row
@@ -121,7 +121,7 @@ namespace Music.Writer
             if (dgSong.Rows.Count <= SongGridManager.FIXED_ROW_HARMONY)
                 return;
 
-            // Populate the harmony row with the timeline data
+            // Populate the harmony row with the track data
             PopulateHarmonyRow(dgSong, harmonyTrack);
         }
 
@@ -133,7 +133,7 @@ namespace Music.Writer
         /// <param name="harmonyTrack">HarmonyTrack containing harmony events</param>
         private static void PopulateHarmonyRow(DataGridView dgSong, HarmonyTrack harmonyTrack)
         {
-            // Store the timeline in the hidden data cell
+            // Store the track in the hidden data cell
             dgSong.Rows[SongGridManager.FIXED_ROW_HARMONY].Cells["colData"].Value = harmonyTrack;
 
             // Clear all existing measure cells in the harmony row
@@ -220,7 +220,7 @@ namespace Music.Writer
             if (dgSong.Rows.Count <= SongGridManager.FIXED_ROW_TIME_SIGNATURE)
                 return;
 
-            // Populate the time signature row with the timeline data
+            // Populate the time signature row with the track data
             PopulateTimeSignatureRow(dgSong, timeSignatureTrack);
         }
 
@@ -231,7 +231,7 @@ namespace Music.Writer
         /// <param name="timeSignatureTrack">TimeSignatureTrack containing time signature events</param>
         private static void PopulateTimeSignatureRow(DataGridView dgSong, TimeSignatureTrack timeSignatureTrack)
         {
-            // Store the timeline in the hidden data cell
+            // Store the track in the hidden data cell
             dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE].Cells["colData"].Value = timeSignatureTrack;
 
             // Clear all existing measure cells in the time signature row
@@ -300,7 +300,7 @@ namespace Music.Writer
             if (dgSong.Rows.Count <= SongGridManager.FIXED_ROW_TEMPO)
                 return;
 
-            // Populate the tempo row with the timeline data
+            // Populate the tempo row with the track data
             PopulateTempoRow(dgSong, tempoTrack);
         }
 
@@ -311,7 +311,7 @@ namespace Music.Writer
         /// <param name="tempoTrack">TempoTrack containing tempo events</param>
         private static void PopulateTempoRow(DataGridView dgSong, TempoTrack tempoTrack)
         {
-            // Store the timeline in the hidden data cell
+            // Store the track in the hidden data cell
             dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO].Cells["colData"].Value = tempoTrack;
 
             // Clear all existing measure cells in the tempo row

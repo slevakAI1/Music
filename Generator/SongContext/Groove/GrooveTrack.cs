@@ -1,7 +1,7 @@
 namespace Music.Generator
 {
     // This is a design track for Groove
-    // Global bar/beat-aligned groove timeline
+    // Global bar/beat-aligned groove track
     public class GrooveTrack
     {
         //TO DO - this may change per instance right? Why is it up here?

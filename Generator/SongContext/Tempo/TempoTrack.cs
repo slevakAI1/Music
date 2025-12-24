@@ -1,7 +1,7 @@
 namespace Music.Generator
 {
     // This is a design track for tempo
-    // Global bar/beat-aligned tempo timeline
+    // Global bar/beat-aligned tempo track
     public class TempoTrack
     {
         private readonly Dictionary<int, TempoEvent> _barHeads = new(); // bar -> event active at beat 1
@@ -88,13 +88,13 @@ namespace Music.Generator
             Reindex();
         }
 
-        // Helper: Get the duration in beats for a specific event (until next event or end of timeline)
+        // Helper: Get the duration in beats for a specific event (until next event or end of track)
         public int GetEventDuration(TempoEvent evt, int totalBars)
         {
             var startAbs = (evt.StartBar - 1) * BeatsPerBar + (evt.StartBeat - 1);
             
             // Find the next event
-            int nextStartAbs = totalBars * BeatsPerBar; // default to end of timeline
+            int nextStartAbs = totalBars * BeatsPerBar; // default to end of track
             
             foreach (var te in Events)
             {

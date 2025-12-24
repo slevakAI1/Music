@@ -1,7 +1,7 @@
 namespace Music.Generator
 {
     // This is a design track for Harmony
-    // Global bar/beat-aligned harmony timeline
+    // Global bar/beat-aligned harmony track
 
     public class HarmonyTrack
     {

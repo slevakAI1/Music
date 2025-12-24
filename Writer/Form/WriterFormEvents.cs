@@ -34,7 +34,7 @@ namespace Music.Writer
                 return;
             }
 
-            // Extract tempo timeline from fixed row
+            // Extract tempo track from fixed row
             var tempoRow = dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO];
             var tempoTrack = tempoRow.Cells["colData"].Value as Music.Generator.TempoTrack;
             if (tempoTrack == null || tempoTrack.Events.Count == 0)
@@ -43,7 +43,7 @@ namespace Music.Writer
                 return;
             }
 
-            // Extract time signature timeline from fixed row
+            // Extract time signature track from fixed row
             var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
             var timeSignatureTrack = timeSignatureRow.Cells["colData"].Value as Music.Generator.TimeSignatureTrack;
             if (timeSignatureTrack == null || timeSignatureTrack.Events.Count == 0)
@@ -124,7 +124,7 @@ namespace Music.Writer
                 return;
             }
 
-            // Consolidated conversion: songTracks -> midi document with tempo and time signature timelines
+            // Consolidated conversion: songTracks -> midi document with tempo and time signature tracks
             var midiDoc = ConvertSongTracksToMidiSongDocument.Convert(
                 songTracks,
                 tempoTrack,
@@ -155,7 +155,7 @@ namespace Music.Writer
                 return;
             }
 
-            // Extract tempo timeline from fixed row
+            // Extract tempo track from fixed row
             var tempoRow = dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO];
             var tempoTrack = tempoRow.Cells["colData"].Value as Music.Generator.TempoTrack;
             if (tempoTrack == null || tempoTrack.Events.Count == 0)
@@ -164,7 +164,7 @@ namespace Music.Writer
                 return;
             }
 
-            // Extract time signature timeline from fixed row
+            // Extract time signature track from fixed row
             var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
             var timeSignatureTrack = timeSignatureRow.Cells["colData"].Value as Music.Generator.TimeSignatureTrack;
             if (timeSignatureTrack == null || timeSignatureTrack.Events.Count == 0)
@@ -258,7 +258,7 @@ namespace Music.Writer
 
             try
             {
-                // Consolidated conversion: songTracks -> midi document with tempo and time signature timelines
+                // Consolidated conversion: songTracks -> midi document with tempo and time signature tracks
                 var midiDoc = ConvertSongTracksToMidiSongDocument.Convert(
                     tracks,
                     tempoTrack,
@@ -370,7 +370,7 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Extracts tempo and time signature events from MIDI event lists and converts them to timelines.
+        /// Extracts tempo and time signature events from MIDI event lists and converts them to tracks.
         /// </summary>
         private static (TempoTrack?, TimeSignatureTrack?) ExtractTimelinesFromMidiEvents(
             List<List<MetaMidiEvent>> midiEventLists,

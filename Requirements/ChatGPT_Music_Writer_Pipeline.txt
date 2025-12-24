@@ -92,7 +92,7 @@ Polyrhythm & cross-rhythm
 
 Hemiola (temporary reinterpretation of grouping)
 
-Clave-style timelines (asymmetric repeating anchor patterns)
+Clave-style tracks (asymmetric repeating anchor patterns)
 
 Interlocking rhythms (complementary sparse parts that sum to a dense composite)
 
@@ -1664,7 +1664,7 @@ namespace MusicGen.Pipeline.Step1_FormEnergy
 
         public sectionTrack sectionTrack; // The generated/validated section plan with bar ranges per section.
 
-        public EnergyTimeline EnergyTimeline; // Energy curves indexed over the timeline (bar/beat/step resolution).
+        public EnergyTimeline EnergyTimeline; // Energy curves indexed over the track (bar/beat/step resolution).
 
         public EnergyLandmarks Landmarks; // Named points like "first chorus start", "big lift start", "bridge start".
 
@@ -1681,7 +1681,7 @@ namespace MusicGen.Pipeline.Step1_FormEnergy
     {
         public EnergyResolution Resolution; // Whether the curve is per-bar, per-beat, or per-step.
 
-        public List<EnergyFrame> Frames; // Ordered frames spanning the whole song timeline.
+        public List<EnergyFrame> Frames; // Ordered frames spanning the whole song track.
     }
 
     /// <summary>
@@ -1722,7 +1722,7 @@ namespace MusicGen.Pipeline.Step1_FormEnergy
     }
 
     /// <summary>
-    /// A timeline location expressed in bar/beat/step (matches TimeGridSpec resolution).
+    /// A track location expressed in bar/beat/step (matches TimeGridSpec resolution).
     /// </summary>
     public class TimePoint
     {
@@ -1824,7 +1824,7 @@ namespace MusicGen.Pipeline.Step1_FormEnergy
     /// </summary>
     public class harmonyTrack
     {
-        public List<HarmonySpan> Chords; // Ordered chord spans aligned to timeline positions.
+        public List<HarmonySpan> Chords; // Ordered chord spans aligned to track positions.
     }
 
     /// <summary>
@@ -1977,7 +1977,7 @@ namespace Music.Designer
 
 namespace Music.Designer
 {
-    // Global bar/beat-aligned tempo timeline
+    // Global bar/beat-aligned tempo track
     public class TempoTrack
     {
         private readonly Dictionary<int, TempoEvent> _barHeads = new(); // bar -> event active at beat 1
@@ -2064,13 +2064,13 @@ namespace Music.Designer
             Reindex();
         }
 
-        // Helper: Get the duration in beats for a specific event (until next event or end of timeline)
+        // Helper: Get the duration in beats for a specific event (until next event or end of track)
         public int GetEventDuration(TempoEvent evt, int totalBars)
         {
             var startAbs = (evt.StartBar - 1) * BeatsPerBar + (evt.StartBeat - 1);
             
             // Find the next event
-            int nextStartAbs = totalBars * BeatsPerBar; // default to end of timeline
+            int nextStartAbs = totalBars * BeatsPerBar; // default to end of track
             
             foreach (var te in Events)
             {
@@ -2326,7 +2326,7 @@ When completed based on the manual input song design, it should create a song wi
  
 No code. Just give me an agile plan to implement these requirements. If there are issues with the requirements, you can adjust, but do not expand scope. The plan should be in small non-breaking steps and in order to best to facilitate testing and to reduce/eliminate rework if a bug or issue is found. Use as many stories as needed. Include as much detail as needed for AI coder to effectively apply the changes to known code.
 ChatGPT said:
-Here’s an agile plan that keeps your current structure, adds only what you need (harmony + groove), and stays testable at every step. I’m going to assume you already have a Song object somewhere that holds timelines + parts/voices + generated notes, and you have a “test generator” method that currently writes the fixed patterns you described.
+Here’s an agile plan that keeps your current structure, adds only what you need (harmony + groove), and stays testable at every step. I’m going to assume you already have a Song object somewhere that holds tracks + parts/voices + generated notes, and you have a “test generator” method that currently writes the fixed patterns you described.
 
 The key move: introduce a GrooveTimeline and GroovePattern objects that emit rhythmic onsets, then reuse your existing harmony lookup to pick pitches in-key at those onsets. No critics, no fancy form/hook system beyond “section reuse.”
 
@@ -2335,7 +2335,7 @@ No breaking changes: keep existing test song generator working until the new one
 
 Additive model: new types are optional; if not present, fall back to old behavior.
 
-Event-first: treat groove as events like tempo/harmony: a timeline with events active until next event.
+Event-first: treat groove as events like tempo/harmony: a track with events active until next event.
 
 Section reuse: generate one “section pattern” per section type (Verse/Chorus/etc.), then copy it into each matching section span.
 
@@ -2409,11 +2409,11 @@ Epic 2 — Minimal Harmony-aware Random Note Generation
 Story 4: Add “Harmony query” helper usable by generators
 Goal: A single function/API that given a bar/beat returns the active HarmonyEvent.
 
-You already have HarmonyEvents and likely a timeline. If you don’t have fast lookup yet, mirror what you did for tempo (cache “bar heads”).
+You already have HarmonyEvents and likely a track. If you don’t have fast lookup yet, mirror what you did for tempo (cache “bar heads”).
 
 Acceptance test
 
-For a simple test harmony timeline, querying each bar returns expected chord.
+For a simple test harmony track, querying each bar returns expected chord.
 
 Story 5: Add a “KeyScale” helper (no composition logic)
 Goal: Convert HarmonyEvent.Key into a usable pitch collection (scale degrees), and convert chord degree/quality into chord tones.
@@ -2746,7 +2746,7 @@ namespace Music.Designer
 
 namespace Music.Designer
 {
-    // Global bar/beat-aligned groove timeline
+    // Global bar/beat-aligned groove track
     public class GrooveTimeline
     {
         private readonly Dictionary<int, GrooveEvent> _barHeads = new(); // bar -> event active at beat 1
@@ -2826,7 +2826,7 @@ namespace Music.Designer
 ChatGPT said:
 
 Thought for 34s
-Your overall direction is solid: a preset with an anchor layer + tension layer, plus a timeline of groove events is exactly the minimal scaffolding you want.
+Your overall direction is solid: a preset with an anchor layer + tension layer, plus a track of groove events is exactly the minimal scaffolding you want.
 
 That said, there are a couple “this will bite you later” issues in the current code, plus a clean plan to add randomness without making songs feel sloppy or samey.
 
@@ -3024,11 +3024,11 @@ Story 4: Add “Harmony query” helper usable by generators
 
 Goal: A single function/API that given a bar/beat returns the active HarmonyEvent.
 
-You already have HarmonyEvents and likely a timeline. If you don’t have fast lookup yet, mirror what you did for tempo (cache “bar heads”).
+You already have HarmonyEvents and likely a track. If you don’t have fast lookup yet, mirror what you did for tempo (cache “bar heads”).
 
 Acceptance test
 
-For a simple test harmony timeline, querying each bar returns expected chord.
+For a simple test harmony track, querying each bar returns expected chord.
 ChatGPT said:
 Story 4 (Detailed) — Add “Harmony query” helper usable by generators
 Goal
@@ -3131,7 +3131,7 @@ Do not cache mid-bar queries into _barHeads[bar] unless you’re caching only fo
 E) Edge cases
 Define behavior explicitly:
 
-If bar < 1 or beat < 1 or beat > BeatsPerBar: throw ArgumentOutOfRangeException (or return false; pick one style consistent with your other timelines).
+If bar < 1 or beat < 1 or beat > BeatsPerBar: throw ArgumentOutOfRangeException (or return false; pick one style consistent with your other tracks).
 
 If no events exist, return false and evt = null.
 
@@ -3139,7 +3139,7 @@ If events exist but all start after targetAbs, return false (or return first eve
 
 If multiple events have same (StartBar, StartBeat), choose:
 
-“last one wins” (common in timelines), OR
+“last one wins” (common in tracks), OR
 
 throw.
 For agile compatibility, “last one wins” is safer and avoids breaking UI editing.
@@ -3209,7 +3209,7 @@ If you want, I can also provide a “drop-in” story variant that assumes you a
 
 You said:
 reminder:
-Here’s an agile plan that keeps your current structure, adds only what you need (harmony + groove), and stays testable at every step. I’m going to assume you already have a Song object somewhere that holds timelines + parts/voices + generated notes, and you have a “test generator” method that currently writes the fixed patterns you described.
+Here’s an agile plan that keeps your current structure, adds only what you need (harmony + groove), and stays testable at every step. I’m going to assume you already have a Song object somewhere that holds tracks + parts/voices + generated notes, and you have a “test generator” method that currently writes the fixed patterns you described.
 
 The key move: introduce a GrooveTimeline and GroovePattern objects that emit rhythmic onsets, then reuse your existing harmony lookup to pick pitches in-key at those onsets. No critics, no fancy form/hook system beyond “section reuse.”
 
@@ -3219,7 +3219,7 @@ No breaking changes: keep existing test song generator working until the new one
 
 Additive model: new types are optional; if not present, fall back to old behavior.
 
-Event-first: treat groove as events like tempo/harmony: a timeline with events active until next event.
+Event-first: treat groove as events like tempo/harmony: a track with events active until next event.
 
 Section reuse: generate one “section pattern” per section type (Verse/Chorus/etc.), then copy it into each matching section span.
 
@@ -3297,11 +3297,11 @@ Story 4: Add “Harmony query” helper usable by generators
 
 Goal: A single function/API that given a bar/beat returns the active HarmonyEvent.
 
-You already have HarmonyEvents and likely a timeline. If you don’t have fast lookup yet, mirror what you did for tempo (cache “bar heads”).
+You already have HarmonyEvents and likely a track. If you don’t have fast lookup yet, mirror what you did for tempo (cache “bar heads”).
 
 Acceptance test
 
-For a simple test harmony timeline, querying each bar returns expected chord.
+For a simple test harmony track, querying each bar returns expected chord.
 
 Story 5: Add a “KeyScale” helper (no composition logic)
 
@@ -3525,7 +3525,7 @@ The current "song" is currently represented in entirety as grid rows in a DataGr
 
 I am thinking there should be a song class/instance that holds the current song in entirety - this would be all of the parts, notes, control events, etc.
 
-The data in the datagridview is based on midi - it's higher level than midi events, but has elements that support conversion to midi. There are separate grid rows for the tempo timeline and time signature timeline. No row for Groove timeline yet as this is still a work in progress.
+The data in the datagridview is based on midi - it's higher level than midi events, but has elements that support conversion to midi. There are separate grid rows for the tempo track and time signature track. No row for Groove track yet as this is still a work in progress.
 
 I am not sure if the Song object should contain only data that converts to midi events (i.e. playable) or should also contain the metadata that is used to create the song. An argument to keep is all in only master class object is that would allow me to save the whole thing to disk and reload later, and be in the same state. Currently the designer object (this would be some of the metadata for the song is a separate class).
 
@@ -3535,7 +3535,7 @@ I have helpers that convert between metadata like midi program number and my met
 
 I am guessing that we need a song class/object along with a converter to/from the dataviewgrid format. Must keep the grid and it's functionality as that is only way to play the song. Some metadata in the grid-related data may possibly be removed if not needed.
 
-Goal is to determine the structure or structures to represent a song instance including notes, timelines, etc and other useful data and to generate the class(es) for these.
+Goal is to determine the structure or structures to represent a song instance including notes, tracks, etc and other useful data and to generate the class(es) for these.
 
 The song class must be compatible (i.e. support the current data now in the grid, so we can transfer songs to and from the song grid.
 
@@ -3555,10 +3555,10 @@ namespace Music.Designer
 
         public sectionTrack sectionTrack { get; set; } = new();
 
-        // Harmony timeline persisted with the design
+        // Harmony track persisted with the design
         public harmonyTrack? harmonyTrack { get; set; }
 
-        // New: independent timelines for tempo and time signature
+        // New: independent tracks for tempo and time signature
         public TempoTrack? TempoTrack { get; set; }
         public TimeSignatureTrack? TimeSignatureTrack { get; set; }
 
@@ -3687,7 +3687,7 @@ namespace Music.Designer
 
 namespace Music.Designer
 {
-    // Global bar/beat-aligned groove timeline
+    // Global bar/beat-aligned groove track
     public class GrooveTimeline
     {
         private readonly Dictionary<int, GrooveEvent> _barHeads = new(); // bar -> event active at beat 1
@@ -3796,7 +3796,7 @@ namespace Music.Designer
 
 namespace Music.Designer
 {
-    // Global bar/beat-aligned harmony timeline
+    // Global bar/beat-aligned harmony track
     public class harmonyTrack
     {
         private readonly Dictionary<int, HarmonyEvent> _barHeads = new(); // bar -> event active at beat 1
@@ -3990,7 +3990,7 @@ namespace Music.Designer
 
 namespace Music.Designer
 {
-    // Global bar/beat-aligned tempo timeline
+    // Global bar/beat-aligned tempo track
     public class TempoTrack
     {
         private readonly Dictionary<int, TempoEvent> _barHeads = new(); // bar -> event active at beat 1
@@ -4077,13 +4077,13 @@ namespace Music.Designer
             Reindex();
         }
 
-        // Helper: Get the duration in beats for a specific event (until next event or end of timeline)
+        // Helper: Get the duration in beats for a specific event (until next event or end of track)
         public int GetEventDuration(TempoEvent evt, int totalBars)
         {
             var startAbs = (evt.StartBar - 1) * BeatsPerBar + (evt.StartBeat - 1);
             
             // Find the next event
-            int nextStartAbs = totalBars * BeatsPerBar; // default to end of timeline
+            int nextStartAbs = totalBars * BeatsPerBar; // default to end of track
             
             foreach (var te in Events)
             {
@@ -4116,7 +4116,7 @@ namespace Music.Designer
 
 namespace Music.Designer
 {
-    // Global bar/beat-aligned time signature timeline
+    // Global bar/beat-aligned time signature track
     public class TimeSignatureTrack
     {
         private readonly Dictionary<int, TimeSignatureEvent> _barHeads = new(); // bar -> event active at beat 1
@@ -8314,7 +8314,7 @@ using System.Windows.Forms;
 
 namespace Music.Designer
 {
-    // Popup editor for arranging Harmony Events and configuring the timeline
+    // Popup editor for arranging Harmony Events and configuring the track
     public sealed class HarmonyEditorForm : Form
     {
         private readonly ListView _lv;
@@ -8328,7 +8328,7 @@ namespace Music.Designer
         private readonly Button _btnOk;
         private readonly Button _btnCancel;
 
-        // Global timeline controls
+        // Global track controls
         private readonly TextBox _txtMeter;   // e.g., 4/4 (only numerator used)
 
         // Event editor controls
@@ -8407,7 +8407,7 @@ namespace Music.Designer
 
         public HarmonyEditorForm(harmonyTrack? initial = null)
         {
-            Text = "Edit Harmony Timeline";
+            Text = "Edit Harmony track";
             FormBorderStyle = FormBorderStyle.FixedDialog;
             StartPosition = FormStartPosition.CenterParent;
             MinimizeBox = false;
@@ -9494,7 +9494,7 @@ Integration points with your existing architecture
 1) Where to get harmonic context
 At every onset:
 
-Query the harmony timeline at that bar/beat
+Query the harmony track at that bar/beat
 
 Build HarmonyPitchContext via HarmonyPitchContextBuilder.Build(harmonyEvent, baseOctave) (already exists)
 
@@ -9507,7 +9507,7 @@ Generated notes remain PhraseNote lists like before; Story 7 only changes pitch 
 
 Testing / acceptance criteria (practical)
 A) Determinism tests
-Same seed produces identical output for a fixed test timeline + groove.
+Same seed produces identical output for a fixed test track + groove.
 
 Different seed changes output (at least some notes differ).
 
@@ -10046,7 +10046,7 @@ When GrooveRole == "Comp" the track’s generation policy should be:
 
 chord-based rhythm track
 
-uses harmony timeline + groove onsets
+uses harmony track + groove onsets
 
 voicings optimized for rhythm + register + voice-leading
 

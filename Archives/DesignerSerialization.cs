@@ -45,7 +45,7 @@
 //                design.SectionTrack.SyncAfterExternalLoad();
 //            }
 
-//            // Harmony timeline: preserve order and values
+//            // Harmony track: preserve order and values
 //            if (dto.harmonyTrack != null)
 //            {
 //                var tl = new HarmonyTrack
