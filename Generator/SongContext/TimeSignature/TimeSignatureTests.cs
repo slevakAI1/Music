@@ -6,7 +6,7 @@ namespace Music.Generator
         public static TimeSignatureTrack CreateTestTimelineD1()
         {
             var timeline = new TimeSignatureTrack();
-            timeline.ConfigureGlobal(DesignerTests.GlobalTimeSignature);
+            timeline.ConfigureGlobal(TestDesigns.GlobalTimeSignature);
 
             // One 4/4 event spanning the entire song
             // Duration is implicit - this event continues until another event or end of song

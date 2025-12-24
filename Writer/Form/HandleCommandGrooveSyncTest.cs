@@ -1,11 +1,11 @@
-using Music.Writer;
+using Music.Generator;
 
-namespace Music.Generator
+namespace Music.Writer
 {
     /// <summary>
     /// Command handler for the groove-driven generator test.
     /// </summary>
-    public static class CommandGrooveSyncTest
+    public static class HandleCommandGrooveSyncTest
     {
         /// <summary>
         /// Handles the Harmony Groove Sync Test command.

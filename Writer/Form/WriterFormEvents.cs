@@ -470,7 +470,7 @@ namespace Music.Writer
             DataGridView dgSong,
             SongContext songContext)
         {
-            DesignerTests.SetTestDesignD1(songContext);
+            TestDesigns.SetTestDesignD1(songContext);
 
             GridControlLinesManager.AttachSectionTimeline(dgSong, songContext.SectionTrack);
             GridControlLinesManager.AttachTimeSignatureTimeline(dgSong, songContext.Song.TimeSignatureTrack);

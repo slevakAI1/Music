@@ -11,7 +11,7 @@ namespace Music.Generator
             {
                 StartBar = 1,
                 StartBeat = 1,
-                TempoBpm = DesignerTests.DefaultTempoBpm,
+                TempoBpm = TestDesigns.DefaultTempoBpm,
             });
 
             return timeline;

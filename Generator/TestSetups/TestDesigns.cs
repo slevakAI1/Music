@@ -4,7 +4,7 @@ using Music.Generator;
 namespace Music.Generator
 {
     // Central defaults to keep timelines aligned
-    public static class DesignerTests
+    public static class TestDesigns
     {
         public const int TotalBars = 48;
         public const string GlobalTimeSignature = "4/4";

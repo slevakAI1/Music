@@ -6,7 +6,7 @@ namespace Music.Generator
         public static HarmonyTrack CreateTestTimelineD1()
         {
             var timeline = new HarmonyTrack();
-            timeline.ConfigureGlobal(DesignerTests.GlobalTimeSignature);
+            timeline.ConfigureGlobal(TestDesigns.GlobalTimeSignature);
 
             // Common 4-chord loop: I – V – vi – IV, two bars per 48 bars.
             // Using standard chord symbols
@@ -18,7 +18,7 @@ namespace Music.Generator
                 (4, "")       // Major
             };
 
-            for (int bar = 1; bar <= DesignerTests.TotalBars; bar++)
+            for (int bar = 1; bar <= TestDesigns.TotalBars; bar++)
             {
                 var p = pattern[((bar - 1) / 2) % pattern.Length];
                 Add(timeline, bar, key: "C major", degree: p.degree, quality: p.quality);

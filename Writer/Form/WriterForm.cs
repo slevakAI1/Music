@@ -350,7 +350,7 @@ namespace Music.Writer
                     break;
 
                 case "Harmony Groove Sync Test":
-                    CommandGrooveSyncTest.HandleGrooveSyncTest(_songContext, dgSong);
+                    HandleCommandGrooveSyncTest.HandleGrooveSyncTest(_songContext, dgSong);
                     break;
 
                 // Other cases will be added here later.
