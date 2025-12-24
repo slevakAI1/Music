@@ -48,10 +48,10 @@ namespace Music.Generator
         /// </summary>
         public sealed class GeneratorResult
         {
-            public PartTrack BassTrack { get; init; }
-            public PartTrack GuitarTrack { get; init; }
-            public PartTrack KeysTrack { get; init; }
-            public PartTrack DrumTrack { get; init; }
+            public required PartTrack BassTrack { get; init; }
+            public required PartTrack GuitarTrack { get; init; }
+            public required PartTrack KeysTrack { get; init; }
+            public required PartTrack DrumTrack { get; init; }
         }
 
         private static PartTrack GenerateBassTrack(
