@@ -187,7 +187,6 @@ namespace Music.Writer
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
                     _songContext.GrooveTrack = dlg.ResultTimeline;
-                    _songContext.GrooveTrack?.EnsureIndexed();
                 }
 
                 return;

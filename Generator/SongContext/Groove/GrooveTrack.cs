@@ -4,9 +4,6 @@ namespace Music.Generator
     // Global bar/beat-aligned groove timeline
     public class GrooveTrack
     {
-        private readonly Dictionary<int, GrooveInstance> _barHeads = new(); // bar -> event active at beat 1
-
-
         //TO DO - this may change per instance right? Why is it up here?
 
         public int BeatsPerBar { get; set; } = 4;
@@ -16,69 +13,54 @@ namespace Music.Generator
         public void Reset()
         {
             Events.Clear();
-            _barHeads.Clear();
         }
+
+        //============================================================
+
+        // TO DO - these should be used by the editor when modifying existing events to ensure the list is kept sorted
 
         public void Add(GrooveInstance evt)
         {
             Events.Add(evt);
-            IndexEventForBars(evt);
+            Events = Events.OrderBy(e => e.StartBar).ToList();
         }
 
-        // Fast lookup of the groove active at the start of a bar (beat 1).
-        public bool TryGetAtBar(int bar, out GrooveInstance? evt)
+        public void Update(GrooveInstance evt)
         {
-            if (_barHeads.TryGetValue(bar, out var e))
+            //var existing = Events.FirstOrDefault(e => e == evt);
+            //if (existing != null)
+            //{
+            //    Events.Remove(existing);
+            //    Events.Add(evt);
+            //    Events = Events.OrderBy(e => e.StartBar).ToList();
+            //}
+        }
+
+        public void Delete(GrooveInstance evt)
+        {
+            //Events.Remove(evt);
+            //Events = Events.OrderBy(e => e.StartBar).ToList();
+        }
+
+        //============================================================
+
+
+        // Finds the Groove Event at or immediate before the specified bar and returns the corresponding preset.
+        public GroovePreset GetActiveGroovePreset(int startBar)
+        {
+            if (startBar < 1) throw new ArgumentOutOfRangeException(nameof(startBar));
+
+            for (int i = Events.Count - 1; i >= 0; i--)
             {
-                evt = e;
-                return true;
-            }
-
-            // Fallback: find the most recent event at or before this bar
-            var targetAbs = (bar - 1) * BeatsPerBar;
-
-            GrooveInstance? bestMatch = null;
-            int bestStartAbs = -1;
-
-            foreach (var ge in Events)
-            {
-                // GrooveInstance always starts at beat 1 of StartBar, so no beat offset needed
-                var startAbs = (ge.StartBar - 1) * BeatsPerBar;
-                if (startAbs <= targetAbs && startAbs > bestStartAbs)
+                if (Events[i].StartBar <= startBar)
                 {
-                    bestMatch = ge;
-                    bestStartAbs = startAbs;
+                    var grooveEvent = Events[i];
+                    return GroovePresets.GetByName(grooveEvent.SourcePresetName)!;
                 }
             }
 
-            if (bestMatch != null)
-            {
-                _barHeads[bar] = bestMatch;
-                evt = bestMatch;
-                return true;
-            }
-
-            evt = null;
-            return false;
-        }
-
-        private void IndexEventForBars(GrooveInstance evt)
-        {
-            // GrooveInstance always starts at beat 1 of StartBar (spans entire bars).
-            // Index it at its starting bar for fast lookup.
-            _barHeads[evt.StartBar] = evt;
-        }
-
-        private void Reindex()
-        {
-            _barHeads.Clear();
-            foreach (var ge in Events)
-                IndexEventForBars(ge);
-        }
-
-        public void EnsureIndexed()
-        {
-            Reindex();
+            // If you truly guarantee StartBar=1 exists and startBar>=1, you never hit this.
+            throw new InvalidOperationException("No event at or before this bar. Expected StartBar = 1.");
         }
     }
 }

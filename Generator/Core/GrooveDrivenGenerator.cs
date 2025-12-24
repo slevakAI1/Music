@@ -18,29 +18,22 @@ namespace Music.Generator
             ValidateTimeSignatureTrack(songContext.Song.TimeSignatureTrack);
             ValidateGrooveTrack(songContext.GrooveTrack);
 
-            var harmonyTimeline = songContext.HarmonyTrack;
-            var timeSignatureTimeline = songContext.Song.TimeSignatureTrack;
-            var grooveTrack = songContext.GrooveTrack;
-
-            var timeSignature = timeSignatureTimeline.Events.First();
+            var timeSignature = songContext.Song.TimeSignatureTrack.Events.First();
             int ticksPerQuarterNote = MusicConstants.TicksPerQuarterNote;
             int ticksPerMeasure = (ticksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
 
             // Get total bars from harmony events
-            int totalBars = harmonyTimeline.Events.Max(e => e.StartBar);
+            int totalBars = songContext.HarmonyTrack.Events.Max(e => e.StartBar);
 
             // Use default randomization settings
             var settings = RandomizationSettings.Default;
 
-            // Ensure groove track is indexed for fast lookups
-            grooveTrack.EnsureIndexed();
-
             return new GeneratorResult
             {
-                BassTrack = GenerateBassTrack(harmonyTimeline, grooveTrack, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
-                GuitarTrack = GenerateGuitarTrack(harmonyTimeline, grooveTrack, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
-                KeysTrack = GenerateKeysTrack(harmonyTimeline, grooveTrack, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
-                DrumTrack = GenerateDrumTrack(harmonyTimeline, grooveTrack, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings)
+                BassTrack = GenerateBassTrack(songContext.HarmonyTrack, songContext.GrooveTrack, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
+                GuitarTrack = GenerateGuitarTrack(songContext.HarmonyTrack, songContext.GrooveTrack, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
+                KeysTrack = GenerateKeysTrack(songContext.HarmonyTrack, songContext.GrooveTrack, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings),
+                DrumTrack = GenerateDrumTrack(songContext.HarmonyTrack, songContext.GrooveTrack, ticksPerQuarterNote, ticksPerMeasure, totalBars, settings)
             };
         }
 
@@ -53,22 +46,6 @@ namespace Music.Generator
             public PartTrack GuitarTrack { get; init; }
             public PartTrack KeysTrack { get; init; }
             public PartTrack DrumTrack { get; init; }
-        }
-
-        /// <summary>
-        /// Helper method to get the active groove preset for a given bar.
-        /// </summary>
-        private static GroovePreset? GetActiveGroovePreset(GrooveTrack grooveTrack, int bar)
-        {
-            if (grooveTrack.TryGetAtBar(bar, out var grooveEvent) && grooveEvent != null)
-            {
-                var preset = GroovePresets.GetByName(grooveEvent.SourcePresetName);
-                if (preset != null)
-                    return preset;
-            }
-
-            // Fallback to PopRockBasic if no groove found or preset name is invalid
-            return GroovePresets.GetPopRockBasic();
         }
 
         private static PartTrack? GenerateBassTrack(
@@ -95,9 +72,7 @@ namespace Music.Generator
                     continue;
 
                 // Get the active groove preset for this bar
-                var groovePreset = GetActiveGroovePreset(grooveTrack, bar);
-                if (groovePreset == null)
-                    continue;
+                var groovePreset = grooveTrack.GetActiveGroovePreset(bar);
 
                 var bassOnsets = groovePreset.AnchorLayer.BassOnsets;
                 if (bassOnsets == null || bassOnsets.Count == 0)
@@ -164,9 +139,7 @@ namespace Music.Generator
                     continue;
 
                 // Get the active groove preset for this bar
-                var groovePreset = GetActiveGroovePreset(grooveTrack, bar);
-                if (groovePreset == null)
-                    continue;
+                var groovePreset = grooveTrack.GetActiveGroovePreset(bar);
 
                 var compOnsets = groovePreset.AnchorLayer.CompOnsets;
                 if (compOnsets == null || compOnsets.Count == 0)
@@ -236,9 +209,7 @@ namespace Music.Generator
                     continue;
 
                 // Get the active groove preset for this bar
-                var groovePreset = GetActiveGroovePreset(grooveTrack, bar);
-                if (groovePreset == null)
-                    continue;
+                var groovePreset = grooveTrack.GetActiveGroovePreset(bar);
 
                 var padsOnsets = groovePreset.AnchorLayer.PadsOnsets;
                 if (padsOnsets == null || padsOnsets.Count == 0)
@@ -312,9 +283,7 @@ namespace Music.Generator
             for (int bar = 1; bar <= totalBars; bar++)
             {
                 // Get the active groove preset for this bar
-                var groovePreset = GetActiveGroovePreset(grooveTrack, bar);
-                if (groovePreset == null)
-                    continue;
+                var groovePreset = grooveTrack.GetActiveGroovePreset(bar);
 
                 var layer = groovePreset.AnchorLayer;
                 int measureStartTick = (bar - 1) * ticksPerMeasure;
