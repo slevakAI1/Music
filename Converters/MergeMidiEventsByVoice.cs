@@ -9,16 +9,16 @@ namespace Music.Writer
         /// </summary>
         public static List<List<MetaMidiEvent>> Convert(
             List<List<MetaMidiEvent>> midiEventLists,
-            Music.Generator.TempoTrack tempoTimeline,
-            Music.Generator.TimeSignatureTrack timeSignatureTimeline)
+            Music.Generator.TempoTrack tempoTrack,
+            Music.Generator.TimeSignatureTrack timeSignatureTrack)
         {
             if (midiEventLists == null) throw new ArgumentNullException(nameof(midiEventLists));
-            if (tempoTimeline == null) throw new ArgumentNullException(nameof(tempoTimeline));
-            if (timeSignatureTimeline == null) throw new ArgumentNullException(nameof(timeSignatureTimeline));
+            if (tempoTrack == null) throw new ArgumentNullException(nameof(tempoTrack));
+            if (timeSignatureTrack == null) throw new ArgumentNullException(nameof(timeSignatureTrack));
 
             // Create tempo events from timeline
             var tempoEvents = new List<MetaMidiEvent>();
-            foreach (var tempoEvent in tempoTimeline.Events)
+            foreach (var tempoEvent in tempoTrack.Events)
             {
                 // Calculate absolute ticks based on start bar (1-based to 0-based conversion)
                 var absoluteTicks = (long)(tempoEvent.StartBar - 1) * MusicConstants.TicksPerQuarterNote * 4;
@@ -27,7 +27,7 @@ namespace Music.Writer
 
             // Create time signature events from timeline
             var timeSignatureEvents = new List<MetaMidiEvent>();
-            foreach (var tsEvent in timeSignatureTimeline.Events)
+            foreach (var tsEvent in timeSignatureTrack.Events)
             {
                 // Calculate absolute ticks based on start bar (1-based to 0-based conversion)
                 var absoluteTicks = (long)(tsEvent.StartBar - 1) * MusicConstants.TicksPerQuarterNote * 4;

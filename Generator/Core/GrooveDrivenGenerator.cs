@@ -195,7 +195,7 @@ namespace Music.Generator
         }
 
         private static PartTrack GenerateKeysTrack(
-            HarmonyTrack harmonyTimeline,
+            HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
             TimeSignatureTrack timeSignatureTrack,
             int ticksPerMeasure,
@@ -206,7 +206,7 @@ namespace Music.Generator
             var randomizer = new PitchRandomizer(settings);
             const int keysOctave = 4;
 
-            var harmonyByBar = harmonyTimeline.Events
+            var harmonyByBar = harmonyTrack.Events
                 .OrderBy(e => e.StartBar)
                 .ThenBy(e => e.StartBeat)
                 .ToList();

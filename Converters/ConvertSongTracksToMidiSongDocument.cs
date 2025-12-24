@@ -16,12 +16,12 @@ namespace Music.Writer
     {
         public static MidiSongDocument Convert(
             List<PartTrack> songTracks,
-            TempoTrack tempoTimeline,
-            TimeSignatureTrack timeSignatureTimeline)
+            TempoTrack tempoTrack,
+            TimeSignatureTrack timeSignatureTrack)
         {
             if (songTracks == null) throw new ArgumentNullException(nameof(songTracks));
-            if (tempoTimeline == null) throw new ArgumentNullException(nameof(tempoTimeline));
-            if (timeSignatureTimeline == null) throw new ArgumentNullException(nameof(timeSignatureTimeline));
+            if (tempoTrack == null) throw new ArgumentNullException(nameof(tempoTrack));
+            if (timeSignatureTrack == null) throw new ArgumentNullException(nameof(timeSignatureTrack));
 
             // Step 1 - convert songTracks to MIDI EVENTS - Absolute positions
             var midiEventLists = ConvertSongTracksToMetaMidiEvents.Convert(songTracks);
@@ -30,8 +30,8 @@ namespace Music.Writer
             // and integrate tempo and time signature events
             var mergedMidiEventLists = MergeMidiEventsByVoice.Convert(
                 midiEventLists,
-                tempoTimeline,
-                timeSignatureTimeline);
+                tempoTrack,
+                timeSignatureTrack);
 
             // Step 3 - Execute merged timed notes to MIDI document
             var midiDoc = ConvertMetaMidiEventsToMidiSongDocument.Convert(mergedMidiEventLists);
