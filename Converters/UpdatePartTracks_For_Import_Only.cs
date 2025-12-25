@@ -10,7 +10,7 @@ namespace Music.Writer
     {
         /// <summary>
         /// Converts lists of MetaMidiEvent objects to PartTrack objects.
-        /// Splits tracks by program changes - each program change segment becomes a separate songTrack.
+        /// Splits tracks by program changes - each program change segment becomes a separate updatedPartTrack.
         /// </summary>
         /// <param name="partTracks"></param>
         /// <param name="midiInstruments">Available MIDI instruments for name lookup</param>
@@ -28,8 +28,8 @@ namespace Music.Writer
 
                 foreach (var segment in segmentedEvents)
                 {
-                    var partTrackEvents = new List<PartTrackEvent>();
-                    var songTrack = new PartTrack(partTrackEvents);
+                    var partTrackEvents = new List<PartTrackEvent>();  // TO DO fix type
+                    var updatedPartTrack = new PartTrack(partTrackEvents);
 
                     // Get instrument info from this segment's program change
                     var programChangeEvent = segment.Events
@@ -43,24 +43,24 @@ namespace Music.Writer
                     if (isDrumTrack)
                     {
                         // Drums use channel 10 (index 9) and don't have program changes
-                        songTrack.MidiProgramNumber = 255; // Sentinel value for drums
-                        songTrack.MidiProgramName = "Drum Set";
+                        updatedPartTrack.MidiProgramNumber = 255; // Sentinel value for drums
+                        updatedPartTrack.MidiProgramName = "Drum Set";
                     }
                     else if (programChangeEvent != null &&
                              programChangeEvent.Parameters.TryGetValue("Program", out var programObj))
                     {
                         int programNumber = System.Convert.ToInt32(programObj);
-                        songTrack.MidiProgramNumber = programNumber;
+                        updatedPartTrack.MidiProgramNumber = programNumber;
 
                         var instrument = MidiVoices.MidiVoiceList()
                             .FirstOrDefault(i => i.ProgramNumber == programNumber);
-                        songTrack.MidiProgramName = instrument?.Name ?? $"Program {programNumber}";
+                        updatedPartTrack.MidiProgramName = instrument?.Name ?? $"Program {programNumber}";
                     }
                     else
                     {
                         // No program change found - use default
-                        songTrack.MidiProgramNumber = 0;
-                        songTrack.MidiProgramName = "Acoustic Grand Piano";
+                        updatedPartTrack.MidiProgramNumber = 0;
+                        updatedPartTrack.MidiProgramName = "Acoustic Grand Piano";
                     }
 
                     // Calculate tick scaling factor
@@ -84,7 +84,7 @@ namespace Music.Writer
                             {
                                 if (noteOnEvents.TryGetValue(noteNumber, out var noteOnEvent))
                                 {
-                                    CreateSongTrackNoteFromPair(noteOnEvent, midiEvent, partTrackEvents, tickScale);
+                                    CreatePartTrackEventFromPair(noteOnEvent, midiEvent, partTrackEvents, tickScale);
                                     noteOnEvents.Remove(noteNumber);
                                 }
                             }
@@ -102,16 +102,16 @@ namespace Music.Writer
 
                             if (noteOnEvents.TryGetValue(noteNumber, out var noteOnEvent))
                             {
-                                CreateSongTrackNoteFromPair(noteOnEvent, midiEvent, partTrackEvents, tickScale);
+                                CreatePartTrackEventFromPair(noteOnEvent, midiEvent, partTrackEvents, tickScale);
                                 noteOnEvents.Remove(noteNumber);
                             }
                         }
                     }
 
-                    // Only add songTrack if it has notes
+                    // Only add updatedPartTrack if it has notes
                     if (partTrackEvents.Count > 0)
                     {
-                        updatedPartTracks.Add(songTrack);
+                        updatedPartTracks.Add(updatedPartTrack);
                     }
                 }
             }
@@ -165,12 +165,12 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Creates a songTrackNoteEvent from a NoteOn/NoteOff event pair.
+        /// Creates a PartTrackEvent from a NoteOn/NoteOff event pair.
         /// </summary>
-        private static void CreateSongTrackNoteFromPair(
+        private static void CreatePartTrackEventFromPair(
             PartTrackEvent noteOnEvent,
             PartTrackEvent noteOffEvent,
-            List<PartTrackEvent> songTrackNotes,
+            List<PartTrackEvent> partTrackEvents,  // to do,
             double tickScale)
         {
             if (!noteOnEvent.Parameters.TryGetValue("NoteNumber", out var noteNumObj) ||
@@ -192,7 +192,7 @@ namespace Music.Writer
                 noteDurationTicks,
                 velocity);
 
-            songTrackNotes.Add(songTrackNoteEvent);
+            partTrackEvents.Add(songTrackNoteEvent);
         }
     }
 }
