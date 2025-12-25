@@ -343,7 +343,7 @@ namespace Music.Writer
                 }
 
                 // Convert MetaMidiEvent lists to PartTrack objects, passing the source ticks per quarter note
-                var tracks = ConvertingPartTracksToPartTracks_For_Import_Only.Convert(
+                var tracks = UpdatePartTracks_For_Import_Only.Convert(
                     partTracks,
                     ticksPerQuarterNote);
 

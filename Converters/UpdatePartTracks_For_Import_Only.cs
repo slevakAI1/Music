@@ -6,7 +6,7 @@ namespace Music.Writer
     /// <summary>
     /// Helper to convert lists of MetaMidiEvent objects to PartTrack objects.
     /// </summary>
-    internal static class ConvertingPartTracksToPartTracks_For_Import_Only
+    internal static class UpdatePartTracks_For_Import_Only
     {
         /// <summary>
         /// Converts lists of MetaMidiEvent objects to PartTrack objects.
@@ -19,7 +19,7 @@ namespace Music.Writer
             List<Generator.PartTrack> partTracks,
             short sourceTicksPerQuarterNote)
         {
-            var songTracks = new List<PartTrack>();
+            var updatedPartTracks = new List<PartTrack>();
 
             foreach (var partTrack in partTracks)
             {
@@ -28,8 +28,8 @@ namespace Music.Writer
 
                 foreach (var segment in segmentedEvents)
                 {
-                    var songTrackNoteEvents = new List<PartTrackEvent>();
-                    var songTrack = new PartTrack(songTrackNoteEvents);
+                    var partTrackEvents = new List<PartTrackEvent>();
+                    var songTrack = new PartTrack(partTrackEvents);
 
                     // Get instrument info from this segment's program change
                     var programChangeEvent = segment.Events
@@ -84,7 +84,7 @@ namespace Music.Writer
                             {
                                 if (noteOnEvents.TryGetValue(noteNumber, out var noteOnEvent))
                                 {
-                                    CreateSongTrackNoteFromPair(noteOnEvent, midiEvent, songTrackNoteEvents, tickScale);
+                                    CreateSongTrackNoteFromPair(noteOnEvent, midiEvent, partTrackEvents, tickScale);
                                     noteOnEvents.Remove(noteNumber);
                                 }
                             }
@@ -102,21 +102,21 @@ namespace Music.Writer
 
                             if (noteOnEvents.TryGetValue(noteNumber, out var noteOnEvent))
                             {
-                                CreateSongTrackNoteFromPair(noteOnEvent, midiEvent, songTrackNoteEvents, tickScale);
+                                CreateSongTrackNoteFromPair(noteOnEvent, midiEvent, partTrackEvents, tickScale);
                                 noteOnEvents.Remove(noteNumber);
                             }
                         }
                     }
 
                     // Only add songTrack if it has notes
-                    if (songTrackNoteEvents.Count > 0)
+                    if (partTrackEvents.Count > 0)
                     {
-                        songTracks.Add(songTrack);
+                        updatedPartTracks.Add(songTrack);
                     }
                 }
             }
 
-            return songTracks;
+            return updatedPartTracks;
         }
 
         /// <summary>
