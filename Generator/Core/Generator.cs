@@ -7,7 +7,7 @@ namespace Music.Generator
     /// Story 7: Now supports controlled randomness for pitch variation.
     /// Updated to support groove track with multiple groove changes throughout the song.
     /// </summary>
-    public static class GrooveDrivenGenerator
+    public static class Generator
     {
         /// <summary>
         /// Generates all tracks based on SongContext.
