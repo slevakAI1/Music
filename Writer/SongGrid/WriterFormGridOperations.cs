@@ -167,28 +167,6 @@ namespace Music.Writer
 
         // ========== GRID DATA MANIPULATION ==========
 
-        // TO DO - HIGH - DEAD CODE?? DO SOMETHING WITH THESE OR DELETE!!!
-
-        // KEEP THIS FOR FUTURE EXPANSION
-        /// <summary>
-        /// Writes a track object to the colData cell of all selected rows and updates measure display.
-        /// </summary>
-        /// <param name="track">The track to write to the grid.</param>
-        private void WriteTrackToSelectedRows(DataGridView dgSong, PartTrack track)
-        {
-            foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
-            {
-                // Skip fixed rows
-                if (selectedRow.Index < SongGridManager.FIXED_ROWS_COUNT)
-                    continue;
-
-                selectedRow.Cells["colData"].Value = track;
-                
-                // Update measure cells to show note distribution
-                SongGridManager.PopulatePartMeasureNoteCount(dgSong, selectedRow.Index);
-            }
-        }
-
 
         // ========== PLAYBACK CONTROL ==========
 
