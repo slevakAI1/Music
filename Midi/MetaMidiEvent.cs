@@ -1,3 +1,5 @@
+using Music.Writer;
+
 namespace Music.MyMidi
 {
     /// <summary>
@@ -5,7 +7,7 @@ namespace Music.MyMidi
     /// Uses a dictionary-based parameter system for flexibility.
     /// Use factory methods for creating event types with proper validation.
     /// </summary>
-    public sealed record MetaMidiEvent
+    public class MetaMidiEvent
     {
         /// <summary>
         /// Absolute time position in ticks from the start of the track.
@@ -29,6 +31,48 @@ namespace Music.MyMidi
         /// Values can be int, string, or byte[] depending on the parameter type.
         /// </summary>
         public Dictionary<string, object> Parameters { get; init; } = new();
+
+        // MIDI-related properties for simple note creation - 480 ticks / quarter note is standard
+        public int NoteNumber { get; set; }
+        public int AbsolutePositionTicks { get; set; }
+        public int NoteDurationTicks { get; set; }
+        public int NoteOnVelocity { get; set; } = 100;
+
+        // Metadata fields - can be used for display purposes. Also used by musicxml.
+        public char Step { get; set; }
+        public int Alter { get; set; }
+        public int Octave { get; set; }
+        public int Duration { get; set; }
+        public int Dots { get; set; }
+        public int? TupletActualNotes { get; set; }
+        public int? TupletNormalNotes { get; set; }
+
+        /// <summary>
+        /// Simple note constructor for backward compatibility with note-based code.
+        /// </summary>
+        public MetaMidiEvent(
+            int noteNumber,
+            int absolutePositionTicks,
+            int noteDurationTicks,
+            int noteOnVelocity = 100)
+        {
+            NoteNumber = noteNumber;
+            AbsolutePositionTicks = absolutePositionTicks;
+            NoteDurationTicks = noteDurationTicks;
+            NoteOnVelocity = noteOnVelocity;
+            AbsoluteTimeTicks = absolutePositionTicks;
+
+            // Calculate metadata fields from MIDI properties
+            (Step, Alter, Octave) = MusicCalculations.CalculatePitch(noteNumber);
+            (Duration, Dots, TupletActualNotes, TupletNormalNotes) = MusicCalculations.CalculateRhythm(noteDurationTicks);
+        }
+
+        /// <summary>
+        /// Default constructor for factory methods.
+        /// </summary>
+        public MetaMidiEvent()
+        {
+        }
 
         // ============================================================
         // Factory Methods - Meta Events

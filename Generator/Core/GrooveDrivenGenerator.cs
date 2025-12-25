@@ -1,3 +1,5 @@
+using Music.MyMidi;
+
 namespace Music.Generator
 {
     /// <summary>
@@ -65,7 +67,7 @@ namespace Music.Generator
             int totalBars,
             RandomizationSettings settings)
         {
-            var notes = new List<PartTrackNoteEvent>();
+            var notes = new List<MetaMidiEvent>();
             var randomizer = new PitchRandomizer(settings);
             const int bassOctave = 2;
 
@@ -103,7 +105,7 @@ namespace Music.Generator
 
                     int midiNote = randomizer.SelectBassPitch(ctx, bar, onsetBeat);
 
-                    notes.Add(new PartTrackNoteEvent(
+                    notes.Add(new MetaMidiEvent(
                         noteNumber: midiNote,
                         absolutePositionTicks: onsetTick,
                         noteDurationTicks: duration,
@@ -122,7 +124,7 @@ namespace Music.Generator
             int totalBars,
             RandomizationSettings settings)
         {
-            var notes = new List<PartTrackNoteEvent>();
+            var notes = new List<MetaMidiEvent>();
             var randomizer = new PitchRandomizer(settings);
             int? previousPitchClass = null;
             const int guitarOctave = 4;
@@ -169,7 +171,7 @@ namespace Music.Generator
 
                     var (midiNote, pitchClass) = randomizer.SelectGuitarPitch(ctx, bar, onsetBeat, previousPitchClass);
 
-                    notes.Add(new PartTrackNoteEvent(
+                    notes.Add(new MetaMidiEvent(
                         noteNumber: midiNote,
                         absolutePositionTicks: onsetTick,
                         noteDurationTicks: duration,
@@ -190,7 +192,7 @@ namespace Music.Generator
             int totalBars,
             RandomizationSettings settings)
         {
-            var notes = new List<PartTrackNoteEvent>();
+            var notes = new List<MetaMidiEvent>();
             var randomizer = new PitchRandomizer(settings);
             const int keysOctave = 3;
 
@@ -236,7 +238,7 @@ namespace Music.Generator
 
                     foreach (int midiNote in chordMidiNotes)
                     {
-                        notes.Add(new PartTrackNoteEvent(
+                        notes.Add(new MetaMidiEvent(
                             noteNumber: midiNote,
                             absolutePositionTicks: onsetTick,
                             noteDurationTicks: duration,
@@ -262,7 +264,7 @@ namespace Music.Generator
             int totalBars,
             RandomizationSettings settings)
         {
-            var notes = new List<PartTrackNoteEvent>();
+            var notes = new List<MetaMidiEvent>();
             var randomizer = new PitchRandomizer(settings);
 
             // MIDI drum note numbers (General MIDI)
@@ -288,7 +290,7 @@ namespace Music.Generator
                         // Apply slight velocity randomization for humanization
                         int velocity = randomizer.SelectDrumVelocity(bar, onsetBeat, "kick", baseVelocity: 100);
                         
-                        notes.Add(new PartTrackNoteEvent(
+                        notes.Add(new MetaMidiEvent(
                             noteNumber: kickNote,
                             absolutePositionTicks: onsetTick,
                             noteDurationTicks: MusicConstants.TicksPerQuarterNote,
@@ -305,7 +307,7 @@ namespace Music.Generator
                         
                         int velocity = randomizer.SelectDrumVelocity(bar, onsetBeat, "snare", baseVelocity: 90);
                         
-                        notes.Add(new PartTrackNoteEvent(
+                        notes.Add(new MetaMidiEvent(
                             noteNumber: snareNote,
                             absolutePositionTicks: onsetTick,
                             noteDurationTicks: MusicConstants.TicksPerQuarterNote,
@@ -322,7 +324,7 @@ namespace Music.Generator
                         
                         int velocity = randomizer.SelectDrumVelocity(bar, onsetBeat, "hat", baseVelocity: 70);
                         
-                        notes.Add(new PartTrackNoteEvent(
+                        notes.Add(new MetaMidiEvent(
                             noteNumber: closedHiHatNote,
                             absolutePositionTicks: onsetTick,
                             noteDurationTicks: MusicConstants.TicksPerQuarterNote / 2, // shorter duration for hi-hat

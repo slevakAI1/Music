@@ -1,3 +1,5 @@
+using Music.MyMidi;
+
 namespace Music.Generator
 {
     /// <summary>
@@ -19,12 +21,12 @@ namespace Music.Generator
             int repeatCount,
             int noteOnVelocity = 100)
         {
-            var SongTrackNoteEvents = new List<PartTrackNoteEvent>();
+            var SongTrackNoteEvents = new List<MetaMidiEvent>();
             int currentPosition = 0;
 
             for (int i = 0; i < repeatCount; i++)
             {
-                var songTrackNoteEvent = new PartTrackNoteEvent(
+                var songTrackNoteEvent = new MetaMidiEvent(
                     noteNumber: noteNumber,
                     absolutePositionTicks: currentPosition,
                     noteDurationTicks: noteDurationTicks,

@@ -53,7 +53,7 @@ namespace Music.Writer
             events.Add(programChangeEvent);
 
             // Process each note in the songTrack
-            foreach (var songTrackNoteEvent in songTrack.PartTrackNoteEvents ?? Enumerable.Empty<PartTrackNoteEvent>())
+            foreach (var songTrackNoteEvent in songTrack.PartTrackNoteEvents ?? Enumerable.Empty<MetaMidiEvent>())
                     ProcessSingleNote(events, songTrackNoteEvent);
 
             return events;
@@ -62,7 +62,7 @@ namespace Music.Writer
         /// <summary>
         /// Processes a single note event.
         /// </summary>
-        private static void ProcessSingleNote(List<MetaMidiEvent> events, PartTrackNoteEvent songTrackNoteEvent)
+        private static void ProcessSingleNote(List<MetaMidiEvent> events, MetaMidiEvent songTrackNoteEvent)
         {
             // Create NoteOn event at the note's absolute position
             var noteOnEvent = MetaMidiEvent.CreateNoteOn(

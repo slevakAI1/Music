@@ -28,7 +28,7 @@ namespace Music.Writer
 
                 foreach (var segment in segmentedEvents)
                 {
-                    var songTrackNoteEvents = new List<PartTrackNoteEvent>();
+                    var songTrackNoteEvents = new List<MetaMidiEvent>();
                     var songTrack = new PartTrack(songTrackNoteEvents);
 
                     // Get instrument info from this segment's program change
@@ -170,7 +170,7 @@ namespace Music.Writer
         private static void CreateSongTrackNoteFromPair(
             MetaMidiEvent noteOnEvent,
             MetaMidiEvent noteOffEvent,
-            List<PartTrackNoteEvent> songTrackNotes,
+            List<MetaMidiEvent> songTrackNotes,
             double tickScale)
         {
             if (!noteOnEvent.Parameters.TryGetValue("NoteNumber", out var noteNumObj) ||
@@ -186,7 +186,7 @@ namespace Music.Writer
             if (noteDurationTicks < 1)
                 noteDurationTicks = 1;
 
-            var songTrackNoteEvent = new PartTrackNoteEvent(
+            var songTrackNoteEvent = new MetaMidiEvent(
                 noteNumber,
                 absolutePositionTicks,
                 noteDurationTicks,

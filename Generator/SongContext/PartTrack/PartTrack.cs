@@ -1,3 +1,5 @@
+using Music.MyMidi;
+
 namespace Music.Generator
 {
     /// <summary>
@@ -15,9 +17,9 @@ namespace Music.Generator
         //public string NotionPartName { get; set; }
         public int MidiProgramNumber { get; set; }
 
-        public List<PartTrackNoteEvent> PartTrackNoteEvents { get; set; } = new();
+        public List<MetaMidiEvent> PartTrackNoteEvents { get; set; } = new();
 
-        public PartTrack(List<PartTrackNoteEvent> songTrackNoteEvent)
+        public PartTrack(List<MetaMidiEvent> songTrackNoteEvent)
         {
             PartTrackNoteEvents = songTrackNoteEvent;
         }
