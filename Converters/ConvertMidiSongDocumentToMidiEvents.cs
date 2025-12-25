@@ -4,24 +4,24 @@ using Music.MyMidi;
 namespace Music.Writer
 {
     /// <summary>
-    /// Converts a MidiSongDocument to lists of high-level MetaMidiEvent objects.
-    /// Each track in the MIDI file produces one List&lt;MetaMidiEvent&gt;.
+    /// Converts a MidiSongDocument to PartTrack objects with MetaMidiEvent lists.
+    /// Each track in the MIDI file produces one PartTrack.
     /// Handles conversion of DryWetMidi events to our domain MetaMidiEvent format.
     /// </summary>
     public static class ConvertMidiSongDocumentToMidiEvents
     {
         /// <summary>
-        /// Converts all tracks in a MIDI document to lists of MetaMidiEvent objects.
+        /// Converts all tracks in a MIDI document to PartTrack objects with MetaMidiEvent lists.
         /// </summary>
         /// <param name="midiDoc">The MIDI document to convert</param>
-        /// <returns>List of MetaMidiEvent lists, one per track</returns>
+        /// <returns>List of PartTrack objects, one per track</returns>
         /// <exception cref="InvalidOperationException">Thrown when an unsupported MIDI event is encountered</exception>
-        public static List<List<PartTrackEvent>> Convert(MidiSongDocument midiDoc)
+        public static List<Generator.PartTrack> Convert(MidiSongDocument midiDoc)
         {
             if (midiDoc == null)
                 throw new ArgumentNullException(nameof(midiDoc));
 
-            var result = new List<List<PartTrackEvent>>();
+            var result = new List<Generator.PartTrack>();
             int trackIndex = 0;
 
             foreach (var trackChunk in midiDoc.Tracks)
@@ -29,7 +29,8 @@ namespace Music.Writer
                 try
                 {
                     var trackEvents = ConvertTrack(trackChunk, trackIndex);
-                    result.Add(trackEvents);
+                    var partTrack = new Generator.PartTrack(trackEvents);
+                    result.Add(partTrack);
                     trackIndex++;
                 }
                 catch (Exception ex)

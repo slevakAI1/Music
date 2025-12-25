@@ -303,11 +303,11 @@ namespace Music.Writer
                 var debugDir = Path.Combine(projectRoot, "Files", "Debug");
                 Directory.CreateDirectory(debugDir);
 
-                // Convert MIDI document to lists of MetaMidiEvent objects
-                List<List<PartTrackEvent>> midiEventLists;
+                // Convert MIDI document to PartTrack objects with MetaMidiEvent lists
+                List<Generator.PartTrack> partTracks;
                 try
                 {
-                    midiEventLists = ConvertMidiSongDocumentToMidiEvents.Convert(midiDoc);
+                    partTracks = ConvertMidiSongDocumentToMidiEvents.Convert(midiDoc);
                 }
                 catch (NotSupportedException ex)
                 {
@@ -329,7 +329,7 @@ namespace Music.Writer
 
                 // Extract tempo and time signature events from MIDI and attach to grid
                 var (tempoTrack, timeSignatureTrack) = ExtractTracksFromMidiEvents(
-                    midiEventLists, 
+                    partTracks, 
                     ticksPerQuarterNote);
 
                 if (tempoTrack != null && tempoTrack.Events.Count > 0)
@@ -344,7 +344,7 @@ namespace Music.Writer
 
                 // Convert MetaMidiEvent lists to PartTrack objects, passing the source ticks per quarter note
                 var tracks = ConvertMetaMidiEventsToSongTracks.Convert(
-                    midiEventLists,
+                    partTracks,
                     ticksPerQuarterNote);
 
                 // Add each songTrack to the grid - no need to pass trackNumber anymore
@@ -373,7 +373,7 @@ namespace Music.Writer
         /// Extracts tempo and time signature events from MIDI event lists and converts them to tracks.
         /// </summary>
         private static (TempoTrack?, TimeSignatureTrack?) ExtractTracksFromMidiEvents(
-            List<List<PartTrackEvent>> midiEventLists,
+            List<Generator.PartTrack> partTracks,
             short ticksPerQuarterNote)
         {
             var tempoTrack = new TempoTrack();
@@ -384,9 +384,9 @@ namespace Music.Writer
             int ticksPerBeat = ticksPerQuarterNote;
 
             // First pass: extract time signatures to determine beatsPerBar for bar calculations
-            foreach (var trackEvents in midiEventLists)
+            foreach (var track in partTracks)
             {
-                foreach (var evt in trackEvents.Where(e => e.Type == MidiEventType.TimeSignature))
+                foreach (var evt in track.PartTrackNoteEvents.Where(e => e.Type == MidiEventType.TimeSignature))
                 {
                     if (evt.Parameters.TryGetValue("Numerator", out var numObj) &&
                         evt.Parameters.TryGetValue("Denominator", out var denObj))
@@ -416,9 +416,9 @@ namespace Music.Writer
             }
 
             // Second pass: extract tempo events using the time signature info
-            foreach (var trackEvents in midiEventLists)
+            foreach (var track in partTracks)
             {
-                foreach (var evt in trackEvents.Where(e => e.Type == MidiEventType.SetTempo))
+                foreach (var evt in track.PartTrackNoteEvents.Where(e => e.Type == MidiEventType.SetTempo))
                 {
                     int bpm = 120; // Default
 

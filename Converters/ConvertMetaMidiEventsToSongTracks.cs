@@ -16,15 +16,15 @@ namespace Music.Writer
         /// <param name="midiInstruments">Available MIDI instruments for name lookup</param>
         /// <param name="sourceTicksPerQuarterNote">The ticks per quarter note from the source MIDI file (default 480)</param>
         public static List<PartTrack> Convert(
-            List<List<PartTrackEvent>> midiEventLists,
+            List<Generator.PartTrack> partTracks,
             short sourceTicksPerQuarterNote)
         {
             var songTracks = new List<PartTrack>();
 
-            foreach (var midiEventList in midiEventLists)
+            foreach (var partTrack in partTracks)
             {
                 // Split track by program changes
-                var segmentedEvents = SplitByProgramChanges(midiEventList);
+                var segmentedEvents = SplitByProgramChanges(partTrack.PartTrackNoteEvents);
 
                 foreach (var segment in segmentedEvents)
                 {

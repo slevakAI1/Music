@@ -12,10 +12,10 @@ namespace Music.Writer
     /// </summary>
     public static class ConvertMetaMidiEventsToMidiSongDocument
     {
-        public static MidiSongDocument Convert(List<List<PartTrackEvent>> midiEventLists)
+        public static MidiSongDocument Convert(List<Generator.PartTrack> partTracks)
         {
-            if (midiEventLists == null)
-                throw new ArgumentNullException(nameof(midiEventLists));
+            if (partTracks == null)
+                throw new ArgumentNullException(nameof(partTracks));
 
             // Create MIDI file with specified time division
             var midiFile = new MidiFile
@@ -23,10 +23,10 @@ namespace Music.Writer
                 TimeDivision = new TicksPerQuarterNoteTimeDivision(MusicConstants.TicksPerQuarterNote)
             };
 
-            // Convert each MetaMidiEvent list to a track
-            foreach (var eventList in midiEventLists)
+            // Convert each PartTrack to a track
+            foreach (var partTrack in partTracks)
             {
-                var trackChunk = CreateTrackFromMidiEvents(eventList);
+                var trackChunk = CreateTrackFromMidiEvents(partTrack.PartTrackNoteEvents);
                 midiFile.Chunks.Add(trackChunk);
             }
 
@@ -265,11 +265,6 @@ namespace Music.Writer
                 DeltaTime = deltaTime 
             };
         }
-
-
-
-
-
 
         private static PitchBendEvent CreatePitchBendEvent(PartTrackEvent midiEvent, long deltaTime, bool isDrumTrack)
         {

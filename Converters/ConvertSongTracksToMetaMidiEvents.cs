@@ -4,29 +4,35 @@ using Music.MyMidi;
 namespace Music.Writer
 {
     /// <summary>
-    /// Converts PartTrack objects to lists of MetaMidiEvent objects with absolute time positioning.
+    /// Converts PartTrack objects to PartTrack objects with MetaMidiEvent objects with absolute time positioning.
     /// This is stage 1 processing - creates NoteOn, NoteOff, and SequenceTrackName events only.
     /// Channel assignment and other processing happens in later stages.
     /// </summary>
     public static class ConvertSongTracksToMetaMidiEvents
     {
         /// <summary>
-        /// Converts a list of songTracks to lists of MIDI events (one list per songTrack).
+        /// Converts a list of songTracks to PartTrack objects with MIDI events (one PartTrack per input).
         /// Each songTrack is processed independently with its own event list.
         /// </summary>
         /// <param name="songTracks">List of songTracks to convert</param>
         /// <param name="ticksPerQuarterNote">MIDI time resolution (default 480 ticks per quarter note)</param>
-        /// <returns>List of MetaMidiEvent lists, one per input song track</returns>
-        public static List<List<PartTrackEvent>> Convert(
+        /// <returns>List of PartTrack objects with populated events, one per input song track</returns>
+        public static List<PartTrack> Convert(
             List<PartTrack> songTracks)
         {
             if (songTracks == null)
                 throw new ArgumentNullException(nameof(songTracks));
 
-            var result = new List<List<PartTrackEvent>>();
+            var result = new List<PartTrack>();
             foreach (var songTrack in songTracks)
             {
-                result.Add(ConvertSingleSongTrack(songTrack));
+                var events = ConvertSingleSongTrack(songTrack);
+                var newTrack = new PartTrack(events)
+                {
+                    MidiProgramName = songTrack.MidiProgramName,
+                    MidiProgramNumber = songTrack.MidiProgramNumber
+                };
+                result.Add(newTrack);
             }
 
             return result;

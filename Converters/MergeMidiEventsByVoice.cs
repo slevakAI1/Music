@@ -7,12 +7,12 @@ namespace Music.Writer
         /// <summary>
         /// Merges MIDI event lists by instrument and adds tempo and time signature events.
         /// </summary>
-        public static List<List<PartTrackEvent>> Convert(
-            List<List<PartTrackEvent>> midiEventLists,
+        public static List<Generator.PartTrack> Convert(
+            List<Generator.PartTrack> partTracks,
             Music.Generator.TempoTrack tempoTrack,
             Music.Generator.TimeSignatureTrack timeSignatureTrack)
         {
-            if (midiEventLists == null) throw new ArgumentNullException(nameof(midiEventLists));
+            if (partTracks == null) throw new ArgumentNullException(nameof(partTracks));
             if (tempoTrack == null) throw new ArgumentNullException(nameof(tempoTrack));
             if (timeSignatureTrack == null) throw new ArgumentNullException(nameof(timeSignatureTrack));
 
@@ -38,12 +38,11 @@ namespace Music.Writer
             }
 
             // Merge song track events by program number
-            // FIXED: Get program number from each event list, not from individual events
-            var grouped = midiEventLists
-                .Select((list, index) => new 
+            var grouped = partTracks
+                .Select((track, index) => new 
                 { 
-                    ProgramNumber = GetProgramNumberFromList(list), 
-                    Events = list.Where(e => e.Type != MidiEventType.SequenceTrackName).ToList() // Skip duplicate track names
+                    ProgramNumber = track.MidiProgramNumber, 
+                    Events = track.PartTrackNoteEvents.Where(e => e.Type != MidiEventType.SequenceTrackName).ToList() // Skip duplicate track names
                 })
                 .GroupBy(x => x.ProgramNumber)
                 .Select(g => new
@@ -53,14 +52,14 @@ namespace Music.Writer
                 })
                 .ToList();
 
-            var mergedLists = new List<List<PartTrackEvent>>();
+            var mergedTracks = new List<Generator.PartTrack>();
 
             foreach (var group in grouped)
             {
                 var mergedEvents = new List<PartTrackEvent>(group.Events);
 
                 // Add tempo and time signature events to the first track only
-                if (mergedLists.Count == 0)
+                if (mergedTracks.Count == 0)
                 {
                     mergedEvents.AddRange(tempoEvents);
                     mergedEvents.AddRange(timeSignatureEvents);
@@ -70,7 +69,7 @@ namespace Music.Writer
                 mergedEvents = mergedEvents.OrderBy(e => e.AbsoluteTimeTicks).ToList();
 
                 // Assign channels
-                int channel = mergedLists.Count;
+                int channel = mergedTracks.Count;
                 if (channel >= 16) channel = 15;
                 if (group.ProgramNumber == 255) channel = 9; // Drums on channel 10 (index 9)
 
@@ -85,23 +84,14 @@ namespace Music.Writer
                     }
                 }
 
-                mergedLists.Add(mergedEvents);
+                var mergedTrack = new Generator.PartTrack(mergedEvents)
+                {
+                    MidiProgramNumber = group.ProgramNumber
+                };
+                mergedTracks.Add(mergedTrack);
             }
 
-            return mergedLists;
-        }
-
-        /// <summary>
-        /// Gets the program number from an event list by finding the first ProgramChange event.
-        /// </summary>
-        private static int GetProgramNumberFromList(List<PartTrackEvent> eventList)
-        {
-            var programChange = eventList.FirstOrDefault(e => e.Type == MidiEventType.ProgramChange);
-            if (programChange != null && programChange.Parameters.TryGetValue("Program", out var program))
-            {
-                return System.Convert.ToInt32(program);
-            }
-            return -1;
+            return mergedTracks;
         }
     }
 }
