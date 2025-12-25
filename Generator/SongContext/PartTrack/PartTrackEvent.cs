@@ -1,5 +1,3 @@
-using Music.Writer;
-
 namespace Music.MyMidi
 {
     /// <summary>
