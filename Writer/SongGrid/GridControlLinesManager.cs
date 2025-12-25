@@ -73,29 +73,26 @@ namespace Music.Writer
                 dgSong.Columns.Add(colMeasure);
             }
 
-            // Populate measure cells with section numbers
+            // Populate measure cells with section names only at each section start
             for (int sectionIndex = 0; sectionIndex < sectionTrack.Sections.Count; sectionIndex++)
             {
                 var section = sectionTrack.Sections[sectionIndex];
-                int sectionNumber = sectionIndex + 1; // 1-based section number
 
-                // Iterate through each bar in this section
-                for (int bar = 0; bar < section.BarCount; bar++)
+                // Convert 1-based start bar to 0-based measure index
+                int measureIndex = (section.StartBar > 0 ? section.StartBar : 1) - 1;
+
+                // Calculate the column index for this measure
+                int columnIndex = SongGridManager.MEASURE_START_COLUMN_INDEX + measureIndex;
+
+                // Use section name when present; otherwise fall back to section type or index
+                string text = !string.IsNullOrWhiteSpace(section.Name)
+                    ? section.Name!
+                    : section.SectionType.ToString();
+
+                // Set the section name only at the start bar's cell
+                if (columnIndex < dgSong.Columns.Count)
                 {
-                    // Calculate the absolute measure number (1-based)
-                    int absoluteMeasure = section.StartBar + bar;
-                    
-                    // Convert to 0-based measure index
-                    int measureIndex = absoluteMeasure - 1;
-                    
-                    // Calculate the column index for this measure
-                    int columnIndex = SongGridManager.MEASURE_START_COLUMN_INDEX + measureIndex;
-
-                    // Set the section number in the appropriate measure cell
-                    if (columnIndex < dgSong.Columns.Count)
-                    {
-                        dgSong.Rows[SongGridManager.FIXED_ROW_SECTION].Cells[columnIndex].Value = sectionNumber.ToString();
-                    }
+                    dgSong.Rows[SongGridManager.FIXED_ROW_SECTION].Cells[columnIndex].Value = text;
                 }
             }
         }
