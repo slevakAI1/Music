@@ -38,18 +38,6 @@ namespace Music.MyMidi
         public int NoteNumber { get; set; }
 
         /// <summary>
-        /// Absolute position in ticks - computed from AbsoluteTimeTicks for consistency.
-        /// This property ensures backward compatibility with existing code while maintaining a single source of truth.
-        /// </summary>
-        public int AbsolutePositionTicks
-        {
-            get => (int)AbsoluteTimeTicks;
-            set => throw new InvalidOperationException(
-                "AbsolutePositionTicks is computed from AbsoluteTimeTicks. " +
-                "Set AbsoluteTimeTicks in the constructor or object initializer instead.");
-        }
-
-        /// <summary>
         /// Duration of the note in ticks. Used for simple note creation.
         /// </summary>
         public int NoteDurationTicks { get; set; }
@@ -63,14 +51,18 @@ namespace Music.MyMidi
         /// Simple note constructor for backward compatibility with note-based code.
         /// Creates a note event with proper MIDI event type set.
         /// </summary>
+        /// <param name="noteNumber">MIDI note number (0-127)</param>
+        /// <param name="absoluteTimeTicks">Absolute time position in ticks from the start of the track</param>
+        /// <param name="noteDurationTicks">Duration of the note in ticks</param>
+        /// <param name="noteOnVelocity">MIDI velocity (0-127), default is 100</param>
         public PartTrackEvent(
             int noteNumber,
-            int absolutePositionTicks,
+            int absoluteTimeTicks,
             int noteDurationTicks,
             int noteOnVelocity = 100)
         {
             NoteNumber = noteNumber;
-            AbsoluteTimeTicks = absolutePositionTicks;
+            AbsoluteTimeTicks = absoluteTimeTicks;
             NoteDurationTicks = noteDurationTicks;
             NoteOnVelocity = noteOnVelocity;
             Type = MidiEventType.NoteOn; // Set proper type for simple notes

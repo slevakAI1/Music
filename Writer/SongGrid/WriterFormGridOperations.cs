@@ -216,19 +216,19 @@ namespace Music.Writer
                     int offset = 0;
                     if (existingTrack.PartTrackNoteEvents.Count > 0)
                     {
-                        // Find the last note's end time (absolute position + duration)
+                        // Find the last note's end time (absolute time + duration)
                         var lastNote = existingTrack.PartTrackNoteEvents
-                            .OrderBy(n => n.AbsolutePositionTicks + n.NoteDurationTicks)
+                            .OrderBy(n => n.AbsoluteTimeTicks + n.NoteDurationTicks)
                             .Last();
-                        offset = lastNote.AbsolutePositionTicks + lastNote.NoteDurationTicks;
+                        offset = (int)(lastNote.AbsoluteTimeTicks + lastNote.NoteDurationTicks);
                     }
 
-                    // Append new notes with adjusted absolutePositions
+                    // Append new notes with adjusted absolute times
                     foreach (var note in track.PartTrackNoteEvents)
                     {
                         var adjustedNote = new PartTrackEvent(
                             noteNumber: note.NoteNumber,
-                            absolutePositionTicks: note.AbsolutePositionTicks + offset,
+                            absoluteTimeTicks: (int)note.AbsoluteTimeTicks + offset,
                             noteDurationTicks: note.NoteDurationTicks,
                             noteOnVelocity: note.NoteOnVelocity);
 

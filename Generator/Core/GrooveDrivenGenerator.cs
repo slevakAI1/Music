@@ -107,7 +107,7 @@ namespace Music.Generator
 
                     notes.Add(new PartTrackEvent(
                         noteNumber: midiNote,
-                        absolutePositionTicks: onsetTick,
+                        absoluteTimeTicks: onsetTick,
                         noteDurationTicks: duration,
                         noteOnVelocity: 95));
                 }
@@ -173,7 +173,7 @@ namespace Music.Generator
 
                     notes.Add(new PartTrackEvent(
                         noteNumber: midiNote,
-                        absolutePositionTicks: onsetTick,
+                        absoluteTimeTicks: onsetTick,
                         noteDurationTicks: duration,
                         noteOnVelocity: 85));
 
@@ -240,7 +240,7 @@ namespace Music.Generator
                     {
                         notes.Add(new PartTrackEvent(
                             noteNumber: midiNote,
-                            absolutePositionTicks: onsetTick,
+                            absoluteTimeTicks: onsetTick,
                             noteDurationTicks: duration,
                             noteOnVelocity: 75));
                     }
@@ -292,7 +292,7 @@ namespace Music.Generator
                         
                         notes.Add(new PartTrackEvent(
                             noteNumber: kickNote,
-                            absolutePositionTicks: onsetTick,
+                            absoluteTimeTicks: onsetTick,
                             noteDurationTicks: MusicConstants.TicksPerQuarterNote,
                             noteOnVelocity: velocity));
                     }
@@ -309,7 +309,7 @@ namespace Music.Generator
                         
                         notes.Add(new PartTrackEvent(
                             noteNumber: snareNote,
-                            absolutePositionTicks: onsetTick,
+                            absoluteTimeTicks: onsetTick,
                             noteDurationTicks: MusicConstants.TicksPerQuarterNote,
                             noteOnVelocity: velocity));
                     }
@@ -326,7 +326,7 @@ namespace Music.Generator
                         
                         notes.Add(new PartTrackEvent(
                             noteNumber: closedHiHatNote,
-                            absolutePositionTicks: onsetTick,
+                            absoluteTimeTicks: onsetTick,
                             noteDurationTicks: MusicConstants.TicksPerQuarterNote / 2, // shorter duration for hi-hat
                             noteOnVelocity: velocity));
                     }

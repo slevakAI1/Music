@@ -265,9 +265,9 @@ namespace Music.Writer
             // Calculate ticks per measure (4/4 time: 4 quarter notes per measure)
             int ticksPerMeasure = MusicConstants.TicksPerQuarterNote * 4;
 
-            // Group notes by measure based on their absolute position
+            // Group notes by measure based on their absolute time
             var notesByMeasure = track.PartTrackNoteEvents
-                .GroupBy(note => note.AbsolutePositionTicks / ticksPerMeasure)
+                .GroupBy(note => note.AbsoluteTimeTicks / ticksPerMeasure)
                 .OrderBy(g => g.Key)
                 .ToList();
 

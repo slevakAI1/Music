@@ -72,7 +72,7 @@ namespace Music.Writer
         {
             // Create NoteOn event at the note's absolute position
             var noteOnEvent = PartTrackEvent.CreateNoteOn(
-                partTrackEvent.AbsolutePositionTicks, 
+                partTrackEvent.AbsoluteTimeTicks, 
                 0, 
                 partTrackEvent.NoteNumber, 
                 partTrackEvent.NoteOnVelocity);
@@ -80,7 +80,7 @@ namespace Music.Writer
             partTrackEvents.Add(noteOnEvent);
 
             // Create NoteOff event at absolute position + duration
-            long noteOffTime = partTrackEvent.AbsolutePositionTicks + partTrackEvent.NoteDurationTicks;
+            long noteOffTime = partTrackEvent.AbsoluteTimeTicks + partTrackEvent.NoteDurationTicks;
             var noteOffEvent = PartTrackEvent.CreateNoteOff(noteOffTime, 0, partTrackEvent.NoteNumber, 0);
             noteOffEvent.Parameters.Remove("Channel");
             partTrackEvents.Add(noteOffEvent);

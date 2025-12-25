@@ -180,7 +180,7 @@ namespace Music.Writer
             int noteNumber = System.Convert.ToInt32(noteNumObj);
             int velocity = System.Convert.ToInt32(velocityObj);
             
-            int absolutePositionTicks = (int)Math.Round(noteOnEvent.AbsoluteTimeTicks * tickScale);
+            int absoluteTimeTicks = (int)Math.Round(noteOnEvent.AbsoluteTimeTicks * tickScale);
             int noteDurationTicks = (int)Math.Round((noteOffEvent.AbsoluteTimeTicks - noteOnEvent.AbsoluteTimeTicks) * tickScale);
 
             if (noteDurationTicks < 1)
@@ -188,7 +188,7 @@ namespace Music.Writer
 
             var songTrackNoteEvent = new PartTrackEvent(
                 noteNumber,
-                absolutePositionTicks,
+                absoluteTimeTicks,
                 noteDurationTicks,
                 velocity);
 

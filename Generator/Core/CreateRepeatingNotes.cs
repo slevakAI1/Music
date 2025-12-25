@@ -28,7 +28,7 @@ namespace Music.Generator
             {
                 var songTrackNoteEvent = new PartTrackEvent(
                     noteNumber: noteNumber,
-                    absolutePositionTicks: currentPosition,
+                    absoluteTimeTicks: currentPosition,
                     noteDurationTicks: noteDurationTicks,
                     noteOnVelocity: noteOnVelocity);
 
