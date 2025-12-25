@@ -342,7 +342,7 @@ namespace Music.Writer
                     GridControlLinesManager.AttachTimeSignatureTrack(dgSong, timeSignatureTrack);
                 }
 
-                // Convert MetaMidiEvent lists to PartTrack objects, passing the source ticks per quarter note
+                // Update PartTracks to be compatible with the grid
                 var tracks = UpdatePartTracks_For_Import_Only.Convert(
                     partTracks,
                     ticksPerQuarterNote);

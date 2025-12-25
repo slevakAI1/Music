@@ -5,28 +5,28 @@ namespace Music.Writer
 {
     /// <summary>
     /// Converts PartTrack objects to PartTrack objects with MetaMidiEvent objects with absolute time positioning.
-    /// This is stage 1 processing - creates NoteOn, NoteOff, and SequenceTrackName events only.
+    /// This is stage 1 processing - creates NoteOn, NoteOff, and SequenceTrackName partTrackEvents only.
     /// Channel assignment and other processing happens in later stages.
     /// </summary>
     public static class ConvertPartTracksToMidiSongDocument_Step_1
     {
         /// <summary>
-        /// Converts a list of songTracks to PartTrack objects with MIDI events (one PartTrack per input).
+        /// Converts a list of partTracks to PartTrack objects with MIDI partTrackEvents (one PartTrack per input).
         /// Each songTrack is processed independently with its own event list.
         /// </summary>
-        /// <param name="songTracks">List of songTracks to convert</param>
+        /// <param name="partTracks">List of partTracks to convert</param>
         /// <param name="ticksPerQuarterNote">MIDI time resolution (default 480 ticks per quarter note)</param>
-        /// <returns>List of PartTrack objects with populated events, one per input song track</returns>
+        /// <returns>List of PartTrack objects with populated partTrackEvents, one per input song track</returns>
         public static List<PartTrack> Convert(
-            List<PartTrack> songTracks)
+            List<PartTrack> partTracks)
         {
-            if (songTracks == null)
-                throw new ArgumentNullException(nameof(songTracks));
+            if (partTracks == null)
+                throw new ArgumentNullException(nameof(partTracks));
 
             var result = new List<PartTrack>();
-            foreach (var songTrack in songTracks)
+            foreach (var songTrack in partTracks)
             {
-                var events = ConvertSingleSongTrack(songTrack);
+                var events = UpdatePartTrack_1(songTrack);
                 var newTrack = new PartTrack(events)
                 {
                     MidiProgramName = songTrack.MidiProgramName,
@@ -39,9 +39,9 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Converts a single songTrack to a list of MIDI events with absolute time positioning.
+        /// Converts a single PartTrack to a list of MIDI partTrackEvents with absolute time positioning.
         /// </summary>
-        private static List<PartTrackEvent> ConvertSingleSongTrack(PartTrack songTrack)
+        private static List<PartTrackEvent> UpdatePartTrack_1(PartTrack songTrack)
         {
             var events = new List<PartTrackEvent>();
 
@@ -58,7 +58,7 @@ namespace Music.Writer
             programChangeEvent.Parameters.Remove("Channel");
             events.Add(programChangeEvent);
 
-            // Process each note in the songTrack
+            // Process each PartTrackEvent (note) in the PartTrack
             foreach (var songTrackNoteEvent in songTrack.PartTrackNoteEvents ?? Enumerable.Empty<PartTrackEvent>())
                     ProcessSingleNote(events, songTrackNoteEvent);
 
@@ -68,22 +68,22 @@ namespace Music.Writer
         /// <summary>
         /// Processes a single note event.
         /// </summary>
-        private static void ProcessSingleNote(List<PartTrackEvent> events, PartTrackEvent songTrackNoteEvent)
+        private static void ProcessSingleNote(List<PartTrackEvent> partTrackEvents, PartTrackEvent partTrackEvent)
         {
             // Create NoteOn event at the note's absolute position
             var noteOnEvent = PartTrackEvent.CreateNoteOn(
-                songTrackNoteEvent.AbsolutePositionTicks, 
+                partTrackEvent.AbsolutePositionTicks, 
                 0, 
-                songTrackNoteEvent.NoteNumber, 
-                songTrackNoteEvent.NoteOnVelocity);
+                partTrackEvent.NoteNumber, 
+                partTrackEvent.NoteOnVelocity);
             noteOnEvent.Parameters.Remove("Channel");
-            events.Add(noteOnEvent);
+            partTrackEvents.Add(noteOnEvent);
 
             // Create NoteOff event at absolute position + duration
-            long noteOffTime = songTrackNoteEvent.AbsolutePositionTicks + songTrackNoteEvent.NoteDurationTicks;
-            var noteOffEvent = PartTrackEvent.CreateNoteOff(noteOffTime, 0, songTrackNoteEvent.NoteNumber, 0);
+            long noteOffTime = partTrackEvent.AbsolutePositionTicks + partTrackEvent.NoteDurationTicks;
+            var noteOffEvent = PartTrackEvent.CreateNoteOff(noteOffTime, 0, partTrackEvent.NoteNumber, 0);
             noteOffEvent.Parameters.Remove("Channel");
-            events.Add(noteOffEvent);
+            partTrackEvents.Add(noteOffEvent);
         }
 
         /// <summary>
