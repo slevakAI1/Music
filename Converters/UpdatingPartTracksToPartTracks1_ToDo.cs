@@ -6,13 +6,13 @@ namespace Music.Writer
     /// <summary>
     /// Helper to convert lists of MetaMidiEvent objects to PartTrack objects.
     /// </summary>
-    internal static class ConvertMetaMidiEventsToSongTracks
+    internal static class UpdatingPartTracksToPartTracks1_ToDo
     {
         /// <summary>
         /// Converts lists of MetaMidiEvent objects to PartTrack objects.
         /// Splits tracks by program changes - each program change segment becomes a separate songTrack.
         /// </summary>
-        /// <param name="midiEventLists">Lists of MetaMidiEvent objects, one per track</param>
+        /// <param name="partTracks"></param>
         /// <param name="midiInstruments">Available MIDI instruments for name lookup</param>
         /// <param name="sourceTicksPerQuarterNote">The ticks per quarter note from the source MIDI file (default 480)</param>
         public static List<PartTrack> Convert(

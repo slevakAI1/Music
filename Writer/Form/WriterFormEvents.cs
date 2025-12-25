@@ -307,7 +307,7 @@ namespace Music.Writer
                 List<Generator.PartTrack> partTracks;
                 try
                 {
-                    partTracks = ConvertMidiSongDocumentToMidiEvents.Convert(midiDoc);
+                    partTracks = ConvertMidiSongDocumentToPartTracks.Convert(midiDoc);
                 }
                 catch (NotSupportedException ex)
                 {
@@ -343,7 +343,7 @@ namespace Music.Writer
                 }
 
                 // Convert MetaMidiEvent lists to PartTrack objects, passing the source ticks per quarter note
-                var tracks = ConvertMetaMidiEventsToSongTracks.Convert(
+                var tracks = UpdatingPartTracksToPartTracks1_ToDo.Convert(
                     partTracks,
                     ticksPerQuarterNote);
 
