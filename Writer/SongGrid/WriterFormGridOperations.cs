@@ -137,33 +137,6 @@ namespace Music.Writer
             dgSong.Refresh();
         }
 
-        // TODO DEAD CODE OR JUST DISCONNECTED OR REPLICATED?
-
-        // ========== GRID VALIDATION HELPERS ==========
-
-        /// <summary>
-        /// Validates that one or more tracks are selected in the grid.
-        /// Shows a message box if no rows are selected.
-        /// </summary>
-        /// <returns>True if at least one row is selected, false otherwise.</returns>
-        private bool ValidateTracksSelected(DataGridView dgSong)
-        {
-            // Check if any non-fixed rows are selected
-            var hasValidSelection = dgSong.SelectedRows
-                .Cast<DataGridViewRow>()
-                .Any(r => r.Index >= SongGridManager.FIXED_ROWS_COUNT);
-
-            if (!hasValidSelection)
-            {
-                MessageBoxHelper.Show(
-                    "Please select one or more tracks to apply this command.",
-                    "No Selection",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-                return false;
-            }
-            return true;
-        }
 
         // ========== GRID DATA MANIPULATION ==========
 
