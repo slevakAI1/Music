@@ -12,7 +12,7 @@ namespace Music.Writer
     /// </summary>
     public static class ConvertMetaMidiEventsToMidiSongDocument
     {
-        public static MidiSongDocument Convert(List<List<MetaMidiEvent>> midiEventLists)
+        public static MidiSongDocument Convert(List<List<PartTrackEvent>> midiEventLists)
         {
             if (midiEventLists == null)
                 throw new ArgumentNullException(nameof(midiEventLists));
@@ -33,7 +33,7 @@ namespace Music.Writer
             return new MidiSongDocument(midiFile);
         }
 
-        private static TrackChunk CreateTrackFromMidiEvents(List<MetaMidiEvent> midiEvents)
+        private static TrackChunk CreateTrackFromMidiEvents(List<PartTrackEvent> midiEvents)
         {
             var trackChunk = new TrackChunk();
             long lastAbsoluteTime = 0;
@@ -66,7 +66,7 @@ namespace Music.Writer
         }
 
         private static Melanchall.DryWetMidi.Core.MidiEvent? ConvertToDryWetMidiEvent(
-            MetaMidiEvent midiEvent,
+            PartTrackEvent midiEvent,
             long deltaTime,
             bool isDrumTrack)
         {
@@ -180,7 +180,7 @@ namespace Music.Writer
             };
         }
 
-        private static ProgramChangeEvent? CreateProgramChangeEvent(MetaMidiEvent midiEvent, long deltaTime, bool isDrumTrack)
+        private static ProgramChangeEvent? CreateProgramChangeEvent(PartTrackEvent midiEvent, long deltaTime, bool isDrumTrack)
         {
             int programNumber = GetIntParam(midiEvent, "Program");
             
@@ -195,7 +195,7 @@ namespace Music.Writer
             };
         }
 
-        private static SetTempoEvent CreateSetTempoEvent(MetaMidiEvent midiEvent, long deltaTime)
+        private static SetTempoEvent CreateSetTempoEvent(PartTrackEvent midiEvent, long deltaTime)
         {
             int microsecondsPerQuarterNote;
             
@@ -221,7 +221,7 @@ namespace Music.Writer
         } 
 
         // TO DO - LOW - look at this. Looks like overkill.
-        private static TimeSignatureEvent CreateTimeSignatureEvent(MetaMidiEvent midiEvent, long deltaTime)
+        private static TimeSignatureEvent CreateTimeSignatureEvent(PartTrackEvent midiEvent, long deltaTime)
         {
             var numerator = (byte)GetIntParam(midiEvent, "Numerator");
 
@@ -271,7 +271,7 @@ namespace Music.Writer
 
 
 
-        private static PitchBendEvent CreatePitchBendEvent(MetaMidiEvent midiEvent, long deltaTime, bool isDrumTrack)
+        private static PitchBendEvent CreatePitchBendEvent(PartTrackEvent midiEvent, long deltaTime, bool isDrumTrack)
         {
             int value = GetIntParam(midiEvent, "Value");
             
@@ -285,7 +285,7 @@ namespace Music.Writer
             };
         }
 
-        private static SmpteOffsetEvent CreateSmpteOffsetEvent(MetaMidiEvent midiEvent, long deltaTime)
+        private static SmpteOffsetEvent CreateSmpteOffsetEvent(PartTrackEvent midiEvent, long deltaTime)
         {
             int formatValue = GetIntParam(midiEvent, "Format");
             byte hours = (byte)GetIntParam(midiEvent, "Hours");
@@ -310,21 +310,21 @@ namespace Music.Writer
         }
 
         // Helper methods to extract parameters safely
-        private static string GetStringParam(MetaMidiEvent midiEvent, string key)
+        private static string GetStringParam(PartTrackEvent midiEvent, string key)
         {
             if (midiEvent.Parameters.TryGetValue(key, out var value))
                 return value.ToString() ?? string.Empty;
             return string.Empty;
         }
 
-        private static int GetIntParam(MetaMidiEvent midiEvent, string key)
+        private static int GetIntParam(PartTrackEvent midiEvent, string key)
         {
             if (midiEvent.Parameters.TryGetValue(key, out var value))
                 return System.Convert.ToInt32(value);
             return 0;
         }
 
-        private static byte[] GetBytesParam(MetaMidiEvent midiEvent, string key)
+        private static byte[] GetBytesParam(PartTrackEvent midiEvent, string key)
         {
             if (midiEvent.Parameters.TryGetValue(key, out var value) && value is byte[] bytes)
                 return bytes;

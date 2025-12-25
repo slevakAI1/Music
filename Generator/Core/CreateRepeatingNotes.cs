@@ -21,12 +21,12 @@ namespace Music.Generator
             int repeatCount,
             int noteOnVelocity = 100)
         {
-            var SongTrackNoteEvents = new List<MetaMidiEvent>();
+            var SongTrackNoteEvents = new List<PartTrackEvent>();
             int currentPosition = 0;
 
             for (int i = 0; i < repeatCount; i++)
             {
-                var songTrackNoteEvent = new MetaMidiEvent(
+                var songTrackNoteEvent = new PartTrackEvent(
                     noteNumber: noteNumber,
                     absolutePositionTicks: currentPosition,
                     noteDurationTicks: noteDurationTicks,

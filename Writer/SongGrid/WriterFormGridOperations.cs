@@ -15,7 +15,7 @@ namespace Music.Writer
         public void HandleAddSongTrack(DataGridView dgSong)
         {
             // Create an empty PartTrack and add it to the grid via the existing helper.
-            var emptyTrack = new PartTrack(new List<MetaMidiEvent>())
+            var emptyTrack = new PartTrack(new List<PartTrackEvent>())
             {
                 MidiProgramNumber = -1  // "Select..."
             };
@@ -123,7 +123,7 @@ namespace Music.Writer
                 // Reset data to empty PartTrack
                 var trackDataCol = dgSong.Columns["colData"];
                 if (trackDataCol != null)
-                    row.Cells[trackDataCol.Index].Value = new PartTrack(new List<MetaMidiEvent>()) { MidiProgramNumber = -1 };
+                    row.Cells[trackDataCol.Index].Value = new PartTrack(new List<PartTrackEvent>()) { MidiProgramNumber = -1 };
 
                 // Clear the Part description
                 var descriptionCol = dgSong.Columns["colDescription"];
@@ -207,7 +207,7 @@ namespace Music.Writer
                 if (existingTrack == null)
                 {
                     // No existing track, create new one with the notes (no offset needed)
-                    existingTrack = new PartTrack(new List<MetaMidiEvent>(track.PartTrackNoteEvents));
+                    existingTrack = new PartTrack(new List<PartTrackEvent>(track.PartTrackNoteEvents));
                     selectedRow.Cells["colData"].Value = existingTrack;
                 }
                 else
@@ -226,7 +226,7 @@ namespace Music.Writer
                     // Append new notes with adjusted absolutePositions
                     foreach (var note in track.PartTrackNoteEvents)
                     {
-                        var adjustedNote = new MetaMidiEvent(
+                        var adjustedNote = new PartTrackEvent(
                             noteNumber: note.NoteNumber,
                             absolutePositionTicks: note.AbsolutePositionTicks + offset,
                             noteDurationTicks: note.NoteDurationTicks,

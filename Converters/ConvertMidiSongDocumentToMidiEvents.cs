@@ -16,12 +16,12 @@ namespace Music.Writer
         /// <param name="midiDoc">The MIDI document to convert</param>
         /// <returns>List of MetaMidiEvent lists, one per track</returns>
         /// <exception cref="InvalidOperationException">Thrown when an unsupported MIDI event is encountered</exception>
-        public static List<List<MetaMidiEvent>> Convert(MidiSongDocument midiDoc)
+        public static List<List<PartTrackEvent>> Convert(MidiSongDocument midiDoc)
         {
             if (midiDoc == null)
                 throw new ArgumentNullException(nameof(midiDoc));
 
-            var result = new List<List<MetaMidiEvent>>();
+            var result = new List<List<PartTrackEvent>>();
             int trackIndex = 0;
 
             foreach (var trackChunk in midiDoc.Tracks)
@@ -46,9 +46,9 @@ namespace Music.Writer
         /// <summary>
         /// Converts a single track chunk to a list of MetaMidiEvent objects.
         /// </summary>
-        private static List<MetaMidiEvent> ConvertTrack(TrackChunk trackChunk, int trackIndex)
+        private static List<PartTrackEvent> ConvertTrack(TrackChunk trackChunk, int trackIndex)
         {
-            var events = new List<MetaMidiEvent>();
+            var events = new List<PartTrackEvent>();
             long absoluteTime = 0;
 
             foreach (var midiEvent in trackChunk.Events)
@@ -83,7 +83,7 @@ namespace Music.Writer
         /// <summary>
         /// Converts a single DryWetMidi event to our domain MetaMidiEvent format.
         /// </summary>
-        private static MetaMidiEvent? ConvertEvent(Melanchall.DryWetMidi.Core.MidiEvent dryWetEvent, long absoluteTime)
+        private static PartTrackEvent? ConvertEvent(Melanchall.DryWetMidi.Core.MidiEvent dryWetEvent, long absoluteTime)
         {
             return dryWetEvent switch
             {
@@ -92,51 +92,51 @@ namespace Music.Writer
                 // ============================================================
 
                 SequenceNumberEvent sequenceNumberEvent => 
-                    MetaMidiEvent.CreateSequenceNumber(absoluteTime, sequenceNumberEvent.Number),
+                    PartTrackEvent.CreateSequenceNumber(absoluteTime, sequenceNumberEvent.Number),
 
                 TextEvent textEvent => 
-                    MetaMidiEvent.CreateText(absoluteTime, textEvent.Text),
+                    PartTrackEvent.CreateText(absoluteTime, textEvent.Text),
 
                 CopyrightNoticeEvent copyrightEvent => 
-                    MetaMidiEvent.CreateCopyrightNotice(absoluteTime, copyrightEvent.Text),
+                    PartTrackEvent.CreateCopyrightNotice(absoluteTime, copyrightEvent.Text),
 
                 SequenceTrackNameEvent trackNameEvent => 
-                    MetaMidiEvent.CreateSequenceTrackName(absoluteTime, trackNameEvent.Text),
+                    PartTrackEvent.CreateSequenceTrackName(absoluteTime, trackNameEvent.Text),
 
                 InstrumentNameEvent instrumentEvent => 
-                    MetaMidiEvent.CreateInstrumentName(absoluteTime, instrumentEvent.Text),
+                    PartTrackEvent.CreateInstrumentName(absoluteTime, instrumentEvent.Text),
 
                 LyricEvent lyricEvent => 
-                    MetaMidiEvent.CreateLyric(absoluteTime, lyricEvent.Text),
+                    PartTrackEvent.CreateLyric(absoluteTime, lyricEvent.Text),
 
                 MarkerEvent markerEvent => 
-                    MetaMidiEvent.CreateMarker(absoluteTime, markerEvent.Text),
+                    PartTrackEvent.CreateMarker(absoluteTime, markerEvent.Text),
 
                 CuePointEvent cuePointEvent => 
-                    MetaMidiEvent.CreateCuePoint(absoluteTime, cuePointEvent.Text),
+                    PartTrackEvent.CreateCuePoint(absoluteTime, cuePointEvent.Text),
 
                 ProgramNameEvent programNameEvent => 
-                    MetaMidiEvent.CreateProgramName(absoluteTime, programNameEvent.Text),
+                    PartTrackEvent.CreateProgramName(absoluteTime, programNameEvent.Text),
 
                 DeviceNameEvent deviceNameEvent => 
-                    MetaMidiEvent.CreateDeviceName(absoluteTime, deviceNameEvent.Text),
+                    PartTrackEvent.CreateDeviceName(absoluteTime, deviceNameEvent.Text),
 
                 ChannelPrefixEvent channelPrefixEvent => 
-                    MetaMidiEvent.CreateMidiChannelPrefix(absoluteTime, channelPrefixEvent.Channel),
+                    PartTrackEvent.CreateMidiChannelPrefix(absoluteTime, channelPrefixEvent.Channel),
 
                 PortPrefixEvent portPrefixEvent => 
-                    MetaMidiEvent.CreateMidiPort(absoluteTime, portPrefixEvent.Port),
+                    PartTrackEvent.CreateMidiPort(absoluteTime, portPrefixEvent.Port),
 
                 EndOfTrackEvent => 
-                    MetaMidiEvent.CreateEndOfTrack(absoluteTime),
+                    PartTrackEvent.CreateEndOfTrack(absoluteTime),
 
                 SetTempoEvent tempoEvent => 
-                    MetaMidiEvent.CreateSetTempo(
+                    PartTrackEvent.CreateSetTempo(
                         absoluteTime, 
                         microsecondsPerQuarterNote: (int)tempoEvent.MicrosecondsPerQuarterNote),
 
                 SmpteOffsetEvent smpteEvent => 
-                    MetaMidiEvent.CreateSmpteOffset(
+                    PartTrackEvent.CreateSmpteOffset(
                         absoluteTime,
                         (int)smpteEvent.Format,
                         smpteEvent.Hours,
@@ -146,7 +146,7 @@ namespace Music.Writer
                         smpteEvent.SubFrames),
 
                 TimeSignatureEvent timeSignatureEvent => 
-                    MetaMidiEvent.CreateTimeSignature(
+                    PartTrackEvent.CreateTimeSignature(
                         absoluteTime,
                         timeSignatureEvent.Numerator,
                         timeSignatureEvent.Denominator,  // Store the exponent as-is, don't convert to note value
@@ -154,16 +154,16 @@ namespace Music.Writer
                         timeSignatureEvent.ThirtySecondNotesPerBeat),
 
                 KeySignatureEvent keySignatureEvent => 
-                    MetaMidiEvent.CreateKeySignature(
+                    PartTrackEvent.CreateKeySignature(
                         absoluteTime,
                         keySignatureEvent.Key,
                         keySignatureEvent.Scale),
 
                 SequencerSpecificEvent sequencerEvent => 
-                    MetaMidiEvent.CreateSequencerSpecific(absoluteTime, sequencerEvent.Data),
+                    PartTrackEvent.CreateSequencerSpecific(absoluteTime, sequencerEvent.Data),
 
                 UnknownMetaEvent unknownMetaEvent => 
-                    MetaMidiEvent.CreateUnknownMeta(
+                    PartTrackEvent.CreateUnknownMeta(
                         absoluteTime, 
                         unknownMetaEvent.StatusByte, 
                         unknownMetaEvent.Data),
@@ -173,47 +173,47 @@ namespace Music.Writer
                 // ============================================================
 
                 NoteOffEvent noteOffEvent => 
-                    MetaMidiEvent.CreateNoteOff(
+                    PartTrackEvent.CreateNoteOff(
                         absoluteTime,
                         (int)noteOffEvent.Channel,
                         noteOffEvent.NoteNumber,
                         noteOffEvent.Velocity),
 
                 NoteOnEvent noteOnEvent => 
-                    MetaMidiEvent.CreateNoteOn(
+                    PartTrackEvent.CreateNoteOn(
                         absoluteTime,
                         (int)noteOnEvent.Channel,
                         noteOnEvent.NoteNumber,
                         noteOnEvent.Velocity),
 
                 NoteAftertouchEvent aftertouchEvent => 
-                    MetaMidiEvent.CreatePolyKeyPressure(
+                    PartTrackEvent.CreatePolyKeyPressure(
                         absoluteTime,
                         (int)aftertouchEvent.Channel,
                         aftertouchEvent.NoteNumber,
                         aftertouchEvent.AftertouchValue),
 
                 ControlChangeEvent controlChangeEvent => 
-                    MetaMidiEvent.CreateControlChange(
+                    PartTrackEvent.CreateControlChange(
                         absoluteTime,
                         (int)controlChangeEvent.Channel,
                         controlChangeEvent.ControlNumber,
                         controlChangeEvent.ControlValue),
 
                 ProgramChangeEvent programChangeEvent => 
-                    MetaMidiEvent.CreateProgramChange(
+                    PartTrackEvent.CreateProgramChange(
                         absoluteTime,
                         (int)programChangeEvent.Channel,
                         programChangeEvent.ProgramNumber),
 
                 ChannelAftertouchEvent channelAftertouchEvent => 
-                    MetaMidiEvent.CreateChannelPressure(
+                    PartTrackEvent.CreateChannelPressure(
                         absoluteTime,
                         (int)channelAftertouchEvent.Channel,
                         channelAftertouchEvent.AftertouchValue),
 
                 PitchBendEvent pitchBendEvent => 
-                    MetaMidiEvent.CreatePitchBend(
+                    PartTrackEvent.CreatePitchBend(
                         absoluteTime,
                         (int)pitchBendEvent.Channel,
                         pitchBendEvent.PitchValue - 8192), // Convert from unsigned to signed
@@ -223,51 +223,51 @@ namespace Music.Writer
                 // ============================================================
 
                 NormalSysExEvent normalSysExEvent => 
-                    MetaMidiEvent.CreateNormalSysEx(absoluteTime, normalSysExEvent.Data),
+                    PartTrackEvent.CreateNormalSysEx(absoluteTime, normalSysExEvent.Data),
 
                 EscapeSysExEvent escapeSysExEvent => 
-                    MetaMidiEvent.CreateEscapeSysEx(absoluteTime, escapeSysExEvent.Data),
+                    PartTrackEvent.CreateEscapeSysEx(absoluteTime, escapeSysExEvent.Data),
 
                 // ============================================================
                 // System Common Messages
                 // ============================================================
 
                 MidiTimeCodeEvent mtcEvent => 
-                    MetaMidiEvent.CreateMtcQuarterFrame(
+                    PartTrackEvent.CreateMtcQuarterFrame(
                         absoluteTime, 
                         (byte)mtcEvent.Component, 
                         mtcEvent.ComponentValue),
 
                 SongPositionPointerEvent songPositionEvent => 
-                    MetaMidiEvent.CreateSongPositionPointer(absoluteTime, songPositionEvent.PointerValue),
+                    PartTrackEvent.CreateSongPositionPointer(absoluteTime, songPositionEvent.PointerValue),
 
                 SongSelectEvent songSelectEvent => 
-                    MetaMidiEvent.CreateSongSelect(absoluteTime, songSelectEvent.Number),
+                    PartTrackEvent.CreateSongSelect(absoluteTime, songSelectEvent.Number),
 
                 TuneRequestEvent => 
-                    MetaMidiEvent.CreateTuneRequest(absoluteTime),
+                    PartTrackEvent.CreateTuneRequest(absoluteTime),
 
                 // ============================================================
                 // System Real-Time Messages
                 // ============================================================
 
                 TimingClockEvent => 
-                    MetaMidiEvent.CreateTimingClock(absoluteTime),
+                    PartTrackEvent.CreateTimingClock(absoluteTime),
 
                 StartEvent => 
-                    MetaMidiEvent.CreateStart(absoluteTime),
+                    PartTrackEvent.CreateStart(absoluteTime),
 
                 ContinueEvent => 
-                    MetaMidiEvent.CreateContinue(absoluteTime),
+                    PartTrackEvent.CreateContinue(absoluteTime),
 
                 StopEvent => 
-                    MetaMidiEvent.CreateStop(absoluteTime),
+                    PartTrackEvent.CreateStop(absoluteTime),
 
                 ActiveSensingEvent => 
-                    MetaMidiEvent.CreateActiveSensing(absoluteTime),
+                    PartTrackEvent.CreateActiveSensing(absoluteTime),
 
                 ResetEvent => 
-                    MetaMidiEvent.CreateSystemReset(absoluteTime),
+                    PartTrackEvent.CreateSystemReset(absoluteTime),
 
                 // ============================================================
                 // Unknown/Unsupported

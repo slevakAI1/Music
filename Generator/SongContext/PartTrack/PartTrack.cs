@@ -17,9 +17,9 @@ namespace Music.Generator
         //public string NotionPartName { get; set; }
         public int MidiProgramNumber { get; set; }
 
-        public List<MetaMidiEvent> PartTrackNoteEvents { get; set; } = new();
+        public List<PartTrackEvent> PartTrackNoteEvents { get; set; } = new();
 
-        public PartTrack(List<MetaMidiEvent> songTrackNoteEvent)
+        public PartTrack(List<PartTrackEvent> songTrackNoteEvent)
         {
             PartTrackNoteEvents = songTrackNoteEvent;
         }

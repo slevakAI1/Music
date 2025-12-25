@@ -7,7 +7,7 @@ namespace Music.MyMidi
     /// Uses a dictionary-based parameter system for flexibility.
     /// Use factory methods for creating event types with proper validation.
     /// </summary>
-    public class MetaMidiEvent
+    public class PartTrackEvent
     {
         /// <summary>
         /// Absolute time position in ticks from the start of the track.
@@ -50,7 +50,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Simple note constructor for backward compatibility with note-based code.
         /// </summary>
-        public MetaMidiEvent(
+        public PartTrackEvent(
             int noteNumber,
             int absolutePositionTicks,
             int noteDurationTicks,
@@ -70,7 +70,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Default constructor for factory methods.
         /// </summary>
-        public MetaMidiEvent()
+        public PartTrackEvent()
         {
         }
 
@@ -81,7 +81,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a sequence number meta event (0x00).
         /// </summary>
-        public static MetaMidiEvent CreateSequenceNumber(long absoluteTime, ushort sequenceNumber) =>
+        public static PartTrackEvent CreateSequenceNumber(long absoluteTime, ushort sequenceNumber) =>
             new()
             {
                 Type = MidiEventType.SequenceNumber,
@@ -92,7 +92,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a text meta event (0x01).
         /// </summary>
-        public static MetaMidiEvent CreateText(long absoluteTime, string text) =>
+        public static PartTrackEvent CreateText(long absoluteTime, string text) =>
             new()
             {
                 Type = MidiEventType.Text,
@@ -103,7 +103,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a copyright notice meta event (0x02).
         /// </summary>
-        public static MetaMidiEvent CreateCopyrightNotice(long absoluteTime, string text) =>
+        public static PartTrackEvent CreateCopyrightNotice(long absoluteTime, string text) =>
             new()
             {
                 Type = MidiEventType.CopyrightNotice,
@@ -114,7 +114,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a sequence/track name meta event (0x03).
         /// </summary>
-        public static MetaMidiEvent CreateSequenceTrackName(long absoluteTime, string name) =>
+        public static PartTrackEvent CreateSequenceTrackName(long absoluteTime, string name) =>
             new()
             {
                 Type = MidiEventType.SequenceTrackName,
@@ -125,7 +125,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates an instrument name meta event (0x04).
         /// </summary>
-        public static MetaMidiEvent CreateInstrumentName(long absoluteTime, string name) =>
+        public static PartTrackEvent CreateInstrumentName(long absoluteTime, string name) =>
             new()
             {
                 Type = MidiEventType.InstrumentName,
@@ -136,7 +136,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a lyric meta event (0x05).
         /// </summary>
-        public static MetaMidiEvent CreateLyric(long absoluteTime, string lyric) =>
+        public static PartTrackEvent CreateLyric(long absoluteTime, string lyric) =>
             new()
             {
                 Type = MidiEventType.Lyric,
@@ -147,7 +147,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a marker meta event (0x06).
         /// </summary>
-        public static MetaMidiEvent CreateMarker(long absoluteTime, string marker) =>
+        public static PartTrackEvent CreateMarker(long absoluteTime, string marker) =>
             new()
             {
                 Type = MidiEventType.Marker,
@@ -158,7 +158,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a cue point meta event (0x07).
         /// </summary>
-        public static MetaMidiEvent CreateCuePoint(long absoluteTime, string cuePoint) =>
+        public static PartTrackEvent CreateCuePoint(long absoluteTime, string cuePoint) =>
             new()
             {
                 Type = MidiEventType.CuePoint,
@@ -169,7 +169,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a program name meta event (0x08).
         /// </summary>
-        public static MetaMidiEvent CreateProgramName(long absoluteTime, string programName) =>
+        public static PartTrackEvent CreateProgramName(long absoluteTime, string programName) =>
             new()
             {
                 Type = MidiEventType.ProgramName,
@@ -180,7 +180,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a device name meta event (0x09).
         /// </summary>
-        public static MetaMidiEvent CreateDeviceName(long absoluteTime, string deviceName) =>
+        public static PartTrackEvent CreateDeviceName(long absoluteTime, string deviceName) =>
             new()
             {
                 Type = MidiEventType.DeviceName,
@@ -191,7 +191,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a MIDI channel prefix meta event (0x20).
         /// </summary>
-        public static MetaMidiEvent CreateMidiChannelPrefix(long absoluteTime, byte channel) =>
+        public static PartTrackEvent CreateMidiChannelPrefix(long absoluteTime, byte channel) =>
             new()
             {
                 Type = MidiEventType.MidiChannelPrefix,
@@ -202,7 +202,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a MIDI port meta event (0x21).
         /// </summary>
-        public static MetaMidiEvent CreateMidiPort(long absoluteTime, byte port) =>
+        public static PartTrackEvent CreateMidiPort(long absoluteTime, byte port) =>
             new()
             {
                 Type = MidiEventType.MidiPort,
@@ -213,7 +213,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates an end-of-track meta event (0x2F).
         /// </summary>
-        public static MetaMidiEvent CreateEndOfTrack(long absoluteTime = 0) =>
+        public static PartTrackEvent CreateEndOfTrack(long absoluteTime = 0) =>
             new()
             {
                 Type = MidiEventType.EndOfTrack,
@@ -225,7 +225,7 @@ namespace Music.MyMidi
         /// Creates a set tempo meta event (0x51).
         /// Can specify either BPM or microseconds per quarter note.
         /// </summary>
-        public static MetaMidiEvent CreateSetTempo(long absoluteTime, int? bpm = null, int? microsecondsPerQuarterNote = null)
+        public static PartTrackEvent CreateSetTempo(long absoluteTime, int? bpm = null, int? microsecondsPerQuarterNote = null)
         {
             var parameters = new Dictionary<string, object>();
             if (bpm.HasValue)
@@ -245,7 +245,7 @@ namespace Music.MyMidi
         /// Creates a SMPTE offset meta event (0x54).
         /// Specifies an offset for SMPTE time code synchronization.
         /// </summary>
-        public static MetaMidiEvent CreateSmpteOffset(
+        public static PartTrackEvent CreateSmpteOffset(
             long absoluteTime,
             byte hours,
             byte minutes,
@@ -253,7 +253,7 @@ namespace Music.MyMidi
             byte frames,
             byte subFrames)
         {
-            return new MetaMidiEvent
+            return new PartTrackEvent
             {
                 AbsoluteTimeTicks = absoluteTime,
                 Type = MidiEventType.SmpteOffset,
@@ -271,7 +271,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a SMPTE offset meta event (0x54) with format specification.
         /// </summary>
-        public static MetaMidiEvent CreateSmpteOffset(
+        public static PartTrackEvent CreateSmpteOffset(
             long absoluteTime,
             int format,
             byte hours,
@@ -280,7 +280,7 @@ namespace Music.MyMidi
             byte frames,
             byte subFrames)
         {
-            return new MetaMidiEvent
+            return new PartTrackEvent
             {
                 AbsoluteTimeTicks = absoluteTime,
                 Type = MidiEventType.SmpteOffset,
@@ -299,7 +299,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a time signature meta event (0x58).
         /// </summary>
-        public static MetaMidiEvent CreateTimeSignature(
+        public static PartTrackEvent CreateTimeSignature(
             long absoluteTime,
             int numerator,
             int denominator,
@@ -321,7 +321,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a key signature meta event (0x59).
         /// </summary>
-        public static MetaMidiEvent CreateKeySignature(long absoluteTime, int sharpsFlats, int mode) =>
+        public static PartTrackEvent CreateKeySignature(long absoluteTime, int sharpsFlats, int mode) =>
             new()
             {
                 Type = MidiEventType.KeySignature,
@@ -336,7 +336,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a sequencer-specific meta event (0x7F).
         /// </summary>
-        public static MetaMidiEvent CreateSequencerSpecific(long absoluteTime, byte[] data) =>
+        public static PartTrackEvent CreateSequencerSpecific(long absoluteTime, byte[] data) =>
             new()
             {
                 Type = MidiEventType.SequencerSpecific,
@@ -347,7 +347,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates an unknown meta event for forward compatibility.
         /// </summary>
-        public static MetaMidiEvent CreateUnknownMeta(long absoluteTime, byte statusByte, byte[] data) =>
+        public static PartTrackEvent CreateUnknownMeta(long absoluteTime, byte statusByte, byte[] data) =>
             new()
             {
                 Type = MidiEventType.UnknownMeta,
@@ -366,7 +366,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a note-off event (0x8n).
         /// </summary>
-        public static MetaMidiEvent CreateNoteOff(long absoluteTime, int channel, int noteNumber, int velocity = 0, string? note = null)
+        public static PartTrackEvent CreateNoteOff(long absoluteTime, int channel, int noteNumber, int velocity = 0, string? note = null)
         {
             var parameters = new Dictionary<string, object>
             {
@@ -388,7 +388,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a note-on event (0x9n).
         /// </summary>
-        public static MetaMidiEvent CreateNoteOn(long absoluteTime, int channel, int noteNumber, int velocity, string? note = null)
+        public static PartTrackEvent CreateNoteOn(long absoluteTime, int channel, int noteNumber, int velocity, string? note = null)
         {
             var parameters = new Dictionary<string, object>
             {
@@ -410,7 +410,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a polyphonic key pressure (aftertouch) event (0xAn).
         /// </summary>
-        public static MetaMidiEvent CreatePolyKeyPressure(long absoluteTime, int channel, int noteNumber, int pressure, string? note = null)
+        public static PartTrackEvent CreatePolyKeyPressure(long absoluteTime, int channel, int noteNumber, int pressure, string? note = null)
         {
             var parameters = new Dictionary<string, object>
             {
@@ -432,7 +432,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a control change event (0xBn).
         /// </summary>
-        public static MetaMidiEvent CreateControlChange(long absoluteTime, int channel, int controller, int value, string? controllerName = null)
+        public static PartTrackEvent CreateControlChange(long absoluteTime, int channel, int controller, int value, string? controllerName = null)
         {
             var parameters = new Dictionary<string, object>
             {
@@ -454,7 +454,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a program change event (0xCn).
         /// </summary>
-        public static MetaMidiEvent CreateProgramChange(long absoluteTime, int channel, int program, string? programName = null)
+        public static PartTrackEvent CreateProgramChange(long absoluteTime, int channel, int program, string? programName = null)
         {
             var parameters = new Dictionary<string, object>
             {
@@ -475,7 +475,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a channel pressure (aftertouch) event (0xDn).
         /// </summary>
-        public static MetaMidiEvent CreateChannelPressure(long absoluteTime, int channel, int pressure) =>
+        public static PartTrackEvent CreateChannelPressure(long absoluteTime, int channel, int pressure) =>
             new()
             {
                 Type = MidiEventType.ChannelPressure,
@@ -490,7 +490,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a pitch bend event (0xEn).
         /// </summary>
-        public static MetaMidiEvent CreatePitchBend(long absoluteTime, int channel, int value) =>
+        public static PartTrackEvent CreatePitchBend(long absoluteTime, int channel, int value) =>
             new()
             {
                 Type = MidiEventType.PitchBend,
@@ -509,7 +509,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a normal system exclusive event (0xF0).
         /// </summary>
-        public static MetaMidiEvent CreateNormalSysEx(long absoluteTime, byte[] data) =>
+        public static PartTrackEvent CreateNormalSysEx(long absoluteTime, byte[] data) =>
             new()
             {
                 Type = MidiEventType.NormalSysEx,
@@ -520,7 +520,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates an escape system exclusive event (0xF7).
         /// </summary>
-        public static MetaMidiEvent CreateEscapeSysEx(long absoluteTime, byte[] data) =>
+        public static PartTrackEvent CreateEscapeSysEx(long absoluteTime, byte[] data) =>
             new()
             {
                 Type = MidiEventType.EscapeSysEx,
@@ -535,7 +535,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates an MTC quarter frame event (0xF1).
         /// </summary>
-        public static MetaMidiEvent CreateMtcQuarterFrame(long absoluteTime, byte messageType, byte values) =>
+        public static PartTrackEvent CreateMtcQuarterFrame(long absoluteTime, byte messageType, byte values) =>
             new()
             {
                 Type = MidiEventType.MtcQuarterFrame,
@@ -550,7 +550,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a song position pointer event (0xF2).
         /// </summary>
-        public static MetaMidiEvent CreateSongPositionPointer(long absoluteTime, ushort position) =>
+        public static PartTrackEvent CreateSongPositionPointer(long absoluteTime, ushort position) =>
             new()
             {
                 Type = MidiEventType.SongPositionPointer,
@@ -561,7 +561,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a song select event (0xF3).
         /// </summary>
-        public static MetaMidiEvent CreateSongSelect(long absoluteTime, byte songNumber) =>
+        public static PartTrackEvent CreateSongSelect(long absoluteTime, byte songNumber) =>
             new()
             {
                 Type = MidiEventType.SongSelect,
@@ -572,7 +572,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a tune request event (0xF6).
         /// </summary>
-        public static MetaMidiEvent CreateTuneRequest(long absoluteTime) =>
+        public static PartTrackEvent CreateTuneRequest(long absoluteTime) =>
             new()
             {
                 Type = MidiEventType.TuneRequest,
@@ -587,7 +587,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a timing clock event (0xF8).
         /// </summary>
-        public static MetaMidiEvent CreateTimingClock(long absoluteTime) =>
+        public static PartTrackEvent CreateTimingClock(long absoluteTime) =>
             new()
             {
                 Type = MidiEventType.TimingClock,
@@ -598,7 +598,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a start event (0xFA).
         /// </summary>
-        public static MetaMidiEvent CreateStart(long absoluteTime) =>
+        public static PartTrackEvent CreateStart(long absoluteTime) =>
             new()
             {
                 Type = MidiEventType.Start,
@@ -609,7 +609,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a continue event (0xFB).
         /// </summary>
-        public static MetaMidiEvent CreateContinue(long absoluteTime) =>
+        public static PartTrackEvent CreateContinue(long absoluteTime) =>
             new()
             {
                 Type = MidiEventType.Continue,
@@ -620,7 +620,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a stop event (0xFC).
         /// </summary>
-        public static MetaMidiEvent CreateStop(long absoluteTime) =>
+        public static PartTrackEvent CreateStop(long absoluteTime) =>
             new()
             {
                 Type = MidiEventType.Stop,
@@ -631,7 +631,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates an active sensing event (0xFE).
         /// </summary>
-        public static MetaMidiEvent CreateActiveSensing(long absoluteTime) =>
+        public static PartTrackEvent CreateActiveSensing(long absoluteTime) =>
             new()
             {
                 Type = MidiEventType.ActiveSensing,
@@ -642,7 +642,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates a system reset event (0xFF).
         /// </summary>
-        public static MetaMidiEvent CreateSystemReset(long absoluteTime) =>
+        public static PartTrackEvent CreateSystemReset(long absoluteTime) =>
             new()
             {
                 Type = MidiEventType.SystemReset,
@@ -657,7 +657,7 @@ namespace Music.MyMidi
         /// <summary>
         /// Creates an unknown event type for forward compatibility.
         /// </summary>
-        public static MetaMidiEvent CreateUnknown(long absoluteTime, byte[] rawData) =>
+        public static PartTrackEvent CreateUnknown(long absoluteTime, byte[] rawData) =>
             new()
             {
                 Type = MidiEventType.Unknown,

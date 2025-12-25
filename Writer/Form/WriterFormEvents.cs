@@ -304,7 +304,7 @@ namespace Music.Writer
                 Directory.CreateDirectory(debugDir);
 
                 // Convert MIDI document to lists of MetaMidiEvent objects
-                List<List<MetaMidiEvent>> midiEventLists;
+                List<List<PartTrackEvent>> midiEventLists;
                 try
                 {
                     midiEventLists = ConvertMidiSongDocumentToMidiEvents.Convert(midiDoc);
@@ -373,7 +373,7 @@ namespace Music.Writer
         /// Extracts tempo and time signature events from MIDI event lists and converts them to tracks.
         /// </summary>
         private static (TempoTrack?, TimeSignatureTrack?) ExtractTracksFromMidiEvents(
-            List<List<MetaMidiEvent>> midiEventLists,
+            List<List<PartTrackEvent>> midiEventLists,
             short ticksPerQuarterNote)
         {
             var tempoTrack = new TempoTrack();

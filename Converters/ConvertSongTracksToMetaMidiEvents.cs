@@ -17,13 +17,13 @@ namespace Music.Writer
         /// <param name="songTracks">List of songTracks to convert</param>
         /// <param name="ticksPerQuarterNote">MIDI time resolution (default 480 ticks per quarter note)</param>
         /// <returns>List of MetaMidiEvent lists, one per input song track</returns>
-        public static List<List<MetaMidiEvent>> Convert(
+        public static List<List<PartTrackEvent>> Convert(
             List<PartTrack> songTracks)
         {
             if (songTracks == null)
                 throw new ArgumentNullException(nameof(songTracks));
 
-            var result = new List<List<MetaMidiEvent>>();
+            var result = new List<List<PartTrackEvent>>();
             foreach (var songTrack in songTracks)
             {
                 result.Add(ConvertSingleSongTrack(songTrack));
@@ -35,25 +35,25 @@ namespace Music.Writer
         /// <summary>
         /// Converts a single songTrack to a list of MIDI events with absolute time positioning.
         /// </summary>
-        private static List<MetaMidiEvent> ConvertSingleSongTrack(PartTrack songTrack)
+        private static List<PartTrackEvent> ConvertSingleSongTrack(PartTrack songTrack)
         {
-            var events = new List<MetaMidiEvent>();
+            var events = new List<PartTrackEvent>();
 
             // Add track name event at the beginning (using instrument name)
             var trackName = string.IsNullOrWhiteSpace(songTrack.MidiProgramName) 
                 ? "Unnamed Track" 
                 : songTrack.MidiProgramName;
-            events.Add(MetaMidiEvent.CreateSequenceTrackName(0, trackName));
+            events.Add(PartTrackEvent.CreateSequenceTrackName(0, trackName));
 
             // Add program change event at the beginning to set the instrument
             // Channel is null and will be assigned in Phase 2
-            var programChangeEvent = MetaMidiEvent.CreateProgramChange(0, 0, songTrack.MidiProgramNumber);
+            var programChangeEvent = PartTrackEvent.CreateProgramChange(0, 0, songTrack.MidiProgramNumber);
             // Remove the channel parameter temporarily (will be assigned in Phase 2)
             programChangeEvent.Parameters.Remove("Channel");
             events.Add(programChangeEvent);
 
             // Process each note in the songTrack
-            foreach (var songTrackNoteEvent in songTrack.PartTrackNoteEvents ?? Enumerable.Empty<MetaMidiEvent>())
+            foreach (var songTrackNoteEvent in songTrack.PartTrackNoteEvents ?? Enumerable.Empty<PartTrackEvent>())
                     ProcessSingleNote(events, songTrackNoteEvent);
 
             return events;
@@ -62,10 +62,10 @@ namespace Music.Writer
         /// <summary>
         /// Processes a single note event.
         /// </summary>
-        private static void ProcessSingleNote(List<MetaMidiEvent> events, MetaMidiEvent songTrackNoteEvent)
+        private static void ProcessSingleNote(List<PartTrackEvent> events, PartTrackEvent songTrackNoteEvent)
         {
             // Create NoteOn event at the note's absolute position
-            var noteOnEvent = MetaMidiEvent.CreateNoteOn(
+            var noteOnEvent = PartTrackEvent.CreateNoteOn(
                 songTrackNoteEvent.AbsolutePositionTicks, 
                 0, 
                 songTrackNoteEvent.NoteNumber, 
@@ -75,7 +75,7 @@ namespace Music.Writer
 
             // Create NoteOff event at absolute position + duration
             long noteOffTime = songTrackNoteEvent.AbsolutePositionTicks + songTrackNoteEvent.NoteDurationTicks;
-            var noteOffEvent = MetaMidiEvent.CreateNoteOff(noteOffTime, 0, songTrackNoteEvent.NoteNumber, 0);
+            var noteOffEvent = PartTrackEvent.CreateNoteOff(noteOffTime, 0, songTrackNoteEvent.NoteNumber, 0);
             noteOffEvent.Parameters.Remove("Channel");
             events.Add(noteOffEvent);
         }

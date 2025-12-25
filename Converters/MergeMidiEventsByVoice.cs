@@ -7,8 +7,8 @@ namespace Music.Writer
         /// <summary>
         /// Merges MIDI event lists by instrument and adds tempo and time signature events.
         /// </summary>
-        public static List<List<MetaMidiEvent>> Convert(
-            List<List<MetaMidiEvent>> midiEventLists,
+        public static List<List<PartTrackEvent>> Convert(
+            List<List<PartTrackEvent>> midiEventLists,
             Music.Generator.TempoTrack tempoTrack,
             Music.Generator.TimeSignatureTrack timeSignatureTrack)
         {
@@ -17,21 +17,21 @@ namespace Music.Writer
             if (timeSignatureTrack == null) throw new ArgumentNullException(nameof(timeSignatureTrack));
 
             // Create tempo events from track
-            var tempoEvents = new List<MetaMidiEvent>();
+            var tempoEvents = new List<PartTrackEvent>();
             foreach (var tempoEvent in tempoTrack.Events)
             {
                 // Calculate absolute ticks based on start bar (1-based to 0-based conversion)
                 var absoluteTicks = (long)(tempoEvent.StartBar - 1) * MusicConstants.TicksPerQuarterNote * 4;
-                tempoEvents.Add(MetaMidiEvent.CreateSetTempo(absoluteTicks, bpm: tempoEvent.TempoBpm));
+                tempoEvents.Add(PartTrackEvent.CreateSetTempo(absoluteTicks, bpm: tempoEvent.TempoBpm));
             }
 
             // Create time signature events from track
-            var timeSignatureEvents = new List<MetaMidiEvent>();
+            var timeSignatureEvents = new List<PartTrackEvent>();
             foreach (var tsEvent in timeSignatureTrack.Events)
             {
                 // Calculate absolute ticks based on start bar (1-based to 0-based conversion)
                 var absoluteTicks = (long)(tsEvent.StartBar - 1) * MusicConstants.TicksPerQuarterNote * 4;
-                timeSignatureEvents.Add(MetaMidiEvent.CreateTimeSignature(
+                timeSignatureEvents.Add(PartTrackEvent.CreateTimeSignature(
                     absoluteTicks,
                     tsEvent.Numerator,
                     tsEvent.Denominator));
@@ -53,11 +53,11 @@ namespace Music.Writer
                 })
                 .ToList();
 
-            var mergedLists = new List<List<MetaMidiEvent>>();
+            var mergedLists = new List<List<PartTrackEvent>>();
 
             foreach (var group in grouped)
             {
-                var mergedEvents = new List<MetaMidiEvent>(group.Events);
+                var mergedEvents = new List<PartTrackEvent>(group.Events);
 
                 // Add tempo and time signature events to the first track only
                 if (mergedLists.Count == 0)
@@ -94,7 +94,7 @@ namespace Music.Writer
         /// <summary>
         /// Gets the program number from an event list by finding the first ProgramChange event.
         /// </summary>
-        private static int GetProgramNumberFromList(List<MetaMidiEvent> eventList)
+        private static int GetProgramNumberFromList(List<PartTrackEvent> eventList)
         {
             var programChange = eventList.FirstOrDefault(e => e.Type == MidiEventType.ProgramChange);
             if (programChange != null && programChange.Parameters.TryGetValue("Program", out var program))
