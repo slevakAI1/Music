@@ -189,57 +189,6 @@ namespace Music.Writer
             }
         }
 
-        /// <summary>
-        /// Appends track notes to the existing PartTrack objects in all selected rows.
-        /// The appended notes' absolute positions are adjusted to start after the existing track ends.
-        /// </summary>
-        /// <param name="track">The track containing notes to append to the grid.</param>
-        private void AppendTrackToSelectedRows(DataGridView dgSong, PartTrack track)
-        {
-            foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
-            {
-                // Skip fixed rows
-                if (selectedRow.Index < SongGridManager.FIXED_ROWS_COUNT)
-                    continue;
-
-                // Get existing track or create new one if null
-                var existingTrack = selectedRow.Cells["colData"].Value as PartTrack;
-                if (existingTrack == null)
-                {
-                    // No existing track, create new one with the notes (no offset needed)
-                    existingTrack = new PartTrack(new List<PartTrackEvent>(track.PartTrackNoteEvents));
-                    selectedRow.Cells["colData"].Value = existingTrack;
-                }
-                else
-                {
-                    // Calculate offset: find where the existing track ends
-                    int offset = 0;
-                    if (existingTrack.PartTrackNoteEvents.Count > 0)
-                    {
-                        // Find the last note's end time (absolute time + duration)
-                        var lastNote = existingTrack.PartTrackNoteEvents
-                            .OrderBy(n => n.AbsoluteTimeTicks + n.NoteDurationTicks)
-                            .Last();
-                        offset = (int)(lastNote.AbsoluteTimeTicks + lastNote.NoteDurationTicks);
-                    }
-
-                    // Append new notes with adjusted absolute times
-                    foreach (var note in track.PartTrackNoteEvents)
-                    {
-                        var adjustedNote = new PartTrackEvent(
-                            noteNumber: note.NoteNumber,
-                            absoluteTimeTicks: (int)note.AbsoluteTimeTicks + offset,
-                            noteDurationTicks: note.NoteDurationTicks,
-                            noteOnVelocity: note.NoteOnVelocity);
-
-                        existingTrack.PartTrackNoteEvents.Add(adjustedNote);
-                    }
-                }
-
-                // Update measure cell display
-                SongGridManager.PopulatePartMeasureNoteCount(dgSong, selectedRow.Index);
-            }
-        }
 
         // ========== PLAYBACK CONTROL ==========
 
