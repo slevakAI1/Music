@@ -38,18 +38,6 @@ namespace Music.MyMidi
         public int NoteDurationTicks { get; set; }
         public int NoteOnVelocity { get; set; } = 100;
 
-
-
-
-        // Metadata fields - can be used for display purposes. Also used by musicxml.
-        public char Step { get; set; }
-        public int Alter { get; set; }
-        public int Octave { get; set; }
-        public int Duration { get; set; }
-        public int Dots { get; set; }
-        public int? TupletActualNotes { get; set; }
-        public int? TupletNormalNotes { get; set; }
-
         /// <summary>
         /// Simple note constructor for backward compatibility with note-based code.
         /// </summary>
@@ -64,10 +52,6 @@ namespace Music.MyMidi
             NoteDurationTicks = noteDurationTicks;
             NoteOnVelocity = noteOnVelocity;
             AbsoluteTimeTicks = absolutePositionTicks;
-
-            // Calculate metadata fields from MIDI properties
-            (Step, Alter, Octave) = MusicCalculations.CalculatePitch(noteNumber);
-            (Duration, Dots, TupletActualNotes, TupletNormalNotes) = MusicCalculations.CalculateRhythm(noteDurationTicks);
         }
 
         /// <summary>
