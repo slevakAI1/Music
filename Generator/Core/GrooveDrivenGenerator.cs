@@ -55,7 +55,7 @@ namespace Music.Generator
         }
 
 
-        // TO DO - STEP THRU THIS TO SEE HOW IT WORKS EXACTLY
+        // TO DO - HIGH - STEP THRU THIS TO SEE HOW IT WORKS EXACTLY
 
         private static PartTrack GenerateBassTrack(
             HarmonyTrack harmonyTrack,
@@ -69,14 +69,9 @@ namespace Music.Generator
             var randomizer = new PitchRandomizer(settings);
             const int bassOctave = 2;
 
-            var harmonyByBar = harmonyTrack.Events
-                .OrderBy(e => e.StartBar)
-                .ThenBy(e => e.StartBeat)
-                .ToList();
-
             for (int bar = 1; bar <= totalBars; bar++)
             {
-                var harmonyEvent = GetActiveHarmonyForBar(harmonyByBar, bar);
+                var harmonyEvent = harmonyTrack.GetActiveHarmonyEvent(bar);
                 if (harmonyEvent == null)
                     continue;
 
@@ -132,14 +127,9 @@ namespace Music.Generator
             int? previousPitchClass = null;
             const int guitarOctave = 4;
 
-            var harmonyByBar = harmonyTrack.Events
-                .OrderBy(e => e.StartBar)
-                .ThenBy(e => e.StartBeat)
-                .ToList();
-
             for (int bar = 1; bar <= totalBars; bar++)
             {
-                var harmonyEvent = GetActiveHarmonyForBar(harmonyByBar, bar);
+                var harmonyEvent = harmonyTrack.GetActiveHarmonyEvent(bar);
                 if (harmonyEvent == null)
                     continue;
 
@@ -159,7 +149,7 @@ namespace Music.Generator
 
 
 
-                // NOTE TO DO - ticks per measure can vary based on the time signature events
+                // TO DO - HIGH - ticks per measure can vary based on the time signature events
                 // The loops that write notes will need to get this value from the time signature active in each bar as it loops
                 // this could be tricky. Example ticksPerMeasure will be different for 3/4 vs 4/4 time signatures
                 // that can occur in the same track. Same goes for all these tracks.
@@ -202,18 +192,13 @@ namespace Music.Generator
         {
             var notes = new List<PartTrackNoteEvent>();
             var randomizer = new PitchRandomizer(settings);
-            const int keysOctave = 4;
-
-            var harmonyByBar = harmonyTrack.Events
-                .OrderBy(e => e.StartBar)
-                .ThenBy(e => e.StartBeat)
-                .ToList();
+            const int keysOctave = 3;
 
             HarmonyEvent? previousHarmony = null;
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
-                var harmonyEvent = GetActiveHarmonyForBar(harmonyByBar, bar);
+                var harmonyEvent = harmonyTrack.GetActiveHarmonyEvent(bar);
                 if (harmonyEvent == null)
                     continue;
 
@@ -348,26 +333,7 @@ namespace Music.Generator
 
             return new PartTrack(notes) { MidiProgramNumber = 255 }; // Drum Set
         }
-
-
-        // TO DO MOVE THIS TO HARMONYTRACK CLASS! IT SHOULD WORK LIKE GROOVE DOES! then wont need in every bar
-
-        /// <summary>
-        /// Gets the active harmony event for a given bar.
-        /// Returns the most recent harmony event that starts on or before this bar.
-        /// </summary>
-        private static HarmonyEvent? GetActiveHarmonyForBar(List<HarmonyEvent> harmonyEvents, int bar)
-        {
-            HarmonyEvent? active = null;
-            foreach (var evt in harmonyEvents)
-            {
-                if (evt.StartBar <= bar)
-                    active = evt;
-                else
-                    break;
-            }
-            return active;
-        }
+   
         #region Validation
 
         private static void ValidateHarmonyTrack(HarmonyTrack harmonyTrack)

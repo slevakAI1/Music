@@ -167,7 +167,7 @@ namespace Music.Writer
 
         // ========== GRID DATA MANIPULATION ==========
 
-        // TO DO  DEAD CODE??
+        // TO DO - HIGH - DEAD CODE?? DO SOMETHING WITH THESE OR DELETE!!!
 
         // KEEP THIS FOR FUTURE EXPANSION
         /// <summary>
@@ -188,10 +188,6 @@ namespace Music.Writer
                 SongGridManager.PopulatePartMeasureNoteCount(dgSong, selectedRow.Index);
             }
         }
-
-
-        // TO DO - MANUALLY NOTES ARE NOT APPENDING AND DISPLAYING IN THE GRID RIGHT!!!
-        // FIX THIS NEXT!!!
 
         /// <summary>
         /// Appends track notes to the existing PartTrack objects in all selected rows.

@@ -613,7 +613,7 @@ Potential missing groove capabilities (intentionally NOT added as properties per
 - Probability / density controls per instrument for controlled permutation while staying in-genre.
 */
 
-// AI TO DO:
+// TO DO - FUTURE NOTE WRITING
 //    If you want the next step to be immediately useful for permutation,
 //    the most leverage is adding a genre-specific “allowed offsets grid”
 //    (8ths only vs 16ths vs triplets) and density bounds per part—but that can

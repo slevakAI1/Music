@@ -291,7 +291,7 @@ namespace Music.Writer
             _songContext ??= new SongContext();
             _eventHandlers.HandleSetDesignTestScenarioD1(dgSong, _songContext);
 
-            Globals.SongContext = _songContext;  // TO DO ... currently test groove track is pulling from globals, should get from local
+            Globals.SongContext = _songContext;  // TO DO - HIGH -... currently test groove track is pulling from globals, should get from local
             // copy
 
         }
@@ -323,9 +323,6 @@ namespace Music.Writer
 
             switch (command)
             {
-
-                // TO DO this is not running the note count per measure routine. call must have got lost!!!!
-
                 case "Repeat Note":
                     HandleRepeatNoteCommand.Execute(formData, dgSong);
                     break;

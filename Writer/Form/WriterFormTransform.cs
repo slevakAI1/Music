@@ -58,7 +58,7 @@
             // Capture chord radio button state
             var isChord = rbChord.Checked;
 
-            // TO DO stepchar = " " at program startup. is there a better way?
+            // TO DO - LOW - stepchar = " " at program startup. is there a better way?
             // I think this whole class needs to go.
 
             // Execute step string to char (use '\0' for Rest)

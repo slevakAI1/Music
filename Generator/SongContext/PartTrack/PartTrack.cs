@@ -35,34 +35,34 @@ namespace Music.Generator
     /// </summary>
     /// 
 
-    // TO DO this may not really be needed
+    // TO DO - MED - NOT USED REMOVE
 
-    public sealed class SongTrackChord
-    {
-        // Chords
-        public bool IsChord { get; set; }
-        public string? ChordKey { get; set; }
-        public int? ChordDegree { get; set; }
-        public string? ChordQuality { get; set; } // list from musictheory chordtype i think
-        public string? ChordBase { get; set; }
-        public string? ChordType { get; set; } = "Straight"; // Just an idea. Straight, arppegiated, etc ???
+    //public sealed class SongTrackChord
+    //{
+    //    // Chords
+    //    public bool IsChord { get; set; }
+    //    public string? ChordKey { get; set; }
+    //    public int? ChordDegree { get; set; }
+    //    public string? ChordQuality { get; set; } // list from musictheory chordtype i think
+    //    public string? ChordBase { get; set; }
+    //    public string? ChordType { get; set; } = "Straight"; // Just an idea. Straight, arppegiated, etc ???
 
-        public SongTrackChord(
-            bool isChord,
-            string? chordKey = null,
-            int? chordDegree = null,
-            string? chordQuality = null,
-            string? chordBase = null,
-            string? chordType = "Straight")
-        {
-            IsChord = isChord;
-            ChordKey = chordKey;
-            ChordDegree = chordDegree;
-            ChordQuality = chordQuality;
-            ChordBase = chordBase;
-            ChordType = chordType;
-        }
-    }
+    //    public SongTrackChord(
+    //        bool isChord,
+    //        string? chordKey = null,
+    //        int? chordDegree = null,
+    //        string? chordQuality = null,
+    //        string? chordBase = null,
+    //        string? chordType = "Straight")
+    //    {
+    //        IsChord = isChord;
+    //        ChordKey = chordKey;
+    //        ChordDegree = chordDegree;
+    //        ChordQuality = chordQuality;
+    //        ChordBase = chordBase;
+    //        ChordType = chordType;
+    //    }
+    //}
 
     /// <summary>
     /// Represents a single note within a song track note event, including pitch, timing, and velocity.

@@ -5,12 +5,12 @@ namespace Music.Generator
 
     public class HarmonyTrack
     {
-        private readonly Dictionary<int, HarmonyEvent> _barHeads = new(); // bar -> event active at beat 1
-
+        // TO DO - HIGH - THIS PROBABLY SHOULD GO AS WELL - timing is kept in the timeSignatureTrack
         public int BeatsPerBar { get; set; } = 4; // Remove - this is represented elsewhere
 
         public List<HarmonyEvent> Events { get; set; } = new();
 
+        // TO DO - HIGH - WHY DOES THIS EXIST???!!!
         public void ConfigureGlobal(string meter)
         {
             // Expect "x/y". For now, only x matters for bar length in beats.
@@ -20,82 +20,56 @@ namespace Music.Generator
                 throw new ArgumentException("Invalid meter format. Expected like \"4/4\".", nameof(meter));   // REMOVE METER!!
 
             BeatsPerBar = Math.Max(1, beats); // REMOVE - this is represented elsewhere
+        }
 
-            // Reindex any existing events with the new meter
-            Reindex();
+        public void Reset()
+        {
+            Events.Clear();
         }
 
         public void Add(HarmonyEvent evt)
         {
             Events.Add(evt);
-            IndexEventForBars(evt);
+            Events = Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat).ToList();
         }
 
-        // TO DO - THIS IS UNTESTED CODE
-
-        // Fast lookup of the harmony active at a given bar and beat.
-        public bool TryGetAt(int bar, int beat, out HarmonyEvent? evt)
+        public void Update(HarmonyEvent evt)
         {
-            if (bar < 1 || beat < 1 || beat > BeatsPerBar)
-                throw new ArgumentOutOfRangeException($"Invalid bar/beat: {bar}/{beat}");
+            //var existing = Events.FirstOrDefault(e => e == evt);
+            //if (existing != null)
+            //{
+            //    Events.Remove(existing);
+            //    Events.Add(evt);
+            //    Events = Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat).ToList();
+            //}
+        }
 
-            var targetAbs = (bar - 1) * BeatsPerBar + (beat - 1);
+        public void Delete(HarmonyEvent evt)
+        {
+            //Events.Remove(evt);
+            //Events = Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat).ToList();
+        }
 
-            // Try bar-head cache if querying beat 1
-            if (beat == 1 && _barHeads.TryGetValue(bar, out var cached))
+        /// <summary>
+        /// Gets the active harmony event for a given bar.
+        /// Returns the most recent harmony event that starts on or before this bar.
+        /// </summary>
+        public HarmonyEvent? GetActiveHarmonyEvent(int bar)
+        {
+            if (bar < 1) throw new ArgumentOutOfRangeException(nameof(bar));
+
+            for (int i = Events.Count - 1; i >= 0; i--)
             {
-                evt = cached;
-                return true;
-            }
-
-            // Find the most recent event at or before targetAbs
-            HarmonyEvent? bestMatch = null;
-            int bestStartAbs = -1;
-
-            foreach (var he in Events)
-            {
-                var startAbs = (he.StartBar - 1) * BeatsPerBar + (he.StartBeat - 1);
-                if (startAbs <= targetAbs && startAbs > bestStartAbs)
+                var evt = Events[i];
+                var eventStartBar = evt.StartBar;
+                
+                if (eventStartBar <= bar)
                 {
-                    bestMatch = he;
-                    bestStartAbs = startAbs;
+                    return evt;
                 }
             }
 
-            if (bestMatch != null)
-            {
-                // Cache only if querying beat 1
-                if (beat == 1)
-                {
-                    _barHeads[bar] = bestMatch;
-                }
-                evt = bestMatch;
-                return true;
-            }
-
-            evt = null;
-            return false;
-        }
-       
-        private void IndexEventForBars(HarmonyEvent evt)
-        {
-            // Only cache bar-head (beat 1) entries
-            if (evt.StartBeat == 1)
-            {
-                _barHeads[evt.StartBar] = evt;
-            }
-        }
-
-        private void Reindex()
-        {
-            _barHeads.Clear();
-            foreach (var he in Events)
-                IndexEventForBars(he);
-        }
-
-        public void EnsureIndexed()
-        {
-            Reindex();
+            return null;
         }
     }
 }

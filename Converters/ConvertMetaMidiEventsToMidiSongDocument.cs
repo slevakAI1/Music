@@ -220,7 +220,7 @@ namespace Music.Writer
             };
         } 
 
-        // TO DO look at this. Looks like overkill.
+        // TO DO - LOW - look at this. Looks like overkill.
         private static TimeSignatureEvent CreateTimeSignatureEvent(MetaMidiEvent midiEvent, long deltaTime)
         {
             var numerator = (byte)GetIntParam(midiEvent, "Numerator");

@@ -4,7 +4,7 @@ namespace Music.Generator
     // Global bar/beat-aligned groove track
     public class GrooveTrack
     {
-        //TO DO - this may change per instance right? Why is it up here?
+        //TO DO HIGH - this may change per instance right? Why is it up here?
 
         public int BeatsPerBar { get; set; } = 4;
 
@@ -17,7 +17,7 @@ namespace Music.Generator
 
         //============================================================
 
-        // TO DO - these should be used by the editor when modifying existing events to ensure the list is kept sorted
+        // TO DO - HIGH - these should be used by the editor when modifying existing events to ensure the list is kept sorted
 
         public void Add(GrooveInstance evt)
         {
@@ -45,7 +45,9 @@ namespace Music.Generator
         //============================================================
 
 
-        // Finds the Groove Event at or immediate before the specified bar and returns the corresponding preset.
+        // TO DO - MED - FIGURE OUT THE DIFFERENCE BETWEEN GET PRESET AND GET EVENT!
+
+        // Finds the Groove Prest at or immediate before the specified bar and returns the corresponding preset.
         public GroovePreset GetActiveGroovePreset(int startBar)
         {
             if (startBar < 1) throw new ArgumentOutOfRangeException(nameof(startBar));

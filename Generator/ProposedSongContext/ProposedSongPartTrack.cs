@@ -1,7 +1,6 @@
 
 
-// TO DO - What about drum set - pseudo midi number 255? Is it handled/allowed here?
-
+// TO DO NOTE ONLY - Does not include drums channel 10
 
 namespace Music.Generator
 {

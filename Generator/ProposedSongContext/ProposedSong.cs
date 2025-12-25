@@ -16,7 +16,7 @@ namespace Music.Generator
         /// </summary>
         public string? SourceDesignId { get; init; }
 
-        // TO DO - this has an issue... what if specific tracks/pieces are replaced using a new seed -
+        // TO DO NOTE ONLY - this has an issue... what if specific tracks/pieces are replaced using a new seed -
         //      this is not a global key situation
 
         /// <summary>
