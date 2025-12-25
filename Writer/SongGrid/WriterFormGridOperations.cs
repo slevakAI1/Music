@@ -137,10 +137,6 @@ namespace Music.Writer
             dgSong.Refresh();
         }
 
-
-        // ========== GRID DATA MANIPULATION ==========
-
-
         // ========== PLAYBACK CONTROL ==========
 
         /// <summary>
