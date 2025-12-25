@@ -18,7 +18,8 @@ namespace Music.Generator
                 (4, "")       // Major
             };
 
-            for (int bar = 1; bar <= TestDesigns.TotalBars; bar++)
+            // Place each pattern item on one bar, then skip the next bar (i.e. bars 1,3,5,...)
+            for (int bar = 1; bar <= TestDesigns.TotalBars; bar += 2)
             {
                 var p = pattern[((bar - 1) / 2) % pattern.Length];
                 Add(track, bar, key: "C major", degree: p.degree, quality: p.quality);
@@ -33,7 +34,8 @@ namespace Music.Generator
             {
                 StartBar = bar,
                 StartBeat = 1,
-                DurationBeats = 4,
+                // DurationBeats covers two bars (8 beats) so the event spans the written bar and the skipped bar
+                DurationBeats = 8,
                 Key = key,
                 Degree = degree,
                 Quality = quality,

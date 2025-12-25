@@ -203,6 +203,8 @@ namespace Music.Generator
                 }
             }
 
+            // TO DO - MED - THIS STOPPED AT DEBUG.ASSERT WHEN F# MINOR WAS PICKED AS THE CHORD - SEEMS LIKE TEST NOTES WERE NOT IN SCALE? WHY?
+
             // Sort and ensure uniqueness
             midiNotes = midiNotes.Distinct().OrderBy(n => n).ToList();
 
