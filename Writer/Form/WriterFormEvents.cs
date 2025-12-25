@@ -125,7 +125,7 @@ namespace Music.Writer
             }
 
             // Consolidated conversion: songTracks -> midi document with tempo and time signature tracks
-            var midiDoc = ConvertSongTracksToMidiSongDocument.Convert(
+            var midiDoc = ConvertPartTracksToMidiSongDocument.Convert(
                 songTracks,
                 tempoTrack,
                 timeSignatureTrack);
@@ -259,7 +259,7 @@ namespace Music.Writer
             try
             {
                 // Consolidated conversion: songTracks -> midi document with tempo and time signature tracks
-                var midiDoc = ConvertSongTracksToMidiSongDocument.Convert(
+                var midiDoc = ConvertPartTracksToMidiSongDocument.Convert(
                     tracks,
                     tempoTrack,
                     timeSignatureTrack);

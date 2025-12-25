@@ -12,7 +12,7 @@ namespace Music.Writer
     /// 
     /// This preserves existing logic and keeps changes minimal.
     /// </summary>
-    public static class ConvertSongTracksToMidiSongDocument
+    public static class ConvertPartTracksToMidiSongDocument
     {
         public static MidiSongDocument Convert(
             List<PartTrack> songTracks,
@@ -34,7 +34,7 @@ namespace Music.Writer
                 timeSignatureTrack);
 
             // Step 3 - Execute merged timed notes to MIDI document
-            var midiDoc = ConvertSongTracksToMidiSongDocumentHelper.Convert(mergedPartTracks);
+            var midiDoc = ConvertPartTracksToMidiSongDocumentHelper.Convert(mergedPartTracks);
 
             return midiDoc;
         }
