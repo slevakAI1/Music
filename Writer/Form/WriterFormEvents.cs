@@ -125,7 +125,7 @@ namespace Music.Writer
             }
 
             // Consolidated conversion: songTracks -> midi document with tempo and time signature tracks
-            var midiDoc = ConvertPartTracksToMidiSongDocument.Convert(
+            var midiDoc = ConvertPartTracksToMidiSongDocument_For_Play_And_Export.Convert(
                 songTracks,
                 tempoTrack,
                 timeSignatureTrack);
@@ -259,7 +259,7 @@ namespace Music.Writer
             try
             {
                 // Consolidated conversion: songTracks -> midi document with tempo and time signature tracks
-                var midiDoc = ConvertPartTracksToMidiSongDocument.Convert(
+                var midiDoc = ConvertPartTracksToMidiSongDocument_For_Play_And_Export.Convert(
                     tracks,
                     tempoTrack,
                     timeSignatureTrack);
@@ -307,7 +307,7 @@ namespace Music.Writer
                 List<Generator.PartTrack> partTracks;
                 try
                 {
-                    partTracks = ConvertMidiSongDocumentToPartTracks.Convert(midiDoc);
+                    partTracks = ConvertMidiSongDocumentToPartTracks_For_Import_Only.Convert(midiDoc);
                 }
                 catch (NotSupportedException ex)
                 {
@@ -343,7 +343,7 @@ namespace Music.Writer
                 }
 
                 // Convert MetaMidiEvent lists to PartTrack objects, passing the source ticks per quarter note
-                var tracks = UpdatingPartTracksToPartTracks1_ToDo.Convert(
+                var tracks = ConvertingPartTracksToPartTracks_For_Import_Only.Convert(
                     partTracks,
                     ticksPerQuarterNote);
 

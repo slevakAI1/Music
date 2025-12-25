@@ -12,7 +12,7 @@ namespace Music.Writer
     /// 
     /// This preserves existing logic and keeps changes minimal.
     /// </summary>
-    public static class ConvertPartTracksToMidiSongDocument
+    public static class ConvertPartTracksToMidiSongDocument_For_Play_And_Export
     {
         public static MidiSongDocument Convert(
             List<PartTrack> songTracks,
@@ -24,17 +24,17 @@ namespace Music.Writer
             if (timeSignatureTrack == null) throw new ArgumentNullException(nameof(timeSignatureTrack));
 
             // Step 1 - convert songTracks to MIDI EVENTS - Absolute positions
-            var partTracks = UpdatingPartTracksToPartTracks2_ToDo.Convert(songTracks);
+            var partTracks = ConvertPartTracksToMidiSongDocument_Step_1.Convert(songTracks);
 
             // Step 2 - Merge Part Tracks that are for the same instrument
             //    and integrate tempo and time signature events
-            var mergedPartTracks = MergePartTracksByVoice.Convert(
+            var mergedPartTracks = ConvertPartTracksToMidiSongDocument_Step_2.Convert(
                 partTracks,
                 tempoTrack,
                 timeSignatureTrack);
 
             // Step 3 - Execute merged timed notes to MIDI document
-            var midiDoc = ConvertPartTracksToMidiSongDocumentHelper.Convert(mergedPartTracks);
+            var midiDoc = ConvertPartTracksToMidiSongDocument_Step_3.Convert(mergedPartTracks);
 
             return midiDoc;
         }

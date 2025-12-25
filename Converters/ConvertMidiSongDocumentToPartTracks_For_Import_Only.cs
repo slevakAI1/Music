@@ -8,7 +8,7 @@ namespace Music.Writer
     /// Each track in the MIDI file produces one PartTrack.
     /// Handles conversion of DryWetMidi events to our domain MetaMidiEvent format.
     /// </summary>
-    public static class ConvertMidiSongDocumentToPartTracks
+    public static class ConvertMidiSongDocumentToPartTracks_For_Import_Only
     {
         /// <summary>
         /// Converts all tracks in a MIDI document to PartTrack objects with MetaMidiEvent lists.

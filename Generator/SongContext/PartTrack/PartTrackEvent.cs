@@ -38,6 +38,9 @@ namespace Music.MyMidi
         public int NoteDurationTicks { get; set; }
         public int NoteOnVelocity { get; set; } = 100;
 
+
+
+
         // Metadata fields - can be used for display purposes. Also used by musicxml.
         public char Step { get; set; }
         public int Alter { get; set; }

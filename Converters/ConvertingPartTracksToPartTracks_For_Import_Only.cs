@@ -6,7 +6,7 @@ namespace Music.Writer
     /// <summary>
     /// Helper to convert lists of MetaMidiEvent objects to PartTrack objects.
     /// </summary>
-    internal static class UpdatingPartTracksToPartTracks1_ToDo
+    internal static class ConvertingPartTracksToPartTracks_For_Import_Only
     {
         /// <summary>
         /// Converts lists of MetaMidiEvent objects to PartTrack objects.

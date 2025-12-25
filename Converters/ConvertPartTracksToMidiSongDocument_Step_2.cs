@@ -2,7 +2,7 @@ using Music.MyMidi;
 
 namespace Music.Writer
 {
-    public static class MergePartTracksByVoice
+    public static class ConvertPartTracksToMidiSongDocument_Step_2
     {
         /// <summary>
         /// Merges MIDI event lists by instrument and adds tempo and time signature events.

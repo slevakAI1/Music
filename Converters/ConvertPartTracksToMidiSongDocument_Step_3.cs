@@ -10,7 +10,7 @@ namespace Music.Writer
     /// Each inner list represents one track in the MIDI file.
     /// Converts absolute time positions to delta times for the MIDI format.
     /// </summary>
-    public static class ConvertPartTracksToMidiSongDocumentHelper
+    public static class ConvertPartTracksToMidiSongDocument_Step_3
     {
         public static MidiSongDocument Convert(List<Generator.PartTrack> partTracks)
         {
