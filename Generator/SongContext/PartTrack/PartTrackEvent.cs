@@ -31,13 +31,37 @@ namespace Music.MyMidi
         public Dictionary<string, object> Parameters { get; init; } = new();
 
         // MIDI-related properties for simple note creation - 480 ticks / quarter note is standard
+        
+        /// <summary>
+        /// MIDI note number (0-127). Used for simple note creation.
+        /// </summary>
         public int NoteNumber { get; set; }
-        public int AbsolutePositionTicks { get; set; }
+
+        /// <summary>
+        /// Absolute position in ticks - computed from AbsoluteTimeTicks for consistency.
+        /// This property ensures backward compatibility with existing code while maintaining a single source of truth.
+        /// </summary>
+        public int AbsolutePositionTicks
+        {
+            get => (int)AbsoluteTimeTicks;
+            set => throw new InvalidOperationException(
+                "AbsolutePositionTicks is computed from AbsoluteTimeTicks. " +
+                "Set AbsoluteTimeTicks in the constructor or object initializer instead.");
+        }
+
+        /// <summary>
+        /// Duration of the note in ticks. Used for simple note creation.
+        /// </summary>
         public int NoteDurationTicks { get; set; }
+        
+        /// <summary>
+        /// MIDI velocity (0-127). Default is 100. Used for simple note creation.
+        /// </summary>
         public int NoteOnVelocity { get; set; } = 100;
 
         /// <summary>
         /// Simple note constructor for backward compatibility with note-based code.
+        /// Creates a note event with proper MIDI event type set.
         /// </summary>
         public PartTrackEvent(
             int noteNumber,
@@ -46,10 +70,10 @@ namespace Music.MyMidi
             int noteOnVelocity = 100)
         {
             NoteNumber = noteNumber;
-            AbsolutePositionTicks = absolutePositionTicks;
+            AbsoluteTimeTicks = absolutePositionTicks;
             NoteDurationTicks = noteDurationTicks;
             NoteOnVelocity = noteOnVelocity;
-            AbsoluteTimeTicks = absolutePositionTicks;
+            Type = MidiEventType.NoteOn; // Set proper type for simple notes
         }
 
         /// <summary>

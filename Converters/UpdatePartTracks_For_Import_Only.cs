@@ -28,7 +28,7 @@ namespace Music.Writer
 
                 foreach (var segment in segmentedEvents)
                 {
-                    var partTrackEvents = new List<PartTrackEvent>();  // TO DO fix type
+                    var partTrackEvents = new List<PartTrackEvent>();
                     var updatedPartTrack = new PartTrack(partTrackEvents);
 
                     // Get instrument info from this segment's program change

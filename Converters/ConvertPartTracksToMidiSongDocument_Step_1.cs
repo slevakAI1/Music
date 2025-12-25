@@ -85,24 +85,5 @@ namespace Music.Writer
             noteOffEvent.Parameters.Remove("Channel");
             partTrackEvents.Add(noteOffEvent);
         }
-
-        /// <summary>
-        /// Calculates MIDI note number from note properties.
-        /// </summary>
-        private static int CalculateMidiNoteNumber(char step, int alter, int octave)
-        {
-            var baseNote = char.ToUpper(step) switch
-            {
-                'C' => 0,
-                'D' => 2,
-                'E' => 4,
-                'F' => 5,
-                'G' => 7,
-                'A' => 9,
-                'B' => 11,
-                _ => 0
-            };
-            return (octave + 1) * 12 + baseNote + alter;
-        }
     }
 }
