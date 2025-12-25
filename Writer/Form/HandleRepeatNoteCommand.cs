@@ -73,8 +73,11 @@ namespace Music.Writer
                 // Append the new notes
                 existingSongTrack.PartTrackNoteEvents.AddRange(songTrack.PartTrackNoteEvents);
 
+                // Get TimeSignatureTrack from the grid
+                var timeSignatureTrack = GridControlLinesManager.GetTimeSignatureTrack(dgSong);
+
                 // Update the measure cells to reflect the new note counts
-                SongGridManager.PopulatePartMeasureNoteCount(dgSong, selectedRow.Index);
+                SongGridManager.PopulatePartMeasureNoteCount(dgSong, selectedRow.Index, timeSignatureTrack);
             }
         }
     }

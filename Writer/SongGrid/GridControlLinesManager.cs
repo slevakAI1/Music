@@ -360,6 +360,24 @@ namespace Music.Writer
         
         #endregion
 
+        #region GetTimeSignatureTrack
 
+        /// <summary>
+        /// Gets the TimeSignatureTrack from the fixed Time Signature row's hidden data cell.
+        /// </summary>
+        /// <param name="dgSong">Target DataGridView</param>
+        /// <returns>TimeSignatureTrack or null if not found</returns>
+        public static TimeSignatureTrack? GetTimeSignatureTrack(DataGridView dgSong)
+        {
+            if (!dgSong.Columns.Contains("colData"))
+                return null;
+
+            if (dgSong.Rows.Count <= SongGridManager.FIXED_ROW_TIME_SIGNATURE)
+                return null;
+
+            return dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE].Cells["colData"].Value as TimeSignatureTrack;
+        }
+
+        #endregion
     }
 }

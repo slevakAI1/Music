@@ -30,10 +30,10 @@
 //            var drumSetTrack = CreateDrumSetTrack(harmonyTrack, timeSignatureTrack);
 
 //            // Add tracks to the grid - no need to track trackNumber anymore
-//            SongGridManager.AddNewTrack(rockOrganTrack, dgSong);
-//            SongGridManager.AddNewTrack(electricGuitarTrack, dgSong);
-//            SongGridManager.AddNewTrack(electricBassTrack, dgSong);
-//            SongGridManager.AddNewTrack(drumSetTrack, dgSong);
+//            SongGridManager.AddNewPartTrack(rockOrganTrack, dgSong);
+//            SongGridManager.AddNewPartTrack(electricGuitarTrack, dgSong);
+//            SongGridManager.AddNewPartTrack(electricBassTrack, dgSong);
+//            SongGridManager.AddNewPartTrack(drumSetTrack, dgSong);
 
 //            ShowSuccessMessage();
 //        }

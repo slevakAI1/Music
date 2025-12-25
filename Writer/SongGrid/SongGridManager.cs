@@ -238,12 +238,13 @@ namespace Music.Writer
         }
 
         /// <summary>
-        /// Populates the measure columns for a song row based on the ProposedSong object's notes.
-        /// Assumes 4/4 time signature (4 quarter notes per measure).
+        /// Populates the measure columns for a song row based on the PartTrack object's notes.
+        /// Uses the active time signature for each bar to correctly group notes.
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
         /// <param name="rowIndex">Index of the row to populate</param>
-        public static void PopulatePartMeasureNoteCount(DataGridView dgSong, int rowIndex)
+        /// <param name="timeSignatureTrack">The time signature track for the song</param>
+        public static void PopulatePartMeasureNoteCount(DataGridView dgSong, int rowIndex, TimeSignatureTrack timeSignatureTrack)
         {
             // Skip fixed rows
             if (rowIndex < FIXED_ROWS_COUNT || rowIndex >= dgSong.Rows.Count)
@@ -261,46 +262,77 @@ namespace Music.Writer
             if (track == null || track.PartTrackNoteEvents.Count == 0)
                 return;
 
-            // Calculate ticks per measure (4/4 time: 4 quarter notes per measure)
-            int ticksPerMeasure = MusicConstants.TicksPerQuarterNote * 4;
+            if (timeSignatureTrack == null || timeSignatureTrack.Events.Count == 0)
+                return;
 
-            // Group notes by measure based on their absolute time
-            var notesByMeasure = track.PartTrackNoteEvents
-                .GroupBy(note => note.AbsoluteTimeTicks / ticksPerMeasure)
-                .OrderBy(g => g.Key)
-                .ToList();
+            // Determine the maximum bar number we need to process
+            long maxTicks = track.PartTrackNoteEvents.Max(n => n.AbsoluteTimeTicks);
+            int estimatedMaxBar = 100; // Start with a reasonable estimate
 
-            // Ensure we have enough columns for all measures
-            int maxMeasure = notesByMeasure.Any() ? (int)notesByMeasure.Last().Key : 0;
-            int requiredColumns = MEASURE_START_COLUMN_INDEX + maxMeasure + 1;
-            
-            while (dgSong.Columns.Count < requiredColumns)
+            // Build a map of bar -> note count by iterating through bars with accumulated ticks
+            var noteCountByBar = new Dictionary<int, int>();
+            int currentTick = 0;
+
+            for (int bar = 1; bar <= estimatedMaxBar; bar++)
             {
-                int measureNumber = dgSong.Columns.Count - MEASURE_START_COLUMN_INDEX + 1;
-                var colMeasure = new DataGridViewTextBoxColumn
+                var timeSignature = timeSignatureTrack.GetActiveTimeSignatureEvent(bar);
+                if (timeSignature == null)
+                    break;
+
+                int ticksPerMeasure = (MusicConstants.TicksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
+                int barStartTick = currentTick;
+                int barEndTick = currentTick + ticksPerMeasure;
+
+                // Count notes that start in this bar
+                int noteCount = track.PartTrackNoteEvents
+                    .Count(note => note.AbsoluteTimeTicks >= barStartTick && note.AbsoluteTimeTicks < barEndTick);
+
+                if (noteCount > 0)
                 {
-                    Name = $"colMeasure{measureNumber}",
-                    HeaderText = $"{measureNumber}",
-                    Width = 40,
-                    ReadOnly = true,
-                    DefaultCellStyle = new DataGridViewCellStyle
-                    {
-                        Alignment = DataGridViewContentAlignment.MiddleCenter
-                    }
-                };
-                dgSong.Columns.Add(colMeasure);
+                    noteCountByBar[bar] = noteCount;
+                }
+
+                currentTick += ticksPerMeasure;
+
+                // Stop if we've passed all notes
+                if (currentTick > maxTicks)
+                    break;
             }
 
-            // Populate measure cells with note counts
-            foreach (var measureGroup in notesByMeasure)
+            // Ensure we have enough columns for all measures
+            if (noteCountByBar.Any())
             {
-                int measureIndex = (int)measureGroup.Key;
-                int columnIndex = MEASURE_START_COLUMN_INDEX + measureIndex;
-                
-                if (columnIndex < dgSong.Columns.Count)
+                int maxMeasure = noteCountByBar.Keys.Max();
+                int requiredColumns = MEASURE_START_COLUMN_INDEX + maxMeasure;
+
+                while (dgSong.Columns.Count < requiredColumns)
                 {
-                    int noteCount = measureGroup.Count();
-                    row.Cells[columnIndex].Value = noteCount.ToString();
+                    int measureNumber = dgSong.Columns.Count - MEASURE_START_COLUMN_INDEX + 1;
+                    var colMeasure = new DataGridViewTextBoxColumn
+                    {
+                        Name = $"colMeasure{measureNumber}",
+                        HeaderText = $"{measureNumber}",
+                        Width = 40,
+                        ReadOnly = true,
+                        DefaultCellStyle = new DataGridViewCellStyle
+                        {
+                            Alignment = DataGridViewContentAlignment.MiddleCenter
+                        }
+                    };
+                    dgSong.Columns.Add(colMeasure);
+                }
+
+                // Populate measure cells with note counts
+                foreach (var kvp in noteCountByBar)
+                {
+                    int bar = kvp.Key;
+                    int noteCount = kvp.Value;
+                    int columnIndex = MEASURE_START_COLUMN_INDEX + bar - 1;
+
+                    if (columnIndex < dgSong.Columns.Count)
+                    {
+                        row.Cells[columnIndex].Value = noteCount.ToString();
+                    }
                 }
             }
         }
@@ -379,7 +411,7 @@ namespace Music.Writer
         /// </summary>
         /// <param name="track">The track to add</param>
         /// <param name="dgSong">The DataGridView to add to</param>
-        internal static void AddNewTrack(
+        internal static void AddNewPartTrack(
             PartTrack track,
             DataGridView dgSong)
         {
@@ -432,8 +464,11 @@ namespace Music.Writer
                 row.Cells["colDescription"].Value = string.Empty;
             }
 
+            // Get TimeSignatureTrack from the grid or use a default one
+            var timeSignatureTrack = GridControlLinesManager.GetTimeSignatureTrack(dgSong);
+
             // Populate measure cells (columns 4+) with note counts per measure
-            PopulatePartMeasureNoteCount(dgSong, newRowIndex);
+            PopulatePartMeasureNoteCount(dgSong, newRowIndex, timeSignatureTrack);
         }
     }
 }

@@ -1,4 +1,3 @@
-
 namespace Music.Generator
 {
     // This is a design track for time signature
@@ -27,6 +26,28 @@ namespace Music.Generator
             Events.Add(evt);
             // Clear cache when adding new events
             _barHeads.Clear();
+        }
+
+        /// <summary>
+        /// Gets the active time signature event for a given bar.
+        /// Returns the most recent time signature event that starts on or before this bar.
+        /// </summary>
+        public TimeSignatureEvent? GetActiveTimeSignatureEvent(int bar)
+        {
+            if (bar < 1) throw new ArgumentOutOfRangeException(nameof(bar));
+
+            for (int i = Events.Count - 1; i >= 0; i--)
+            {
+                var evt = Events[i];
+                var eventStartBar = evt.StartBar;
+
+                if (eventStartBar <= bar)
+                {
+                    return evt;
+                }
+            }
+
+            return null;
         }
     }
 }

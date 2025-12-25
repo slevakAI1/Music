@@ -25,10 +25,10 @@ namespace Music.Writer
                 songContext.Song.PartTracks.Add(result.DrumTrack);
 
                 // Update Grid with song tracks
-                SongGridManager.AddNewTrack(result.BassTrack, dgSong);
-                SongGridManager.AddNewTrack(result.GuitarTrack, dgSong);
-                SongGridManager.AddNewTrack(result.KeysTrack, dgSong);
-                SongGridManager.AddNewTrack(result.DrumTrack, dgSong);
+                SongGridManager.AddNewPartTrack(result.BassTrack, dgSong);
+                SongGridManager.AddNewPartTrack(result.GuitarTrack, dgSong);
+                SongGridManager.AddNewPartTrack(result.KeysTrack, dgSong);
+                SongGridManager.AddNewPartTrack(result.DrumTrack, dgSong);
                 ShowGrooveSuccess(4);
             }
             catch (Exception ex)

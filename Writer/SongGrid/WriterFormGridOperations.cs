@@ -21,7 +21,7 @@ namespace Music.Writer
             };
 
             // Use SongGridManager to initialize the row consistently with other adds.
-            SongGridManager.AddNewTrack(emptyTrack, dgSong);
+            SongGridManager.AddNewPartTrack(emptyTrack, dgSong);
 
             // Select the newly added row (last row)
             if (dgSong.Rows.Count > SongGridManager.FIXED_ROWS_COUNT)

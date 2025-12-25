@@ -350,7 +350,7 @@ namespace Music.Writer
                 // Add each songTrack to the grid - no need to pass trackNumber anymore
                 foreach (var track in tracks)
                 {
-                    SongGridManager.AddNewTrack(track, dgSong);
+                    SongGridManager.AddNewPartTrack(track, dgSong);
                 }
 
                 MessageBoxHelper.Show(

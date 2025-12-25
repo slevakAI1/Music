@@ -18,6 +18,14 @@ namespace Music.Generator
                 Denominator = 4
             });
 
+            track.Add(new TimeSignatureEvent
+            {
+                StartBar = 2,
+                StartBeat = 1,
+                Numerator = 3,
+                Denominator = 4
+            });
+
             return track;
         }
     }
