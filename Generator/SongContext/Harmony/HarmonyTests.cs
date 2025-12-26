@@ -6,7 +6,6 @@ namespace Music.Generator
         public static HarmonyTrack CreateTestTrackD1()
         {
             var track = new HarmonyTrack();
-            track.ConfigureGlobal(TestDesigns.GlobalTimeSignature);
 
             // Common 4-chord loop: I – V – vi – IV, two bars per 48 bars.
             // Using standard chord symbols

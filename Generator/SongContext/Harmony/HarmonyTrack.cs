@@ -5,22 +5,7 @@ namespace Music.Generator
 
     public class HarmonyTrack
     {
-        // TO DO - HIGH - THIS PROBABLY SHOULD GO AS WELL - timing is kept in the timeSignatureTrack
-        public int BeatsPerBar { get; set; } = 4; // Remove - this is represented elsewhere
-
         public List<HarmonyEvent> Events { get; set; } = new();
-
-        // TO DO - HIGH - WHY DOES THIS EXIST???!!!
-        public void ConfigureGlobal(string meter)
-        {
-            // Expect "x/y". For now, only x matters for bar length in beats.
-            if (string.IsNullOrWhiteSpace(meter)) throw new ArgumentException(nameof(meter));
-            var parts = meter.Split('/');
-            if (parts.Length != 2 || !int.TryParse(parts[0], out var beats))
-                throw new ArgumentException("Invalid meter format. Expected like \"4/4\".", nameof(meter));   // REMOVE METER!!
-
-            BeatsPerBar = Math.Max(1, beats); // REMOVE - this is represented elsewhere
-        }
 
         public void Reset()
         {

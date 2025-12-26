@@ -17,9 +17,6 @@ namespace Music.Designer
         private readonly Button _btnOk;
         private readonly Button _btnCancel;
 
-        // Global track controls
-        private readonly TextBox _txtMeter;   // e.g., 4/4 (only numerator used)
-
         // Event editor controls
         private readonly Label _lblStart; // computed start bar:beat
         private readonly NumericUpDown _numDuration;
@@ -36,9 +33,6 @@ namespace Music.Designer
 
         // Suppress feedback updates while programmatically changing editor controls
         private bool _suppressEditorApply;
-
-        // Current global settings
-        private int _beatsPerBar = 4;
 
         public HarmonyTrack ResultTrack { get; private set; } = new HarmonyTrack();
 
@@ -168,34 +162,16 @@ namespace Music.Designer
 
             rowButtons.Controls.AddRange(new Control[] { _btnAdd, _btnInsert, _btnDelete, _btnDuplicate, _btnUp, _btnDown });
 
-            // Right: global + editor + OK/Cancel
+            // Right: editor + OK/Cancel
             var right = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
                 ColumnCount = 1,
-                RowCount = 3
+                RowCount = 2
             };
-            right.RowStyles.Add(new RowStyle(SizeType.Absolute, 90)); // global settings
             right.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); // event editor
             right.RowStyles.Add(new RowStyle(SizeType.Absolute, 40)); // buttons
             root.Controls.Add(right, 1, 0);
-
-            // Global settings panel (Meter only)
-            var globalsPanel = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 2,
-                RowCount = 1,
-                Padding = new Padding(6)
-            };
-            globalsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 110));
-            globalsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            right.Controls.Add(globalsPanel, 0, 0);
-
-            globalsPanel.Controls.Add(new Label { Text = "Meter:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) }, 0, 0);
-            _txtMeter = new TextBox { Anchor = AnchorStyles.Left | AnchorStyles.Right, Text = "4/4" };
-            _txtMeter.TextChanged += (s, e) => OnGlobalsChanged();
-            globalsPanel.Controls.Add(_txtMeter, 1, 0);
 
             // Event editor panel
             var editor = new TableLayoutPanel
@@ -207,7 +183,7 @@ namespace Music.Designer
             };
             editor.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 110));
             editor.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            right.Controls.Add(editor, 0, 1);
+            right.Controls.Add(editor, 0, 0);
 
             int row = 0;
             editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 28));
@@ -231,7 +207,7 @@ namespace Music.Designer
             editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
             editor.Controls.Add(new Label { Text = "Key:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) }, 0, row);
             _cbKey = CreateSelectorCombo();
-            _cbKey.SelectedIndexChanged += (s, e) => ApplyEditorToSelected(); // Changed from TextChanged
+            _cbKey.SelectedIndexChanged += (s, e) => ApplyEditorToSelected();
             editor.Controls.Add(_cbKey, 1, row);
             row++;
 
@@ -245,14 +221,14 @@ namespace Music.Designer
             editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
             editor.Controls.Add(new Label { Text = "Quality:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) }, 0, row);
             _cbQuality = CreateSelectorCombo();
-            _cbQuality.SelectedIndexChanged += (s, e) => ApplyEditorToSelected(); // Changed from TextChanged
+            _cbQuality.SelectedIndexChanged += (s, e) => ApplyEditorToSelected();
             editor.Controls.Add(_cbQuality, 1, row);
             row++;
 
             editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
             editor.Controls.Add(new Label { Text = "Bass:", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 6, 0, 0) }, 0, row);
             _cbBass = CreateSelectorCombo();
-            _cbBass.SelectedIndexChanged += (s, e) => ApplyEditorToSelected(); // Changed from TextChanged
+            _cbBass.SelectedIndexChanged += (s, e) => ApplyEditorToSelected();
             editor.Controls.Add(_cbBass, 1, row);
             row++;
 
@@ -260,7 +236,7 @@ namespace Music.Designer
                 editor.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
             var bottomButtons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.RightToLeft };
-            right.Controls.Add(bottomButtons, 0, 2);
+            right.Controls.Add(bottomButtons, 0, 1);
 
             _btnOk = new Button { Text = "OK", DialogResult = DialogResult.OK, AutoSize = true };
             _btnCancel = new Button { Text = "Cancel", DialogResult = DialogResult.Cancel, AutoSize = true };
@@ -319,16 +295,8 @@ namespace Music.Designer
 
             if (initial == null || initial.Events.Count == 0)
             {
-                if (initial != null)
-                {
-                    _beatsPerBar = Math.Max(1, initial.BeatsPerBar);
-                }
-                ApplyGlobalsToUi();
                 return;
             }
-
-            _beatsPerBar = Math.Max(1, initial.BeatsPerBar);
-            ApplyGlobalsToUi();
 
             foreach (var he in initial.Events)
             {
@@ -348,47 +316,9 @@ namespace Music.Designer
             RecalculateStartPositions();
         }
 
-        private void ApplyGlobalsToUi()
-        {
-            _suppressEditorApply = true;
-            try
-            {
-                _txtMeter.Text = $"{_beatsPerBar}/4";
-            }
-            finally
-            {
-                _suppressEditorApply = false;
-            }
-        }
-
-        private void OnGlobalsChanged()
-        {
-            if (_suppressEditorApply) return;
-
-            // Parse meter like x/y but only numerator matters
-            int beats = _beatsPerBar;
-            var txt = _txtMeter.Text?.Trim();
-            if (!string.IsNullOrWhiteSpace(txt))
-            {
-                var parts = txt.Split('/');
-                if (parts.Length == 2 && int.TryParse(parts[0], out var b) && b >= 1)
-                    beats = b;
-            }
-
-            if (beats != _beatsPerBar)
-            {
-                _beatsPerBar = beats;
-                RecalculateStartPositions();
-                RefreshListView(_lv.SelectedIndices.Count > 0 ? _lv.SelectedIndices[0] : -1);
-            }
-
-            UpdateButtonsEnabled();
-        }
-
         private HarmonyTrack BuildResult()
         {
             var tl = new HarmonyTrack();
-            tl.ConfigureGlobal($"{_beatsPerBar}/4");
             foreach (var w in _working)
             {
                 tl.Add(new HarmonyEvent
@@ -614,7 +544,7 @@ namespace Music.Designer
             _suppressEditorApply = true;
             try
             {
-                _numDuration.Value = Math.Max(_numDuration.Minimum, Math.Min(_numDuration.Maximum, _beatsPerBar));
+                _numDuration.Value = Math.Max(_numDuration.Minimum, Math.Min(_numDuration.Maximum, 4));
                 // keep last key/quality/bass/degree for fast entry
                 var (bar, beat) = PreviewStartForIndex(_working.Count);
                 _lblStart.Text = $"{bar}:{beat}";
@@ -729,8 +659,6 @@ namespace Music.Designer
             var defaults = HarmonyTests.CreateTestTrackD1();
 
             _working.Clear();
-            _beatsPerBar = Math.Max(1, defaults.BeatsPerBar);
-            ApplyGlobalsToUi();
 
             foreach (var he in defaults.Events)
             {
@@ -751,8 +679,10 @@ namespace Music.Designer
         }
 
         // Recompute contiguous start positions from order and durations
+        // Uses fixed 4 beats per bar for simplicity
         private void RecalculateStartPositions()
         {
+            const int beatsPerBar = 4;
             int bar = 1;
             int beat = 1;
 
@@ -763,8 +693,8 @@ namespace Music.Designer
 
                 // advance to next event position
                 int remaining = w.DurationBeats + (beat - 1);
-                bar += remaining / _beatsPerBar;
-                beat = (remaining % _beatsPerBar) + 1;
+                bar += remaining / beatsPerBar;
+                beat = (remaining % beatsPerBar) + 1;
             }
 
             // Update visible rows that exist
@@ -795,14 +725,15 @@ namespace Music.Designer
 
         private (int bar, int beat) PreviewStartForIndex(int insertAt)
         {
+            const int beatsPerBar = 4;
             int bar = 1;
             int beat = 1;
             for (int i = 0; i < insertAt && i < _working.Count; i++)
             {
                 var w = _working[i];
                 int remaining = w.DurationBeats + (beat - 1);
-                bar += remaining / _beatsPerBar;
-                beat = (remaining % _beatsPerBar) + 1;
+                bar += remaining / beatsPerBar;
+                beat = (remaining % beatsPerBar) + 1;
             }
             return (bar, beat);
         }
@@ -836,9 +767,6 @@ namespace Music.Designer
 
             if (degree < 1 || degree > 7)
                 error = (error == null) ? "Degree must be 1..7." : error + " Degree must be 1..7.";
-
-            if (_beatsPerBar < 1)
-                error = (error == null) ? "Invalid meter." : error + " Invalid meter.";
 
             startPreview = PreviewStartForIndex(insertAt);
 
