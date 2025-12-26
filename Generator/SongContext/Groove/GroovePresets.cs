@@ -313,7 +313,7 @@
                         1m, 1.5m, 2m, 2.5m, 3m, 3.5m, 4m, 4.5m
                     },
 
-                    // Bass locks to double-kick bed
+                    // Bass locks --> double-kick bed
                     BassOnsets = new List<decimal>
                     {
                         1m, 1.5m, 2m, 2.5m, 3m, 3.5m, 4m, 4.5m
