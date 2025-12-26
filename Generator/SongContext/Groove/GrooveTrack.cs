@@ -16,34 +16,11 @@ namespace Music.Generator
             Events.Clear();
         }
 
-        //============================================================
-
-        // TO DO - HIGH - these should be used by the editor when modifying existing events to ensure the list is kept sorted
-
         public void Add(GrooveEvent evt)
         {
             Events.Add(evt);
             Events = Events.OrderBy(e => e.StartBar).ToList();
         }
-
-        public void Update(GrooveEvent evt)
-        {
-            //var existing = Events.FirstOrDefault(e => e == evt);
-            //if (existing != null)
-            //{
-            //    Events.Remove(existing);
-            //    Events.Add(evt);
-            //    Events = Events.OrderBy(e => e.StartBar).ToList();
-            //}
-        }
-
-        public void Delete(GrooveEvent evt)
-        {
-            //Events.Remove(evt);
-            //Events = Events.OrderBy(e => e.StartBar).ToList();
-        }
-
-        //============================================================
 
         // Finds the Groove Prest at or immediate before the specified bar and returns the corresponding preset.
         // Split into two methods: one returns the active event, the other returns the preset (current behavior).
