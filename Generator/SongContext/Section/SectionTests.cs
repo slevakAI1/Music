@@ -2,23 +2,6 @@
 {
     public sealed class SectionTests
     {
-        // Populate the provided SectionsClass (persisted on the design), render its summary, and reset dependent sets/displays
-        public void SetDefaultSections(
-            IWin32Window owner,
-            SectionTrack sections,
-            VoiceSet voiceSet)
-        {
-            SetTestSectionsD1(sections);
-
-            // Display only
-            var names = new List<string>();
-            foreach (var s in sections.Sections)
-            {
-                names.Add(s.SectionType.ToString());
-            }
-            //txtSections.Text = string.Join("\r\n", names);
-        }
-
         /// <summary>
         /// Build the standard top-level structure on the provided SectionsClass and return a printable summary.
         /// Structure: Intro → Verse → Chorus → Verse → Chorus → Bridge → Chorus → Outro
