@@ -1,14 +1,15 @@
 namespace Music.Generator
 {
-    // This is a design track for Groove
-    // Global bar/beat-aligned groove track
+    // This is a design track for the music groove
+
     public class GrooveTrack
     {
         //TO DO HIGH - this may change per instance right? Why is it up here?
+        // or Groove maybe should be for a specified time signature!
 
-        public int BeatsPerBar { get; set; } = 4;
+        public int BeatsPerBar { get; set; } = 4; // config for this exact groove
 
-        public List<GrooveInstance> Events { get; set; } = new();
+        public List<GrooveEvent> Events { get; set; } = new();
 
         public void Reset()
         {
@@ -19,13 +20,13 @@ namespace Music.Generator
 
         // TO DO - HIGH - these should be used by the editor when modifying existing events to ensure the list is kept sorted
 
-        public void Add(GrooveInstance evt)
+        public void Add(GrooveEvent evt)
         {
             Events.Add(evt);
             Events = Events.OrderBy(e => e.StartBar).ToList();
         }
 
-        public void Update(GrooveInstance evt)
+        public void Update(GrooveEvent evt)
         {
             //var existing = Events.FirstOrDefault(e => e == evt);
             //if (existing != null)
@@ -36,7 +37,7 @@ namespace Music.Generator
             //}
         }
 
-        public void Delete(GrooveInstance evt)
+        public void Delete(GrooveEvent evt)
         {
             //Events.Remove(evt);
             //Events = Events.OrderBy(e => e.StartBar).ToList();
@@ -46,7 +47,7 @@ namespace Music.Generator
 
         // Finds the Groove Prest at or immediate before the specified bar and returns the corresponding preset.
         // Split into two methods: one returns the active event, the other returns the preset (current behavior).
-        public GrooveInstance GetActiveGrooveEvent(int startBar)
+        public GrooveEvent GetActiveGrooveEvent(int startBar)
         {
             if (startBar < 1) throw new ArgumentOutOfRangeException(nameof(startBar));
 

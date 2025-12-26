@@ -4,7 +4,7 @@ namespace Music.Generator
     /// A concrete groove instance generated for a specific section of the song.
     /// Combines base preset with variations and tension layer sampling.
     /// </summary>
-    public sealed class GrooveInstance
+    public sealed class GrooveEvent
     {
         /// <summary>
         /// Unique identifier for this groove instance.
@@ -39,7 +39,7 @@ namespace Music.Generator
         /// </summary>
         public Dictionary<int, GrooveBarOnsets> BarOnsets { get; set; }
 
-        public GrooveInstance()
+        public GrooveEvent()
         {
             InstanceId = Guid.NewGuid().ToString("N");
             SourcePresetName = string.Empty;

@@ -19,7 +19,7 @@ namespace Music.Generator
         /// <summary>
         /// Active groove instances by bar range.
         /// </summary>
-        public List<GrooveInstance> GrooveInstances { get; set; }
+        public List<GrooveEvent> GrooveInstances { get; set; }
 
         /// <summary>
         /// Variation settings controlling surprise/randomness.
@@ -55,7 +55,7 @@ namespace Music.Generator
         {
             Song = new ProposedSong();
             PatternLibrary = new ProposedPatternLibrary();
-            GrooveInstances = new List<GrooveInstance>();
+            GrooveInstances = new List<GrooveEvent>();
             VariationSettings = new VariationSettings();
             TicksPerQuarterNote = 480;
             BeatsPerBar = 4;
