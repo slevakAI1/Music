@@ -45,7 +45,8 @@ namespace Music.Generator
         //============================================================
 
         // Finds the Groove Prest at or immediate before the specified bar and returns the corresponding preset.
-        public GroovePreset GetActiveGroovePreset(int startBar)
+        // Split into two methods: one returns the active event, the other returns the preset (current behavior).
+        public GrooveInstance GetActiveGrooveEvent(int startBar)
         {
             if (startBar < 1) throw new ArgumentOutOfRangeException(nameof(startBar));
 
@@ -53,13 +54,18 @@ namespace Music.Generator
             {
                 if (Events[i].StartBar <= startBar)
                 {
-                    var grooveEvent = Events[i];
-                    return GroovePresets.GetByName(grooveEvent.SourcePresetName)!;
+                    return Events[i];
                 }
             }
 
             // If you truly guarantee StartBar=1 exists and startBar>=1, you never hit this.
             throw new InvalidOperationException("No event at or before this bar. Expected StartBar = 1.");
+        }
+
+        public GroovePreset GetActiveGroovePreset(int startBar)
+        {
+            var grooveEvent = GetActiveGrooveEvent(startBar);
+            return GroovePresets.GetByName(grooveEvent.SourcePresetName)!;
         }
     }
 }
