@@ -9,14 +9,14 @@ namespace Music.Writer
     internal static class UpdatePartTracks_For_Import_Only
     {
         /// <summary>
-        /// Converts lists of MetaMidiEvent objects to PartTrack objects.
+        /// Updates PartTrack objects
         /// Splits tracks by program changes - each program change segment becomes a separate updatedPartTrack.
         /// </summary>
         /// <param name="partTracks"></param>
         /// <param name="midiInstruments">Available MIDI instruments for name lookup</param>
         /// <param name="sourceTicksPerQuarterNote">The ticks per quarter note from the source MIDI file (default 480)</param>
         public static List<PartTrack> Convert(
-            List<Generator.PartTrack> partTracks,
+            List<PartTrack> partTracks,
             short sourceTicksPerQuarterNote)
         {
             var updatedPartTracks = new List<PartTrack>();
@@ -84,7 +84,7 @@ namespace Music.Writer
                             {
                                 if (noteOnEvents.TryGetValue(noteNumber, out var noteOnEvent))
                                 {
-                                    CreatePartTrackEventFromPair(noteOnEvent, midiEvent, partTrackEvents, tickScale);
+                                    CreatePartTrackEventFromPair(noteOnEvent, midiEvent, updatedPartTrack, tickScale);
                                     noteOnEvents.Remove(noteNumber);
                                 }
                             }
@@ -102,14 +102,14 @@ namespace Music.Writer
 
                             if (noteOnEvents.TryGetValue(noteNumber, out var noteOnEvent))
                             {
-                                CreatePartTrackEventFromPair(noteOnEvent, midiEvent, partTrackEvents, tickScale);
+                                CreatePartTrackEventFromPair(noteOnEvent, midiEvent, updatedPartTrack, tickScale);
                                 noteOnEvents.Remove(noteNumber);
                             }
                         }
                     }
 
                     // Only add updatedPartTrack if it has notes
-                    if (partTrackEvents.Count > 0)
+                    if (updatedPartTrack.PartTrackNoteEvents.Count > 0)
                     {
                         updatedPartTracks.Add(updatedPartTrack);
                     }
@@ -170,7 +170,7 @@ namespace Music.Writer
         private static void CreatePartTrackEventFromPair(
             PartTrackEvent noteOnEvent,
             PartTrackEvent noteOffEvent,
-            List<PartTrackEvent> partTrackEvents,  // to do,
+            PartTrack targetPartTrack,
             double tickScale)
         {
             if (!noteOnEvent.Parameters.TryGetValue("NoteNumber", out var noteNumObj) ||
@@ -192,7 +192,7 @@ namespace Music.Writer
                 noteDurationTicks,
                 velocity);
 
-            partTrackEvents.Add(songTrackNoteEvent);
+            targetPartTrack.PartTrackNoteEvents.Add(songTrackNoteEvent);
         }
     }
 }
