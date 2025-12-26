@@ -290,10 +290,7 @@ namespace Music.Writer
         {
             _songContext ??= new SongContext();
             _eventHandlers.HandleSetDesignTestScenarioD1(dgSong, _songContext);
-
-            Globals.SongContext = _songContext;  // TO DO - HIGH -... currently test groove track is pulling from globals, should get from local
-            // copy
-
+            Globals.SongContext = _songContext;  
         }
 
         private void btnSetWriterTestScenarioG1_Click(object sender, EventArgs e)
