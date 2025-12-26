@@ -58,7 +58,7 @@ namespace Music
         }
 
         /// <summary>
-        /// Handles exceptions from unobserved Task operations (async/await that don't get awaited properly).
+        /// Handles exceptions from unobserved Task operations (async/await that do not get awaited properly).
         /// </summary>
         private static void OnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {
