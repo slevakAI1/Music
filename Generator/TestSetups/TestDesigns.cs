@@ -13,10 +13,6 @@ namespace Music.Generator
         // Apply all defaults so the tracks end on the same beat
         public static void SetTestDesignD1(SongContext songContext)
         {
-
-            // TO DO - in SectionTests file, there is a mix of test data setups and default setups. probably in the similar other files too.
-
-
             // 1) Sections: apply default/test structure
             var sectionTestData = new SectionTests();
             sectionTestData.SetTestSectionsD1(songContext.SectionTrack);

@@ -5,7 +5,7 @@ Tempo / Track 0 globals / MidiEvent List
     This should support TempoEvents. That needs to display and be editable. It needs to import
     and export as well. Must handle multiple Tempo events with absolute positions.
     This needs to inject into the conversion to midi.
-    This needs to extract from converion from midi to dong tracks
+    This needs to extract from converion from midi to part tracks
 
 Design Solution - This supports the whole execute --> writing thing! right in the grid!: 
 

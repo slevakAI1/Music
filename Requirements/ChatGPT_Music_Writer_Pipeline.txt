@@ -1838,7 +1838,7 @@ namespace MusicGen.Pipeline.Step1_FormEnergy
     }
 }
 You said:
-I like the direction, but this is way too big to tackle as described. I want to do this in agile fashion.
+I like the direction, but this is way too big to tackle as described. I want this in agile fashion.
 
 The application currently:
     * supports a song designer screen with edit forms for sections, harmony event, temp events, time signatures, voices.
@@ -2313,7 +2313,7 @@ Randomness here: choose one of many anchor archetypes, then stochastic tension p
 
 ==========================================
 
-My short term goal is to update my application to be able to be able to apply the harmony events and groove model, whatever that looks like, to a song. These are the only two I want to implement at this time and I want to do it in a minimal way so i can test it agile style.
+My short term goal is to update my application to be able to be able to apply the harmony events and groove model, whatever that looks like, to a song. These are the only two I want to implement at this time and I want it in a minimal way so i can test it agile style.
 
 Requirements:
 (1)   Be able to generate the random initial notes (within the current harmony model key) for the parts, sections, hooks, etc as per prior discussion here. I am guessing these objects get created and stored for later use.
@@ -3825,7 +3825,7 @@ namespace Music.Designer
             IndexEventForBars(evt);
         }
 
-        // TO DO - THIS IS UNTESTED CODE
+        // - THIS IS UNTESTED CODE
 
         // Fast lookup of the harmony active at a given bar and beat.
         public bool TryGetAt(int bar, int beat, out HarmonyEvent? evt)
@@ -6984,7 +6984,7 @@ Low effort, prevents weirdness.
 5) MapQualityToChordType: a couple of mappings are questionable
 These aren’t “code bugs,” but be aware:
 
-"9" maps to Dominant9. In many UIs “9” could mean “add9” or “maj9”. You chose dominant. That may surprise users.
+"9" maps --> Dominant9. In many UIs “9” could mean “add9” or “maj9”. You chose dominant. That may surprise users.
 
 "add9" maps to MajorAdd9. Some people use add9 for major triad add9, so that’s okay, but you’ll want to align with your editor’s actual labels.
 

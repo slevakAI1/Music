@@ -145,7 +145,7 @@ namespace Music.Writer
         /// </summary>
         public void HandlePause(MidiPlaybackService midiPlaybackService)
         {
-            // If there is no playback service, nothing to do.
+            // If there is no playback service, do nothing
             if (midiPlaybackService == null)
                 return;
 
@@ -164,7 +164,7 @@ namespace Music.Writer
                     return;
                 }
 
-                // Not playing and not paused -> nothing to do.
+                // Not playing and not paused -> do nothing .
             }
             catch (TargetInvocationException tie)
             {
