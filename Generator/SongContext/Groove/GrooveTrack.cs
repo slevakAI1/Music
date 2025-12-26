@@ -44,9 +44,6 @@ namespace Music.Generator
 
         //============================================================
 
-
-        // TO DO - MED - FIGURE OUT THE DIFFERENCE BETWEEN GET PRESET AND GET EVENT!
-
         // Finds the Groove Prest at or immediate before the specified bar and returns the corresponding preset.
         public GroovePreset GetActiveGroovePreset(int startBar)
         {

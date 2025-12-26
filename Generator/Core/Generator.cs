@@ -75,9 +75,9 @@ namespace Music.Generator
                     continue;
 
                 // Get the active groove preset for this bar
-                var groovePreset = grooveTrack.GetActiveGroovePreset(bar);
+                var grooveEvent = grooveTrack.GetActiveGroovePreset(bar);
 
-                var bassOnsets = groovePreset.AnchorLayer.BassOnsets;
+                var bassOnsets = grooveEvent.AnchorLayer.BassOnsets;
                 if (bassOnsets == null || bassOnsets.Count == 0)
                     continue;
 
@@ -145,9 +145,9 @@ namespace Music.Generator
                     continue;
 
                 // Get the active groove preset for this bar
-                var groovePreset = grooveTrack.GetActiveGroovePreset(bar);
+                var grooveEvent = grooveTrack.GetActiveGroovePreset(bar);
 
-                var compOnsets = groovePreset.AnchorLayer.CompOnsets;
+                var compOnsets = grooveEvent.AnchorLayer.CompOnsets;
                 if (compOnsets == null || compOnsets.Count == 0)
                     continue;
 
@@ -217,9 +217,9 @@ namespace Music.Generator
                     continue;
 
                 // Get the active groove preset for this bar
-                var groovePreset = grooveTrack.GetActiveGroovePreset(bar);
+                var grooveEvent = grooveTrack.GetActiveGroovePreset(bar);
 
-                var padsOnsets = groovePreset.AnchorLayer.PadsOnsets;
+                var padsOnsets = grooveEvent.AnchorLayer.PadsOnsets;
                 if (padsOnsets == null || padsOnsets.Count == 0)
                     continue;
 
@@ -296,10 +296,10 @@ namespace Music.Generator
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
-                // Get the active groove preset for this bar
-                var groovePreset = grooveTrack.GetActiveGroovePreset(bar);
+                // Get the active groove event for this bar
+                var grooveEvent = grooveTrack.GetActiveGroovePreset(bar);
 
-                var layer = groovePreset.AnchorLayer;
+                var layer = grooveEvent.AnchorLayer;
 
                 // Get ticks per measure for the active time signature at this bar
                 var timeSignature = timeSignatureTrack.GetActiveTimeSignatureEvent(bar);
