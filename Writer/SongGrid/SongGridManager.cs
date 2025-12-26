@@ -244,7 +244,7 @@ namespace Music.Writer
         /// <param name="dgSong">Target DataGridView</param>
         /// <param name="rowIndex">Index of the row to populate</param>
         /// <param name="timeSignatureTrack">The time signature track for the song</param>
-        public static void PopulatePartMeasureNoteCount(DataGridView dgSong, int rowIndex, TimeSignatureTrack timeSignatureTrack)
+        public static void PopulatePartMeasureNoteCount(DataGridView dgSong, int rowIndex, Timingtrack timeSignatureTrack)
         {
             // Skip fixed rows
             if (rowIndex < FIXED_ROWS_COUNT || rowIndex >= dgSong.Rows.Count)

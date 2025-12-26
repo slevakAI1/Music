@@ -9,7 +9,7 @@ using System.Windows.Forms;
 namespace Music.Designer
 {
     // Popup editor for arranging Time Signature Events
-    public sealed class TimeSignatureEditorForm : Form
+    public sealed class TimingEditorForm : Form
     {
         private readonly ListView _lv;
         private readonly Button _btnAdd;
@@ -36,7 +36,7 @@ namespace Music.Designer
         // Suppress feedback updates while programmatically changing editor controls
         private bool _suppressEditorApply;
 
-        public TimeSignatureTrack ResultTrack { get; private set; } = new TimeSignatureTrack();
+        public Timingtrack ResultTrack { get; private set; } = new Timingtrack();
 
         private sealed class WorkingEvent
         {
@@ -46,7 +46,7 @@ namespace Music.Designer
             public int Denominator { get; set; } = 4;
         }
 
-        public TimeSignatureEditorForm(TimeSignatureTrack? initial = null)
+        public TimingEditorForm(Timingtrack? initial = null)
         {
             Text = "Edit Time Signatures";
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -230,7 +230,7 @@ namespace Music.Designer
             };
         }
 
-        private void LoadInitial(TimeSignatureTrack? initial)
+        private void LoadInitial(Timingtrack? initial)
         {
             _working.Clear();
 
@@ -546,14 +546,14 @@ namespace Music.Designer
             _dragItem = null;
         }
 
-        private TimeSignatureTrack BuildResult()
+        private Timingtrack BuildResult()
         {
-            var tl = new TimeSignatureTrack();
+            var tl = new Timingtrack();
             tl.ConfigureGlobal("4/4");
 
             foreach (var w in _working)
             {
-                tl.Add(new TimeSignatureEvent
+                tl.Add(new TimingEvent
                 {
                     StartBar = w.StartBar,
                     StartBeat = w.StartBeat,
@@ -567,7 +567,7 @@ namespace Music.Designer
 
         private void ApplyDefaultTrack()
         {
-            var defaults = TimeSignatureTests.CreateTestTrackD1();
+            var defaults = TimingTests.CreateTestTrackD1();
 
             _working.Clear();
             

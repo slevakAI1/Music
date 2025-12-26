@@ -45,7 +45,7 @@ namespace Music.Writer
 
             // Extract time signature track from fixed row
             var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
-            var timeSignatureTrack = timeSignatureRow.Cells["colData"].Value as Music.Generator.TimeSignatureTrack;
+            var timeSignatureTrack = timeSignatureRow.Cells["colData"].Value as Music.Generator.Timingtrack;
             if (timeSignatureTrack == null || timeSignatureTrack.Events.Count == 0)
             {
                 MessageBoxHelper.Show("No time signature events defined. Please add at least one time signature event.", "Missing Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -166,7 +166,7 @@ namespace Music.Writer
 
             // Extract time signature track from fixed row
             var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
-            var timeSignatureTrack = timeSignatureRow.Cells["colData"].Value as Music.Generator.TimeSignatureTrack;
+            var timeSignatureTrack = timeSignatureRow.Cells["colData"].Value as Music.Generator.Timingtrack;
             if (timeSignatureTrack == null || timeSignatureTrack.Events.Count == 0)
             {
                 MessageBoxHelper.Show("No time signature events defined. Please add at least one time signature event.", "Missing Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -372,12 +372,12 @@ namespace Music.Writer
         /// <summary>
         /// Extracts tempo and time signature events from MIDI event lists and converts them to tracks.
         /// </summary>
-        private static (TempoTrack?, TimeSignatureTrack?) ExtractTracksFromMidiEvents(
+        private static (TempoTrack?, Timingtrack?) ExtractTracksFromMidiEvents(
             List<Generator.PartTrack> partTracks,
             short ticksPerQuarterNote)
         {
             var tempoTrack = new TempoTrack();
-            var timeSignatureTrack = new TimeSignatureTrack();
+            var timeSignatureTrack = new Timingtrack();
 
             // Assume 4/4 time signature initially for bar calculation
             int beatsPerBar = 4;
@@ -399,7 +399,7 @@ namespace Music.Writer
                         int bar = (int)(evt.AbsoluteTimeTicks / ticksPerBar) + 1;
                         int beatInBar = (int)((evt.AbsoluteTimeTicks % ticksPerBar) / ticksPerBeat) + 1;
 
-                        var timeSignatureEvent = new TimeSignatureEvent
+                        var timeSignatureEvent = new TimingEvent
                         {
                             StartBar = bar,
                             StartBeat = beatInBar,

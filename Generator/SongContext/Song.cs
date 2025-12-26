@@ -14,7 +14,7 @@
         /// <summary>
         /// Global time signature track for the song.
         /// </summary>
-        public TimeSignatureTrack TimeSignatureTrack { get; set; }
+        public Timingtrack TimeSignatureTrack { get; set; }
 
         /// <summary>
         /// All part/instrument tracks in the song.
@@ -29,7 +29,7 @@
         public Song()
         {
             TempoTrack = new TempoTrack();
-            TimeSignatureTrack = new TimeSignatureTrack();
+            TimeSignatureTrack = new Timingtrack();
             PartTracks = new List<PartTrack>();
         }
     }

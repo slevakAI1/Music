@@ -58,7 +58,7 @@ namespace Music.Generator
         private static PartTrack GenerateBassTrack(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
-            TimeSignatureTrack timeSignatureTrack,
+            Timingtrack timeSignatureTrack,
             int totalBars,
             RandomizationSettings settings)
         {
@@ -127,7 +127,7 @@ namespace Music.Generator
         private static PartTrack GenerateGuitarTrack(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
-            TimeSignatureTrack timeSignatureTrack,
+            Timingtrack timeSignatureTrack,
             int totalBars,
             RandomizationSettings settings)
         {
@@ -199,7 +199,7 @@ namespace Music.Generator
         private static PartTrack GenerateKeysTrack(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
-            TimeSignatureTrack timeSignatureTrack,
+            Timingtrack timeSignatureTrack,
             int totalBars,
             RandomizationSettings settings)
         {
@@ -280,7 +280,7 @@ namespace Music.Generator
         private static PartTrack GenerateDrumTrack(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
-            TimeSignatureTrack timeSignatureTrack,
+            Timingtrack timeSignatureTrack,
             int totalBars,
             RandomizationSettings settings)
         {
@@ -384,7 +384,7 @@ namespace Music.Generator
                 throw new ArgumentException("Harmony track must have events", nameof(harmonyTrack));
         }
 
-        private static void ValidateTimeSignatureTrack(TimeSignatureTrack timeSignatureTrack)
+        private static void ValidateTimeSignatureTrack(Timingtrack timeSignatureTrack)
         {
             if (timeSignatureTrack == null || timeSignatureTrack.Events.Count == 0)
                 throw new ArgumentException("Time signature track must have events", nameof(timeSignatureTrack));

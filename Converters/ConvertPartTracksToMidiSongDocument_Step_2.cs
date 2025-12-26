@@ -10,7 +10,7 @@ namespace Music.Writer
         public static List<Generator.PartTrack> Convert(
             List<Generator.PartTrack> partTracks,
             Music.Generator.TempoTrack tempoTrack,
-            Music.Generator.TimeSignatureTrack timeSignatureTrack)
+            Music.Generator.Timingtrack timeSignatureTrack)
         {
             if (partTracks == null) throw new ArgumentNullException(nameof(partTracks));
             if (tempoTrack == null) throw new ArgumentNullException(nameof(tempoTrack));

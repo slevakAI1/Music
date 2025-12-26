@@ -206,7 +206,7 @@ namespace Music.Writer
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
         /// <param name="timeSignatureTrack">TimeSignatureTrack to store in the hidden data cell (null to skip)</param>
-        public static void AttachTimeSignatureTrack(DataGridView dgSong, TimeSignatureTrack? timeSignatureTrack)
+        public static void AttachTimeSignatureTrack(DataGridView dgSong, Timingtrack? timeSignatureTrack)
         {
             if (timeSignatureTrack == null)
                 return;
@@ -226,7 +226,7 @@ namespace Music.Writer
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
         /// <param name="timeSignatureTrack">TimeSignatureTrack containing time signature events</param>
-        private static void PopulateTimeSignatureRow(DataGridView dgSong, TimeSignatureTrack timeSignatureTrack)
+        private static void PopulateTimeSignatureRow(DataGridView dgSong, Timingtrack timeSignatureTrack)
         {
             // Store the track in the hidden data cell
             dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE].Cells["colData"].Value = timeSignatureTrack;
@@ -364,7 +364,7 @@ namespace Music.Writer
         /// </summary>
         /// <param name="dgSong">Target DataGridView</param>
         /// <returns>TimeSignatureTrack or null if not found</returns>
-        public static TimeSignatureTrack? GetTimeSignatureTrack(DataGridView dgSong)
+        public static Timingtrack? GetTimeSignatureTrack(DataGridView dgSong)
         {
             if (!dgSong.Columns.Contains("colData"))
                 return null;
@@ -372,7 +372,7 @@ namespace Music.Writer
             if (dgSong.Rows.Count <= SongGridManager.FIXED_ROW_TIME_SIGNATURE)
                 return null;
 
-            return dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE].Cells["colData"].Value as TimeSignatureTrack;
+            return dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE].Cells["colData"].Value as Timingtrack;
         }
 
         #endregion

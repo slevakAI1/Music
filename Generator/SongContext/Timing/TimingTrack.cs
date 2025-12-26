@@ -2,13 +2,22 @@ namespace Music.Generator
 {
     // This is a design track for time signature
     // Global bar/beat-aligned time signature track
-    public class TimeSignatureTrack
+    public class Timingtrack
     {
-        private readonly Dictionary<int, TimeSignatureEvent> _barHeads = new(); // bar -> event active at beat 1
+        // TO DO SUPER HIGH IMPORTANT!
+        //   THIS HAS THAT OLD barhead code and globals code in it - remove
+        //   Add all the start measure ticks, beats per bar, ticksperbar
+        //      and any other timing related tick related calcs that are per bar
+        //         - calculate and save for every individual measure for ? measures (100?, length of song - may not be known? something else?)
+        //          must do here because this is where the time signatures are edited
+        //   Then lookup is just the bar index
+        //   Only show one entry in the grid, i.e. dont show the subsequent duplicates - they are hidden!
+
+        private readonly Dictionary<int, TimingEvent> _barHeads = new(); // bar -> event active at beat 1
 
         public int BeatsPerBar { get; set; } = 4;
 
-        public List<TimeSignatureEvent> Events { get; set; } = new();
+        public List<TimingEvent> Events { get; set; } = new();
 
         public void ConfigureGlobal(string meter)
         {
@@ -21,7 +30,7 @@ namespace Music.Generator
             BeatsPerBar = Math.Max(1, beats);
         }
 
-        public void Add(TimeSignatureEvent evt)
+        public void Add(TimingEvent evt)
         {
             Events.Add(evt);
             // Clear cache when adding new events
@@ -32,7 +41,7 @@ namespace Music.Generator
         /// Gets the active time signature event for a given bar.
         /// Returns the most recent time signature event that starts on or before this bar.
         /// </summary>
-        public TimeSignatureEvent? GetActiveTimeSignatureEvent(int bar)
+        public TimingEvent? GetActiveTimeSignatureEvent(int bar)
         {
             if (bar < 1) throw new ArgumentOutOfRangeException(nameof(bar));
 

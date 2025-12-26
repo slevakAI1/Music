@@ -200,7 +200,7 @@ namespace Music.Writer
 
                 var initialTimeSignature = _songContext.Song.TimeSignatureTrack;
 
-                using var dlg = new Music.Designer.TimeSignatureEditorForm(initialTimeSignature);
+                using var dlg = new Music.Designer.TimingEditorForm(initialTimeSignature);
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
                     _songContext.Song.TimeSignatureTrack = dlg.ResultTrack;

@@ -24,7 +24,7 @@ namespace Music.Generator
             songContext.HarmonyTrack = HarmonyTests.CreateTestTrackD1();
 
             // 4) Time signature track: apply default (4/4 starting at bar 1)
-            songContext.Song.TimeSignatureTrack = TimeSignatureTests.CreateTestTrackD1();
+            songContext.Song.TimeSignatureTrack = TimingTests.CreateTestTrackD1();
 
             // 5) Tempo track: include default tempo (112 BPM starting at bar 1)
             songContext.Song.TempoTrack = TempoTests.CreateTestTrackD1();
