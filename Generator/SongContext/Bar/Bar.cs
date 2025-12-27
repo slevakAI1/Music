@@ -3,9 +3,11 @@
     public class Bar
     {
         public int BarNumber;
-        public long StartTick;
-        public long EndTick;           
+
+        public long EndTick;  
+        
         public int Numerator;
+
         public int Denominator;
 
         // Computed properties
@@ -35,7 +37,7 @@
         /// Absolute time position in ticks from the start of the track.
         /// This is the source of truth for event timing.
         /// </summary>
-        public long AbsoluteTimeTicks { get; init; }
+        public long StartTick { get; init; }
 
         private int CalculateBeatsPerBar()
         {

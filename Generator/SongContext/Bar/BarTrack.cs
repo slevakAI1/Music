@@ -47,10 +47,9 @@
                 var bar = new Bar
                 {
                     BarNumber = barNumber,
-                    StartTick = currentTick,
                     Numerator = activeEvent.Numerator,
                     Denominator = activeEvent.Denominator,
-                    AbsoluteTimeTicks = currentTick
+                    StartTick = currentTick
                 };
 
                 // Calculate end tick using the bar's computed TicksPerMeasure
