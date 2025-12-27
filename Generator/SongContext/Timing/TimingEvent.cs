@@ -5,7 +5,6 @@ namespace Music.Generator
     {
         // Placement (1-based bar/beat)
         public int StartBar { get; init; }
-        public int StartBeat { get; init; } = 1;
 
         // Time signature numerator/denominator
         public int Numerator { get; init; } = 4;
@@ -13,11 +12,25 @@ namespace Music.Generator
 
         // Computed properties
         private int? _ticksPerMeasure;
+        private int? _ticksPerBeat;
 
         /// <summary>
         /// Ticks per measure calculated once and cached.
         /// Formula: ticksPerQuarterNote * (numerator * 4 / denominator)
         /// </summary>
         public int TicksPerMeasure => _ticksPerMeasure ??= (MusicConstants.TicksPerQuarterNote * 4 * Numerator) / Denominator;
+
+        /// <summary>
+        /// Ticks per beat (the beat unit defined by the time signature).
+        /// Derived from TicksPerMeasure divided by the numerator for consistency.
+        /// </summary>
+        public int TicksPerBeat => _ticksPerBeat ??= TicksPerMeasure / Numerator;
+
+        /// <summary>
+        /// Absolute time position in ticks from the start of the track.
+        /// This is the source of truth for event timing.
+        /// </summary>
+        public long AbsoluteTimeTicks { get; init; }
+
     }
 }

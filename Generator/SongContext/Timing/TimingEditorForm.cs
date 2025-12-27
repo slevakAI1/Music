@@ -41,7 +41,6 @@ namespace Music.Designer
         private sealed class WorkingEvent
         {
             public int StartBar { get; set; } = 1;
-            public int StartBeat { get; set; } = 1;
             public int Numerator { get; set; } = 4;
             public int Denominator { get; set; } = 4;
         }
@@ -243,7 +242,6 @@ namespace Music.Designer
             // Sort events by start position
             var sorted = initial.Events
                 .OrderBy(e => e.StartBar)
-                .ThenBy(e => e.StartBeat)
                 .ToList();
 
             foreach (var ev in sorted)
@@ -251,7 +249,6 @@ namespace Music.Designer
                 _working.Add(new WorkingEvent
                 {
                     StartBar = ev.StartBar,
-                    StartBeat = ev.StartBeat,
                     Numerator = Math.Max(1, ev.Numerator),
                     Denominator = Math.Max(1, ev.Denominator)
                 });
@@ -379,7 +376,6 @@ namespace Music.Designer
             var w = new WorkingEvent
             {
                 StartBar = (int)_numStartBar.Value,
-                StartBeat = 1,
                 Numerator = (int)_numNumerator.Value,
                 Denominator = (int)_numDenominator.Value
             };
@@ -407,7 +403,6 @@ namespace Music.Designer
             var w = new WorkingEvent
             {
                 StartBar = (int)_numStartBar.Value,
-                StartBeat = 1,
                 Numerator = (int)_numNumerator.Value,
                 Denominator = (int)_numDenominator.Value
             };
@@ -463,7 +458,6 @@ namespace Music.Designer
             var clone = new WorkingEvent
             {
                 StartBar = src.StartBar + 1, // Suggest next bar
-                StartBeat = src.StartBeat,
                 Numerator = src.Numerator,
                 Denominator = src.Denominator
             };
@@ -549,14 +543,12 @@ namespace Music.Designer
         private Timingtrack BuildResult()
         {
             var tl = new Timingtrack();
-            tl.ConfigureGlobal("4/4");
 
             foreach (var w in _working)
             {
                 tl.Add(new TimingEvent
                 {
                     StartBar = w.StartBar,
-                    StartBeat = w.StartBeat,
                     Numerator = w.Numerator,
                     Denominator = w.Denominator
                 });
@@ -576,7 +568,6 @@ namespace Music.Designer
                 _working.Add(new WorkingEvent
                 {
                     StartBar = e.StartBar,
-                    StartBeat = e.StartBeat,
                     Numerator = Math.Max(1, e.Numerator),
                     Denominator = Math.Max(1, e.Denominator)
                 });

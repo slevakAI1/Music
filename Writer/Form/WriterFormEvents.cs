@@ -397,12 +397,10 @@ namespace Music.Writer
                         // Calculate bar position (1-based)
                         int ticksPerBar = ticksPerQuarterNote * beatsPerBar;
                         int bar = (int)(evt.AbsoluteTimeTicks / ticksPerBar) + 1;
-                        int beatInBar = (int)((evt.AbsoluteTimeTicks % ticksPerBar) / ticksPerBeat) + 1;
 
                         var timeSignatureEvent = new TimingEvent
                         {
                             StartBar = bar,
-                            StartBeat = beatInBar,
                             Numerator = numerator,
                             Denominator = denominator
                         };

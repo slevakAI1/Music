@@ -6,14 +6,12 @@ namespace Music.Generator
         public static Timingtrack CreateTestTrackD1()
         {
             var track = new Timingtrack();
-            track.ConfigureGlobal(TestDesigns.GlobalTimeSignature);
 
             // One 4/4 event spanning the entire song
             // Duration is implicit - this event continues until another event or end of song
             track.Add(new TimingEvent
             {
                 StartBar = 1,
-                StartBeat = 1,
                 Numerator = 4,
                 Denominator = 4
             });
@@ -21,7 +19,6 @@ namespace Music.Generator
             track.Add(new TimingEvent
             {
                 StartBar = 2,
-                StartBeat = 1,
                 Numerator = 3,
                 Denominator = 4
             });
