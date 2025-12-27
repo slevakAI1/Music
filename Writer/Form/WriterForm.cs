@@ -205,6 +205,9 @@ namespace Music.Writer
                 {
                     _songContext.Song.TimeSignatureTrack = dlg.ResultTrack;
                     GridControlLinesManager.AttachTimeSignatureTrack(dgSong, _songContext.Song.TimeSignatureTrack);
+                    
+                    // Rebuild the bar track from the updated timing track
+                    _songContext.BarTrack.RebuildFromTimingTrack(_songContext.Song.TimeSignatureTrack);
                 }
 
                 return;

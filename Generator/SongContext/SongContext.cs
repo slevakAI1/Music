@@ -15,6 +15,11 @@
         public int CurrentBar { get; set; } = 1;
 
         /// <summary>
+        /// Design bar track (initialised to avoid null checks).
+        /// </summary>
+        public BarTrack BarTrack { get; set; } = new();
+
+        /// <summary>
         /// Design groove track (initialised to avoid null checks).
         /// </summary>
         public GrooveTrack GrooveTrack { get; set; } = new();
