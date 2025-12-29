@@ -29,28 +29,33 @@ namespace Music.Generator
             _nextBar += section.BarCount;
         }
 
+        /// <summary>
+        /// Gets the active section at the specified bar.
+        /// Returns the section that contains this bar.
+        /// </summary>
+        public bool GetActiveSection(int bar, out Section? section)
+        {
+            if (bar < 1)
+            {
+                section = null;
+                return false;
+            }
+
+            for (int i = Sections.Count - 1; i >= 0; i--)
+            {
+                if (Sections[i].StartBar <= bar)
+                {
+                    section = Sections[i];
+                    return true;
+                }
+            }
+
+            section = null;
+            return false;
+        }
+
         // Total bars in the arrangement
         public int TotalBars => _nextBar - 1;
 
-        // Preserve StartBar values and only sync internal next-bar based on existing sections
-        public void SyncAfterExternalLoad()
-        {
-            if (Sections.Count == 0)
-            {
-                _nextBar = 1;
-                return;
-            }
-
-            int lastEnd = 0;
-            foreach (var s in Sections)
-            {
-                if (s == null) continue;
-                int start = s.StartBar > 0 ? s.StartBar : 1;
-                int len = s.BarCount > 0 ? s.BarCount : 1;
-                int end = start + len - 1;
-                if (end > lastEnd) lastEnd = end;
-            }
-            _nextBar = lastEnd + 1;
-        }
     }
 }

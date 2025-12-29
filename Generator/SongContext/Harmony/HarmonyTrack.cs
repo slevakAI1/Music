@@ -17,23 +17,6 @@ namespace Music.Generator
             Events = Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat).ToList();
         }
 
-        public void Update(HarmonyEvent evt)
-        {
-            //var existing = Events.FirstOrDefault(e => e == evt);
-            //if (existing != null)
-            //{
-            //    Events.Remove(existing);
-            //    Events.Add(evt);
-            //    Events = Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat).ToList();
-            //}
-        }
-
-        public void Delete(HarmonyEvent evt)
-        {
-            //Events.Remove(evt);
-            //Events = Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat).ToList();
-        }
-
         /// <summary>
         /// Gets the active harmony event for a given bar.
         /// Returns the most recent harmony event that starts on or before this bar.
