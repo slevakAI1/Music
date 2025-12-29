@@ -16,12 +16,12 @@ namespace Music.Generator
                 Denominator = 4
             });
 
-            track.Add(new TimingEvent
-            {
-                StartBar = 2,
-                Numerator = 3,
-                Denominator = 4
-            });
+            //track.Add(new TimingEvent
+            //{
+            //    StartBar = 2,
+            //    Numerator = 3,
+            //    Denominator = 4
+            //});
 
             return track;
         }
