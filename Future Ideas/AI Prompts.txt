@@ -1,0 +1,25 @@
+
+
+
+THIS IS TO DOCUMENT A C# CLASS FILE OPTIMIZED FOR AI USE
+
+
+You are reviewing a C# class file in a .NET project. Update the XML documentation (///) for the class and its public members to be human-readable and optimized for future maintenance and AI-assisted code changes.
+Goals:
+•	Focus on why the class/members exist, not a verbose description of what the code obviously does.
+•	Capture intent, invariants, assumptions, contracts, and domain meaning that are not immediately clear from the code.
+•	Keep documentation concise and information-dense to avoid crowding out other context in future prompts.
+Include in docs where relevant:
+•	A 1–2 line <summary> for each type/member.
+•	A short “Rationale / Constraints” section (bullets are fine) for any non-obvious behavior (ordering assumptions, 1-based indexes, null meaning, default behaviors, error handling choices).
+•	<param> and <returns> that describe semantic meaning and notable edge cases (not restating names).
+•	Mention caller responsibilities when the API intentionally does not validate, normalize, or sort.
+•	Only mention performance characteristics if they affect correct usage or expected scale.
+Non-goals:
+•	Do not change runtime behavior.
+•	Do not refactor, rename, reformat, or add new features.
+•	Avoid redundant “what the code does” commentary.
+Now update documentation for the following file content: [PASTE CLASS FILE HERE]
+Guidance:
+•	Assume existing comments are of good quality but may not be 100% accurate or complete.
+•	Analyze nearby methods (i.e. there is a reference between the classes/methods) for context to better understand intent of the method(s) in this class.
