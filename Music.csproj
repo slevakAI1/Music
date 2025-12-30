@@ -12,12 +12,15 @@
     <Compile Remove="Archives\Arranger\**" />
     <Compile Remove="Archives\MusicXml\**" />
     <Compile Remove="Files\OutputSamples\**" />
+    <Compile Remove="Future Ideas\ProposedSongContext\**" />
     <EmbeddedResource Remove="Archives\Arranger\**" />
     <EmbeddedResource Remove="Archives\MusicXml\**" />
     <EmbeddedResource Remove="Files\OutputSamples\**" />
+    <EmbeddedResource Remove="Future Ideas\ProposedSongContext\**" />
     <None Remove="Archives\Arranger\**" />
     <None Remove="Archives\MusicXml\**" />
     <None Remove="Files\OutputSamples\**" />
+    <None Remove="Future Ideas\ProposedSongContext\**" />
   </ItemGroup>
 
   <ItemGroup>
