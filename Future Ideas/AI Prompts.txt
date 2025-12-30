@@ -1,9 +1,6 @@
 
 
 
-THIS IS TO DOCUMENT A C# CLASS FILE OPTIMIZED FOR AI USE
-
-
 You are reviewing a C# class file in a .NET project. Update the XML documentation (///) for the class and its public members to be human-readable and optimized for future maintenance and AI-assisted code changes.
 Goals:
 •	Focus on why the class/members exist, not a verbose description of what the code obviously does.
@@ -19,7 +16,7 @@ Non-goals:
 •	Do not change runtime behavior.
 •	Do not refactor, rename, reformat, or add new features.
 •	Avoid redundant “what the code does” commentary.
-Now update documentation for the following file content: [PASTE CLASS FILE HERE]
 Guidance:
 •	Assume existing comments are of good quality but may not be 100% accurate or complete.
 •	Analyze nearby methods (i.e. there is a reference between the classes/methods) for context to better understand intent of the method(s) in this class.
+Now update documentation for the active document
