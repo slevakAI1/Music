@@ -7,6 +7,7 @@ namespace Music.Generator
     {
         public List<Section> Sections { get; set; } = new();
 
+
         private int _nextBar = 1;
 
         public void Reset()

@@ -19,9 +19,9 @@ namespace Music.Generator
 
         public List<PartTrackEvent> PartTrackNoteEvents { get; set; } = new();
 
-        public PartTrack(List<PartTrackEvent> songTrackNoteEvent)
+        public PartTrack(List<PartTrackEvent> partTrackNoteEvents)
         {
-            PartTrackNoteEvents = songTrackNoteEvent;
+            PartTrackNoteEvents = partTrackNoteEvents;
         }
     }
 }
