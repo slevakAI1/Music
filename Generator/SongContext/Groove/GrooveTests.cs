@@ -9,11 +9,6 @@ namespace Music.Generator
         {
             var grooveTrack = new GrooveTrack();
 
-
-            grooveTrack.BeatsPerBar = 4;     //  TO DO - this needs to be in the preset!!! move it there and reference it from there.
-
-
-
             grooveTrack.Add(new GrooveEvent
             {
                 StartBar = 1,

@@ -4,11 +4,6 @@ namespace Music.Generator
 
     public class GrooveTrack
     {
-        //TO DO HIGH - this may change per instance right? Why is it up here?
-        // or Groove maybe should be for a specified time signature!
-
-        public int BeatsPerBar { get; set; } = 4; // config for this exact groove
-
         public List<GrooveEvent> Events { get; set; } = new();
 
         public void Reset()

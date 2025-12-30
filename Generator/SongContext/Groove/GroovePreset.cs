@@ -5,6 +5,9 @@ namespace Music.Generator
     {
         public string Name { get; init; } = string.Empty;
 
+        // Time signature configuration for this groove
+        public int BeatsPerBar { get; init; } = 4;
+
         // Anchor layer: stable patterns that create entrainability
         public GrooveInstanceLayer AnchorLayer { get; init; } = new();
 
