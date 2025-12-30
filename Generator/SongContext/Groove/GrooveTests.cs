@@ -8,8 +8,12 @@ namespace Music.Generator
         public static GrooveTrack CreateTestGrooveD1()
         {
             var groove = new GrooveTrack();
-            groove.BeatsPerBar = 4;     //  TODO - HIGH if groove always has the same beats per bar, then it would need to be coordinated with the time signature track right?
-                                        //  for instance maybe it should throw an error? currently the generator truncates the groove if time signature changes to something shorter
+
+
+            groove.BeatsPerBar = 4;     //  TO DO - this needs to be in the preset!!! move it there and reference it from there.
+
+
+
             groove.Add(new GrooveEvent
             {
                 StartBar = 1,
