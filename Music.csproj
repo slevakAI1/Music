@@ -27,9 +27,14 @@
     <Compile Remove="Archives\AppendNoteEventsToScoreParams.cs" />
     <Compile Remove="Archives\AppendNotes.cs" />
     <Compile Remove="Archives\AppendNotesHelper.cs" />
+    <Compile Remove="Archives\CommandHarmonySyncTest.cs" />
+    <Compile Remove="Archives\ConvertHarmonyEventToSongTrackNoteEvents.cs" />
     <Compile Remove="Archives\CreateTestFile.cs" />
     <Compile Remove="Archives\CreateTestFile2.cs" />
     <Compile Remove="Archives\CreateTestsFile1.cs" />
+    <Compile Remove="Archives\DesignerFileManager.cs" />
+    <Compile Remove="Archives\DesignerReport.cs" />
+    <Compile Remove="Archives\DesignerSerialization.cs" />
     <Compile Remove="Archives\FileManager.cs" />
     <Compile Remove="Archives\MusicXmlParser - Backup.cs" />
     <Compile Remove="Archives\MusicXmlParserTests.cs" />
@@ -37,6 +42,7 @@
     <Compile Remove="Archives\ScoreDesign_original draft.cs" />
     <Compile Remove="Archives\SerializerTestForm.cs" />
     <Compile Remove="Archives\SerializerTestForm.Designer.cs" />
+    <Compile Remove="Archives\UpdateWriterFormDataFromDesigner.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -70,6 +76,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Archives\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
