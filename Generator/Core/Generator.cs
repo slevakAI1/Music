@@ -31,13 +31,13 @@ namespace Music.Generator
                 BassTrack = GenerateBassTrack(
                     songContext.HarmonyTrack,
                     songContext.GrooveTrack,
-                    songContext.Song.TimeSignatureTrack,
+                    songContext.BarTrack,
                     totalBars,
                     settings),            //  Randomization settings 
 
-                GuitarTrack = GenerateGuitarTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.Song.TimeSignatureTrack, totalBars, settings),
-                KeysTrack = GenerateKeysTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.Song.TimeSignatureTrack, totalBars, settings),
-                DrumTrack = GenerateDrumTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.Song.TimeSignatureTrack, totalBars, settings)
+                GuitarTrack = GenerateGuitarTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, totalBars, settings),
+                KeysTrack = GenerateKeysTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, totalBars, settings),
+                DrumTrack = GenerateDrumTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, totalBars, settings)
             };
         }
 
@@ -58,15 +58,13 @@ namespace Music.Generator
         private static PartTrack GenerateBassTrack(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
-            Timingtrack timeSignatureTrack,
+            BarTrack barTrack,
             int totalBars,
             RandomizationSettings settings)
         {
             var notes = new List<PartTrackEvent>();
             var randomizer = new PitchRandomizer(settings);
             const int bassOctave = 2;
-
-            int measureStartTick = 0;
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
@@ -88,23 +86,25 @@ namespace Music.Generator
                     harmonyEvent.Bass,
                     bassOctave);
 
-                // Get ticks per measure for the active time signature at this bar
-                var timeSignature = timeSignatureTrack.GetActiveTimeSignatureEvent(bar);
-                if (timeSignature == null)
+
+                var currentBar = barTrack.GetBar(bar);
+                if (currentBar == null)
                     continue;
-                int ticksPerMeasure = (MusicConstants.TicksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
+
+                int ticksPerMeasure = currentBar.TicksPerMeasure;
+                long measureStartTick = currentBar.StartTick;
 
                 for (int i = 0; i < bassOnsets.Count; i++)
                 {
                     decimal onsetBeat = bassOnsets[i];
-                    int onsetTick = measureStartTick + (int)((onsetBeat - 1m) * MusicConstants.TicksPerQuarterNote);
+                    int onsetTick = (int)(measureStartTick + (long)((onsetBeat - 1m) * MusicConstants.TicksPerQuarterNote));
 
                     // Only add note if onset is within this measure
                     if (onsetTick < measureStartTick + ticksPerMeasure)
                     {
                         int nextOnsetTick = (i + 1 < bassOnsets.Count)
-                            ? measureStartTick + (int)((bassOnsets[i + 1] - 1m) * MusicConstants.TicksPerQuarterNote)
-                            : measureStartTick + ticksPerMeasure;
+                            ? (int)(measureStartTick + (long)((bassOnsets[i + 1] - 1m) * MusicConstants.TicksPerQuarterNote))
+                            : (int)(measureStartTick + ticksPerMeasure);
                         int duration = nextOnsetTick - onsetTick;
 
                         int midiNote = randomizer.SelectBassPitch(ctx, bar, onsetBeat);
@@ -117,8 +117,6 @@ namespace Music.Generator
                             noteOnVelocity: 95));
                     }
                 }
-
-                measureStartTick += ticksPerMeasure;
             }
 
             return new PartTrack(notes) { MidiProgramNumber = 33 }; // Electric Bass
@@ -127,7 +125,7 @@ namespace Music.Generator
         private static PartTrack GenerateGuitarTrack(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
-            Timingtrack timeSignatureTrack,
+            BarTrack barTrack,
             int totalBars,
             RandomizationSettings settings)
         {
@@ -135,8 +133,6 @@ namespace Music.Generator
             var randomizer = new PitchRandomizer(settings);
             int? previousPitchClass = null;
             const int guitarOctave = 4;
-
-            int measureStartTick = 0;
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
@@ -159,23 +155,24 @@ namespace Music.Generator
                     guitarOctave);
 
 
-                // Get ticks per measure for the active time signature at this bar
-                var timeSignature = timeSignatureTrack.GetActiveTimeSignatureEvent(bar);
-                if (timeSignature == null)
+                var currentBar = barTrack.GetBar(bar);
+                if (currentBar == null)
                     continue;
-                int ticksPerMeasure = (MusicConstants.TicksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
+
+                int ticksPerMeasure = currentBar.TicksPerMeasure;
+                long measureStartTick = currentBar.StartTick;
 
                 for (int i = 0; i < compOnsets.Count; i++)
                 {
                     decimal onsetBeat = compOnsets[i];
-                    int onsetTick = measureStartTick + (int)((onsetBeat - 1m) * MusicConstants.TicksPerQuarterNote);
+                    int onsetTick = (int)(measureStartTick + (long)((onsetBeat - 1m) * MusicConstants.TicksPerQuarterNote));
 
                     // Only add note if onset is within this measure
                     if (onsetTick < measureStartTick + ticksPerMeasure)
                     {
                         int nextOnsetTick = (i + 1 < compOnsets.Count)
-                            ? measureStartTick + (int)((compOnsets[i + 1] - 1m) * MusicConstants.TicksPerQuarterNote)
-                            : measureStartTick + ticksPerMeasure;
+                            ? (int)(measureStartTick + (long)((compOnsets[i + 1] - 1m) * MusicConstants.TicksPerQuarterNote))
+                            : (int)(measureStartTick + ticksPerMeasure);
                         int duration = nextOnsetTick - onsetTick;
 
                         var (midiNote, pitchClass) = randomizer.SelectGuitarPitch(ctx, bar, onsetBeat, previousPitchClass);
@@ -189,8 +186,6 @@ namespace Music.Generator
                         previousPitchClass = pitchClass;
                     }
                 }
-
-                measureStartTick += ticksPerMeasure;
             }
 
             return new PartTrack(notes) { MidiProgramNumber = 27 }; // Electric Guitar
@@ -199,7 +194,7 @@ namespace Music.Generator
         private static PartTrack GenerateKeysTrack(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
-            Timingtrack timeSignatureTrack,
+            BarTrack barTrack,
             int totalBars,
             RandomizationSettings settings)
         {
@@ -208,7 +203,6 @@ namespace Music.Generator
             const int keysOctave = 3;
 
             HarmonyEvent? previousHarmony = null;
-            int measureStartTick = 0;
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
@@ -230,23 +224,25 @@ namespace Music.Generator
                     harmonyEvent.Bass,
                     keysOctave);
 
-                // Get ticks per measure for the active time signature at this bar
-                var timeSignature = timeSignatureTrack.GetActiveTimeSignatureEvent(bar);
-                if (timeSignature == null)
+
+                var currentBar = barTrack.GetBar(bar);
+                if (currentBar == null)
                     continue;
-                int ticksPerMeasure = (MusicConstants.TicksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
+
+                int ticksPerMeasure = currentBar.TicksPerMeasure;
+                long measureStartTick = currentBar.StartTick;
 
                 for (int i = 0; i < padsOnsets.Count; i++)
                 {
                     decimal onsetBeat = padsOnsets[i];
-                    int onsetTick = measureStartTick + (int)((onsetBeat - 1m) * MusicConstants.TicksPerQuarterNote);
+                    int onsetTick = (int)(measureStartTick + (long)((onsetBeat - 1m) * MusicConstants.TicksPerQuarterNote));
 
                     // Only add note if onset is within this measure
                     if (onsetTick < measureStartTick + ticksPerMeasure)
                     {
                         int nextOnsetTick = (i + 1 < padsOnsets.Count)
-                            ? measureStartTick + (int)((padsOnsets[i + 1] - 1m) * MusicConstants.TicksPerQuarterNote)
-                            : measureStartTick + ticksPerMeasure;
+                            ? (int)(measureStartTick + (long)((padsOnsets[i + 1] - 1m) * MusicConstants.TicksPerQuarterNote))
+                            : (int)(measureStartTick + ticksPerMeasure);
                         int duration = nextOnsetTick - onsetTick;
 
                         bool isFirstOnset = previousHarmony == null ||
@@ -267,7 +263,6 @@ namespace Music.Generator
                 }
 
                 previousHarmony = harmonyEvent;
-                measureStartTick += ticksPerMeasure;
             }
 
             return new PartTrack(notes) { MidiProgramNumber = 4 }; // Electric Piano 1
@@ -280,7 +275,7 @@ namespace Music.Generator
         private static PartTrack GenerateDrumTrack(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
-            Timingtrack timeSignatureTrack,
+            BarTrack barTrack,
             int totalBars,
             RandomizationSettings settings)
         {
@@ -292,8 +287,6 @@ namespace Music.Generator
             const int snareNote = 38;
             const int closedHiHatNote = 42;
 
-            int measureStartTick = 0;
-
             for (int bar = 1; bar <= totalBars; bar++)
             {
                 // Get the active groove event for this bar
@@ -301,18 +294,20 @@ namespace Music.Generator
 
                 var layer = grooveEvent.AnchorLayer;
 
-                // Get ticks per measure for the active time signature at this bar
-                var timeSignature = timeSignatureTrack.GetActiveTimeSignatureEvent(bar);
-                if (timeSignature == null)
+
+                var currentBar = barTrack.GetBar(bar);
+                if (currentBar == null)
                     continue;
-                int ticksPerMeasure = (MusicConstants.TicksPerQuarterNote * 4 * timeSignature.Numerator) / timeSignature.Denominator;
+
+                int ticksPerMeasure = currentBar.TicksPerMeasure;
+                long measureStartTick = currentBar.StartTick;
 
                 // Kick pattern
                 if (layer.KickOnsets != null)
                 {
                     foreach (var onsetBeat in layer.KickOnsets)
                     {
-                        int onsetTick = measureStartTick + (int)((onsetBeat - 1m) * MusicConstants.TicksPerQuarterNote);
+                        int onsetTick = (int)(measureStartTick + (long)((onsetBeat - 1m) * MusicConstants.TicksPerQuarterNote));
 
                         // Only add note if onset is within this measure
                         if (onsetTick < measureStartTick + ticksPerMeasure)
@@ -333,7 +328,7 @@ namespace Music.Generator
                 {
                     foreach (var onsetBeat in layer.SnareOnsets)
                     {
-                        int onsetTick = measureStartTick + (int)((onsetBeat - 1m) * MusicConstants.TicksPerQuarterNote);
+                        int onsetTick = (int)(measureStartTick + (long)((onsetBeat - 1m) * MusicConstants.TicksPerQuarterNote));
 
                         // Only add note if onset is within this measure
                         if (onsetTick < measureStartTick + ticksPerMeasure)
@@ -354,7 +349,7 @@ namespace Music.Generator
                 {
                     foreach (var onsetBeat in layer.HatOnsets)
                     {
-                        int onsetTick = measureStartTick + (int)((onsetBeat - 1m) * MusicConstants.TicksPerQuarterNote);
+                        int onsetTick = (int)(measureStartTick + (long)((onsetBeat - 1m) * MusicConstants.TicksPerQuarterNote));
 
                         // Only add note if onset is within this measure
                         if (onsetTick < measureStartTick + ticksPerMeasure)
@@ -369,8 +364,6 @@ namespace Music.Generator
                         }
                     }
                 }
-
-                measureStartTick += ticksPerMeasure;
             }
 
             return new PartTrack(notes) { MidiProgramNumber = 255 }; // Drum Set

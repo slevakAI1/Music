@@ -17,6 +17,10 @@ namespace Music.Writer
         {
             try
             {
+                // Ensure BarTrack is up-to-date before generating
+                int totalBars = songContext.HarmonyTrack.Events.Max(e => e.StartBar);
+                songContext.BarTrack.RebuildFromTimingTrack(songContext.Song.TimeSignatureTrack, totalBars);
+
                 // Generate all song tracks using the GrooveTrack
                 var result = Generator.Generator.Generate(songContext);
                 songContext.Song.PartTracks.Add(result.BassTrack);

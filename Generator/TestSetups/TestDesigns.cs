@@ -8,7 +8,7 @@ namespace Music.Generator
     {
         public const int TotalBars = 48;
         public const string GlobalTimeSignature = "4/4";
-        public const int DefaultTempoBpm = 120;  // per ai, 120 is acutually an industry default
+        public const int DefaultTempoBpm = 120;  // per ai, 120 is acutally an industry default
 
         // Apply all defaults so the tracks end on the same beat
         public static void SetTestDesignD1(SongContext songContext)
@@ -31,6 +31,9 @@ namespace Music.Generator
 
             // 6) Groove track: set one event at bar 1 beat one for PopRockBasic preset
             songContext.GrooveTrack = GrooveTests.CreateTestGrooveD1();
+
+            // 7) Build bar track from timing track
+            songContext.BarTrack.RebuildFromTimingTrack(songContext.Song.TimeSignatureTrack, TotalBars);
         }
     }
 }
