@@ -1,3 +1,8 @@
+// AI: purpose=stage3: build MidiSongDocument from PartTrack lists; convert absolute AbsoluteTimeTicks->delta times for DryWetMidi
+// AI: invariants=input events must be pre-sorted by AbsoluteTimeTicks; TimeDivision uses MusicConstants.TicksPerQuarterNote
+// AI: deps=Melanchall.DryWetMidi.Core; PartTrackEvent.Parameters keys expected: Channel, Program, NoteNumber, Velocity, BPM
+// AI: errors=unsupported/unknown PartTrackEvent types are skipped (return null); do not convert skip->throw
+// AI: perf=hotpath O(n) over events; preserve single-pass delta calculation and minimal allocations
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
 using Music.MyMidi;
@@ -5,13 +10,9 @@ using PartTrackEventType = Music.Generator.PartTrackEventType;
 
 namespace Music.Writer
 {
-    /// <summary>
-    /// Converts MetaMidiEvent lists to a MIDI file (MidiSongDocument).
-    /// Each inner list represents one track in the MIDI file.
-    /// Converts absolute time positions to delta times for the MIDI format.
-    /// </summary>
     public static class ConvertPartTracksToMidiSongDocument_Step_3
     {
+        // AI: Convert: null-check input; creates MidiFile.TimeDivision from MusicConstants; one TrackChunk per PartTrack
         public static MidiSongDocument Convert(List<Generator.PartTrack> partTracks)
         {
             if (partTracks == null)
@@ -33,6 +34,8 @@ namespace Music.Writer
             return new MidiSongDocument(midiFile);
         }
 
+        // AI: CreateTrackFromMidiEvents: single-pass convert; lastAbsoluteTime starts 0; detect drum track if any Program==255
+        // AI: Skip EndOfTrack from input; TrackChunk writer will add final EndOfTrack automatically
         private static TrackChunk CreateTrackFromMidiEvents(List<PartTrackEvent> midiEvents)
         {
             var trackChunk = new TrackChunk();
@@ -65,6 +68,8 @@ namespace Music.Writer
             return trackChunk;
         }
 
+        // AI: ConvertToDryWetMidiEvent: exhaustive mapping; keep channel rules (drum->9) and conversions (pitchbend signed->unsigned)
+        // AI: DO NOT change which event types are converted vs skipped; maintain parameter key usage consistency
         private static Melanchall.DryWetMidi.Core.MidiEvent? ConvertToDryWetMidiEvent(
             PartTrackEvent midiEvent,
             long deltaTime,
@@ -180,6 +185,7 @@ namespace Music.Writer
             };
         }
 
+        // AI: CreateProgramChangeEvent: programNumber==255 is sentinel for drums; skip emitting ProgramChange for drums
         private static ProgramChangeEvent? CreateProgramChangeEvent(PartTrackEvent midiEvent, long deltaTime, bool isDrumTrack)
         {
             int programNumber = GetIntParam(midiEvent, "Program");
@@ -195,6 +201,7 @@ namespace Music.Writer
             };
         }
 
+        // AI: CreateSetTempoEvent: honors MicrosecondsPerQuarterNote if present; else uses BPM; default 120BPM if missing
         private static SetTempoEvent CreateSetTempoEvent(PartTrackEvent midiEvent, long deltaTime)
         {
             int microsecondsPerQuarterNote;
@@ -220,7 +227,8 @@ namespace Music.Writer
             };
         } 
 
-        // TO DO - LOW - look at this. Looks like overkill.
+        // AI: TimeSignature conversion: Parameters store actual denominator (4,8,16); DryWetMidi expects exponent (2,3,4)
+        // AI: Keep fallback behavior: non-power-of-two denominators round to nearest exponent and clamp 0..8
         private static TimeSignatureEvent CreateTimeSignatureEvent(PartTrackEvent midiEvent, long deltaTime)
         {
             var numerator = (byte)GetIntParam(midiEvent, "Numerator");
@@ -266,6 +274,7 @@ namespace Music.Writer
             };
         }
 
+        // AI: CreatePitchBendEvent: expects param Value signed (-8192..+8191); convert to unsigned 0..16383 by +8192
         private static PitchBendEvent CreatePitchBendEvent(PartTrackEvent midiEvent, long deltaTime, bool isDrumTrack)
         {
             int value = GetIntParam(midiEvent, "Value");

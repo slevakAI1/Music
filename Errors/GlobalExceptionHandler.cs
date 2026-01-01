@@ -1,23 +1,20 @@
 using System.Diagnostics;
 
-
-// CLEAN - is this necessary - what about MessageBoxHelper?
+// AI: purpose=centralized app exception handling; registers UI, AppDomain and TaskScheduler handlers; call Configure once at startup
+// AI: invariants=Configure idempotent; must be called before showing forms; handlers depend on WinForms Application.OpenForms
+// AI: threading=handlers run on different threads; HandleException marshals to UI thread via main form Invoke when required
+// AI: behavior=UnobservedTaskException is SetObserved to avoid process termination; UnhandledException may run on non-UI thread
+// AI: security=messages may reveal file/stack info; avoid exposing to end users in production builds or sanitize before logging
 
 namespace Music
 {
-    /// <summary>
-    /// Provides centralized exception handling for the entire application.
-    /// Intercepts unhandled exceptions from UI thread, background threads, and async operations,
-    /// displays them to the user, and returns control to the active form.
-    /// </summary>
+    // AI: GlobalExceptionHandler: static helper; keep registration and message behavior stable to avoid changing app crash semantics
     public static class GlobalExceptionHandler
     {
         private static bool _isConfigured = false;
 
-        /// <summary>
-        /// Configures global exception handlers for the application.
-        /// Should be called once at application startup, before any forms are shown.
-        /// </summary>
+        // AI: Configure: idempotent registration of ThreadException, AppDomain.UnhandledException, TaskScheduler.UnobservedTaskException
+        // AI: DO NOT call more than once; calling later than app start may miss earlier exceptions
         public static void Configure()
         {
             if (_isConfigured)
@@ -38,17 +35,13 @@ namespace Music
             _isConfigured = true;
         }
 
-        /// <summary>
-        /// Handles exceptions thrown on the UI thread (Windows Forms controls, event handlers, etc.)
-        /// </summary>
+        // AI: OnThreadException: UI thread exceptions forwarded to HandleException
         private static void OnThreadException(object sender, ThreadExceptionEventArgs e)
         {
             HandleException(e.Exception);
         }
 
-        /// <summary>
-        /// Handles exceptions thrown on background threads or from the AppDomain.
-        /// </summary>
+        // AI: OnUnhandledException: AppDomain-level handler; ExceptionObject may not be an Exception in some hosts
         private static void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             if (e.ExceptionObject is Exception exception)
@@ -57,19 +50,15 @@ namespace Music
             }
         }
 
-        /// <summary>
-        /// Handles exceptions from unobserved Task operations (async/await that do not get awaited properly).
-        /// </summary>
+        // AI: OnUnobservedTaskException: marks task exception observed to prevent process termination
         private static void OnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {
             HandleException(e.Exception);
             e.SetObserved(); // Prevent the application from terminating
         }
 
-        /// <summary>
-        /// Core exception handling logic. Displays error to user on the UI thread
-        /// and returns control to the active MDI child form.
-        /// </summary>
+        // AI: HandleException: compose user-friendly message, marshal to UI thread using mainForm if available, show MessageBox
+        // AI: fallback: if no forms, call MessageBox.Show; keep Activate() call to restore focus to owner after dialog
         private static void HandleException(Exception exception)
         {
             try
@@ -125,9 +114,7 @@ namespace Music
             }
         }
 
-        /// <summary>
-        /// Gets the currently active MDI child form, if any.
-        /// </summary>
+        // AI: GetActiveMdiChild: attempts to find active MDI child; may return null if not determinable or on error
         private static Form? GetActiveMdiChild()
         {
             try
@@ -149,9 +136,7 @@ namespace Music
             return null;
         }
 
-        /// <summary>
-        /// Displays the error dialog to the user.
-        /// </summary>
+        // AI: ShowErrorDialog: primary UI for error display; keep owner Activate to restore focus; fallback to ownerless MessageBox on failure
         private static void ShowErrorDialog(Form owner, string message, string caption)
         {
             try
@@ -172,9 +157,7 @@ namespace Music
             }
         }
 
-        /// <summary>
-        /// Builds a user-friendly error message from an exception, including source location details.
-        /// </summary>
+        // AI: BuildErrorMessage: composes message for AggregateException or single exceptions; includes inner exception details
         private static string BuildErrorMessage(Exception exception)
         {
             if (exception == null)
@@ -213,9 +196,7 @@ namespace Music
             return message.ToString();
         }
 
-        /// <summary>
-        /// Appends source location information (file, class, method, line number) to the message.
-        /// </summary>
+        // AI: AppendExceptionSource: best-effort include file/class/method/line; may be empty in release builds without PDBs
         private static void AppendExceptionSource(System.Text.StringBuilder message, Exception exception)
         {
             try
@@ -252,9 +233,7 @@ namespace Music
             }
         }
 
-        /// <summary>
-        /// Extracts source location information from an exception's stack trace.
-        /// </summary>
+        // AI: GetExceptionSourceInfo: uses StackTrace(exception, true) to read file/line info; requires PDBs to return file/line
         private static ExceptionSourceInfo? GetExceptionSourceInfo(Exception exception)
         {
             try
@@ -286,9 +265,7 @@ namespace Music
             }
         }
 
-        /// <summary>
-        /// Contains information about where an exception occurred.
-        /// </summary>
+        // AI: ExceptionSourceInfo: container for best-effort source metadata; keep fields nullable for missing info
         private sealed class ExceptionSourceInfo
         {
             public string? FileName { get; set; }

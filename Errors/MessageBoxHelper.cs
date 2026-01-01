@@ -1,3 +1,9 @@
+// AI: purpose=thread-safe UI message helper; safe to call from any thread; use BeginInvoke to avoid deadlocks from worker threads
+// AI: invariants=ShowInternal is fire-and-forget for ownered messages; synchronous Show(...) returns DialogResult and may block UI
+// AI: threading=Show(Form,..) uses Invoke if required to ensure modal owner dialog; BeginInvoke used in ShowInternal to avoid deadlock
+// AI: behavior=ShowInternal swallows secondary exceptions to avoid crashing during error display; keep that behavior
+// AI: change=if altering threading or ownership rules update GlobalExceptionHandler and callers that rely on non-blocking calls
+
 namespace Music.Writer
 
     // CLEAN - This should be used everywhere
@@ -63,6 +69,8 @@ namespace Music.Writer
 
         // Centralized: always execute the UI show on the UI thread, asynchronously.
         // Used by ShowMessage/ShowError to avoid deadlocks when called from background threads.
+        // AI: ShowInternal is fire-and-forget for ownered dialogs; it intentionally does not return DialogResult.
+        // AI: It guards against owner disposal between scheduling and execution and swallows secondary exceptions.
         private static void ShowInternal(Form? owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
         {
             try

@@ -2,12 +2,16 @@
 using System.Reflection;
 using System.Text.Json;
 
+// AI: purpose=debug-only safe serializer: build limited object graph, catch getter errors, avoid cycles, then JSON serialize
+// AI: invariants=visited uses reference equality; cycles produce "<cyclic reference>"; depth cutoff returns "<MaxDepth N reached>"
+// AI: deps=uses reflection and System.Text.Json; expensive—intended for debugging, not production hot paths
+// AI: security=can expose secrets via reflection; avoid running on PII or untrusted objects
+
 namespace Music
 {
     public static class ObjectViewer
     {
-        // Safe debug serializer: builds a "safe" object graph by reflection, catching getter exceptions,
-        // stopping on cyclic references, and limiting recursion depth. Then serializes that safe graph.
+        // AI: Json: convenience wrapper using default maxDepth=6; returns indented JSON for readability
         public static string Json<T>(T obj) => Show(obj, maxDepth: 6);
 
         private static string Show<T>(T obj, int maxDepth)
@@ -17,6 +21,8 @@ namespace Music
             return JsonSerializer.Serialize(safe, new JsonSerializerOptions { WriteIndented = true });
         }
 
+        // AI: CreateSafeObject: core logic. Treats primitives/strings/DateTime/Guid/TimeSpan/decimal/enum as terminals.
+        // AI: Adds reference types to visited to prevent cycles; only inspects public instance properties/fields; catches exceptions.
         private static object? CreateSafeObject(object? obj, int depth, int maxDepth, HashSet<object> visited)
         {
             if (obj == null)
@@ -131,6 +137,7 @@ namespace Music
         }
 
         // Reference equality comparer for visited set to detect object identity cycles
+        // AI: ReferenceEqualityComparer: uses ReferenceEquals and RuntimeHelpers.GetHashCode to detect object identity
         private sealed class ReferenceEqualityComparer : IEqualityComparer<object>
         {
             public new bool Equals(object? x, object? y) => ReferenceEquals(x, y);

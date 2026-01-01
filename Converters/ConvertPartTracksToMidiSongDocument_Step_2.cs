@@ -1,13 +1,16 @@
 using Music.Generator;
 using Music.MyMidi;
 
+// AI: purpose=merge per-track events by program and inject tempo/time-signature; output consumed by Step_3 to build MidiSongDocument
+// AI: invariants=absolute timing preserved; tempo/time-signature absoluteTicks uses (StartBar-1)*TicksPerQuarterNote*4 (StartBar is 1-based)
+// AI: deps=MusicConstants.TicksPerQuarterNote, PartTrackEvent factory; consumers expect Channel param present for note/program/control events
+// AI: change=when modifying channel assignment, drum mapping, or tick calc update Step_3 and playback/export tests
+
 namespace Music.Writer
 {
     public static class ConvertPartTracksToMidiSongDocument_Step_2
     {
-        /// <summary>
-        /// Merges MIDI event lists by instrument and adds tempo and time signature events.
-        /// </summary>
+        // AI: Convert: validates inputs; builds tempo & time-sig events, groups by MidiProgramNumber, sorts and assigns channels
         public static List<Generator.PartTrack> Convert(
             List<Generator.PartTrack> partTracks,
             Music.Generator.TempoTrack tempoTrack,
@@ -21,7 +24,7 @@ namespace Music.Writer
             var tempoEvents = new List<PartTrackEvent>();
             foreach (var tempoEvent in tempoTrack.Events)
             {
-                // Calculate absolute ticks based on start bar (1-based to 0-based conversion)
+                // AI: tempo: StartBar is 1-based; conversion yields 0 for StartBar==1; CreateSetTempo expects bpm param
                 var absoluteTicks = (long)(tempoEvent.StartBar - 1) * MusicConstants.TicksPerQuarterNote * 4;
                 tempoEvents.Add(PartTrackEvent.CreateSetTempo(absoluteTicks, bpm: tempoEvent.TempoBpm));
             }
@@ -30,7 +33,7 @@ namespace Music.Writer
             var timeSignatureEvents = new List<PartTrackEvent>();
             foreach (var tsEvent in timeSignatureTrack.Events)
             {
-                // Calculate absolute ticks based on start bar (1-based to 0-based conversion)
+                // AI: time sig: Denominator forwarded verbatim; consumers interpret format consistently with CreateTimeSignature
                 var absoluteTicks = (long)(tsEvent.StartBar - 1) * MusicConstants.TicksPerQuarterNote * 4;
                 timeSignatureEvents.Add(PartTrackEvent.CreateTimeSignature(
                     absoluteTicks,
@@ -67,6 +70,7 @@ namespace Music.Writer
                 }
 
                 // Sort all events by absolute time
+                // AI: sorting must be stable and happen before channel assignment so NoteOn/NoteOff pairs align
                 mergedEvents = mergedEvents.OrderBy(e => e.AbsoluteTimeTicks).ToList();
 
                 // Assign channels
@@ -81,6 +85,7 @@ namespace Music.Writer
                         evt.Type == PartTrackEventType.ProgramChange ||
                         evt.Type == PartTrackEventType.ControlChange)
                     {
+                        // AI: only assign Channel for these types; other event types keep their parameters untouched
                         evt.Parameters["Channel"] = channel;
                     }
                 }

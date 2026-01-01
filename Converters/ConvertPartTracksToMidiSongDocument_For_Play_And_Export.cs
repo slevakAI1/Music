@@ -1,19 +1,19 @@
+// AI: purpose=orchestrate 3-step pipeline to produce MidiSongDocument from PartTrack data; keeps steps isolated
+// AI: invariants=Step_1 output=absolute-time events; Step_2 merges by instrument and injects tempo/time sig; Step_3 emits MidiSongDocument
+// AI: deps=ConvertPartTracksToMidiSongDocument_Step_1/Step_2/Step_3; consumers rely on absolute event times and merged ordering
+// AI: errors=throws ArgNull for null inputs; preserve exception types and messages; do not swallow exceptions
+// AI: perf=single-thread caller expected; O(total events); avoid adding allocations in pipeline steps
+// AI: change=when modifying timing or merging rules update all 3 steps and associated unit tests for time integrity
 using Music.Designer;
 using Music.Generator;
 using Music.MyMidi;
 
 namespace Music.Writer
 {
-    /// <summary>
-    /// Thin wrapper that executes the existing three-stage pipeline:
-    /// 1) Convert PartTrack -> midi event lists
-    /// 2) Merge midi event lists by instrument
-    /// 3) Convert merged events -> Midi document
-    /// 
-    /// This preserves existing logic and keeps changes minimal.
-    /// </summary>
+    // AI: class=thin coordinator; no state; keep method signatures stable for external callers
     public static class ConvertPartTracksToMidiSongDocument_For_Play_And_Export
     {
+        // AI: Convert: validate inputs then run step1->step2->step3; maintain null checks and step ordering
         public static MidiSongDocument Convert(
             List<PartTrack> songTracks,
             TempoTrack tempoTrack,

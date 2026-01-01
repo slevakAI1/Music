@@ -1,22 +1,17 @@
 using Music.Generator;
 using Music.MyMidi;
 
+// AI: purpose=stage1: convert PartTrack notes -> absolute-time PartTrackEvent lists (note on/off + program+track name only)
+// AI: invariants=output events must retain input timing; Channel removed here and must be assigned in stage2
+// AI: deps=PartTrack.PartTrackNoteEvents may be null; PartTrackEvent factory methods used; consumers expect stable order
+// AI: perf=O(total notes) per track; avoid changing insertion order or adding sorting here
+
 namespace Music.Writer
 {
-    /// <summary>
-    /// Converts PartTrack objects to PartTrack objects with MetaMidiEvent objects with absolute time positioning.
-    /// This is stage 1 processing - creates NoteOn, NoteOff, and SequenceTrackName partTrackEvents only.
-    /// Channel assignment and other processing happens in later stages.
-    /// </summary>
+    // AI: class=stateless stage1 converter; keep API and output event shapes stable for downstream stages
     public static class ConvertPartTracksToMidiSongDocument_Step_1
     {
-        /// <summary>
-        /// Converts a list of partTracks to PartTrack objects with MIDI partTrackEvents (one PartTrack per input).
-        /// Each songTrack is processed independently with its own event list.
-        /// </summary>
-        /// <param name="partTracks">List of partTracks to convert</param>
-        /// <param name="ticksPerQuarterNote">MIDI time resolution (default 480 ticks per quarter note)</param>
-        /// <returns>List of PartTrack objects with populated partTrackEvents, one per input song track</returns>
+        // AI: Convert: per-track independent processing; copies MidiProgramName/Number; throws on null input
         public static List<PartTrack> Convert(
             List<PartTrack> partTracks)
         {
@@ -38,9 +33,8 @@ namespace Music.Writer
             return result;
         }
 
-        /// <summary>
-        /// Converts a single PartTrack to a list of MIDI partTrackEvents with absolute time positioning.
-        /// </summary>
+        // AI: UpdatePartTrack_1: emits track name at t=0 and ProgramChange at t=0 with Channel removed for phase2 assignment
+        // AI: empty MidiProgramName -> "Unnamed Track"; iterate PartTrackNoteEvents null-safe
         private static List<PartTrackEvent> UpdatePartTrack_1(PartTrack songTrack)
         {
             var events = new List<PartTrackEvent>();
@@ -65,9 +59,8 @@ namespace Music.Writer
             return events;
         }
 
-        /// <summary>
-        /// Processes a single note event.
-        /// </summary>
+        // AI: ProcessSingleNote: create NoteOn at AbsoluteTimeTicks and NoteOff at AbsoluteTime+Duration; both have Channel param removed
+        // AI: noteOffTime computed by simple addition using long; do not alter arithmetic or add rounding
         private static void ProcessSingleNote(List<PartTrackEvent> partTrackEvents, PartTrackEvent partTrackEvent)
         {
             // Create NoteOn event at the note's absolute position

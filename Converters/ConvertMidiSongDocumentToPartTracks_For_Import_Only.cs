@@ -1,21 +1,17 @@
+// AI: purpose=convert DryWetMidi MidiSongDocument -> Generator.PartTrack list; single-pass, preserves absolute times
+// AI: invariants=event order and absoluteTime must match input; delta accumulation must remain; pitchbend converted signed by -8192
+// AI: deps=Melanchall.DryWetMidi.Core; Generator.PartTrack, PartTrackEvent factory methods; consumers expect meta events intact
+// AI: errors=unsupported events throw NotSupportedException with track/time debug info; Convert wraps track errors as InvalidOperationException
+// AI: perf=hotpath O(n) over events; avoid heavy allocations; GetEventDebugInfo uses limited reflection for error context
 using Melanchall.DryWetMidi.Core;
 using Music.MyMidi;
 
 namespace Music.Writer
 {
-    /// <summary>
-    /// Converts a MidiSongDocument to PartTrack objects with MetaMidiEvent lists.
-    /// Each track in the MIDI file produces one PartTrack.
-    /// Handles conversion of DryWetMidi events to our domain MetaMidiEvent format.
-    /// </summary>
+    // AI: class:stateless converter; input=midiDoc.Tracks; output=list with one PartTrack per TrackChunk
     public static class ConvertMidiSongDocumentToPartTracks_For_Import_Only
     {
-        /// <summary>
-        /// Converts all tracks in a MIDI document to PartTrack objects with MetaMidiEvent lists.
-        /// </summary>
-        /// <param name="midiDoc">The MIDI document to convert</param>
-        /// <returns>List of PartTrack objects, one per track</returns>
-        /// <exception cref="InvalidOperationException">Thrown when an unsupported MIDI event is encountered</exception>
+        // AI: Convert: null-checks input; wraps per-track exceptions into InvalidOperationException with track index
         public static List<Generator.PartTrack> Convert(MidiSongDocument midiDoc)
         {
             if (midiDoc == null)
@@ -44,9 +40,8 @@ namespace Music.Writer
             return result;
         }
 
-        /// <summary>
-        /// Converts a single track chunk to a list of MetaMidiEvent objects.
-        /// </summary>
+        // AI: ConvertTrack: accumulates absoluteTime from DeltaTime; may skip events if ConvertEvent returns null
+        // AI: throws NotSupportedException with added context for unsupported events (do not swallow)
         private static List<PartTrackEvent> ConvertTrack(TrackChunk trackChunk, int trackIndex)
         {
             var events = new List<PartTrackEvent>();
@@ -81,9 +76,8 @@ namespace Music.Writer
             return events;
         }
 
-        /// <summary>
-        /// Converts a single DryWetMidi event to our domain MetaMidiEvent format.
-        /// </summary>
+        // AI: ConvertEvent: exhaustive pattern-match mapping to PartTrackEvent factory methods
+        // AI: DON'T change mapping order or payload conversions (eg pitch bend: value-8192, tempo cast to int)
         private static PartTrackEvent? ConvertEvent(Melanchall.DryWetMidi.Core.MidiEvent dryWetEvent, long absoluteTime)
         {
             return dryWetEvent switch
@@ -279,9 +273,7 @@ namespace Music.Writer
             };
         }
 
-        /// <summary>
-        /// Gets debug information for an unsupported MIDI event.
-        /// </summary>
+        // AI: GetEventDebugInfo: limited reflection; returns up to 5 property=value pairs; swallow errors and return fallback
         private static string GetEventDebugInfo(Melanchall.DryWetMidi.Core.MidiEvent midiEvent)
         {
             try

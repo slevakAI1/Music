@@ -1,20 +1,17 @@
 using Music.Generator;
 using Music.MyMidi;
 
+// AI: purpose=normalize imported PartTrack event lists into note-centric PartTrack(s); split by program changes
+// AI: invariants=Program 255 == drum sentinel; drum channel index==9; tickScale = MusicConstants.TicksPerQuarterNote/sourceTicksPerQuarterNote
+// AI: pairing=velocity==0 treated as NoteOff; unmatched pairs ignored; preserve temporal order via AbsoluteTimeTicks
+// AI: rounding=min duration 1 tick; rounding uses Math.Round on scaled values; do not change rounding logic
+
 namespace Music.Writer
 {
-    /// <summary>
-    /// Helper to convert lists of MetaMidiEvent objects to PartTrack objects.
-    /// </summary>
+    // AI: internal helper used only during import; outputs one or more PartTracks per input track after splitting by program
     internal static class UpdatePartTracks_For_Import_Only
     {
-        /// <summary>
-        /// Updates PartTrack objects
-        /// Splits tracks by program changes - each program change segment becomes a separate updatedPartTrack.
-        /// </summary>
-        /// <param name="partTracks"></param>
-        /// <param name="midiInstruments">Available MIDI instruments for name lookup</param>
-        /// <param name="sourceTicksPerQuarterNote">The ticks per quarter note from the source MIDI file (default 480)</param>
+        // AI: Convert: splits input track events by ProgramChange segments, maps program->name, rescales ticks, pairs NoteOn/NoteOff
         public static List<PartTrack> Convert(
             List<PartTrack> partTracks,
             short sourceTicksPerQuarterNote)
@@ -119,10 +116,8 @@ namespace Music.Writer
             return updatedPartTracks;
         }
 
-        /// <summary>
-        /// Splits a list of MIDI events by program changes.
-        /// Each segment contains events from one program change to the next.
-        /// </summary>
+        // AI: SplitByProgramChanges: segments start at first event and split whenever a ProgramChange occurs and current segment not empty
+        // AI: If no program changes found, returns single segment containing original events
         private static List<EventSegment> SplitByProgramChanges(List<PartTrackEvent> events)
         {
             var segments = new List<EventSegment>();
@@ -156,17 +151,14 @@ namespace Music.Writer
             return segments;
         }
 
-        /// <summary>
-        /// Helper class to group events by program change segments
-        /// </summary>
+        // AI: simple container for event segments; keep mutable list for downstream processing
         private class EventSegment
         {
             public List<PartTrackEvent> Events { get; set; } = new List<PartTrackEvent>();
         }
 
-        /// <summary>
-        /// Creates a PartTrackEvent from a NoteOn/NoteOff event pair.
-        /// </summary>
+        // AI: CreatePartTrackEventFromPair: scales times by tickScale, rounds, clamps duration>=1, and appends PartTrackEvent
+        // AI: rounding uses Math.Round for both start and duration; small negative durations clamped to 1
         private static void CreatePartTrackEventFromPair(
             PartTrackEvent noteOnEvent,
             PartTrackEvent noteOffEvent,
