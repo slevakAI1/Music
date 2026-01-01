@@ -86,7 +86,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="SongContext\Voices\Voices.Notion.json">
+    <None Update="Song\Voices\Voices.Notion.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
