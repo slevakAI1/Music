@@ -34,6 +34,7 @@ namespace Music.Writer
             btnClearAll = new Button();
             btnPlayTracks = new Button();
             dgSong = new DataGridView();
+            btnSettings = new Button();
             groupBox3.SuspendLayout();
             gbSong.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgSong).BeginInit();
@@ -75,12 +76,13 @@ namespace Music.Writer
             // groupBox3
             // 
             groupBox3.BackColor = SystemColors.ActiveCaptionText;
+            groupBox3.Controls.Add(btnSettings);
             groupBox3.Controls.Add(btnExecute);
             groupBox3.Controls.Add(cbCommand);
             groupBox3.ForeColor = Color.White;
             groupBox3.Location = new Point(436, 609);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(413, 59);
+            groupBox3.Size = new Size(538, 59);
             groupBox3.TabIndex = 33;
             groupBox3.TabStop = false;
             groupBox3.Text = "Command";
@@ -88,7 +90,7 @@ namespace Music.Writer
             // btnExecute
             // 
             btnExecute.ForeColor = Color.FromArgb(0, 192, 0);
-            btnExecute.Location = new Point(284, 21);
+            btnExecute.Location = new Point(411, 22);
             btnExecute.Name = "btnExecute";
             btnExecute.Size = new Size(114, 23);
             btnExecute.TabIndex = 31;
@@ -252,6 +254,17 @@ namespace Music.Writer
             dgSong.TabIndex = 37;
             dgSong.CellDoubleClick += dgSong_CellDoubleClick;
             // 
+            // btnSettings
+            // 
+            btnSettings.ForeColor = Color.FromArgb(0, 192, 0);
+            btnSettings.Location = new Point(282, 22);
+            btnSettings.Name = "btnSettings";
+            btnSettings.Size = new Size(114, 23);
+            btnSettings.TabIndex = 32;
+            btnSettings.Text = "Settings";
+            btnSettings.UseVisualStyleBackColor = true;
+            btnSettings.Click += btnSettings_Click;
+            // 
             // WriterForm
             // 
             BackColor = Color.White;
@@ -285,5 +298,6 @@ namespace Music.Writer
         private Button btnPause;
         private Button btnLoadDesign;
         private Button btnSaveDesign;
+        private Button btnSettings;
     }
 }

@@ -198,7 +198,7 @@ namespace Music.Writer
                 {
                     _songContext.Song.TimeSignatureTrack = dlg.ResultTrack;
                     GridControlLinesManager.AttachTimeSignatureTrack(dgSong, _songContext.Song.TimeSignatureTrack);
-                    
+
                     // Rebuild the bar track from the updated timing track
                     _songContext.BarTrack.RebuildFromTimingTrack(_songContext.Song.TimeSignatureTrack);
                 }
@@ -279,7 +279,7 @@ namespace Music.Writer
         {
             _songContext ??= new SongContext();
             _eventHandlers.HandleSetDesignTestScenarioD1(dgSong, _songContext);
-            Globals.SongContext = _songContext;  
+            Globals.SongContext = _songContext;
         }
 
 
@@ -294,7 +294,7 @@ namespace Music.Writer
             // Open OptionForm to show and allow editing of the generated test scenario
             using var optionForm = new Music.Writer.OptionForm.OptionForm();
             optionForm.ApplyWriterFormData(_writer);
-            
+
             if (optionForm.ShowDialog(this) == DialogResult.OK)
             {
                 // Capture any changes made in the option form
@@ -414,6 +414,11 @@ namespace Music.Writer
             //        dgSong_CurrentCellDirtyStateChanged,
             //        _songContext);
             //}
+        }
+
+        private void btnSettings_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
