@@ -6,6 +6,12 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
+// AI: purpose=Modal voice picker UI; produces SelectedVoicesWithRoles after user accepts (OK).
+// AI: invariants=_selectedVoicesWithRoles uses case-insensitive keys; UI shows catalog entries raw, no dedupe/normalization.
+// AI: deps=VoiceCatalog.Load(out sourcePath) must supply Notion JSON-derived catalog; roles from VoiceSet.ValidGrooveRoles.
+// AI: contract=role placeholder="Select..." means unassigned; SetExistingVoices replaces internal selection map; Build shows filtered view.
+// AI: note=SetDefaultVoices targets category "Rock Band" case-insensitively; SelectedVoicesWithRoles is populated only when OK is clicked.
+
 namespace Music.Designer
 {
     // Multi-select voice picker powered by a Notion JSON voice catalog.
@@ -26,6 +32,7 @@ namespace Music.Designer
         private readonly Dictionary<string, string> _selectedVoicesWithRoles = new(StringComparer.OrdinalIgnoreCase);
         private string? _currentCategory;
 
+        // AI: populated on OK only; until then this remains empty. Keys preserved as in internal map when copied.
         public Dictionary<string, string> SelectedVoicesWithRoles { get; } = new();
 
         public VoiceSelectorForm()

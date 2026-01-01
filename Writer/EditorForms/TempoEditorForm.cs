@@ -1,10 +1,10 @@
 using Music.Generator;
-using Music.Writer;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
+
+// AI: purpose=Modal UI for editing tempo events; ResultTrack is built only after OK.
+// AI: invariants=StartBar/StartBeat are 1-based; BPM constrained to 20-300; _working typically sorted by start.
+// AI: ordering=Add/Insert auto-sort by (StartBar,StartBeat); drag/move intentionally preserve list order and may break chronology.
+// AI: deps=TempoTrack/TempoEvent/TempoTests; must run on UI thread; ListView index mapping required for drag/drop.
+// AI: change=If sorting behavior changes, update Add/Insert/BuildResult and drag/move logic together.
 
 namespace Music.Writer
 {
@@ -232,6 +232,7 @@ namespace Music.Writer
             };
         }
 
+        // AI: LoadInitial sorts incoming TempoTrack by StartBar,StartBeat to initialize _working chronologically
         private void LoadInitial(TempoTrack? initial)
         {
             _working.Clear();
@@ -554,6 +555,7 @@ namespace Music.Writer
             _dragItem = null;
         }
 
+        // AI: BuildResult preserves current _working order; it does NOT sort the events before creating the track
         private TempoTrack BuildResult()
         {
             var tl = new TempoTrack();
@@ -590,6 +592,7 @@ namespace Music.Writer
             RefreshListView(selectIndex: _working.Count > 0 ? 0 : -1);
         }
 
+        // AI: ValidateEditorValues: checks ranges and returns a user-facing error; does NOT mutate editor state
         private bool ValidateEditorValues(out string? error)
         {
             error = null;

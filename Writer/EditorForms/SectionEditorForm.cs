@@ -1,10 +1,11 @@
 using Music.Generator;
 using Music.Writer;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
+
+// AI: purpose=UI dialog to edit an ordered Section list; exposes ResultSections only when OK is confirmed.
+// AI: invariants=_working mirrors ListView order; StartBar is 1-based and must be recomputed via RecalculateStartBars after edits.
+// AI: constraints=BarCount>=1; Section.Id not preserved; StartBar assigned by SectionTrack.Add when building result.
+// AI: deps=SectionTrack, Section, SectionTests; must run on UI thread; controls drive validation; no background access.
+// AI: drag=drag uses ListViewItem.Index captured at drag start; do not change index mapping logic without adjusting drag code.
 
 namespace Music.Designer
 {
@@ -557,6 +558,7 @@ namespace Music.Designer
             _dragItem = null;
         }
 
+        // AI: must-call=RecalculateStartBars after any change to _working; keeps StartBar and list visuals consistent
         private void RecalculateStartBars()
         {
             int start = 1;
@@ -588,6 +590,7 @@ namespace Music.Designer
             UpdateButtonsEnabled();
         }
 
+        // AI: BuildResult relies on SectionTrack.Add to set StartBar; caller uses ResultSections only after OK click
         private SectionTrack BuildResult()
         {
             var result = new SectionTrack();
@@ -628,6 +631,7 @@ namespace Music.Designer
             return start;
         }
 
+        // AI: ValidateAndGetEditorValues reads editor state; does NOT mutate _working; insertAt used only for start preview
         private bool ValidateAndGetEditorValues(
             int insertAt,
             out MusicConstants.eSectionType type,

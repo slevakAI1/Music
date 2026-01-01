@@ -1,14 +1,14 @@
 using Music.Generator;
 using Music.Writer;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
+
+// AI: purpose=Popup UI for editing a Timingtrack; produces ResultTrack when user accepts (OK).
+// AI: invariants=_working models user-visible order; StartBar is 1-based and must be >=1; ListView index==order.
+// AI: contract=BuildResult returns events in _working order (no auto-normalize/dedupe); callers expect ordering preserved.
+// AI: deps=Timingtrack/TimingEvent; validation occurs on Add/Insert, BuildResult does not revalidate.
 
 namespace Music.Designer
 {
-    // Popup editor for arranging Time Signature Events
+    // AI: ui=editor fields are editable with no selection to "stage" values; _suppressEditorApply prevents feedback loops.
     public sealed class TimingEditorForm : Form
     {
         private readonly ListView _lv;
@@ -36,6 +36,7 @@ namespace Music.Designer
         // Suppress feedback updates while programmatically changing editor controls
         private bool _suppressEditorApply;
 
+        // AI: ResultTrack populated only when OK clicked; otherwise caller should ignore default empty track.
         public Timingtrack ResultTrack { get; private set; } = new Timingtrack();
 
         private sealed class WorkingEvent
@@ -540,6 +541,7 @@ namespace Music.Designer
             _dragItem = null;
         }
 
+        // AI: BuildResult: returns Timingtrack from _working order; does not validate or remove duplicate start bars.
         private Timingtrack BuildResult()
         {
             var tl = new Timingtrack();

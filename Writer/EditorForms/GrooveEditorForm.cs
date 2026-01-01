@@ -2,6 +2,12 @@ using Music.Generator;
 using Music.Writer;
 using System.Reflection;
 
+// AI: purpose=Modal editor for Groove events; maps UI rows to a GrooveTrack for caller acceptance.
+// AI: invariants=_working mirrors ListView rows; StartBar is 1-based and must be >=1.
+// AI: deps=Reflects GroovePresets static Get* methods; renaming/removing those breaks PopulatePresetNames.
+// AI: contract=Caller may pass null initial => editor starts empty; ResultTrack is produced only when OK clicked.
+// AI: change=If GrooveEvent adds fields, update WorkingEvent, LoadInitial, BuildResult to preserve them.
+
 namespace Music.Designer
 {
     // Popup editor for arranging Groove Events
@@ -164,6 +170,7 @@ namespace Music.Designer
             _cbPresetName.SelectedIndexChanged += (s, e) => ApplyEditorToSelected();
 
             // Populate preset names using reflection
+            // AI: deps=uses reflection to find public static GroovePresets.Get* methods; names mapped by stripping 'Get'.
             PopulatePresetNames();
 
             // layout rows
@@ -538,6 +545,7 @@ namespace Music.Designer
             _dragItem = null;
         }
 
+        // AI: contract=Constructs GrooveTrack from _working; order preserved as-is; caller expects valid preset names.
         private GrooveTrack BuildResult()
         {
             var tl = new GrooveTrack();
@@ -568,6 +576,7 @@ namespace Music.Designer
             RefreshListView(selectIndex: 0);
         }
 
+        // AI: errors=returns false and sets error when StartBar<1 or preset name empty; UI shows message to user.
         private bool ValidateEditorValues(out string? error)
         {
             error = null;

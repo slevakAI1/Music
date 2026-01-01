@@ -1,6 +1,13 @@
 using Music.Generator;
 using Music.Writer;
 
+// AI: purpose=Modal editor for composing an ordered HarmonyTrack; UI-centric, emits normalized track on OK
+// AI: invariants=_working list must remain ordered; RecalculateStartPositions enforces contiguous 1-based bar:beat
+// AI: beatsPerBar=4 fixed across methods; change carefully if supporting other meters
+// AI: storage=Chord quality stored as short name; UI maps long names <-> short names via ChordQuality helpers
+// AI: caller=Form does not validate higher-level musical conflicts; callers should use ResultTrack after OK
+// AI: dragdrop=ListView indices drive reorder; always call RecalculateStartPositions then RefreshListView after edits
+
 namespace Music.Designer
 {
     // Popup editor for arranging Harmony Events and configuring the track
@@ -34,6 +41,7 @@ namespace Music.Designer
         // Suppress feedback updates while programmatically changing editor controls
         private bool _suppressEditorApply;
 
+        // AI: contract=ResultTrack events are ordered, contiguous, and use short-quality names; set when OK pressed
         public HarmonyTrack ResultTrack { get; private set; } = new HarmonyTrack();
 
         // Predefined values
@@ -678,8 +686,8 @@ namespace Music.Designer
             RefreshListView(selectIndex: _working.Count > 0 ? 0 : -1);
         }
 
-        // Recompute contiguous start positions from order and durations
-        // Uses fixed 4 beats per bar for simplicity
+        // AI: invariants=Enforces contiguous 1-based start positions across _working; updates visible rows and editor label
+        // AI: note=uses constant beatsPerBar=4; callers must call this after any insertion, deletion, or reorder
         private void RecalculateStartPositions()
         {
             const int beatsPerBar = 4;
@@ -723,6 +731,7 @@ namespace Music.Designer
             UpdateButtonsEnabled();
         }
 
+        // AI: note=Computes start for insertAt using current _working; insertAt==_working.Count means append start
         private (int bar, int beat) PreviewStartForIndex(int insertAt)
         {
             const int beatsPerBar = 4;
@@ -738,6 +747,7 @@ namespace Music.Designer
             return (bar, beat);
         }
 
+        // AI: behavior=Validate editor fields; converts long-quality->short; returns startPreview; does not modify _working
         private bool ValidateAndGetEditorValues(
             int insertAt,
             out int duration,
