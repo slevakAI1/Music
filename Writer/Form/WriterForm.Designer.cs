@@ -5,7 +5,7 @@ namespace Music.Writer
         private System.ComponentModel.IContainer components = null;
         private System.Windows.Forms.ComboBox cbCommand;
 
-        private System.Windows.Forms.GroupBox grbParts;
+        private System.Windows.Forms.GroupBox gbPartOptions;
         private System.Windows.Forms.CheckedListBox clbParts;
         private System.Windows.Forms.Label lblPart;
         private System.Windows.Forms.Label lblStaff;
@@ -40,7 +40,7 @@ namespace Music.Writer
         private void InitializeComponent()
         {
             cbCommand = new ComboBox();
-            grbParts = new GroupBox();
+            gbPartOptions = new GroupBox();
             lblPart = new Label();
             clbParts = new CheckedListBox();
             lblStaff = new Label();
@@ -99,7 +99,7 @@ namespace Music.Writer
             btnClearAll = new Button();
             btnPlayTracks = new Button();
             dgSong = new DataGridView();
-            grbParts.SuspendLayout();
+            gbPartOptions.SuspendLayout();
             gbPitchOptions.SuspendLayout();
             grpChord.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numChordDegree).BeginInit();
@@ -126,20 +126,20 @@ namespace Music.Writer
             cbCommand.Size = new Size(250, 23);
             cbCommand.TabIndex = 1;
             // 
-            // grbParts
+            // gbPartOptions
             // 
-            grbParts.BackColor = Color.Black;
-            grbParts.Controls.Add(lblPart);
-            grbParts.Controls.Add(clbParts);
-            grbParts.Controls.Add(lblStaff);
-            grbParts.Controls.Add(clbStaffs);
-            grbParts.ForeColor = Color.FromArgb(255, 128, 0);
-            grbParts.Location = new Point(1006, 664);
-            grbParts.Name = "grbParts";
-            grbParts.Size = new Size(322, 174);
-            grbParts.TabIndex = 2;
-            grbParts.TabStop = false;
-            grbParts.Text = "Part";
+            gbPartOptions.BackColor = Color.Black;
+            gbPartOptions.Controls.Add(lblPart);
+            gbPartOptions.Controls.Add(clbParts);
+            gbPartOptions.Controls.Add(lblStaff);
+            gbPartOptions.Controls.Add(clbStaffs);
+            gbPartOptions.ForeColor = Color.FromArgb(255, 128, 0);
+            gbPartOptions.Location = new Point(1006, 664);
+            gbPartOptions.Name = "gbPartOptions";
+            gbPartOptions.Size = new Size(322, 174);
+            gbPartOptions.TabIndex = 2;
+            gbPartOptions.TabStop = false;
+            gbPartOptions.Text = "Part";
             // 
             // lblPart
             // 
@@ -779,14 +779,14 @@ namespace Music.Writer
             Controls.Add(btnSetDesignTestScenarioD1);
             Controls.Add(btnSetWriterTestScenarioG1);
             Controls.Add(gbRhythmOptions);
-            Controls.Add(grbParts);
+            Controls.Add(gbPartOptions);
             Controls.Add(gbPitchOptions);
             Controls.Add(groupBox3);
             Controls.Add(gbSong);
             Name = "WriterForm";
             Text = "Music Writer";
-            grbParts.ResumeLayout(false);
-            grbParts.PerformLayout();
+            gbPartOptions.ResumeLayout(false);
+            gbPartOptions.PerformLayout();
             gbPitchOptions.ResumeLayout(false);
             gbPitchOptions.PerformLayout();
             grpChord.ResumeLayout(false);
