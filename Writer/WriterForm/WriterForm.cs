@@ -313,18 +313,18 @@ namespace Music.Writer
             if (string.IsNullOrEmpty(command))
                 return;
 
-            // TODO: Broken - controls moved to OptionForm, need to wire up data capture differently
-            // Capture form data once at the higher level and pass to command handlers
-            // var transform = new WriterFormTransform();
-            // var formData = transform.CaptureFormData(...);
-
             switch (command)
             {
                 case "Repeat Note":
+                    // TODO: Broken - controls moved to OptionForm, need to wire up data capture differently
+                    // Capture form data once at the higher level and pass to command handlers
+                    // var transform = new WriterFormTransform();
+                    // var formData = transform.CaptureFormData(...);
                     // TODO: Broken - formData not available, controls moved to OptionForm
                     // HandleRepeatNoteCommand.Execute(formData, dgSong);
                     break;
 
+                    // THIS IS WORKING NOW!
                 case "Harmony Groove Sync Test":
                     HandleCommandGrooveSyncTest.HandleGrooveSyncTest(_songContext, dgSong);
                     break;
