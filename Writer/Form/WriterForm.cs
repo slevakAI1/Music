@@ -214,7 +214,7 @@ namespace Music.Writer
 
                 var initialTempo = _songContext.Song.TempoTrack;
 
-                using var dlg = new Music.Designer.TempoEditorForm(initialTempo);
+                using var dlg = new Music.Writer.TempoEditorForm(initialTempo);
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
                     _songContext.Song.TempoTrack = dlg.ResultTrack;

@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Music.Designer
+namespace Music.Writer
 {
     // Popup editor for arranging Tempo Events
     public sealed class TempoEditorForm : Form

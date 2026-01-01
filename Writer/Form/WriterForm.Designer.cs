@@ -20,6 +20,7 @@ namespace Music.Writer
             btnSetWriterTestScenarioG1 = new Button();
             btnSetDesignTestScenarioD1 = new Button();
             groupBox3 = new GroupBox();
+            btnSettings = new Button();
             btnExecute = new Button();
             gbSong = new GroupBox();
             btnLoadDesign = new Button();
@@ -34,7 +35,6 @@ namespace Music.Writer
             btnClearAll = new Button();
             btnPlayTracks = new Button();
             dgSong = new DataGridView();
-            btnSettings = new Button();
             groupBox3.SuspendLayout();
             gbSong.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgSong).BeginInit();
@@ -53,7 +53,7 @@ namespace Music.Writer
             // 
             btnSetWriterTestScenarioG1.BackColor = Color.Black;
             btnSetWriterTestScenarioG1.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSetWriterTestScenarioG1.Location = new Point(212, 609);
+            btnSetWriterTestScenarioG1.Location = new Point(212, 841);
             btnSetWriterTestScenarioG1.Name = "btnSetWriterTestScenarioG1";
             btnSetWriterTestScenarioG1.Size = new Size(196, 33);
             btnSetWriterTestScenarioG1.TabIndex = 8;
@@ -65,7 +65,7 @@ namespace Music.Writer
             // 
             btnSetDesignTestScenarioD1.BackColor = Color.Black;
             btnSetDesignTestScenarioD1.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSetDesignTestScenarioD1.Location = new Point(18, 609);
+            btnSetDesignTestScenarioD1.Location = new Point(18, 841);
             btnSetDesignTestScenarioD1.Name = "btnSetDesignTestScenarioD1";
             btnSetDesignTestScenarioD1.Size = new Size(179, 33);
             btnSetDesignTestScenarioD1.TabIndex = 10;
@@ -80,12 +80,23 @@ namespace Music.Writer
             groupBox3.Controls.Add(btnExecute);
             groupBox3.Controls.Add(cbCommand);
             groupBox3.ForeColor = Color.White;
-            groupBox3.Location = new Point(436, 609);
+            groupBox3.Location = new Point(436, 841);
             groupBox3.Name = "groupBox3";
             groupBox3.Size = new Size(538, 59);
             groupBox3.TabIndex = 33;
             groupBox3.TabStop = false;
             groupBox3.Text = "Command";
+            // 
+            // btnSettings
+            // 
+            btnSettings.ForeColor = Color.FromArgb(0, 192, 0);
+            btnSettings.Location = new Point(282, 22);
+            btnSettings.Name = "btnSettings";
+            btnSettings.Size = new Size(114, 23);
+            btnSettings.TabIndex = 32;
+            btnSettings.Text = "Settings";
+            btnSettings.UseVisualStyleBackColor = true;
+            btnSettings.Click += btnSettings_Click;
             // 
             // btnExecute
             // 
@@ -116,7 +127,7 @@ namespace Music.Writer
             gbSong.ForeColor = Color.White;
             gbSong.Location = new Point(12, 12);
             gbSong.Name = "gbSong";
-            gbSong.Size = new Size(1900, 581);
+            gbSong.Size = new Size(1900, 811);
             gbSong.TabIndex = 36;
             gbSong.TabStop = false;
             gbSong.Text = "Song";
@@ -124,7 +135,7 @@ namespace Music.Writer
             // btnLoadDesign
             // 
             btnLoadDesign.ForeColor = Color.FromArgb(0, 192, 0);
-            btnLoadDesign.Location = new Point(1089, 542);
+            btnLoadDesign.Location = new Point(1089, 772);
             btnLoadDesign.Name = "btnLoadDesign";
             btnLoadDesign.Size = new Size(89, 23);
             btnLoadDesign.TabIndex = 47;
@@ -135,7 +146,7 @@ namespace Music.Writer
             // btnSaveDesign
             // 
             btnSaveDesign.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSaveDesign.Location = new Point(994, 542);
+            btnSaveDesign.Location = new Point(994, 772);
             btnSaveDesign.Name = "btnSaveDesign";
             btnSaveDesign.Size = new Size(85, 23);
             btnSaveDesign.TabIndex = 46;
@@ -146,7 +157,7 @@ namespace Music.Writer
             // btnPause
             // 
             btnPause.ForeColor = Color.FromArgb(0, 192, 0);
-            btnPause.Location = new Point(870, 544);
+            btnPause.Location = new Point(870, 774);
             btnPause.Name = "btnPause";
             btnPause.Size = new Size(72, 23);
             btnPause.TabIndex = 45;
@@ -157,7 +168,7 @@ namespace Music.Writer
             // btnClearSelectedTracks
             // 
             btnClearSelectedTracks.ForeColor = Color.FromArgb(0, 192, 0);
-            btnClearSelectedTracks.Location = new Point(174, 544);
+            btnClearSelectedTracks.Location = new Point(174, 774);
             btnClearSelectedTracks.Name = "btnClearSelectedTracks";
             btnClearSelectedTracks.Size = new Size(116, 23);
             btnClearSelectedTracks.TabIndex = 44;
@@ -168,7 +179,7 @@ namespace Music.Writer
             // btnStop
             // 
             btnStop.ForeColor = Color.FromArgb(0, 192, 0);
-            btnStop.Location = new Point(783, 544);
+            btnStop.Location = new Point(783, 774);
             btnStop.Name = "btnStop";
             btnStop.Size = new Size(72, 23);
             btnStop.TabIndex = 43;
@@ -179,7 +190,7 @@ namespace Music.Writer
             // btnExport
             // 
             btnExport.ForeColor = Color.FromArgb(0, 192, 0);
-            btnExport.Location = new Point(535, 542);
+            btnExport.Location = new Point(535, 772);
             btnExport.Name = "btnExport";
             btnExport.Size = new Size(75, 23);
             btnExport.TabIndex = 42;
@@ -190,7 +201,7 @@ namespace Music.Writer
             // btnImport
             // 
             btnImport.ForeColor = Color.FromArgb(0, 192, 0);
-            btnImport.Location = new Point(457, 542);
+            btnImport.Location = new Point(457, 772);
             btnImport.Name = "btnImport";
             btnImport.Size = new Size(72, 23);
             btnImport.TabIndex = 41;
@@ -201,7 +212,7 @@ namespace Music.Writer
             // btnAddTrack
             // 
             btnAddTrack.ForeColor = Color.FromArgb(0, 192, 0);
-            btnAddTrack.Location = new Point(15, 544);
+            btnAddTrack.Location = new Point(15, 774);
             btnAddTrack.Name = "btnAddTrack";
             btnAddTrack.Size = new Size(72, 23);
             btnAddTrack.TabIndex = 40;
@@ -212,7 +223,7 @@ namespace Music.Writer
             // btnDeleteTrack
             // 
             btnDeleteTrack.ForeColor = Color.FromArgb(0, 192, 0);
-            btnDeleteTrack.Location = new Point(95, 544);
+            btnDeleteTrack.Location = new Point(95, 774);
             btnDeleteTrack.Name = "btnDeleteTrack";
             btnDeleteTrack.Size = new Size(72, 23);
             btnDeleteTrack.TabIndex = 39;
@@ -223,7 +234,7 @@ namespace Music.Writer
             // btnClearAll
             // 
             btnClearAll.ForeColor = Color.FromArgb(0, 192, 0);
-            btnClearAll.Location = new Point(313, 544);
+            btnClearAll.Location = new Point(313, 774);
             btnClearAll.Name = "btnClearAll";
             btnClearAll.Size = new Size(72, 23);
             btnClearAll.TabIndex = 38;
@@ -234,7 +245,7 @@ namespace Music.Writer
             // btnPlayTracks
             // 
             btnPlayTracks.ForeColor = Color.FromArgb(0, 192, 0);
-            btnPlayTracks.Location = new Point(703, 544);
+            btnPlayTracks.Location = new Point(703, 774);
             btnPlayTracks.Name = "btnPlayTracks";
             btnPlayTracks.Size = new Size(72, 23);
             btnPlayTracks.TabIndex = 32;
@@ -246,29 +257,18 @@ namespace Music.Writer
             // 
             dgSong.AllowUserToAddRows = false;
             dgSong.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgSong.Location = new Point(15, 19);
+            dgSong.Location = new Point(15, 27);
             dgSong.Name = "dgSong";
             dgSong.ReadOnly = true;
             dgSong.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgSong.Size = new Size(1864, 503);
+            dgSong.Size = new Size(1864, 732);
             dgSong.TabIndex = 37;
             dgSong.CellDoubleClick += dgSong_CellDoubleClick;
-            // 
-            // btnSettings
-            // 
-            btnSettings.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSettings.Location = new Point(282, 22);
-            btnSettings.Name = "btnSettings";
-            btnSettings.Size = new Size(114, 23);
-            btnSettings.TabIndex = 32;
-            btnSettings.Text = "Settings";
-            btnSettings.UseVisualStyleBackColor = true;
-            btnSettings.Click += btnSettings_Click;
             // 
             // WriterForm
             // 
             BackColor = Color.White;
-            ClientSize = new Size(1924, 750);
+            ClientSize = new Size(1924, 930);
             Controls.Add(btnSetDesignTestScenarioD1);
             Controls.Add(btnSetWriterTestScenarioG1);
             Controls.Add(groupBox3);
