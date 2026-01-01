@@ -2,6 +2,7 @@
 // AI: invariants=_songContext and _writer may be null; Globals hold canonical persisted design; UI code assumes 1-based bars and grid fixed rows.
 // AI: deps=Depends on SongGridManager, GridControlLinesManager, WriterFormTransform, Midi services, and Generator APIs; renaming these breaks form wiring.
 // AI: perf=Many operations run on UI thread (generation, file IO via services); consider backgrounding long ops to avoid UI hangs.
+// AI: breaking=Controls gbPartOptions, gbPitchOptions, gbRhythmOptions moved to OptionForm; references to those controls are broken.
 
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 #pragma warning disable CS8605 // Unboxing a possibly null value.
@@ -53,16 +54,6 @@ namespace Music.Writer
             dgSong.DefaultCellStyle.ForeColor = Color.Black; // had trouble setting this in the forms designer
             dgSong.DefaultCellStyle.BackColor = Color.White;
 
-            // Initialize comboboxes - doesn't seem to be a way to set a default in the designer or form.
-            // The changes keep getting discarded. wtf?
-            cbChordBase.SelectedIndex = 0; // C
-            cbChordQuality.SelectedIndex = 0; // Major
-            cbChordKey.SelectedIndex = 0; // C
-
-            // Initialize staff selection - default to staff 1 checked
-            if (clbStaffs != null && clbStaffs.Items.Count > 0)
-                clbStaffs.SetItemChecked(0, true); // Check staff "1"
-
             cbCommand.SelectedIndex = 1; // harmony groove sync test
 
             // Configure dgSong with MIDI instrument dropdown
@@ -76,12 +67,9 @@ namespace Music.Writer
 
             // Capture form control values manually set in the form designer
             // This will only be done once, at form construction time.
-            var transform = new WriterFormTransform();
-            _writer ??= transform.CaptureFormData(
-                cbCommand, clbParts, clbStaffs, rbChord, cbStep,
-                rbPitchAbsolute, rbPitchKeyRelative, cbAccidental, numOctaveAbs,
-                numDegree, cbChordKey, numChordDegree, cbChordQuality, cbChordBase,
-                cbNoteValue, numDots, txtTupletNumber, numTupletCount, numTupletOf, numNumberOfNotes);
+            // TODO: Broken - controls moved to OptionForm, need to wire up data capture differently
+            // var transform = new WriterFormTransform();
+            // _writer ??= transform.CaptureFormData(...);
         }
 
         /// <summary>
@@ -262,12 +250,9 @@ namespace Music.Writer
             if (Globals.Writer != null)
                 _writer = Globals.Writer;
 
-            var transform = new WriterFormTransform();
-            transform.ApplyFormData(_writer,
-                cbCommand, clbParts, clbStaffs, rbChord, cbStep,
-                rbPitchAbsolute, rbPitchKeyRelative, cbAccidental, numOctaveAbs,
-                numDegree, cbChordKey, numChordDegree, cbChordQuality, cbChordBase,
-                cbNoteValue, numDots, txtTupletNumber, numTupletCount, numTupletOf, numNumberOfNotes);
+            // TODO: Broken - controls moved to OptionForm, need to wire up data apply differently
+            // var transform = new WriterFormTransform();
+            // transform.ApplyFormData(_writer, ...);
         }
 
         // Persist current control state whenever the form loses activation (user switches to another MDI child)
@@ -278,13 +263,9 @@ namespace Music.Writer
 
             // Save on the way out
             Globals.SongContext = _songContext;
-            var transform = new WriterFormTransform();
-            _writer = Globals.Writer = transform.CaptureFormData(
-                cbCommand, clbParts, clbStaffs, rbChord, cbStep,
-                rbPitchAbsolute, rbPitchKeyRelative, cbAccidental, numOctaveAbs,
-                numDegree, cbChordKey, numChordDegree, cbChordQuality, cbChordBase,
-                cbNoteValue, numDots, txtTupletNumber, numTupletCount, numTupletOf, numNumberOfNotes);
-            Globals.Writer = _writer;
+            // TODO: Broken - controls moved to OptionForm, need to wire up data capture differently
+            // var transform = new WriterFormTransform();
+            // _writer = Globals.Writer = transform.CaptureFormData(...);
         }
 
         //===============================   E V E N T S   ==============================
@@ -301,16 +282,30 @@ namespace Music.Writer
             Globals.SongContext = _songContext;  
         }
 
+
+
+
+
         private void btnSetWriterTestScenarioG1_Click(object sender, EventArgs e)
         {
             _writer = _eventHandlers.HandleSetWriterTestScenarioG1(_songContext);
-            var transform = new WriterFormTransform();
-            transform.ApplyFormData(_writer,
-                cbCommand, clbParts, clbStaffs, rbChord, cbStep,
-                rbPitchAbsolute, rbPitchKeyRelative, cbAccidental, numOctaveAbs,
-                numDegree, cbChordKey, numChordDegree, cbChordQuality, cbChordBase,
-                cbNoteValue, numDots, txtTupletNumber, numTupletCount, numTupletOf, numNumberOfNotes);
+            Globals.Writer = _writer;
+
+            // Open OptionForm to show and allow editing of the generated test scenario
+            using var optionForm = new Music.Writer.OptionForm.OptionForm();
+            optionForm.ApplyWriterFormData(_writer);
+            
+            if (optionForm.ShowDialog(this) == DialogResult.OK)
+            {
+                // Capture any changes made in the option form
+                _writer = optionForm.CaptureWriterFormData();
+                Globals.Writer = _writer;
+            }
         }
+
+
+
+
 
         private void btnExecute_Click(object sender, EventArgs e)
         {
@@ -318,18 +313,16 @@ namespace Music.Writer
             if (string.IsNullOrEmpty(command))
                 return;
 
+            // TODO: Broken - controls moved to OptionForm, need to wire up data capture differently
             // Capture form data once at the higher level and pass to command handlers
-            var transform = new WriterFormTransform();
-            var formData = transform.CaptureFormData(
-                cbCommand, clbParts, clbStaffs, rbChord, cbStep,
-                rbPitchAbsolute, rbPitchKeyRelative, cbAccidental, numOctaveAbs,
-                numDegree, cbChordKey, numChordDegree, cbChordQuality, cbChordBase,
-                cbNoteValue, numDots, txtTupletNumber, numTupletCount, numTupletOf, numNumberOfNotes);
+            // var transform = new WriterFormTransform();
+            // var formData = transform.CaptureFormData(...);
 
             switch (command)
             {
                 case "Repeat Note":
-                    HandleRepeatNoteCommand.Execute(formData, dgSong);
+                    // TODO: Broken - formData not available, controls moved to OptionForm
+                    // HandleRepeatNoteCommand.Execute(formData, dgSong);
                     break;
 
                 case "Harmony Groove Sync Test":
@@ -343,6 +336,12 @@ namespace Music.Writer
                     break;
             }
         }
+
+
+
+
+
+
 
         private void btnClearAll_Click(object sender, EventArgs e)
         {
