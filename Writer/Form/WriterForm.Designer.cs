@@ -11,7 +11,7 @@ namespace Music.Writer
         private System.Windows.Forms.Label lblStaff;
         private System.Windows.Forms.CheckedListBox clbStaffs; // Changed from NumericUpDown numStaff
 
-        private System.Windows.Forms.GroupBox grpPitch;
+        private System.Windows.Forms.GroupBox gbPitchOptions;
         private System.Windows.Forms.RadioButton rbPitchAbsolute;
         private System.Windows.Forms.RadioButton rbPitchKeyRelative;
 
@@ -45,7 +45,7 @@ namespace Music.Writer
             clbParts = new CheckedListBox();
             lblStaff = new Label();
             clbStaffs = new CheckedListBox();
-            grpPitch = new GroupBox();
+            gbPitchOptions = new GroupBox();
             grpChord = new GroupBox();
             lblKey = new Label();
             cbChordKey = new ComboBox();
@@ -100,7 +100,7 @@ namespace Music.Writer
             btnPlayTracks = new Button();
             dgSong = new DataGridView();
             grbParts.SuspendLayout();
-            grpPitch.SuspendLayout();
+            gbPitchOptions.SuspendLayout();
             grpChord.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numChordDegree).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numOctaveAbs).BeginInit();
@@ -180,24 +180,24 @@ namespace Music.Writer
             clbStaffs.Size = new Size(120, 40);
             clbStaffs.TabIndex = 6;
             // 
-            // grpPitch
+            // gbPitchOptions
             // 
-            grpPitch.BackColor = Color.Black;
-            grpPitch.Controls.Add(grpChord);
-            grpPitch.Controls.Add(lblOctaveAbs);
-            grpPitch.Controls.Add(numOctaveAbs);
-            grpPitch.Controls.Add(rbChord);
-            grpPitch.Controls.Add(rbPitchAbsolute);
-            grpPitch.Controls.Add(rbPitchKeyRelative);
-            grpPitch.Controls.Add(grpAbsolute);
-            grpPitch.Controls.Add(grpKeyRelative);
-            grpPitch.ForeColor = Color.White;
-            grpPitch.Location = new Point(429, 664);
-            grpPitch.Name = "grpPitch";
-            grpPitch.Size = new Size(541, 280);
-            grpPitch.TabIndex = 3;
-            grpPitch.TabStop = false;
-            grpPitch.Text = "Pitch Options";
+            gbPitchOptions.BackColor = Color.Black;
+            gbPitchOptions.Controls.Add(grpChord);
+            gbPitchOptions.Controls.Add(lblOctaveAbs);
+            gbPitchOptions.Controls.Add(numOctaveAbs);
+            gbPitchOptions.Controls.Add(rbChord);
+            gbPitchOptions.Controls.Add(rbPitchAbsolute);
+            gbPitchOptions.Controls.Add(rbPitchKeyRelative);
+            gbPitchOptions.Controls.Add(grpAbsolute);
+            gbPitchOptions.Controls.Add(grpKeyRelative);
+            gbPitchOptions.ForeColor = Color.White;
+            gbPitchOptions.Location = new Point(429, 664);
+            gbPitchOptions.Name = "gbPitchOptions";
+            gbPitchOptions.Size = new Size(541, 280);
+            gbPitchOptions.TabIndex = 3;
+            gbPitchOptions.TabStop = false;
+            gbPitchOptions.Text = "Pitch Options";
             // 
             // grpChord
             // 
@@ -780,15 +780,15 @@ namespace Music.Writer
             Controls.Add(btnSetWriterTestScenarioG1);
             Controls.Add(gbRhythmOptions);
             Controls.Add(grbParts);
-            Controls.Add(grpPitch);
+            Controls.Add(gbPitchOptions);
             Controls.Add(groupBox3);
             Controls.Add(gbSong);
             Name = "WriterForm";
             Text = "Music Writer";
             grbParts.ResumeLayout(false);
             grbParts.PerformLayout();
-            grpPitch.ResumeLayout(false);
-            grpPitch.PerformLayout();
+            gbPitchOptions.ResumeLayout(false);
+            gbPitchOptions.PerformLayout();
             grpChord.ResumeLayout(false);
             grpChord.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)numChordDegree).EndInit();
