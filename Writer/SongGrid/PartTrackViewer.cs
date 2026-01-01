@@ -1,16 +1,19 @@
+// AI: purpose=Modal viewer showing a PartTrack as formatted JSON for debugging and inspection.
+// AI: invariants=Read-only viewer; uses ObjectViewer.Json for serialization; large tracks may produce very large strings.
+// AI: deps=Depends on PartTrack structure and ObjectViewer.Json; changing those requires updating this viewer.
+// AI: change=If PartTrack shape or JSON helper changes, update error handling to avoid runtime exceptions in viewer.
+
 using Music.Generator;
 
 namespace Music.Writer
 {
-    /// <summary>
-    /// A modal dialog that displays a PartTrack object as formatted JSON.
-    /// </summary>
-    public class SongTrackViewer : Form
+    public class PartTrackViewer : Form
     {
         private TextBox txtJson;
         private Button btnClose;
 
-        public SongTrackViewer(PartTrack track, string trackNumber)
+        // AI: ctor: initialize UI and load given PartTrack; trackNumber used only for title.
+        public PartTrackViewer(PartTrack track, string trackNumber)
         {
             InitializeComponents(trackNumber);
             LoadTrackData(track);
@@ -18,7 +21,6 @@ namespace Music.Writer
 
         private void InitializeComponents(string trackNumber)
         {
-            // Form settings
             this.Text = $"Part Viewer - #{trackNumber}";
             this.Size = new Size(800, 600);
             this.StartPosition = FormStartPosition.CenterParent;
@@ -29,7 +31,6 @@ namespace Music.Writer
             this.TopMost = true;
             this.BackColor = Color.Black;
 
-            // TextBox for JSON display
             txtJson = new TextBox
             {
                 Multiline = true,
@@ -44,7 +45,6 @@ namespace Music.Writer
                 TabStop = false
             };
 
-            // Close button
             btnClose = new Button
             {
                 Text = "Close",
@@ -57,7 +57,6 @@ namespace Music.Writer
             btnClose.FlatAppearance.BorderColor = Color.FromArgb(255, 128, 0);
             btnClose.Click += (s, e) => this.Close();
 
-            // Panel for button
             var buttonPanel = new Panel
             {
                 Dock = DockStyle.Bottom,
@@ -68,16 +67,15 @@ namespace Music.Writer
             buttonPanel.Controls.Add(btnClose);
             btnClose.Location = new Point(buttonPanel.Width - btnClose.Width - 10, 10);
 
-            // Add controls to form
             this.Controls.Add(txtJson);
             this.Controls.Add(buttonPanel);
         }
 
+        // AI: LoadTrackData: serialize PartTrack via ObjectViewer.Json; on failure display error in textbox only.
         private void LoadTrackData(PartTrack track)
         {
             try
             {
-                // Use the existing Helpers.Json method to convert to JSON
                 string json = ObjectViewer.Json(track);
                 txtJson.Text = json;
             }

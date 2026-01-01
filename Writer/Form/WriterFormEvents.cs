@@ -1,17 +1,17 @@
-using Music.Designer;
+// AI: purpose=Event handlers for WriterForm; validate UI grid rows, convert between PartTrack and MIDI, and coordinate playback/export/import.
+// AI: invariants=Grid fixed rows are used for control lines; handlers expect colData to contain PartTrack/track objects.
+// AI: deps=Relies on SongGridManager, GridControlLinesManager, Convert* helpers, Midi services, and MessageBoxHelper.
+// AI: errors=Handlers show dialogs for recoverable/user errors; conversions throw NotSupportedException for unsupported MIDI events.
+
 using Music.Generator;
 using Music.MyMidi;
 
 namespace Music.Writer
 {
-    /// <summary>
-    /// Event handler logic for WriterForm, now as a standalone class.
-    /// Each method receives only the dependencies it actually needs.
-    /// </summary>
     public class WriterFormEventHandlers
     {
-        // ========== PLAYBACK & EXPORT EVENT HANDLERS ==========
-
+        // AI: HandlePlayAsync: validates selection, builds PartTrack list, converts to MidiSongDocument and plays via Player helper.
+        // AI: edge=Aborts if tempo/time signature missing, selected rows lack PartTrack, or instrument not chosen.
         public async Task HandlePlayAsync(
             DataGridView dgSong,
             MidiPlaybackService midiPlaybackService)
@@ -133,6 +133,7 @@ namespace Music.Writer
             await Player.PlayMidiFromSongTracksAsync(midiPlaybackService, midiDoc);
         }
 
+        // AI: HandleExport: similar validation to Play then converts selected PartTracks to MidiSongDocument and writes file via service.
         public static void HandleExport(
             DataGridView dgSong,
             MidiIoService midiIoService)
@@ -279,6 +280,8 @@ namespace Music.Writer
             }
         }
 
+        // AI: HandleImport: loads Midi via service, converts to PartTrack list, extracts timing/tempo, and adds tracks to grid.
+        // AI: errors=Unsupported MIDI events throw NotSupportedException which is shown to user; other exceptions show generic import error.
         public void HandleImport(
             DataGridView dgSong,
             MidiIoService midiIoService)
@@ -369,9 +372,8 @@ namespace Music.Writer
             }
         }
 
-        /// <summary>
-        /// Extracts tempo and timing tracks from PartTracks
-        /// </summary>
+        // AI: ExtractTempoAndTimingFromPartTracks: two-pass extraction. First collects time signatures, then tempos using beatsPerBar.
+        // AI: note=Calculates 1-based bar/beat from AbsoluteTimeTicks using ticksPerQuarterNote; assumes whole-bar durations.
         private static (TempoTrack?, Timingtrack?) ExtractTempoAndTimingFromPartTracks(
             List<Generator.PartTrack> partTracks,
             short ticksPerQuarterNote)
@@ -473,6 +475,7 @@ namespace Music.Writer
 
         // ========== GRID CELL EVENT HANDLERS ==========
 
+        // AI: HandleTrackDoubleClick: opens a JSON viewer for PartTrack rows; shows message if no track data available.
         public void HandleTrackDoubleClick(DataGridView dgSong, DataGridViewCellEventArgs e)
         {
             // Skip fixed rows
@@ -501,7 +504,7 @@ namespace Music.Writer
             var trackNumber = row.Cells["colEventNumber"].Value?.ToString() ?? (e.RowIndex + 1).ToString();
 
             // Open the JSON viewer dialog
-            using var viewer = new SongTrackViewer(songTrack, trackNumber);
+            using var viewer = new PartTrackViewer(songTrack, trackNumber);
             viewer.ShowDialog();
         }
     }

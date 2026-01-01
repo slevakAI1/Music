@@ -1,3 +1,8 @@
+// AI: purpose=WriterForm UI for designing and generating song tracks, wiring grid, playback, import/export, and command handlers.
+// AI: invariants=_songContext and _writer may be null; Globals hold canonical persisted design; UI code assumes 1-based bars and grid fixed rows.
+// AI: deps=Depends on SongGridManager, GridControlLinesManager, WriterFormTransform, Midi services, and Generator APIs; renaming these breaks form wiring.
+// AI: perf=Many operations run on UI thread (generation, file IO via services); consider backgrounding long ops to avoid UI hangs.
+
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 #pragma warning disable CS8605 // Unboxing a possibly null value.
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
@@ -26,6 +31,7 @@ namespace Music.Writer
         private readonly WriterFormGridOperations _gridOperations = new();
 
         //===========================   I N I T I A L I Z A T I O N   ===========================
+        // AI: ctor initializes services, default UI selections, and captures initial WriterFormData once.
         public WriterForm()
         {
             InitializeComponent();
@@ -94,9 +100,8 @@ namespace Music.Writer
             SongGridManager.HandleCellValueChanged(dgSong, sender, e);
         }
 
-        /// <summary>
-        /// Opens a JSON viewer when the user double-clicks on the PartTrack column.
-        /// </summary>
+        // AI: dgSong_CellDoubleClick: opens editors for fixed rows (Voice, Section, Harmony, Groove, TimeSignature, Tempo).
+        // AI: note=Each editor returns updated track/result which is then attached to grid via GridControlLinesManager.
         private void dgSong_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
         {
             // If the fixed Voice row was double-clicked, open the Voice selector and write back to the local _songContext
@@ -242,9 +247,8 @@ namespace Music.Writer
                 this.WindowState = FormWindowState.Maximized;
         }
 
-        // The Writer form is activated each time it gains focus.
-        // The initialization of controls is controlled entirely by the current Design and persisted Writer.
-        // It does not depend on the prior state of the controls.
+        // AI: OnActivated: reloads globals into local state and reapplies Writer settings to controls.
+        // AI: note=Do not overwrite local _songContext if Globals.SongContext==null to avoid losing in-form edits.
         protected override void OnActivated(EventArgs e)
         {
             base.OnActivated(e);
@@ -267,6 +271,7 @@ namespace Music.Writer
         }
 
         // Persist current control state whenever the form loses activation (user switches to another MDI child)
+        // AI: OnDeactivate persists both SongContext and Writer snapshot back to Globals for cross-form continuity.
         protected override void OnDeactivate(EventArgs e)
         {
             base.OnDeactivate(e);
@@ -406,7 +411,6 @@ namespace Music.Writer
             //    // Refresh grid control lines with the newly loaded design
             //    SongGridManager.ConfigureSongGridView(
             //        dgSong,
-            //        _midiInstruments,
             //        dgSong_CellValueChanged,
             //        dgSong_CurrentCellDirtyStateChanged,
             //        _songContext);
@@ -414,3 +418,4 @@ namespace Music.Writer
         }
     }
 }
+#pragma warning restore CS8602 // Dereference of a possibly null reference.

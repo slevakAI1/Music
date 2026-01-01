@@ -1,17 +1,17 @@
+// AI: purpose=Handlers for grid row operations and playback control in WriterForm; UI-only helpers with predictable side-effects.
+// AI: invariants=Grid fixed rows indices and column names (colData,colType,colDescription) are stable contracts used across the app.
+// AI: deps=Relies on SongGridManager, GridControlLinesManager, Midi services, and PartTrack DTO; renaming breaks many callers.
+// AI: change=If adding new grid behaviors update unit tests and grid population helpers accordingly.
+
 using System.Reflection;
 using Music.Generator;
 using Music.MyMidi;
 
 namespace Music.Writer
 {
-    /// <summary>
-    /// Grid operation handlers for WriterForm, now as a standalone class.
-    /// Each method receives only the dependencies it actually needs.
-    /// </summary>
     public class WriterFormGridOperations
     {
-        // ========== GRID ROW OPERATIONS ==========
-
+        // AI: HandleAddSongTrack: create an empty PartTrack row and select it; expects SongGridManager.AddNewPartTrack semantics.
         public void HandleAddSongTrack(DataGridView dgSong)
         {
             // Create an empty PartTrack and add it to the grid via the existing helper.
@@ -39,6 +39,7 @@ namespace Music.Writer
             }
         }
 
+        // AI: HandleDeleteSongTracks: removes selected non-fixed rows safely by deleting in descending order to avoid reindexing.
         public void HandleDeleteSongTracks(DataGridView dgSong)
         {
             if (dgSong.SelectedRows.Count == 0)
@@ -51,8 +52,6 @@ namespace Music.Writer
                 return;
             }
 
-            // Collect selected row indices and remove in descending order to avoid reindex issues
-            // Skip fixed rows
             var indices = dgSong.SelectedRows
                 .Cast<DataGridViewRow>()
                 .Select(r => r.Index)
@@ -67,6 +66,7 @@ namespace Music.Writer
             }
         }
 
+        // AI: HandleClearAll: clears all dynamic track rows and resets fixed-row data objects and measure displays.
         public void HandleClearAll(DataGridView dgSong)
         {
             // Remove all design and music track data
@@ -90,6 +90,7 @@ namespace Music.Writer
             SongGridManager.ResetTrackNumber();
         }
 
+        // AI: HandleClearSelected: clears selected rows; fixed rows clear their data, track rows reset to empty PartTrack and Select...
         public void HandleClearSelected(DataGridView dgSong)
         {
             if (dgSong.SelectedRows == null || dgSong.SelectedRows.Count == 0)
@@ -137,21 +138,14 @@ namespace Music.Writer
             dgSong.Refresh();
         }
 
-        // ========== PLAYBACK CONTROL ==========
-
-        /// <summary>
-        /// Handles Pause/Resume logic for the shared MidiPlaybackService.
-        /// Extracted from the form event handler to keep grid/event logic together.
-        /// </summary>
+        // AI: HandlePause: toggles play/pause using MidiPlaybackService public API. Catches invocation and general exceptions.
         public void HandlePause(MidiPlaybackService midiPlaybackService)
         {
-            // If there is no playback service, do nothing
             if (midiPlaybackService == null)
                 return;
 
             try
             {
-                // Use the playback service's public API when available.
                 if (midiPlaybackService.IsPlaying)
                 {
                     midiPlaybackService.Pause();

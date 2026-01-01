@@ -1,9 +1,12 @@
+// AI: purpose=DTO for WriterForm control values; provides safe defaults to simplify callers and reduce repeated fallback logic.
+// AI: invariants=Getters return usable defaults (e.g., StartBar>=1, Octave resolved, PartsState non-null) so callers can read without null checks.
+// AI: deps=Consumed by UI command handlers and transforms; changing property names or default semantics breaks serialization and UI logic.
+// AI: change=If adding fields update WriterFormTransform and any serializers; keep getters' default behavior stable.
+
 namespace Music.Writer
 {
-    // Data holder object for WriterForm user-editable values.
-    // - All properties are simple data types (strings, ints, bools, Dictionary<string,bool>)
-    // - Value types remain nullable for compatibility, but getters now provide sensible defaults
-    //   so callers can rely on the property value without repeating the same fallback logic.
+    // AI: WriterFormData is a lightweight, form-bound data holder; keep it free of business logic and side-effects.
+    // AI: design=backing fields nullable for serializer compatibility; getters supply pragmatic defaults for consumers.
     public sealed class WriterFormData
     {
         // General / ProposedPattern
@@ -51,6 +54,7 @@ namespace Music.Writer
 
         // Voices / scope
         // New: map of part name to checked state. Getter returns an empty dictionary when not set.
+        // AI: PartsState returns a case-insensitive map; callers may add keys; treat returned instance as mutable.
         public Dictionary<string, bool>? PartsState
         {
             get => _partsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -59,6 +63,7 @@ namespace Music.Writer
 
         // Sections / scope
         // New: map of section name to checked state. Getter returns an empty dictionary when not set.
+        // AI: SectionsState mirrors PartsState semantics; keep keys trimmed and case-insensitive when persisting.
         public Dictionary<string, bool>? SectionsState
         {
             get => _sectionsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -145,6 +150,7 @@ namespace Music.Writer
         // Derived effective octave (combines absolute/key-relative fallbacks).
         // Consumers that previously did: data.OctaveAbsolute ?? data.OctaveKeyRelative ?? 4
         // can now use this property to get the resolved octave.
+        // AI: Octave resolves to absolute then key-relative then 4; keep default 4 stable across versions.
         public int Octave
         {
             get => _octaveAbsolute ?? _octaveKeyRelative ?? 4;
@@ -194,6 +200,7 @@ namespace Music.Writer
         }
 
         // Always provide a default of 1 note when not explicitly set.
+        // AI: NumberOfNotes default ensures callers don't need to check for null; keep default=1 stable.
         public int? NumberOfNotes
         {
             get => _numberOfNotes ?? 1;
@@ -226,6 +233,7 @@ namespace Music.Writer
         }
 
         // Staff selection - list of selected staff numbers
+        // AI: SelectedStaffs returns an empty list when unset; callers may mutate the returned list.
         public List<int>? SelectedStaffs
         {
             get => _selectedStaffs ?? new List<int>();

@@ -1,22 +1,16 @@
+// AI: purpose=Manage fixed grid control lines (Section/Harmony/TimeSignature/Tempo rows) and attach their track data to the grid.
+// AI: invariants=Fixed rows use hidden "colData" cell to store track objects; columns represent measures starting at MEASURE_START_COLUMN_INDEX.
+// AI: deps=Consumers rely on SongGridManager constants and Music.Generator track shapes; changing names breaks many callers.
+// AI: change=If adding track types update attach helpers and any grid population logic to keep UI in sync.
+
 using Music.Designer;
 using Music.Generator;
 
 namespace Music.Writer
 {
-    /// <summary>
-    /// Manages the grid control lines (fixed rows) such as Tempo row population.
-    /// </summary>
     internal static class GridControlLinesManager
     {
-
-        #region AttachsectionTrack
-
-        /// <summary>
-        /// Public helper to attach a SectionTrack instance to the fixed Section row's hidden data cell.
-        /// Safe to call anytime after the grid's columns and rows have been created.
-        /// </summary>
-        /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="sectionTrack">SectionTrack to store in the hidden data cell (null to skip)</param>
+        // AI: AttachsectionTrack: safe no-op when sectionTrack null or grid not yet configured.
         public static void AttachsectionTrack(DataGridView dgSong, SectionTrack? sectionTrack)
         {
             if (sectionTrack == null)
@@ -32,11 +26,7 @@ namespace Music.Writer
             PopulateSectionRow(dgSong, sectionTrack);
         }
 
-        /// <summary>
-        /// Populates the fixed Section row with section numbers at their respective measure positions.
-        /// </summary>
-        /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="sectionTrack">SectionTrack containing section events</param>
+        // AI: PopulateSectionRow: writes SectionTrack into hidden cell and places section names at start-bar columns.
         private static void PopulateSectionRow(DataGridView dgSong, SectionTrack sectionTrack)
         {
             // Store the track in the hidden data cell
@@ -97,16 +87,7 @@ namespace Music.Writer
             }
         }
 
-        #endregion
-
-        #region AttachharmonyTrack
-
-        /// <summary>
-        /// Public helper to attach a HarmonyTrack instance to the fixed Harmony row's hidden data cell.
-        /// Safe to call anytime after the grid's columns and rows have been created.
-        /// </summary>
-        /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="harmonyTrack">HarmonyTrack to store in the hidden data cell (null to skip)</param>
+        // AI: AttachharmonyTrack: safe no-op when harmonyTrack null or grid not configured.
         public static void AttachharmonyTrack(DataGridView dgSong, HarmonyTrack? harmonyTrack)
         {
             if (harmonyTrack == null)
@@ -122,12 +103,7 @@ namespace Music.Writer
             PopulateHarmonyRow(dgSong, harmonyTrack);
         }
 
-        /// <summary>
-        /// Populates the fixed Harmony row with chord notation at their respective measure positions.
-        /// Multiple chords per measure are separated by line breaks.
-        /// </summary>
-        /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="harmonyTrack">HarmonyTrack containing harmony events</param>
+        // AI: PopulateHarmonyRow: groups events by StartBar and writes chord notation into measure cells, adding columns as needed.
         private static void PopulateHarmonyRow(DataGridView dgSong, HarmonyTrack harmonyTrack)
         {
             // Store the track in the hidden data cell
@@ -196,16 +172,7 @@ namespace Music.Writer
             }
         }
 
-        #endregion
-
-        #region AttachTimeSignatureTrack
-
-        /// <summary>
-        /// Public helper to attach a TimeSignatureTrack instance to the fixed Time Signature row's hidden data cell.
-        /// Safe to call anytime after the grid's columns and rows have been created.
-        /// </summary>
-        /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="timeSignatureTrack">TimeSignatureTrack to store in the hidden data cell (null to skip)</param>
+        // AI: AttachTimeSignatureTrack: safe no-op guard and then populate fixed row.
         public static void AttachTimeSignatureTrack(DataGridView dgSong, Timingtrack? timeSignatureTrack)
         {
             if (timeSignatureTrack == null)
@@ -221,11 +188,7 @@ namespace Music.Writer
             PopulateTimeSignatureRow(dgSong, timeSignatureTrack);
         }
 
-        /// <summary>
-        /// Populates the fixed Time Signature row with time signature values at their respective measure positions.
-        /// </summary>
-        /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="timeSignatureTrack">TimeSignatureTrack containing time signature events</param>
+        // AI: PopulateTimeSignatureRow: writes "N/D" at the StartBar column for each time signature event.
         private static void PopulateTimeSignatureRow(DataGridView dgSong, Timingtrack timeSignatureTrack)
         {
             // Store the track in the hidden data cell
@@ -275,17 +238,8 @@ namespace Music.Writer
                 }
             }
         }
-        
-        #endregion
 
-        #region AttachTempoTrack
-
-        /// <summary>
-        /// Public helper to attach a TempoTrack instance to the fixed Tempo row's hidden data cell.
-        /// Safe to call anytime after the grid's columns and rows have been created.
-        /// </summary>
-        /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="tempoTrack">TempoTrack to store in the hidden data cell (null to skip)</param>
+        // AI: AttachTempoTrack: guard then populate fixed tempo row.
         public static void AttachTempoTrack(DataGridView dgSong, TempoTrack? tempoTrack)
         {
             if (tempoTrack == null)
@@ -301,11 +255,7 @@ namespace Music.Writer
             PopulateTempoRow(dgSong, tempoTrack);
         }
 
-        /// <summary>
-        /// Populates the fixed Tempo row with BPM values at their respective measure positions.
-        /// </summary>
-        /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="tempoTrack">TempoTrack containing tempo events</param>
+        // AI: PopulateTempoRow: writes BPM string at StartBar column for each tempo event; adds columns dynamically.
         private static void PopulateTempoRow(DataGridView dgSong, TempoTrack tempoTrack)
         {
             // Store the track in the hidden data cell
@@ -354,16 +304,8 @@ namespace Music.Writer
                 }
             }
         }
-        
-        #endregion
 
-        #region GetTimeSignatureTrack
-
-        /// <summary>
-        /// Gets the TimeSignatureTrack from the fixed Time Signature row's hidden data cell.
-        /// </summary>
-        /// <param name="dgSong">Target DataGridView</param>
-        /// <returns>TimeSignatureTrack or null if not found</returns>
+        // AI: GetTimeSignatureTrack: returns Timingtrack stored in fixed row hidden cell or null when absent.
         public static Timingtrack? GetTimeSignatureTrack(DataGridView dgSong)
         {
             if (!dgSong.Columns.Contains("colData"))
@@ -374,7 +316,5 @@ namespace Music.Writer
 
             return dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE].Cells["colData"].Value as Timingtrack;
         }
-
-        #endregion
     }
 }

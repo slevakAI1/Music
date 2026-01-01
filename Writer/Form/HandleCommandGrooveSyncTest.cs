@@ -1,16 +1,17 @@
+// AI: purpose=Handler to generate groove-synced test tracks and add them to SongContext and UI grid.
+// AI: invariants=Uses HarmonyTrack.Events to compute totalBars; mutates songContext.Song.PartTracks and Grid; callers expect these side-effects.
+// AI: deps=Relies on Generator.Generator.Generate, SongGridManager.AddNewPartTrack, and GrooveTrack presets; changing generator API breaks this.
+// AI: perf=Generation may allocate; run on UI thread currently; consider backgrounding if UI stalls for large songs.
+
 using Music.Generator;
 
 namespace Music.Writer
 {
-    /// <summary>
-    /// Command handler for the groove-driven generator test.
-    /// </summary>
+    // AI: Command handler for groove-driven generator test; wraps generator call and updates UI grid with results.
     public static class HandleCommandGrooveSyncTest
     {
-        /// <summary>
-        /// Handles the Harmony Groove Sync Test command.
-        /// Generates synchronized test tracks using groove presets from the GrooveTrack track.
-        /// </summary>
+        // AI: HandleGrooveSyncTest: rebuilds BarTrack from HarmonyTrack, runs generator, appends 4 PartTracks to Song and grid.
+        // AI: errors=any exception is shown via ShowGrooveError; no retry or partial-commit logic.
         public static void HandleGrooveSyncTest(
             SongContext songContext,
             DataGridView dgSong)
@@ -43,6 +44,7 @@ namespace Music.Writer
 
         #region MessageBox
 
+        // AI: ShowGrooveSuccess: message text should remain stable for tests that assert success dialogs.
         private static void ShowGrooveSuccess(int addedCount)
         {
             MessageBoxHelper.Show(
@@ -52,6 +54,7 @@ namespace Music.Writer
                 MessageBoxIcon.Information);
         }
 
+        // AI: ShowGrooveError: shows exception message; avoid leaking sensitive info in production UI.
         private static void ShowGrooveError(Exception ex)
         {
             MessageBoxHelper.Show(

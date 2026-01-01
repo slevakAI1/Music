@@ -1,12 +1,13 @@
+// AI: purpose=Manage WriterForm song grid layout and fixed control rows (voice/section/harmony/time/tempo).
+// AI: invariants=Fixed rows 0..8 are reserved; MEASURE_START_COLUMN_INDEX is the canonical start for measure columns.
+// AI: deps=Grid consumers rely on hidden "colData" to store track objects; changing cell names breaks multiple callers.
+// AI: change=If adding control lines update InitializeFixedRows and GridControlLinesManager attachers to keep UI in sync.
+
 using Music.Generator;
 using Music.MyMidi;
 
 namespace Music.Writer
 {
-    /// <summary>
-    /// Manages adding song components to the dgSong DataGridView control
-    /// on the WriterForm form. Components include Sections, Harmonies, Time Signatures, Tempos, PartTrackNoteEvents
-    /// </summary>
     internal static class SongGridManager
     {
         // Constants for the four fixed rows at the top of the grid
@@ -30,22 +31,13 @@ namespace Music.Writer
         // Track the next available track number for display purposes
         private static int _nextTrackNumber = 0;
 
-        /// <summary>
-        /// Resets the track number counter (useful when clearing all tracks or starting fresh).
-        /// </summary>
+        // AI: ResetTrackNumber resets the display counter; used when clearing grid to reuse numbering.
         public static void ResetTrackNumber()
         {
             _nextTrackNumber = 0;
         }
 
-        /// <summary>
-        /// Configures the dgSong DataGridView with proper columns including MIDI instrument dropdown.
-        /// </summary>
-        /// <param name="dgSong">The DataGridView to configure</param>
-        /// <param name="midiInstruments">List of available MIDI instruments</param>
-        /// <param name="cellValueChangedHandler">Event handler for cell value changes</param>
-        /// <param name="currentCellDirtyStateChangedHandler">Event handler for dirty state changes</param>
-        /// <param name="tempoTrack">Optional TempoTrack to place into the fixed Tempo row hidden data cell</param>
+        // AI: ConfigureSongGridView: build columns, wire events, and initialize fixed rows. Keep column and fixed-row contracts stable.
         internal static void ConfigureSongGridView(
             DataGridView dgSong,
             DataGridViewCellEventHandler cellValueChangedHandler,
@@ -84,9 +76,9 @@ namespace Music.Writer
             var colType = new DataGridViewTextBoxColumn
             {
                 Name = "colType",
-                HeaderText = "", // Changed from "Type" to empty string
+                HeaderText = "",
                 Width = 200,
-                ReadOnly = false // Will be set per-cell basis in InitializeFixedRows
+                ReadOnly = false
             };
             dgSong.Columns.Add(colType);
 
@@ -94,7 +86,7 @@ namespace Music.Writer
             var colDescription = new DataGridViewTextBoxColumn
             {
                 Name = "colDescription",
-                HeaderText = "", // Changed from "Description" to empty string
+                HeaderText = "",
                 Width = 150,
                 ReadOnly = true,
                 DefaultCellStyle = new DataGridViewCellStyle
@@ -105,7 +97,6 @@ namespace Music.Writer
             dgSong.Columns.Add(colDescription);
 
             // Columns 4+: Measure columns (dynamically created)
-            // Create initial set of measure columns
             for (int i = 0; i < DEFAULT_MEASURE_COLUMNS; i++)
             {
                 var colMeasure = new DataGridViewTextBoxColumn
@@ -122,13 +113,11 @@ namespace Music.Writer
                 dgSong.Columns.Add(colMeasure);
             }
 
-            // Ensure existing columns are not sortable and make future added columns not sortable as well
             foreach (DataGridViewColumn col in dgSong.Columns)
             {
                 col.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             }
 
-            // This is an event handler!
             dgSong.ColumnAdded += (s, e) =>
             {
                 if (e?.Column != null)
@@ -139,30 +128,20 @@ namespace Music.Writer
             dgSong.CellValueChanged += cellValueChangedHandler;
             dgSong.CurrentCellDirtyStateChanged += currentCellDirtyStateChangedHandler;
 
-            // Add the fixed rows at the top and optionally attach tempoTrack to the hidden data cell
+            // Add the fixed rows at the top and optionally attach tracks
             InitializeFixedRows(dgSong, designer);
         }
 
-        /// <summary>
-        /// Initializes the fixed rows at the top of the grid.
-        /// Entire fixed rows are set to ReadOnly so users cannot edit them.
-        /// If a TempoTrack is provided it will be stored in the fixed Tempo row's hidden data cell.
-        /// The separator row is styled with black background and white foreground.
-        /// </summary>
+        // AI: InitializeFixedRows: creates fixed rows in defined order and styles separator rows. Do not reorder fixed row indices.
         private static void InitializeFixedRows(
             DataGridView dgSong,
             SongContext? songContext = null)
         {
-            // Add fixed rows
             for (int i = 0; i < FIXED_ROWS_COUNT; i++)
             {
                 dgSong.Rows.Add();
             }
 
-            // Set Type column values for the fixed rows and mark each row read-only
-
-
-            // Set Type column values for the fixed rows and mark each row read-only
             dgSong.Rows[FIXED_ROW_VOICE].Cells["colType"].Value = "Voice";
             dgSong.Rows[FIXED_ROW_VOICE].Cells["colType"].ReadOnly = true;
             dgSong.Rows[FIXED_ROW_VOICE].ReadOnly = true;
@@ -183,51 +162,40 @@ namespace Music.Writer
             dgSong.Rows[FIXED_ROW_HARMONY].Cells["colType"].ReadOnly = true;
             dgSong.Rows[FIXED_ROW_HARMONY].ReadOnly = true;
 
-
             dgSong.Rows[FIXED_ROW_TEMPO].Cells["colType"].Value = "Tempo";
             dgSong.Rows[FIXED_ROW_TEMPO].Cells["colType"].ReadOnly = true;
             dgSong.Rows[FIXED_ROW_TEMPO].ReadOnly = true;
 
-            // Separator row: style black background and white foreground across entire row
             var sepRow1 = dgSong.Rows[FIXED_ROW_SEPARATOR_1];
-            sepRow1.Cells["colDescription"].Value = "Design"; // Changed from string.Empty to "Design"
+            sepRow1.Cells["colDescription"].Value = "Design";
             sepRow1.Cells["colType"].ReadOnly = true;
             sepRow1.ReadOnly = true;
 
-            // Apply row styling (including selection colors so selection doesn't hide the appearance)
             sepRow1.DefaultCellStyle.BackColor = Color.Black;
             sepRow1.DefaultCellStyle.ForeColor = Color.White;
             sepRow1.DefaultCellStyle.SelectionBackColor = Color.Black;
             sepRow1.DefaultCellStyle.SelectionForeColor = Color.White;
 
-            //  ====================================================================================
-
-            // Separator row: style black background and white foreground across entire row
             var sepRow2 = dgSong.Rows[FIXED_ROW_SEPARATOR_2];
-            // ensure the Type cell exists and is readonly
-            sepRow2.Cells["colDescription"].Value = "Midi"; // Changed from string.Empty to "Midi"
+            sepRow2.Cells["colDescription"].Value = "Midi";
             sepRow2.Cells["colType"].ReadOnly = true;
             sepRow2.ReadOnly = true;
 
-            // Apply row styling (including selection colors so selection doesn't hide the appearance)
             sepRow2.DefaultCellStyle.BackColor = Color.Black;
             sepRow2.DefaultCellStyle.ForeColor = Color.White;
             sepRow2.DefaultCellStyle.SelectionBackColor = Color.Black;
             sepRow2.DefaultCellStyle.SelectionForeColor = Color.White;
 
             var sepRow3 = dgSong.Rows[FIXED_ROW_SEPARATOR_3];
-            // ensure the Type cell exists and is readonly
             sepRow3.Cells["colType"].Value = string.Empty;
             sepRow3.Cells["colType"].ReadOnly = true;
             sepRow3.ReadOnly = true;
 
-            // Apply row styling (including selection colors so selection doesn't hide the appearance)
             sepRow3.DefaultCellStyle.BackColor = Color.Black;
             sepRow3.DefaultCellStyle.ForeColor = Color.White;
             sepRow3.DefaultCellStyle.SelectionBackColor = Color.Black;
             sepRow3.DefaultCellStyle.SelectionForeColor = Color.White;
 
-            // Delegate attaching the control lines to the control line manager class
             if (songContext != null)
             {
                 GridControlLinesManager.AttachsectionTrack(dgSong, songContext.SectionTrack);
@@ -237,23 +205,15 @@ namespace Music.Writer
             }
         }
 
-        /// <summary>
-        /// Populates the measure columns for a song row based on the PartTrack object's notes.
-        /// Uses the active time signature for each bar to correctly group notes.
-        /// </summary>
-        /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="rowIndex">Index of the row to populate</param>
-        /// <param name="timeSignatureTrack">The time signature track for the song</param>
+        // AI: PopulatePartMeasureNoteCount: counts notes per bar using timeSignatureTrack.GetActiveTimeSignatureEvent and ticks math.
         public static void PopulatePartMeasureNoteCount(DataGridView dgSong, int rowIndex, Timingtrack timeSignatureTrack)
         {
-            // Skip fixed rows
             if (rowIndex < FIXED_ROWS_COUNT || rowIndex >= dgSong.Rows.Count)
                 return;
 
             var row = dgSong.Rows[rowIndex];
             var track = row.Cells["colData"].Value as PartTrack;
 
-            // Clear existing measure cells first
             for (int colIndex = MEASURE_START_COLUMN_INDEX; colIndex < dgSong.Columns.Count; colIndex++)
             {
                 row.Cells[colIndex].Value = string.Empty;
@@ -265,11 +225,9 @@ namespace Music.Writer
             if (timeSignatureTrack == null || timeSignatureTrack.Events.Count == 0)
                 return;
 
-            // Determine the maximum bar number we need to process
             long maxTicks = track.PartTrackNoteEvents.Max(n => n.AbsoluteTimeTicks);
             int estimatedMaxBar = 100; // Start with a reasonable estimate
 
-            // Build a map of bar -> note count by iterating through bars with accumulated ticks
             var noteCountByBar = new Dictionary<int, int>();
             int currentTick = 0;
 
@@ -283,7 +241,6 @@ namespace Music.Writer
                 int barStartTick = currentTick;
                 int barEndTick = currentTick + ticksPerMeasure;
 
-                // Count notes that start in this bar
                 int noteCount = track.PartTrackNoteEvents
                     .Count(note => note.AbsoluteTimeTicks >= barStartTick && note.AbsoluteTimeTicks < barEndTick);
 
@@ -294,12 +251,10 @@ namespace Music.Writer
 
                 currentTick += ticksPerMeasure;
 
-                // Stop if we've passed all notes
                 if (currentTick > maxTicks)
                     break;
             }
 
-            // Ensure we have enough columns for all measures
             if (noteCountByBar.Any())
             {
                 int maxMeasure = noteCountByBar.Keys.Max();
@@ -322,7 +277,6 @@ namespace Music.Writer
                     dgSong.Columns.Add(colMeasure);
                 }
 
-                // Populate measure cells with note counts
                 foreach (var kvp in noteCountByBar)
                 {
                     int bar = kvp.Key;
@@ -337,12 +291,7 @@ namespace Music.Writer
             }
         }
 
-        /// <summary>
-        /// Clears the measure display cells (columns MEASURE_START_COLUMN_INDEX and onward) for the specified row.
-        /// Safe to call for both fixed rows and track rows.
-        /// </summary>
-        /// <param name="dgSong">Target DataGridView</param>
-        /// <param name="rowIndex">Row index whose measure cells should be cleared</param>
+        // AI: ClearMeasureCellsForRow: clears display cells from MEASURE_START_COLUMN_INDEX onward for a given row.
         public static void ClearMeasureCellsForRow(DataGridView dgSong, int rowIndex)
         {
             if (dgSong == null || rowIndex < 0 || rowIndex >= dgSong.Rows.Count)
@@ -355,12 +304,7 @@ namespace Music.Writer
             }
         }
 
-        /// <summary>
-        /// Handles the CurrentCellDirtyStateChanged event to commit combo box edits immediately.
-        /// </summary>
-        /// <param name="dgSong">The DataGridView</param>
-        /// <param name="sender">Event sender</param>
-        /// <param name="e">Event args</param>
+        // AI: HandleCurrentCellDirtyStateChanged: commits combo edits immediately so CellValueChanged fires promptly.
         internal static void HandleCurrentCellDirtyStateChanged(DataGridView dgSong, object? sender, EventArgs e)
         {
             if (dgSong.IsCurrentCellDirty && dgSong.CurrentCell is DataGridViewComboBoxCell)
@@ -369,65 +313,43 @@ namespace Music.Writer
             }
         }
 
-        /// <summary>
-        /// Handles the CellValueChanged event to update ProposedSong objects when instrument selection changes.
-        /// </summary>
-        /// <param name="dgSong">The DataGridView</param>
-        /// <param name="sender">Event sender</param>
-        /// <param name="e">Event args</param>
+        // AI: HandleCellValueChanged: only handles instrument dropdown changes for song rows; updates PartTrack.MidiProgramName.
         internal static void HandleCellValueChanged(DataGridView dgSong, object? sender, DataGridViewCellEventArgs e)
         {
-            // Skip fixed rows
             if (e.RowIndex < FIXED_ROWS_COUNT)
                 return;
 
-            // Only handle changes to the Type column (which now contains the instrument dropdown for song rows)
             if (e.RowIndex < 0 || e.ColumnIndex != dgSong.Columns["colType"]?.Index)
                 return;
 
             var row = dgSong.Rows[e.RowIndex];
             var cellValue = row.Cells["colData"].Value;
 
-            // Check if the hidden data cell contains a PartTrack object
             if (cellValue is PartTrack songTrack)
             {
-                // Get the selected instrument name
                 var selectedInstrumentName = row.Cells["colType"].FormattedValue?.ToString();
 
                 if (!string.IsNullOrEmpty(selectedInstrumentName))
                 {
-                    // Update the PartTrack object's MidiProgramName property
                     songTrack.MidiProgramName = selectedInstrumentName;
-
-                    // Optionally update the description column to reflect the change
                     row.Cells["colDescription"].Value = $"Part: {selectedInstrumentName}";
                 }
             }
         }
 
-        /// <summary>
-        /// Adds a track to the song grid with instrument information from the track itself.
-        /// Automatically assigns the next available track number.
-        /// </summary>
-        /// <param name="track">The track to add</param>
-        /// <param name="dgSong">The DataGridView to add to</param>
+        // AI: AddNewPartTrack: appends a PartTrack row, configures instrument combo, sets hidden data, and populates measure counts.
         internal static void AddNewPartTrack(
             PartTrack track,
             DataGridView dgSong)
         {
-            // Automatically assign and increment track number
             _nextTrackNumber++;
             var rowName = _nextTrackNumber.ToString();
 
-            // Get part name from the track
             var voiceName = track.MidiProgramName ?? "Select...";
 
-            // Add new row
             int newRowIndex = dgSong.Rows.Add();
             var row = dgSong.Rows[newRowIndex];
 
-            // Column 0: Type column - convert to combo box for this row
-            // Replace the text box cell with a combo box cell
             var comboBoxCell = new DataGridViewComboBoxCell
             {
                 DataSource = new List<MidiVoices>(MidiVoices.MidiVoiceList()),
@@ -438,10 +360,8 @@ namespace Music.Writer
             };
             row.Cells["colType"] = comboBoxCell;
 
-            // Column 1: Hidden data (PartTrack object)
             row.Cells["colData"].Value = track;
 
-            // Set MIDI Instrument dropdown value
             int programNumberToSet = -1;
 
             if (track.MidiProgramNumber <= 127 || track.MidiProgramNumber == 255)
@@ -451,10 +371,8 @@ namespace Music.Writer
 
             row.Cells["colType"].Value = programNumberToSet;
 
-            // Column 2: Event number
             row.Cells["colEventNumber"].Value = rowName;
 
-            // Column 3: Description
             if (!string.IsNullOrEmpty(voiceName) && voiceName != "Select...")
             {
                 row.Cells["colDescription"].Value = $"Part: {voiceName}";
@@ -464,10 +382,8 @@ namespace Music.Writer
                 row.Cells["colDescription"].Value = string.Empty;
             }
 
-            // Get TimeSignatureTrack from the grid or use a default one
             var timeSignatureTrack = GridControlLinesManager.GetTimeSignatureTrack(dgSong);
 
-            // Populate measure cells (columns 4+) with note counts per measure
             PopulatePartMeasureNoteCount(dgSong, newRowIndex, timeSignatureTrack);
         }
     }

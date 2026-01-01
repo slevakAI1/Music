@@ -1,9 +1,14 @@
-﻿namespace Music.Writer
+﻿// AI: purpose=Map between WriterForm controls and WriterFormData DTO; capture/apply UI state consistently.
+// AI: invariants=Capture/Apply must remain symmetrical; control names and expected item values are stable contracts.
+// AI: deps=Called by WriterForm to persist UI prefs; changing properties requires updating WriterForm and tests.
+// AI: change=If adding new controls, update CaptureFormData, ApplyFormData, WriterFormData, and tests in tandem.
+
+namespace Music.Writer
 {
-    // Converted helper into a separate class that receives control references as parameters
+    // AI: Pure transform class: keep UI logic here, avoid business logic; methods accept control refs to aid unit testing.
     public class WriterFormTransform
     {
-        // Capture current control values into a class object.
+        // AI: CaptureFormData: read control values into a WriterFormData; null-safe for optional controls, uses defaults.
         public WriterFormData CaptureFormData(
             ComboBox? cbCommand,
             CheckedListBox? clbParts,
@@ -110,7 +115,8 @@
             return data;
         }
 
-        // Apply a WriterData object back to the form controls.
+        // AI: ApplyFormData: sets control states from WriterFormData; operations are idempotent and safe to call repeatedly.
+        // AI: note=Clears and repopulates clbParts to match data.PartsState exactly; preserves numeric control bounds via LimitRange.
         public void ApplyFormData(
             WriterFormData? data,
             ComboBox? cbCommand,
@@ -254,6 +260,7 @@
                 cbChordBase.SelectedItem = data.ChordBase;
         }
         // Forces the value for a numeric up-down control to an integer within its min/max range.
+        // AI: LimitRange clamps integer value into control bounds and returns decimal for assignment to NumericUpDown.Value.
         public static decimal LimitRange(NumericUpDown control, int value)
         {
             var min = (int)control.Minimum;
