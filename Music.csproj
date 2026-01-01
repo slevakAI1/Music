@@ -47,10 +47,10 @@
 
   <ItemGroup>
     <EmbeddedResource Remove="Archives\SerializerTestForm.resx" />
-    <EmbeddedResource Remove="Writer\Form\ConsoleTransform.resx" />
-    <EmbeddedResource Remove="Writer\Form\WriterForm.DataBinder.resx" />
-    <EmbeddedResource Remove="Writer\Form\WriterFormEvents.resx" />
-    <EmbeddedResource Remove="Writer\Form\WriterFormGridOperations.resx" />
+    <EmbeddedResource Remove="Writer\WriterForm\ConsoleTransform.resx" />
+    <EmbeddedResource Remove="Writer\WriterForm\WriterForm.DataBinder.resx" />
+    <EmbeddedResource Remove="Writer\WriterForm\WriterFormEvents.resx" />
+    <EmbeddedResource Remove="Writer\WriterForm\WriterFormGridOperations.resx" />
   </ItemGroup>
 
   <ItemGroup>
