@@ -1,3 +1,4 @@
+using Music.Generator;
 using Music.MyMidi;
 
 namespace Music.Writer
@@ -42,7 +43,7 @@ namespace Music.Writer
                 .Select((track, index) => new 
                 { 
                     ProgramNumber = track.MidiProgramNumber, 
-                    Events = track.PartTrackNoteEvents.Where(e => e.Type != MidiEventType.SequenceTrackName).ToList() // Skip duplicate track names
+                    Events = track.PartTrackNoteEvents.Where(e => e.Type != PartTrackEventType.SequenceTrackName).ToList() // Skip duplicate track names
                 })
                 .GroupBy(x => x.ProgramNumber)
                 .Select(g => new
@@ -75,10 +76,10 @@ namespace Music.Writer
 
                 foreach (var evt in mergedEvents)
                 {
-                    if (evt.Type == MidiEventType.NoteOn || 
-                        evt.Type == MidiEventType.NoteOff || 
-                        evt.Type == MidiEventType.ProgramChange ||
-                        evt.Type == MidiEventType.ControlChange)
+                    if (evt.Type == PartTrackEventType.NoteOn || 
+                        evt.Type == PartTrackEventType.NoteOff || 
+                        evt.Type == PartTrackEventType.ProgramChange ||
+                        evt.Type == PartTrackEventType.ControlChange)
                     {
                         evt.Parameters["Channel"] = channel;
                     }

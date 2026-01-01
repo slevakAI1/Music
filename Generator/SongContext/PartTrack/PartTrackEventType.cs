@@ -1,10 +1,10 @@
-namespace Music.MyMidi
+namespace Music.Generator
 {
     /// <summary>
     /// Represents the type of MIDI event (channel, meta, or system exclusive).
     /// </summary>
 
-    public enum MidiEventType
+    public enum PartTrackEventType
     {
         // ----------------------------
         // Meta events (SMF track-level)

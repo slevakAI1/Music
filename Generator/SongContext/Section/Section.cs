@@ -1,23 +1,23 @@
-﻿namespace Music.Generator
-{
-    // This class represents one section of a song. A song is composed of a List<Section>.
-    // The sections are assumed to be in order.
-    // The first section is assumed to start at bar 1, beat 1.
-    // Each section in a song is assumed to start at the next bar/beat immediately after the
-    //   previous section.
-    // Section durations (BarCount) are currently limited to whole bars.
+﻿// AI: purpose=Model a song section used by arrangers and editors to build song structure (start bar + bar count).
+// AI: invariants=Sections are ordered; first section starts at bar 1; sections should start immediately after previous section.
+// AI: deps=Consumed by song-building, UI and persistence; renaming props or changing semantics breaks serializers and editors.
+// AI: constraints=StartBar is 1-based >=1; BarCount is whole bars only; Name may be null; SectionType must map to MusicConstants.eSectionType.
 
+namespace Music.Generator
+{
+    // AI: data-only DTO; contains minimal metadata; avoid adding logic here (editors/serializers expect plain properties).
     public class Section
     {
-        // Event Data
+        // AI: SectionType: enum value used for defaults/labels; keep enum names stable for UI mapping.
         public MusicConstants.eSectionType SectionType { get; set; }
 
+        // AI: Name: optional human label for the section; may be null or empty; used in UI only.
         public string? Name { get; set; }
 
-        // StartBar is 1-based
+        // AI: StartBar: 1-based bar index where this section begins; validators expect >=1 and contiguous ordering.
         public int StartBar { get; set; }
 
-        // For data entry assist only
+        // AI: BarCount: whole bars only; default 4; changing to fractional bars requires updating all layout logic.
         public int BarCount { get; set; } = 4;
     }
 }

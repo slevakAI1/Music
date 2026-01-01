@@ -1,16 +1,16 @@
+// AI: purpose=Runtime validator for pitch randomization used in tests/debug; verifies constraints, determinism, and variation.
+// AI: invariants=Validators treat Warnings as non-fatal; IsValid == (Errors.Count==0); do not change that semantics.
+// AI: deps=relies on PitchClassUtils, RandomHelpers, and PitchRandomizer seeding; changing RNG/seed breaks determinism tests.
+// AI: perf=not hotpath; used in test/debug only; keep error strings stable for test assertions.
+// TODO? confirm bass/guitar range thresholds mirror production ranges in PitchRandomizer constants.
+
 using System.Text;
 
 namespace Music.Generator
 {
-    /// <summary>
-    /// Validates that randomized pitch generation follows all constraints.
-    /// Use for testing and debug verification.
-    /// </summary>
+    // AI: ValidationResult: IsValid derives from Errors only; Warnings are advisory and preserved for diagnostics.
     public static class RandomizationValidator
     {
-        /// <summary>
-        /// Result of a validation check.
-        /// </summary>
         public sealed class ValidationResult
         {
             public bool IsValid { get; init; }
@@ -40,9 +40,7 @@ namespace Music.Generator
             }
         }
 
-        /// <summary>
-        /// Validates a bass note against constraints.
-        /// </summary>
+        // AI: ValidateBassPitch: error if not root/fifth or not in key; range warning is advisory and may differ from generator consts.
         public static ValidationResult ValidateBassPitch(int midiNote, HarmonyPitchContext ctx)
         {
             var errors = new List<string>();
@@ -78,9 +76,7 @@ namespace Music.Generator
             };
         }
 
-        /// <summary>
-        /// Validates a guitar note against constraints.
-        /// </summary>
+        // AI: ValidateGuitarPitch: errors for out-of-scale or non-chord on strong beats; range is advisory.
         public static ValidationResult ValidateGuitarPitch(
             int midiNote, 
             HarmonyPitchContext ctx, 
@@ -117,9 +113,7 @@ namespace Music.Generator
             };
         }
 
-        /// <summary>
-        /// Validates a keys/pad chord voicing against constraints.
-        /// </summary>
+        // AI: ValidateKeysVoicing: errors if any note outside key; warns if root missing (voicing may still be valid).
         public static ValidationResult ValidateKeysVoicing(
             IReadOnlyList<int> midiNotes, 
             HarmonyPitchContext ctx)
@@ -155,9 +149,7 @@ namespace Music.Generator
             };
         }
 
-        /// <summary>
-        /// Tests determinism: generates with same seed twice and verifies identical results.
-        /// </summary>
+        // AI: TestDeterminism: uses two independent randomizers with same settings; any RNG/seed change breaks this.
         public static ValidationResult TestDeterminism(
             RandomizationSettings settings, 
             HarmonyPitchContext ctx,
@@ -205,9 +197,7 @@ namespace Music.Generator
             };
         }
 
-        /// <summary>
-        /// Tests that different seeds produce different results (variation test).
-        /// </summary>
+        // AI: TestVariation: checks that different seeds produce some difference; it's heuristic and reports warning if none found.
         public static ValidationResult TestVariation(HarmonyPitchContext ctx)
         {
             var errors = new List<string>();

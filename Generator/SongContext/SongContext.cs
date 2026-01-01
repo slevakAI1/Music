@@ -1,40 +1,31 @@
 ﻿namespace Music.Generator
 {
-    /// <summary>
-    /// Design structure for a song.
-    /// </summary>
+    // AI: DTO used by editors and generation pipeline. Keep property names and default initializations stable.
     public sealed class SongContext
     {
         public SongContext()
         {
         }
 
-        /// <summary>
-        /// Current bar (1-based).
-        /// </summary>
+        // AI: CurrentBar: 1-based index into the design; editors and generators rely on this convention.
         public int CurrentBar { get; set; } = 1;
 
-        /// <summary>
-        /// Design bar track (initialised to avoid null checks).
-        /// </summary>
+        // AI: BarTrack pre-initialized to avoid null checks; contains measure tick mapping used during generation.
         public BarTrack BarTrack { get; set; } = new();
 
-        /// <summary>
-        /// Design groove track (initialised to avoid null checks).
-        /// </summary>
+        // AI: GrooveTrack pre-initialized; holds groove events applied during generation. Consumers must normalize lists.
         public GrooveTrack GrooveTrack { get; set; } = new();
 
-        // Harmony track persisted with the design (optional)
+        // AI: HarmonyTrack persisted with design; may be empty. Used to build HarmonyPitchContext for generators.
         public HarmonyTrack HarmonyTrack { get; set; } = new();
 
+        // AI: SectionTrack contains ordered, contiguous song sections; builders rely on StartBar assignment logic there.
         public SectionTrack SectionTrack { get; set; } = new();
 
-        /// <summary>
-        /// Song being generated
-        /// </summary>
+        // AI: Song: output runtime song populated by generator; contains tempo/time signature and rendered PartTracks.
         public Song Song { get; set; } = new();
 
-        // Design space
+        // AI: Voices: design-time voice set used to map roles to instruments; keep VoiceName stable for MIDI mapping.
         public VoiceSet Voices { get; set; } = new();
     }
 }

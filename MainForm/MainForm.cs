@@ -1,3 +1,8 @@
+// AI: purpose=Main MDI host: wires MIDI IO and playback services and shows WriterForm on startup.
+// AI: invariants=Runs on UI thread; MidiIoService/MidiPlaybackService used synchronously from UI handlers; AppState stores current song.
+// AI: deps=Depends on Music.Writer.WriterForm, MidiIoService, MidiPlaybackService, AppState.CurrentSong. Do not change child form ctor expectations.
+// AI: perf=UI code; avoid long-running work on UI thread; services may block so dispatch to background if needed.
+
 using Music.MyMidi;
 using Music.Writer;
 
@@ -28,7 +33,8 @@ namespace Music
 
         }
 
-        // Show or activate a child form. Let the child manage its own size/state.
+        // AI: ShowChildForm: finds existing MDI child by exact type or creates a new instance via Activator.
+        // AI: note=childType must be a Form type with a parameterless constructor; method does not force size/style beyond MDI parenting.
         private void ShowChildForm(Type childType)
         {
             var existing = this.MdiChildren.FirstOrDefault(f => f.GetType() == childType);
@@ -46,6 +52,7 @@ namespace Music
             child.Show();
         }
 
+        // AI: ShowStatus updates the first StatusStrip item text if present; UI-only helper.
         private void ShowStatus(String message)
         {
             if (statusStrip1 != null && statusStrip1.Items.Count > 0)

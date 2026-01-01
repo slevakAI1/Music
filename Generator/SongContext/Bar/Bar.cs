@@ -1,44 +1,42 @@
-﻿namespace Music.Generator
+﻿// AI: purpose=Represents a musical bar; authoritative StartTick; caches timing values.
+// AI: invariants=Numerator>0; Denominator!=0; StartTick init-only; caches stale if TS fields change.
+// AI: deps=MusicConstants.TicksPerQuarterNote; thread-safety=none; change=when altering TS, clear caches & notify callers.
+
+namespace Music.Generator
 {
+    // AI: type=Bar; owns=bar timing/TS; not=validation heavy; callers maintain TS validity and Start/End consistency.
     public class Bar
     {
+        // AI: logical position; no enforcement of 0/1 base; callers maintain uniqueness/order if required.
         public int BarNumber;
 
+        // AI: absolute tick for bar end; no enforced relation to StartTick; inclusive/exclusive convention is external.
         public long EndTick;  
         
+        // AI: TS numerator; must be positive; changing after cache access yields stale cached values.
         public int Numerator;
 
+        // AI: TS denominator; must be non-zero and a valid musical subdivision; changing after cache access stale.
         public int Denominator;
 
-        // Computed properties
+        // AI: cached derived values; lazily computed; not thread-safe; to refresh set these to null where used.
         private int? _ticksPerMeasure;
         private int? _ticksPerBeat;
         private int? _beatsPerBar;
 
-        /// <summary>
-        /// Ticks per measure calculated once and cached.
-        /// Formula: ticksPerQuarterNote * (numerator * 4 / denominator)
-        /// </summary>
+        // AI: computed=(TicksPerQuarterNote*4*Numerator)/Denominator; integer division truncates remainder; cached.
         public int TicksPerMeasure => _ticksPerMeasure ??= (MusicConstants.TicksPerQuarterNote * 4 * Numerator) / Denominator;
 
-        /// <summary>
-        /// Ticks per beat (the beat unit defined by the time signature).
-        /// Derived from TicksPerMeasure divided by the numerator for consistency.
-        /// </summary>
+        // AI: computed=TicksPerMeasure/Numerator; integer division truncates; cached; depends on TicksPerMeasure.
         public int TicksPerBeat => _ticksPerBeat ??= TicksPerMeasure / Numerator;
 
-        /// <summary>
-        /// Beats per bar - for simple meters this equals the numerator.
-        /// For compound meters (e.g., 6/8, 9/8, 12/8), this returns numerator / 3 to represent the compound beat groupings.
-        /// </summary>
+        // AI: computed=musical beats in bar; heuristic: for 6/8,9/8,12/8 returns Numerator/3; cached.
         public int BeatsPerBar => _beatsPerBar ??= CalculateBeatsPerBar();
 
-        /// <summary>
-        /// Absolute time position in ticks from the start of the track.
-        /// This is the source of truth for event timing.
-        /// </summary>
+        // AI: authoritative start tick for events in this bar; init-only: set at creation and not modified.
         public long StartTick { get; init; }
 
+        // AI: heuristic for compound meters: if Denominator==8 and Numerator divisible by 3 and >=6, group beats by 3.
         private int CalculateBeatsPerBar()
         {
             // Detect common compound meters: 6/8, 9/8, 12/8

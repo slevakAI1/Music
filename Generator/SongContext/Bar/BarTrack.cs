@@ -1,20 +1,20 @@
 ﻿namespace Music.Generator
 { 
+    // AI: purpose=Represents derived sequence of Bars for one track; not the authoritative timing source.
+    // AI: invariants=Bar.BarNumber is 1-based; Bars list mirrors last RebuildFromTimingTrack(); StartTick strictly increases.
+    // AI: deps=Depends on Timingtrack.Events providing StartBar,Numerator,Denominator; caller must validate events.
+    // AI: change=If changing timing calc update GetActiveTimingEvent and keep numbering/tick semantics stable.
+
     public class BarTrack
     {
         private List<Bar> _bars = new();
 
-        /// <summary>
-        /// Gets the list of bars (read-only access).
-        /// </summary>
+        // AI: Bars: live IReadOnlyList wrapper over internal list; reflects rebuild/clear; not thread-safe.
         public IReadOnlyList<Bar> Bars => _bars.AsReadOnly();
 
-        /// <summary>
-        /// Rebuilds the entire bar track from a timing track.
-        /// Each bar inherits its time signature from the active TimingEvent.
-        /// </summary>
-        /// <param name="timingTrack">The timing track containing time signature events</param>
-        /// <param name="totalBars">Number of bars to generate (default 100)</param>
+        // AI: RebuildFromTimingTrack: derive bars using latest TimingEvent with StartBar<=barNumber.
+        // AI: behavior: skips bars with no active event; totalBars is a maximum cap; non-positive totalBars yields no loop.
+        // AI: tickcalc: StartTick starts at 0 and advances by each bar's TicksPerMeasure; relies on Bar.TicksPerMeasure.
         public void RebuildFromTimingTrack(Timingtrack timingTrack, int totalBars = 100)
         {
             _bars.Clear();
@@ -62,10 +62,7 @@
             }
         }
 
-        /// <summary>
-        /// Gets the active timing event for a given bar.
-        /// Returns the most recent timing event that starts on or before this bar.
-        /// </summary>
+        // AI: GetActiveTimingEvent: returns last event with StartBar<=barNumber or null; expects sortedEvents asc.
         private TimingEvent? GetActiveTimingEvent(List<TimingEvent> sortedEvents, int barNumber)
         {
             TimingEvent? activeEvent = null;
@@ -83,17 +80,13 @@
             return activeEvent;
         }
 
-        /// <summary>
-        /// Gets a bar by its bar number (1-based).
-        /// </summary>
+        // AI: GetBar: returns matching Bar by BarNumber or null if not present (skipped or cleared).
         public Bar? GetBar(int barNumber)
         {
             return _bars.FirstOrDefault(b => b.BarNumber == barNumber);
         }
 
-        /// <summary>
-        /// Clears all bars.
-        /// </summary>
+        // AI: Clear: destructive; resets internal list only; callers must RebuildFromTimingTrack to repopulate.
         public void Clear()
         {
             _bars.Clear();

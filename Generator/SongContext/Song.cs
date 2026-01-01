@@ -1,29 +1,18 @@
 ﻿namespace Music.Generator
 {
-    /// <summary>
-    /// The complete generated song, containing all tracks and temporal data.
-    /// This is the runtime representation of a composed piece, separate from design templates.
-    /// </summary>
+    // AI: runtime DTO: separate from design templates; producers populate tracks then exporters consume them.
      public sealed class Song
     {
-        /// <summary>
-        /// Global tempo track for the song.
-        /// </summary>
+        // AI: Global tempo track; should contain at least one TempoEvent starting at bar 1 for correct export.
         public TempoTrack TempoTrack { get; set; }
 
-        /// <summary>
-        /// Global time signature track for the song.
-        /// </summary>
+        // AI: Global time-signature track; events are 1-based bar-aligned and queried during export.
         public Timingtrack TimeSignatureTrack { get; set; }
 
-        /// <summary>
-        /// All part/instrument tracks in the song.
-        /// </summary>
+        // AI: All rendered part/instrument tracks; ordering may affect multi-track MIDI channel assignment.
         public List<PartTrack> PartTracks { get; set; }
 
-        /// <summary>
-        /// Total number of bars in the song.
-        /// </summary>
+        // AI: TotalBars: total bars in the song; exporters rely on this for timeline length and track trimming.
         public int TotalBars { get; set; }
 
         public Song()

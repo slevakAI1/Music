@@ -1,19 +1,16 @@
+// AI: purpose=Generate PartTracks for parts using harmony, groove, and timing; uses controlled randomness via PitchRandomizer.
+// AI: invariants=Order: Harmony->Groove->Bar must align; totalBars derived from Harmony events; tick calc uses (onsetBeat-1)*TicksPerQuarterNote.
+// AI: deps=Relies on HarmonyTrack.GetActiveHarmonyEvent, GrooveTrack.GetActiveGroovePreset, BarTrack.GetBar, MusicConstants.TicksPerQuarterNote.
+// AI: perf=Not real-time; called once per song generation; avoid heavy allocations in inner loops.
+// TODO? confirm behavior when groove/pads onsets null vs empty; current code skips in both cases.
+
 using Music.MyMidi;
 
 namespace Music.Generator
 {
-    /// <summary>
-    /// Generates tracks for multiple parts based on groove patterns and harmony events.
-    /// Story 7: Now supports controlled randomness for pitch variation.
-    /// Updated to support groove track with multiple groove changes throughout the song.
-    /// </summary>
     public static class Generator
     {
-        /// <summary>
-        /// Generates all tracks based on SongContext.
-        /// </summary>
-        /// <param name="songContext">The song context containing harmony, time signature, and groove tracks.</param>
-        /// <returns>Generated tracks for each role.</returns>
+        // AI: Generate: uses RandomizationSettings.Default for now; changing to accept settings affects all child generators and determinism.
         public static GeneratorResult Generate(SongContext songContext)
         {
             ValidateHarmonyTrack(songContext.HarmonyTrack);
@@ -41,9 +38,7 @@ namespace Music.Generator
             };
         }
 
-        /// <summary>
-        /// Result of generating all tracks for a groove preset.
-        /// </summary>
+        // AI: GeneratorResult: required PartTracks returned; consumers expect these program numbers and ordering.
         public sealed class GeneratorResult
         {
             public required PartTrack BassTrack { get; init; }
@@ -55,6 +50,8 @@ namespace Music.Generator
 
         // TO DO - HIGH - STEP THRU THIS TO SEE HOW IT WORKS EXACTLY
 
+        // AI: GenerateBassTrack: builds HarmonyPitchContext with bassOctave=2; SelectBassPitch must return appropriate pc.
+        // AI: keep MIDI program number 33; changing octave constant or program number impacts tonal range and tests.
         private static PartTrack GenerateBassTrack(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
@@ -122,6 +119,8 @@ namespace Music.Generator
             return new PartTrack(notes) { MidiProgramNumber = 33 }; // Electric Bass
         }
 
+        // AI: GenerateGuitarTrack: tracks previousPitchClass across onsets to enable passing tones; changing this state breaks guitar voicing.
+        // AI: keep program number 27 for Electric Guitar to match intended timbre.
         private static PartTrack GenerateGuitarTrack(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
@@ -191,6 +190,8 @@ namespace Music.Generator
             return new PartTrack(notes) { MidiProgramNumber = 27 }; // Electric Guitar
         }
 
+        // AI: GenerateKeysTrack: detects first onset of a harmony event via previousHarmony; added 9th only when isFirstOnset true.
+        // AI: keep program number 4; chord voicing order preserved when adding notes.
         private static PartTrack GenerateKeysTrack(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
@@ -371,6 +372,7 @@ namespace Music.Generator
 
         #region Validation
 
+        // AI: Validation methods throw ArgumentException when required tracks are missing; callers rely on exceptions for invalid song contexts.
         private static void ValidateHarmonyTrack(HarmonyTrack harmonyTrack)
         {
             if (harmonyTrack == null || harmonyTrack.Events.Count == 0)

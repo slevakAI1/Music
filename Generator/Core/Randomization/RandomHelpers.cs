@@ -1,22 +1,14 @@
-using Music.Generator;
-using System.Collections.Generic;
+// AI: purpose=Deterministic per-decision RNG & helpers for pitch selection; callers expect reproducible choices.
+// AI: invariants=StableSeed/CreateLocalRng determinism; PickMidiNearRange must pick a MIDI with target pc when possible.
+// AI: deps=PitchClassUtils, HarmonyPitchContext shapes, RandomizationSettings.Seed; used heavily by PitchRandomizer.
+// AI: perf=Hotpath per-note; avoid adding allocations or changing fallback determinism.
+// TODO? confirm callers expect scalePitchClasses to be 7 items for diatonic helpers.
 
 namespace Music.Generator
 {
-    /// <summary>
-    /// Helper methods for controlled randomness in pitch generation.
-    /// </summary>
     public static class RandomHelpers
     {
-        /// <summary>
-        /// Creates a stable local seed for per-decision RNG.
-        /// Combining base seed with context ensures edits earlier don't reshuffle later decisions.
-        /// </summary>
-        /// <param name="baseSeed">Master seed from settings</param>
-        /// <param name="partRole">Part identifier (e.g., "bass", "guitar", "keys")</param>
-        /// <param name="bar">1-based bar number</param>
-        /// <param name="onsetBeat">Beat position within the bar (can be fractional)</param>
-        /// <returns>A deterministic seed for this specific decision point</returns>
+        // AI: seed:bar/onset uses bar+decimal onset to separate subdivided beats; absoluteTicks overload for tick-based decisions.
         public static int StableSeed(int baseSeed, string partRole, int bar, decimal onsetBeat)
         {
             unchecked
@@ -30,9 +22,7 @@ namespace Music.Generator
             }
         }
 
-        /// <summary>
-        /// Creates a stable local seed using absolute tick position.
-        /// </summary>
+        // AI: seed:ticks uses absoluteTicks for decisions where a tick timestamp is authoritative.
         public static int StableSeed(int baseSeed, string partRole, long absoluteTicks)
         {
             unchecked
@@ -45,39 +35,25 @@ namespace Music.Generator
             }
         }
 
-        /// <summary>
-        /// Creates a new SeededRandomSource for a specific decision point.
-        /// Use this to ensure each pitch decision is independently reproducible.
-        /// </summary>
+        // AI: CreateLocalRng returns a deterministic IRandomSource for the provided decision context.
         public static IRandomSource CreateLocalRng(int baseSeed, string partRole, int bar, decimal onsetBeat)
         {
             return new SeededRandomSource(StableSeed(baseSeed, partRole, bar, onsetBeat));
         }
 
-        /// <summary>
-        /// Creates a new SeededRandomSource using absolute tick position.
-        /// </summary>
+        // AI: CreateLocalRng(ticks) variant; keep behavior identical to bar/onset variant for determinism.
         public static IRandomSource CreateLocalRng(int baseSeed, string partRole, long absoluteTicks)
         {
             return new SeededRandomSource(StableSeed(baseSeed, partRole, absoluteTicks));
         }
 
-        /// <summary>
-        /// Determines if a beat position is a strong beat (on the beat, not subdivided).
-        /// </summary>
-        /// <param name="onsetBeat">Beat position (1-based or 0-based decimal)</param>
-        /// <returns>True if this is a strong beat (integer position)</returns>
+        // AI: strongBeat: true only when onsetBeat is an exact integer; relies on decimal modulus equality (no epsilon).
         public static bool IsStrongBeat(decimal onsetBeat)
         {
             return onsetBeat % 1m == 0m;
         }
 
-        /// <summary>
-        /// Performs a weighted random choice from a set of options.
-        /// </summary>
-        /// <param name="rng">Random source</param>
-        /// <param name="items">Array of (value, weight) tuples</param>
-        /// <returns>The chosen value</returns>
+        // AI: weightedChoice: if totalWeight <= 0 returns first item; keep this deterministic fallback.
         public static int WeightedChoice(IRandomSource rng, (int value, double weight)[] items)
         {
             if (items == null || items.Length == 0)
@@ -104,31 +80,18 @@ namespace Music.Generator
             return items[^1].value;
         }
 
-        /// <summary>
-        /// Checks if a pitch class is in the current key's scale.
-        /// </summary>
+        // AI: IsInScale/IsChordTone are thin wrappers; keep equality semantics intact.
         public static bool IsInScale(int pitchClass, HarmonyPitchContext ctx)
         {
             return ctx.KeyScalePitchClasses.Contains(pitchClass);
         }
 
-        /// <summary>
-        /// Checks if a pitch class is a chord tone in the current harmony.
-        /// </summary>
         public static bool IsChordTone(int pitchClass, HarmonyPitchContext ctx)
         {
             return ctx.ChordPitchClasses.Contains(pitchClass);
         }
 
-        /// <summary>
-        /// Finds a MIDI note number with the given pitch class within the specified range,
-        /// preferring notes closer to the center.
-        /// </summary>
-        /// <param name="pitchClass">Target pitch class (0-11)</param>
-        /// <param name="minMidi">Minimum MIDI note (inclusive)</param>
-        /// <param name="maxMidi">Maximum MIDI note (inclusive)</param>
-        /// <param name="preferredCenter">Preferred center MIDI note</param>
-        /// <returns>MIDI note number with the target pitch class</returns>
+        // AI: pickMidi: normalize pitchClass, prefer candidate closest to preferredCenter, fallback builds baseMidi from minMidi.
         public static int PickMidiNearRange(int pitchClass, int minMidi, int maxMidi, int preferredCenter)
         {
             // Normalize pitch class
@@ -167,9 +130,7 @@ namespace Music.Generator
             return best;
         }
 
-        /// <summary>
-        /// Randomly selects an element from a list.
-        /// </summary>
+        // AI: ChooseRandom throws on empty list; callers expect ArgumentException for invalid input.
         public static T ChooseRandom<T>(IRandomSource rng, IReadOnlyList<T> items)
         {
             if (items == null || items.Count == 0)
@@ -178,9 +139,7 @@ namespace Music.Generator
             return items[rng.NextInt(0, items.Count)];
         }
 
-        /// <summary>
-        /// Finds the index of a pitch class in the scale, or -1 if not found.
-        /// </summary>
+        // AI: FindScaleIndex linear search; returns -1 when pitchClass not present in scale.
         public static int FindScaleIndex(int pitchClass, IReadOnlyList<int> scalePitchClasses)
         {
             for (int i = 0; i < scalePitchClasses.Count; i++)
@@ -191,12 +150,7 @@ namespace Music.Generator
             return -1;
         }
 
-        /// <summary>
-        /// Gets diatonic neighbor pitch classes (scale-adjacent) for passing tone selection.
-        /// </summary>
-        /// <param name="currentPitchClass">Current pitch class</param>
-        /// <param name="scalePitchClasses">The 7 pitch classes of the scale in order</param>
-        /// <returns>List of neighbor pitch classes (0-2 elements)</returns>
+        // AI: diatonicNeighbors expects scalePitchClasses to be ordered and typically length 7; returns prev and next, wrapped.
         public static List<int> GetDiatonicNeighbors(int currentPitchClass, IReadOnlyList<int> scalePitchClasses)
         {
             var neighbors = new List<int>();

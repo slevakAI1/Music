@@ -1,24 +1,16 @@
+// AI: purpose=Internal helper to build chord voicings as MIDI notes from harmony params; used by builders and pitch contexts.
+// AI: invariants=Output MIDI list must match chord tones order after voicing; Normalize quality before mapping; exceptions indicate caller errors.
+// AI: deps=Relies on PitchClassUtils.ParseKey, MusicTheory Scale/Chord/Note types and ChordQuality.Normalization mapping.
+// AI: perf=Not hotpath; heavy allocations acceptable during song setup; avoid changing voicing order, it affects downstream consumers.
+
 using MusicTheory;
 
 namespace Music.Generator
 {
-    /// <summary>
-    /// Internal helper for generating chord voicings from harmony parameters.
-    /// Shared by conversion and pitch context systems.
-    /// </summary>
     internal static class ChordVoicingHelper
     {
-        /// <summary>
-        /// Generates chord voicing as MIDI note numbers from harmony parameters.
-        /// </summary>
-        /// <param name="key">The key (e.g., "C major", "F# minor")</param>
-        /// <param name="degree">The scale degree (1-7)</param>
-        /// <param name="quality">The chord quality (standard chord symbol, e.g., "", "m7", "7")</param>
-        /// <param name="bass">The bass note option (e.g., "root", "3rd", "5th")</param>
-        /// <param name="baseOctave">The base octave for chord voicing</param>
-        /// <returns>List of MIDI note numbers representing the chord</returns>
-        /// <exception cref="ArgumentException">When parameters are invalid</exception>
-        /// <exception cref="InvalidOperationException">When chord cannot be constructed</exception>
+        // AI: GenerateChordMidiNotes: validates args, normalizes quality, maps to ChordType, voicing preserves chord-tone order.
+        // AI: errors=throws InvalidOperationException on invalid degree, mapping, or other failures; callers catch/log as needed.
         public static List<int> GenerateChordMidiNotes(
             string key,
             int degree,
@@ -87,9 +79,7 @@ namespace Music.Generator
             }
         }
 
-        /// <summary>
-        /// Calculates MIDI note number from note properties.
-        /// </summary>
+        // AI: CalculateMidiNoteNumber: mapping uses step->semitone base and (octave+1)*12 convention; keep formula stable.
         private static int CalculateMidiNoteNumber(char step, int alter, int octave)
         {
             var baseNote = char.ToUpper(step) switch
@@ -106,11 +96,9 @@ namespace Music.Generator
             return (octave + 1) * 12 + baseNote + alter;
         }
 
-        /// <summary>
-        /// Converts ParsedKey to MusicTheory.Note and mode string.
-        /// Uses the shared parsed components from PitchClassUtils.
-        /// </summary>
-        private static (Note root, string mode) ConvertParsedKeyToNote(PitchClassUtils.ParsedKey parsed)
+        // AI: ConvertParsedKeyToNote: maps ParsedKey to MusicTheory.Note with octave=4 by convention.
+        // AI: change=If ParseKey parsed shape changes, update this mapping accordingly.
+        private static (Note root, string mode) ConvertParsedKeyToNote(ParsedKey parsed)
         {
             NoteName noteName = parsed.NoteLetter switch
             {
@@ -135,10 +123,8 @@ namespace Music.Generator
             return (new Note(noteName, alteration, 4), parsed.Mode);
         }
 
-        /// <summary>
-        /// Maps normalized standard chord symbols to MusicTheory ChordType.
-        /// Expects input to already be normalized via ChordQuality.Normalize().
-        /// </summary>
+        // AI: MapQualityToChordType: expects normalized short quality strings; update when adding qualities to ChordQuality.All.
+        // AI: errors=throws NotSupportedException for unknown qualities to alert callers to update mappings.
         private static ChordType MapQualityToChordType(string quality)
         {
             return quality switch
@@ -180,9 +166,8 @@ namespace Music.Generator
             };
         }
 
-        /// <summary>
-        /// Applies chord voicing based on bass option by rotating notes and adjusting octaves.
-        /// </summary>
+        // AI: ApplyVoicing: bassOption selects rotation index; if index >= chord size, returns root position unchanged.
+        // AI: behavior=notes at/after bassIndex stay at baseOctave; notes before move up one octave to avoid octave clash.
         private static List<Note> ApplyVoicing(List<Note> notes, string bassOption, int baseOctave)
         {
             if (notes == null || notes.Count == 0)
@@ -231,9 +216,7 @@ namespace Music.Generator
             return voicedNotes;
         }
 
-        /// <summary>
-        /// Maps MusicTheory Alteration to MusicXML alter value.
-        /// </summary>
+        // AI: MapAlterationToAlter: converts MusicTheory.Alteration to semitone alter integers; keep mapping exhaustive.
         private static int MapAlterationToAlter(Alteration alteration) => alteration switch
         {
             Alteration.Natural => 0,

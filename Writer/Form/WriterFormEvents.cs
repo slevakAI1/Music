@@ -386,7 +386,7 @@ namespace Music.Writer
             // First pass: extract time signatures to determine beatsPerBar for bar calculations
             foreach (var track in partTracks)
             {
-                foreach (var evt in track.PartTrackNoteEvents.Where(e => e.Type == MidiEventType.TimeSignature))
+                foreach (var evt in track.PartTrackNoteEvents.Where(e => e.Type == PartTrackEventType.TimeSignature))
                 {
                     if (evt.Parameters.TryGetValue("Numerator", out var numObj) &&
                         evt.Parameters.TryGetValue("Denominator", out var denObj))
@@ -416,7 +416,7 @@ namespace Music.Writer
             // Second pass: extract tempo events using the time signature info
             foreach (var track in partTracks)
             {
-                foreach (var evt in track.PartTrackNoteEvents.Where(e => e.Type == MidiEventType.SetTempo))
+                foreach (var evt in track.PartTrackNoteEvents.Where(e => e.Type == PartTrackEventType.SetTempo))
                 {
                     int bpm = 120; // Default
 

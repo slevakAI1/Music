@@ -3,9 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace Music.Generator
 {
-    // Loads voices from Voices.Notion.json and exposes them grouped by category.
+    // AI: purpose=Load voice catalog from Voices.Notion.json and expose categories of voice names.
+    // AI: invariants=Result cached after first load; returned dict keys are category names (case-insensitive).
+    // AI: deps=Reads file at project root via MusicConstants.VoicesNotionJsonRelativePath; JSON schema must match VoiceData.
+    // AI: errors=On load/parse error returns catalog with single "error" key containing diagnostic message; caches that result.
+    // AI: perf=Designed for cold init then cached; avoid changing file path computation which other tools expect.
     internal static class VoiceCatalog
     {
+        // AI: VoiceData mirrors JSON shape; update these properties if the external schema changes.
         private sealed class VoiceData
         {
             [JsonPropertyName("product")]
@@ -21,6 +26,7 @@ namespace Music.Generator
             public List<CategoryEntry>? Categories { get; set; }
         }
 
+        // AI: CategoryEntry maps each JSON category; Names trimmed and Voices deduped case-insensitively.
         private sealed class CategoryEntry
         {
             [JsonPropertyName("name")]
@@ -30,10 +36,13 @@ namespace Music.Generator
             public List<string>? Voices { get; set; }
         }
 
+        // AI: cached state: _cachedCatalog and _cachedData persist across calls to avoid repeated I/O.
         private static VoiceData? _cachedData;
         private static IReadOnlyDictionary<string, IReadOnlyList<string>>? _cachedCatalog;
         private static string? _cachedSourcePath;
 
+        // AI: Load: returns cached catalog if available; otherwise reads JSON, deserializes, builds and caches catalog.
+        // AI: Note: file path resolution uses AppContext.BaseDirectory -> project root; keep this logic in sync with tooling.
         public static IReadOnlyDictionary<string, IReadOnlyList<string>> Load(out string? sourcePath)
         {
             if (_cachedCatalog != null)
@@ -96,9 +105,7 @@ namespace Music.Generator
             }
         }
 
-        /// <summary>
-        /// Returns the list of voice names that require two staves (e.g., Piano, Harp).
-        /// </summary>
+        // AI: GetTwoStaffVoices: ensures Load has been called and returns two-staff voice list or empty list.
         public static IReadOnlyList<string> GetTwoStaffVoices()
         {
             // Ensure data is loaded
@@ -110,6 +117,7 @@ namespace Music.Generator
             return _cachedData?.TwoStaffVoices ?? new List<string>();
         }
 
+        // AI: BuildErrorCatalog: create a stable error-shaped catalog for callers to display diagnostic info.
         private static IReadOnlyDictionary<string, IReadOnlyList<string>> BuildErrorCatalog(string message)
         {
             return new Dictionary<string, IReadOnlyList<string>>(StringComparer.OrdinalIgnoreCase)

@@ -1,6 +1,11 @@
+// AI: purpose=Create default tempo track used by tests/demos with a single BPM event at bar 1.
+// AI: invariants=Produces one TempoEvent at StartBar=1; TempoBpm equals TestDesigns.DefaultTempoBpm; consumers expect discrete events.
+// AI: deps=Relies on TempoTrack.Add and TestDesigns.DefaultTempoBpm; changing those breaks fixtures and default demos.
+// AI: change=If adding tempo maps/ramps, provide a new factory; keep this for legacy single-event tests.
+
 namespace Music.Generator
 {
-    // Builds the app's default tempo track (single 90 BPM event starting at bar 1).
+    // AI: returns a TempoTrack with a single tempo event covering the song (legacy default behavior).
     public static class TempoTests
     {
         public static TempoTrack CreateTestTrackD1()

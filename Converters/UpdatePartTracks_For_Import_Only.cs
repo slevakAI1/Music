@@ -33,7 +33,7 @@ namespace Music.Writer
 
                     // Get instrument info from this segment's program change
                     var programChangeEvent = segment.Events
-                        .FirstOrDefault(e => e.Type == MidiEventType.ProgramChange);
+                        .FirstOrDefault(e => e.Type == PartTrackEventType.ProgramChange);
 
                     // Determine if this is a drum track (channel 10/9)
                     bool isDrumTrack = segment.Events.Any(e => 
@@ -71,7 +71,7 @@ namespace Music.Writer
 
                     foreach (var midiEvent in segment.Events.OrderBy(e => e.AbsoluteTimeTicks))
                     {
-                        if (midiEvent.Type == MidiEventType.NoteOn)
+                        if (midiEvent.Type == PartTrackEventType.NoteOn)
                         {
                             if (!midiEvent.Parameters.TryGetValue("NoteNumber", out var noteNumObj) ||
                                 !midiEvent.Parameters.TryGetValue("Velocity", out var velocityObj))
@@ -93,7 +93,7 @@ namespace Music.Writer
                                 noteOnEvents[noteNumber] = midiEvent;
                             }
                         }
-                        else if (midiEvent.Type == MidiEventType.NoteOff)
+                        else if (midiEvent.Type == PartTrackEventType.NoteOff)
                         {
                             if (!midiEvent.Parameters.TryGetValue("NoteNumber", out var noteNumObj))
                                 continue;
@@ -130,7 +130,7 @@ namespace Music.Writer
 
             foreach (var evt in events)
             {
-                if (evt.Type == MidiEventType.ProgramChange && currentSegment.Events.Any())
+                if (evt.Type == PartTrackEventType.ProgramChange && currentSegment.Events.Any())
                 {
                     // Start new segment when we encounter a program change
                     // (but only if current segment has events)

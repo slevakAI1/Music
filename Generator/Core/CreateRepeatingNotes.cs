@@ -1,20 +1,17 @@
+// AI: purpose=Create a PartTrack of repeating MIDI note events for tests/fixtures; tick-based timing starting at 0.
+// AI: invariants=Events are contiguous, start at tick 0, each event duration==noteDurationTicks; no overlaps by construction.
+// AI: deps=Emits Music.MyMidi.PartTrack/PartTrackEvent; changing event ctor or PartTrack ordering breaks consumers.
+// AI: constraints=noteNumber 0-127; noteDurationTicks should be >0; repeatCount>=0; noteOnVelocity 0-127; negative repeatCount -> 0 events.
+// AI: perf=Allocates list of repeatCount events; avoid huge repeatCount in production.
+
 using Music.MyMidi;
 
 namespace Music.Generator
 {
-    /// <summary>
-    /// Transforms WriterFormData to PartTrack objects with MIDI tick-based timing.
-    /// </summary>
     public static class CreateRepeatingNotes
     {
-        /// <summary>
-        /// Creates a PartTrack with a repeating set of the specified MIDI note number.
-        /// </summary>
-        /// <param name="noteNumber">The MIDI note number (0-127). Use 60 for Middle C.</param>
-        /// <param name="repeatCount">Number of times to repeat the note.</param>
-        /// <param name="noteDurationTicks">Duration of each note in MIDI ticks. Default is 480 (quarter note).</param>
-        /// <param name="noteOnVelocity">MIDI velocity (0-127). Default is 100.</param>
-        /// <returns>A PartTrack object containing the repeating notes.</returns>
+        // AI: params: noteNumber 0..127; noteDurationTicks ticks per event; repeatCount number of events; velocity 0..127.
+        // AI: returns PartTrack with events at 0, duration, 2*duration,...; preserve ordering when changing implementation.
         public static PartTrack Execute(
             int noteNumber,
             int noteDurationTicks,

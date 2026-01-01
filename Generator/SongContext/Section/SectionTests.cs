@@ -1,12 +1,13 @@
-﻿namespace Music.Generator
+﻿// AI: purpose=Create canonical 48-bar section layout used by tests and demos (Intro→Verse→Chorus→...→Outro).
+// AI: invariants=Durations sum to TestDesigns.TotalBars (48); sections ordered and contiguous; names and types expected by fixtures.
+// AI: deps=Relies on SectionTrack.Add(type,barCount,name) and MusicConstants.eSectionType values; changing names breaks tests.
+// AI: change=If altering structure or totals, update all tests and any hard-coded expectations.
+
+namespace Music.Generator
 {
     public sealed class SectionTests
     {
-        /// <summary>
-        /// Build the standard top-level structure on the provided SectionsClass and return a printable summary.
-        /// Structure: Intro → Verse → Chorus → Verse → Chorus → Bridge → Chorus → Outro
-        /// Measures per section (total 48 bars): Intro=4, Verse/Chorus=8, Bridge=4, final Chorus=4, Outro=4
-        /// </summary>
+        // AI: SetTestSectionsD1 builds the standard section sequence; durations chosen to total 48 bars.
         public void SetTestSectionsD1(SectionTrack sections)
         {
             sections.Reset();

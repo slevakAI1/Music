@@ -1,17 +1,19 @@
-using Music.Generator;
+// AI: purpose=Controlled pitch selection per instrument; returns MIDI notes that respect key and chord constraints.
+// AI: invariants=All returned pitch classes must be in the provided key scale; bass pcs MUST be root or fifth; guitar strong-beat pcs MUST be chord tones.
+// AI: deps=RandomHelpers (rng, pick, scale helpers), PitchClassUtils, RandomizationSettings.Seed controls determinism.
+// AI: perf=hotpath per note; avoid allocations; uses local per-call RNG for determinism.
+// TODO? confirm PickMidiNearRange handles octave wrapping and chooses nearest octave of target pc.
+
 using System.Diagnostics;
 
 namespace Music.Generator
 {
-    /// <summary>
-    /// Applies controlled randomness to pitch selection for different instrument parts.
-    /// All generated pitches remain within key/chord constraints.
-    /// </summary>
+    // AI: class:stateless wrapper around RandomHelpers; do NOT change algorithmic choices or assertions.
     public sealed class PitchRandomizer
     {
         private readonly RandomizationSettings _settings;
 
-        // Bass register constants
+        // AI: registers: min/max/preferred center are absolute MIDI numbers; keep these when tuning ranges.
         private const int BassMinMidi = 28;  // E1
         private const int BassMaxMidi = 48;  // C3
         private const int BassPreferredCenter = 36; // C2
@@ -31,14 +33,8 @@ namespace Music.Generator
             _settings = settings ?? RandomizationSettings.Default;
         }
 
-        /// <summary>
-        /// Selects a bass pitch for the given harmony context.
-        /// Chooses from root, fifth, or octave with configurable weights.
-        /// </summary>
-        /// <param name="ctx">Current harmony context</param>
-        /// <param name="bar">1-based bar number</param>
-        /// <param name="onsetBeat">Beat position</param>
-        /// <returns>MIDI note number for bass</returns>
+        // AI: bass:choice mapping=0=root,1=fifth,2=octave; weights come from settings; octave biases center up 12.
+        // AI: must preserve Debug.Assert that resulting pc equals root or fifth; used by downstream harmony consumers.
         public int SelectBassPitch(HarmonyPitchContext ctx, int bar, decimal onsetBeat)
         {
             var rng = RandomHelpers.CreateLocalRng(_settings.Seed, "bass", bar, onsetBeat);
@@ -81,15 +77,8 @@ namespace Music.Generator
             return midi;
         }
 
-        /// <summary>
-        /// Selects a guitar pitch for the given harmony context.
-        /// Strong beats use chord tones; weak beats may use passing tones.
-        /// </summary>
-        /// <param name="ctx">Current harmony context</param>
-        /// <param name="bar">1-based bar number</param>
-        /// <param name="onsetBeat">Beat position</param>
-        /// <param name="previousPitchClass">Previous guitar pitch class, or null if none</param>
-        /// <returns>Tuple of (MIDI note, new pitch class for tracking)</returns>
+        // AI: guitar:strongBeat -> choose chord tones only; weak beat may use diatonic neighbors as passing tones.
+        // AI: passing:true only when previousPitchClass present and probability check passes; prefer non-chord neighbors.
         public (int midi, int pitchClass) SelectGuitarPitch(
             HarmonyPitchContext ctx, 
             int bar, 
@@ -158,15 +147,8 @@ namespace Music.Generator
             return (midi, pc);
         }
 
-        /// <summary>
-        /// Selects a chord voicing for keys/pads.
-        /// May add a diatonic 9th on the first onset of a harmony event.
-        /// </summary>
-        /// <param name="ctx">Current harmony context</param>
-        /// <param name="bar">1-based bar number</param>
-        /// <param name="onsetBeat">Beat position</param>
-        /// <param name="isFirstOnsetOfHarmony">True if this is the first onset of this harmony event</param>
-        /// <returns>List of MIDI notes for the chord voicing</returns>
+        // AI: keys: start from ctx.ChordMidiNotes; optional diatonic 9th only on first onset and per probability.
+        // AI: ninth selection uses next scale degree above root; ensure no duplicates; all returned pcs must be in scale.
         public List<int> SelectKeysVoicing(
             HarmonyPitchContext ctx, 
             int bar, 
@@ -220,13 +202,7 @@ namespace Music.Generator
             return midiNotes;
         }
 
-        /// <summary>
-        /// Selects an inversion/bass option for chord voicing.
-        /// </summary>
-        /// <param name="ctx">Current harmony context</param>
-        /// <param name="bar">1-based bar number</param>
-        /// <param name="onsetBeat">Beat position</param>
-        /// <returns>Bass option string ("root", "3rd", "5th", or "7th")</returns>
+        // AI: inversion: options depend on chord size; keep mapping stable as callers expect these string values.
         public string SelectChordInversion(HarmonyPitchContext ctx, int bar, decimal onsetBeat)
         {
             var rng = RandomHelpers.CreateLocalRng(_settings.Seed, "keys-inversion", bar, onsetBeat);
@@ -240,9 +216,7 @@ namespace Music.Generator
             return options[idx];
         }
 
-        /// <summary>
-        /// Selects a drum velocity with subtle humanization randomness.
-        /// </summary>
+        // AI: drums:humanize=±10% baseVelocity clamped to 1..127; rng key includes drum type for consistent variation.
         public int SelectDrumVelocity(int bar, decimal onsetBeat, string drumType, int baseVelocity)
         {
             var rng = RandomHelpers.CreateLocalRng(_settings.Seed, $"drum_{drumType}", bar, onsetBeat);

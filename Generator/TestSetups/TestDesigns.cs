@@ -1,8 +1,15 @@
+// AI: purpose=Assemble a canonical SongContext for tests/demos so all design tracks align to TotalBars.
+// AI: invariants=After SetTestDesignD1 all design and song tracks cover TestDesigns.TotalBars and are contiguous.
+// AI: deps=Depends on SectionTests, HarmonyTests, TimingTests, TempoTests, GrooveTests, and BarTrack.RebuildFromTimingTrack.
+// AI: change=If you change defaults update all tests/fixtures and any code that asserts specific part names or TotalBars.
+
 using Music.Designer;
 using Music.Generator;
 
 namespace Music.Generator
 {
+    // AI: mutates=This method populates many SongContext fields; callers expect these side-effects (no new SongContext created).
+    // AI: order=Builds sections->voices->harmony->timing->tempo->groove->bartrack; BarTrack.RebuildFromTimingTrack must run last.
     // Central defaults to keep tracks aligned
     public static class TestDesigns
     {
@@ -27,6 +34,7 @@ namespace Music.Generator
             songContext.Song.TimeSignatureTrack = TimingTests.CreateTestTrackD1();
 
             // 5) Tempo track: include default tempo (112 BPM starting at bar 1)
+            // AI: note=DefaultTempoBpm constant is 120; ensure TempoTests uses TestDesigns.DefaultTempoBpm and avoid hardcoded values.
             songContext.Song.TempoTrack = TempoTests.CreateTestTrackD1();
 
             // 6) Groove track: set one event at bar 1 beat one for PopRockBasic preset

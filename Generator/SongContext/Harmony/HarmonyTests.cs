@@ -1,14 +1,18 @@
+// AI: purpose=Generate default 48-bar test harmony track used in demos/tests; pattern repeats I-V-vi-IV on odd bars.
+// AI: invariants=Produces events at odd StartBar values 1..TotalBars; callers expect DurationBeats to cover two bars here.
+// AI: deps=Relies on HarmonyTrack.Add behavior and TestDesigns.TotalBars; renaming fields or constants breaks fixtures.
+// AI: change=If altering pattern or TotalBars update dependent tests and any test fixtures that assert these events.
+
 namespace Music.Generator
 {
-    // Builds the app's default harmony track (48 bars).
+    // AI: factory=CreateTestTrackD1 returns a paired-bar I–V–vi–IV loop; events start at beat 1 and span two bars each.
     public static class HarmonyTests
     {
         public static HarmonyTrack CreateTestTrackD1()
         {
             var track = new HarmonyTrack();
 
-            // Common 4-chord loop: I – V – vi – IV, two bars per 48 bars.
-            // Using standard chord symbols
+            // Pattern: I – V – vi – IV (standard pop progression)
             var pattern = new (int degree, string quality)[]
             {
                 (1, ""),      // Major
@@ -27,6 +31,7 @@ namespace Music.Generator
             return track;
         }
 
+        // AI: Add helper: creates HarmonyEvent with StartBeat=1, DurationBeats=8 (spans two bars), Bass default "root".
         private static void Add(HarmonyTrack track, int bar, string key, int degree, string quality)
         {
             track.Add(new HarmonyEvent

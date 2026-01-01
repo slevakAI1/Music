@@ -1,60 +1,34 @@
+// AI: purpose=Flexible, human-friendly MIDI event representation for composition and MIDI export.
+// AI: invariants=AbsoluteTimeTicks is authoritative timing; Parameters keys and types are a stable contract; Type must match Parameters.
+// AI: deps=Used by MIDI exporter and generators; changing parameter key names/types breaks downstream serialization and consumers.
+// AI: perf=Not hotpath; objects created during track build/export; avoid large binary blobs in Parameters unless intentional.
+
+using Music.Generator;
+
 namespace Music.MyMidi
 {
-    /// <summary>
-    /// High-level, human-readable MIDI event representation.
-    /// Uses a dictionary-based parameter system for flexibility.
-    /// Use factory methods for creating event types with proper validation.
-    /// </summary>
+    // AI: PartTrackEvent is a thin DTO; factories set Type and Parameters consistently. Keep constructors and factory behaviors stable.
     public class PartTrackEvent
     {
-        /// <summary>
-        /// Absolute time position in ticks from the start of the track.
-        /// This is the source of truth for event timing.
-        /// </summary>
+        // AI: AbsoluteTimeTicks: absolute tick position from track start; used to compute delta times later.
         public long AbsoluteTimeTicks { get; init; }
 
-        /// <summary>
-        /// Delta time in ticks since the previous event.
-        /// This is calculated separately and will be 0 when the event is created.
-        /// </summary>
+        // AI: DeltaTicks: computed later; initialized to 0 on creation; not authoritative for ordering.
         public long DeltaTicks { get; init; }
 
-        /// <summary>
-        /// The type of MIDI event.
-        /// </summary>
-        public MidiEventType Type { get; init; }
+        // AI: Type: MIDI event classification; factories must set matching Parameters schema.
+        public PartTrackEventType Type { get; init; }
 
-        /// <summary>
-        /// Dictionary of event parameters. Keys are parameter names following MIDI standards.
-        /// Values can be int, string, or byte[] depending on the parameter type.
-        /// </summary>
+        // AI: Parameters: string keys to object values (int,string,byte[]). Keys must be stable across exporters.
         public Dictionary<string, object> Parameters { get; init; } = new();
 
-        // MIDI-related properties for simple note creation - 480 ticks / quarter note is standard
-        
-        /// <summary>
-        /// MIDI note number (0-127). Used for simple note creation.
-        /// </summary>
+        // AI: Convenience fields for simple note events; factories prefer Parameters dictionary for full compatibility.
         public int NoteNumber { get; set; }
-
-        /// <summary>
-        /// Duration of the note in ticks. Used for simple note creation.
-        /// </summary>
         public int NoteDurationTicks { get; set; }
-        
-        /// <summary>
-        /// MIDI velocity (0-127). Default is 100. Used for simple note creation.
-        /// </summary>
         public int NoteOnVelocity { get; set; } = 100;
 
-        /// <summary>
-        /// Simple note constructor for backward compatibility with note-based code.
-        /// Creates a note event with proper MIDI event type set.
-        /// </summary>
-        /// <param name="noteNumber">MIDI note number (0-127)</param>
-        /// <param name="absoluteTimeTicks">Absolute time position in ticks from the start of the track</param>
-        /// <param name="noteDurationTicks">Duration of the note in ticks</param>
-        /// <param name="noteOnVelocity">MIDI velocity (0-127), default is 100</param>
+        // AI: Simple note constructor: creates a NoteOn-type event with minimal fields for backward compatibility.
+        // AI: change=If altering behavior, update callers that construct notes directly instead of using factories.
         public PartTrackEvent(
             int noteNumber,
             int absoluteTimeTicks,
@@ -65,12 +39,10 @@ namespace Music.MyMidi
             AbsoluteTimeTicks = absoluteTimeTicks;
             NoteDurationTicks = noteDurationTicks;
             NoteOnVelocity = noteOnVelocity;
-            Type = MidiEventType.NoteOn; // Set proper type for simple notes
+            Type = PartTrackEventType.NoteOn; // Set proper type for simple notes
         }
 
-        /// <summary>
-        /// Default constructor for factory methods.
-        /// </summary>
+        // AI: Default ctor retained for factory methods and deserialization.
         public PartTrackEvent()
         {
         }
@@ -78,154 +50,114 @@ namespace Music.MyMidi
         // ============================================================
         // Factory Methods - Meta Events
         // ============================================================
+        // AI: Factory methods construct fully-formed events: set Type, AbsoluteTimeTicks, and Parameters.
+        // AI: Keep parameter key names stable; exporters rely on these keys.
 
-        /// <summary>
-        /// Creates a sequence number meta event (0x00).
-        /// </summary>
         public static PartTrackEvent CreateSequenceNumber(long absoluteTime, ushort sequenceNumber) =>
             new()
             {
-                Type = MidiEventType.SequenceNumber,
+                Type = PartTrackEventType.SequenceNumber,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["SequenceNumber"] = sequenceNumber }
             };
 
-        /// <summary>
-        /// Creates a text meta event (0x01).
-        /// </summary>
         public static PartTrackEvent CreateText(long absoluteTime, string text) =>
             new()
             {
-                Type = MidiEventType.Text,
+                Type = PartTrackEventType.Text,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["Text"] = text }
             };
 
-        /// <summary>
-        /// Creates a copyright notice meta event (0x02).
-        /// </summary>
         public static PartTrackEvent CreateCopyrightNotice(long absoluteTime, string text) =>
             new()
             {
-                Type = MidiEventType.CopyrightNotice,
+                Type = PartTrackEventType.CopyrightNotice,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["Text"] = text }
             };
 
-        /// <summary>
-        /// Creates a sequence/track name meta event (0x03).
-        /// </summary>
         public static PartTrackEvent CreateSequenceTrackName(long absoluteTime, string name) =>
             new()
             {
-                Type = MidiEventType.SequenceTrackName,
+                Type = PartTrackEventType.SequenceTrackName,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["Text"] = name }
             };
 
-        /// <summary>
-        /// Creates an instrument name meta event (0x04).
-        /// </summary>
         public static PartTrackEvent CreateInstrumentName(long absoluteTime, string name) =>
             new()
             {
-                Type = MidiEventType.InstrumentName,
+                Type = PartTrackEventType.InstrumentName,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["Text"] = name }
             };
 
-        /// <summary>
-        /// Creates a lyric meta event (0x05).
-        /// </summary>
         public static PartTrackEvent CreateLyric(long absoluteTime, string lyric) =>
             new()
             {
-                Type = MidiEventType.Lyric,
+                Type = PartTrackEventType.Lyric,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["Text"] = lyric }
             };
 
-        /// <summary>
-        /// Creates a marker meta event (0x06).
-        /// </summary>
         public static PartTrackEvent CreateMarker(long absoluteTime, string marker) =>
             new()
             {
-                Type = MidiEventType.Marker,
+                Type = PartTrackEventType.Marker,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["Text"] = marker }
             };
 
-        /// <summary>
-        /// Creates a cue point meta event (0x07).
-        /// </summary>
         public static PartTrackEvent CreateCuePoint(long absoluteTime, string cuePoint) =>
             new()
             {
-                Type = MidiEventType.CuePoint,
+                Type = PartTrackEventType.CuePoint,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["Text"] = cuePoint }
             };
 
-        /// <summary>
-        /// Creates a program name meta event (0x08).
-        /// </summary>
         public static PartTrackEvent CreateProgramName(long absoluteTime, string programName) =>
             new()
             {
-                Type = MidiEventType.ProgramName,
+                Type = PartTrackEventType.ProgramName,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["Text"] = programName }
             };
 
-        /// <summary>
-        /// Creates a device name meta event (0x09).
-        /// </summary>
         public static PartTrackEvent CreateDeviceName(long absoluteTime, string deviceName) =>
             new()
             {
-                Type = MidiEventType.DeviceName,
+                Type = PartTrackEventType.DeviceName,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["Text"] = deviceName }
             };
 
-        /// <summary>
-        /// Creates a MIDI channel prefix meta event (0x20).
-        /// </summary>
         public static PartTrackEvent CreateMidiChannelPrefix(long absoluteTime, byte channel) =>
             new()
             {
-                Type = MidiEventType.MidiChannelPrefix,
+                Type = PartTrackEventType.MidiChannelPrefix,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["Channel"] = channel }
             };
 
-        /// <summary>
-        /// Creates a MIDI port meta event (0x21).
-        /// </summary>
         public static PartTrackEvent CreateMidiPort(long absoluteTime, byte port) =>
             new()
             {
-                Type = MidiEventType.MidiPort,
+                Type = PartTrackEventType.MidiPort,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["Port"] = port }
             };
 
-        /// <summary>
-        /// Creates an end-of-track meta event (0x2F).
-        /// </summary>
         public static PartTrackEvent CreateEndOfTrack(long absoluteTime = 0) =>
             new()
             {
-                Type = MidiEventType.EndOfTrack,
+                Type = PartTrackEventType.EndOfTrack,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new()
             };
 
-        /// <summary>
-        /// Creates a set tempo meta event (0x51).
-        /// Can specify either BPM or microseconds per quarter note.
-        /// </summary>
+        // AI: CreateSetTempo accepts either bpm or microsecondsPerQuarterNote; prefer bpm for readability.
         public static PartTrackEvent CreateSetTempo(long absoluteTime, int? bpm = null, int? microsecondsPerQuarterNote = null)
         {
             var parameters = new Dictionary<string, object>();
@@ -236,16 +168,12 @@ namespace Music.MyMidi
 
             return new()
             {
-                Type = MidiEventType.SetTempo,
+                Type = PartTrackEventType.SetTempo,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = parameters
             };
         }
 
-        /// <summary>
-        /// Creates a SMPTE offset meta event (0x54).
-        /// Specifies an offset for SMPTE time code synchronization.
-        /// </summary>
         public static PartTrackEvent CreateSmpteOffset(
             long absoluteTime,
             byte hours,
@@ -257,7 +185,7 @@ namespace Music.MyMidi
             return new PartTrackEvent
             {
                 AbsoluteTimeTicks = absoluteTime,
-                Type = MidiEventType.SmpteOffset,
+                Type = PartTrackEventType.SmpteOffset,
                 Parameters = new Dictionary<string, object>
                 {
                     { "Hours", hours },
@@ -269,9 +197,6 @@ namespace Music.MyMidi
             };
         }
 
-        /// <summary>
-        /// Creates a SMPTE offset meta event (0x54) with format specification.
-        /// </summary>
         public static PartTrackEvent CreateSmpteOffset(
             long absoluteTime,
             int format,
@@ -284,7 +209,7 @@ namespace Music.MyMidi
             return new PartTrackEvent
             {
                 AbsoluteTimeTicks = absoluteTime,
-                Type = MidiEventType.SmpteOffset,
+                Type = PartTrackEventType.SmpteOffset,
                 Parameters = new Dictionary<string, object>
                 {
                     { "Format", format },
@@ -297,9 +222,6 @@ namespace Music.MyMidi
             };
         }
 
-        /// <summary>
-        /// Creates a time signature meta event (0x58).
-        /// </summary>
         public static PartTrackEvent CreateTimeSignature(
             long absoluteTime,
             int numerator,
@@ -308,7 +230,7 @@ namespace Music.MyMidi
             int thirtySecondNotesPerQuarter = 8) =>
             new()
             {
-                Type = MidiEventType.TimeSignature,
+                Type = PartTrackEventType.TimeSignature,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new()
                 {
@@ -319,13 +241,10 @@ namespace Music.MyMidi
                 }
             };
 
-        /// <summary>
-        /// Creates a key signature meta event (0x59).
-        /// </summary>
         public static PartTrackEvent CreateKeySignature(long absoluteTime, int sharpsFlats, int mode) =>
             new()
             {
-                Type = MidiEventType.KeySignature,
+                Type = PartTrackEventType.KeySignature,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new()
                 {
@@ -334,24 +253,18 @@ namespace Music.MyMidi
                 }
             };
 
-        /// <summary>
-        /// Creates a sequencer-specific meta event (0x7F).
-        /// </summary>
         public static PartTrackEvent CreateSequencerSpecific(long absoluteTime, byte[] data) =>
             new()
             {
-                Type = MidiEventType.SequencerSpecific,
+                Type = PartTrackEventType.SequencerSpecific,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["Data"] = data }
             };
 
-        /// <summary>
-        /// Creates an unknown meta event for forward compatibility.
-        /// </summary>
         public static PartTrackEvent CreateUnknownMeta(long absoluteTime, byte statusByte, byte[] data) =>
             new()
             {
-                Type = MidiEventType.UnknownMeta,
+                Type = PartTrackEventType.UnknownMeta,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() 
                 { 
@@ -364,9 +277,6 @@ namespace Music.MyMidi
         // Factory Methods - Channel Voice Messages
         // ============================================================
 
-        /// <summary>
-        /// Creates a note-off event (0x8n).
-        /// </summary>
         public static PartTrackEvent CreateNoteOff(long absoluteTime, int channel, int noteNumber, int velocity = 0, string? note = null)
         {
             var parameters = new Dictionary<string, object>
@@ -380,15 +290,12 @@ namespace Music.MyMidi
 
             return new()
             {
-                Type = MidiEventType.NoteOff,
+                Type = PartTrackEventType.NoteOff,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = parameters
             };
         }
 
-        /// <summary>
-        /// Creates a note-on event (0x9n).
-        /// </summary>
         public static PartTrackEvent CreateNoteOn(long absoluteTime, int channel, int noteNumber, int velocity, string? note = null)
         {
             var parameters = new Dictionary<string, object>
@@ -402,15 +309,12 @@ namespace Music.MyMidi
 
             return new()
             {
-                Type = MidiEventType.NoteOn,
+                Type = PartTrackEventType.NoteOn,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = parameters
             };
         }
 
-        /// <summary>
-        /// Creates a polyphonic key pressure (aftertouch) event (0xAn).
-        /// </summary>
         public static PartTrackEvent CreatePolyKeyPressure(long absoluteTime, int channel, int noteNumber, int pressure, string? note = null)
         {
             var parameters = new Dictionary<string, object>
@@ -424,15 +328,12 @@ namespace Music.MyMidi
 
             return new()
             {
-                Type = MidiEventType.PolyKeyPressure,
+                Type = PartTrackEventType.PolyKeyPressure,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = parameters
             };
         }
 
-        /// <summary>
-        /// Creates a control change event (0xBn).
-        /// </summary>
         public static PartTrackEvent CreateControlChange(long absoluteTime, int channel, int controller, int value, string? controllerName = null)
         {
             var parameters = new Dictionary<string, object>
@@ -446,15 +347,12 @@ namespace Music.MyMidi
 
             return new()
             {
-                Type = MidiEventType.ControlChange,
+                Type = PartTrackEventType.ControlChange,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = parameters
             };
         }
 
-        /// <summary>
-        /// Creates a program change event (0xCn).
-        /// </summary>
         public static PartTrackEvent CreateProgramChange(long absoluteTime, int channel, int program, string? programName = null)
         {
             var parameters = new Dictionary<string, object>
@@ -467,19 +365,16 @@ namespace Music.MyMidi
 
             return new()
             {
-                Type = MidiEventType.ProgramChange,
+                Type = PartTrackEventType.ProgramChange,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = parameters
             };
         }
 
-        /// <summary>
-        /// Creates a channel pressure (aftertouch) event (0xDn).
-        /// </summary>
         public static PartTrackEvent CreateChannelPressure(long absoluteTime, int channel, int pressure) =>
             new()
             {
-                Type = MidiEventType.ChannelPressure,
+                Type = PartTrackEventType.ChannelPressure,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new()
                 {
@@ -488,13 +383,10 @@ namespace Music.MyMidi
                 }
             };
 
-        /// <summary>
-        /// Creates a pitch bend event (0xEn).
-        /// </summary>
         public static PartTrackEvent CreatePitchBend(long absoluteTime, int channel, int value) =>
             new()
             {
-                Type = MidiEventType.PitchBend,
+                Type = PartTrackEventType.PitchBend,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new()
                 {
@@ -507,24 +399,18 @@ namespace Music.MyMidi
         // Factory Methods - System Exclusive Events
         // ============================================================
 
-        /// <summary>
-        /// Creates a normal system exclusive event (0xF0).
-        /// </summary>
         public static PartTrackEvent CreateNormalSysEx(long absoluteTime, byte[] data) =>
             new()
             {
-                Type = MidiEventType.NormalSysEx,
+                Type = PartTrackEventType.NormalSysEx,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["Data"] = data }
             };
 
-        /// <summary>
-        /// Creates an escape system exclusive event (0xF7).
-        /// </summary>
         public static PartTrackEvent CreateEscapeSysEx(long absoluteTime, byte[] data) =>
             new()
             {
-                Type = MidiEventType.EscapeSysEx,
+                Type = PartTrackEventType.EscapeSysEx,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["Data"] = data }
             };
@@ -533,13 +419,10 @@ namespace Music.MyMidi
         // Factory Methods - System Common Messages
         // ============================================================
 
-        /// <summary>
-        /// Creates an MTC quarter frame event (0xF1).
-        /// </summary>
         public static PartTrackEvent CreateMtcQuarterFrame(long absoluteTime, byte messageType, byte values) =>
             new()
             {
-                Type = MidiEventType.MtcQuarterFrame,
+                Type = PartTrackEventType.MtcQuarterFrame,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new()
                 {
@@ -548,35 +431,26 @@ namespace Music.MyMidi
                 }
             };
 
-        /// <summary>
-        /// Creates a song position pointer event (0xF2).
-        /// </summary>
         public static PartTrackEvent CreateSongPositionPointer(long absoluteTime, ushort position) =>
             new()
             {
-                Type = MidiEventType.SongPositionPointer,
+                Type = PartTrackEventType.SongPositionPointer,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["Position"] = position }
             };
 
-        /// <summary>
-        /// Creates a song select event (0xF3).
-        /// </summary>
         public static PartTrackEvent CreateSongSelect(long absoluteTime, byte songNumber) =>
             new()
             {
-                Type = MidiEventType.SongSelect,
+                Type = PartTrackEventType.SongSelect,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["SongNumber"] = songNumber }
             };
 
-        /// <summary>
-        /// Creates a tune request event (0xF6).
-        /// </summary>
         public static PartTrackEvent CreateTuneRequest(long absoluteTime) =>
             new()
             {
-                Type = MidiEventType.TuneRequest,
+                Type = PartTrackEventType.TuneRequest,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new()
             };
@@ -585,68 +459,50 @@ namespace Music.MyMidi
         // Factory Methods - System Real-Time Messages
         // ============================================================
 
-        /// <summary>
-        /// Creates a timing clock event (0xF8).
-        /// </summary>
         public static PartTrackEvent CreateTimingClock(long absoluteTime) =>
             new()
             {
-                Type = MidiEventType.TimingClock,
+                Type = PartTrackEventType.TimingClock,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new()
             };
 
-        /// <summary>
-        /// Creates a start event (0xFA).
-        /// </summary>
         public static PartTrackEvent CreateStart(long absoluteTime) =>
             new()
             {
-                Type = MidiEventType.Start,
+                Type = PartTrackEventType.Start,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new()
             };
 
-        /// <summary>
-        /// Creates a continue event (0xFB).
-        /// </summary>
         public static PartTrackEvent CreateContinue(long absoluteTime) =>
             new()
             {
-                Type = MidiEventType.Continue,
+                Type = PartTrackEventType.Continue,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new()
             };
 
-        /// <summary>
-        /// Creates a stop event (0xFC).
-        /// </summary>
         public static PartTrackEvent CreateStop(long absoluteTime) =>
             new()
             {
-                Type = MidiEventType.Stop,
+                Type = PartTrackEventType.Stop,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new()
             };
 
-        /// <summary>
-        /// Creates an active sensing event (0xFE).
-        /// </summary>
         public static PartTrackEvent CreateActiveSensing(long absoluteTime) =>
             new()
             {
-                Type = MidiEventType.ActiveSensing,
+                Type = PartTrackEventType.ActiveSensing,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new()
             };
 
-        /// <summary>
-        /// Creates a system reset event (0xFF).
-        /// </summary>
         public static PartTrackEvent CreateSystemReset(long absoluteTime) =>
             new()
             {
-                Type = MidiEventType.SystemReset,
+                Type = PartTrackEventType.SystemReset,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new()
             };
@@ -655,13 +511,10 @@ namespace Music.MyMidi
         // Factory Methods - Unknown/Forward Compatibility
         // ============================================================
 
-        /// <summary>
-        /// Creates an unknown event type for forward compatibility.
-        /// </summary>
         public static PartTrackEvent CreateUnknown(long absoluteTime, byte[] rawData) =>
             new()
             {
-                Type = MidiEventType.Unknown,
+                Type = PartTrackEventType.Unknown,
                 AbsoluteTimeTicks = absoluteTime,
                 Parameters = new() { ["RawData"] = rawData }
             };

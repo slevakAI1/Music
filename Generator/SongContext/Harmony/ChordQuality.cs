@@ -1,19 +1,11 @@
 namespace Music.Generator
 {
-    /// <summary>
-    /// Centralized chord quality definitions. Single source of truth for all chord quality strings.
-    /// Short names use standard chord symbol notation (e.g., "", "m7", "7"); long names are for UI display (e.g., "Major", "Minor7").
-    /// </summary>
+    // AI: Quality: pair of (ShortName, LongName). ShortName may be empty for 'Major' (default).
+    public readonly record struct Quality(string ShortName, string LongName);
+
+    // AI: All: canonical set and display order; keep this as authoritative list when adding/removing qualities.
     public static class ChordQuality
     {
-        /// <summary>
-        /// Represents a chord quality with short (standard chord symbol) and long name variants.
-        /// </summary>
-        public readonly record struct Quality(string ShortName, string LongName);
-
-        /// <summary>
-        /// All supported chord qualities. Short names use standard chord symbol notation.
-        /// </summary>
         public static readonly IReadOnlyList<Quality> All = new Quality[]
         {
             // Triads
@@ -50,26 +42,18 @@ namespace Music.Generator
             new("add11", "MajorAdd11"),
         };
 
-        /// <summary>
-        /// All short names (standard chord symbols) for internal use.
-        /// </summary>
+        // AI: ShortNames/LongNames are derived for convenience; do not modify them directly.
         public static readonly IReadOnlyList<string> ShortNames = All.Select(q => q.ShortName).ToList();
-
-        /// <summary>
-        /// All long names for UI display.
-        /// </summary>
         public static readonly IReadOnlyList<string> LongNames = All.Select(q => q.LongName).ToList();
 
+        // AI: Mappings use OrdinalIgnoreCase for robust input handling; update if case-sensitivity is required.
         private static readonly Dictionary<string, string> _shortToLong =
             All.ToDictionary(q => q.ShortName, q => q.LongName, StringComparer.OrdinalIgnoreCase);
 
         private static readonly Dictionary<string, string> _longToShort =
             All.ToDictionary(q => q.LongName, q => q.ShortName, StringComparer.OrdinalIgnoreCase);
 
-        /// <summary>
-        /// Converts a short name (chord symbol) to its long name equivalent.
-        /// Returns the input unchanged if not found (for forward compatibility).
-        /// </summary>
+        // AI: ToLongName: returns mapped long name or input unchanged for forward compatibility.
         public static string ToLongName(string shortName)
         {
             if (string.IsNullOrWhiteSpace(shortName))
@@ -77,10 +61,7 @@ namespace Music.Generator
             return _shortToLong.TryGetValue(shortName.Trim(), out var longName) ? longName : shortName;
         }
 
-        /// <summary>
-        /// Converts a long name to its short name (chord symbol) equivalent.
-        /// Returns the input unchanged if not found (for forward compatibility).
-        /// </summary>
+        // AI: ToShortName: returns mapped short symbol or input unchanged for forward compatibility.
         public static string ToShortName(string longName)
         {
             if (string.IsNullOrWhiteSpace(longName))
@@ -88,9 +69,7 @@ namespace Music.Generator
             return _longToShort.TryGetValue(longName.Trim(), out var shortName) ? shortName : longName;
         }
 
-        /// <summary>
-        /// Normalizes any quality string (short or long) to its canonical short name (chord symbol).
-        /// </summary>
+        // AI: Normalize: returns canonical short name; empty/whitespace -> "" (Major); unknown returns trimmed input.
         public static string Normalize(string quality)
         {
             if (string.IsNullOrWhiteSpace(quality))
@@ -111,9 +90,7 @@ namespace Music.Generator
             return trimmed;
         }
 
-        /// <summary>
-        /// Checks if the given string is a valid chord quality (short or long name).
-        /// </summary>
+        // AI: IsValid: returns true only when input matches a known short or long name (case-insensitive); whitespace=false.
         public static bool IsValid(string quality)
         {
             if (string.IsNullOrWhiteSpace(quality))

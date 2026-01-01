@@ -1,7 +1,7 @@
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
 using Music.MyMidi;
-using MidiEventType = Music.MyMidi.MidiEventType;
+using PartTrackEventType = Music.Generator.PartTrackEventType;
 
 namespace Music.Writer
 {
@@ -40,13 +40,13 @@ namespace Music.Writer
 
             // Detect if this is a drum track by checking for program number 255
             bool isDrumTrack = midiEvents.Any(e => 
-                e.Type == MidiEventType.ProgramChange && 
+                e.Type == PartTrackEventType.ProgramChange && 
                 GetIntParam(e, "Program") == 255);
 
             foreach (var midiEvent in midiEvents)
             {
                 // Skip EndOfTrack events from input - TrackChunk will add it automatically
-                if (midiEvent.Type == MidiEventType.EndOfTrack)
+                if (midiEvent.Type == PartTrackEventType.EndOfTrack)
                     continue;
 
                 // Calculate delta time from last event
@@ -73,65 +73,65 @@ namespace Music.Writer
             return midiEvent.Type switch
             {
                 // Meta Events
-                MidiEventType.Text => new TextEvent(GetStringParam(midiEvent, "Text"))
+                PartTrackEventType.Text => new TextEvent(GetStringParam(midiEvent, "Text"))
                 {
                     DeltaTime = deltaTime
                 },
                 
-                MidiEventType.CopyrightNotice => new CopyrightNoticeEvent(GetStringParam(midiEvent, "Text"))
+                PartTrackEventType.CopyrightNotice => new CopyrightNoticeEvent(GetStringParam(midiEvent, "Text"))
                 {
                     DeltaTime = deltaTime
                 },
                 
-                MidiEventType.SequenceTrackName => new SequenceTrackNameEvent(GetStringParam(midiEvent, "Text"))
+                PartTrackEventType.SequenceTrackName => new SequenceTrackNameEvent(GetStringParam(midiEvent, "Text"))
                 {
                     DeltaTime = deltaTime
                 },
                 
-                MidiEventType.InstrumentName => new InstrumentNameEvent(GetStringParam(midiEvent, "Text"))
+                PartTrackEventType.InstrumentName => new InstrumentNameEvent(GetStringParam(midiEvent, "Text"))
                 {
                     DeltaTime = deltaTime
                 },
                 
-                MidiEventType.Lyric => new LyricEvent(GetStringParam(midiEvent, "Text"))
+                PartTrackEventType.Lyric => new LyricEvent(GetStringParam(midiEvent, "Text"))
                 {
                     DeltaTime = deltaTime
                 },
                 
-                MidiEventType.Marker => new MarkerEvent(GetStringParam(midiEvent, "Text"))
+                PartTrackEventType.Marker => new MarkerEvent(GetStringParam(midiEvent, "Text"))
                 {
                     DeltaTime = deltaTime
                 },
                 
-                MidiEventType.ProgramName => new ProgramNameEvent(GetStringParam(midiEvent, "Text"))
+                PartTrackEventType.ProgramName => new ProgramNameEvent(GetStringParam(midiEvent, "Text"))
                 {
                     DeltaTime = deltaTime
                 },
                 
-                MidiEventType.EndOfTrack => 
+                PartTrackEventType.EndOfTrack => 
                     // Skip - TrackChunk handles EndOfTrack automatically during write
                     null,
                 
-                MidiEventType.SetTempo => CreateSetTempoEvent(midiEvent, deltaTime),
+                PartTrackEventType.SetTempo => CreateSetTempoEvent(midiEvent, deltaTime),
                 
-                MidiEventType.TimeSignature => CreateTimeSignatureEvent(midiEvent, deltaTime),
+                PartTrackEventType.TimeSignature => CreateTimeSignatureEvent(midiEvent, deltaTime),
                 
-                MidiEventType.KeySignature => new KeySignatureEvent(
+                PartTrackEventType.KeySignature => new KeySignatureEvent(
                     (sbyte)GetIntParam(midiEvent, "SharpsFlats"),
                     (byte)GetIntParam(midiEvent, "Mode"))
                 {
                     DeltaTime = deltaTime
                 },
                 
-                MidiEventType.SequencerSpecific => new SequencerSpecificEvent(GetBytesParam(midiEvent, "Data"))
+                PartTrackEventType.SequencerSpecific => new SequencerSpecificEvent(GetBytesParam(midiEvent, "Data"))
                 {
                     DeltaTime = deltaTime
                 },
 
-                MidiEventType.SmpteOffset => CreateSmpteOffsetEvent(midiEvent, deltaTime),
+                PartTrackEventType.SmpteOffset => CreateSmpteOffsetEvent(midiEvent, deltaTime),
                 
                 // Channel Voice Messages
-                MidiEventType.NoteOff => new NoteOffEvent(
+                PartTrackEventType.NoteOff => new NoteOffEvent(
                     (SevenBitNumber)GetIntParam(midiEvent, "NoteNumber"),
                     (SevenBitNumber)GetIntParam(midiEvent, "Velocity"))
                 {
@@ -139,7 +139,7 @@ namespace Music.Writer
                     DeltaTime = deltaTime
                 },
                 
-                MidiEventType.NoteOn => new NoteOnEvent(
+                PartTrackEventType.NoteOn => new NoteOnEvent(
                     (SevenBitNumber)GetIntParam(midiEvent, "NoteNumber"),
                     (SevenBitNumber)GetIntParam(midiEvent, "Velocity"))
                 {
@@ -147,7 +147,7 @@ namespace Music.Writer
                     DeltaTime = deltaTime
                 },
                 
-                MidiEventType.PolyKeyPressure => new NoteAftertouchEvent(
+                PartTrackEventType.PolyKeyPressure => new NoteAftertouchEvent(
                     (SevenBitNumber)GetIntParam(midiEvent, "NoteNumber"),
                     (SevenBitNumber)GetIntParam(midiEvent, "Pressure"))
                 {
@@ -155,7 +155,7 @@ namespace Music.Writer
                     DeltaTime = deltaTime
                 },
                 
-                MidiEventType.ControlChange => new ControlChangeEvent(
+                PartTrackEventType.ControlChange => new ControlChangeEvent(
                     (SevenBitNumber)GetIntParam(midiEvent, "Controller"),
                     (SevenBitNumber)GetIntParam(midiEvent, "Value"))
                 {
@@ -163,18 +163,18 @@ namespace Music.Writer
                     DeltaTime = deltaTime
                 },
                 
-                MidiEventType.ProgramChange => CreateProgramChangeEvent(midiEvent, deltaTime, isDrumTrack),
+                PartTrackEventType.ProgramChange => CreateProgramChangeEvent(midiEvent, deltaTime, isDrumTrack),
                 
-                MidiEventType.ChannelPressure => new ChannelAftertouchEvent(
+                PartTrackEventType.ChannelPressure => new ChannelAftertouchEvent(
                     (SevenBitNumber)GetIntParam(midiEvent, "Pressure"))
                 {
                     Channel = isDrumTrack ? (FourBitNumber)9 : (FourBitNumber)GetIntParam(midiEvent, "Channel"),
                     DeltaTime = deltaTime
                 },
                 
-                MidiEventType.PitchBend => CreatePitchBendEvent(midiEvent, deltaTime, isDrumTrack),
+                PartTrackEventType.PitchBend => CreatePitchBendEvent(midiEvent, deltaTime, isDrumTrack),
                 
-                MidiEventType.Unknown => null, // Skip unknown events
+                PartTrackEventType.Unknown => null, // Skip unknown events
                 
                 _ => null
             };

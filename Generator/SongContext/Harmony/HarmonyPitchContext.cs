@@ -1,69 +1,43 @@
-﻿namespace Music.Generator
+﻿// AI: purpose=Read-only pitch context for a harmony event; used by generators to choose pitches that respect key/chord.
+// AI: invariants=ChordPitchClasses and KeyScalePitchClasses are sorted unique pitch classes (0-11); ChordMidiNotes match those pcs in usable register.
+// AI: deps=Built by HarmonyPitchContextBuilder and consumed by PitchRandomizer/ChordVoicing; changing shapes breaks consumers.
+// AI: perf=Lightweight DTO; keep init-only immutability to preserve reproducibility and thread-safety assumptions.
+
+namespace Music.Generator
 {
-    /// <summary>
-    /// Provides pitch information for a harmony event, including chord tones and scale tones.
-    /// This is a read-only context object used by generators to make pitch choices.
-    /// </summary>
+    // AI: SourceEvent optional reference for debugging; null in derived contexts or tests.
     public sealed class HarmonyPitchContext
     {
-        /// <summary>
-        /// The source harmony event (optional, useful for debugging).
-        /// </summary>
         public Music.Generator.HarmonyEvent? SourceEvent { get; init; }
 
-        /// <summary>
-        /// The root pitch class of the key (0-11, where 0=C).
-        /// This is the tonic of the key signature, not the chord root.
-        /// </summary>
+        // AI: KeyRootPitchClass: tonic of the key, 0=C..11; not the chord root.
         public int KeyRootPitchClass { get; init; }
 
-        /// <summary>
-        /// The root pitch class of the chord (0-11, where 0=C).
-        /// This is calculated from the scale degree applied to the key.
-        /// For example: C major, degree 5 → chord root is G (pitch class 7).
-        /// </summary>
+        // AI: ChordRootPitchClass: pitch class of the chord root derived from degree+key.
         public int ChordRootPitchClass { get; init; }
 
-        /// <summary>
-        /// Pitch classes of the chord tones (0-11), sorted and unique.
-        /// </summary>
+        // AI: ChordPitchClasses: chord tone pcs 0-11, sorted unique; used for chord-tone constraints.
         public IReadOnlyList<int> ChordPitchClasses { get; init; } = Array.Empty<int>();
 
-        /// <summary>
-        /// Pitch classes of the key scale (0-11), sorted and unique.
-        /// For MVP, this is the major scale for major keys and natural minor for minor keys.
-        /// </summary>
+        // AI: KeyScalePitchClasses: scale pcs (major or natural minor for MVP), sorted unique; used for scale constraints.
         public IReadOnlyList<int> KeyScalePitchClasses { get; init; } = Array.Empty<int>();
 
-        /// <summary>
-        /// Actual MIDI note numbers for the chord tones in a usable register.
-        /// These are the exact notes returned by the chord conversion system.
-        /// </summary>
+        // AI: ChordMidiNotes: concrete MIDI notes for chord tones in a usable register; order matters for voicing consumers.
         public IReadOnlyList<int> ChordMidiNotes { get; init; } = Array.Empty<int>();
 
-        /// <summary>
-        /// The base octave used when generating the chord MIDI notes.
-        /// </summary>
+        // AI: BaseOctaveUsed: octave used when constructing ChordMidiNotes; changing this affects voicing ranges.
         public int BaseOctaveUsed { get; init; }
 
-        /// <summary>
-        /// The key string from the harmony event (e.g., "C major", "A minor").
-        /// </summary>
+        // AI: Key string from source event; parsed by consumers via PitchClassUtils.ParseKey when needed.
         public string Key { get; init; } = string.Empty;
 
-        /// <summary>
-        /// The scale degree (1-7) from the harmony event.
-        /// </summary>
+        // AI: Degree: 1..7 scale degree; consumers expect validated range.
         public int Degree { get; init; }
 
-        /// <summary>
-        /// The chord quality from the harmony event (e.g., "Major", "Minor7").
-        /// </summary>
+        // AI: Quality: original chord quality string; callers typically normalize via ChordQuality.Normalize before mapping.
         public string Quality { get; init; } = string.Empty;
 
-        /// <summary>
-        /// The bass/inversion setting from the harmony event (e.g., "root", "3rd").
-        /// </summary>
+        // AI: Bass: inversion hint (e.g., "root","3rd","5th"); affects voicing selection.
         public string Bass { get; init; } = string.Empty;
     }
 }

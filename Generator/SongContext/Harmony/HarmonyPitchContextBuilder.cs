@@ -1,19 +1,13 @@
+// AI: purpose=Create read-only HarmonyPitchContext from event/params; used by generators to constrain pitch choices.
+// AI: invariants=Produces ChordPitchClasses and KeyScalePitchClasses as sorted unique pitch classes.
+// AI: deps=Relies on PitchClassUtils, ChordVoicingHelper.GenerateChordMidiNotes; changing those breaks this builder.
+// AI: errors=Throws ArgumentOutOfRange/ArgumentNull/InvalidOperation when inputs or voicing are invalid; callers should handle.
+
 namespace Music.Generator
 {
-    /// <summary>
-    /// Builds a HarmonyPitchContext from a HarmonyEvent.
-    /// This is a lightweight helper that reuses the shared chord voicing infrastructure
-    /// to extract pitch information for generators.
-    /// </summary>
     public static class HarmonyPitchContextBuilder
     {
-        /// <summary>
-        /// Builds a HarmonyPitchContext from a HarmonyEvent.
-        /// </summary>
-        /// <param name="harmonyEvent">The harmony event to analyze</param>
-        /// <param name="baseOctave">The base octave for chord voicing (default: 4)</param>
-        /// <returns>A HarmonyPitchContext containing chord and scale pitch information</returns>
-        /// <exception cref="ArgumentNullException">When harmonyEvent is null</exception>
+        // AI: Build(harmonyEvent): null-checks then forwards to param Build; preserves SourceEvent for debugging.
         public static HarmonyPitchContext Build(HarmonyEvent harmonyEvent, int baseOctave = 4)
         {
             if (harmonyEvent == null)
@@ -28,16 +22,8 @@ namespace Music.Generator
                 harmonyEvent);
         }
 
-        /// <summary>
-        /// Builds a HarmonyPitchContext from harmony parameters.
-        /// </summary>
-        /// <param name="key">The key (e.g., "C major", "F# minor")</param>
-        /// <param name="degree">The scale degree (1-7)</param>
-        /// <param name="quality">The chord quality (e.g., "maj", "min7")</param>
-        /// <param name="bass">The bass note option (e.g., "root", "3rd", "5th")</param>
-        /// <param name="baseOctave">The base octave for chord voicing (default: 4)</param>
-        /// <param name="sourceEvent">Optional source event for debugging</param>
-        /// <returns>A HarmonyPitchContext containing chord and scale pitch information</returns>
+        // AI: Build(params): key steps: parse key->pitchclass, get scale pcs, validate degree, get chord MIDI notes, dedupe/sort, map to pcs.
+        // AI: invariants=Degree must be 1..7; ChordMidiNotes are deduped/sorted; ChordPitchClasses are unique sorted 0-11 values.
         public static HarmonyPitchContext Build(
             string key,
             int degree,

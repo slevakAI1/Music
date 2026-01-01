@@ -1,38 +1,27 @@
+// AI: purpose=Utilities for parsing keys, mapping notes to pitch classes, and building scale pitch-class lists.
+// AI: invariants=Pitch classes are 0-11; ParseKey normalizes mode to 'major'|'minor' and validates format; functions throw on invalid input.
+// AI: deps=Used by chord voicing and context builders; changing exception behavior or normalization breaks many callers.
+// AI: perf=Lightweight helper used during context/build time, not tight audio hotpaths.
+
 namespace Music.Generator
 {
-    /// <summary>
-    /// Utility methods for working with pitch classes and scale construction.
-    /// Pitch class: 0=C, 1=C#, 2=D, 3=D#, 4=E, 5=F, 6=F#, 7=G, 8=G#, 9=A, 10=A#, 11=B
-    /// </summary>
+    // AI: ParsedKey: canonical parsed components from ParseKey (NoteLetter, Alteration, Mode).
+    internal record struct ParsedKey(
+        char NoteLetter,
+        int Alteration,
+        string Mode
+    );
+
     public static class PitchClassUtils
     {
-        /// <summary>
-        /// Parsed key components. Single source of truth for key parsing.
-        /// </summary>
-        internal record struct ParsedKey(
-            char NoteLetter,
-            int Alteration,
-            string Mode
-        );
-
-        /// <summary>
-        /// Converts a MIDI note number to its pitch class (0-11).
-        /// Handles negative MIDI numbers defensively.
-        /// </summary>
-        /// <param name="midiNoteNumber">MIDI note number (typically 0-127)</param>
-        /// <returns>Pitch class (0-11)</returns>
+        // AI: ToPitchClass: returns 0-11; handles negative MIDI defensively via double-mod wrapping.
         public static int ToPitchClass(int midiNoteNumber)
         {
             // Handle negative numbers correctly (double modulo wrap)
             return (midiNoteNumber % 12 + 12) % 12;
         }
 
-        /// <summary>
-        /// Gets the pitch class for a note name and alteration.
-        /// </summary>
-        /// <param name="noteName">Note name (C, D, E, F, G, A, B)</param>
-        /// <param name="alteration">Alteration (-2=double flat, -1=flat, 0=natural, 1=sharp, 2=double sharp)</param>
-        /// <returns>Pitch class (0-11)</returns>
+        // AI: GetPitchClass: maps note letter + alteration (-2..2) to 0-11; invalid letters throw ArgumentException.
         public static int GetPitchClass(char noteName, int alteration = 0)
         {
             int basePitch = char.ToUpper(noteName) switch
@@ -54,13 +43,8 @@ namespace Music.Generator
             return pitchClass;
         }
 
-        /// <summary>
-        /// Parses a key string and returns all components.
-        /// Single source of truth to avoid drift between different key parsing methods.
-        /// </summary>
-        /// <param name="keyString">Key string in format "NoteName [#/b] mode"</param>
-        /// <returns>ParsedKey with note letter, alteration, and normalized mode</returns>
-        /// <exception cref="ArgumentException">When key format is invalid</exception>
+        // AI: ParseKey: single source of truth for key parsing. Expects exactly two tokens: note (letter+optional '#'/'b') and mode.
+        // AI: mode normalized to lowercase 'major' or 'minor'; accepts single accidental '#' or 'b' only; throws ArgumentException on invalid input.
         internal static ParsedKey ParseKey(string keyString)
         {
             if (string.IsNullOrWhiteSpace(keyString))
@@ -107,22 +91,14 @@ namespace Music.Generator
             return new ParsedKey(noteLetter, alteration, normalizedMode);
         }
 
-        /// <summary>
-        /// Parses a key string (e.g., "C major", "F# minor") and returns the root pitch class.
-        /// </summary>
-        /// <param name="keyString">Key string in format "NoteName [#/b] mode"</param>
-        /// <returns>Root pitch class (0-11)</returns>
+        // AI: ParseKeyToPitchClass: convenience wrapper around ParseKey then GetPitchClass.
         public static int ParseKeyToPitchClass(string keyString)
         {
             var parsed = ParseKey(keyString);
             return GetPitchClass(parsed.NoteLetter, parsed.Alteration);
         }
 
-        /// <summary>
-        /// Gets the pitch classes for a major scale starting from the given root pitch class.
-        /// </summary>
-        /// <param name="rootPitchClass">Root pitch class (0-11)</param>
-        /// <returns>List of 7 pitch classes in major scale order</returns>
+        // AI: GetMajorScalePitchClasses: returns 7 pitch classes for major scale starting at root; validates root in 0..11.
         public static IReadOnlyList<int> GetMajorScalePitchClasses(int rootPitchClass)
         {
             if (rootPitchClass < 0 || rootPitchClass > 11)
@@ -136,11 +112,7 @@ namespace Music.Generator
                 .ToList();
         }
 
-        /// <summary>
-        /// Gets the pitch classes for a natural minor scale starting from the given root pitch class.
-        /// </summary>
-        /// <param name="rootPitchClass">Root pitch class (0-11)</param>
-        /// <returns>List of 7 pitch classes in natural minor scale order</returns>
+        // AI: GetNaturalMinorScalePitchClasses: returns 7 pitch classes for natural minor scale; validates root in 0..11.
         public static IReadOnlyList<int> GetNaturalMinorScalePitchClasses(int rootPitchClass)
         {
             if (rootPitchClass < 0 || rootPitchClass > 11)
@@ -154,11 +126,7 @@ namespace Music.Generator
                 .ToList();
         }
 
-        /// <summary>
-        /// Gets scale pitch classes for a key string. Currently supports major and minor modes.
-        /// </summary>
-        /// <param name="keyString">Key string (e.g., "C major", "A minor")</param>
-        /// <returns>List of pitch classes in scale order</returns>
+        // AI: GetScalePitchClassesForKey: parses key then returns major or natural minor scale pcs based on mode.
         public static IReadOnlyList<int> GetScalePitchClassesForKey(string keyString)
         {
             var parsed = ParseKey(keyString);
