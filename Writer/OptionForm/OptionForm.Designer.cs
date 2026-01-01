@@ -70,6 +70,8 @@
             numTupletCount = new NumericUpDown();
             lblTupletOf = new Label();
             numTupletOf = new NumericUpDown();
+            btnOk = new Button();
+            btnCancel = new Button();
             gbPartOptions.SuspendLayout();
             gbPitchOptions.SuspendLayout();
             grpChord.SuspendLayout();
@@ -93,7 +95,7 @@
             gbPartOptions.Controls.Add(lblStaff);
             gbPartOptions.Controls.Add(clbStaffs);
             gbPartOptions.ForeColor = Color.FromArgb(255, 128, 0);
-            gbPartOptions.Location = new Point(596, 12);
+            gbPartOptions.Location = new Point(583, 13);
             gbPartOptions.Name = "gbPartOptions";
             gbPartOptions.Size = new Size(322, 174);
             gbPartOptions.TabIndex = 2;
@@ -527,11 +529,36 @@
             numTupletOf.TabIndex = 15;
             numTupletOf.Value = new decimal(new int[] { 2, 0, 0, 0 });
             // 
+            // btnOk
+            // 
+            btnOk.DialogResult = DialogResult.OK;
+            btnOk.ForeColor = Color.FromArgb(0, 192, 0);
+            btnOk.Location = new Point(652, 419);
+            btnOk.Name = "btnOk";
+            btnOk.Size = new Size(72, 23);
+            btnOk.TabIndex = 39;
+            btnOk.Text = "OK";
+            btnOk.UseVisualStyleBackColor = true;
+            // 
+            // btnCancel
+            // 
+            btnCancel.DialogResult = DialogResult.Cancel;
+            btnCancel.ForeColor = Color.FromArgb(0, 192, 0);
+            btnCancel.Location = new Point(758, 419);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(72, 23);
+            btnCancel.TabIndex = 40;
+            btnCancel.Text = "Cancel";
+            btnCancel.UseVisualStyleBackColor = true;
+            // 
             // OptionForm
             // 
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Black;
             ClientSize = new Size(930, 485);
+            Controls.Add(btnCancel);
+            Controls.Add(btnOk);
             Controls.Add(gbRhythmOptions);
             Controls.Add(gbPartOptions);
             Controls.Add(gbPitchOptions);
@@ -607,5 +634,7 @@
         private ComboBox cbChordBase;
         private Label lblTupletNumber;
         private TextBox txtTupletNumber;
+        private Button btnOk;
+        private Button btnCancel;
     }
 }
