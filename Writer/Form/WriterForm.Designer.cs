@@ -69,7 +69,7 @@ namespace Music.Writer
             lblDegree = new Label();
             numDegree = new NumericUpDown();
             lblOctaveKR = new Label();
-            groupBox1 = new GroupBox();
+            gbRhythmOptions = new GroupBox();
             txtTupletNumber = new TextBox();
             lblTupletNumber = new Label();
             label3 = new Label();
@@ -107,7 +107,7 @@ namespace Music.Writer
             grpAbsolute.SuspendLayout();
             grpKeyRelative.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numDegree).BeginInit();
-            groupBox1.SuspendLayout();
+            gbRhythmOptions.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numNumberOfNotes).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numDots).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numTupletCount).BeginInit();
@@ -431,28 +431,28 @@ namespace Music.Writer
             lblOctaveKR.TabIndex = 2;
             lblOctaveKR.Text = "Oct:";
             // 
-            // groupBox1
+            // gbRhythmOptions
             // 
-            groupBox1.BackColor = Color.Black;
-            groupBox1.Controls.Add(txtTupletNumber);
-            groupBox1.Controls.Add(lblTupletNumber);
-            groupBox1.Controls.Add(label3);
-            groupBox1.Controls.Add(numNumberOfNotes);
-            groupBox1.Controls.Add(lblNoteValue);
-            groupBox1.Controls.Add(cbNoteValue);
-            groupBox1.Controls.Add(lblDots);
-            groupBox1.Controls.Add(numDots);
-            groupBox1.Controls.Add(lblTupletCount);
-            groupBox1.Controls.Add(numTupletCount);
-            groupBox1.Controls.Add(lblTupletOf);
-            groupBox1.Controls.Add(numTupletOf);
-            groupBox1.ForeColor = Color.White;
-            groupBox1.Location = new Point(10, 735);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(325, 174);
-            groupBox1.TabIndex = 6;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "Rhythm options";
+            gbRhythmOptions.BackColor = Color.Black;
+            gbRhythmOptions.Controls.Add(txtTupletNumber);
+            gbRhythmOptions.Controls.Add(lblTupletNumber);
+            gbRhythmOptions.Controls.Add(label3);
+            gbRhythmOptions.Controls.Add(numNumberOfNotes);
+            gbRhythmOptions.Controls.Add(lblNoteValue);
+            gbRhythmOptions.Controls.Add(cbNoteValue);
+            gbRhythmOptions.Controls.Add(lblDots);
+            gbRhythmOptions.Controls.Add(numDots);
+            gbRhythmOptions.Controls.Add(lblTupletCount);
+            gbRhythmOptions.Controls.Add(numTupletCount);
+            gbRhythmOptions.Controls.Add(lblTupletOf);
+            gbRhythmOptions.Controls.Add(numTupletOf);
+            gbRhythmOptions.ForeColor = Color.White;
+            gbRhythmOptions.Location = new Point(10, 735);
+            gbRhythmOptions.Name = "gbRhythmOptions";
+            gbRhythmOptions.Size = new Size(325, 174);
+            gbRhythmOptions.TabIndex = 6;
+            gbRhythmOptions.TabStop = false;
+            gbRhythmOptions.Text = "Rhythm options";
             // 
             // txtTupletNumber
             // 
@@ -778,7 +778,7 @@ namespace Music.Writer
             ClientSize = new Size(1924, 991);
             Controls.Add(btnSetDesignTestScenarioD1);
             Controls.Add(btnSetWriterTestScenarioG1);
-            Controls.Add(groupBox1);
+            Controls.Add(gbRhythmOptions);
             Controls.Add(grbParts);
             Controls.Add(grpPitch);
             Controls.Add(groupBox3);
@@ -798,8 +798,8 @@ namespace Music.Writer
             grpKeyRelative.ResumeLayout(false);
             grpKeyRelative.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)numDegree).EndInit();
-            groupBox1.ResumeLayout(false);
-            groupBox1.PerformLayout();
+            gbRhythmOptions.ResumeLayout(false);
+            gbRhythmOptions.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)numNumberOfNotes).EndInit();
             ((System.ComponentModel.ISupportInitialize)numDots).EndInit();
             ((System.ComponentModel.ISupportInitialize)numTupletCount).EndInit();
@@ -809,7 +809,7 @@ namespace Music.Writer
             ((System.ComponentModel.ISupportInitialize)dgSong).EndInit();
             ResumeLayout(false);
         }
-        private GroupBox groupBox1;
+        private GroupBox gbRhythmOptions;
 
         // New time/duration control fields
         private Label lblNoteValue;
