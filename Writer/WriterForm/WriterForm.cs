@@ -282,31 +282,6 @@ namespace Music.Writer
             Globals.SongContext = _songContext;
         }
 
-
-
-
-
-        private void btnSetWriterTestScenarioG1_Click(object sender, EventArgs e)
-        {
-            _writer = _eventHandlers.HandleSetWriterTestScenarioG1(_songContext);
-            Globals.Writer = _writer;
-
-            // Open OptionForm to show and allow editing of the generated test scenario
-            using var optionForm = new Music.Writer.OptionForm.OptionForm();
-            optionForm.ApplyWriterFormData(_writer);
-
-            if (optionForm.ShowDialog(this) == DialogResult.OK)
-            {
-                // Capture any changes made in the option form
-                _writer = optionForm.CaptureWriterFormData();
-                Globals.Writer = _writer;
-            }
-        }
-
-
-
-
-
         private void btnExecute_Click(object sender, EventArgs e)
         {
             var command = cbCommand?.Text?.Trim() ?? string.Empty;

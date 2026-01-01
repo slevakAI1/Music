@@ -72,6 +72,7 @@
             numTupletOf = new NumericUpDown();
             btnOk = new Button();
             btnCancel = new Button();
+            btnSetWriterTestScenarioG1 = new Button();
             gbPartOptions.SuspendLayout();
             gbPitchOptions.SuspendLayout();
             grpChord.SuspendLayout();
@@ -551,12 +552,25 @@
             btnCancel.Text = "Cancel";
             btnCancel.UseVisualStyleBackColor = true;
             // 
+            // btnSetWriterTestScenarioG1
+            // 
+            btnSetWriterTestScenarioG1.BackColor = Color.Black;
+            btnSetWriterTestScenarioG1.ForeColor = Color.FromArgb(0, 192, 0);
+            btnSetWriterTestScenarioG1.Location = new Point(634, 243);
+            btnSetWriterTestScenarioG1.Name = "btnSetWriterTestScenarioG1";
+            btnSetWriterTestScenarioG1.Size = new Size(196, 33);
+            btnSetWriterTestScenarioG1.TabIndex = 41;
+            btnSetWriterTestScenarioG1.Text = "Set Writer - Test Scenario G1";
+            btnSetWriterTestScenarioG1.UseVisualStyleBackColor = false;
+            btnSetWriterTestScenarioG1.Click += btnSetWriterTestScenarioG1_Click;
+            // 
             // OptionForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Black;
             ClientSize = new Size(930, 485);
+            Controls.Add(btnSetWriterTestScenarioG1);
             Controls.Add(btnCancel);
             Controls.Add(btnOk);
             Controls.Add(gbRhythmOptions);
@@ -636,5 +650,6 @@
         private TextBox txtTupletNumber;
         private Button btnOk;
         private Button btnCancel;
+        private Button btnSetWriterTestScenarioG1;
     }
 }

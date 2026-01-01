@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Music.Generator;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -82,5 +83,19 @@ namespace Music.Writer.OptionForm
                 numTupletOf,
                 numNumberOfNotes);
         }
+
+        private void btnSetWriterTestScenarioG1_Click(object sender, EventArgs e)
+        {
+            // Generate the test WriterFormData from the current Globals SongContext
+            var songContext = Globals.SongContext;
+            var testWriter = WriterFormTests.SetTestWriterG1(songContext);
+
+            // Persist to globals and apply to this form's controls
+            Globals.Writer = testWriter;
+
+            ApplyWriterFormData(testWriter);
+        }
+
+
     }
 }

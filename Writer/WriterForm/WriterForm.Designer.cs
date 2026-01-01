@@ -17,7 +17,6 @@ namespace Music.Writer
         private void InitializeComponent()
         {
             cbCommand = new ComboBox();
-            btnSetWriterTestScenarioG1 = new Button();
             btnSetDesignTestScenarioD1 = new Button();
             groupBox3 = new GroupBox();
             btnSettings = new Button();
@@ -48,18 +47,6 @@ namespace Music.Writer
             cbCommand.Name = "cbCommand";
             cbCommand.Size = new Size(250, 23);
             cbCommand.TabIndex = 1;
-            // 
-            // btnSetWriterTestScenarioG1
-            // 
-            btnSetWriterTestScenarioG1.BackColor = Color.Black;
-            btnSetWriterTestScenarioG1.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSetWriterTestScenarioG1.Location = new Point(212, 841);
-            btnSetWriterTestScenarioG1.Name = "btnSetWriterTestScenarioG1";
-            btnSetWriterTestScenarioG1.Size = new Size(196, 33);
-            btnSetWriterTestScenarioG1.TabIndex = 8;
-            btnSetWriterTestScenarioG1.Text = "Set Writer - Test Scenario G1";
-            btnSetWriterTestScenarioG1.UseVisualStyleBackColor = false;
-            btnSetWriterTestScenarioG1.Click += btnSetWriterTestScenarioG1_Click;
             // 
             // btnSetDesignTestScenarioD1
             // 
@@ -270,7 +257,6 @@ namespace Music.Writer
             BackColor = Color.White;
             ClientSize = new Size(1924, 930);
             Controls.Add(btnSetDesignTestScenarioD1);
-            Controls.Add(btnSetWriterTestScenarioG1);
             Controls.Add(groupBox3);
             Controls.Add(gbSong);
             Name = "WriterForm";
@@ -280,8 +266,6 @@ namespace Music.Writer
             ((System.ComponentModel.ISupportInitialize)dgSong).EndInit();
             ResumeLayout(false);
         }
-
-        private Button btnSetWriterTestScenarioG1;
         private Button btnSetDesignTestScenarioD1;
         private GroupBox groupBox3;
         private GroupBox gbSong;
