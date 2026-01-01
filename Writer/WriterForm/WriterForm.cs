@@ -316,12 +316,19 @@ namespace Music.Writer
             switch (command)
             {
                 case "Repeat Note":
-                    // TODO: Broken - controls moved to OptionForm, need to wire up data capture differently
-                    // Capture form data once at the higher level and pass to command handlers
-                    // var transform = new WriterFormTransform();
-                    // var formData = transform.CaptureFormData(...);
-                    // TODO: Broken - formData not available, controls moved to OptionForm
-                    // HandleRepeatNoteCommand.Execute(formData, dgSong);
+                    // Open OptionForm to capture parameters for the Repeat Note command
+                    using (var optionForm = new Music.Writer.OptionForm.OptionForm())
+                    {
+                        optionForm.ApplyWriterFormData(_writer);
+
+                        if (optionForm.ShowDialog(this) == DialogResult.OK)
+                        {
+                            var formData = optionForm.CaptureWriterFormData();
+                            _writer = formData;
+                            Globals.Writer = _writer;
+                            HandleRepeatNoteCommand.Execute(formData, dgSong);
+                        }
+                    }
                     break;
 
                     // THIS IS WORKING NOW!
