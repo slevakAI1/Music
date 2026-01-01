@@ -1,3 +1,8 @@
+// AI: purpose=Play a MidiSongDocument end-to-end using MidiPlaybackService; auto-selects an output device and cleans up.
+// AI: invariants=Chooses first available output device; if none found shows error and returns; always stops to release resources.
+// AI: deps=Relies on MidiPlaybackService API, MidiSongDocument.Duration, and MessageBoxHelper for UI errors.
+// AI: perf=Async waits using Task.Delay for duration+buffer; long songs will asynchronously yield but still occupy workflow.
+
 using Music.Writer;
 
 namespace Music.MyMidi
@@ -8,6 +13,8 @@ namespace Music.MyMidi
         /// <summary>
         /// Plays a MIDI document and releases the MIDI device after playback completes.
         /// </summary>
+        // AI: PlayMidiFromSongTracksAsync: starts playback, awaits duration+250ms, then stops to free device resources.
+        // AI: edge=Duration==0 yields immediate stop after short buffer; callers may prefer tighter control for live interactions.
         internal static async Task PlayMidiFromSongTracksAsync(
             MidiPlaybackService playbackService,
             MidiSongDocument midiDoc)

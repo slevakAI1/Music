@@ -1,8 +1,11 @@
+// AI: purpose=Canonical General MIDI voice list for UI and mapping to program numbers; includes sentinel Drum Set entry (255).
+// AI: invariants=ProgramNumber in 0-127 for GM voices, sentinel 255 for Drum Set; callers treat returned list as read-only.
+// AI: deps=Used by UI voice pickers and presets; changing names or order may break persisted settings and tests.
+// AI: change=When adding/removing voices update s_cachedVoices and any UI that expects indices or exact names.
+
 namespace Music.MyMidi
 {
-    /// <summary>
-    /// Represents a General MIDI Voice with its program number and display name.
-    /// </summary>
+    // AI: MidiVoices: simple immutable pair of program number and display name; used to populate voice lists.
     public sealed class MidiVoices
     {
         public int ProgramNumber { get; }
@@ -186,11 +189,7 @@ namespace Music.MyMidi
             new(255, "Drum Set")
         };
 
-        /// <summary>
-        /// Returns the cached General MIDI Voice set (ProgramNumber 0-127),
-        /// plus a pseudo-entry for the GM Drum Set (Channel 10) using a sentinel program number (255).
-        /// This method now returns the same pre-built list instance on every call.
-        /// </summary>
+        // AI: MidiVoiceList returns the prebuilt cached list instance; callers should not mutate it.
         public static List<MidiVoices> MidiVoiceList()
         {
             return s_cachedVoices;

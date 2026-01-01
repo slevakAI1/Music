@@ -1,12 +1,13 @@
+// AI: purpose=Loaded MIDI container exposing Raw MidiFile, tempo map, track chunks, duration and event counts for UI/export.
+// AI: invariants=Raw != null; Tempo derived from Raw; Tracks == Raw.GetTrackChunks(); Duration computed from last timed event or zero.
+// AI: deps=Relies on DryWetMidi types (MidiFile, TempoMap, TrackChunk) and TimeConverter.ConvertTo; changing Raw/TimedEvent semantics breaks consumers.
+// AI: perf=Constructor performs parsing work (GetTempoMap/GetTrackChunks/GetTimedEvents); intended for load-time, not per-frame.
+
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 
 namespace Music.MyMidi
 {
-    /// <summary>
-    /// Represents a loaded MIDI song, with access to tracks, notes, chords, and metadata.
-    /// Intended for future MusicXML, device playback, and DAW round-trip.
-    /// </summary>
     public class MidiSongDocument
     {
         public MidiFile Raw { get; }
@@ -23,7 +24,7 @@ namespace Music.MyMidi
             Tempo = raw.GetTempoMap();
             Tracks = raw.GetTrackChunks().ToList();
 
-            // Calculate duration using the last timed event
+            // AI: Duration calc: use the last timed event's absolute time converted to MetricTimeSpan; zero if no timed events.
             var lastTimedEvent = Raw.GetTimedEvents().LastOrDefault();
             if (lastTimedEvent != null)
             {

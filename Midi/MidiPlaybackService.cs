@@ -1,3 +1,8 @@
+// AI: purpose=Manage MIDI playback via DryWetMidi OutputDevice and Playback; simple lifecycle wrapper for UI usage.
+// AI: invariants=Playback (_playback) is tied to an OutputDevice; Stop disposes both playback and device; Resume only valid after Pause before Stop.
+// AI: deps=Relies on MidiSongDocument.Raw providing GetPlayback(OutputDevice); changing that breaks Play behavior.
+// AI: thread-safety=Not thread-safe; intended for UI thread calls; perform heavy I/O off UI thread if needed.
+
 using Melanchall.DryWetMidi.Multimedia;
 
 namespace Music.MyMidi
@@ -12,12 +17,16 @@ namespace Music.MyMidi
             return OutputDevice.GetAll().Select(d => d.Name);
         }
 
+        // AI: SelectOutput disposes any previous device and selects first device with exact name match.
+        // AI: note=If no match found _outputDevice becomes null; callers should verify available devices beforehand.
         public void SelectOutput(string name)
         {
             _outputDevice?.Dispose();
             _outputDevice = OutputDevice.GetAll().FirstOrDefault(d => d.Name == name);
         }
 
+        // AI: Play: stops existing playback, ensures an output device exists (auto-selects first), then starts playback.
+        // AI: edge=If no output device is available Play returns silently; callers should check EnumerateOutputDevices first.
         public void Play(MidiSongDocument doc)
         {
             // Stop any existing playback first
@@ -36,9 +45,7 @@ namespace Music.MyMidi
             _playback.Start();
         }
 
-        /// <summary>
-        /// Pauses playback at the current position. Call Resume() to continue from this point.
-        /// </summary>
+        // AI: Pause stops playback but preserves _playback for Resume; sets _isPaused flag. Do not call Stop() if you plan to Resume().
         public void Pause()
         {
             if (_playback?.IsRunning == true)
@@ -49,9 +56,7 @@ namespace Music.MyMidi
             }
         }
 
-        /// <summary>
-        /// Resumes playback from the paused position.
-        /// </summary>
+        // AI: Resume restarts the existing _playback only if previously paused. Resume after Stop() is a no-op.
         public void Resume()
         {
             if (_isPaused && _playback != null)
@@ -67,6 +72,7 @@ namespace Music.MyMidi
 
         private bool _isPaused = false;
 
+        // AI: Stop stops and disposes playback and output device, resetting internal state. After Stop(), Resume() will not work.
         public void Stop()
         {
             _playback?.Stop();
