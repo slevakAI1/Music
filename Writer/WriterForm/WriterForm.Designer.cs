@@ -83,7 +83,7 @@ namespace Music.Writer
             btnTestWordparser.TabIndex = 32;
             btnTestWordparser.Text = "Test Word Parser";
             btnTestWordparser.UseVisualStyleBackColor = true;
-            btnTestWordparser.Click += btnSettings_Click;
+            btnTestWordparser.Click += btnTestWordparser_Click;
             // 
             // btnExecute
             // 

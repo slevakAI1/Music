@@ -399,7 +399,7 @@ namespace Music.Writer
             //}
         }
 
-        private void btnSettings_Click(object sender, EventArgs e)
+        private void btnTestWordparser_Click(object sender, EventArgs e)
         {
             // Simple lookup
             var pronunciation = WordParser.Instance.TryLookup("singing");
