@@ -12,15 +12,16 @@ namespace Music.Writer
     {
         // Constants for the four fixed rows at the top of the grid
         public const int FIXED_ROW_SEPARATOR_1 = 0;
-        public const int FIXED_ROW_VOICE = 1;
-        public const int FIXED_ROW_SECTION = 2;
-        public const int FIXED_ROW_HARMONY = 3;
-        public const int FIXED_ROW_GROOVE = 4;
-        public const int FIXED_ROW_TIME_SIGNATURE = 5;
-        public const int FIXED_ROW_SEPARATOR_2 = 6;
-        public const int FIXED_ROW_TEMPO = 7;
-        public const int FIXED_ROW_SEPARATOR_3 = 8;
-        public const int FIXED_ROWS_COUNT = 9;
+        public const int FIXED_ROW_SECTION = 1;
+        public const int FIXED_ROW_LYRICS = 2;
+        public const int FIXED_ROW_VOICE = 3;
+        public const int FIXED_ROW_HARMONY = 4;
+        public const int FIXED_ROW_GROOVE = 5;
+        public const int FIXED_ROW_TIME_SIGNATURE = 6;
+        public const int FIXED_ROW_SEPARATOR_2 = 7;
+        public const int FIXED_ROW_TEMPO = 8;
+        public const int FIXED_ROW_SEPARATOR_3 = 9;
+        public const int FIXED_ROWS_COUNT = 10;
 
         // Index where measure columns begin (adjusted because the Stave column was removed)
         public const int MEASURE_START_COLUMN_INDEX = 4;
@@ -149,6 +150,10 @@ namespace Music.Writer
             dgSong.Rows[FIXED_ROW_SECTION].Cells["colType"].Value = "Section";
             dgSong.Rows[FIXED_ROW_SECTION].Cells["colType"].ReadOnly = true;
             dgSong.Rows[FIXED_ROW_SECTION].ReadOnly = true;
+
+            dgSong.Rows[FIXED_ROW_LYRICS].Cells["colType"].Value = "Lyrics";
+            dgSong.Rows[FIXED_ROW_LYRICS].Cells["colType"].ReadOnly = true;
+            dgSong.Rows[FIXED_ROW_LYRICS].ReadOnly = true;
 
             dgSong.Rows[FIXED_ROW_TIME_SIGNATURE].Cells["colType"].Value = "Time Signature";
             dgSong.Rows[FIXED_ROW_TIME_SIGNATURE].Cells["colType"].ReadOnly = true;
