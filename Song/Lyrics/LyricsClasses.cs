@@ -22,11 +22,6 @@
         /// <summary>Raw input for display/editing.</summary>
         public string RawText { get; set; } = string.Empty;
 
-
-
-
-
-
         /// <summary>
         /// Optional: link to an existing section in your section track.
         /// </summary>
@@ -37,9 +32,6 @@
         /// Interpreted as the phrase start in musical ticks.
         /// </summary>
         /// 
-
-
-
 
         public MusicalTime? StartTime { get; set; }
 

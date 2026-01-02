@@ -11,6 +11,7 @@
 using Music.Designer;
 using Music.Generator;
 using Music.MyMidi;
+using MusicGen.Lyrics;
 
 namespace Music.Writer
 {
@@ -400,7 +401,17 @@ namespace Music.Writer
 
         private void btnSettings_Click(object sender, EventArgs e)
         {
+            // Simple lookup
+            var pronunciation = WordParser.Instance.TryLookup("singing");
+            var syllables = pronunciation.GetStressSyllables(); // S[IH]NG<1> [IH]NG<0>
 
+            // Find rhymes
+            var rhymes = WordParser.Instance.GetRhymingWords("cat", 20);
+
+            // Parse lyrics with phonetics
+            var phrase = new LyricPhrase();
+            LyricPhoneticsHelper.ParseTextToLyricPhrase(phrase, "I love music");
+            LyricPhoneticsHelper.MarkBreathPoints(phrase);
         }
     }
 }

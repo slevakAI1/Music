@@ -19,7 +19,7 @@ namespace Music.Writer
             cbCommand = new ComboBox();
             btnSetDesignTestScenarioD1 = new Button();
             groupBox3 = new GroupBox();
-            btnSettings = new Button();
+            btnTestWordparser = new Button();
             btnExecute = new Button();
             gbSong = new GroupBox();
             btnLoadDesign = new Button();
@@ -63,32 +63,32 @@ namespace Music.Writer
             // groupBox3
             // 
             groupBox3.BackColor = SystemColors.ActiveCaptionText;
-            groupBox3.Controls.Add(btnSettings);
+            groupBox3.Controls.Add(btnTestWordparser);
             groupBox3.Controls.Add(btnExecute);
             groupBox3.Controls.Add(cbCommand);
             groupBox3.ForeColor = Color.White;
             groupBox3.Location = new Point(436, 841);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(538, 59);
+            groupBox3.Size = new Size(675, 59);
             groupBox3.TabIndex = 33;
             groupBox3.TabStop = false;
             groupBox3.Text = "Command";
             // 
-            // btnSettings
+            // btnTestWordparser
             // 
-            btnSettings.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSettings.Location = new Point(282, 22);
-            btnSettings.Name = "btnSettings";
-            btnSettings.Size = new Size(114, 23);
-            btnSettings.TabIndex = 32;
-            btnSettings.Text = "Settings";
-            btnSettings.UseVisualStyleBackColor = true;
-            btnSettings.Click += btnSettings_Click;
+            btnTestWordparser.ForeColor = Color.FromArgb(0, 192, 0);
+            btnTestWordparser.Location = new Point(515, 21);
+            btnTestWordparser.Name = "btnTestWordparser";
+            btnTestWordparser.Size = new Size(140, 23);
+            btnTestWordparser.TabIndex = 32;
+            btnTestWordparser.Text = "Test Word Parser";
+            btnTestWordparser.UseVisualStyleBackColor = true;
+            btnTestWordparser.Click += btnSettings_Click;
             // 
             // btnExecute
             // 
             btnExecute.ForeColor = Color.FromArgb(0, 192, 0);
-            btnExecute.Location = new Point(411, 22);
+            btnExecute.Location = new Point(279, 21);
             btnExecute.Name = "btnExecute";
             btnExecute.Size = new Size(114, 23);
             btnExecute.TabIndex = 31;
@@ -282,6 +282,6 @@ namespace Music.Writer
         private Button btnPause;
         private Button btnLoadDesign;
         private Button btnSaveDesign;
-        private Button btnSettings;
+        private Button btnTestWordparser;
     }
 }

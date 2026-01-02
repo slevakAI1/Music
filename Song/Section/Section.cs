@@ -8,6 +8,12 @@ namespace Music.Generator
     // AI: data-only DTO; contains minimal metadata; avoid adding logic here (editors/serializers expect plain properties).
     public class Section
     {
+        /// <summary>
+        /// Optional: provides a stable unique identifier for this section.
+        /// It is assumed to be unique within the song.
+        /// </summary>
+        public int SectionId { get; set; }
+
         // AI: SectionType: enum value used for defaults/labels; keep enum names stable for UI mapping.
         public MusicConstants.eSectionType SectionType { get; set; }
 
