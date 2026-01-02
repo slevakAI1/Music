@@ -89,7 +89,7 @@ namespace Music.Writer
             SongGridManager.HandleCellValueChanged(dgSong, sender, e);
         }
 
-        // AI: dgSong_CellDoubleClick: opens editors for fixed rows (Voice, Section, Harmony, Groove, TimeSignature, Tempo).
+        // AI: dgSong_CellDoubleClick: opens editors for fixed rows (Voice, Section, Lyrics, Harmony, Groove, TimeSignature, Tempo).
         // AI: note=Each editor returns updated track/result which is then attached to grid via GridControlLinesManager.
         private void dgSong_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
         {
@@ -146,6 +146,24 @@ namespace Music.Writer
                 {
                     _songContext.SectionTrack = dlg.ResultSections;
                     GridControlLinesManager.AttachsectionTrack(dgSong, _songContext.SectionTrack);
+                }
+
+                return;
+            }
+
+            // If the fixed Lyrics row was double-clicked, open the Lyrics editor and write back to the local _songContext
+            if (e.RowIndex == SongGridManager.FIXED_ROW_LYRICS)
+			{
+                if (_songContext == null)
+                    _songContext = new SongContext();
+
+                var initialLyrics = _songContext.LyricTrack;
+
+                using var dlg = new Music.Writer.LyricEditorForm(initialLyrics);
+                if (dlg.ShowDialog(this) == DialogResult.OK)
+                {
+                    _songContext.LyricTrack = dlg.ResultTrack;
+                    // TODO: Add GridControlLinesManager.AttachLyricTrack when ready to visualize
                 }
 
                 return;

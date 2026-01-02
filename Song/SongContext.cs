@@ -1,4 +1,6 @@
-﻿namespace Music.Generator
+﻿using MusicGen.Lyrics;
+
+namespace Music.Generator
 {
     // AI: DTO used by editors and generation pipeline. Keep property names and default initializations stable.
     public sealed class SongContext
@@ -21,6 +23,9 @@
 
         // AI: SectionTrack contains ordered, contiguous song sections; builders rely on StartBar assignment logic there.
         public SectionTrack SectionTrack { get; set; } = new();
+
+        // AI: LyricTrack: synchronized lyrics track with phonetic syllable data; used for vocal generation.
+        public LyricTrack LyricTrack { get; set; } = new();
 
         // AI: Song: output runtime song populated by generator; contains tempo/time signature and rendered PartTracks.
         public Song Song { get; set; } = new();
