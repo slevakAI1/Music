@@ -10,12 +10,30 @@ namespace Music.Generator
 {
     public static class Generator
     {
-        // AI: Generate: uses RandomizationSettings.Default for now; changing to accept settings affects all child generators and determinism.
+        // AI: Generate: validates harmony track before generation; fast-fail on invalid data prevents silent errors.
+        // AI: behavior=Runs HarmonyValidator with default options (StrictDiatonicChordTones=true) to catch F# minor crashes.
         public static GeneratorResult Generate(SongContext songContext)
         {
             ValidateHarmonyTrack(songContext.HarmonyTrack);
             ValidateTimeSignatureTrack(songContext.Song.TimeSignatureTrack);
             ValidateGrooveTrack(songContext.GrooveTrack);
+
+            // Validate harmony events for musical correctness before generation
+            var validationResult = HarmonyValidator.ValidateTrack(
+                songContext.HarmonyTrack,
+                new HarmonyValidationOptions
+                {
+                    ApplyFixes = false,
+                    StrictDiatonicChordTones = true,
+                    ClampInvalidBassToRoot = false,
+                    AllowUnknownQuality = false
+                });
+
+            if (!validationResult.IsValid)
+            {
+                var errorMessage = "Harmony validation failed:\n" + string.Join("\n", validationResult.Errors);
+                throw new InvalidOperationException(errorMessage);
+            }
 
             // Get total bars from harmony events
             int totalBars = songContext.HarmonyTrack.Events.Max(e => e.StartBar);

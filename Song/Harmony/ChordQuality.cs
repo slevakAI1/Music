@@ -90,11 +90,22 @@ namespace Music.Generator
             return trimmed;
         }
 
-        // AI: IsValid: returns true only when input matches a known short or long name (case-insensitive); whitespace=false.
+        // AI: IsValid: returns true only when input matches a known short or long name (case-insensitive); empty string valid (Major).
+        // AI: behavior=Empty string "" is valid (Major short name); only null or whitespace-only strings are invalid.
         public static bool IsValid(string quality)
         {
+            // Null check
+            if (quality == null)
+                return false;
+            
+            // Empty string is valid (Major chord short name "")
+            if (quality == "")
+                return true;
+            
+            // Whitespace-only strings are invalid
             if (string.IsNullOrWhiteSpace(quality))
                 return false;
+            
             var trimmed = quality.Trim();
             return _shortToLong.ContainsKey(trimmed) || _longToShort.ContainsKey(trimmed);
         }
