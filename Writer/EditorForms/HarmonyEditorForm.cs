@@ -308,15 +308,17 @@ namespace Music.Designer
 
             foreach (var he in initial.Events)
             {
+                var normalized = HarmonyEventNormalizer.Normalize(he);
+                
                 _working.Add(new WorkingEvent
                 {
-                    StartBar = he.StartBar,
-                    StartBeat = he.StartBeat,
-                    DurationBeats = he.DurationBeats,
-                    Key = he.Key,
-                    Degree = he.Degree,
-                    Quality = ChordQuality.Normalize(he.Quality), // Normalize to short name
-                    Bass = he.Bass
+                    StartBar = normalized.StartBar,
+                    StartBeat = normalized.StartBeat,
+                    DurationBeats = normalized.DurationBeats,
+                    Key = normalized.Key,
+                    Degree = normalized.Degree,
+                    Quality = normalized.Quality,
+                    Bass = normalized.Bass
                 });
             }
 
@@ -670,15 +672,17 @@ namespace Music.Designer
 
             foreach (var he in defaults.Events)
             {
+                var normalized = HarmonyEventNormalizer.Normalize(he);
+                
                 _working.Add(new WorkingEvent
                 {
-                    StartBar = he.StartBar,
-                    StartBeat = he.StartBeat,
-                    DurationBeats = he.DurationBeats,
-                    Key = he.Key,
-                    Degree = he.Degree,
-                    Quality = ChordQuality.Normalize(he.Quality), // Normalize to short name
-                    Bass = he.Bass
+                    StartBar = normalized.StartBar,
+                    StartBeat = normalized.StartBeat,
+                    DurationBeats = normalized.DurationBeats,
+                    Key = normalized.Key,
+                    Degree = normalized.Degree,
+                    Quality = normalized.Quality,
+                    Bass = normalized.Bass
                 });
             }
 
