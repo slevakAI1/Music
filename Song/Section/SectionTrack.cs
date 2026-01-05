@@ -13,6 +13,9 @@ namespace Music.Generator
 
         private int _nextBar = 1;
 
+        // AI: TotalBars: computed as next free bar - 1; reflects last bar index covered by Sections.
+        public int TotalBars => _nextBar - 1;
+
         // AI: Reset clears sections and resets next bar to 1; callers may reuse same SectionTrack instance.
         public void Reset()
         {
@@ -58,9 +61,5 @@ namespace Music.Generator
             section = null;
             return false;
         }
-
-        // AI: TotalBars: computed as next free bar - 1; reflects last bar index covered by Sections.
-        public int TotalBars => _nextBar - 1;
-
     }
 }
