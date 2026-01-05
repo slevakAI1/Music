@@ -102,8 +102,7 @@ namespace Music.Generator
                     bassOctave);
 
 
-                var currentBar = barTrack.GetBar(bar);
-                if (currentBar == null)
+                if (!barTrack.TryGetBar(bar, out var currentBar))
                     continue;
 
                 int ticksPerMeasure = currentBar.TicksPerMeasure;
@@ -172,8 +171,7 @@ namespace Music.Generator
                     guitarOctave);
 
 
-                var currentBar = barTrack.GetBar(bar);
-                if (currentBar == null)
+                if (!barTrack.TryGetBar(bar, out var currentBar))
                     continue;
 
                 int ticksPerMeasure = currentBar.TicksPerMeasure;
@@ -244,8 +242,7 @@ namespace Music.Generator
                     keysOctave);
 
 
-                var currentBar = barTrack.GetBar(bar);
-                if (currentBar == null)
+                if (!barTrack.TryGetBar(bar, out var currentBar))
                     continue;
 
                 int ticksPerMeasure = currentBar.TicksPerMeasure;
@@ -314,8 +311,7 @@ namespace Music.Generator
                 var layer = grooveEvent.AnchorLayer;
 
 
-                var currentBar = barTrack.GetBar(bar);
-                if (currentBar == null)
+                if (!barTrack.TryGetBar(bar, out var currentBar))
                     continue;
 
                 int ticksPerMeasure = currentBar.TicksPerMeasure;
