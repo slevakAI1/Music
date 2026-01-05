@@ -80,25 +80,11 @@
             return activeEvent;
         }
 
-        // AI: GetBar: returns matching Bar by BarNumber or null if not present (skipped or cleared).
-        // AI: implementation delegates to TryGetBar for consistent validation and lookup logic.
-        public Bar? GetBar(int barNumber)
-        {
-            return TryGetBar(barNumber, out var bar) ? bar : null;
-        }
-
         // AI: Clear: destructive; resets internal list only; callers must RebuildFromTimingTrack to repopulate.
         public void Clear()
         {
             _bars.Clear();
         }
-
-
-        // ==============================================================================================================================
-
-
-
-        //   THESE ARE NEW METHODS added to BarTrack to support common operations like retrieving bars, converting bar+beat to ticks, and validating beat positions within bars. They rely on the existing structure of Bar and the way bars are built from TimingTrack events. These methods are essential for consumers of BarTrack to interact with the bar data effectively without needing to manually search through the Bars list or perform their own calculations for ticks and beat positions.
 
         // AI: TryGetBar: primary lookup method with validation; returns false for barNumber < 1 or not found; callers should prefer this for robustness.
         public bool TryGetBar(int barNumber, out Bar bar)
@@ -114,6 +100,10 @@
             bar = found;
             return true;
         }
+
+        // ==============================================================================================================================
+
+        //   THESE ARE NEW METHODS added to BarTrack to support common operations like retrieving bars, converting bar+beat to ticks, and validating beat positions within bars. They rely on the existing structure of Bar and the way bars are built from TimingTrack events. These methods are essential for consumers of BarTrack to interact with the bar data effectively without needing to manually search through the Bars list or perform their own calculations for ticks and beat positions.
 
         /// <summary>
         /// Converts a bar + fractional onsetBeat (1-based, quarter-note beat units) into absolute ticks.

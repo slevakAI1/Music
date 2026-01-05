@@ -105,21 +105,21 @@ namespace Music.Generator
                 if (!barTrack.TryGetBar(bar, out var currentBar))
                     continue;
 
-                int ticksPerMeasure = currentBar.TicksPerMeasure;
-                long measureStartTick = currentBar.StartTick;
+                long measureEndTick = barTrack.GetBarEndTick(bar);
 
                 for (int i = 0; i < bassOnsets.Count; i++)
                 {
                     decimal onsetBeat = bassOnsets[i];
-                    int onsetTick = (int)(measureStartTick + (long)((onsetBeat - 1m) * MusicConstants.TicksPerQuarterNote));
+                    long onsetTickLong = barTrack.ToTick(bar, onsetBeat);
 
                     // Only add note if onset is within this measure
-                    if (onsetTick < measureStartTick + ticksPerMeasure)
+                    if (onsetTickLong < measureEndTick)
                     {
-                        int nextOnsetTick = (i + 1 < bassOnsets.Count)
-                            ? (int)(measureStartTick + (long)((bassOnsets[i + 1] - 1m) * MusicConstants.TicksPerQuarterNote))
-                            : (int)(measureStartTick + ticksPerMeasure);
-                        int duration = nextOnsetTick - onsetTick;
+                        long nextOnsetTickLong = (i + 1 < bassOnsets.Count)
+                            ? barTrack.ToTick(bar, bassOnsets[i + 1])
+                            : measureEndTick;
+                        int onsetTick = (int)onsetTickLong;
+                        int duration = (int)(nextOnsetTickLong - onsetTickLong);
 
                         int midiNote = randomizer.SelectBassPitch(ctx, bar, onsetBeat);
 
@@ -174,21 +174,21 @@ namespace Music.Generator
                 if (!barTrack.TryGetBar(bar, out var currentBar))
                     continue;
 
-                int ticksPerMeasure = currentBar.TicksPerMeasure;
-                long measureStartTick = currentBar.StartTick;
+                long measureEndTick = barTrack.GetBarEndTick(bar);
 
                 for (int i = 0; i < compOnsets.Count; i++)
                 {
                     decimal onsetBeat = compOnsets[i];
-                    int onsetTick = (int)(measureStartTick + (long)((onsetBeat - 1m) * MusicConstants.TicksPerQuarterNote));
+                    long onsetTickLong = barTrack.ToTick(bar, onsetBeat);
 
                     // Only add note if onset is within this measure
-                    if (onsetTick < measureStartTick + ticksPerMeasure)
+                    if (onsetTickLong < measureEndTick)
                     {
-                        int nextOnsetTick = (i + 1 < compOnsets.Count)
-                            ? (int)(measureStartTick + (long)((compOnsets[i + 1] - 1m) * MusicConstants.TicksPerQuarterNote))
-                            : (int)(measureStartTick + ticksPerMeasure);
-                        int duration = nextOnsetTick - onsetTick;
+                        long nextOnsetTickLong = (i + 1 < compOnsets.Count)
+                            ? barTrack.ToTick(bar, compOnsets[i + 1])
+                            : measureEndTick;
+                        int onsetTick = (int)onsetTickLong;
+                        int duration = (int)(nextOnsetTickLong - onsetTickLong);
 
                         var (midiNote, pitchClass) = randomizer.SelectGuitarPitch(ctx, bar, onsetBeat, previousPitchClass);
 
@@ -245,21 +245,21 @@ namespace Music.Generator
                 if (!barTrack.TryGetBar(bar, out var currentBar))
                     continue;
 
-                int ticksPerMeasure = currentBar.TicksPerMeasure;
-                long measureStartTick = currentBar.StartTick;
+                long measureEndTick = barTrack.GetBarEndTick(bar);
 
                 for (int i = 0; i < padsOnsets.Count; i++)
                 {
                     decimal onsetBeat = padsOnsets[i];
-                    int onsetTick = (int)(measureStartTick + (long)((onsetBeat - 1m) * MusicConstants.TicksPerQuarterNote));
+                    long onsetTickLong = barTrack.ToTick(bar, onsetBeat);
 
                     // Only add note if onset is within this measure
-                    if (onsetTick < measureStartTick + ticksPerMeasure)
+                    if (onsetTickLong < measureEndTick)
                     {
-                        int nextOnsetTick = (i + 1 < padsOnsets.Count)
-                            ? (int)(measureStartTick + (long)((padsOnsets[i + 1] - 1m) * MusicConstants.TicksPerQuarterNote))
-                            : (int)(measureStartTick + ticksPerMeasure);
-                        int duration = nextOnsetTick - onsetTick;
+                        long nextOnsetTickLong = (i + 1 < padsOnsets.Count)
+                            ? barTrack.ToTick(bar, padsOnsets[i + 1])
+                            : measureEndTick;
+                        int onsetTick = (int)onsetTickLong;
+                        int duration = (int)(nextOnsetTickLong - onsetTickLong);
 
                         bool isFirstOnset = previousHarmony == null ||
                             harmonyEvent.StartBar != previousHarmony.StartBar ||
@@ -314,19 +314,19 @@ namespace Music.Generator
                 if (!barTrack.TryGetBar(bar, out var currentBar))
                     continue;
 
-                int ticksPerMeasure = currentBar.TicksPerMeasure;
-                long measureStartTick = currentBar.StartTick;
+                long measureEndTick = barTrack.GetBarEndTick(bar);
 
                 // Kick pattern
                 if (layer.KickOnsets != null)
                 {
                     foreach (var onsetBeat in layer.KickOnsets)
                     {
-                        int onsetTick = (int)(measureStartTick + (long)((onsetBeat - 1m) * MusicConstants.TicksPerQuarterNote));
+                        long onsetTickLong = barTrack.ToTick(bar, onsetBeat);
 
                         // Only add note if onset is within this measure
-                        if (onsetTick < measureStartTick + ticksPerMeasure)
+                        if (onsetTickLong < measureEndTick)
                         {
+                            int onsetTick = (int)onsetTickLong;
                             int velocity = randomizer.SelectDrumVelocity(bar, onsetBeat, "kick", baseVelocity: 100);
 
                             notes.Add(new PartTrackEvent(
@@ -343,11 +343,12 @@ namespace Music.Generator
                 {
                     foreach (var onsetBeat in layer.SnareOnsets)
                     {
-                        int onsetTick = (int)(measureStartTick + (long)((onsetBeat - 1m) * MusicConstants.TicksPerQuarterNote));
+                        long onsetTickLong = barTrack.ToTick(bar, onsetBeat);
 
                         // Only add note if onset is within this measure
-                        if (onsetTick < measureStartTick + ticksPerMeasure)
+                        if (onsetTickLong < measureEndTick)
                         {
+                            int onsetTick = (int)onsetTickLong;
                             int velocity = randomizer.SelectDrumVelocity(bar, onsetBeat, "snare", baseVelocity: 90);
 
                             notes.Add(new PartTrackEvent(
@@ -364,11 +365,12 @@ namespace Music.Generator
                 {
                     foreach (var onsetBeat in layer.HatOnsets)
                     {
-                        int onsetTick = (int)(measureStartTick + (long)((onsetBeat - 1m) * MusicConstants.TicksPerQuarterNote));
+                        long onsetTickLong = barTrack.ToTick(bar, onsetBeat);
 
                         // Only add note if onset is within this measure
-                        if (onsetTick < measureStartTick + ticksPerMeasure)
+                        if (onsetTickLong < measureEndTick)
                         {
+                            int onsetTick = (int)onsetTickLong;
                             int velocity = randomizer.SelectDrumVelocity(bar, onsetBeat, "hat", baseVelocity: 70);
 
                             notes.Add(new PartTrackEvent(
