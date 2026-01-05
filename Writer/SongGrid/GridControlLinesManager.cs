@@ -1,4 +1,4 @@
-// AI: purpose=Manage fixed grid control lines (Section/Harmony/TimeSignature/Tempo rows) and attach their track data to the grid.
+﻿// AI: purpose=Manage fixed grid control lines (Section/Harmony/TimeSignature/Tempo rows) and attach their track data to the grid.
 // AI: invariants=Fixed rows use hidden "colData" cell to store track objects; columns represent measures starting at MEASURE_START_COLUMN_INDEX.
 // AI: deps=Consumers rely on SongGridManager constants and Music.Generator track shapes; changing names breaks many callers.
 // AI: change=If adding track types update attach helpers and any grid population logic to keep UI in sync.
@@ -206,32 +206,14 @@ namespace Music.Writer
             // Populate measure cells with time signature at the starting bar of each time signature event
             foreach (var timeSignatureEvent in timeSignatureTrack.Events)
             {
-                // Convert 1-based bar number to 0-based measure index
-                int measureIndex = timeSignatureEvent.StartBar - 1;
-                
-                // Calculate the column index for this measure
-                int columnIndex = SongGridManager.MEASURE_START_COLUMN_INDEX + measureIndex;
+                // StartBar is 1-based, so bar 1 should map to column MEASURE_START_COLUMN_INDEX
+                int columnIndex = SongGridManager.MEASURE_START_COLUMN_INDEX + (timeSignatureEvent.StartBar - 1);
 
-                // Ensure the column exists (dynamically add if needed)
-                while (dgSong.Columns.Count <= columnIndex)
-                {
-                    int measureNumber = dgSong.Columns.Count - SongGridManager.MEASURE_START_COLUMN_INDEX + 1;
-                    var colMeasure = new DataGridViewTextBoxColumn
-                    {
-                        Name = $"colMeasure{measureNumber}",
-                        HeaderText = $"{measureNumber}",
-                        Width = 40,
-                        ReadOnly = true,
-                        DefaultCellStyle = new DataGridViewCellStyle
-                        {
-                            Alignment = DataGridViewContentAlignment.MiddleCenter
-                        }
-                    };
-                    dgSong.Columns.Add(colMeasure);
-                }
+                // Debug output
+                System.Diagnostics.Debug.WriteLine($"Time Sig: Bar {timeSignatureEvent.StartBar} → Column {columnIndex} = {timeSignatureEvent.Numerator}/{timeSignatureEvent.Denominator}");
 
-                // Set the time signature value in the appropriate measure cell (format: "numerator/denominator")
-                if (columnIndex < dgSong.Columns.Count)
+                // Set the time signature value in the appropriate measure cell
+                if (columnIndex >= 0 && columnIndex < dgSong.Columns.Count)
                 {
                     dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE].Cells[columnIndex].Value = 
                         $"{timeSignatureEvent.Numerator}/{timeSignatureEvent.Denominator}";
