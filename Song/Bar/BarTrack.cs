@@ -25,17 +25,12 @@
                 return;
             }
 
-            // Sort timing events by start bar
-            var sortedEvents = timingTrack.Events
-                .OrderBy(e => e.StartBar)
-                .ToList();
-
             long currentTick = 0;
 
             for (int barNumber = 1; barNumber <= totalBars; barNumber++)
             {
-                // Find the active time signature for this bar
-                var activeEvent = GetActiveTimingEvent(sortedEvents, barNumber);
+                // Use the canonical Timingtrack method to find the active time signature for this bar
+                var activeEvent = timingTrack.GetActiveTimeSignatureEvent(barNumber);
 
                 if (activeEvent == null)
                 {
@@ -60,24 +55,6 @@
                 // Advance to next bar's start tick
                 currentTick = bar.EndTick;
             }
-        }
-
-        // AI: GetActiveTimingEvent: returns last event with StartBar<=barNumber or null; expects sortedEvents asc.
-        private TimingEvent? GetActiveTimingEvent(List<TimingEvent> sortedEvents, int barNumber)
-        {
-            TimingEvent? activeEvent = null;
-
-            foreach (var evt in sortedEvents)
-            {
-                if (evt.StartBar > barNumber)
-                {
-                    // We've gone past the target bar
-                    break;
-                }
-                activeEvent = evt;
-            }
-
-            return activeEvent;
         }
 
         // AI: Clear: destructive; resets internal list only; callers must RebuildFromTimingTrack to repopulate.
