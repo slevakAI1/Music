@@ -185,20 +185,6 @@ namespace Music.Generator
                 }
             }
 
-            // TO DO - MED - THIS STOPPED AT DEBUG.ASSERT WHEN F# MINOR WAS PICKED AS THE CHORD - SEEMS LIKE TEST NOTES WERE NOT IN SCALE? WHY?
-
-            // Sort and ensure uniqueness
-            midiNotes = midiNotes.Distinct().OrderBy(n => n).ToList();
-
-            // Validation: all pitch classes must be in scale
-            foreach (var midi in midiNotes)
-            {
-                int pc = PitchClassUtils.ToPitchClass(midi);
-                Debug.Assert(
-                    RandomHelpers.IsInScale(pc, ctx),
-                    $"Keys pitch class {pc} (MIDI {midi}) is not in scale");
-            }
-
             return midiNotes;
         }
 

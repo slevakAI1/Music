@@ -94,7 +94,8 @@ namespace Music.Designer
             MaximizeBox = false;
             ShowInTaskbar = false;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            ClientSize = new Size(1000, 600);
+            // Increased width so advisory column can show messages fully and right-side editor is pushed right
+            ClientSize = new Size(1200, 600);
 
             var root = new TableLayoutPanel
             {
@@ -103,9 +104,10 @@ namespace Music.Designer
                 RowCount = 1,
                 Padding = new Padding(8)
             };
-            root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60));
-            root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40));
-            Controls.Add(root);
+            // Give a bit more width to the list (left) so the advisory column is visible
+            root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 68));
+            root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 32));
+             Controls.Add(root);
 
             // Left: list and row actions
             var left = new TableLayoutPanel
@@ -134,6 +136,8 @@ namespace Music.Designer
             _lv.Columns.Add("Deg", 50, HorizontalAlignment.Right);
             _lv.Columns.Add("Qual", 80, HorizontalAlignment.Left);
             _lv.Columns.Add("Bass", 80, HorizontalAlignment.Left);
+            // Wider advisory column so short messages like 'Not Diatonic' are fully visible
+            _lv.Columns.Add("Adv", 160, HorizontalAlignment.Left); // Advisory column
 
             _lv.SelectedIndexChanged += OnListSelectionChanged;
             _lv.ItemDrag += OnItemDrag;
@@ -360,6 +364,9 @@ namespace Music.Designer
                 item.SubItems.Add(w.Degree.ToString());
                 item.SubItems.Add(w.Quality); // Display short name in list
                 item.SubItems.Add(w.Bass);
+                // Advisory: show 'Not Diatonic' when chord tones are not all in the key's scale
+                bool isDiatonic = HarmonyValidator.IsChordDiatonic(w.Key, w.Degree, w.Quality, w.Bass);
+                item.SubItems.Add(isDiatonic ? string.Empty : "Not Diatonic");
                 item.Tag = w;
                 _lv.Items.Add(item);
             }
@@ -388,6 +395,11 @@ namespace Music.Designer
             it.SubItems[4].Text = w.Degree.ToString();
             it.SubItems[5].Text = w.Quality;
             it.SubItems[6].Text = w.Bass;
+            // Advisory: show 'Not Diatonic' when chord tones are not all in the key's scale
+            // ensure columns/subitems exist
+            while (it.SubItems.Count <= 7) it.SubItems.Add(string.Empty); // status at index 7
+            bool diatonic = HarmonyValidator.IsChordDiatonic(w.Key, w.Degree, w.Quality, w.Bass);
+            it.SubItems[7].Text = diatonic ? string.Empty : "Not Diatonic";
         }
 
         private void UpdateButtonsEnabled()

@@ -24,7 +24,7 @@ namespace Music.Generator
                 new HarmonyValidationOptions
                 {
                     ApplyFixes = false,
-                    StrictDiatonicChordTones = true,
+                    StrictDiatonicChordTones = false,
                     ClampInvalidBassToRoot = false,
                     AllowUnknownQuality = false
                 });

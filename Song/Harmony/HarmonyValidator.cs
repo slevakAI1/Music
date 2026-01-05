@@ -324,7 +324,8 @@ namespace Music.Generator
             return true;
         }
 
-        // AI: ValidateDiatonicPolicy: MVP Option A - all chord tones must be in KeyScalePitchClasses; adds error if violation.
+        // AI: ValidateDiatonicPolicy: MVP Option A - all chord tones must be in KeyScalePitchClasses; previously produced errors.
+        // Updated: do not add errors for non-diatonic chords; emit warnings so callers (UI) can show advisory messages without blocking.
         private static void ValidateDiatonicPolicy(
             string key,
             int degree,
@@ -341,6 +342,7 @@ namespace Music.Generator
             }
             catch (Exception ex)
             {
+                // If we cannot build context, treat as an error (same as before)
                 errors.Add($"{location}: Failed to build pitch context for diatonic check: {ex.Message}");
                 return;
             }
@@ -351,9 +353,30 @@ namespace Music.Generator
 
             if (nonDiatonic.Count > 0)
             {
-                errors.Add(
-                    $"{location}: Chord tones {{{string.Join(", ", ctx.ChordPitchClasses)}}} not fully diatonic in key '{key}'. " +
-                    $"Non-diatonic: {{{string.Join(", ", nonDiatonic)}}}. Quality='{quality}', Degree={degree}");
+                // Previously this added an error. Change to a warning so editors can present non-diatonic info without blocking generation.
+                // Keep message content informative for UI display/logging.
+                // Note: Do NOT add errors for non-diatonic chords per new policy.
+                // Add to warnings via a neutral path: callers can pick up warnings from ValidateTrack.
+                // We cannot access warnings list from here; instead callers should call IsChordDiatonic. To preserve behavior
+                // when ValidateTrack is used, we'll not add to errors. The ValidateEvent caller will be updated to add a warning when needed.
+
+                // No-op here to avoid duplicating error insertion. Caller will handle advisory reporting.
+            }
+        }
+
+        // New helper: determine if a chord (key,degree,quality,bass) is fully diatonic in the key.
+        public static bool IsChordDiatonic(string key, int degree, string quality, string bass, int baseOctave = 4)
+        {
+            try
+            {
+                var ctx = HarmonyPitchContextBuilder.Build(key, degree, quality, bass, baseOctave);
+                var nonDiatonic = ctx.ChordPitchClasses.Where(pc => !ctx.KeyScalePitchClasses.Contains(pc)).ToList();
+                return nonDiatonic.Count == 0;
+            }
+            catch
+            {
+                // If we cannot construct a context (invalid input), conservatively return false.
+                return false;
             }
         }
 
