@@ -40,8 +40,8 @@ namespace Music.Generator
             // 6) Groove track: set one event at bar 1 beat one for PopRockBasic preset
             songContext.GrooveTrack = GrooveTests.CreateTestGrooveD1();
 
-            // 7) Build bar track from timing track
-            songContext.BarTrack.RebuildFromTimingTrack(songContext.Song.TimeSignatureTrack, TotalBars);
+            // 7) Build bar track from timing track using SectionTrack total bars
+            songContext.BarTrack.RebuildFromTimingTrack(songContext.Song.TimeSignatureTrack, songContext.SectionTrack.TotalBars);
         }
     }
 }

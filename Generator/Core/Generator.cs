@@ -1,5 +1,5 @@
 // AI: purpose=Generate PartTracks for parts using harmony, groove, and timing; uses controlled randomness via PitchRandomizer.
-// AI: invariants=Order: Harmony->Groove->Bar must align; totalBars derived from Harmony events; tick calc uses (onsetBeat-1)*TicksPerQuarterNote.
+// AI: invariants=Order: Harmony->Groove->Bar must align; totalBars derived from SectionTrack; tick calc uses (onsetBeat-1)*TicksPerQuarterNote.
 // AI: deps=Relies on HarmonyTrack.GetActiveHarmonyEvent, GrooveTrack.GetActiveGroovePreset, BarTrack.GetBar, MusicConstants.TicksPerQuarterNote.
 // AI: perf=Not real-time; called once per song generation; avoid heavy allocations in inner loops.
 // TODO? confirm behavior when groove/pads onsets null vs empty; current code skips in both cases.
@@ -35,8 +35,8 @@ namespace Music.Generator
                 throw new InvalidOperationException(errorMessage);
             }
 
-            // Get total bars from harmony events
-            int totalBars = songContext.HarmonyTrack.Events.Max(e => e.StartBar);
+            // Get total bars from section track
+            int totalBars = songContext.SectionTrack.TotalBars;
 
             // Use default randomization settings
             var settings = RandomizationSettings.Default;
