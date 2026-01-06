@@ -60,7 +60,7 @@ namespace Music.Generator
         // TO DO 
         // AI: EndTick: computed property retrieves EndTick. EndTick will be either
         // (1) the start tick of the next event in the list (assume they are sorted by startbar)
-        // or (2) if there is only one groove event then will be = to the last tick of the last bar in the song 
+        // or (2) if there is only one groove event then will be = to the last tick of the last bar in the song (from bartrack) 
         // The compute logic can be in the property for now. Use minimum amount of code.
         public long EndTick
         {
