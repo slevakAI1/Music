@@ -39,14 +39,20 @@ namespace Music.Designer
 
         public GrooveTrack ResultTrack { get; private set; } = new GrooveTrack();
 
+        // Store BarTrack for creating GrooveEvents
+        private readonly BarTrack _barTrack;
+
         private sealed class WorkingEvent
         {
             public int StartBar { get; set; } = 1;
             public string GroovePresetName { get; set; } = string.Empty;
         }
 
-        public GrooveEditorForm(GrooveTrack? initial = null)
+        public GrooveEditorForm(BarTrack barTrack, GrooveTrack? initial = null)
         {
+            ArgumentNullException.ThrowIfNull(barTrack);
+            _barTrack = barTrack;
+            
             Text = "Edit Groove";
             FormBorderStyle = FormBorderStyle.FixedDialog;
             StartPosition = FormStartPosition.CenterParent;
@@ -552,7 +558,7 @@ namespace Music.Designer
 
             foreach (var w in _working)
             {
-                tl.Add(new GrooveEvent
+                tl.Add(new GrooveEvent(_barTrack)
                 {
                     StartBar = w.StartBar,
                     SourcePresetName = w.GroovePresetName

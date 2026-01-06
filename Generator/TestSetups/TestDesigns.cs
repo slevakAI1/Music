@@ -37,11 +37,12 @@ namespace Music.Generator
             // AI: note=DefaultTempoBpm constant is 120; ensure TempoTests uses TestDesigns.DefaultTempoBpm and avoid hardcoded values.
             songContext.Song.TempoTrack = TempoTests.CreateTestTrackD1();
 
-            // 6) Groove track: set one event at bar 1 beat one for PopRockBasic preset
-            songContext.GrooveTrack = GrooveTests.CreateTestGrooveD1();
-
-            // 7) Build bar track from timing track using SectionTrack total bars
+            // 6) Build bar track from timing track using SectionTrack total bars
+            // AI: note=BarTrack must be built before GrooveTrack since GrooveEvent constructor requires non-null BarTrack.
             songContext.BarTrack.RebuildFromTimingTrack(songContext.Song.TimeSignatureTrack, songContext.SectionTrack.TotalBars);
+
+            // 7) Groove track: set one event at bar 1 beat one for PopRockBasic preset
+            songContext.GrooveTrack = GrooveTests.CreateTestGrooveD1(songContext.BarTrack);
         }
     }
 }

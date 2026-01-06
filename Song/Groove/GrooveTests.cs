@@ -9,18 +9,18 @@ namespace Music.Generator
     public static class GrooveTests
     {
         // AI: CreateTestGrooveD1 used in unit tests and default demos; keep commented multi-event example for manual testing.
-        public static GrooveTrack CreateTestGrooveD1()
+        public static GrooveTrack CreateTestGrooveD1(BarTrack barTrack)
         {
             var grooveTrack = new GrooveTrack();
 
-            grooveTrack.Add(new GrooveEvent
+            grooveTrack.Add(new GrooveEvent(barTrack)
             {
                 StartBar = 1,
                 SourcePresetName = "PopRockBasic"
             });
 
             // Multiple event test case - do not delete this:
-            //grooveTrack.Add(new GrooveEvent
+            //grooveTrack.Add(new GrooveEvent(barTrack)
             //{
             //    StartBar = 3,
             //    StartBeat = 1,

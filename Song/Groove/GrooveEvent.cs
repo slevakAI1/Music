@@ -14,14 +14,9 @@ namespace Music.Generator
         // AI: SourcePresetName optional human label; may be empty when created programmatically.
         public string SourcePresetName { get; set; }
 
-
-
-
         // AI: StartBar is 1-based; class does not enforce StartBar <= EndBar; callers must ensure validity.
         public int StartBar { get; set; }
 
-        // AI: EndBar inclusive 1-based end; consumers treat interval as [StartBar, EndBar].
-        public int EndBar { get; set; }
 
         // AI: AnchorLayer is primary groove pattern; lists inside may be unsorted/duplicated and must be normalized by callers.
         public GrooveInstanceLayer AnchorLayer { get; set; }
@@ -32,34 +27,51 @@ namespace Music.Generator
         // AI: BarOnsets keys are 1-based bar numbers; values may omit bars inside the range to indicate no onsets.
         public Dictionary<int, GrooveBarOnsets> BarOnsets { get; set; }
 
-        // AI: ctor: initializes collections to empty to avoid null checks; preserves InstanceId immutability.
-        public GrooveEvent()
+        // AI: BarTrack reference for tick calculations; stored from constructor; required non-null.
+        private readonly BarTrack _barTrack;
+
+        // AI: ctor: initializes collections to empty to avoid null checks; preserves InstanceId immutability; requires non-null BarTrack for tick lookups.
+        public GrooveEvent(BarTrack barTrack)
         {
+            ArgumentNullException.ThrowIfNull(barTrack);
+            
             InstanceId = Guid.NewGuid().ToString("N");
             SourcePresetName = string.Empty;
             StartBar = 1;
-            EndBar = 1;
             AnchorLayer = new GrooveInstanceLayer();
             TensionLayer = new GrooveInstanceLayer();
             BarOnsets = new Dictionary<int, GrooveBarOnsets>();
+            _barTrack = barTrack;
+        }
+
+        // AI: StartTick: computed property retrieves StartTick from Bar corresponding to StartBar; throws if bar not found.
+        public long StartTick
+        {
+            get
+            {
+                if (!_barTrack.TryGetBar(StartBar, out var bar))
+                    throw new InvalidOperationException($"Bar {StartBar} not found in BarTrack.");
+                
+                return bar.StartTick;
+            }
         }
 
 
+        // TO DO 
+        // AI: EndTick: computed property retrieves EndTick. EndTick will be either
+        // (1) the start tick of the next event in the list (assume they are sorted by startbar)
+        // or (2) if there is only one groove event then will be = to the last tick of the last bar in the song 
+        // The compute logic can be in the property for now. Use minimum amount of code.
+        public long EndTick
+        {
+            get
+            {
+                // TBD
 
-
-
-
-        // Computed properties or methods for GrooveEvent
-
-        public int StartTick { get; set; }
-
-        public int EndTick { get; set; }
+                return 0; 
+            }
+        }
     }
-
-
-
-
-
 
     // AI: GrooveInstanceLayer holds per-role onset lists; lists may be empty and are not normalized here.
     public sealed class GrooveInstanceLayer

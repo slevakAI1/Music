@@ -33,6 +33,7 @@ namespace Music.Writer
         private readonly WriterFormGridOperations _gridOperations = new();
 
         //===========================   I N I T I A L I Z A T I O N   ===========================
+
         // AI: ctor initializes services, default UI selections, and captures initial WriterFormData once.
         public WriterForm()
         {
@@ -195,7 +196,10 @@ namespace Music.Writer
 
                 var initialGroove = _songContext.GrooveTrack;
 
-                using var dlg = new Music.Designer.GrooveEditorForm(initialGroove);
+
+                // TO DO - Groove endbar is always a 1 - doesnt seem to be used
+
+                using var dlg = new Music.Designer.GrooveEditorForm(_songContext.BarTrack, initialGroove);
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
                     _songContext.GrooveTrack = dlg.ResultTrack;
@@ -337,8 +341,6 @@ namespace Music.Writer
                     break;
             }
         }
-
-
 
 
 
