@@ -13,7 +13,7 @@ namespace Music.Generator
         {
             var grooveTrack = new GrooveTrack();
 
-            grooveTrack.Add(new GrooveEvent(barTrack)
+            grooveTrack.Add(new GrooveEvent()
             {
                 StartBar = 1,
                 SourcePresetName = "PopRockBasic"

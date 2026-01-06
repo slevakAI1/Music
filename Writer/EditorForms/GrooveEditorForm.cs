@@ -558,7 +558,7 @@ namespace Music.Designer
 
             foreach (var w in _working)
             {
-                tl.Add(new GrooveEvent(_barTrack)
+                tl.Add(new GrooveEvent()
                 {
                     StartBar = w.StartBar,
                     SourcePresetName = w.GroovePresetName
