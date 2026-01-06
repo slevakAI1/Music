@@ -204,13 +204,30 @@ namespace Music.Designer
             editor.Controls.Add(meterPanel, 1, row);
             row++;
 
+            // Add instructional label in remaining space
+            editor.RowStyles.Add(new RowStyle(SizeType.Absolute, 20)); // spacing
+            row++;
+            
+            editor.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            var instructionLabel = new Label 
+            { 
+                Text = "Click Add or Insert, then set Start Bar to add new timing events",
+                AutoSize = false,
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.TopLeft,
+                Margin = new Padding(0, 10, 0, 0)
+            };
+            editor.Controls.Add(instructionLabel, 0, row);
+            editor.SetColumnSpan(instructionLabel, 2);
+            row++;
+
             for (; row < editor.RowCount; row++)
                 editor.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
             var bottomButtons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.RightToLeft };
             right.Controls.Add(bottomButtons, 0, 1);
 
-            _btnOk = new Button { Text = "OK", DialogResult = DialogResult.OK, AutoSize = true };
+            _btnOk = new Button { Text = "Save", DialogResult = DialogResult.OK, AutoSize = true };
             _btnCancel = new Button { Text = "Cancel", DialogResult = DialogResult.Cancel, AutoSize = true };
             bottomButtons.Controls.AddRange(new Control[] { _btnOk, _btnCancel, _btnDefaults });
 
@@ -221,9 +238,29 @@ namespace Music.Designer
             LoadInitial(initial);
             RefreshListView(selectIndex: _working.Count > 0 ? 0 : -1);
 
-            // Build ResultTrack only when OK
+            // Build ResultTrack only when Save is clicked, after validation
             _btnOk.Click += (s, e) =>
             {
+                // Check for duplicate StartBar values
+                var duplicates = _working
+                    .GroupBy(w => w.StartBar)
+                    .Where(g => g.Count() > 1)
+                    .Select(g => g.Key)
+                    .OrderBy(bar => bar)
+                    .ToList();
+
+                if (duplicates.Count > 0)
+                {
+                    string barList = string.Join(", ", duplicates);
+                    string message = duplicates.Count == 1
+                        ? $"Error: Multiple events have the same Start Bar value: {barList}\n\nPlease ensure each event has a unique Start Bar value."
+                        : $"Error: Multiple events share Start Bar values: {barList}\n\nPlease ensure each event has a unique Start Bar value.";
+                    
+                    MessageBoxHelper.Show(message, "Duplicate Start Bar Values", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    DialogResult = DialogResult.None;
+                    return;
+                }
+
                 ResultTrack = BuildResult();
                 DialogResult = DialogResult.OK;
                 Close();
