@@ -14,6 +14,9 @@ namespace Music.Generator
         // AI: SourcePresetName optional human label; may be empty when created programmatically.
         public string SourcePresetName { get; set; }
 
+
+
+
         // AI: StartBar is 1-based; class does not enforce StartBar <= EndBar; callers must ensure validity.
         public int StartBar { get; set; }
 
@@ -40,7 +43,23 @@ namespace Music.Generator
             TensionLayer = new GrooveInstanceLayer();
             BarOnsets = new Dictionary<int, GrooveBarOnsets>();
         }
+
+
+
+
+
+
+        // Computed properties or methods for GrooveEvent
+
+        public int StartTick { get; set; }
+
+        public int EndTick { get; set; }
     }
+
+
+
+
+
 
     // AI: GrooveInstanceLayer holds per-role onset lists; lists may be empty and are not normalized here.
     public sealed class GrooveInstanceLayer

@@ -10,8 +10,11 @@ namespace Music.Generator
         // AI: logical position; no enforcement of 0/1 base; callers maintain uniqueness/order if required.
         public int BarNumber;
 
-        // AI: absolute tick for bar end; no enforced relation to StartTick; inclusive/exclusive convention is external.
-        public long EndTick;  
+        // AI: authoritative start tick for events in this bar - set by RebuildFromTimingTrack()
+        public long StartTick { get; set; }
+
+        // AI: absolute tick for bar end - set by RebuildFromTimingTrack()
+        public long EndTick { get; set; }  
         
         // AI: TS numerator; must be positive; changing after cache access yields stale cached values.
         public int Numerator;
@@ -33,8 +36,6 @@ namespace Music.Generator
         // AI: computed=musical beats in bar; heuristic: for 6/8,9/8,12/8 returns Numerator/3; cached.
         public int BeatsPerBar => _beatsPerBar ??= CalculateBeatsPerBar();
 
-        // AI: authoritative start tick for events in this bar; init-only: set at creation and not modified.
-        public long StartTick { get; init; }
 
         // AI: heuristic for compound meters: if Denominator==8 and Numerator divisible by 3 and >=6, group beats by 3.
         private int CalculateBeatsPerBar()
