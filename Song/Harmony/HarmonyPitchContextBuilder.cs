@@ -8,7 +8,7 @@ namespace Music.Generator
     public static class HarmonyPitchContextBuilder
     {
         // AI: Build(harmonyEvent): null-checks then forwards to param Build; preserves SourceEvent for debugging.
-        public static HarmonyPitchContext Build(HarmonyEvent harmonyEvent, int baseOctave = 4)
+        public static HarmonyPitchContext Build(HarmonyEvent harmonyEvent, int baseOctave = 4, HarmonyPolicy? policy = null)
         {
             if (harmonyEvent == null)
                 throw new ArgumentNullException(nameof(harmonyEvent));
@@ -19,19 +19,25 @@ namespace Music.Generator
                 harmonyEvent.Quality,
                 harmonyEvent.Bass,
                 baseOctave,
+                policy,
                 harmonyEvent);
         }
 
         // AI: Build(params): key steps: parse key->pitchclass, get scale pcs, validate degree, get chord MIDI notes, dedupe/sort, map to pcs.
         // AI: invariants=Degree must be 1..7; ChordMidiNotes are deduped/sorted; ChordPitchClasses are unique sorted 0-11 values.
+        // AI: policy=When AllowNonDiatonicChordTones=false (default), filters chord tones to only include diatonic pitch classes.
         public static HarmonyPitchContext Build(
             string key,
             int degree,
             string quality,
             string bass,
             int baseOctave = 4,
+            HarmonyPolicy? policy = null,
             HarmonyEvent? sourceEvent = null)
         {
+            // Use default policy if not provided
+            policy ??= HarmonyPolicy.Default;
+
             // Step 1: Get the key root pitch class
             int keyRootPitchClass = PitchClassUtils.ParseKeyToPitchClass(key);
 
@@ -65,7 +71,24 @@ namespace Music.Generator
                 .OrderBy(pc => pc)
                 .ToList();
 
-            // Step 7: Build and return the context
+            // Step 7: Apply policy-based filtering
+            if (!policy.AllowNonDiatonicChordTones)
+            {
+                // Filter chord tones to only include diatonic pitch classes
+                var diatonicChordPitchClasses = chordPitchClasses
+                    .Where(pc => keyScalePitchClasses.Contains(pc))
+                    .ToList();
+
+                // Filter MIDI notes to match the diatonic chord pitch classes
+                var diatonicChordMidiNotes = sortedChordMidiNotes
+                    .Where(midi => diatonicChordPitchClasses.Contains(PitchClassUtils.ToPitchClass(midi)))
+                    .ToList();
+
+                chordPitchClasses = diatonicChordPitchClasses;
+                sortedChordMidiNotes = diatonicChordMidiNotes;
+            }
+
+            // Step 8: Build and return the context
             return new HarmonyPitchContext
             {
                 SourceEvent = sourceEvent,

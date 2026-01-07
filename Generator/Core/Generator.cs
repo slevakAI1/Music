@@ -46,8 +46,9 @@ namespace Music.Generator
             // Get total bars from section track
             int totalBars = songContext.SectionTrack.TotalBars;
 
-            // Use default randomization settings
+            // Use default randomization settings and harmony policy
             var settings = RandomizationSettings.Default;
+            var harmonyPolicy = HarmonyPolicy.Default;
 
             return new GeneratorResult
             {
@@ -56,10 +57,11 @@ namespace Music.Generator
                     songContext.GrooveTrack,
                     songContext.BarTrack,
                     totalBars,
-                    settings),            //  Randomization settings 
+                    settings,
+                    harmonyPolicy),            //  Randomization settings 
 
-                GuitarTrack = GenerateGuitarTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, totalBars, settings),
-                KeysTrack = GenerateKeysTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, totalBars, settings),
+                GuitarTrack = GenerateGuitarTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, totalBars, settings, harmonyPolicy),
+                KeysTrack = GenerateKeysTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, totalBars, settings, harmonyPolicy),
                 DrumTrack = GenerateDrumTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, totalBars, settings)
             };
         }
@@ -82,7 +84,8 @@ namespace Music.Generator
             GrooveTrack grooveTrack,
             BarTrack barTrack,
             int totalBars,
-            RandomizationSettings settings)
+            RandomizationSettings settings,
+            HarmonyPolicy policy)
         {
             var notes = new List<PartTrackEvent>();
             var randomizer = new PitchRandomizer(settings);
@@ -110,7 +113,8 @@ namespace Music.Generator
                         harmonyEvent.Degree,
                         harmonyEvent.Quality,
                         harmonyEvent.Bass,
-                        bassOctave);
+                        bassOctave,
+                        policy);
 
                     int midiNote = randomizer.SelectBassPitch(ctx, slot.Bar, slot.OnsetBeat);
 
@@ -132,7 +136,8 @@ namespace Music.Generator
             GrooveTrack grooveTrack,
             BarTrack barTrack,
             int totalBars,
-            RandomizationSettings settings)
+            RandomizationSettings settings,
+            HarmonyPolicy policy)
         {
             var notes = new List<PartTrackEvent>();
             var randomizer = new PitchRandomizer(settings);
@@ -161,7 +166,8 @@ namespace Music.Generator
                         harmonyEvent.Degree,
                         harmonyEvent.Quality,
                         harmonyEvent.Bass,
-                        guitarOctave);
+                        guitarOctave,
+                        policy);
 
                     var (midiNote, pitchClass) = randomizer.SelectGuitarPitch(ctx, slot.Bar, slot.OnsetBeat, previousPitchClass);
 
@@ -185,7 +191,8 @@ namespace Music.Generator
             GrooveTrack grooveTrack,
             BarTrack barTrack,
             int totalBars,
-            RandomizationSettings settings)
+            RandomizationSettings settings,
+            HarmonyPolicy policy)
         {
             var notes = new List<PartTrackEvent>();
             var randomizer = new PitchRandomizer(settings);
@@ -219,7 +226,8 @@ namespace Music.Generator
                         harmonyEvent.Degree,
                         harmonyEvent.Quality,
                         harmonyEvent.Bass,
-                        keysOctave);
+                        keysOctave,
+                        policy);
 
                     var chordMidiNotes = randomizer.SelectKeysVoicing(ctx, slot.Bar, slot.OnsetBeat, isFirstOnset);
 

@@ -117,12 +117,16 @@ COMPLETED - `HarmonyDiagnostics` and `HarmonyEventDiagnostic` classes created; `
 
 ===============================================================================================================
 
-## Story 2.3 — Make chord tone generation policy-aware
+## Story 2.3 — Make chord tone generation policy-aware - COMPLETED
 
 Acceptance criteria:
 - Update `HarmonyPitchContextBuilder`/`ChordVoicingHelper` usage to allow policy-based chord tone sets.
 - When `AllowNonDiatonicChordTones=false`, ensure chord tone pitch classes are in scale (as today).
 - When enabled later, expand scale membership checks accordingly.
+
+COMPLETED - `HarmonyPitchContextBuilder.Build` now accepts optional `HarmonyPolicy` parameter; filters chord tones and MIDI notes to only include diatonic pitch classes when `AllowNonDiatonicChordTones=false`; Generator passes `HarmonyPolicy.Default` to all context builder calls.
+
+===============================================================================================================
 
 ---
 
