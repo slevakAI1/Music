@@ -26,7 +26,7 @@ Generate real music that resembles skilled human composition and performance:
 
 **Why:** generation currently depends on `SectionTrack.TotalBars` and bar-only harmony activation; onset duration logic is duplicated; future realism needs a single time model.
 
-## Story 1.1 — Make `SectionTrack` the sole authority for song length
+## Story 1.1 — Make `SectionTrack` the sole authority for song length - COMPLETED
 
 **Intent:** remove ambiguity: the song’s total bar count is defined by the arranged sections, not by how many notes exist in any track.
 
@@ -34,11 +34,11 @@ Acceptance criteria:
 - Define and enforce the invariant: **song length = sum of section lengths**.
   - In code terms: `Song.TotalBars == SongContext.SectionTrack.TotalBars`.
 
-DONE - code updated
+COMPLETED - code updated
 	
 - If `SectionTrack.Sections.Count == 0`, treat the song as **not arranged** (invalid for generation/export), and surface a clear, actionable error.
 
-DONE - code updated
+COMPLETED - code updated
 
 
 - Rebuild tick ruler from this authority:
