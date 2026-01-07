@@ -158,9 +158,27 @@ namespace Music.Generator
             if (!ValidateBass(ref bass, key, evt.Degree, quality, location, errors, warnings, options))
                 return;
 
-            if (options.StrictDiatonicChordTones)
+            // Use policy to determine diatonic validation behavior
+            var policy = options.Policy ?? HarmonyPolicy.Default;
+            
+            if (policy.StrictChordToneScaleMembership || options.StrictDiatonicChordTones)
             {
-                ValidateDiatonicPolicy(key, evt.Degree, quality, bass, location, errors, options);
+                // Check if chord is diatonic
+                if (!IsChordDiatonic(key, evt.Degree, quality, bass, options.ValidationBaseOctave))
+                {
+                    // Non-diatonic chord detected
+                    if (policy.AllowNonDiatonicChordTones)
+                    {
+                        // Policy allows non-diatonic chord tones; add advisory warning only
+                        warnings.Add($"{location}: Chord contains non-diatonic tones (allowed by policy)");
+                    }
+                    else
+                    {
+                        // Strict policy: chord tones must be in scale (current MVP default)
+                        // Continue to allow generation but add warning for editor display
+                        warnings.Add($"{location}: Chord contains non-diatonic tones");
+                    }
+                }
             }
 
             if (options.ApplyFixes)

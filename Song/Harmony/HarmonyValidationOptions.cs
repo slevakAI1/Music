@@ -23,5 +23,9 @@ namespace Music.Generator
 
         // AI: AllowUnknownQuality: when false (recommended), unknown qualities are errors; when true, they pass validation.
         public bool AllowUnknownQuality { get; init; } = false;
+
+        // AI: Policy: HarmonyPolicy controls non-diatonic tones, borrowed chords, secondary dominants (Stage 2).
+        // AI: behavior=When null, uses HarmonyPolicy.Default; validator uses this to determine pitch context rules.
+        public HarmonyPolicy? Policy { get; init; }
     }
 }

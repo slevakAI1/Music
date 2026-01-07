@@ -7,9 +7,14 @@
   - Canonical short chord qualities exist via `ChordQuality`.
   - UI editor `HarmonyEditorForm` displays long names but **stores short names**.
   - `HarmonyEventNormalizer` and `HarmonyValidator` already exist (ordering, key parse, degree 1–7, quality validity, bass validity, optional diatonic checks).
+  - **HarmonyPolicy** defines rules for non-diatonic tones, borrowed chords, and secondary dominants.
 - **Timing / ticks:** `Timingtrack` provides time signatures by bar; `BarTrack.RebuildFromTimingTrack` derives bar start/end ticks; `BarTrack.ToTick(bar, onsetBeat)` converts 1-based quarter-note beat units to absolute ticks.
 - **Generation (MVP):** `Generator.Core.Generator` produces monophonic bass + guitar, block-chord keys, and simple drums driven by groove onsets, with constrained randomness (`PitchRandomizer`).
 - **Export:** MIDI conversion pipeline works and assumes absolute event ticks.
+
+## Assumptions (design-time validation)
+
+All design elements in `SongContext` (groove, harmony, lyrics, sections, timing/time signatures, and the derived `BarTrack`) are entered via UI editors and validated on Save. The generator can assume these design-time data elements are valid and does not re-validate or normalize them during generation.
 
 ## End goal
 
@@ -22,7 +27,7 @@ Generate real music that resembles skilled human composition and performance:
 
 ---
 
-# Stage 1 — Make musical time + authority explicit (foundation)
+# Stage 1 — Make musical time + authority explicit (foundation) - COMPLETED
 
 **Why:** generation currently depends on `SectionTrack.TotalBars` and bar-only harmony activation; onset duration logic is duplicated; future realism needs a single time model.
 
@@ -44,14 +49,13 @@ COMPLETED - code updated
 - Rebuild tick ruler from this authority:
   - `SongContext.BarTrack.RebuildFromTimingTrack(song.TimeSignatureTrack, totalBars: Song.TotalBars)`.
 
-N/A - Generators should be able to rely on `BarTrack` for accurate bar start/end ticks, and `Timingtrack` for time signature info.
+N/A - Generator assumes `BarTrack` is already correct and does not rebuild it.
 
 - - Enforce the “no notes outside the song form” rule:
   - Generators must not emit events whose `absoluteTimeTicks` are outside `[0, endTickOfLastBar)`.
   - Editors/importers should validate and/or trim notes that fall outside the arranged bars.
 
-N/A - Generators will have access to section/bar/tick info to avoid/enfore this; the timing track editor already rebuilds upon editing
-so the generators can rely that the `BarTrack` is always accurate;
+N/A - Generator uses section/bar/tick info to avoid this.
 
 ===============================================================================================================
 
@@ -61,7 +65,7 @@ The detailed per-part coverage story has been deferred and moved to `Backlog.md`
 
 =============================================================================================================== 
 
-## Story 1.2 — Harmony activation by bar + beat (not bar-only) - DONE
+## Story 1.2 — Harmony activation by bar + beat (not bar-only) - COMPLETED
 
 **Intent:** unlock mid-bar harmony changes, anticipations, and more realistic harmonic rhythm.
 
@@ -72,7 +76,7 @@ Acceptance criteria:
 
 =============================================================================================================== 
 
-## Story 1.3 — Centralize onset/duration tick math - DONE
+## Story 1.3 — Centralize onset/duration tick math - COMPLETED
 
 **Intent:** eliminate repeated “next onset else end of measure” logic and make durations consistent across instruments.
 
@@ -81,24 +85,6 @@ Acceptance criteria:
   - Input: bar number, list of onset beats, `BarTrack`.
   - Output: list of `OnsetSlot { Bar, OnsetBeat, StartTick, EndTick, DurationTicks, IsStrongBeat }`.
 - Refactor bass/guitar/keys/drums generators to consume `OnsetGrid`.
-- Edge cases handled:
-  - duplicates/sortedness of onsets (either normalize or validate + fail fast)
-  - onsets outside the bar return errors/are rejected consistently.
-
-=============================================================================================================== 
-
-## Story 1.4 — Groove onset normalization + diagnostics
-
-**Intent:** groove presets are raw lists; generation should be robust and produce actionable diagnostics.
-
-Acceptance criteria:
-- Add `GrooveOnsetNormalizer.NormalizeLayer(GrooveInstanceLayer layer, int beatsPerBar)`.
-- Normalization operations:
-  - sort ascending
-  - distinct within tolerance (exact decimal equality is fine for now)
-  - remove invalid (<1 or >= beatsPerBar+1)
-- Generator uses normalized onsets.
-- Unit tests for normalization edge cases.
 
 ---
 
@@ -106,7 +92,7 @@ Acceptance criteria:
 
 **Why:** the code already has `HarmonyValidator` and partial diatonic logic; “real music” needs explicit, configurable treatment of non-diatonic tones (borrowed chords, secondary dominants).
 
-## Story 2.1 — Define `HarmonyPolicy` used by validator + pitch context
+## Story 2.1 — Define `HarmonyPolicy` used by validator + pitch context - COMPLETED
 
 Acceptance criteria:
 - Add `HarmonyPolicy` (settings object) with options such as:
@@ -115,6 +101,10 @@ Acceptance criteria:
   - `AllowBorrowedChords` (future)
   - `StrictChordToneScaleMembership` (current Stage-1 behavior)
 - `HarmonyValidator.ValidateTrack` takes `HarmonyPolicy` (or embeds into existing `HarmonyValidationOptions`).
+
+COMPLETED - `HarmonyPolicy` class created with default policy; embedded in `HarmonyValidationOptions.Policy`; validator uses policy to control diatonic validation behavior.
+
+===============================================================================================================
 
 ## Story 2.2 — Produce a structured diagnostics report
 
