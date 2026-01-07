@@ -34,7 +34,7 @@ Acceptance criteria:
 - Define and enforce the invariant: **song length = sum of section lengths**.
   - In code terms: `Song.TotalBars == SongContext.SectionTrack.TotalBars`.
 
-COMPLETED - code updated
+COMPLETED - code updated	
 	
 - If `SectionTrack.Sections.Count == 0`, treat the song as **not arranged** (invalid for generation/export), and surface a clear, actionable error.
 
@@ -54,24 +54,12 @@ N/A - Generators will have access to section/bar/tick info to avoid/enfore this;
 so the generators can rely that the `BarTrack` is always accurate;
 
 ===============================================================================================================
-	-
-## Story 1.1b — Track per-part bar coverage (progress) independently of song length
 
-**Intent:** support incremental/manual workflows where parts are filled non-uniformly and non-contiguously; generation needs to know what is empty vs already has content.
+## Story 1.1b — Track per-part bar coverage (progress) moved to backlog
 
-Acceptance criteria:
-- Introduce a computed analysis utility (not stored state) such as `PartTrackBarCoverageAnalyzer`:
-  - Inputs: `PartTrack`, `BarTrack` (the ruler), and `totalBars`.
-  - Output: per-bar status map, e.g. `Dictionary<int, BarFillState>`.
-- Define `BarFillState` (proposed MVP):
-  - `Empty`: no events intersect this bar
-  - `HasContent`: at least one event intersects this bar
-  - `Locked`: optional user-set flag meaning “do not modify” (may be added later)
-- Provide bar intersection rules (MVP):
-  - A note “belongs to” a bar if its `[startTick, endTick)` overlaps the bar’s `[StartTick, EndTick)`.
-- Update generators to optionally:
-  - fill only `Empty` bars
-  - leave `HasContent` bars untouched (or add only if policy allows)
+The detailed per-part coverage story has been deferred and moved to `Backlog.md`. See `Backlog.md` for the full deferred story and acceptance criteria.
+
+=============================================================================================================== 
 
 ## Story 1.2 — Harmony activation by bar + beat (not bar-only)
 
@@ -79,6 +67,9 @@ Acceptance criteria:
 
 Acceptance criteria:
 - Add `HarmonyTrack.GetActiveHarmonyEvent(int bar, decimal beat)` (beat is 1-based, quarter-note units to match groove onsets).
+
+
+
 - Preserve existing `GetActiveHarmonyEvent(int bar)` for compatibility.
 - Ordering invariant remains: `StartBar`, then `StartBeat`.
 - Update generator to query active harmony at each onset (`bar`, `onsetBeat`).
