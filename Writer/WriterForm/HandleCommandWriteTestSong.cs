@@ -8,21 +8,17 @@ using Music.Generator;
 namespace Music.Writer
 {
     // AI: Command handler for groove-driven generator test; wraps generator call and updates UI grid with results.
-    public static class HandleCommandGrooveSyncTest
+    public static class HandleCommandWriteTestSong
     {
-        // AI: HandleGrooveSyncTest: rebuilds BarTrack from SectionTrack, runs generator, appends 4 PartTracks to Song and grid.
-        // AI: errors=any exception is shown via ShowGrooveError; no retry or partial-commit logic.
-        public static void HandleGrooveSyncTest(
+        // AI: HandleCommandWriteTestSong: runs generator, appends 4 PartTracks to Song and grid.
+        // AI: errors=any exception is shown via ShowError; no retry or partial-commit logic.
+        public static void HandleWriteTestSong(
             SongContext songContext,
             DataGridView dgSong)
         {
             try
             {
-                // Ensure BarTrack is up-to-date before generating
-                int totalBars = songContext.SectionTrack.TotalBars;
-                songContext.BarTrack.RebuildFromTimingTrack(songContext.Song.TimeSignatureTrack, totalBars);
-
-                // Generate all song tracks using the GrooveTrack
+                // Generate all song tracks 
                 var result = Generator.Generator.Generate(songContext);
                 songContext.Song.PartTracks.Add(result.BassTrack);
                 songContext.Song.PartTracks.Add(result.GuitarTrack);
@@ -34,31 +30,31 @@ namespace Music.Writer
                 SongGridManager.AddNewPartTrack(result.GuitarTrack, dgSong);
                 SongGridManager.AddNewPartTrack(result.KeysTrack, dgSong);
                 SongGridManager.AddNewPartTrack(result.DrumTrack, dgSong);
-                ShowGrooveSuccess(4);
+                ShowSuccess(4);
             }
             catch (Exception ex)
             {
-                ShowGrooveError(ex);
+                ShowError(ex);
             }
         }
 
         #region MessageBox
 
-        // AI: ShowGrooveSuccess: message text should remain stable for tests that assert success dialogs.
-        private static void ShowGrooveSuccess(int addedCount)
+        // AI: ShowSuccess: message text should remain stable for tests that assert success dialogs.
+        private static void ShowSuccess(int addedCount)
         {
             MessageBoxHelper.Show(
-                $"Successfully created {addedCount} synchronized tracks using groove track with controlled randomness.",
-                "Groove Sync Test",
+                $"Successfully created {addedCount} tracks.",
+                "Write Test Song",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
         }
 
-        // AI: ShowGrooveError: shows exception message; avoid leaking sensitive info in production UI.
-        private static void ShowGrooveError(Exception ex)
+        // AI: ShowError: shows exception message; avoid leaking sensitive info in production UI.
+        private static void ShowError(Exception ex)
         {
             MessageBoxHelper.Show(
-                $"Error generating groove tracks:\n{ex.Message}",
+                $"Generator error:\n{ex.Message}",
                 "Generation Error",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);

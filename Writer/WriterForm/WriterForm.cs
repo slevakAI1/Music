@@ -330,8 +330,8 @@ namespace Music.Writer
                     break;
 
                     // THIS IS WORKING NOW!
-                case "Harmony Groove Sync Test":
-                    HandleCommandGrooveSyncTest.HandleGrooveSyncTest(_songContext, dgSong);
+                case "Write Test Song":
+                    HandleCommandWriteTestSong.HandleWriteTestSong(_songContext, dgSong);
                     break;
 
                 // Other cases will be added here later.

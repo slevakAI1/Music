@@ -14,6 +14,9 @@ namespace Music.Generator
         // AI: behavior=Runs HarmonyValidator with default options (StrictDiatonicChordTones=true) to catch F# minor crashes.
         public static GeneratorResult Generate(SongContext songContext)
         {
+            // validate songcontext is not null
+            ValidateSongContext(songContext);
+
             ValidateHarmonyTrack(songContext.HarmonyTrack);
             ValidateTimeSignatureTrack(songContext.Song.TimeSignatureTrack);
             ValidateGrooveTrack(songContext.GrooveTrack);
@@ -405,6 +408,12 @@ namespace Music.Generator
         {
             if (grooveTrack == null || grooveTrack.Events.Count == 0)
                 throw new ArgumentException("Groove track must have events", nameof(grooveTrack));
+        }
+
+        // ValidateSongContext: ensures caller provided a non-null SongContext; throws ArgumentNullException when null.
+        private static void ValidateSongContext(SongContext songContext)
+        {
+            ArgumentNullException.ThrowIfNull(songContext);
         }
 
         #endregion
