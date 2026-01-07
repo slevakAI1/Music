@@ -3,6 +3,11 @@
 // AI: deps=Relies on HarmonyTrack.GetActiveHarmonyEvent, GrooveTrack.GetActiveGroovePreset, BarTrack.GetBar, MusicConstants.TicksPerQuarterNote.
 // AI: perf=Not real-time; called once per song generation; avoid heavy allocations in inner loops.
 // TODO? confirm behavior when groove/pads onsets null vs empty; current code skips in both cases.
+// IMPORTANT: Generator MUST NOT rebuild or mutate `BarTrack`.
+// The `BarTrack` is considered a read-only timing "ruler" for generation and must be built
+// by the caller (e.g., editor/export pipeline) via `BarTrack.RebuildFromTimingTrack(...)` before
+// calling `Generator.Generate(...)`. Rebuilding `BarTrack` inside the generator would mask
+// upstream integrity issues and is intentionally avoided.
 
 using Music.MyMidi;
 
@@ -16,7 +21,7 @@ namespace Music.Generator
         {
             // validate songcontext is not null
             ValidateSongContext(songContext);
-
+            ValidateSectionTrack(songContext.SectionTrack);
             ValidateHarmonyTrack(songContext.HarmonyTrack);
             ValidateTimeSignatureTrack(songContext.Song.TimeSignatureTrack);
             ValidateGrooveTrack(songContext.GrooveTrack);
@@ -392,6 +397,13 @@ namespace Music.Generator
         #region Validation
 
         // AI: Validation methods throw ArgumentException when required tracks are missing; callers rely on exceptions for invalid song contexts.
+
+        private static void ValidateSectionTrack(SectionTrack sectionTrack)
+        {
+            if (sectionTrack == null || sectionTrack.Sections.Count == 0)
+                throw new ArgumentException("Section track must have events", nameof(sectionTrack));
+        }
+
         private static void ValidateHarmonyTrack(HarmonyTrack harmonyTrack)
         {
             if (harmonyTrack == null || harmonyTrack.Events.Count == 0)

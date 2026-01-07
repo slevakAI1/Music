@@ -33,17 +33,28 @@ Generate real music that resembles skilled human composition and performance:
 Acceptance criteria:
 - Define and enforce the invariant: **song length = sum of section lengths**.
   - In code terms: `Song.TotalBars == SongContext.SectionTrack.TotalBars`.
-	- 
-	- 
-	- 
-	- 
+
+DONE - code updated
+	
 - If `SectionTrack.Sections.Count == 0`, treat the song as **not arranged** (invalid for generation/export), and surface a clear, actionable error.
+
+DONE - code updated
+
+
 - Rebuild tick ruler from this authority:
   - `SongContext.BarTrack.RebuildFromTimingTrack(song.TimeSignatureTrack, totalBars: Song.TotalBars)`.
-- Enforce the “no notes outside the song form” rule:
+
+N/A - Generators should be able to rely on `BarTrack` for accurate bar start/end ticks, and `Timingtrack` for time signature info.
+
+- - Enforce the “no notes outside the song form” rule:
   - Generators must not emit events whose `absoluteTimeTicks` are outside `[0, endTickOfLastBar)`.
   - Editors/importers should validate and/or trim notes that fall outside the arranged bars.
 
+N/A - Generators will have access to section/bar/tick info to avoid/enfore this; the timing track editor already rebuilds upon editing
+so the generators can rely that the `BarTrack` is always accurate;
+
+===============================================================================================================
+	-
 ## Story 1.1b — Track per-part bar coverage (progress) independently of song length
 
 **Intent:** support incremental/manual workflows where parts are filled non-uniformly and non-contiguously; generation needs to know what is empty vs already has content.
