@@ -199,10 +199,12 @@ namespace Music.Generator
 
             var result = HarmonyValidator.ValidateTrack(track, options);
 
-            if (result.IsValid)
-                return Fail("V minor in C major should fail strict diatonic check");
-            if (!result.Errors.Any(e => e.Contains("not fully diatonic")))
-                return Fail("Expected diatonic error");
+            // After Story 2.1, non-diatonic chords produce warnings, not errors
+            if (!result.IsValid)
+                return Fail("Track should be valid (non-diatonic produces warnings, not errors)");
+            
+            if (!result.Warnings.Any(w => w.Contains("Non-diatonic") || w.Contains("non-diatonic")))
+                return Fail("Expected non-diatonic warning");
 
             return Pass("TestNonDiatonicChordTones");
         }

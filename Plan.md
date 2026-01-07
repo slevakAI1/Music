@@ -106,12 +106,16 @@ COMPLETED - `HarmonyPolicy` class created with default policy; embedded in `Harm
 
 ===============================================================================================================
 
-## Story 2.2 — Produce a structured diagnostics report
+## Story 2.2 — Produce a structured diagnostics report - COMPLETED
 
 Acceptance criteria:
 - Introduce `HarmonyDiagnostics`:
   - `Errors[]`, `Warnings[]`, and **per-event** diagnostics (bar:beat, summary).
-- `HarmonyEditorForm` can display advisory messages from diagnostics (existing “Adv” column is a good hook).
+- `HarmonyEditorForm` can display advisory messages from diagnostics (existing "Adv" column is a good hook).
+
+COMPLETED - `HarmonyDiagnostics` and `HarmonyEventDiagnostic` classes created; `HarmonyValidationResult` updated with Diagnostics property; validator populates structured diagnostics; editor form displays warnings in Adv column; comprehensive tests added and passing.
+
+===============================================================================================================
 
 ## Story 2.3 — Make chord tone generation policy-aware
 
