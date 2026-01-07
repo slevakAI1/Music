@@ -74,7 +74,6 @@ namespace Music.Generator
         }
 
 
-        // TO DO - HIGH - STEP THRU THIS TO SEE HOW IT WORKS EXACTLY
 
         // AI: GenerateBassTrack: builds HarmonyPitchContext with bassOctave=2; SelectBassPitch must return appropriate pc.
         // AI: keep MIDI program number 33; changing octave constant or program number impacts tonal range and tests.
@@ -91,54 +90,35 @@ namespace Music.Generator
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
-                // Get the active groove preset for this bar
                 var grooveEvent = grooveTrack.GetActiveGroovePreset(bar);
-
                 var bassOnsets = grooveEvent.AnchorLayer.BassOnsets;
                 if (bassOnsets == null || bassOnsets.Count == 0)
                     continue;
 
-                if (!barTrack.TryGetBar(bar, out var currentBar))
-                    continue;
+                // Build onset grid for this bar
+                var onsetSlots = OnsetGrid.Build(bar, bassOnsets, barTrack);
 
-                long measureEndTick = barTrack.GetBarEndTick(bar);
-
-                for (int i = 0; i < bassOnsets.Count; i++)
+                foreach (var slot in onsetSlots)
                 {
-                    decimal onsetBeat = bassOnsets[i];
-
                     // Find active harmony at this bar+beat
-                    var harmonyEvent = harmonyTrack.GetActiveHarmonyEvent(bar, onsetBeat);
+                    var harmonyEvent = harmonyTrack.GetActiveHarmonyEvent(slot.Bar, slot.OnsetBeat);
                     if (harmonyEvent == null)
                         continue;
 
-                    long onsetTickLong = barTrack.ToTick(bar, onsetBeat);
+                    var ctx = HarmonyPitchContextBuilder.Build(
+                        harmonyEvent.Key,
+                        harmonyEvent.Degree,
+                        harmonyEvent.Quality,
+                        harmonyEvent.Bass,
+                        bassOctave);
 
-                    // Only add note if onset is within this measure
-                    if (onsetTickLong < measureEndTick)
-                    {
-                        long nextOnsetTickLong = (i + 1 < bassOnsets.Count)
-                            ? barTrack.ToTick(bar, bassOnsets[i + 1])
-                            : measureEndTick;
-                        int onsetTick = (int)onsetTickLong;
-                        int duration = (int)(nextOnsetTickLong - onsetTickLong);
+                    int midiNote = randomizer.SelectBassPitch(ctx, slot.Bar, slot.OnsetBeat);
 
-                        var ctx = HarmonyPitchContextBuilder.Build(
-                            harmonyEvent.Key,
-                            harmonyEvent.Degree,
-                            harmonyEvent.Quality,
-                            harmonyEvent.Bass,
-                            bassOctave);
-
-                        int midiNote = randomizer.SelectBassPitch(ctx, bar, onsetBeat);
-
-
-                        notes.Add(new PartTrackEvent(
-                            noteNumber: midiNote,
-                            absoluteTimeTicks: onsetTick,
-                            noteDurationTicks: duration,
-                            noteOnVelocity: 95));
-                    }
+                    notes.Add(new PartTrackEvent(
+                        noteNumber: midiNote,
+                        absoluteTimeTicks: (int)slot.StartTick,
+                        noteDurationTicks: slot.DurationTicks,
+                        noteOnVelocity: 95));
                 }
             }
 
@@ -161,55 +141,37 @@ namespace Music.Generator
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
-                // Get the active groove preset for this bar
                 var grooveEvent = grooveTrack.GetActiveGroovePreset(bar);
-
                 var compOnsets = grooveEvent.AnchorLayer.CompOnsets;
                 if (compOnsets == null || compOnsets.Count == 0)
                     continue;
 
-                if (!barTrack.TryGetBar(bar, out var currentBar))
-                    continue;
+                // Build onset grid for this bar
+                var onsetSlots = OnsetGrid.Build(bar, compOnsets, barTrack);
 
-                long measureEndTick = barTrack.GetBarEndTick(bar);
-
-                for (int i = 0; i < compOnsets.Count; i++)
+                foreach (var slot in onsetSlots)
                 {
-                    decimal onsetBeat = compOnsets[i];
-
                     // Find active harmony at this bar+beat
-                    var harmonyEvent = harmonyTrack.GetActiveHarmonyEvent(bar, onsetBeat);
+                    var harmonyEvent = harmonyTrack.GetActiveHarmonyEvent(slot.Bar, slot.OnsetBeat);
                     if (harmonyEvent == null)
                         continue;
 
-                    long onsetTickLong = barTrack.ToTick(bar, onsetBeat);
+                    var ctx = HarmonyPitchContextBuilder.Build(
+                        harmonyEvent.Key,
+                        harmonyEvent.Degree,
+                        harmonyEvent.Quality,
+                        harmonyEvent.Bass,
+                        guitarOctave);
 
-                    // Only add note if onset is within this measure
-                    if (onsetTickLong < measureEndTick)
-                    {
-                        long nextOnsetTickLong = (i + 1 < compOnsets.Count)
-                            ? barTrack.ToTick(bar, compOnsets[i + 1])
-                            : measureEndTick;
-                        int onsetTick = (int)onsetTickLong;
-                        int duration = (int)(nextOnsetTickLong - onsetTickLong);
+                    var (midiNote, pitchClass) = randomizer.SelectGuitarPitch(ctx, slot.Bar, slot.OnsetBeat, previousPitchClass);
 
-                        var ctx = HarmonyPitchContextBuilder.Build(
-                            harmonyEvent.Key,
-                            harmonyEvent.Degree,
-                            harmonyEvent.Quality,
-                            harmonyEvent.Bass,
-                            guitarOctave);
+                    notes.Add(new PartTrackEvent(
+                        noteNumber: midiNote,
+                        absoluteTimeTicks: (int)slot.StartTick,
+                        noteDurationTicks: slot.DurationTicks,
+                        noteOnVelocity: 85));
 
-                        var (midiNote, pitchClass) = randomizer.SelectGuitarPitch(ctx, bar, onsetBeat, previousPitchClass);
-
-                        notes.Add(new PartTrackEvent(
-                            noteNumber: midiNote,
-                            absoluteTimeTicks: onsetTick,
-                            noteDurationTicks: duration,
-                            noteOnVelocity: 85));
-
-                        previousPitchClass = pitchClass;
-                    }
+                    previousPitchClass = pitchClass;
                 }
             }
 
@@ -233,59 +195,41 @@ namespace Music.Generator
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
-                // Get the active groove preset for this bar
                 var grooveEvent = grooveTrack.GetActiveGroovePreset(bar);
-
                 var padsOnsets = grooveEvent.AnchorLayer.PadsOnsets;
                 if (padsOnsets == null || padsOnsets.Count == 0)
                     continue;
 
-                if (!barTrack.TryGetBar(bar, out var currentBar))
-                    continue;
+                // Build onset grid for this bar
+                var onsetSlots = OnsetGrid.Build(bar, padsOnsets, barTrack);
 
-                long measureEndTick = barTrack.GetBarEndTick(bar);
-
-                for (int i = 0; i < padsOnsets.Count; i++)
+                foreach (var slot in onsetSlots)
                 {
-                    decimal onsetBeat = padsOnsets[i];
-
                     // Find active harmony at this bar+beat
-                    var harmonyEvent = harmonyTrack.GetActiveHarmonyEvent(bar, onsetBeat);
+                    var harmonyEvent = harmonyTrack.GetActiveHarmonyEvent(slot.Bar, slot.OnsetBeat);
                     if (harmonyEvent == null)
                         continue;
 
-                    long onsetTickLong = barTrack.ToTick(bar, onsetBeat);
+                    bool isFirstOnset = previousHarmony == null ||
+                        harmonyEvent.StartBar != previousHarmony.StartBar ||
+                        harmonyEvent.StartBeat != previousHarmony.StartBeat;
 
-                    // Only add note if onset is within this measure
-                    if (onsetTickLong < measureEndTick)
+                    var ctx = HarmonyPitchContextBuilder.Build(
+                        harmonyEvent.Key,
+                        harmonyEvent.Degree,
+                        harmonyEvent.Quality,
+                        harmonyEvent.Bass,
+                        keysOctave);
+
+                    var chordMidiNotes = randomizer.SelectKeysVoicing(ctx, slot.Bar, slot.OnsetBeat, isFirstOnset);
+
+                    foreach (int midiNote in chordMidiNotes)
                     {
-                        long nextOnsetTickLong = (i + 1 < padsOnsets.Count)
-                            ? barTrack.ToTick(bar, padsOnsets[i + 1])
-                            : measureEndTick;
-                        int onsetTick = (int)onsetTickLong;
-                        int duration = (int)(nextOnsetTickLong - onsetTickLong);
-
-                        bool isFirstOnset = previousHarmony == null ||
-                            harmonyEvent.StartBar != previousHarmony.StartBar ||
-                            harmonyEvent.StartBeat != previousHarmony.StartBeat;
-
-                        var ctx = HarmonyPitchContextBuilder.Build(
-                            harmonyEvent.Key,
-                            harmonyEvent.Degree,
-                            harmonyEvent.Quality,
-                            harmonyEvent.Bass,
-                            keysOctave);
-
-                        var chordMidiNotes = randomizer.SelectKeysVoicing(ctx, bar, onsetBeat, isFirstOnset);
-
-                        foreach (int midiNote in chordMidiNotes)
-                        {
-                            notes.Add(new PartTrackEvent(
-                                noteNumber: midiNote,
-                                absoluteTimeTicks: onsetTick,
-                                noteDurationTicks: duration,
-                                noteOnVelocity: 75));
-                        }
+                        notes.Add(new PartTrackEvent(
+                            noteNumber: midiNote,
+                            absoluteTimeTicks: (int)slot.StartTick,
+                            noteDurationTicks: slot.DurationTicks,
+                            noteOnVelocity: 75));
                     }
                 }
 
@@ -317,95 +261,54 @@ namespace Music.Generator
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
-                // Get the active groove event for this bar
                 var grooveEvent = grooveTrack.GetActiveGroovePreset(bar);
-
                 var layer = grooveEvent.AnchorLayer;
 
-
-                if (!barTrack.TryGetBar(bar, out var currentBar))
-                    continue;
-
-                long measureEndTick = barTrack.GetBarEndTick(bar);
-
                 // Kick pattern
-                if (layer.KickOnsets != null)
+                if (layer.KickOnsets != null && layer.KickOnsets.Count > 0)
                 {
-                    foreach (var onsetBeat in layer.KickOnsets)
+                    var onsetSlots = OnsetGrid.Build(bar, layer.KickOnsets, barTrack);
+                    foreach (var slot in onsetSlots)
                     {
-                        // Find active harmony at this bar+beat
-                        var harmonyEvent = harmonyTrack.GetActiveHarmonyEvent(bar, onsetBeat);
-                        if (harmonyEvent == null)
-                            continue;
+                        int velocity = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "kick", baseVelocity: 100);
 
-                        long onsetTickLong = barTrack.ToTick(bar, onsetBeat);
-
-                        // Only add note if onset is within this measure
-                        if (onsetTickLong < measureEndTick)
-                        {
-                            int onsetTick = (int)onsetTickLong;
-                            int velocity = randomizer.SelectDrumVelocity(bar, onsetBeat, "kick", baseVelocity: 100);
-
-                            notes.Add(new PartTrackEvent(
-                                noteNumber: kickNote,
-                                absoluteTimeTicks: onsetTick,
-                                noteDurationTicks: MusicConstants.TicksPerQuarterNote,
-                                noteOnVelocity: velocity));
-                        }
+                        notes.Add(new PartTrackEvent(
+                            noteNumber: kickNote,
+                            absoluteTimeTicks: (int)slot.StartTick,
+                            noteDurationTicks: MusicConstants.TicksPerQuarterNote,
+                            noteOnVelocity: velocity));
                     }
                 }
 
                 // Snare pattern
-                if (layer.SnareOnsets != null)
+                if (layer.SnareOnsets != null && layer.SnareOnsets.Count > 0)
                 {
-                    foreach (var onsetBeat in layer.SnareOnsets)
+                    var onsetSlots = OnsetGrid.Build(bar, layer.SnareOnsets, barTrack);
+                    foreach (var slot in onsetSlots)
                     {
-                        // Find active harmony at this bar+beat
-                        var harmonyEvent = harmonyTrack.GetActiveHarmonyEvent(bar, onsetBeat);
-                        if (harmonyEvent == null)
-                            continue;
+                        int velocity = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "snare", baseVelocity: 90);
 
-                        long onsetTickLong = barTrack.ToTick(bar, onsetBeat);
-
-                        // Only add note if onset is within this measure
-                        if (onsetTickLong < measureEndTick)
-                        {
-                            int onsetTick = (int)onsetTickLong;
-                            int velocity = randomizer.SelectDrumVelocity(bar, onsetBeat, "snare", baseVelocity: 90);
-
-                            notes.Add(new PartTrackEvent(
-                                noteNumber: snareNote,
-                                absoluteTimeTicks: onsetTick,
-                                noteDurationTicks: MusicConstants.TicksPerQuarterNote,
-                                noteOnVelocity: velocity));
-                        }
+                        notes.Add(new PartTrackEvent(
+                            noteNumber: snareNote,
+                            absoluteTimeTicks: (int)slot.StartTick,
+                            noteDurationTicks: MusicConstants.TicksPerQuarterNote,
+                            noteOnVelocity: velocity));
                     }
                 }
 
                 // Hi-hat pattern
-                if (layer.HatOnsets != null)
+                if (layer.HatOnsets != null && layer.HatOnsets.Count > 0)
                 {
-                    foreach (var onsetBeat in layer.HatOnsets)
+                    var onsetSlots = OnsetGrid.Build(bar, layer.HatOnsets, barTrack);
+                    foreach (var slot in onsetSlots)
                     {
-                        // Find active harmony at this bar+beat
-                        var harmonyEvent = harmonyTrack.GetActiveHarmonyEvent(bar, onsetBeat);
-                        if (harmonyEvent == null)
-                            continue;
+                        int velocity = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "hat", baseVelocity: 70);
 
-                        long onsetTickLong = barTrack.ToTick(bar, onsetBeat);
-
-                        // Only add note if onset is within this measure
-                        if (onsetTickLong < measureEndTick)
-                        {
-                            int onsetTick = (int)onsetTickLong;
-                            int velocity = randomizer.SelectDrumVelocity(bar, onsetBeat, "hat", baseVelocity: 70);
-
-                            notes.Add(new PartTrackEvent(
-                                noteNumber: closedHiHatNote,
-                                absoluteTimeTicks: onsetTick,
-                                noteDurationTicks: MusicConstants.TicksPerQuarterNote / 2,
-                                noteOnVelocity: velocity));
-                        }
+                        notes.Add(new PartTrackEvent(
+                            noteNumber: closedHiHatNote,
+                            absoluteTimeTicks: (int)slot.StartTick,
+                            noteDurationTicks: MusicConstants.TicksPerQuarterNote / 2,
+                            noteOnVelocity: velocity));
                     }
                 }
             }
