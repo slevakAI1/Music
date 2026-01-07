@@ -354,6 +354,11 @@ namespace Music.Designer
             _lv.BeginUpdate();
             _lv.Items.Clear();
 
+            // Validate the current working track to get diagnostics
+            var tempTrack = BuildResult();
+            var validationResult = HarmonyValidator.ValidateTrack(tempTrack, new HarmonyValidationOptions());
+            var diagnostics = validationResult.Diagnostics;
+
             for (int i = 0; i < _working.Count; i++)
             {
                 var w = _working[i];
@@ -364,9 +369,20 @@ namespace Music.Designer
                 item.SubItems.Add(w.Degree.ToString());
                 item.SubItems.Add(w.Quality); // Display short name in list
                 item.SubItems.Add(w.Bass);
-                // Advisory: show 'Not Diatonic' when chord tones are not all in the key's scale
-                bool isDiatonic = HarmonyValidator.IsChordDiatonic(w.Key, w.Degree, w.Quality, w.Bass);
-                item.SubItems.Add(isDiatonic ? string.Empty : "Not Diatonic");
+                
+                // Advisory: display warnings from diagnostics if available
+                string advisory = string.Empty;
+                if (diagnostics != null && i < diagnostics.EventDiagnostics.Count)
+                {
+                    var eventDiag = diagnostics.EventDiagnostics[i];
+                    if (eventDiag.Warnings.Count > 0)
+                    {
+                        // Join warnings with semicolon for compact display
+                        advisory = string.Join("; ", eventDiag.Warnings.Select(w => 
+                            w.Contains("Non-diatonic") ? "Non-diatonic" : w));
+                    }
+                }
+                item.SubItems.Add(advisory);
                 item.Tag = w;
                 _lv.Items.Add(item);
             }
@@ -386,6 +402,7 @@ namespace Music.Designer
         private void UpdateRowVisuals(int index)
         {
             if (index < 0 || index >= _lv.Items.Count) return;
+            
             var w = _working[index];
             var it = _lv.Items[index];
             it.Text = (index + 1).ToString();
@@ -395,11 +412,26 @@ namespace Music.Designer
             it.SubItems[4].Text = w.Degree.ToString();
             it.SubItems[5].Text = w.Quality;
             it.SubItems[6].Text = w.Bass;
-            // Advisory: show 'Not Diatonic' when chord tones are not all in the key's scale
-            // ensure columns/subitems exist
-            while (it.SubItems.Count <= 7) it.SubItems.Add(string.Empty); // status at index 7
-            bool diatonic = HarmonyValidator.IsChordDiatonic(w.Key, w.Degree, w.Quality, w.Bass);
-            it.SubItems[7].Text = diatonic ? string.Empty : "Not Diatonic";
+            
+            // Advisory: validate this single event to get diagnostics
+            while (it.SubItems.Count <= 7) it.SubItems.Add(string.Empty);
+            
+            var tempTrack = BuildResult();
+            var validationResult = HarmonyValidator.ValidateTrack(tempTrack, new HarmonyValidationOptions());
+            var diagnostics = validationResult.Diagnostics;
+            
+            string advisory = string.Empty;
+            if (diagnostics != null && index < diagnostics.EventDiagnostics.Count)
+            {
+                var eventDiag = diagnostics.EventDiagnostics[index];
+                if (eventDiag.Warnings.Count > 0)
+                {
+                    // Join warnings with semicolon for compact display
+                    advisory = string.Join("; ", eventDiag.Warnings.Select(w => 
+                        w.Contains("Non-diatonic") ? "Non-diatonic" : w));
+                }
+            }
+            it.SubItems[7].Text = advisory;
         }
 
         private void UpdateButtonsEnabled()

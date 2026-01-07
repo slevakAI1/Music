@@ -24,16 +24,27 @@ namespace Music.Generator
             options ??= new HarmonyValidationOptions();
             var errors = new List<string>();
             var warnings = new List<string>();
+            var diagnostics = new HarmonyDiagnostics();
             List<HarmonyEvent>? normalizedEvents = null;
 
             if (track == null)
             {
-                return new HarmonyValidationResult { Errors = { "HarmonyTrack is null" } };
+                diagnostics.Errors.Add("HarmonyTrack is null");
+                return new HarmonyValidationResult 
+                { 
+                    Errors = diagnostics.Errors,
+                    Diagnostics = diagnostics 
+                };
             }
 
             if (track.Events == null || track.Events.Count == 0)
             {
-                return new HarmonyValidationResult { Errors = { "HarmonyTrack has no events" } };
+                diagnostics.Errors.Add("HarmonyTrack has no events");
+                return new HarmonyValidationResult 
+                { 
+                    Errors = diagnostics.Errors,
+                    Diagnostics = diagnostics 
+                };
             }
 
             var events = options.ApplyFixes
@@ -49,25 +60,68 @@ namespace Music.Generator
                 }).ToList()
                 : track.Events.ToList();
 
-            ValidateTrackLevel(events, errors, warnings, options);
+            // Validate track-level issues first
+            ValidateTrackLevel(events, diagnostics.Errors, diagnostics.Warnings, options);
 
+            // Validate each event and populate per-event diagnostics
             for (int i = 0; i < events.Count; i++)
             {
-                ValidateEvent(events, i, errors, warnings, options);
+                var eventDiag = new HarmonyEventDiagnostic
+                {
+                    EventIndex = i,
+                    Location = $"{events[i].StartBar}:{events[i].StartBeat}",
+                    Summary = BuildEventSummary(events[i])
+                };
+
+                ValidateEvent(events, i, eventDiag.Errors, eventDiag.Warnings, options);
+                
+                diagnostics.EventDiagnostics.Add(eventDiag);
+                
+                // Also add to flat lists for backward compatibility
+                foreach (var err in eventDiag.Errors)
+                    diagnostics.Errors.Add(err);
+                foreach (var warn in eventDiag.Warnings)
+                    diagnostics.Warnings.Add(warn);
             }
 
-            if (options.ApplyFixes && errors.Count == 0)
+            if (options.ApplyFixes && diagnostics.Errors.Count == 0)
             {
                 normalizedEvents = events;
             }
 
             return new HarmonyValidationResult
             {
-                Errors = errors,
-                Warnings = warnings,
-                NormalizedEvents = normalizedEvents
+                Errors = diagnostics.Errors,
+                Warnings = diagnostics.Warnings,
+                NormalizedEvents = normalizedEvents,
+                Diagnostics = diagnostics
             };
         }
+
+        // AI: BuildEventSummary: creates one-line summary of HarmonyEvent for diagnostics display.
+        // AI: format="Key Degree Quality Bass" (e.g., "C major I maj root", "A minor V7 3rd").
+        private static string BuildEventSummary(HarmonyEvent evt)
+        {
+            var key = evt.Key?.Trim() ?? "?";
+            var degree = RomanNumeral(evt.Degree);
+            var quality = evt.Quality?.Trim() ?? "";
+            var bass = evt.Bass?.Trim() ?? "root";
+            
+            return $"{key} {degree} {quality} {bass}".Trim();
+        }
+
+        // AI: RomanNumeral: converts degree 1-7 to Roman numeral for display.
+        private static string RomanNumeral(int degree) => degree switch
+        {
+            1 => "I",
+            2 => "II",
+            3 => "III",
+            4 => "IV",
+            5 => "V",
+            6 => "VI",
+            7 => "VII",
+            _ => degree.ToString()
+        };
 
         // AI: ValidateTrackLevel: checks ordering, duplicates, basic sanity; does not require music theory.
         private static void ValidateTrackLevel(

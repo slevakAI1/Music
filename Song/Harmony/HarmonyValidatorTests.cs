@@ -23,6 +23,12 @@ namespace Music.Generator
             allPassed &= TestUnsortedEvents();
             allPassed &= TestApplyFixes();
             allPassed &= TestValidTrack();
+            
+            // New diagnostics tests
+            allPassed &= TestDiagnosticsStructure();
+            allPassed &= TestPerEventDiagnostics();
+            allPassed &= TestDiagnosticsWithWarnings();
+            allPassed &= TestEventDiagnosticSummary();
 
             return allPassed;
         }
@@ -304,6 +310,151 @@ namespace Music.Generator
                 return Fail("Valid track should have no errors");
 
             return Pass("TestValidTrack");
+        }
+
+        private static bool TestDiagnosticsStructure()
+        {
+            var track = new HarmonyTrack();
+            track.Add(new HarmonyEvent
+            {
+                StartBar = 1,
+                Key = "C major",
+                Degree = 1,
+                Quality = "",
+                Bass = "root"
+            });
+            track.Add(new HarmonyEvent
+            {
+                StartBar = 2,
+                Key = "C major",
+                Degree = 5,
+                Quality = "7",
+                Bass = "root"
+            });
+
+            var result = HarmonyValidator.ValidateTrack(track);
+
+            if (result.Diagnostics == null)
+                return Fail("Diagnostics should be populated");
+
+            if (result.Diagnostics.EventDiagnostics.Count != 2)
+                return Fail($"Expected 2 event diagnostics, got {result.Diagnostics.EventDiagnostics.Count}");
+
+            if (!result.Diagnostics.IsValid)
+                return Fail("Valid track diagnostics should be IsValid=true");
+
+            return Pass("TestDiagnosticsStructure");
+        }
+
+        private static bool TestPerEventDiagnostics()
+        {
+            var track = new HarmonyTrack();
+            track.Add(new HarmonyEvent
+            {
+                StartBar = 1,
+                Key = "C major",
+                Degree = 1,
+                Quality = "",
+                Bass = "root"
+            });
+            track.Add(new HarmonyEvent
+            {
+                StartBar = 2,
+                Key = "C major",
+                Degree = 5,
+                Quality = "7",
+                Bass = "root"
+            });
+
+            var result = HarmonyValidator.ValidateTrack(track);
+
+            if (result.Diagnostics == null)
+                return Fail("Diagnostics should be populated");
+
+            var diag0 = result.Diagnostics.EventDiagnostics[0];
+            if (diag0.Location != "1:1")
+                return Fail($"Expected location '1:1', got '{diag0.Location}'");
+            if (diag0.EventIndex != 0)
+                return Fail($"Expected EventIndex 0, got {diag0.EventIndex}");
+            if (string.IsNullOrEmpty(diag0.Summary))
+                return Fail("Event summary should not be empty");
+            if (!diag0.Summary.Contains("C major"))
+                return Fail($"Summary should contain key 'C major', got '{diag0.Summary}'");
+
+            var diag1 = result.Diagnostics.EventDiagnostics[1];
+            if (diag1.Location != "2:1")
+                return Fail($"Expected location '2:1', got '{diag1.Location}'");
+            if (diag1.EventIndex != 1)
+                return Fail($"Expected EventIndex 1, got {diag1.EventIndex}");
+
+            return Pass("TestPerEventDiagnostics");
+        }
+
+        private static bool TestDiagnosticsWithWarnings()
+        {
+            var track = new HarmonyTrack();
+            track.Add(new HarmonyEvent
+            {
+                StartBar = 1,
+                Key = "C major",
+                Degree = 5,
+                Quality = "m",
+                Bass = "root"
+            });
+
+            var options = new HarmonyValidationOptions
+            {
+                StrictDiatonicChordTones = true
+            };
+
+            var result = HarmonyValidator.ValidateTrack(track, options);
+
+            if (result.Diagnostics == null)
+                return Fail("Diagnostics should be populated");
+
+            if (!result.Diagnostics.HasWarnings)
+                return Fail("Expected warnings for non-diatonic chord");
+
+            var eventDiag = result.Diagnostics.EventDiagnostics[0];
+            if (eventDiag.Warnings.Count == 0)
+                return Fail("Expected warnings in event diagnostics");
+
+            if (!eventDiag.Warnings.Any(w => w.Contains("Non-diatonic") || w.Contains("non-diatonic")))
+                return Fail("Expected 'non-diatonic' warning message");
+
+            return Pass("TestDiagnosticsWithWarnings");
+        }
+
+        private static bool TestEventDiagnosticSummary()
+        {
+            var track = new HarmonyTrack();
+            track.Add(new HarmonyEvent
+            {
+                StartBar = 1,
+                Key = "A minor",
+                Degree = 5,
+                Quality = "7",
+                Bass = "3rd"
+            });
+
+            var result = HarmonyValidator.ValidateTrack(track);
+
+            if (result.Diagnostics == null)
+                return Fail("Diagnostics should be populated");
+
+            var eventDiag = result.Diagnostics.EventDiagnostics[0];
+            var summary = eventDiag.Summary;
+
+            if (!summary.Contains("A minor"))
+                return Fail($"Summary should contain 'A minor', got '{summary}'");
+            if (!summary.Contains("V"))
+                return Fail($"Summary should contain Roman numeral 'V', got '{summary}'");
+            if (!summary.Contains("7"))
+                return Fail($"Summary should contain quality '7', got '{summary}'");
+            if (!summary.Contains("3rd"))
+                return Fail($"Summary should contain bass '3rd', got '{summary}'");
+
+            return Pass("TestEventDiagnosticSummary");
         }
 
         private static bool Pass(string testName)

@@ -20,6 +20,10 @@ namespace Music.Generator
         // AI: NormalizedEvents: only set when ApplyFixes=true; contains normalized/clamped copies; null otherwise.
         public List<HarmonyEvent>? NormalizedEvents { get; init; }
 
+        // AI: Diagnostics: structured per-event diagnostics with location, summary, errors, and warnings.
+        // AI: note=Provides richer context than flat Errors/Warnings lists; used by UI for detailed display.
+        public HarmonyDiagnostics? Diagnostics { get; init; }
+
         // AI: ToString: formats result for logging/debugging; stable message format for tests.
         public override string ToString()
         {
@@ -42,6 +46,12 @@ namespace Music.Generator
 
             if (NormalizedEvents != null)
                 sb.AppendLine($"NormalizedEvents: {NormalizedEvents.Count} events");
+
+            if (Diagnostics != null)
+            {
+                sb.AppendLine("Structured Diagnostics:");
+                sb.Append(Diagnostics.ToString().TrimEnd());
+            }
 
             return sb.ToString();
         }
