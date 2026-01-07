@@ -24,18 +24,22 @@ namespace Music.Generator
             Events = Events.OrderBy(e => e.StartBar).ThenBy(e => e.StartBeat).ToList();
         }
 
-        // AI: Returns most recent HarmonyEvent with StartBar <= bar, or null if none. Throws if bar<1.
-        // AI: callers treat null as "no harmony defined yet" and must handle accordingly.
-        public HarmonyEvent? GetActiveHarmonyEvent(int bar)
+        // AI: Returns most recent HarmonyEvent active at the given bar and beat (beat is 1-based).
+        // AI: Semantic: find the latest event whose (StartBar, StartBeat) is <= (bar, beat) ordering.
+        public HarmonyEvent? GetActiveHarmonyEvent(int bar, decimal beat)
         {
             if (bar < 1) throw new ArgumentOutOfRangeException(nameof(bar));
+            if (beat < 1m) throw new ArgumentOutOfRangeException(nameof(beat));
 
             for (int i = Events.Count - 1; i >= 0; i--)
             {
                 var evt = Events[i];
-                var eventStartBar = evt.StartBar;
-                
-                if (eventStartBar <= bar)
+                if (evt.StartBar < bar)
+                {
+                    return evt;
+                }
+
+                if (evt.StartBar == bar && evt.StartBeat <= beat)
                 {
                     return evt;
                 }

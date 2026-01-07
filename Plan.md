@@ -66,11 +66,7 @@ The detailed per-part coverage story has been deferred and moved to `Backlog.md`
 **Intent:** unlock mid-bar harmony changes, anticipations, and more realistic harmonic rhythm.
 
 Acceptance criteria:
-- Add `HarmonyTrack.GetActiveHarmonyEvent(int bar, decimal beat)` (beat is 1-based, quarter-note units to match groove onsets).
-
-
-
-- Preserve existing `GetActiveHarmonyEvent(int bar)` for compatibility.
+- Update HarmonyTrack.GetActiveHarmonyEvent to work with beat parameter: `HarmonyTrack.GetActiveHarmonyEvent(int bar, decimal beat)` (beat is 1-based, quarter-note units to match groove onsets).
 - Ordering invariant remains: `StartBar`, then `StartBeat`.
 - Update generator to query active harmony at each onset (`bar`, `onsetBeat`).
 
