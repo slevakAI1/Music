@@ -72,7 +72,7 @@ Acceptance criteria:
 
 =============================================================================================================== 
 
-## Story 1.3 — Centralize onset/duration tick math
+## Story 1.3 — Centralize onset/duration tick math - DONE
 
 **Intent:** eliminate repeated “next onset else end of measure” logic and make durations consistent across instruments.
 
@@ -84,6 +84,8 @@ Acceptance criteria:
 - Edge cases handled:
   - duplicates/sortedness of onsets (either normalize or validate + fail fast)
   - onsets outside the bar return errors/are rejected consistently.
+
+=============================================================================================================== 
 
 ## Story 1.4 — Groove onset normalization + diagnostics
 

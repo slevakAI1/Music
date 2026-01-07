@@ -10,7 +10,7 @@ namespace Music.Generator
     public static class OnsetGrid
     {
         // AI: Build: converts onset beats to slots with precomputed ticks; throws ArgumentOutOfRangeException on invalid onsets.
-        // AI: behavior=IsStrongBeat true when onsetBeat is integer (beat 1, 2, 3...).
+        // AI: behavior=IsStrongBeat true when onsetBeat is integer (beat 1, 2, 3...); validates onset order and bar bounds.
         public static IReadOnlyList<OnsetSlot> Build(int bar, IReadOnlyList<decimal> onsetBeats, BarTrack barTrack)
         {
             if (bar < 1)
@@ -28,6 +28,8 @@ namespace Music.Generator
             long barEndTick = barTrack.GetBarEndTick(bar);
             var slots = new List<OnsetSlot>(onsetBeats.Count);
 
+            decimal previousOnsetBeat = 0m;
+
             for (int i = 0; i < onsetBeats.Count; i++)
             {
                 decimal onsetBeat = onsetBeats[i];
@@ -37,6 +39,14 @@ namespace Music.Generator
                 {
                     throw new ArgumentOutOfRangeException(nameof(onsetBeats),
                         $"Onset beat {onsetBeat} at index {i} is outside bar {bar}");
+                }
+
+                // Validate onset order (detect unsorted or duplicate onsets)
+                if (i > 0 && onsetBeat <= previousOnsetBeat)
+                {
+                    throw new ArgumentException(
+                        $"Onset beats must be strictly ascending. Found {onsetBeat} at index {i} after {previousOnsetBeat}.",
+                        nameof(onsetBeats));
                 }
 
                 long startTick = barTrack.ToTick(bar, onsetBeat);
@@ -58,6 +68,8 @@ namespace Music.Generator
                     DurationTicks = (int)(endTick - startTick),
                     IsStrongBeat = isStrongBeat
                 });
+
+                previousOnsetBeat = onsetBeat;
             }
 
             return slots;
