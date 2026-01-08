@@ -147,9 +147,9 @@ namespace Music.Generator
             return (midi, pc);
         }
 
-        // AI: keys: start from ctx.ChordMidiNotes; optional diatonic 9th only on first onset and per probability.
+        // AI: keys: returns ChordRealization instead of raw MIDI list; consumers use .MidiNotes to emit events.
         // AI: ninth selection uses next scale degree above root; ensure no duplicates; all returned pcs must be in scale.
-        public List<int> SelectKeysVoicing(
+        public ChordRealization SelectKeysVoicing(
             HarmonyPitchContext ctx, 
             int bar, 
             decimal onsetBeat, 
@@ -159,6 +159,10 @@ namespace Music.Generator
 
             // Start with the base chord voicing
             var midiNotes = ctx.ChordMidiNotes.ToList();
+
+            // Track if we added a color tone
+            bool hasColorTone = false;
+            string? colorToneTag = null;
 
             // Optionally add a diatonic 9th on the first onset
             if (isFirstOnsetOfHarmony && rng.NextDouble() < _settings.KeysAdd9Probability)
@@ -181,11 +185,26 @@ namespace Music.Generator
                     if (!midiNotes.Contains(ninthMidi))
                     {
                         midiNotes.Add(ninthMidi);
+                        hasColorTone = true;
+                        colorToneTag = "add9";
                     }
                 }
             }
 
-            return midiNotes;
+            // Calculate register center as median
+            int registerCenter = midiNotes.Count > 0
+                ? midiNotes[midiNotes.Count / 2]
+                : KeysPreferredCenter;
+
+            return new ChordRealization
+            {
+                MidiNotes = midiNotes,
+                Inversion = ctx.Bass,
+                RegisterCenterMidi = registerCenter,
+                HasColorTone = hasColorTone,
+                ColorToneTag = colorToneTag,
+                Density = midiNotes.Count
+            };
         }
 
         // AI: inversion: options depend on chord size; keep mapping stable as callers expect these string values.

@@ -104,5 +104,46 @@ namespace Music.Generator
                 Bass = bass
             };
         }
+
+        // Minimal convenience: convert built context into a ChordRealization for voicing-aware consumers
+        public static ChordRealization ToChordRealization(this HarmonyPitchContext ctx)
+        {
+            if (ctx == null) throw new ArgumentNullException(nameof(ctx));
+
+            var midiNotes = ctx.ChordMidiNotes ?? Array.Empty<int>();
+
+            // Determine register center as median MIDI note if available
+            int registerCenter = midiNotes.Count > 0
+                ? midiNotes[midiNotes.Count / 2]
+                : 60; // default C4
+
+            // Heuristic: detect color tone by checking quality string for common add/alter tokens
+            bool hasColor = !string.IsNullOrWhiteSpace(ctx.Quality) &&
+                            (ctx.Quality.Contains("add", StringComparison.OrdinalIgnoreCase) ||
+                             ctx.Quality.Contains("#", StringComparison.OrdinalIgnoreCase) ||
+                             ctx.Quality.Contains("b", StringComparison.OrdinalIgnoreCase));
+
+            string? colorTag = null;
+            if (hasColor)
+            {
+                // crude extract of addN tag
+                var idx = ctx.Quality.IndexOf("add", StringComparison.OrdinalIgnoreCase);
+                if (idx >= 0)
+                {
+                    var token = ctx.Quality.Substring(idx);
+                    colorTag = token;
+                }
+            }
+
+            return new ChordRealization
+            {
+                MidiNotes = midiNotes,
+                Inversion = ctx.Bass ?? string.Empty,
+                RegisterCenterMidi = registerCenter,
+                HasColorTone = hasColor,
+                ColorToneTag = colorTag,
+                Density = midiNotes.Count
+            };
+        }
     }
 }

@@ -39,6 +39,7 @@
     <Compile Remove="Archives\MusicXmlParser - Backup.cs" />
     <Compile Remove="Archives\MusicXmlParserTests.cs" />
     <Compile Remove="Archives\MusicXmlSerializerTests.cs" />
+    <Compile Remove="Archives\RandomizationValidator.cs" />
     <Compile Remove="Archives\ScoreDesign_original draft.cs" />
     <Compile Remove="Archives\SerializerTestForm.cs" />
     <Compile Remove="Archives\SerializerTestForm.Designer.cs" />

@@ -184,7 +184,7 @@ namespace Music.Generator
             return new PartTrack(notes) { MidiProgramNumber = 27 }; // Electric Guitar
         }
 
-        // AI: GenerateKeysTrack: detects first onset of a harmony event via previousHarmony; added 9th only when isFirstOnset true.
+        // AI: GenerateKeysTrack: consumes ChordRealization per onset slot; accesses .MidiNotes for event emission.
         // AI: keep program number 4; chord voicing order preserved when adding notes.
         private static PartTrack GenerateKeysTrack(
             HarmonyTrack harmonyTrack,
@@ -229,9 +229,9 @@ namespace Music.Generator
                         keysOctave,
                         policy);
 
-                    var chordMidiNotes = randomizer.SelectKeysVoicing(ctx, slot.Bar, slot.OnsetBeat, isFirstOnset);
+                    var chordRealization = randomizer.SelectKeysVoicing(ctx, slot.Bar, slot.OnsetBeat, isFirstOnset);
 
-                    foreach (int midiNote in chordMidiNotes)
+                    foreach (int midiNote in chordRealization.MidiNotes)
                     {
                         notes.Add(new PartTrackEvent(
                             noteNumber: midiNote,
