@@ -149,11 +149,13 @@ namespace Music.Generator
 
         // AI: keys: returns ChordRealization instead of raw MIDI list; consumers use .MidiNotes to emit events.
         // AI: ninth selection uses next scale degree above root; ensure no duplicates; all returned pcs must be in scale.
+        // AI: sectionProfile: if provided, uses ColorToneProbability instead of global KeysAdd9Probability.
         public ChordRealization SelectKeysVoicing(
             HarmonyPitchContext ctx, 
             int bar, 
             decimal onsetBeat, 
-            bool isFirstOnsetOfHarmony)
+            bool isFirstOnsetOfHarmony,
+            SectionProfile? sectionProfile = null)
         {
             var rng = RandomHelpers.CreateLocalRng(_settings.Seed, "keys", bar, onsetBeat);
 
@@ -164,8 +166,11 @@ namespace Music.Generator
             bool hasColorTone = false;
             string? colorToneTag = null;
 
+            // Determine color tone probability (section profile overrides global setting)
+            double colorToneProbability = sectionProfile?.ColorToneProbability ?? _settings.KeysAdd9Probability;
+
             // Optionally add a diatonic 9th on the first onset
-            if (isFirstOnsetOfHarmony && rng.NextDouble() < _settings.KeysAdd9Probability)
+            if (isFirstOnsetOfHarmony && rng.NextDouble() < colorToneProbability)
             {
                 int rootPc = ctx.ChordRootPitchClass;
                 int scaleIdx = RandomHelpers.FindScaleIndex(rootPc, ctx.KeyScalePitchClasses);
@@ -189,6 +194,13 @@ namespace Music.Generator
                         colorToneTag = "add9";
                     }
                 }
+            }
+
+            // Apply density constraint from section profile
+            if (sectionProfile != null && midiNotes.Count > sectionProfile.MaxDensity)
+            {
+                // Trim to max density by keeping lowest notes (bass/guide tones)
+                midiNotes = midiNotes.Take(sectionProfile.MaxDensity).ToList();
             }
 
             // Calculate register center as median

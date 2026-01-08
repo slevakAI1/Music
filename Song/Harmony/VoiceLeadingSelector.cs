@@ -11,16 +11,16 @@ namespace Music.Generator
     public static class VoiceLeadingSelector
     {
         // AI: Select: main entry point; generates candidates and picks lowest-cost voicing.
-        // AI: sectionProfile: reserved for Story 3.3 (register lift, density); currently unused.
+        // AI: sectionProfile: used to apply register lift and density constraints per section.
         public static ChordRealization Select(
             ChordRealization? previousRealization,
             HarmonyPitchContext ctx,
-            object? sectionProfile = null)
+            SectionProfile? sectionProfile = null)
         {
             ArgumentNullException.ThrowIfNull(ctx);
 
             // Generate candidate voicings (different inversions/registers)
-            var candidates = GenerateCandidateVoicings(ctx);
+            var candidates = GenerateCandidateVoicings(ctx, sectionProfile);
 
             if (candidates.Count == 0)
             {
@@ -40,7 +40,7 @@ namespace Music.Generator
 
             foreach (var candidate in candidates)
             {
-                double cost = CalculateVoiceLeadingCost(previousRealization, candidate);
+                double cost = CalculateVoiceLeadingCost(previousRealization, candidate, sectionProfile);
                 if (cost < lowestCost)
                 {
                     lowestCost = cost;
@@ -52,10 +52,20 @@ namespace Music.Generator
         }
 
         // AI: GenerateCandidateVoicings: creates multiple voicings using different inversions and registers.
-        // AI: keeps candidates within reasonable range; avoid generating too many to maintain performance.
-        private static List<ChordRealization> GenerateCandidateVoicings(HarmonyPitchContext ctx)
+        // AI: applies section profile register lift and density constraints when generating candidates.
+        private static List<ChordRealization> GenerateCandidateVoicings(
+            HarmonyPitchContext ctx, 
+            SectionProfile? sectionProfile)
         {
             var candidates = new List<ChordRealization>();
+
+            // Apply section profile register lift to base octave
+            int baseOctave = ctx.BaseOctaveUsed;
+            if (sectionProfile != null)
+            {
+                // Register lift: convert semitones to octave shift
+                baseOctave += sectionProfile.RegisterLift / 12;
+            }
 
             // Inversions to try (based on chord size)
             string[] inversions = ctx.ChordPitchClasses.Count >= 4
@@ -69,7 +79,7 @@ namespace Music.Generator
             {
                 foreach (var octaveShift in octaveShifts)
                 {
-                    int targetOctave = ctx.BaseOctaveUsed + octaveShift;
+                    int targetOctave = baseOctave + octaveShift;
 
                     // Skip invalid octaves
                     if (targetOctave < 1 || targetOctave > 7)
@@ -87,6 +97,13 @@ namespace Music.Generator
 
                         if (midiNotes.Count == 0)
                             continue;
+
+                        // Apply density constraint from section profile
+                        if (sectionProfile != null && midiNotes.Count > sectionProfile.MaxDensity)
+                        {
+                            // Trim to max density by keeping lowest notes (bass/guide tones)
+                            midiNotes = midiNotes.Take(sectionProfile.MaxDensity).ToList();
+                        }
 
                         // Create ChordRealization
                         var realization = new ChordRealization
@@ -116,15 +133,16 @@ namespace Music.Generator
         // AI: formula: sum of absolute differences + penalties for range violations and voice crossings.
         private static double CalculateVoiceLeadingCost(
             ChordRealization previous,
-            ChordRealization candidate)
+            ChordRealization candidate,
+            SectionProfile? sectionProfile)
         {
             double cost = 0.0;
 
             // Primary cost: total absolute semitone movement
             cost += CalculateTotalMovement(previous.MidiNotes, candidate.MidiNotes);
 
-            // Penalty: keep top note within reasonable range (avoid extreme registers)
-            cost += CalculateTopNoteRangePenalty(candidate.MidiNotes);
+            // Penalty: keep top note within reasonable range (adjust by register lift)
+            cost += CalculateTopNoteRangePenalty(candidate.MidiNotes, sectionProfile);
 
             // Optional penalty: voice crossings (when voices swap order)
             cost += CalculateVoiceCrossingPenalty(previous.MidiNotes, candidate.MidiNotes);
@@ -178,16 +196,24 @@ namespace Music.Generator
         }
 
         // AI: CalculateTopNoteRangePenalty: penalizes voicings with top note outside target range.
-        // AI: target range for keys/pads: C4 (60) to C6 (84); adjust constants if roles differ.
-        private static double CalculateTopNoteRangePenalty(IReadOnlyList<int> midiNotes)
+        // AI: target range adjusted by section profile register lift; base range C4 (60) to C6 (84).
+        private static double CalculateTopNoteRangePenalty(IReadOnlyList<int> midiNotes, SectionProfile? sectionProfile)
         {
             if (midiNotes.Count == 0)
                 return 0.0;
 
             int topNote = midiNotes.Max();
 
-            const int idealMin = 60; // C4
-            const int idealMax = 84; // C6
+            // Base ideal range for keys/pads
+            int idealMin = 60; // C4
+            int idealMax = 84; // C6
+
+            // Apply register lift from section profile
+            if (sectionProfile != null)
+            {
+                idealMin += sectionProfile.RegisterLift;
+                idealMax += sectionProfile.RegisterLift;
+            }
 
             if (topNote < idealMin)
                 return (idealMin - topNote) * 1.5; // Penalty for too low

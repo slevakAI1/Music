@@ -61,7 +61,7 @@ namespace Music.Generator
                     harmonyPolicy),            //  Randomization settings 
 
                 GuitarTrack = GenerateGuitarTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, totalBars, settings, harmonyPolicy),
-                KeysTrack = GenerateKeysTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, totalBars, settings, harmonyPolicy),
+                KeysTrack = GenerateKeysTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, songContext.SectionTrack, totalBars, settings, harmonyPolicy),
                 DrumTrack = GenerateDrumTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, totalBars, settings)
             };
         }
@@ -184,12 +184,13 @@ namespace Music.Generator
             return new PartTrack(notes) { MidiProgramNumber = 27 }; // Electric Guitar
         }
 
-        // AI: GenerateKeysTrack: uses VoiceLeadingSelector to maintain smooth voice leading across onsets.
+        // AI: GenerateKeysTrack: uses VoiceLeadingSelector and SectionProfile for dynamic voicing per section.
         // AI: keep program number 4; tracks previous ChordRealization for voice-leading continuity.
         private static PartTrack GenerateKeysTrack(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
             BarTrack barTrack,
+            SectionTrack sectionTrack,
             int totalBars,
             RandomizationSettings settings,
             HarmonyPolicy policy)
@@ -207,6 +208,13 @@ namespace Music.Generator
                 var padsOnsets = grooveEvent.AnchorLayer.PadsOnsets;
                 if (padsOnsets == null || padsOnsets.Count == 0)
                     continue;
+
+                // Get section profile for current bar
+                SectionProfile? sectionProfile = null;
+                if (sectionTrack.GetActiveSection(bar, out var section) && section != null)
+                {
+                    sectionProfile = SectionProfile.GetForSectionType(section.SectionType);
+                }
 
                 // Build onset grid for this bar
                 var onsetSlots = OnsetGrid.Build(bar, padsOnsets, barTrack);
@@ -235,12 +243,12 @@ namespace Music.Generator
                     // For first onset of new harmony, optionally add color tones via randomizer
                     if (isFirstOnset)
                     {
-                        var baseVoicing = randomizer.SelectKeysVoicing(ctx, slot.Bar, slot.OnsetBeat, isFirstOnset);
+                        var baseVoicing = randomizer.SelectKeysVoicing(ctx, slot.Bar, slot.OnsetBeat, isFirstOnset, sectionProfile);
                         
                         // If we have previous voicing, apply voice leading to the base voicing
                         if (previousVoicing != null)
                         {
-                            chordRealization = VoiceLeadingSelector.Select(previousVoicing, ctx);
+                            chordRealization = VoiceLeadingSelector.Select(previousVoicing, ctx, sectionProfile);
                             
                             // Preserve color tone from randomizer if it was added
                             if (baseVoicing.HasColorTone && !chordRealization.HasColorTone)
@@ -268,7 +276,7 @@ namespace Music.Generator
                     else
                     {
                         // Subsequent onset of same harmony: use voice leading
-                        chordRealization = VoiceLeadingSelector.Select(previousVoicing, ctx);
+                        chordRealization = VoiceLeadingSelector.Select(previousVoicing, ctx, sectionProfile);
                     }
 
                     foreach (int midiNote in chordRealization.MidiNotes)
