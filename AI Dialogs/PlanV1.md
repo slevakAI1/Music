@@ -145,7 +145,6 @@ Acceptance criteria:
 Acceptance criteria:
 - Implement `VoiceLeadingSelector` that chooses inversion/voicing to minimize total movement from previous chord.
 - Integrate into keys generation (store previous voicing per track).
-- Add tests: consecutive chords should not jump unnecessarily.
 
 ## Story 3.3 — Chord color policy per section
 

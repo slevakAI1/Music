@@ -54,6 +54,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="AI Dialogs\Backlog.md" />
+    <None Remove="AI Dialogs\HarmonyPolicy.md" />
+    <None Remove="AI Dialogs\Plan.md" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DiffPlex" Version="1.9.0" />
     <PackageReference Include="Melanchall.DryWetMidi" Version="8.0.2" />
     <PackageReference Include="MusicTheory" Version="1.4.0" />
