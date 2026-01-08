@@ -184,8 +184,8 @@ namespace Music.Generator
             return new PartTrack(notes) { MidiProgramNumber = 27 }; // Electric Guitar
         }
 
-        // AI: GenerateKeysTrack: consumes ChordRealization per onset slot; accesses .MidiNotes for event emission.
-        // AI: keep program number 4; chord voicing order preserved when adding notes.
+        // AI: GenerateKeysTrack: uses VoiceLeadingSelector to maintain smooth voice leading across onsets.
+        // AI: keep program number 4; tracks previous ChordRealization for voice-leading continuity.
         private static PartTrack GenerateKeysTrack(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
@@ -199,6 +199,7 @@ namespace Music.Generator
             const int keysOctave = 3;
 
             HarmonyEvent? previousHarmony = null;
+            ChordRealization? previousVoicing = null; // Track previous voicing for voice leading
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
@@ -229,7 +230,46 @@ namespace Music.Generator
                         keysOctave,
                         policy);
 
-                    var chordRealization = randomizer.SelectKeysVoicing(ctx, slot.Bar, slot.OnsetBeat, isFirstOnset);
+                    ChordRealization chordRealization;
+
+                    // For first onset of new harmony, optionally add color tones via randomizer
+                    if (isFirstOnset)
+                    {
+                        var baseVoicing = randomizer.SelectKeysVoicing(ctx, slot.Bar, slot.OnsetBeat, isFirstOnset);
+                        
+                        // If we have previous voicing, apply voice leading to the base voicing
+                        if (previousVoicing != null)
+                        {
+                            chordRealization = VoiceLeadingSelector.Select(previousVoicing, ctx);
+                            
+                            // Preserve color tone from randomizer if it was added
+                            if (baseVoicing.HasColorTone && !chordRealization.HasColorTone)
+                            {
+                                // Add the color tone from base voicing
+                                var notesWithColor = chordRealization.MidiNotes.ToList();
+                                var colorNotes = baseVoicing.MidiNotes.Except(ctx.ChordMidiNotes).ToList();
+                                notesWithColor.AddRange(colorNotes);
+                                
+                                chordRealization = chordRealization with
+                                {
+                                    MidiNotes = notesWithColor,
+                                    HasColorTone = true,
+                                    ColorToneTag = baseVoicing.ColorToneTag,
+                                    Density = notesWithColor.Count
+                                };
+                            }
+                        }
+                        else
+                        {
+                            // First onset ever: use randomizer result
+                            chordRealization = baseVoicing;
+                        }
+                    }
+                    else
+                    {
+                        // Subsequent onset of same harmony: use voice leading
+                        chordRealization = VoiceLeadingSelector.Select(previousVoicing, ctx);
+                    }
 
                     foreach (int midiNote in chordRealization.MidiNotes)
                     {
@@ -239,6 +279,9 @@ namespace Music.Generator
                             noteDurationTicks: slot.DurationTicks,
                             noteOnVelocity: 75));
                     }
+
+                    // Update previous voicing for next onset
+                    previousVoicing = chordRealization;
                 }
 
                 // Update previousHarmony to the first event active at the bar start (bar,1)

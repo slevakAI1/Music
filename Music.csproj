@@ -58,6 +58,7 @@
     <None Remove="AI Dialogs\Backlog.md" />
     <None Remove="AI Dialogs\HarmonyPolicy.md" />
     <None Remove="AI Dialogs\Plan.md" />
+    <None Remove="AI Dialogs\PlanV1.md" />
   </ItemGroup>
 
   <ItemGroup>
