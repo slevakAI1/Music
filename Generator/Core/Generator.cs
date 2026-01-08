@@ -60,7 +60,7 @@ namespace Music.Generator
                     settings,
                     harmonyPolicy),            //  Randomization settings 
 
-                GuitarTrack = GenerateGuitarTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, totalBars, settings, harmonyPolicy),
+                GuitarTrack = GenerateGuitarTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, songContext.SectionTrack, totalBars, settings, harmonyPolicy),
                 KeysTrack = GenerateKeysTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, songContext.SectionTrack, totalBars, settings, harmonyPolicy),
                 DrumTrack = GenerateDrumTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, totalBars, settings)
             };
@@ -129,12 +129,13 @@ namespace Music.Generator
             return new PartTrack(notes) { MidiProgramNumber = 33 }; // Electric Bass
         }
 
-        // AI: GenerateGuitarTrack: tracks previousPitchClass across onsets to enable passing tones; changing this state breaks guitar voicing.
+        // AI: GenerateGuitarTrack: uses CompRhythmPatternLibrary to select subset of groove onsets deterministically.
         // AI: keep program number 27 for Electric Guitar to match intended timbre.
         private static PartTrack GenerateGuitarTrack(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
             BarTrack barTrack,
+            SectionTrack sectionTrack,
             int totalBars,
             RandomizationSettings settings,
             HarmonyPolicy policy)
@@ -146,13 +147,41 @@ namespace Music.Generator
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
-                var grooveEvent = grooveTrack.GetActiveGroovePreset(bar);
-                var compOnsets = grooveEvent.AnchorLayer.CompOnsets;
+                var groovePreset = grooveTrack.GetActiveGroovePreset(bar);
+                var compOnsets = groovePreset.AnchorLayer.CompOnsets;
                 if (compOnsets == null || compOnsets.Count == 0)
                     continue;
 
-                // Build onset grid for this bar
-                var onsetSlots = OnsetGrid.Build(bar, compOnsets, barTrack);
+                // Get section type for pattern selection
+                MusicConstants.eSectionType sectionType = MusicConstants.eSectionType.Verse; // Default
+                if (sectionTrack.GetActiveSection(bar, out var section) && section != null)
+                {
+                    sectionType = section.SectionType;
+                }
+
+                // Get comp rhythm pattern for this bar
+                var pattern = CompRhythmPatternLibrary.GetPattern(
+                    groovePreset.Name,
+                    sectionType,
+                    bar);
+
+                // Filter onset slots using pattern's included indices
+                var filteredOnsets = new List<decimal>();
+                for (int i = 0; i < pattern.IncludedOnsetIndices.Count; i++)
+                {
+                    int index = pattern.IncludedOnsetIndices[i];
+                    if (index >= 0 && index < compOnsets.Count)
+                    {
+                        filteredOnsets.Add(compOnsets[index]);
+                    }
+                }
+
+                // Skip this bar if pattern resulted in no onsets
+                if (filteredOnsets.Count == 0)
+                    continue;
+
+                // Build onset grid from filtered onsets
+                var onsetSlots = OnsetGrid.Build(bar, filteredOnsets, barTrack);
 
                 foreach (var slot in onsetSlots)
                 {
