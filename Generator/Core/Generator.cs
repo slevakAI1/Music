@@ -91,6 +91,7 @@ namespace Music.Generator
                     songContext.HarmonyTrack,
                     songContext.GrooveTrack,
                     songContext.BarTrack,
+                    songContext.SectionTrack,
                     totalBars,
                     settings,
                     drumProgramNumber)
