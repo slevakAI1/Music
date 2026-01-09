@@ -84,7 +84,7 @@
 
 **Why now:** bass and drums define “song feels like a genre.”
 
-### Story 5.1 — Bass pattern library keyed by groove + section type
+### Story 5.1 — Bass pattern library keyed by groove + section type - COMPLETED
 
 **Acceptance criteria:**
 - Define a handful of reusable bass patterns:
