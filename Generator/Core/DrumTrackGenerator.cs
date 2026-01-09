@@ -1,5 +1,5 @@
 // AI: purpose=Generate drum track: kick, snare, hi-hat using DrumVariationEngine for living performance (Story 6.1).
-// AI: invariants=Calls DrumVariationEngine per bar; converts variation plan to MIDI PartTrackEvent list.
+// AI: invariants=Calls DrumVariationEngine per bar; converts variation plan to MIDI PartTrackEvent list; returns sorted by AbsoluteTimeTicks.
 // AI: deps=Uses DrumVariationEngine, RandomHelpers, PitchRandomizer.SelectDrumVelocity for velocity shaping.
 
 using Music.MyMidi;
@@ -135,6 +135,9 @@ namespace Music.Generator
                     }
                 }
             }
+
+            // Ensure events are sorted by AbsoluteTimeTicks before returning
+            notes = notes.OrderBy(e => e.AbsoluteTimeTicks).ToList();
 
             return new PartTrack(notes) { MidiProgramNumber = midiProgramNumber };
         }

@@ -1,5 +1,5 @@
 // AI: purpose=Generate guitar/comp track using CompRhythmPatternLibrary + CompVoicingSelector for multi-note comp voicings.
-// AI: keep program number 27 for Electric Guitar; tracks previousVoicing for voice-leading continuity across bars.
+// AI: keep program number 27 for Electric Guitar; tracks previousVoicing for voice-leading continuity across bars; returns sorted by AbsoluteTimeTicks.
 // AI: applies strum timing offsets to chord voicings for humanized feel (Story 4.3).
 
 using Music.MyMidi;
@@ -110,6 +110,9 @@ namespace Music.Generator
                     previousVoicing = voicing;
                 }
             }
+
+            // Ensure events are sorted by AbsoluteTimeTicks before returning
+            notes = notes.OrderBy(e => e.AbsoluteTimeTicks).ToList();
 
             return new PartTrack(notes) { MidiProgramNumber = midiProgramNumber };
         }

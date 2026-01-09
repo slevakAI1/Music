@@ -1,5 +1,5 @@
 // AI: purpose=Generate keys/pads track using VoiceLeadingSelector and SectionProfile for dynamic voicing per section.
-// AI: keep program number 4; tracks previous ChordRealization for voice-leading continuity.
+// AI: keep program number 4; tracks previous ChordRealization for voice-leading continuity; returns sorted by AbsoluteTimeTicks.
 
 using Music.MyMidi;
 
@@ -121,6 +121,9 @@ namespace Music.Generator
                 // Update previousHarmony to the first event active at the bar start (bar,1)
                 previousHarmony = harmonyTrack.GetActiveHarmonyEvent(bar, 1m);
             }
+
+            // Ensure events are sorted by AbsoluteTimeTicks before returning
+            notes = notes.OrderBy(e => e.AbsoluteTimeTicks).ToList();
 
             return new PartTrack(notes) { MidiProgramNumber = midiProgramNumber };
         }

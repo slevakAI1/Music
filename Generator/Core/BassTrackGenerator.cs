@@ -1,5 +1,5 @@
 // AI: purpose=Generate bass track using BassPatternLibrary for pattern selection and BassChordChangeDetector for approach notes.
-// AI: keep MIDI program number 33; patterns replace randomizer for more structured bass lines (Story 5.1 + 5.2).
+// AI: keep MIDI program number 33; patterns replace randomizer for more structured bass lines (Story 5.1 + 5.2); returns sorted by AbsoluteTimeTicks.
 
 using Music.MyMidi;
 
@@ -128,6 +128,9 @@ namespace Music.Generator
                         noteOnVelocity: 95));
                 }
             }
+
+            // Ensure events are sorted by AbsoluteTimeTicks before returning
+            notes = notes.OrderBy(e => e.AbsoluteTimeTicks).ToList();
 
             return new PartTrack(notes) { MidiProgramNumber = midiProgramNumber };
         }
