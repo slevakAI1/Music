@@ -113,7 +113,7 @@
 - Full “genre drummer model” / ML.
 - Long-range thematic drum motifs (belongs in Stage 7/8 once section identity/energy transforms are in place).
 
-### Story 6.1 — `GroovePreset` becomes “template”; add variation operators (expanded)
+### Story 6.1 — `GroovePreset` becomes “template”; add variation operators (expanded) -- Completed
 
 **Intent:** turn static onset lists into a living performance while staying deterministic and style-safe.
 
@@ -137,7 +137,7 @@
   - Variation choices are deterministic for `(seed, grooveName, sectionType, barIndex)`.
   - RNG is only used as a deterministic tie-break among valid options.
 
-### Story 6.2 — Timing & dynamics humanization layer (micro-feel)
+### Story 6.2 — Timing & dynamics humanization layer (micro-feel) - Completed
 
 **Intent:** even correct notes sound fake without timing and dynamics nuance.
 

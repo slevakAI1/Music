@@ -23,6 +23,8 @@ namespace Music.Generator
             public bool IsGhost { get; init; } = false;        // ghost note (low velocity)
             public bool IsFlam { get; init; } = false;         // flam accent (pre-hit)
             public bool IsMain { get; init; } = false;         // from template anchor layer
+            public bool IsInFill { get; init; } = false;       // part of a fill
+            public double FillProgress { get; init; } = 0.0;   // fill progress 0.0 to 1.0
         }
 
         /// <summary>
@@ -75,12 +77,21 @@ namespace Music.Generator
             {
                 foreach (var onset in anchor.KickOnsets)
                 {
+                    bool isStrongBeat = RandomHelpers.IsStrongBeat(onset);
+                    int timingOffset = DrumMicroTimingEngine.GetTimingOffset(
+                        "kick", 
+                        grooveEvent.SourcePresetName ?? "default",
+                        barIndex,
+                        onset,
+                        seed,
+                        isStrongBeat);
+
                     variation.Hits.Add(new DrumHit
                     {
                         Role = "kick",
                         OnsetBeat = onset,
                         IsMain = true,
-                        TimingOffsetTicks = MicroTimingJitter(barRng, maxTicks: 8)
+                        TimingOffsetTicks = timingOffset
                     });
                 }
             }
@@ -90,12 +101,21 @@ namespace Music.Generator
             {
                 foreach (var onset in tension.KickOnsets)
                 {
+                    bool isStrongBeat = RandomHelpers.IsStrongBeat(onset);
+                    int timingOffset = DrumMicroTimingEngine.GetTimingOffset(
+                        "kick",
+                        grooveEvent.SourcePresetName ?? "default",
+                        barIndex,
+                        onset,
+                        seed,
+                        isStrongBeat);
+
                     variation.Hits.Add(new DrumHit
                     {
                         Role = "kick",
                         OnsetBeat = onset,
                         IsMain = false,
-                        TimingOffsetTicks = MicroTimingJitter(barRng, maxTicks: 12)
+                        TimingOffsetTicks = timingOffset
                     });
                 }
             }
@@ -107,12 +127,21 @@ namespace Music.Generator
                 if (candidates.Count > 0 && barRng.NextDouble() < 0.12)
                 {
                     var pick = RandomHelpers.ChooseRandom(barRng, candidates);
+                    bool isStrongBeat = RandomHelpers.IsStrongBeat(pick);
+                    int timingOffset = DrumMicroTimingEngine.GetTimingOffset(
+                        "kick",
+                        grooveEvent.SourcePresetName ?? "default",
+                        barIndex,
+                        pick,
+                        seed,
+                        isStrongBeat);
+
                     variation.Hits.Add(new DrumHit
                     {
                         Role = "kick",
                         OnsetBeat = pick,
                         IsMain = false,
-                        TimingOffsetTicks = MicroTimingJitter(barRng, maxTicks: 14)
+                        TimingOffsetTicks = timingOffset
                     });
                 }
             }
@@ -127,27 +156,46 @@ namespace Music.Generator
                     // Flams on high-energy sections (policy-gated)
                     bool allowFlam = IsHighEnergySection(sectionType);
                     bool flam = allowFlam && snareRng.NextDouble() < 0.22;
+                    bool isStrongBeat = RandomHelpers.IsStrongBeat(onset);
 
                     if (flam)
                     {
                         // Add flam pre-hit (small negative offset)
+                        int flamTimingOffset = DrumMicroTimingEngine.GetTimingOffset(
+                            "snare",
+                            grooveEvent.SourcePresetName ?? "default",
+                            barIndex,
+                            onset,
+                            seed,
+                            isStrongBeat);
+                        // Flam pre-hit: additional negative offset
+                        flamTimingOffset -= Math.Max(8, (int)(snareRng.NextDouble() * 18));
+
                         variation.Hits.Add(new DrumHit
                         {
                             Role = "snare",
                             OnsetBeat = onset,
                             IsMain = false,
                             IsFlam = true,
-                            TimingOffsetTicks = -Math.Max(8, (int)(snareRng.NextDouble() * 18))
+                            TimingOffsetTicks = flamTimingOffset
                         });
                     }
 
                     // Main snare hit
+                    int mainTimingOffset = DrumMicroTimingEngine.GetTimingOffset(
+                        "snare",
+                        grooveEvent.SourcePresetName ?? "default",
+                        barIndex,
+                        onset,
+                        seed,
+                        isStrongBeat);
+
                     variation.Hits.Add(new DrumHit
                     {
                         Role = "snare",
                         OnsetBeat = onset,
                         IsMain = true,
-                        TimingOffsetTicks = MicroTimingJitter(snareRng, maxTicks: 6)
+                        TimingOffsetTicks = mainTimingOffset
                     });
                 }
 
@@ -165,13 +213,22 @@ namespace Music.Generator
                         // Avoid ghost on strong beats (where main snare typically hits)
                         if (RandomHelpers.IsStrongBeat(pick)) continue;
                         
+                        bool ghostIsStrongBeat = RandomHelpers.IsStrongBeat(pick);
+                        int ghostTimingOffset = DrumMicroTimingEngine.GetTimingOffset(
+                            "snare",
+                            grooveEvent.SourcePresetName ?? "default",
+                            barIndex,
+                            pick,
+                            seed,
+                            ghostIsStrongBeat);
+
                         variation.Hits.Add(new DrumHit
                         {
                             Role = "snare",
                             OnsetBeat = pick,
                             IsGhost = true,
                             IsMain = false,
-                            TimingOffsetTicks = MicroTimingJitter(ghostRng, maxTicks: 10)
+                            TimingOffsetTicks = ghostTimingOffset
                         });
                     }
                 }
@@ -199,13 +256,22 @@ namespace Music.Generator
 
                     if (!skip)
                     {
+                        bool isStrongBeat = RandomHelpers.IsStrongBeat(onset);
+                        int timingOffset = DrumMicroTimingEngine.GetTimingOffset(
+                            role,
+                            grooveEvent.SourcePresetName ?? "default",
+                            barIndex,
+                            onset,
+                            seed,
+                            isStrongBeat);
+
                         variation.Hits.Add(new DrumHit
                         {
                             Role = role,
                             OnsetBeat = onset,
                             IsMain = true,
                             IsOpenHat = open,
-                            TimingOffsetTicks = MicroTimingJitter(hatRng, maxTicks: 5)
+                            TimingOffsetTicks = timingOffset
                         });
                     }
                 }
@@ -215,6 +281,14 @@ namespace Music.Generator
                 {
                     var pickBase = RandomHelpers.ChooseRandom(barRng, anchor.HatOnsets);
                     decimal extraOnset = pickBase + 0.25m; // quarter subdivision ahead
+                    bool isStrongBeat = RandomHelpers.IsStrongBeat(extraOnset);
+                    int timingOffset = DrumMicroTimingEngine.GetTimingOffset(
+                        role,
+                        grooveEvent.SourcePresetName ?? "default",
+                        barIndex,
+                        extraOnset,
+                        seed,
+                        isStrongBeat);
                     
                     variation.Hits.Add(new DrumHit
                     {
@@ -222,7 +296,7 @@ namespace Music.Generator
                         OnsetBeat = extraOnset,
                         IsMain = false,
                         IsOpenHat = false,
-                        TimingOffsetTicks = MicroTimingJitter(barRng, maxTicks: 6)
+                        TimingOffsetTicks = timingOffset
                     });
                 }
             }
@@ -256,14 +330,6 @@ namespace Music.Generator
                 _ => 0.15
             };
             return rng.NextDouble() < rideProb;
-        }
-
-        /// <summary>
-        /// Generates small deterministic timing jitter (in ticks).
-        /// </summary>
-        private static int MicroTimingJitter(IRandomSource rng, int maxTicks)
-        {
-            return rng.NextInt(-maxTicks, maxTicks + 1);
         }
 
         /// <summary>

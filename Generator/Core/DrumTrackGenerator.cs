@@ -64,9 +64,25 @@ namespace Music.Generator
                     {
                         case "kick":
                             {
+                                bool isStrongBeat = RandomHelpers.IsStrongBeat(slot.OnsetBeat);
                                 int baseVel = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "kick", baseVelocity: 100);
+                                
+                                // Apply velocity shaping
+                                int vel = DrumVelocityShaper.ShapeVelocity(
+                                    role: "kick",
+                                    baseVelocity: baseVel,
+                                    bar: slot.Bar,
+                                    onsetBeat: slot.OnsetBeat,
+                                    seed: settings.Seed,
+                                    sectionType: sectionType,
+                                    isStrongBeat: isStrongBeat,
+                                    isGhost: false,
+                                    isInFill: hit.IsInFill,
+                                    fillProgress: hit.FillProgress);
+                                
                                 // Reduce velocity for non-main kicks
-                                int vel = hit.IsMain ? baseVel : Math.Max(25, (int)(baseVel * 0.82));
+                                if (!hit.IsMain)
+                                    vel = Math.Max(25, (int)(vel * 0.82));
                                 
                                 notes.Add(new PartTrackEvent(
                                     noteNumber: kickNote,
@@ -78,10 +94,14 @@ namespace Music.Generator
 
                         case "snare":
                             {
+                                bool isStrongBeat = RandomHelpers.IsStrongBeat(slot.OnsetBeat);
+
                                 if (hit.IsFlam)
                                 {
-                                    // Flam pre-hit: softer, placed before main hit
-                                    int preVel = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "snare", baseVelocity: 60);
+                                    // Flam pre-hit: use dedicated flam velocity method
+                                    int mainVel = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "snare", baseVelocity: 90);
+                                    int preVel = DrumVelocityShaper.FlamPreHitVelocity(mainVel, settings.Seed, slot.Bar, slot.OnsetBeat);
+                                    
                                     notes.Add(new PartTrackEvent(
                                         noteNumber: snareNote,
                                         absoluteTimeTicks: baseTick,
@@ -90,9 +110,10 @@ namespace Music.Generator
                                 }
                                 else if (hit.IsGhost)
                                 {
-                                    // Ghost note: very quiet
+                                    // Ghost note: use dedicated ghost velocity method
                                     int baseVel = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "snare", baseVelocity: 40);
-                                    int vel = Math.Max(8, (int)(baseVel * 0.6));
+                                    int vel = DrumVelocityShaper.GhostNoteVelocity(baseVel, settings.Seed, slot.Bar, slot.OnsetBeat);
+                                    
                                     notes.Add(new PartTrackEvent(
                                         noteNumber: snareNote,
                                         absoluteTimeTicks: baseTick,
@@ -103,7 +124,23 @@ namespace Music.Generator
                                 {
                                     // Main snare hit
                                     int baseVel = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "snare", baseVelocity: 90);
-                                    int vel = hit.IsMain ? baseVel : Math.Max(30, (int)(baseVel * 0.85));
+                                    
+                                    // Apply velocity shaping
+                                    int vel = DrumVelocityShaper.ShapeVelocity(
+                                        role: "snare",
+                                        baseVelocity: baseVel,
+                                        bar: slot.Bar,
+                                        onsetBeat: slot.OnsetBeat,
+                                        seed: settings.Seed,
+                                        sectionType: sectionType,
+                                        isStrongBeat: isStrongBeat,
+                                        isGhost: false,
+                                        isInFill: hit.IsInFill,
+                                        fillProgress: hit.FillProgress);
+                                    
+                                    if (!hit.IsMain)
+                                        vel = Math.Max(30, (int)(vel * 0.85));
+                                    
                                     notes.Add(new PartTrackEvent(
                                         noteNumber: snareNote,
                                         absoluteTimeTicks: baseTick,
@@ -115,12 +152,21 @@ namespace Music.Generator
 
                         case "hat":
                             {
+                                bool isStrongBeat = RandomHelpers.IsStrongBeat(slot.OnsetBeat);
                                 int baseVel = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "hat", baseVelocity: 70);
 
-                                // Apply hand pattern: accent strong beats
-                                int vel = baseVel;
-                                if (RandomHelpers.IsStrongBeat(slot.OnsetBeat))
-                                    vel = Math.Min(127, vel + 8);
+                                // Apply velocity shaping with hand pattern accents
+                                int vel = DrumVelocityShaper.ShapeVelocity(
+                                    role: "hat",
+                                    baseVelocity: baseVel,
+                                    bar: slot.Bar,
+                                    onsetBeat: slot.OnsetBeat,
+                                    seed: settings.Seed,
+                                    sectionType: sectionType,
+                                    isStrongBeat: isStrongBeat,
+                                    isGhost: false,
+                                    isInFill: hit.IsInFill,
+                                    fillProgress: hit.FillProgress);
 
                                 // Soften non-main hats
                                 if (!hit.IsMain) 
@@ -139,12 +185,21 @@ namespace Music.Generator
 
                         case "ride":
                             {
+                                bool isStrongBeat = RandomHelpers.IsStrongBeat(slot.OnsetBeat);
                                 int baseVel = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "ride", baseVelocity: 75);
 
-                                // Apply hand pattern: accent strong beats
-                                int vel = baseVel;
-                                if (RandomHelpers.IsStrongBeat(slot.OnsetBeat))
-                                    vel = Math.Min(127, vel + 10);
+                                // Apply velocity shaping with hand pattern accents
+                                int vel = DrumVelocityShaper.ShapeVelocity(
+                                    role: "ride",
+                                    baseVelocity: baseVel,
+                                    bar: slot.Bar,
+                                    onsetBeat: slot.OnsetBeat,
+                                    seed: settings.Seed,
+                                    sectionType: sectionType,
+                                    isStrongBeat: isStrongBeat,
+                                    isGhost: false,
+                                    isInFill: hit.IsInFill,
+                                    fillProgress: hit.FillProgress);
 
                                 // Soften non-main ride hits
                                 if (!hit.IsMain) 
