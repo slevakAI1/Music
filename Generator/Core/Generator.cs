@@ -50,6 +50,12 @@ namespace Music.Generator
             var settings = RandomizationSettings.Default;
             var harmonyPolicy = HarmonyPolicy.Default;
 
+            // Resolve MIDI program numbers from VoiceSet
+            int bassProgramNumber = GetProgramNumberForRole(songContext.Voices, "Bass", defaultProgram: 33);
+            int compProgramNumber = GetProgramNumberForRole(songContext.Voices, "Comp", defaultProgram: 27);
+            int padsProgramNumber = GetProgramNumberForRole(songContext.Voices, "Pads", defaultProgram: 4);
+            int drumProgramNumber = GetProgramNumberForRole(songContext.Voices, "DrumKit", defaultProgram: 255);
+
             return new GeneratorResult
             {
                 BassTrack = GenerateBassTrack(
@@ -58,11 +64,36 @@ namespace Music.Generator
                     songContext.BarTrack,
                     totalBars,
                     settings,
-                    harmonyPolicy),            //  Randomization settings 
+                    harmonyPolicy,
+                    bassProgramNumber),            //  Randomization settings 
 
-                GuitarTrack = GenerateGuitarTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, songContext.SectionTrack, totalBars, settings, harmonyPolicy),
-                KeysTrack = GenerateKeysTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, songContext.SectionTrack, totalBars, settings, harmonyPolicy),
-                DrumTrack = GenerateDrumTrack(songContext.HarmonyTrack, songContext.GrooveTrack, songContext.BarTrack, totalBars, settings)
+                GuitarTrack = GenerateGuitarTrack(
+                    songContext.HarmonyTrack,
+                    songContext.GrooveTrack,
+                    songContext.BarTrack,
+                    songContext.SectionTrack,
+                    totalBars,
+                    settings,
+                    harmonyPolicy,
+                    compProgramNumber),
+
+                KeysTrack = GenerateKeysTrack(
+                    songContext.HarmonyTrack,
+                    songContext.GrooveTrack,
+                    songContext.BarTrack,
+                    songContext.SectionTrack,
+                    totalBars,
+                    settings,
+                    harmonyPolicy,
+                    padsProgramNumber),
+
+                DrumTrack = GenerateDrumTrack(
+                    songContext.HarmonyTrack,
+                    songContext.GrooveTrack,
+                    songContext.BarTrack,
+                    totalBars,
+                    settings,
+                    drumProgramNumber)
             };
         }
 
@@ -85,7 +116,8 @@ namespace Music.Generator
             BarTrack barTrack,
             int totalBars,
             RandomizationSettings settings,
-            HarmonyPolicy policy)
+            HarmonyPolicy policy,
+            int midiProgramNumber)
         {
             var notes = new List<PartTrackEvent>();
             var randomizer = new PitchRandomizer(settings);
@@ -126,7 +158,7 @@ namespace Music.Generator
                 }
             }
 
-            return new PartTrack(notes) { MidiProgramNumber = 33 }; // Electric Bass
+            return new PartTrack(notes) { MidiProgramNumber = midiProgramNumber };
         }
 
         // AI: GenerateGuitarTrack: uses CompRhythmPatternLibrary + CompVoicingSelector for multi-note comp voicings.
@@ -139,7 +171,8 @@ namespace Music.Generator
             SectionTrack sectionTrack,
             int totalBars,
             RandomizationSettings settings,
-            HarmonyPolicy policy)
+            HarmonyPolicy policy,
+            int midiProgramNumber)
         {
             var notes = new List<PartTrackEvent>();
             List<int>? previousVoicing = null; // Track previous voicing for voice-leading continuity
@@ -231,7 +264,7 @@ namespace Music.Generator
                 }
             }
 
-            return new PartTrack(notes) { MidiProgramNumber = 27 }; // Electric Guitar
+            return new PartTrack(notes) { MidiProgramNumber = midiProgramNumber };
         }
 
         // AI: GenerateKeysTrack: uses VoiceLeadingSelector and SectionProfile for dynamic voicing per section.
@@ -243,7 +276,8 @@ namespace Music.Generator
             SectionTrack sectionTrack,
             int totalBars,
             RandomizationSettings settings,
-            HarmonyPolicy policy)
+            HarmonyPolicy policy,
+            int midiProgramNumber)
         {
             var notes = new List<PartTrackEvent>();
             var randomizer = new PitchRandomizer(settings);
@@ -347,7 +381,7 @@ namespace Music.Generator
                 previousHarmony = harmonyTrack.GetActiveHarmonyEvent(bar, 1m);
             }
 
-            return new PartTrack(notes) { MidiProgramNumber = 4 }; // Electric Piano 1
+            return new PartTrack(notes) { MidiProgramNumber = midiProgramNumber };
         }
 
         /// <summary>
@@ -359,7 +393,8 @@ namespace Music.Generator
             GrooveTrack grooveTrack,
             BarTrack barTrack,
             int totalBars,
-            RandomizationSettings settings)
+            RandomizationSettings settings,
+            int midiProgramNumber)
         {
             var notes = new List<PartTrackEvent>();
             var randomizer = new PitchRandomizer(settings);
@@ -423,7 +458,7 @@ namespace Music.Generator
                 }
             }
 
-            return new PartTrack(notes) { MidiProgramNumber = 255 }; // Drum Set
+            return new PartTrack(notes) { MidiProgramNumber = midiProgramNumber };
         }
 
         #region Validation
@@ -462,5 +497,24 @@ namespace Music.Generator
 
         #endregion
 
+        /// <summary>
+        /// Resolves MIDI program number from VoiceSet by matching GrooveRole.
+        /// Returns defaultProgram if role not found or voice name cannot be mapped.
+        /// </summary>
+        private static int GetProgramNumberForRole(VoiceSet voices, String grooveRole, int defaultProgram)
+        {
+            // Find voice with matching groove role
+            var voice = voices.Voices.FirstOrDefault(v => 
+                string.Equals(v.GrooveRole, grooveRole, StringComparison.OrdinalIgnoreCase));
+
+            if (voice == null)
+                return defaultProgram;
+
+            // Look up MIDI program number from voice name
+            var midiVoice = MidiVoices.MidiVoiceList()
+                .FirstOrDefault(mv => string.Equals(mv.Name, voice.VoiceName, StringComparison.OrdinalIgnoreCase));
+
+            return midiVoice?.ProgramNumber ?? defaultProgram;
+        }
     }
 }
