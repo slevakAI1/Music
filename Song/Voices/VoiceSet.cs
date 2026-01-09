@@ -38,7 +38,7 @@ namespace Music.Generator
         public IReadOnlyList<Voice> SetTestVoicesD1()
         {
             AddVoice("Electric Piano 1", "Pads");
-            AddVoice("Electric Guitar (clean)", "Comp");
+            AddVoice("Electric Guitar (muted)", "Comp");
             AddVoice("Electric Bass (finger)", "Bass");
             AddVoice("Drum Set", "DrumKit");  // MIDI track 10 reserved for drum set; percussion mapped by note number
             return Voices;

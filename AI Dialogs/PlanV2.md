@@ -43,11 +43,11 @@
 
 ---
 
-## Stage 4 — Make comp into comp (not a monophonic pseudo-lead)
+## Stage 4 — Make comp into comp (not a monophonic pseudo-lead) - Completed
 
 **Why now:** your guitar “comp” is currently a single-note line. That will always read as lead-ish.
 
-### Story 4.1 — Comp rhythm patterns, not just groove onsets
+### Story 4.1 — Comp rhythm patterns, not just groove onsets - COMPLETED
 
 **Intent:** groove onsets are a skeleton, not the part.
 
@@ -70,7 +70,7 @@
   - keep top comp tone below the “lead space” ceiling
 - Guitar comp emits multi-note events per slot (simultaneous notes).
 
-### Story 4.3 — Strum/roll micro-timing (optional but high payoff)
+### Story 4.3 — Strum/roll micro-timing (optional but high payoff) - Completed
 
 **Intent:** block chords sound fake; tiny offsets make it human.
 

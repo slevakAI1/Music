@@ -54,7 +54,7 @@ namespace Music.Writer
             btnSetDesignTestScenarioD1.ForeColor = Color.FromArgb(0, 192, 0);
             btnSetDesignTestScenarioD1.Location = new Point(18, 841);
             btnSetDesignTestScenarioD1.Name = "btnSetDesignTestScenarioD1";
-            btnSetDesignTestScenarioD1.Size = new Size(179, 33);
+            btnSetDesignTestScenarioD1.Size = new Size(179, 59);
             btnSetDesignTestScenarioD1.TabIndex = 10;
             btnSetDesignTestScenarioD1.Text = "Set Design - Test Scenario D1";
             btnSetDesignTestScenarioD1.UseVisualStyleBackColor = false;
@@ -67,9 +67,9 @@ namespace Music.Writer
             groupBox3.Controls.Add(btnExecute);
             groupBox3.Controls.Add(cbCommand);
             groupBox3.ForeColor = Color.White;
-            groupBox3.Location = new Point(436, 841);
+            groupBox3.Location = new Point(208, 841);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(675, 59);
+            groupBox3.Size = new Size(913, 59);
             groupBox3.TabIndex = 33;
             groupBox3.TabStop = false;
             groupBox3.Text = "Command";
@@ -77,7 +77,7 @@ namespace Music.Writer
             // btnTestWordparser
             // 
             btnTestWordparser.ForeColor = Color.FromArgb(0, 192, 0);
-            btnTestWordparser.Location = new Point(515, 21);
+            btnTestWordparser.Location = new Point(743, 22);
             btnTestWordparser.Name = "btnTestWordparser";
             btnTestWordparser.Size = new Size(140, 23);
             btnTestWordparser.TabIndex = 32;

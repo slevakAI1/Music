@@ -129,8 +129,9 @@ namespace Music.Generator
             return new PartTrack(notes) { MidiProgramNumber = 33 }; // Electric Bass
         }
 
-        // AI: GenerateGuitarTrack: uses CompRhythmPatternLibrary to select subset of groove onsets deterministically.
-        // AI: keep program number 27 for Electric Guitar to match intended timbre.
+        // AI: GenerateGuitarTrack: uses CompRhythmPatternLibrary + CompVoicingSelector for multi-note comp voicings.
+        // AI: keep program number 27 for Electric Guitar; tracks previousVoicing for voice-leading continuity across bars.
+        // AI: applies strum timing offsets to chord voicings for humanized feel (Story 4.3).
         private static PartTrack GenerateGuitarTrack(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
@@ -141,9 +142,7 @@ namespace Music.Generator
             HarmonyPolicy policy)
         {
             var notes = new List<PartTrackEvent>();
-            var randomizer = new PitchRandomizer(settings);
-            int? previousPitchClass = null;
-            const int guitarOctave = 4;
+            List<int>? previousVoicing = null; // Track previous voicing for voice-leading continuity
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
@@ -158,6 +157,9 @@ namespace Music.Generator
                 {
                     sectionType = section.SectionType;
                 }
+
+                // Get section profile for voicing selection
+                SectionProfile? sectionProfile = SectionProfile.GetForSectionType(sectionType);
 
                 // Get comp rhythm pattern for this bar
                 var pattern = CompRhythmPatternLibrary.GetPattern(
@@ -190,6 +192,8 @@ namespace Music.Generator
                     if (harmonyEvent == null)
                         continue;
 
+                    // Build harmony context (use higher octave for comp than bass)
+                    const int guitarOctave = 4;
                     var ctx = HarmonyPitchContextBuilder.Build(
                         harmonyEvent.Key,
                         harmonyEvent.Degree,
@@ -198,15 +202,32 @@ namespace Music.Generator
                         guitarOctave,
                         policy);
 
-                    var (midiNote, pitchClass) = randomizer.SelectGuitarPitch(ctx, slot.Bar, slot.OnsetBeat, previousPitchClass);
+                    // Select comp voicing (2-4 note chord fragment)
+                    var voicing = CompVoicingSelector.Select(ctx, slot, previousVoicing, sectionProfile);
 
-                    notes.Add(new PartTrackEvent(
-                        noteNumber: midiNote,
-                        absoluteTimeTicks: (int)slot.StartTick,
-                        noteDurationTicks: slot.DurationTicks,
-                        noteOnVelocity: 85));
+                    // Calculate strum timing offsets for this chord
+                    var strumOffsets = StrumTimingEngine.CalculateStrumOffsets(
+                        voicing,
+                        slot.Bar,
+                        slot.OnsetBeat,
+                        "comp",
+                        settings.Seed);
 
-                    previousPitchClass = pitchClass;
+                    // Add all notes from the voicing with strum timing offsets
+                    for (int i = 0; i < voicing.Count; i++)
+                    {
+                        int midiNote = voicing[i];
+                        int strumOffset = strumOffsets[i];
+
+                        notes.Add(new PartTrackEvent(
+                            noteNumber: midiNote,
+                            absoluteTimeTicks: (int)slot.StartTick + strumOffset,
+                            noteDurationTicks: slot.DurationTicks,
+                            noteOnVelocity: 85));
+                    }
+
+                    // Update previous voicing for next onset
+                    previousVoicing = voicing;
                 }
             }
 
@@ -279,6 +300,7 @@ namespace Music.Generator
                         {
                             chordRealization = VoiceLeadingSelector.Select(previousVoicing, ctx, sectionProfile);
                             
+
                             // Preserve color tone from randomizer if it was added
                             if (baseVoicing.HasColorTone && !chordRealization.HasColorTone)
                             {
