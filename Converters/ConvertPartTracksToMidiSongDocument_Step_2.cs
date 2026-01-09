@@ -69,9 +69,16 @@ namespace Music.Writer
                     mergedEvents.AddRange(timeSignatureEvents);
                 }
 
-                // Sort all events by absolute time
+                // Sort all events by absolute time using stable sort with event type priority
                 // AI: sorting must be stable and happen before channel assignment so NoteOn/NoteOff pairs align
-                mergedEvents = mergedEvents.OrderBy(e => e.AbsoluteTimeTicks).ToList();
+                // AI: Use event type priority for same-tick ordering, then insertion order as final tie-breaker
+                mergedEvents = mergedEvents
+                    .Index()
+                    .OrderBy(e => e.Item.AbsoluteTimeTicks)
+                    .ThenBy(e => GetEventTypePriority(e.Item.Type))
+                    .ThenBy(e => e.Index)
+                    .Select(e => e.Item)
+                    .ToList();
 
                 // Assign channels
                 int channel = mergedTracks.Count;
@@ -99,5 +106,73 @@ namespace Music.Writer
 
             return mergedTracks;
         }
+
+        // AI: GetEventTypePriority: defines ordering for events at same AbsoluteTimeTicks; lower numbers sort first
+        // AI: Critical ordering: NoteOff before NoteOn (allows re-trigger); setup (tempo/program) before notes; meta events grouped logically
+        private static int GetEventTypePriority(PartTrackEventType type) =>
+            type switch
+            {
+                // Priority 0-9: Critical meta events that affect timing/playback - must come first
+                PartTrackEventType.SequenceNumber => 0,
+                PartTrackEventType.SetTempo => 1,
+                PartTrackEventType.TimeSignature => 2,
+                PartTrackEventType.KeySignature => 3,
+                PartTrackEventType.SmpteOffset => 4,
+
+                // Priority 10-19: Track/instrument identification and routing
+                PartTrackEventType.SequenceTrackName => 10,
+                PartTrackEventType.InstrumentName => 11,
+                PartTrackEventType.DeviceName => 12,
+                PartTrackEventType.MidiChannelPrefix => 13,
+                PartTrackEventType.MidiPort => 14,
+
+                // Priority 20-29: Program and control setup - must happen before notes
+                PartTrackEventType.ProgramChange => 20,
+                PartTrackEventType.ControlChange => 21,
+
+                // Priority 30-39: Channel voice messages (non-note)
+                PartTrackEventType.ChannelPressure => 30,
+                PartTrackEventType.PolyKeyPressure => 31,
+                PartTrackEventType.PitchBend => 32,
+
+                // Priority 40-49: Note events - NoteOff MUST come before NoteOn for same tick
+                PartTrackEventType.NoteOff => 40,
+                PartTrackEventType.NoteOn => 41,
+
+                // Priority 50-69: Text/lyric meta events - after notes
+                PartTrackEventType.Text => 50,
+                PartTrackEventType.CopyrightNotice => 51,
+                PartTrackEventType.Lyric => 52,
+                PartTrackEventType.Marker => 53,
+                PartTrackEventType.CuePoint => 54,
+                PartTrackEventType.ProgramName => 55,
+
+                // Priority 70-89: System exclusive and sequencer specific
+                PartTrackEventType.SequencerSpecific => 70,
+                PartTrackEventType.NormalSysEx => 71,
+                PartTrackEventType.EscapeSysEx => 72,
+
+                // Priority 90-99: System common messages
+                PartTrackEventType.MtcQuarterFrame => 90,
+                PartTrackEventType.SongPositionPointer => 91,
+                PartTrackEventType.SongSelect => 92,
+                PartTrackEventType.TuneRequest => 93,
+
+                // Priority 100-109: System real-time messages
+                PartTrackEventType.TimingClock => 100,
+                PartTrackEventType.Start => 101,
+                PartTrackEventType.Continue => 102,
+                PartTrackEventType.Stop => 103,
+                PartTrackEventType.ActiveSensing => 104,
+                PartTrackEventType.SystemReset => 105,
+
+                // Priority 110-119: End of track and unknown
+                PartTrackEventType.EndOfTrack => 110,
+                PartTrackEventType.UnknownMeta => 998,
+                PartTrackEventType.Unknown => 999,
+
+                // Catch-all for any future event types
+                _ => 1000
+            };
     }
 }
