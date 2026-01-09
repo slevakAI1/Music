@@ -16,7 +16,7 @@ namespace Music.Generator
         /// </summary>
         public sealed class DrumHit
         {
-            public string Role { get; init; } = string.Empty;  // "kick" | "snare" | "hat"
+            public string Role { get; init; } = string.Empty;  // "kick" | "snare" | "hat" | "ride"
             public decimal OnsetBeat { get; init; }            // beat position in bar (domain units)
             public int TimingOffsetTicks { get; init; } = 0;   // micro-timing offset (can be negative)
             public bool IsOpenHat { get; init; } = false;      // open vs closed articulation
@@ -63,7 +63,12 @@ namespace Music.Generator
             }
 
             // Bar-level deterministic RNG for consistent bar-wide choices
-            var barRng = RandomHelpers.CreateLocalRng(seed, grooveEvent.SourcePresetName ?? "groove", barIndex, 0m);
+            // FIX: include sectionType in RNG seed for full determinism over (seed, grooveName, sectionType, barIndex)
+            string sectionKey = sectionType.ToString();
+            var barRng = RandomHelpers.CreateLocalRng(seed, $"{grooveEvent.SourcePresetName ?? "groove"}_{sectionKey}", barIndex, 0m);
+
+            // Determine if this bar uses ride instead of hat (based on section energy)
+            bool useRide = ShouldUseRide(sectionType, barRng);
 
             // --- KICK: preserve main hits, add small sensible variations ---
             if (anchor.KickOnsets != null)
@@ -117,7 +122,7 @@ namespace Music.Generator
             {
                 foreach (var onset in anchor.SnareOnsets)
                 {
-                    var snareRng = RandomHelpers.CreateLocalRng(seed, grooveEvent.SourcePresetName ?? "snare", barIndex, onset);
+                    var snareRng = RandomHelpers.CreateLocalRng(seed, $"{grooveEvent.SourcePresetName ?? "snare"}_{sectionKey}", barIndex, onset);
                     
                     // Flams on high-energy sections (policy-gated)
                     bool allowFlam = IsHighEnergySection(sectionType);
@@ -150,7 +155,7 @@ namespace Music.Generator
                 var ghostCandidates = anchor.HatOnsets ?? new List<decimal>();
                 if (ghostCandidates.Count > 0)
                 {
-                    var ghostRng = RandomHelpers.CreateLocalRng(seed, grooveEvent.SourcePresetName ?? "ghost", barIndex, 0m);
+                    var ghostRng = RandomHelpers.CreateLocalRng(seed, $"{grooveEvent.SourcePresetName ?? "ghost"}_{sectionKey}", barIndex, 0m);
                     int ghostCount = ghostRng.NextInt(0, 3); // 0-2 ghosts per bar
                     
                     for (int i = 0; i < ghostCount; i++)
@@ -172,25 +177,31 @@ namespace Music.Generator
                 }
             }
 
-            // --- HI-HAT: open/close articulations, occasional skips/adds ---
+            // --- HI-HAT / RIDE: open/close articulations, occasional skips/adds ---
             if (anchor.HatOnsets != null)
             {
+                string role = useRide ? "ride" : "hat";
+
                 foreach (var onset in anchor.HatOnsets)
                 {
-                    var hatRng = RandomHelpers.CreateLocalRng(seed, grooveEvent.SourcePresetName ?? "hat", barIndex, onset);
+                    var hatRng = RandomHelpers.CreateLocalRng(seed, $"{grooveEvent.SourcePresetName ?? role}_{sectionKey}", barIndex, onset);
 
-                    // Open hat probability depends on section energy
-                    double openProb = OpenHatProbabilityForSection(sectionType);
-                    bool open = hatRng.NextDouble() < openProb;
+                    // Open hat probability depends on section energy (ride doesn't use open articulation)
+                    bool open = false;
+                    if (!useRide)
+                    {
+                        double openProb = OpenHatProbabilityForSection(sectionType);
+                        open = hatRng.NextDouble() < openProb;
+                    }
 
-                    // Occasionally skip hats for flow (never skip strong beats)
+                    // Occasionally skip hats/ride for flow (never skip strong beats)
                     bool skip = !RandomHelpers.IsStrongBeat(onset) && hatRng.NextDouble() < 0.06;
 
                     if (!skip)
                     {
                         variation.Hits.Add(new DrumHit
                         {
-                            Role = "hat",
+                            Role = role,
                             OnsetBeat = onset,
                             IsMain = true,
                             IsOpenHat = open,
@@ -199,7 +210,7 @@ namespace Music.Generator
                     }
                 }
 
-                // Occasionally add extra hat for flow
+                // Occasionally add extra hat/ride for flow
                 if (anchor.HatOnsets.Count > 0 && barRng.NextDouble() < 0.08)
                 {
                     var pickBase = RandomHelpers.ChooseRandom(barRng, anchor.HatOnsets);
@@ -207,7 +218,7 @@ namespace Music.Generator
                     
                     variation.Hits.Add(new DrumHit
                     {
-                        Role = "hat",
+                        Role = role,
                         OnsetBeat = extraOnset,
                         IsMain = false,
                         IsOpenHat = false,
@@ -229,6 +240,22 @@ namespace Music.Generator
             });
 
             return variation;
+        }
+
+        /// <summary>
+        /// Determines if ride should be used instead of hi-hat based on section energy.
+        /// Chorus/Bridge sections have higher probability of using ride.
+        /// </summary>
+        private static bool ShouldUseRide(MusicConstants.eSectionType sectionType, IRandomSource rng)
+        {
+            double rideProb = sectionType switch
+            {
+                MusicConstants.eSectionType.Chorus => 0.70,
+                MusicConstants.eSectionType.Bridge => 0.50,
+                MusicConstants.eSectionType.Solo => 0.60,
+                _ => 0.15
+            };
+            return rng.NextDouble() < rideProb;
         }
 
         /// <summary>

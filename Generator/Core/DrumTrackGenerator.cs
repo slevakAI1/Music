@@ -1,4 +1,4 @@
-// AI: purpose=Generate drum track: kick, snare, hi-hat using DrumVariationEngine for living performance (Story 6.1).
+// AI: purpose=Generate drum track: kick, snare, hi-hat, ride using DrumVariationEngine for living performance (Story 6.1).
 // AI: invariants=Calls DrumVariationEngine per bar; converts variation plan to MIDI PartTrackEvent list; returns sorted by AbsoluteTimeTicks.
 // AI: deps=Uses DrumVariationEngine, RandomHelpers, PitchRandomizer.SelectDrumVelocity for velocity shaping.
 
@@ -9,7 +9,7 @@ namespace Music.Generator
     internal static class DrumTrackGenerator
     {
         /// <summary>
-        /// Generates drum track: kick, snare, hi-hat with deterministic variations.
+        /// Generates drum track: kick, snare, hi-hat, ride with deterministic variations.
         /// Updated to use DrumVariationEngine for Story 6.1 acceptance criteria.
         /// </summary>
         public static PartTrack Generate(
@@ -29,6 +29,7 @@ namespace Music.Generator
             const int snareNote = 38;
             const int closedHiHatNote = 42;
             const int openHiHatNote = 46;
+            const int rideCymbalNote = 51;
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
@@ -55,6 +56,9 @@ namespace Music.Generator
 
                     var slot = slots[0];
                     int baseTick = (int)slot.StartTick + hit.TimingOffsetTicks;
+
+                    // ADD: clamp to zero to avoid negative absolute ticks
+                    baseTick = Math.Max(0, baseTick);
 
                     switch (hit.Role)
                     {
@@ -129,6 +133,27 @@ namespace Music.Generator
                                     noteNumber: noteNumber,
                                     absoluteTimeTicks: baseTick,
                                     noteDurationTicks: MusicConstants.TicksPerQuarterNote / 2,
+                                    noteOnVelocity: vel));
+                                break;
+                            }
+
+                        case "ride":
+                            {
+                                int baseVel = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "ride", baseVelocity: 75);
+
+                                // Apply hand pattern: accent strong beats
+                                int vel = baseVel;
+                                if (RandomHelpers.IsStrongBeat(slot.OnsetBeat))
+                                    vel = Math.Min(127, vel + 10);
+
+                                // Soften non-main ride hits
+                                if (!hit.IsMain) 
+                                    vel = Math.Max(25, (int)(vel * 0.85));
+
+                                notes.Add(new PartTrackEvent(
+                                    noteNumber: rideCymbalNote,
+                                    absoluteTimeTicks: baseTick,
+                                    noteDurationTicks: MusicConstants.TicksPerQuarterNote,
                                     noteOnVelocity: vel));
                                 break;
                             }
