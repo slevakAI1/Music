@@ -68,9 +68,6 @@ namespace Music.Generator
                 }
             }
 
-            // Debug: write selected voicing count and notes to Debug output window
-            System.Diagnostics.Debug.WriteLine($"CompVoicingSelector: bestVoicing.Count={bestVoicing.Count}; notes={string.Join(",", bestVoicing)}");
-
             return bestVoicing;
         }
 

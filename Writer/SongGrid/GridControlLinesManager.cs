@@ -209,9 +209,6 @@ namespace Music.Writer
                 // StartBar is 1-based, so bar 1 should map to column MEASURE_START_COLUMN_INDEX
                 int columnIndex = SongGridManager.MEASURE_START_COLUMN_INDEX + (timeSignatureEvent.StartBar - 1);
 
-                // Debug output
-                System.Diagnostics.Debug.WriteLine($"Time Sig: Bar {timeSignatureEvent.StartBar} → Column {columnIndex} = {timeSignatureEvent.Numerator}/{timeSignatureEvent.Denominator}");
-
                 // Set the time signature value in the appropriate measure cell
                 if (columnIndex >= 0 && columnIndex < dgSong.Columns.Count)
                 {
