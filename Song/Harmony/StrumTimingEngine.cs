@@ -3,6 +3,13 @@
 // AI: deps=Used by Generator for comp track; minimal state; can be expanded to keys/pads later.
 // AI: perf=Lightweight calculation; called per chord onset; no allocations beyond return list.
 
+/*
+ Notes about the strumming perception
+•	If the voicing count is consistently two but it sounds like different densities, that’s likely the strum offsets + sustain/velocity/timbre causing the perception. Try:
+•	Lowering StrumTimingEngine.DefaultMaxSpreadTicks (e.g., to 8) or using CalculateEvenStrumOffsets to make notes truly simultaneous.
+•	Increasing velocities for quieter notes so they aren’t masked by other instruments.
+•	Switching program to muted (28) or overdriven (29) — different patches emphasize the staggered offsets differently.
+ */
 namespace Music.Generator
 {
     /// <summary>
