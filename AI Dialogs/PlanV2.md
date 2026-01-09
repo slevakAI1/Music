@@ -105,22 +105,95 @@
 
 ## Stage 6 — Drums: from static groove to performance (variation + fills)
 
-**Why now:** your drum track is literally the preset. Real songs have micro-variation and transitions.
+**Why now:** your drum track is literally the preset. Real songs have micro-variation, transitions, and *part-writing* choices (sound selection, dynamics, phrasing).
 
-### Story 6.1 — `GroovePreset` becomes “template”; add variation operators
+**Goal for Stage 6:** keep the existing groove as a *template*, then render a convincing drum performance that sounds like a human drummer with an intentional part: consistent “time feel,” controlled variation, musical transitions, and section-dependent energy.
+
+**Non-goals (push later if needed):**
+- Full “genre drummer model” / ML.
+- Long-range thematic drum motifs (belongs in Stage 7/8 once section identity/energy transforms are in place).
+
+### Story 6.1 — `GroovePreset` becomes “template”; add variation operators (expanded)
+
+**Intent:** turn static onset lists into a living performance while staying deterministic and style-safe.
 
 **Acceptance criteria:**
-- Add a `DrumVariationEngine` that:
-  - can drop/add hat hits
-  - adds ghost notes (snare) at low velocity
-  - adds occasional kick variations that still respect style
-- Must be deterministic from seed.
+- Add `DrumVariationEngine` that takes:
+  - groove preset (template)
+  - section type/profile (energy intent)
+  - bar index (for deterministic variation across bars)
+  - seed (for deterministic tie-break only)
+- Engine outputs per-bar drum events with:
+  - **Kick**: small variations that still “make sense” (never sabotage the downbeat/backbeat feel).
+  - **Snare**:
+    - main hits preserved
+    - add **ghost notes** at low velocity on selected weak subdivisions
+    - optional **flams** on high-energy accents (policy-gated)
+  - **Hi-hat / ride**:
+    - controlled open/close articulations (open hat only where it won’t smear the groove)
+    - occasional skipped hats / added hats for flow
+    - velocity “hand pattern” (alternating or shaped) so hats don’t sound machine-gunned
+- Deterministic rules:
+  - Variation choices are deterministic for `(seed, grooveName, sectionType, barIndex)`.
+  - RNG is only used as a deterministic tie-break among valid options.
 
-### Story 6.2 — Section transitions: fills and turnarounds
+### Story 6.2 — Timing & dynamics humanization layer (micro-feel)
+
+**Intent:** even correct notes sound fake without timing and dynamics nuance.
 
 **Acceptance criteria:**
-- At the end of a section (or last bar of a phrase), generate a fill pattern appropriate to the groove.
-- Fills must not break bar boundaries and must respect `Song.TotalBars`.
+- Add a deterministic **micro-timing** layer for drums:
+  - hats slightly ahead/behind depending on groove style (tiny offsets)
+  - kick/snare closer to grid, with controlled push/pull
+  - max deviation is clamped (never breaks bar boundaries)
+- Add a deterministic **velocity shaping** layer:
+  - hat patterns have accents (e.g., beat 2/4 stronger, or offbeat accents per style)
+  - ghost notes are consistently quiet
+  - fills crescendo into transitions
+- Ensure all micro-timing and velocity shaping is repeatable from seed.
+
+### Story 6.3 — Section transitions: fills, turnarounds, and pickups (tight scope)
+
+**Intent:** a drummer signals form; transitions must feel inevitable.
+
+**Acceptance criteria:**
+- At the end of a section **(or last bar of a phrase)** generate an appropriate fill that:
+  - respects bar boundaries and `Song.TotalBars`
+  - is style-aware (mapped from groove name)
+  - is density-capped so it doesn’t overwhelm other roles
+- Fill selection is deterministic by `(seed, grooveName, sectionType, sectionIndex)`.
+- Fills have structured shapes:
+  - simple 8th-note and 16th-note rolls
+  - tom movement (high→mid→low) where supported
+  - crash/ride + kick support at the downbeat of the next section
+
+### Story 6.4 — Cymbal language & orchestration (make it sound “produced”)
+
+**Intent:** pro drum parts use cymbals intentionally (not randomly) to mark phrases/sections.
+
+**Acceptance criteria:**
+- Add deterministic crash/ride placement rules:
+  - crash on section start (configurable per section type)
+  - occasional crash on phrase peaks (e.g., every 4 or 8 bars)
+  - ride vs hat selection based on section energy (chorus may go ride)
+- Add choke/stop hits for endings/outros (optional, style-gated).
+
+### Story 6.5 — Pattern “A / A’ / B” variation hooks for later Stage 7 integration
+
+**Intent:** Stage 7 will control repetition/contrast; drums must expose clean knobs.
+
+**Acceptance criteria:**
+- Expose drum-role parameters that Stage 7 can drive without rewriting drum logic:
+  - `DensityMultiplier` (hats/ghosts/fill density)
+  - `VelocityBias`
+  - `BusyProbability`
+  - `FillProbability` and `FillComplexity`
+- Keep the engine deterministic when these knobs are held constant.
+
+---
+
+**If something should be later:**
+- “Drum identity per section” (A/A’ transforms) becomes truly powerful once Stage 7 `SectionEnergyProfile` exists. Stage 6 should implement the mechanics (variation, fills, feel, orchestration) and keep the controls/inputs ready for Stage 7 to drive.
 
 ---
 
