@@ -82,7 +82,7 @@
 
 ## Stage 5 — Bassline writing (lock to groove + outline harmony)
 
-**Why now:** bass and drums define “song feels like a genre.”
+**Why now:** bass and drums define "song feels like a genre."
 
 ### Story 5.1 — Bass pattern library keyed by groove + section type - COMPLETED
 
@@ -94,7 +94,7 @@
   - diatonic approach into chord change (policy-gated)
 - Pattern selection is deterministic by section + bar; RNG only for tie-break.
 
-### Story 5.2 — Chord-change awareness (approaches + pickups)
+### Story 5.2 — Chord-change awareness (approaches + pickups) - COMPLETED
 
 **Acceptance criteria:**
 - Detect when next harmony changes within `N` beats.
