@@ -152,7 +152,7 @@
   - fills crescendo into transitions
 - Ensure all micro-timing and velocity shaping is repeatable from seed.
 
-### Story 6.3 — Section transitions: fills, turnarounds, and pickups (tight scope)
+### Story 6.3 — Section transitions: fills, turnarounds, and pickups (tight scope) - Completed
 
 **Intent:** a drummer signals form; transitions must feel inevitable.
 
@@ -160,7 +160,7 @@
 - At the end of a section **(or last bar of a phrase)** generate an appropriate fill that:
   - respects bar boundaries and `Song.TotalBars`
   - is style-aware (mapped from groove name)
-  - is density-capped so it doesn’t overwhelm other roles
+  - is density-capped so it doesn't overwhelm other roles
 - Fill selection is deterministic by `(seed, grooveName, sectionType, sectionIndex)`.
 - Fills have structured shapes:
   - simple 8th-note and 16th-note rolls
