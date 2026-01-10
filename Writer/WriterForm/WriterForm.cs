@@ -388,8 +388,26 @@ namespace Music.Writer
 
         private void btnPause_Click(object sender, EventArgs e)
         {
-            // Delegate pause/resume behavior to the grid/operations file for consistency.
+            // Pause/resume MIDI playback
             _gridOperations.HandlePause(_midiPlaybackService);
+            
+            // Stop tracker during pause (simplest consistent behavior)
+            if (_midiPlaybackService.IsPaused)
+            {
+                _progressTracker?.Stop();
+            }
+            else if (_midiPlaybackService.IsPlaying)
+            {
+                // Resume was triggered - restart tracker if we have time signature track
+                var timeSignatureTrack = GridControlLinesManager.GetTimeSignatureTrack(dgSong);
+                if (timeSignatureTrack != null && timeSignatureTrack.Events.Count > 0)
+                {
+                    _progressTracker?.Stop();
+                    _progressTracker = new PlaybackProgressTracker(_midiPlaybackService, timeSignatureTrack, pollIntervalMs: 50);
+                    _progressTracker.MeasureChanged += OnMeasureChanged;
+                    _progressTracker.Start();
+                }
+            }
         }
 
         private void btnSaveDesign_Click(object sender, EventArgs e)
@@ -448,13 +466,13 @@ namespace Music.Writer
                 var timeSignatureTrack = GridControlLinesManager.GetTimeSignatureTrack(dgSong);
                 System.Diagnostics.Debug.WriteLine($"[WriterForm] TimeSignatureTrack: {(timeSignatureTrack == null ? "NULL" : $"{timeSignatureTrack.Events.Count} events")}");
                 
-                if (timeSignatureTrack == null || timeSignatureTrack.Events.Count == 0)
+                // If no time signature track, proceed with playback but without measure tracking
+                bool enableTracking = timeSignatureTrack != null && timeSignatureTrack.Events.Count > 0;
+                
+                if (!enableTracking)
                 {
-                    MessageBoxHelper.Show(
-                        "No time signature events defined. Please add at least one time signature event.",
-                        "Missing Time Signature",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
+                    System.Diagnostics.Debug.WriteLine("[WriterForm] No time signature track - proceeding with playback only (no measure tracking)");
+                    await _eventHandlers.HandlePlayAsync(dgSong, _midiPlaybackService);
                     return;
                 }
 
@@ -472,6 +490,20 @@ namespace Music.Writer
                 await _eventHandlers.HandlePlayAsync(dgSong, _midiPlaybackService);
                 System.Diagnostics.Debug.WriteLine("[WriterForm] HandlePlayAsync completed");
             }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[WriterForm] StartPlaybackWithMeasureTrackingAsync: ERROR - {ex.Message}");
+                // If measure tracking setup fails, try playback without tracking
+                try
+                {
+                    await _eventHandlers.HandlePlayAsync(dgSong, _midiPlaybackService);
+                }
+                catch
+                {
+                    // Let playback errors propagate normally
+                    throw;
+                }
+            }
             finally
             {
                 System.Diagnostics.Debug.WriteLine("[WriterForm] StartPlaybackWithMeasureTrackingAsync: FINALLY block");
@@ -484,14 +516,22 @@ namespace Music.Writer
         {
             System.Diagnostics.Debug.WriteLine($"[WriterForm] OnMeasureChanged: Prev={e.PreviousMeasure}, Current={e.CurrentMeasure}, Tick={e.CurrentTick}");
             
-            if (e.PreviousMeasure > 0)
+            try
             {
-                SongGridManager.ClearMeasureHighlight(dgSong, e.PreviousMeasure);
-            }
+                if (e.PreviousMeasure > 0)
+                {
+                    SongGridManager.ClearMeasureHighlight(dgSong, e.PreviousMeasure);
+                }
 
-            if (e.CurrentMeasure > 0)
+                if (e.CurrentMeasure > 0)
+                {
+                    SongGridManager.HighlightCurrentMeasure(dgSong, e.CurrentMeasure);
+                }
+            }
+            catch (Exception ex)
             {
-                SongGridManager.HighlightCurrentMeasure(dgSong, e.CurrentMeasure);
+                System.Diagnostics.Debug.WriteLine($"[WriterForm] OnMeasureChanged: ERROR - {ex.Message}");
+                // Silently fail to avoid crashing the UI - measure tracking is non-critical
             }
         }
     }

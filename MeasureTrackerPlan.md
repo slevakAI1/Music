@@ -186,11 +186,13 @@ On Play click:
 
 # Story 5 — Edge Cases & Regression Checks
 
+Status: Done
+
 ## Why
 Measure tracking is timing-sensitive and may fail under common situations (no time signature, empty bars, stop/pause).
 
 ## Scope
-Add minimal guards and ensure feature doesn’t break playback.
+Add minimal guards and ensure feature doesn't break playback.
 
 ## Technical Approach
 - If `TimeSignatureTrack` is missing, do not start tracking, and do not crash.
@@ -208,3 +210,12 @@ Add minimal guards and ensure feature doesn’t break playback.
 ## Instructions
 1. Use the minimum changes necessary and only changes related to this goal.
 2. When done, re-check the acceptance criteria against the implemented code changes to ensure completeness.
+
+## Implementation Summary
+? **TimeSignatureTrack missing**: Playback proceeds without tracking, no crash  
+? **Invalid tick?measure mapping**: Returns 0, no highlight attempted  
+? **Measure beyond column count**: Highlight methods check bounds and skip gracefully  
+? **Stop behavior**: Stops tracker and clears highlights  
+? **Pause behavior**: Stops tracker on pause, restarts on resume  
+? **Error handling**: Try-catch in OnMeasureChanged prevents UI crashes  
+? **Graceful degradation**: Tracker setup errors fall back to playback-only mode
