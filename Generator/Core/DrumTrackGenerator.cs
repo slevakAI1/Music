@@ -1,6 +1,6 @@
 // AI: purpose=Generate drum track: kick, snare, hi-hat, ride using DrumVariationEngine for living performance (Story 6.1+6.3).
-// AI: invariants=Calls DrumVariationEngine per bar; integrates DrumFillEngine at section transitions; converts to MIDI PartTrackEvent list; returns sorted by AbsoluteTimeTicks.
-// AI: deps=Uses DrumVariationEngine, DrumFillEngine, RandomHelpers, PitchRandomizer.SelectDrumVelocity for velocity shaping.
+/// AI: invariants=Calls DrumVariationEngine per bar; integrates DrumFillEngine at section transitions; converts to MIDI PartTrackEvent list; returns sorted by AbsoluteTimeTicks.
+/// AI: deps=Uses DrumVariationEngine, DrumFillEngine, RandomHelpers, PitchRandomizer.SelectDrumVelocity for velocity shaping.
 
 using Music.MyMidi;
 
@@ -49,8 +49,12 @@ namespace Music.Generator
                     sectionIndex = section.SectionId;
                 }
 
-                // Check if this bar should have a fill (Story 6.3)
-                bool shouldFill = DrumFillEngine.ShouldGenerateFill(bar, totalBars, sectionTrack);
+                // Create deterministic per-bar RNG so fill decisions remain deterministic when knobs change.
+                var barRng = RandomHelpers.CreateLocalRng(settings.Seed, $"{grooveEvent.SourcePresetName ?? "groove"}_{sectionType}", bar, 0m);
+
+                // Check if this bar should have a fill (Story 6.3) or if Stage 7 requests extra fills via parameter.
+                bool shouldFill = DrumFillEngine.ShouldGenerateFill(bar, totalBars, sectionTrack)
+                    || barRng.NextDouble() < (settings.DrumParameters?.FillProbability ?? 0.0);
 
                 List<DrumVariationEngine.DrumHit> allHits;
 
@@ -63,12 +67,13 @@ namespace Music.Generator
                         sectionType,
                         sectionIndex,
                         settings.Seed,
-                        totalBars);
+                        totalBars,
+                        settings.DrumParameters);
                 }
                 else
                 {
                     // Generate per-bar variation plan using DrumVariationEngine
-                    var variation = DrumVariationEngine.Generate(grooveEvent, sectionType, bar, settings.Seed);
+                    var variation = DrumVariationEngine.Generate(grooveEvent, sectionType, bar, settings.Seed, settings.DrumParameters);
                     allHits = variation.Hits;
                 }
 
@@ -141,6 +146,11 @@ namespace Music.Generator
                                     isInFill: hit.IsInFill,
                                     fillProgress: hit.FillProgress);
                                 
+                                // Apply DrumRoleParameters velocity bias (Story 6.5 hook). Keep deterministic and simple.
+                                if (settings.DrumParameters != null && Math.Abs(settings.DrumParameters.VelocityBias) > 0.0001)
+                                {
+                                    vel = Math.Clamp(vel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
+                                }
 
                                 // Reduce velocity for non-main kicks
                                 if (!hit.IsMain)
@@ -164,6 +174,12 @@ namespace Music.Generator
                                     int mainVel = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "snare", baseVelocity: 90);
                                     int preVel = DrumVelocityShaper.FlamPreHitVelocity(mainVel, settings.Seed, slot.Bar, slot.OnsetBeat);
                                     
+                                    // Apply velocity bias to flam pre-hit
+                                    if (settings.DrumParameters != null && Math.Abs(settings.DrumParameters.VelocityBias) > 0.0001)
+                                    {
+                                        preVel = Math.Clamp(preVel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
+                                    }
+                                    
                                     notes.Add(new PartTrackEvent(
                                         noteNumber: snareNote,
                                         absoluteTimeTicks: baseTick,
@@ -175,6 +191,12 @@ namespace Music.Generator
                                     // Ghost note: use dedicated ghost velocity method
                                     int baseVel = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "snare", baseVelocity: 40);
                                     int vel = DrumVelocityShaper.GhostNoteVelocity(baseVel, settings.Seed, slot.Bar, slot.OnsetBeat);
+                                    
+                                    // Apply velocity bias to ghost notes
+                                    if (settings.DrumParameters != null && Math.Abs(settings.DrumParameters.VelocityBias) > 0.0001)
+                                    {
+                                        vel = Math.Clamp(vel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
+                                    }
                                     
                                     notes.Add(new PartTrackEvent(
                                         noteNumber: snareNote,
@@ -199,6 +221,12 @@ namespace Music.Generator
                                         isGhost: false,
                                         isInFill: hit.IsInFill,
                                         fillProgress: hit.FillProgress);
+                                    
+                                    // Apply velocity bias
+                                    if (settings.DrumParameters != null && Math.Abs(settings.DrumParameters.VelocityBias) > 0.0001)
+                                    {
+                                        vel = Math.Clamp(vel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
+                                    }
                                     
                                     if (!hit.IsMain)
                                         vel = Math.Max(30, (int)(vel * 0.85));
@@ -230,6 +258,12 @@ namespace Music.Generator
                                     isInFill: hit.IsInFill,
                                     fillProgress: hit.FillProgress);
 
+                                // Apply velocity bias
+                                if (settings.DrumParameters != null && Math.Abs(settings.DrumParameters.VelocityBias) > 0.0001)
+                                {
+                                    vel = Math.Clamp(vel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
+                                }
+                                
                                 // Soften non-main hats
                                 if (!hit.IsMain) 
                                     vel = Math.Max(20, (int)(vel * 0.85));
@@ -263,6 +297,12 @@ namespace Music.Generator
                                     isInFill: hit.IsInFill,
                                     fillProgress: hit.FillProgress);
 
+                                // Apply velocity bias
+                                if (settings.DrumParameters != null && Math.Abs(settings.DrumParameters.VelocityBias) > 0.0001)
+                                {
+                                    vel = Math.Clamp(vel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
+                                }
+                                
                                 // Soften non-main ride hits
                                 if (!hit.IsMain) 
                                     vel = Math.Max(25, (int)(vel * 0.85));
@@ -303,6 +343,12 @@ namespace Music.Generator
                                     isInFill: hit.IsInFill,
                                     fillProgress: hit.FillProgress);
 
+                                // Apply velocity bias to toms
+                                if (settings.DrumParameters != null && Math.Abs(settings.DrumParameters.VelocityBias) > 0.0001)
+                                {
+                                    vel = Math.Clamp(vel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
+                                }
+
                                 notes.Add(new PartTrackEvent(
                                     noteNumber: tomNote,
                                     absoluteTimeTicks: baseTick,
@@ -328,6 +374,12 @@ namespace Music.Generator
                                     isGhost: false,
                                     isInFill: hit.IsInFill,
                                     fillProgress: hit.FillProgress);
+
+                                // Apply velocity bias to crashes
+                                if (settings.DrumParameters != null && Math.Abs(settings.DrumParameters.VelocityBias) > 0.0001)
+                                {
+                                    vel = Math.Clamp(vel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
+                                }
 
                                 // Boost velocity for accent hits (but not chokes)
                                 if (hit.IsMain && !hit.IsChoke)
@@ -363,6 +415,12 @@ namespace Music.Generator
                                     isGhost: false,
                                     isInFill: hit.IsInFill,
                                     fillProgress: hit.FillProgress);
+
+                                // Apply velocity bias to crashes
+                                if (settings.DrumParameters != null && Math.Abs(settings.DrumParameters.VelocityBias) > 0.0001)
+                                {
+                                    vel = Math.Clamp(vel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
+                                }
 
                                 // Boost velocity for accent hits
                                 if (hit.IsMain)

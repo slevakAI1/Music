@@ -207,6 +207,7 @@ namespace Music.Generator
         /// <summary>
         /// Generates a drum fill for the specified bar.
         /// Returns list of DrumHit objects compatible with DrumVariationEngine output.
+        /// Story 6.5: now accepts DrumRoleParameters to allow Stage 7 to control fill complexity.
         /// </summary>
         public static List<DrumVariationEngine.DrumHit> GenerateFill(
             int bar,
@@ -214,9 +215,13 @@ namespace Music.Generator
             MusicConstants.eSectionType sectionType,
             int sectionIndex,
             int seed,
-            int totalBars)
+            int totalBars,
+            DrumRoleParameters? drumParams = null)
         {
             var hits = new List<DrumVariationEngine.DrumHit>();
+            
+            // Use default parameters if not provided (preserves existing behavior)
+            drumParams ??= new DrumRoleParameters();
             
             // Get style characteristics
             var style = GetFillStyle(grooveName);
@@ -224,9 +229,12 @@ namespace Music.Generator
             // Deterministic RNG for this fill
             var fillRng = RandomHelpers.CreateLocalRng(seed, $"fill_{grooveName}", sectionIndex, bar);
 
-            // Determine fill complexity based on section type
+            // Determine fill complexity based on section type and allow Stage 7 to scale it.
             int complexity = GetFillComplexity(sectionType, fillRng);
             
+            // Scale complexity by supplied parameter (default 1.0)
+            complexity = Math.Max(1, (int)Math.Round(complexity * drumParams.FillComplexityMultiplier));
+
             // Clamp density to style max
             int targetDensity = Math.Min(complexity, style.MaxDensity);
 

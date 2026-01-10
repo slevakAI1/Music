@@ -32,6 +32,10 @@ namespace Music.Generator
         // AI: KeysAdd9Probability expected 0..1; only considered on first onset of a harmony event.
         public double KeysAdd9Probability { get; init; } = 0.10;
 
+        // ========== DRUM SETTINGS (Story 6.5 hooks for Stage 7) ==========
+        // Expose a single object that Stage 7 can set to control drum behavior without changing engine code.
+        public DrumRoleParameters DrumParameters { get; init; } = new DrumRoleParameters();
+
         // AI: Default returns a minimal-randomness settings instance; callers expect stable defaults.
         public static RandomizationSettings Default => new();
     }

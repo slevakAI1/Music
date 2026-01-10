@@ -39,14 +39,19 @@ namespace Music.Generator
         /// <summary>
         /// Generates deterministic per-bar drum variation from groove template.
         /// All choices are deterministic for (seed, grooveName, sectionType, barIndex).
+        /// Story 6.5: now accepts DrumRoleParameters to expose knobs for Stage 7.
         /// </summary>
         public static DrumBarVariation Generate(
             GrooveEvent grooveEvent,
             MusicConstants.eSectionType sectionType,
             int barIndex,
-            int seed)
+            int seed,
+            DrumRoleParameters? drumParams = null)
         {
             if (grooveEvent == null) throw new ArgumentNullException(nameof(grooveEvent));
+            
+            // Use default parameters if not provided (preserves existing behavior)
+            drumParams ??= new DrumRoleParameters();
             
             var variation = new DrumBarVariation();
 
@@ -97,8 +102,9 @@ namespace Music.Generator
                 }
             }
 
-            // Optionally include tension layer kicks (deterministic ~50% of bars)
-            if (tension.KickOnsets != null && tension.KickOnsets.Count > 0 && barRng.NextDouble() < 0.5)
+            // Optionally include tension layer kicks (deterministic base probability scaled by density)
+            double tensionKickBaseProb = 0.5 * Math.Clamp(drumParams.DensityMultiplier, 0.25, 2.5);
+            if (tension.KickOnsets != null && tension.KickOnsets.Count > 0 && barRng.NextDouble() < tensionKickBaseProb)
             {
                 foreach (var onset in tension.KickOnsets)
                 {
@@ -121,11 +127,13 @@ namespace Music.Generator
                 }
             }
 
-            // Small chance to add extra kick for flow (never on main kick positions)
+            // Small chance to add extra kick for flow (never on main kick positions).
+            // Scale chance by density multiplier and busy probability.
             if (anchor.KickOnsets != null && anchor.KickOnsets.Count > 0)
             {
                 var candidates = BuildWeakSubdivisionCandidates(anchor.HatOnsets, anchor.KickOnsets);
-                if (candidates.Count > 0 && barRng.NextDouble() < 0.12)
+                double extraKickChance = (0.12 * drumParams.DensityMultiplier) + drumParams.BusyProbability;
+                if (candidates.Count > 0 && barRng.NextDouble() < Math.Clamp(extraKickChance, 0.0, 0.95))
                 {
                     var pick = RandomHelpers.ChooseRandom(barRng, candidates);
                     bool isStrongBeat = RandomHelpers.IsStrongBeat(pick);
@@ -205,7 +213,10 @@ namespace Music.Generator
                 if (ghostCandidates.Count > 0)
                 {
                     var ghostRng = RandomHelpers.CreateLocalRng(seed, $"{grooveEvent.SourcePresetName ?? "ghost"}_{sectionKey}", barIndex, 0m);
-                    int ghostCount = ghostRng.NextInt(0, 3); // 0-2 ghosts per bar
+                    // Base 0-2 ghosts per bar, scaled by density multiplier
+                    int maxGhostBase = 2;
+                    int maxGhost = Math.Max(0, (int)Math.Round(maxGhostBase * drumParams.DensityMultiplier));
+                    int ghostCount = ghostRng.NextInt(0, Math.Max(1, maxGhost + 1));
                     
                     for (int i = 0; i < ghostCount; i++)
                     {
@@ -277,8 +288,9 @@ namespace Music.Generator
                     }
                 }
 
-                // Occasionally add extra hat/ride for flow
-                if (anchor.HatOnsets.Count > 0 && barRng.NextDouble() < 0.08)
+                // Occasionally add extra hat/ride for flow; scale by density multiplier and busy probability.
+                double extraHatChance = (0.08 * drumParams.DensityMultiplier) + drumParams.BusyProbability;
+                if (anchor.HatOnsets.Count > 0 && barRng.NextDouble() < Math.Clamp(extraHatChance, 0.0, 0.95))
                 {
                     var pickBase = RandomHelpers.ChooseRandom(barRng, anchor.HatOnsets);
                     decimal extraOnset = pickBase + 0.25m; // quarter subdivision ahead
