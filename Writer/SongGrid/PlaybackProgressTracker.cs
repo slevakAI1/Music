@@ -1,0 +1,150 @@
+using Music.Generator;
+using Music.MyMidi;
+
+namespace Music.Writer;
+
+internal sealed class PlaybackProgressTracker : IDisposable
+{
+    private readonly MidiPlaybackService _playbackService;
+    private readonly Timingtrack _timeSignatureTrack;
+    private readonly int _pollIntervalMs;
+    private readonly SynchronizationContext? _syncContext;
+
+    private CancellationTokenSource? _cts;
+    private Task? _loopTask;
+
+    private int _currentMeasure;
+
+    public PlaybackProgressTracker(
+        MidiPlaybackService playbackService,
+        Timingtrack timeSignatureTrack,
+        int pollIntervalMs = 50)
+    {
+        ArgumentNullException.ThrowIfNull(playbackService);
+        ArgumentNullException.ThrowIfNull(timeSignatureTrack);
+
+        _playbackService = playbackService;
+        _timeSignatureTrack = timeSignatureTrack;
+        _pollIntervalMs = pollIntervalMs <= 0 ? 50 : pollIntervalMs;
+        _syncContext = SynchronizationContext.Current;
+    }
+
+    public event EventHandler<MeasureChangedEventArgs>? MeasureChanged;
+
+    public void Start()
+    {
+        if (_cts != null)
+            return;
+
+        _currentMeasure = 0;
+        _cts = new CancellationTokenSource();
+        _loopTask = RunAsync(_cts.Token);
+    }
+
+    public void Stop()
+    {
+        var cts = _cts;
+        if (cts == null)
+            return;
+
+        _cts = null;
+        try
+        {
+            cts.Cancel();
+        }
+        finally
+        {
+            cts.Dispose();
+        }
+
+        _loopTask = null;
+    }
+
+    private async Task RunAsync(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(_pollIntervalMs));
+
+        System.Diagnostics.Debug.WriteLine("[PlaybackProgressTracker] RunAsync: Starting polling loop");
+
+        try
+        {
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                var isPlaying = _playbackService.IsPlaying;
+                System.Diagnostics.Debug.WriteLine($"[PlaybackProgressTracker] Poll: IsPlaying={isPlaying}");
+
+                if (!isPlaying)
+                    continue;
+
+                var tick = _playbackService.CurrentTick;
+                var measure = TickToMeasure(tick);
+                System.Diagnostics.Debug.WriteLine($"[PlaybackProgressTracker] Tick={tick}, Measure={measure}, _currentMeasure={_currentMeasure}");
+
+                if (measure <= 0 || measure == _currentMeasure)
+                    continue;
+
+                var previous = _currentMeasure;
+                _currentMeasure = measure;
+
+                System.Diagnostics.Debug.WriteLine($"[PlaybackProgressTracker] Raising MeasureChanged: Prev={previous}, Current={measure}");
+                RaiseMeasureChanged(previous, measure, tick);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            System.Diagnostics.Debug.WriteLine("[PlaybackProgressTracker] RunAsync: Cancelled");
+        }
+    }
+
+    private void RaiseMeasureChanged(int previousMeasure, int currentMeasure, long currentTick)
+    {
+        var handler = MeasureChanged;
+        if (handler == null)
+            return;
+
+        var args = new MeasureChangedEventArgs(previousMeasure, currentMeasure, currentTick);
+
+        if (_syncContext != null)
+        {
+            _syncContext.Post(_ => handler(this, args), null);
+        }
+        else
+        {
+            handler(this, args);
+        }
+    }
+
+    private int TickToMeasure(long tick)
+    {
+        if (tick < 0)
+            return 0;
+
+        if (_timeSignatureTrack.Events.Count == 0)
+            return 0;
+
+        long currentTick = 0;
+        int bar = 1;
+
+        for (; bar <= 10000; bar++)
+        {
+            var ts = _timeSignatureTrack.GetActiveTimeSignatureEvent(bar);
+            if (ts == null)
+                return 0;
+
+            int ticksPerMeasure = (MusicConstants.TicksPerQuarterNote * 4 * ts.Numerator) / ts.Denominator;
+            long nextTick = currentTick + ticksPerMeasure;
+
+            if (tick < nextTick)
+                return bar;
+
+            currentTick = nextTick;
+        }
+
+        return 0;
+    }
+
+    public void Dispose()
+    {
+        Stop();
+    }
+}

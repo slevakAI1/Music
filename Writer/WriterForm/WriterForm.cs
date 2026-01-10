@@ -26,6 +26,8 @@ namespace Music.Writer
         // MIDI I/O service for importing/exporting MIDI files
         private MidiIoService _midiIoService;
 
+        private PlaybackProgressTracker? _progressTracker;
+
         // Event handlers instance
         private readonly WriterFormEventHandlers _eventHandlers = new();
 
@@ -295,7 +297,7 @@ namespace Music.Writer
 
         private async void btnPlay_Click(object sender, EventArgs e)
         {
-            await _eventHandlers.HandlePlayAsync(dgSong, _midiPlaybackService);
+            await StartPlaybackWithMeasureTrackingAsync();
         }
 
         private void btnSetDesignTestScenarioD1_Click(object sender, EventArgs e)
@@ -375,6 +377,8 @@ namespace Music.Writer
         private void btnStop_Click(object sender, EventArgs e)
         {
             _midiPlaybackService.Stop();
+            _progressTracker?.Stop();
+            SongGridManager.ClearAllMeasureHighlights(dgSong);
         }
 
         private void btnClearSelected_Click(object sender, EventArgs e)
@@ -432,6 +436,63 @@ namespace Music.Writer
             var phrase = new LyricPhrase();
             LyricPhoneticsHelper.ParseTextToLyricPhrase(phrase, "I love music");
             LyricPhoneticsHelper.MarkBreathPoints(phrase);
+        }
+
+        private async Task StartPlaybackWithMeasureTrackingAsync()
+        {
+            System.Diagnostics.Debug.WriteLine("[WriterForm] StartPlaybackWithMeasureTrackingAsync: BEGIN");
+            
+            try
+            {
+                // Extract time signature track from fixed row
+                var timeSignatureTrack = GridControlLinesManager.GetTimeSignatureTrack(dgSong);
+                System.Diagnostics.Debug.WriteLine($"[WriterForm] TimeSignatureTrack: {(timeSignatureTrack == null ? "NULL" : $"{timeSignatureTrack.Events.Count} events")}");
+                
+                if (timeSignatureTrack == null || timeSignatureTrack.Events.Count == 0)
+                {
+                    MessageBoxHelper.Show(
+                        "No time signature events defined. Please add at least one time signature event.",
+                        "Missing Time Signature",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return;
+                }
+
+                _progressTracker?.Stop();
+                _progressTracker?.Dispose();
+
+                SongGridManager.ClearAllMeasureHighlights(dgSong);
+
+                System.Diagnostics.Debug.WriteLine("[WriterForm] Creating PlaybackProgressTracker");
+                _progressTracker = new PlaybackProgressTracker(_midiPlaybackService, timeSignatureTrack, pollIntervalMs: 50);
+                _progressTracker.MeasureChanged += OnMeasureChanged;
+                _progressTracker.Start();
+                System.Diagnostics.Debug.WriteLine("[WriterForm] PlaybackProgressTracker started");
+
+                await _eventHandlers.HandlePlayAsync(dgSong, _midiPlaybackService);
+                System.Diagnostics.Debug.WriteLine("[WriterForm] HandlePlayAsync completed");
+            }
+            finally
+            {
+                System.Diagnostics.Debug.WriteLine("[WriterForm] StartPlaybackWithMeasureTrackingAsync: FINALLY block");
+                _progressTracker?.Stop();
+                SongGridManager.ClearAllMeasureHighlights(dgSong);
+            }
+        }
+
+        private void OnMeasureChanged(object? sender, MeasureChangedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine($"[WriterForm] OnMeasureChanged: Prev={e.PreviousMeasure}, Current={e.CurrentMeasure}, Tick={e.CurrentTick}");
+            
+            if (e.PreviousMeasure > 0)
+            {
+                SongGridManager.ClearMeasureHighlight(dgSong, e.PreviousMeasure);
+            }
+
+            if (e.CurrentMeasure > 0)
+            {
+                SongGridManager.HighlightCurrentMeasure(dgSong, e.CurrentMeasure);
+            }
         }
     }
 }

@@ -3,6 +3,7 @@
 // AI: deps=Relies on MidiSongDocument.Raw providing GetPlayback(OutputDevice); changing that breaks Play behavior.
 // AI: thread-safety=Not thread-safe; intended for UI thread calls; perform heavy I/O off UI thread if needed.
 
+using Melanchall.DryWetMidi.Interaction;
 using Melanchall.DryWetMidi.Multimedia;
 
 namespace Music.MyMidi
@@ -71,6 +72,22 @@ namespace Music.MyMidi
         public bool IsPaused => _isPaused;
 
         private bool _isPaused = false;
+
+        /// <summary>
+        /// Gets the current playback position in MIDI ticks. Returns 0 when not playing.
+        /// </summary>
+        public long CurrentTick
+        {
+            get
+            {
+                var playback = _playback;
+                if (playback == null)
+                    return 0;
+
+                var time = playback.GetCurrentTime(TimeSpanType.Midi);
+                return time is MidiTimeSpan midiTime ? midiTime.TimeSpan : 0;
+            }
+        }
 
         // AI: Stop stops and disposes playback and output device, resetting internal state. After Stop(), Resume() will not work.
         public void Stop()
