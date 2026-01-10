@@ -30,9 +30,11 @@ namespace Music.Generator
             const int closedHiHatNote = 42;
             const int openHiHatNote = 46;
             const int rideCymbalNote = 51;
-            const int tomHighNote = 50;     // High tom
-            const int tomMidNote = 47;      // Mid tom
-            const int tomLowNote = 45;      // Low tom
+            const int crashCymbal1Note = 49;  // Crash Cymbal 1
+            const int crashCymbal2Note = 57;  // Crash Cymbal 2
+            const int tomHighNote = 50;       // High tom
+            const int tomMidNote = 47;        // Mid tom
+            const int tomLowNote = 45;        // Low tom
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
@@ -70,6 +72,40 @@ namespace Music.Generator
                     allHits = variation.Hits;
                 }
 
+                // Add cymbal orchestration (Story 6.4)
+                var cymbalHits = CymbalOrchestrationEngine.GenerateCymbalHits(
+                    bar,
+                    totalBars,
+                    sectionTrack,
+                    sectionType,
+                    grooveEvent.SourcePresetName ?? "default",
+                    settings.Seed);
+
+                // Convert cymbal hits to DrumHit format and add to allHits
+                foreach (var cymbalHit in cymbalHits)
+                {
+                    string role = cymbalHit.Type switch
+                    {
+                        "crash1" => "crash_cymbal_1",
+                        "crash2" => "crash_cymbal_2",
+                        "choke" => "crash_cymbal_1",  // Use crash1 for choke (short duration)
+                        _ => "crash_cymbal_1"
+                    };
+
+                    bool isChoke = cymbalHit.Type == "choke";
+
+                    allHits.Add(new DrumVariationEngine.DrumHit
+                    {
+                        Role = role,
+                        OnsetBeat = cymbalHit.OnsetBeat,
+                        IsMain = true,
+                        TimingOffsetTicks = cymbalHit.TimingOffsetTicks,
+                        IsInFill = false,
+                        FillProgress = 0.0,
+                        IsChoke = isChoke
+                    });
+                }
+
                 // Convert hits to MIDI events
                 foreach (var hit in allHits)
                 {
@@ -105,6 +141,7 @@ namespace Music.Generator
                                     isInFill: hit.IsInFill,
                                     fillProgress: hit.FillProgress);
                                 
+
                                 // Reduce velocity for non-main kicks
                                 if (!hit.IsMain)
                                     vel = Math.Max(25, (int)(vel * 0.82));
@@ -270,6 +307,71 @@ namespace Music.Generator
                                     noteNumber: tomNote,
                                     absoluteTimeTicks: baseTick,
                                     noteDurationTicks: MusicConstants.TicksPerQuarterNote,
+                                    noteOnVelocity: vel));
+                                break;
+                            }
+
+                        case "crash_cymbal_1":
+                            {
+                                bool isStrongBeat = RandomHelpers.IsStrongBeat(slot.OnsetBeat);
+                                int baseVel = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "crash", baseVelocity: 80);
+
+                                // Apply velocity shaping
+                                int vel = DrumVelocityShaper.ShapeVelocity(
+                                    role: "crash",
+                                    baseVelocity: baseVel,
+                                    bar: slot.Bar,
+                                    onsetBeat: slot.OnsetBeat,
+                                    seed: settings.Seed,
+                                    sectionType: sectionType,
+                                    isStrongBeat: isStrongBeat,
+                                    isGhost: false,
+                                    isInFill: hit.IsInFill,
+                                    fillProgress: hit.FillProgress);
+
+                                // Boost velocity for accent hits (but not chokes)
+                                if (hit.IsMain && !hit.IsChoke)
+                                    vel = Math.Min(127, (int)(vel * 1.15));
+
+                                // Use very short duration for choke, long sustain for crash
+                                int duration = hit.IsChoke
+                                    ? MusicConstants.TicksPerQuarterNote / 16  // Very short for choke
+                                    : MusicConstants.TicksPerQuarterNote * 2;   // Long sustain for crash
+
+                                notes.Add(new PartTrackEvent(
+                                    noteNumber: crashCymbal1Note,
+                                    absoluteTimeTicks: baseTick,
+                                    noteDurationTicks: duration,
+                                    noteOnVelocity: vel));
+                                break;
+                            }
+
+                        case "crash_cymbal_2":
+                            {
+                                bool isStrongBeat = RandomHelpers.IsStrongBeat(slot.OnsetBeat);
+                                int baseVel = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "crash", baseVelocity: 80);
+
+                                // Apply velocity shaping
+                                int vel = DrumVelocityShaper.ShapeVelocity(
+                                    role: "crash",
+                                    baseVelocity: baseVel,
+                                    bar: slot.Bar,
+                                    onsetBeat: slot.OnsetBeat,
+                                    seed: settings.Seed,
+                                    sectionType: sectionType,
+                                    isStrongBeat: isStrongBeat,
+                                    isGhost: false,
+                                    isInFill: hit.IsInFill,
+                                    fillProgress: hit.FillProgress);
+
+                                // Boost velocity for accent hits
+                                if (hit.IsMain)
+                                    vel = Math.Min(127, (int)(vel * 1.15));
+
+                                notes.Add(new PartTrackEvent(
+                                    noteNumber: crashCymbal2Note,
+                                    absoluteTimeTicks: baseTick,
+                                    noteDurationTicks: MusicConstants.TicksPerQuarterNote * 2,
                                     noteOnVelocity: vel));
                                 break;
                             }

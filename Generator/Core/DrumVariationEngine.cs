@@ -25,6 +25,7 @@ namespace Music.Generator
             public bool IsMain { get; init; } = false;         // from template anchor layer
             public bool IsInFill { get; init; } = false;       // part of a fill
             public double FillProgress { get; init; } = 0.0;   // fill progress 0.0 to 1.0
+            public bool IsChoke { get; init; } = false;        // choke/stop hit (very short duration)
         }
 
         /// <summary>
