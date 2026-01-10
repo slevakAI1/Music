@@ -503,8 +503,11 @@ namespace Music.Writer
             // Get the songTrack number for the dialog title
             var trackNumber = row.Cells["colEventNumber"].Value?.ToString() ?? (e.RowIndex + 1).ToString();
 
+            // Extract time signature track from fixed row for measure alignment
+            var timeSignatureTrack = GridControlLinesManager.GetTimeSignatureTrack(dgSong);
+
             // Open the JSON viewer dialog
-            using var viewer = new PartTrackViewer(songTrack, trackNumber);
+            using var viewer = new PartTrackViewer(songTrack, trackNumber, timeSignatureTrack);
             viewer.ShowDialog();
         }
     }

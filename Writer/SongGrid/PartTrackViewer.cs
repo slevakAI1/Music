@@ -3,7 +3,9 @@
 // AI: deps=Depends on PartTrack structure and ObjectViewer.Json; changing those requires updating this viewer.
 // AI: change=If PartTrack shape or JSON helper changes, update error handling to avoid runtime exceptions in viewer.
 
+using Music;
 using Music.Generator;
+using Music.MyMidi;
 
 namespace Music.Writer
 {
@@ -12,11 +14,11 @@ namespace Music.Writer
         private TextBox txtJson;
         private Button btnClose;
 
-        // AI: ctor: initialize UI and load given PartTrack; trackNumber used only for title.
-        public PartTrackViewer(PartTrack track, string trackNumber)
+        // AI: ctor: initialize UI and load given PartTrack with measure dividers based on timeSignatureTrack.
+        public PartTrackViewer(PartTrack track, string trackNumber, Timingtrack? timeSignatureTrack)
         {
             InitializeComponents(trackNumber);
-            LoadTrackData(track);
+            LoadTrackData(track, timeSignatureTrack);
         }
 
         private void InitializeComponents(string trackNumber)
@@ -71,18 +73,142 @@ namespace Music.Writer
             this.Controls.Add(buttonPanel);
         }
 
-        // AI: LoadTrackData: serialize PartTrack via ObjectViewer.Json; on failure display error in textbox only.
-        private void LoadTrackData(PartTrack track)
+        // AI: LoadTrackData: serialize PartTrack with measure dividers aligned to time signatures; on failure display error.
+        private void LoadTrackData(PartTrack track, Timingtrack? timeSignatureTrack)
         {
             try
             {
-                string json = ObjectViewer.Json(track);
-                txtJson.Text = json;
+                if (timeSignatureTrack == null || timeSignatureTrack.Events.Count == 0)
+                {
+                    // No time signature data - fall back to plain JSON
+                    string json = ObjectViewer.Json(track);
+                    txtJson.Text = json;
+                    return;
+                }
+
+                // Build formatted output with measure dividers
+                var output = new System.Text.StringBuilder();
+                
+                // Group events by measure
+                var eventsByMeasure = GroupEventsByMeasure(track, timeSignatureTrack);
+                
+                // Header
+                output.AppendLine($"PartTrack: {track.MidiProgramName ?? "Unknown"} (Program #{track.MidiProgramNumber})");
+                output.AppendLine($"Total Events: {track.PartTrackNoteEvents.Count}");
+                output.AppendLine();
+                
+                // Output events grouped by measure
+                foreach (var kvp in eventsByMeasure.OrderBy(x => x.Key))
+                {
+                    int measureNumber = kvp.Key;
+                    var events = kvp.Value;
+                    
+                    // Measure divider
+                    output.AppendLine();
+                    output.AppendLine($"---- Measure {measureNumber} ----");
+                    output.AppendLine();
+                    
+                    // Events in this measure
+                    foreach (var evt in events)
+                    {
+                        output.AppendLine(ObjectViewer.Json(evt));
+                    }
+                }
+                
+                txtJson.Text = output.ToString();
             }
             catch (Exception ex)
             {
                 txtJson.Text = $"Error loading track data:\r\n{ex.Message}";
             }
+        }
+
+        private Dictionary<int, List<PartTrackEvent>> GroupEventsByMeasure(PartTrack track, Timingtrack timeSignatureTrack)
+        {
+            var result = new Dictionary<int, List<PartTrackEvent>>();
+            
+            foreach (var evt in track.PartTrackNoteEvents)
+            {
+                int measure = CalculateMeasureForTick(evt.AbsoluteTimeTicks, timeSignatureTrack);
+                
+                if (!result.ContainsKey(measure))
+                    result[measure] = new List<PartTrackEvent>();
+                
+                result[measure].Add(evt);
+            }
+            
+            return result;
+        }
+
+        private int CalculateMeasureForTick(long tick, Timingtrack timeSignatureTrack)
+        {
+            long currentTick = 0;
+            int currentMeasure = 1;
+            
+            // Sort events by StartBar to ensure proper iteration
+            var sortedEvents = timeSignatureTrack.Events.OrderBy(e => e.StartBar).ToList();
+            
+            for (int i = 0; i < sortedEvents.Count; i++)
+            {
+                var timeSig = sortedEvents[i];
+                int startBar = timeSig.StartBar;
+                
+                // Calculate ticks from current measure to the start of this time signature event
+                while (currentMeasure < startBar)
+                {
+                    var activeTimeSig = timeSignatureTrack.GetActiveTimeSignatureEvent(currentMeasure);
+                    if (activeTimeSig == null)
+                        break;
+                    
+                    int ticksPerMeasure = (MusicConstants.TicksPerQuarterNote * 4 * activeTimeSig.Numerator) / activeTimeSig.Denominator;
+                    
+                    if (tick >= currentTick && tick < currentTick + ticksPerMeasure)
+                        return currentMeasure;
+                    
+                    currentTick += ticksPerMeasure;
+                    currentMeasure++;
+                }
+                
+                // Now process measures with this time signature
+                int nextStartBar = (i + 1 < sortedEvents.Count) ? sortedEvents[i + 1].StartBar : int.MaxValue;
+                
+                while (currentMeasure < nextStartBar)
+                {
+                    int ticksPerMeasure = (MusicConstants.TicksPerQuarterNote * 4 * timeSig.Numerator) / timeSig.Denominator;
+                    
+                    if (tick >= currentTick && tick < currentTick + ticksPerMeasure)
+                        return currentMeasure;
+                    
+                    currentTick += ticksPerMeasure;
+                    currentMeasure++;
+                    
+                    // Safety check to avoid infinite loop
+                    if (currentTick > tick + (ticksPerMeasure * 1000))
+                        break;
+                }
+            }
+            
+            // If we haven't found the measure yet, continue with the last time signature
+            var lastTimeSig = timeSignatureTrack.Events.OrderBy(e => e.StartBar).LastOrDefault();
+            if (lastTimeSig != null)
+            {
+                int ticksPerMeasure = (MusicConstants.TicksPerQuarterNote * 4 * lastTimeSig.Numerator) / lastTimeSig.Denominator;
+                
+                while (currentTick <= tick)
+                {
+                    if (tick >= currentTick && tick < currentTick + ticksPerMeasure)
+                        return currentMeasure;
+                    
+                    currentTick += ticksPerMeasure;
+                    currentMeasure++;
+                    
+                    // Safety check
+                    if (currentMeasure > 10000)
+                        break;
+                }
+            }
+            
+            return currentMeasure;
         }
     }
 }
