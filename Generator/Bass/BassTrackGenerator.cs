@@ -1,10 +1,8 @@
 // AI: purpose=Generate bass track using BassPatternLibrary for pattern selection and BassChordChangeDetector for approach notes.
 // AI: keep MIDI program number 33; patterns replace randomizer for more structured bass lines (Story 5.1 + 5.2); returns sorted by AbsoluteTimeTicks.
 // AI: Story 7.3=Now accepts section profiles and applies energy controls (density, velocity, busy) with bass range guardrails.
-// AI: Story 7.3=Now accepts section profiles and applies energy controls (density, velocity, busy) with bass range guardrails.
 
 using Music.MyMidi;
-using System.Diagnostics;
 
 namespace Music.Generator
 {
