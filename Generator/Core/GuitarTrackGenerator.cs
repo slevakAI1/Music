@@ -102,9 +102,7 @@ namespace Music.Generator
                         var noteStart = (int)slot.StartTick + strumOffset;
                         var noteDuration = slot.DurationTicks;
 
-                        // Ensure we don't leave previous notes of the same pitch overlapping this new note.
-                        // If a previous note with the same NoteNumber extends past the new note start, trim it so its
-                        // off-time occurs before this note-on. Keep at least 1 tick duration.
+                        // Prevent overlap: trim previous notes of the same pitch that would extend past this note-on
                         for (int j = 0; j < notes.Count; j++)
                         {
                             var existing = notes[j];
