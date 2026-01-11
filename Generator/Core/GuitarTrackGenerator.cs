@@ -99,10 +99,37 @@ namespace Music.Generator
                         int midiNote = voicing[i];
                         int strumOffset = strumOffsets[i];
 
+                        var noteStart = (int)slot.StartTick + strumOffset;
+                        var noteDuration = slot.DurationTicks;
+
+                        // Ensure we don't leave previous notes of the same pitch overlapping this new note.
+                        // If a previous note with the same NoteNumber extends past the new note start, trim it so its
+                        // off-time occurs before this note-on. Keep at least 1 tick duration.
+                        for (int j = 0; j < notes.Count; j++)
+                        {
+                            var existing = notes[j];
+                            if (existing.Type != PartTrackEventType.NoteOn)
+                                continue;
+
+                            if (existing.NoteNumber != midiNote)
+                                continue;
+
+                            long existingStart = existing.AbsoluteTimeTicks;
+                            long existingEnd = existingStart + existing.NoteDurationTicks;
+
+                            if (existingEnd > noteStart && existingStart < noteStart)
+                            {
+                                // Desired end is just before the new note starts
+                                long desiredEnd = noteStart - 1;
+                                int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
+                                existing.NoteDurationTicks = newDuration;
+                            }
+                        }
+
                         notes.Add(new PartTrackEvent(
                             noteNumber: midiNote,
-                            absoluteTimeTicks: (int)slot.StartTick + strumOffset,
-                            noteDurationTicks: slot.DurationTicks,
+                            absoluteTimeTicks: noteStart,
+                            noteDurationTicks: noteDuration,
                             noteOnVelocity: 85));
                     }
 
