@@ -89,8 +89,6 @@ namespace Music.Generator
                     if (harmonyEvent == null)
                         continue;
 
-                    Debug.WriteLine($"[GuitarTrack] Bar {slot.Bar}, Beat {slot.OnsetBeat}: Harmony={harmonyEvent.Key}, Degree={harmonyEvent.Degree}");
-
                     // Build harmony context (use higher octave for comp than bass)
                     const int guitarOctave = 4;
                     var ctx = HarmonyPitchContextBuilder.Build(
@@ -101,27 +99,18 @@ namespace Music.Generator
                         guitarOctave,
                         policy);
 
-                    Debug.WriteLine($"[GuitarTrack] KeyScale={string.Join(",", ctx.KeyScalePitchClasses)}, ChordPCs={string.Join(",", ctx.ChordPitchClasses)}");
-
                     // Select comp voicing (2-4 note chord fragment)
                     var voicing = CompVoicingSelector.Select(ctx, slot, previousVoicing, sectionProfile);
-                    Debug.WriteLine($"[GuitarTrack] Voicing before register adjustment: {string.Join(",", voicing)}");
 
                     // Story 7.3: Apply register lift with lead-space ceiling guardrail
                     var adjustedVoicing = ApplyRegisterWithGuardrail(
                         voicing,
                         compProfile?.RegisterLiftSemitones ?? 0);
 
-                    Debug.WriteLine($"[GuitarTrack] Voicing after register adjustment: {string.Join(",", adjustedVoicing)}");
-
                     // Validate all notes are in scale
                     foreach (int midiNote in adjustedVoicing)
                     {
                         int pc = PitchClassUtils.ToPitchClass(midiNote);
-                        if (!ctx.KeyScalePitchClasses.Contains(pc))
-                        {
-                            Debug.WriteLine($"[GuitarTrack] *** ERROR: Out-of-key note detected! MIDI={midiNote}, PC={pc}, KeyScale={string.Join(",", ctx.KeyScalePitchClasses)} ***");
-                        }
                     }
 
                     // Calculate strum timing offsets for this chord
@@ -201,7 +190,7 @@ namespace Music.Generator
         /// <summary>
         /// Applies register lift with lead-space ceiling guardrail.
         /// Story 7.3: Prevents comp from occupying melody/lead space (C5/MIDI 72 and above).
-        /// CRITICAL: Only allows octave shifts (±12) to preserve scale membership.
+        /// CRITICAL: Only allows octave shifts (?12) to preserve scale membership.
         /// </summary>
         private static List<int> ApplyRegisterWithGuardrail(
             List<int> voicing,

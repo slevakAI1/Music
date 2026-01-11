@@ -19,23 +19,11 @@ namespace Music.Generator
         {
             ArgumentNullException.ThrowIfNull(ctx);
 
-            System.Diagnostics.Debug.WriteLine($"\n[VoiceLeadingSelector] ===== SELECT START =====");
-            System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector] Context: Key={ctx.Key}, Degree={ctx.Degree}, Quality={ctx.Quality}, Bass={ctx.Bass}");
-            System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector] Context Chord Pitch Classes: {string.Join(", ", ctx.ChordPitchClasses)}");
-            System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector] Context Chord MIDI Notes: {string.Join(", ", ctx.ChordMidiNotes)}");
-            if (sectionProfile != null)
-            {
-                System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector] Section Profile: RegisterLift={sectionProfile.RegisterLift}, MaxDensity={sectionProfile.MaxDensity}");
-            }
-
             // Generate candidate voicings (different inversions/registers)
             var candidates = GenerateCandidateVoicings(ctx, sectionProfile);
 
-            System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector] Generated {candidates.Count} candidate voicings");
-
             if (candidates.Count == 0)
             {
-                System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector] WARNING: No candidates generated, using fallback");
                 // Fallback: use context's default voicing
                 return HarmonyPitchContextBuilder.ToChordRealization(ctx);
             }
@@ -43,14 +31,9 @@ namespace Music.Generator
             // If no previous voicing, pick the first candidate (arbitrary but deterministic)
             if (previousRealization == null || previousRealization.MidiNotes.Count == 0)
             {
-                System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector] No previous voicing, selecting first candidate");
                 var selected = candidates[0];
-                System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector] SELECTED: {string.Join(", ", selected.MidiNotes)} (Pitch Classes: {string.Join(", ", selected.MidiNotes.Select(m => m % 12))})");
-                System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector] ===== SELECT COMPLETE =====\n");
                 return selected;
             }
-
-            System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector] Previous voicing: {string.Join(", ", previousRealization.MidiNotes)}");
 
             // Evaluate all candidates and select the one with lowest cost
             ChordRealization best = candidates[0];
@@ -59,16 +42,12 @@ namespace Music.Generator
             foreach (var candidate in candidates)
             {
                 double cost = CalculateVoiceLeadingCost(previousRealization, candidate, sectionProfile);
-                System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector] Candidate: {string.Join(", ", candidate.MidiNotes)} Cost={cost:F2}");
                 if (cost < lowestCost)
                 {
                     lowestCost = cost;
                     best = candidate;
                 }
             }
-
-            System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector] BEST: {string.Join(", ", best.MidiNotes)} Cost={lowestCost:F2} (Pitch Classes: {string.Join(", ", best.MidiNotes.Select(m => m % 12))})");
-            System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector] ===== SELECT COMPLETE =====\n");
 
             return best;
         }
@@ -79,7 +58,6 @@ namespace Music.Generator
             HarmonyPitchContext ctx, 
             SectionProfile? sectionProfile)
         {
-            System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector.GenerateCandidateVoicings] Starting...");
             var candidates = new List<ChordRealization>();
 
             // Apply section profile register lift to base octave
@@ -88,7 +66,6 @@ namespace Music.Generator
             {
                 // Register lift: convert semitones to octave shift
                 baseOctave += sectionProfile.RegisterLift / 12;
-                System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector.GenerateCandidateVoicings] Applied RegisterLift: {sectionProfile.RegisterLift} semitones -> BaseOctave adjusted from {ctx.BaseOctaveUsed} to {baseOctave}");
             }
 
             // Inversion indices to try (0 = root position, 1 = first inversion, etc.)
@@ -107,11 +84,8 @@ namespace Music.Generator
                 // Skip invalid octaves
                 if (targetOctave < 1 || targetOctave > 7)
                 {
-                    System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector.GenerateCandidateVoicings] Skipping invalid octave: {targetOctave}");
                     continue;
                 }
-
-                System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector.GenerateCandidateVoicings] Trying octave {targetOctave} (shift {octaveShift})");
 
                 try
                 {
@@ -125,11 +99,8 @@ namespace Music.Generator
 
                     if (rootPositionNotes.Count == 0)
                     {
-                        System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector.GenerateCandidateVoicings] No notes generated for octave {targetOctave}");
                         continue;
                     }
-
-                    System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector.GenerateCandidateVoicings] Root position notes: {string.Join(", ", rootPositionNotes)}");
 
                     // Generate candidates for each inversion
                     for (int inversionIndex = 0; inversionIndex <= maxInversion && inversionIndex < rootPositionNotes.Count; inversionIndex++)
@@ -137,12 +108,9 @@ namespace Music.Generator
                         // Apply inversion by rotating notes and adjusting octaves
                         var midiNotes = ApplyInversion(rootPositionNotes, inversionIndex);
 
-                        System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector.GenerateCandidateVoicings] Inversion {inversionIndex}: {string.Join(", ", midiNotes)} (Pitch Classes: {string.Join(", ", midiNotes.Select(m => m % 12))})");
-
                         // Apply density constraint from section profile
                         if (sectionProfile != null && midiNotes.Count > sectionProfile.MaxDensity)
                         {
-                            System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector.GenerateCandidateVoicings] Trimming from {midiNotes.Count} to {sectionProfile.MaxDensity} notes for density constraint");
                             // Trim to max density by keeping lowest notes (bass/guide tones)
                             midiNotes = midiNotes.Take(sectionProfile.MaxDensity).ToList();
                         }
@@ -165,15 +133,13 @@ namespace Music.Generator
                         candidates.Add(realization);
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector.GenerateCandidateVoicings] Error generating voicing for octave {targetOctave}: {ex.Message}");
                     // Skip invalid voicings
                     continue;
                 }
             }
 
-            System.Diagnostics.Debug.WriteLine($"[VoiceLeadingSelector.GenerateCandidateVoicings] Total candidates generated: {candidates.Count}");
             return candidates;
         }
 

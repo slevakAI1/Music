@@ -122,9 +122,6 @@ namespace Music.Generator
             EnergyArc energyArc,
             SectionTrack sectionTrack)
         {
-            System.Diagnostics.Debug.WriteLine($"[Generator] ========== BUILDING SECTION PROFILES ==========");
-            System.Diagnostics.Debug.WriteLine($"[Generator] Total sections: {sectionTrack.Sections.Count}");
-            
             var profiles = new Dictionary<int, EnergySectionProfile>();
             
             // Track section indices by type for proper indexing
@@ -141,29 +138,24 @@ namespace Music.Generator
                 }
                 
                 int sectionIndex = sectionIndicesByType[section.SectionType];
-                
-                System.Diagnostics.Debug.WriteLine($"[Generator] Building profile for section: Type={section.SectionType}, Index={sectionIndex}, StartBar={section.StartBar}, BarCount={section.BarCount}");
-                
+
                 // Build profile for this section
                 var profile = EnergyProfileBuilder.BuildProfile(
                     energyArc,
                     section,
                     sectionIndex,
                     previousProfile);
-                
-                System.Diagnostics.Debug.WriteLine($"[Generator] Profile built: Energy={profile.Global.Energy:F2}, KeysPresent={profile.Orchestration.KeysPresent}");
-                
+
                 // Store by StartBar for quick lookup during generation
                 profiles[section.StartBar] = profile;
-                
+
                 // Increment index for this section type
                 sectionIndicesByType[section.SectionType]++;
-                
+
                 // Track for next iteration (contrast calculation)
                 previousProfile = profile;
             }
 
-            System.Diagnostics.Debug.WriteLine($"[Generator] ========== SECTION PROFILES COMPLETE: {profiles.Count} profiles ==========");
             return profiles;
         }
 

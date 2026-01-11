@@ -24,15 +24,6 @@ namespace Music.Generator
             HarmonyPolicy policy,
             int midiProgramNumber)
         {
-            Debug.WriteLine($"[KeysTrack] ========== STARTING KEYS TRACK GENERATION ==========");
-            Debug.WriteLine($"[KeysTrack] Total bars: {totalBars}");
-            Debug.WriteLine($"[KeysTrack] Section profiles count: {sectionProfiles.Count}");
-            
-            foreach (var kvp in sectionProfiles)
-            {
-                Debug.WriteLine($"[KeysTrack] Section profile at bar {kvp.Key}: Energy={kvp.Value.Global.Energy:F2}, KeysPresent={kvp.Value.Orchestration.KeysPresent}");
-            }
-
             var notes = new List<PartTrackEvent>();
             var randomizer = new PitchRandomizer(settings);
             const int keysOctave = 3;
@@ -47,7 +38,6 @@ namespace Music.Generator
                 var padsOnsets = grooveEvent.AnchorLayer.PadsOnsets;
                 if (padsOnsets == null || padsOnsets.Count == 0)
                 {
-                    Debug.WriteLine($"[KeysTrack] Bar {bar}: No pads onsets, skipping");
                     continue;
                 }
 
@@ -55,11 +45,6 @@ namespace Music.Generator
                 Section? section = null;
                 if (sectionTrack.GetActiveSection(bar, out section) && section != null)
                 {
-                    Debug.WriteLine($"[KeysTrack] Bar {bar}: Section '{section.SectionType}' (StartBar={section.StartBar}, BarCount={section.BarCount})");
-                }
-                else
-                {
-                    Debug.WriteLine($"[KeysTrack] Bar {bar}: No active section found");
                 }
 
                 // Story 7.3: Get energy profile for this section
@@ -67,17 +52,11 @@ namespace Music.Generator
                 if (section != null && sectionProfiles.TryGetValue(section.StartBar, out var profile))
                 {
                     energyProfile = profile;
-                    Debug.WriteLine($"[KeysTrack] Bar {bar}: Found energy profile - Energy={profile.Global.Energy:F2}, KeysPresent={profile.Orchestration.KeysPresent}");
-                }
-                else
-                {
-                    Debug.WriteLine($"[KeysTrack] Bar {bar}: No energy profile found (section start bar: {section?.StartBar})");
                 }
 
                 // Story 7.3: Check if keys/pads are present in orchestration
                 if (energyProfile?.Orchestration != null && !energyProfile.Orchestration.KeysPresent)
                 {
-                    Debug.WriteLine($"[KeysTrack] Bar {bar}: SKIPPING - KeysPresent=false in orchestration");
                     // Skip keys for this bar if orchestration says keys not present
                     continue;
                 }
@@ -162,7 +141,6 @@ namespace Music.Generator
                         int pc = PitchClassUtils.ToPitchClass(midiNote);
                         if (!ctx.KeyScalePitchClasses.Contains(pc))
                         {
-                            Debug.WriteLine($"[KeysTrack] *** ERROR: Out-of-key note detected! MIDI={midiNote}, PC={pc}, KeyScale={string.Join(",", ctx.KeyScalePitchClasses)} ***");
                         }
                     }
                     var noteStart = (int)slot.StartTick;

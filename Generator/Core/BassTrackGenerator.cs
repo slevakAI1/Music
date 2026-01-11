@@ -89,8 +89,6 @@ namespace Music.Generator
                     bassOctave,
                     policy);
 
-                Debug.WriteLine($"[BassTrack] Bar {bar}: Harmony={currentHarmony.Key}, Degree={currentHarmony.Degree}, KeyScale={string.Join(",", ctx.KeyScalePitchClasses)}");
-
                 // Get root MIDI note for pattern rendering
                 int rootMidi = ctx.ChordMidiNotes.Count > 0 ? ctx.ChordMidiNotes[0] : 36; // Default to C2
 
@@ -148,7 +146,6 @@ namespace Music.Generator
 
                             int targetRoot = nextCtx.ChordMidiNotes.Count > 0 ? nextCtx.ChordMidiNotes[0] : rootMidi;
                             midiNote = BassChordChangeDetector.CalculateDiatonicApproach(targetRoot, approachFromBelow: true);
-                            Debug.WriteLine($"[BassTrack] Approach note inserted: MIDI={midiNote}, TargetRoot={targetRoot}");
                         }
                         else
                         {
@@ -163,18 +160,10 @@ namespace Music.Generator
                     // Story 7.3: Apply bass range guardrail (no register lift for bass, but clamp to valid range)
                     int originalMidi = midiNote;
                     midiNote = ApplyBassRangeGuardrail(midiNote);
-                    if (originalMidi != midiNote)
-                    {
-                        Debug.WriteLine($"[BassTrack] Guardrail adjustment: {originalMidi} -> {midiNote}");
-                    }
 
                     // Validate note is in scale
                     int pc = PitchClassUtils.ToPitchClass(midiNote);
-                    if (!ctx.KeyScalePitchClasses.Contains(pc))
-                    {
-                        Debug.WriteLine($"[BassTrack] *** ERROR: Out-of-key bass note! MIDI={midiNote}, PC={pc}, KeyScale={string.Join(",", ctx.KeyScalePitchClasses)} ***");
-                    }
-
+                    
                     // Story 7.3: Calculate velocity with energy bias
                     int baseVelocity = 95;
                     int velocity = ApplyVelocityBias(baseVelocity, bassProfile?.VelocityBias ?? 0);

@@ -38,24 +38,17 @@ namespace Music.Generator
             // Use default policy if not provided
             policy ??= HarmonyPolicy.Default;
 
-            System.Diagnostics.Debug.WriteLine($"\n[HarmonyPitchContextBuilder] ===== BUILD START =====");
-            System.Diagnostics.Debug.WriteLine($"[HarmonyPitchContextBuilder] INPUT: Key={key}, Degree={degree}, Quality={quality}, Bass={bass}, BaseOctave={baseOctave}");
-            System.Diagnostics.Debug.WriteLine($"[HarmonyPitchContextBuilder] Policy: AllowNonDiatonicChordTones={policy.AllowNonDiatonicChordTones}");
-
             // Step 1: Get the key root pitch class
             int keyRootPitchClass = PitchClassUtils.ParseKeyToPitchClass(key);
-            System.Diagnostics.Debug.WriteLine($"[HarmonyPitchContextBuilder] Key Root Pitch Class: {keyRootPitchClass}");
 
             // Step 2: Get the scale pitch classes for the key
             var keyScalePitchClasses = PitchClassUtils.GetScalePitchClassesForKey(key);
-            System.Diagnostics.Debug.WriteLine($"[HarmonyPitchContextBuilder] Key Scale Pitch Classes: {string.Join(", ", keyScalePitchClasses)}");
 
             // Step 3: Calculate the chord root pitch class from the scale degree
             if (degree < 1 || degree > 7)
                 throw new ArgumentOutOfRangeException(nameof(degree), degree, "Degree must be 1-7");
 
             int chordRootPitchClass = keyScalePitchClasses[degree - 1];
-            System.Diagnostics.Debug.WriteLine($"[HarmonyPitchContextBuilder] Chord Root Pitch Class (Degree {degree}): {chordRootPitchClass}");
 
             // Step 4: Get chord tones as MIDI note numbers using the shared helper
             var chordMidiNotes = ChordVoicingHelper.GenerateChordMidiNotes(
@@ -71,8 +64,6 @@ namespace Music.Generator
                 .OrderBy(n => n)
                 .ToList();
 
-            System.Diagnostics.Debug.WriteLine($"[HarmonyPitchContextBuilder] Sorted Chord MIDI Notes: {string.Join(", ", sortedChordMidiNotes)}");
-
             // Step 6: Convert to pitch classes (0-11), unique and sorted
             var chordPitchClasses = sortedChordMidiNotes
                 .Select(PitchClassUtils.ToPitchClass)
@@ -80,13 +71,9 @@ namespace Music.Generator
                 .OrderBy(pc => pc)
                 .ToList();
 
-            System.Diagnostics.Debug.WriteLine($"[HarmonyPitchContextBuilder] Chord Pitch Classes (before policy): {string.Join(", ", chordPitchClasses)}");
-
             // Step 7: Apply policy-based filtering
             if (!policy.AllowNonDiatonicChordTones)
             {
-                System.Diagnostics.Debug.WriteLine($"[HarmonyPitchContextBuilder] Filtering to diatonic notes only...");
-                
                 // Filter chord tones to only include diatonic pitch classes
                 var diatonicChordPitchClasses = chordPitchClasses
                     .Where(pc => keyScalePitchClasses.Contains(pc))
@@ -96,11 +83,6 @@ namespace Music.Generator
                     .Where(pc => !keyScalePitchClasses.Contains(pc))
                     .ToList();
 
-                if (nonDiatonicPitchClasses.Count > 0)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[HarmonyPitchContextBuilder] *** REMOVED Non-Diatonic Pitch Classes: {string.Join(", ", nonDiatonicPitchClasses)} ***");
-                }
-
                 // Filter MIDI notes to match the diatonic chord pitch classes
                 var diatonicChordMidiNotes = sortedChordMidiNotes
                     .Where(midi => diatonicChordPitchClasses.Contains(PitchClassUtils.ToPitchClass(midi)))
@@ -108,12 +90,7 @@ namespace Music.Generator
 
                 chordPitchClasses = diatonicChordPitchClasses;
                 sortedChordMidiNotes = diatonicChordMidiNotes;
-                
-                System.Diagnostics.Debug.WriteLine($"[HarmonyPitchContextBuilder] After diatonic filter - MIDI Notes: {string.Join(", ", sortedChordMidiNotes)}");
-                System.Diagnostics.Debug.WriteLine($"[HarmonyPitchContextBuilder] After diatonic filter - Pitch Classes: {string.Join(", ", chordPitchClasses)}");
             }
-
-            System.Diagnostics.Debug.WriteLine($"[HarmonyPitchContextBuilder] ===== BUILD COMPLETE =====\n");
 
             // Step 8: Build and return the context
             return new HarmonyPitchContext

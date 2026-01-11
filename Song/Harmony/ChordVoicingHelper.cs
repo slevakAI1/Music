@@ -25,16 +25,11 @@ namespace Music.Generator
             if (string.IsNullOrWhiteSpace(bass))
                 throw new ArgumentException("Bass cannot be null or empty", nameof(bass));
 
-            // DIAGNOSTIC: Log input parameters
-            System.Diagnostics.Debug.WriteLine($"[ChordVoicingHelper] INPUT: Key={key}, Degree={degree}, Quality={quality}, Bass={bass}, BaseOctave={baseOctave}");
-
             try
             {
                 // Step 1: Parse the key using shared logic (single source of truth)
                 var parsed = PitchClassUtils.ParseKey(key);
                 var (keyRoot, keyMode) = ConvertParsedKeyToNote(parsed);
-                
-                System.Diagnostics.Debug.WriteLine($"[ChordVoicingHelper] Parsed Key: Root={keyRoot.Name}{keyRoot.Alteration}, Mode={keyMode}");
                 
                 // Step 2: Build the scale for the key
                 var scaleType = keyMode.Equals("major", StringComparison.OrdinalIgnoreCase) 
@@ -48,11 +43,9 @@ namespace Music.Generator
                     throw new InvalidOperationException($"Degree must be 1-7, got {degree}");
                 
                 var degreeNote = scaleNotes[degree - 1];
-                System.Diagnostics.Debug.WriteLine($"[ChordVoicingHelper] Degree {degree} Note: {degreeNote.Name}{degreeNote.Alteration}");
                 
                 // Step 4: Map quality string to ChordType (normalize first)
                 var normalizedQuality = ChordQuality.Normalize(quality);
-                System.Diagnostics.Debug.WriteLine($"[ChordVoicingHelper] Normalized Quality: {quality} -> {normalizedQuality}");
                 
                 var chordType = MapQualityToChordType(normalizedQuality);
                 
@@ -62,11 +55,9 @@ namespace Music.Generator
                 
                 // Step 6: Get the notes in root position first
                 var chordNotes = chord.GetNotes().ToList();
-                System.Diagnostics.Debug.WriteLine($"[ChordVoicingHelper] Root Position Notes: {string.Join(", ", chordNotes.Select(n => $"{n.Name}{n.Alteration}{n.Octave}"))}");
                 
                 // Step 7: Apply inversion by rotating and adjusting octaves
                 var voicedNotes = ApplyVoicing(chordNotes, bass, baseOctave);
-                System.Diagnostics.Debug.WriteLine($"[ChordVoicingHelper] After Voicing (Bass={bass}): {string.Join(", ", voicedNotes.Select(n => $"{n.Name}{n.Alteration}{n.Octave}"))}");
                 
                 // Step 8: Convert to MIDI note numbers
                 var midiNotes = new List<int>();
@@ -78,15 +69,11 @@ namespace Music.Generator
                     int noteNumber = CalculateMidiNoteNumber(step, alter, octave);
                     midiNotes.Add(noteNumber);
                 }
-                
-                System.Diagnostics.Debug.WriteLine($"[ChordVoicingHelper] OUTPUT MIDI Notes: {string.Join(", ", midiNotes)}");
-                System.Diagnostics.Debug.WriteLine($"[ChordVoicingHelper] OUTPUT Pitch Classes: {string.Join(", ", midiNotes.Select(m => m % 12))}");
-                
+
                 return midiNotes;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[ChordVoicingHelper] ERROR: {ex.Message}");
                 throw new InvalidOperationException(
                     $"Failed to generate chord voicing: Key={key}, " +
                     $"Degree={degree}, Quality={quality}, Bass={bass}", ex);
