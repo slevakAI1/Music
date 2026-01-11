@@ -186,25 +186,7 @@ namespace Music.Generator
                                 var noteDuration = MusicConstants.TicksPerQuarterNote;
 
                                 // Prevent overlap: trim previous notes of the same pitch that would extend past this note-on
-                                for (int j = 0; j < notes.Count; j++)
-                                {
-                                    var existing = notes[j];
-                                    if (existing.Type != PartTrackEventType.NoteOn)
-                                        continue;
-
-                                    if (existing.NoteNumber != kickNote)
-                                        continue;
-
-                                    long existingStart = existing.AbsoluteTimeTicks;
-                                    long existingEnd = existingStart + existing.NoteDurationTicks;
-
-                                    if (existingEnd > baseTick && existingStart < baseTick)
-                                    {
-                                        long desiredEnd = baseTick - 1;
-                                        int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
-                                        existing.NoteDurationTicks = newDuration;
-                                    }
-                                }
+                                NoteOverlapHelper.PreventOverlap(notes, kickNote, baseTick);
 
                                 notes.Add(new PartTrackEvent(
                                     noteNumber: kickNote,
@@ -233,22 +215,7 @@ namespace Music.Generator
                                     var noteDuration = MusicConstants.TicksPerQuarterNote;
 
                                     // Prevent overlap: trim previous notes of the same pitch
-                                    for (int j = 0; j < notes.Count; j++)
-                                    {
-                                        var existing = notes[j];
-                                        if (existing.Type != PartTrackEventType.NoteOn || existing.NoteNumber != snareNote)
-                                            continue;
-
-                                        long existingStart = existing.AbsoluteTimeTicks;
-                                        long existingEnd = existingStart + existing.NoteDurationTicks;
-
-                                        if (existingEnd > baseTick && existingStart < baseTick)
-                                        {
-                                            long desiredEnd = baseTick - 1;
-                                            int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
-                                            existing.NoteDurationTicks = newDuration;
-                                        }
-                                    }
+                                    NoteOverlapHelper.PreventOverlap(notes, snareNote, baseTick);
 
                                     notes.Add(new PartTrackEvent(
                                         noteNumber: snareNote,
@@ -271,22 +238,7 @@ namespace Music.Generator
                                     var noteDuration = MusicConstants.TicksPerQuarterNote;
 
                                     // Prevent overlap: trim previous notes of the same pitch
-                                    for (int j = 0; j < notes.Count; j++)
-                                    {
-                                        var existing = notes[j];
-                                        if (existing.Type != PartTrackEventType.NoteOn || existing.NoteNumber != snareNote)
-                                            continue;
-
-                                        long existingStart = existing.AbsoluteTimeTicks;
-                                        long existingEnd = existingStart + existing.NoteDurationTicks;
-
-                                        if (existingEnd > baseTick && existingStart < baseTick)
-                                        {
-                                            long desiredEnd = baseTick - 1;
-                                            int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
-                                            existing.NoteDurationTicks = newDuration;
-                                        }
-                                    }
+                                    NoteOverlapHelper.PreventOverlap(notes, snareNote, baseTick);
 
                                     notes.Add(new PartTrackEvent(
                                         noteNumber: snareNote,
@@ -324,22 +276,7 @@ namespace Music.Generator
                                     var noteDuration = MusicConstants.TicksPerQuarterNote;
 
                                     // Prevent overlap: trim previous notes of the same pitch
-                                    for (int j = 0; j < notes.Count; j++)
-                                    {
-                                        var existing = notes[j];
-                                        if (existing.Type != PartTrackEventType.NoteOn || existing.NoteNumber != snareNote)
-                                            continue;
-
-                                        long existingStart = existing.AbsoluteTimeTicks;
-                                        long existingEnd = existingStart + existing.NoteDurationTicks;
-
-                                        if (existingEnd > baseTick && existingStart < baseTick)
-                                        {
-                                            long desiredEnd = baseTick - 1;
-                                            int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
-                                            existing.NoteDurationTicks = newDuration;
-                                        }
-                                    }
+                                    NoteOverlapHelper.PreventOverlap(notes, snareNote, baseTick);
 
                                     notes.Add(new PartTrackEvent(
                                         noteNumber: snareNote,
@@ -383,22 +320,7 @@ namespace Music.Generator
                                 var noteDuration = MusicConstants.TicksPerQuarterNote / 2;
 
                                 // Prevent overlap: trim previous notes of the same pitch (open/closed hats are different pitches)
-                                for (int j = 0; j < notes.Count; j++)
-                                {
-                                    var existing = notes[j];
-                                    if (existing.Type != PartTrackEventType.NoteOn || existing.NoteNumber != noteNumber)
-                                        continue;
-
-                                    long existingStart = existing.AbsoluteTimeTicks;
-                                    long existingEnd = existingStart + existing.NoteDurationTicks;
-
-                                    if (existingEnd > baseTick && existingStart < baseTick)
-                                    {
-                                        long desiredEnd = baseTick - 1;
-                                        int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
-                                        existing.NoteDurationTicks = newDuration;
-                                    }
-                                }
+                                NoteOverlapHelper.PreventOverlap(notes, noteNumber, baseTick);
 
                                 notes.Add(new PartTrackEvent(
                                     noteNumber: noteNumber,
@@ -439,22 +361,7 @@ namespace Music.Generator
                                 var noteDuration = MusicConstants.TicksPerQuarterNote;
 
                                 // Prevent overlap: trim previous notes of the same pitch
-                                for (int j = 0; j < notes.Count; j++)
-                                {
-                                    var existing = notes[j];
-                                    if (existing.Type != PartTrackEventType.NoteOn || existing.NoteNumber != rideCymbalNote)
-                                        continue;
-
-                                    long existingStart = existing.AbsoluteTimeTicks;
-                                    long existingEnd = existingStart + existing.NoteDurationTicks;
-
-                                    if (existingEnd > baseTick && existingStart < baseTick)
-                                    {
-                                        long desiredEnd = baseTick - 1;
-                                        int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
-                                        existing.NoteDurationTicks = newDuration;
-                                    }
-                                }
+                                NoteOverlapHelper.PreventOverlap(notes, rideCymbalNote, baseTick);
 
                                 notes.Add(new PartTrackEvent(
                                     noteNumber: rideCymbalNote,
@@ -501,22 +408,7 @@ namespace Music.Generator
                                 var noteDuration = MusicConstants.TicksPerQuarterNote;
 
                                 // Prevent overlap: trim previous notes of the same pitch (each tom has unique note number)
-                                for (int j = 0; j < notes.Count; j++)
-                                {
-                                    var existing = notes[j];
-                                    if (existing.Type != PartTrackEventType.NoteOn || existing.NoteNumber != tomNote)
-                                        continue;
-
-                                    long existingStart = existing.AbsoluteTimeTicks;
-                                    long existingEnd = existingStart + existing.NoteDurationTicks;
-
-                                    if (existingEnd > baseTick && existingStart < baseTick)
-                                    {
-                                        long desiredEnd = baseTick - 1;
-                                        int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
-                                        existing.NoteDurationTicks = newDuration;
-                                    }
-                                }
+                                NoteOverlapHelper.PreventOverlap(notes, tomNote, baseTick);
 
                                 notes.Add(new PartTrackEvent(
                                     noteNumber: tomNote,
@@ -560,22 +452,7 @@ namespace Music.Generator
                                     : MusicConstants.TicksPerQuarterNote * 2;   // Long sustain for crash
 
                                 // Prevent overlap: trim previous notes of the same pitch
-                                for (int j = 0; j < notes.Count; j++)
-                                {
-                                    var existing = notes[j];
-                                    if (existing.Type != PartTrackEventType.NoteOn || existing.NoteNumber != crashCymbal1Note)
-                                        continue;
-
-                                    long existingStart = existing.AbsoluteTimeTicks;
-                                    long existingEnd = existingStart + existing.NoteDurationTicks;
-
-                                    if (existingEnd > baseTick && existingStart < baseTick)
-                                    {
-                                        long desiredEnd = baseTick - 1;
-                                        int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
-                                        existing.NoteDurationTicks = newDuration;
-                                    }
-                                }
+                                NoteOverlapHelper.PreventOverlap(notes, crashCymbal1Note, baseTick);
 
                                 notes.Add(new PartTrackEvent(
                                     noteNumber: crashCymbal1Note,
@@ -616,22 +493,7 @@ namespace Music.Generator
                                 var noteDuration = MusicConstants.TicksPerQuarterNote * 2;
 
                                 // Prevent overlap: trim previous notes of the same pitch
-                                for (int j = 0; j < notes.Count; j++)
-                                {
-                                    var existing = notes[j];
-                                    if (existing.Type != PartTrackEventType.NoteOn || existing.NoteNumber != crashCymbal2Note)
-                                        continue;
-
-                                    long existingStart = existing.AbsoluteTimeTicks;
-                                    long existingEnd = existingStart + existing.NoteDurationTicks;
-
-                                    if (existingEnd > baseTick && existingStart < baseTick)
-                                    {
-                                        long desiredEnd = baseTick - 1;
-                                        int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
-                                        existing.NoteDurationTicks = newDuration;
-                                    }
-                                }
+                                NoteOverlapHelper.PreventOverlap(notes, crashCymbal2Note, baseTick);
 
                                 notes.Add(new PartTrackEvent(
                                     noteNumber: crashCymbal2Note,

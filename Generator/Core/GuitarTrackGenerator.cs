@@ -103,26 +103,7 @@ namespace Music.Generator
                         var noteDuration = slot.DurationTicks;
 
                         // Prevent overlap: trim previous notes of the same pitch that would extend past this note-on
-                        for (int j = 0; j < notes.Count; j++)
-                        {
-                            var existing = notes[j];
-                            if (existing.Type != PartTrackEventType.NoteOn)
-                                continue;
-
-                            if (existing.NoteNumber != midiNote)
-                                continue;
-
-                            long existingStart = existing.AbsoluteTimeTicks;
-                            long existingEnd = existingStart + existing.NoteDurationTicks;
-
-                            if (existingEnd > noteStart && existingStart < noteStart)
-                            {
-                                // Desired end is just before the new note starts
-                                long desiredEnd = noteStart - 1;
-                                int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
-                                existing.NoteDurationTicks = newDuration;
-                            }
-                        }
+                        NoteOverlapHelper.PreventOverlap(notes, midiNote, noteStart);
 
                         notes.Add(new PartTrackEvent(
                             noteNumber: midiNote,
