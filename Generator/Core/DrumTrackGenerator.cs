@@ -183,10 +183,33 @@ namespace Music.Generator
                                 if (!hit.IsMain)
                                     vel = Math.Max(25, (int)(vel * 0.82));
                                 
+                                var noteDuration = MusicConstants.TicksPerQuarterNote;
+
+                                // Prevent overlap: trim previous notes of the same pitch that would extend past this note-on
+                                for (int j = 0; j < notes.Count; j++)
+                                {
+                                    var existing = notes[j];
+                                    if (existing.Type != PartTrackEventType.NoteOn)
+                                        continue;
+
+                                    if (existing.NoteNumber != kickNote)
+                                        continue;
+
+                                    long existingStart = existing.AbsoluteTimeTicks;
+                                    long existingEnd = existingStart + existing.NoteDurationTicks;
+
+                                    if (existingEnd > baseTick && existingStart < baseTick)
+                                    {
+                                        long desiredEnd = baseTick - 1;
+                                        int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
+                                        existing.NoteDurationTicks = newDuration;
+                                    }
+                                }
+
                                 notes.Add(new PartTrackEvent(
                                     noteNumber: kickNote,
                                     absoluteTimeTicks: baseTick,
-                                    noteDurationTicks: MusicConstants.TicksPerQuarterNote,
+                                    noteDurationTicks: noteDuration,
                                     noteOnVelocity: vel));
                                 break;
                             }
@@ -207,10 +230,30 @@ namespace Music.Generator
                                         preVel = Math.Clamp(preVel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
                                     }
                                     
+                                    var noteDuration = MusicConstants.TicksPerQuarterNote;
+
+                                    // Prevent overlap: trim previous notes of the same pitch
+                                    for (int j = 0; j < notes.Count; j++)
+                                    {
+                                        var existing = notes[j];
+                                        if (existing.Type != PartTrackEventType.NoteOn || existing.NoteNumber != snareNote)
+                                            continue;
+
+                                        long existingStart = existing.AbsoluteTimeTicks;
+                                        long existingEnd = existingStart + existing.NoteDurationTicks;
+
+                                        if (existingEnd > baseTick && existingStart < baseTick)
+                                        {
+                                            long desiredEnd = baseTick - 1;
+                                            int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
+                                            existing.NoteDurationTicks = newDuration;
+                                        }
+                                    }
+
                                     notes.Add(new PartTrackEvent(
                                         noteNumber: snareNote,
                                         absoluteTimeTicks: baseTick,
-                                        noteDurationTicks: MusicConstants.TicksPerQuarterNote,
+                                        noteDurationTicks: noteDuration,
                                         noteOnVelocity: preVel));
                                 }
                                 else if (hit.IsGhost)
@@ -225,10 +268,30 @@ namespace Music.Generator
                                         vel = Math.Clamp(vel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
                                     }
                                     
+                                    var noteDuration = MusicConstants.TicksPerQuarterNote;
+
+                                    // Prevent overlap: trim previous notes of the same pitch
+                                    for (int j = 0; j < notes.Count; j++)
+                                    {
+                                        var existing = notes[j];
+                                        if (existing.Type != PartTrackEventType.NoteOn || existing.NoteNumber != snareNote)
+                                            continue;
+
+                                        long existingStart = existing.AbsoluteTimeTicks;
+                                        long existingEnd = existingStart + existing.NoteDurationTicks;
+
+                                        if (existingEnd > baseTick && existingStart < baseTick)
+                                        {
+                                            long desiredEnd = baseTick - 1;
+                                            int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
+                                            existing.NoteDurationTicks = newDuration;
+                                        }
+                                    }
+
                                     notes.Add(new PartTrackEvent(
                                         noteNumber: snareNote,
                                         absoluteTimeTicks: baseTick,
-                                        noteDurationTicks: MusicConstants.TicksPerQuarterNote,
+                                        noteDurationTicks: noteDuration,
                                         noteOnVelocity: vel));
                                 }
                                 else
@@ -258,10 +321,30 @@ namespace Music.Generator
                                     if (!hit.IsMain)
                                         vel = Math.Max(30, (int)(vel * 0.85));
                                     
+                                    var noteDuration = MusicConstants.TicksPerQuarterNote;
+
+                                    // Prevent overlap: trim previous notes of the same pitch
+                                    for (int j = 0; j < notes.Count; j++)
+                                    {
+                                        var existing = notes[j];
+                                        if (existing.Type != PartTrackEventType.NoteOn || existing.NoteNumber != snareNote)
+                                            continue;
+
+                                        long existingStart = existing.AbsoluteTimeTicks;
+                                        long existingEnd = existingStart + existing.NoteDurationTicks;
+
+                                        if (existingEnd > baseTick && existingStart < baseTick)
+                                        {
+                                            long desiredEnd = baseTick - 1;
+                                            int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
+                                            existing.NoteDurationTicks = newDuration;
+                                        }
+                                    }
+
                                     notes.Add(new PartTrackEvent(
                                         noteNumber: snareNote,
                                         absoluteTimeTicks: baseTick,
-                                        noteDurationTicks: MusicConstants.TicksPerQuarterNote,
+                                        noteDurationTicks: noteDuration,
                                         noteOnVelocity: vel));
                                 }
                                 break;
@@ -297,11 +380,30 @@ namespace Music.Generator
 
                                 // Open vs closed articulation
                                 int noteNumber = hit.IsOpenHat ? openHiHatNote : closedHiHatNote;
+                                var noteDuration = MusicConstants.TicksPerQuarterNote / 2;
+
+                                // Prevent overlap: trim previous notes of the same pitch (open/closed hats are different pitches)
+                                for (int j = 0; j < notes.Count; j++)
+                                {
+                                    var existing = notes[j];
+                                    if (existing.Type != PartTrackEventType.NoteOn || existing.NoteNumber != noteNumber)
+                                        continue;
+
+                                    long existingStart = existing.AbsoluteTimeTicks;
+                                    long existingEnd = existingStart + existing.NoteDurationTicks;
+
+                                    if (existingEnd > baseTick && existingStart < baseTick)
+                                    {
+                                        long desiredEnd = baseTick - 1;
+                                        int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
+                                        existing.NoteDurationTicks = newDuration;
+                                    }
+                                }
 
                                 notes.Add(new PartTrackEvent(
                                     noteNumber: noteNumber,
                                     absoluteTimeTicks: baseTick,
-                                    noteDurationTicks: MusicConstants.TicksPerQuarterNote / 2,
+                                    noteDurationTicks: noteDuration,
                                     noteOnVelocity: vel));
                                 break;
                             }
@@ -334,10 +436,30 @@ namespace Music.Generator
                                 if (!hit.IsMain) 
                                     vel = Math.Max(25, (int)(vel * 0.85));
 
+                                var noteDuration = MusicConstants.TicksPerQuarterNote;
+
+                                // Prevent overlap: trim previous notes of the same pitch
+                                for (int j = 0; j < notes.Count; j++)
+                                {
+                                    var existing = notes[j];
+                                    if (existing.Type != PartTrackEventType.NoteOn || existing.NoteNumber != rideCymbalNote)
+                                        continue;
+
+                                    long existingStart = existing.AbsoluteTimeTicks;
+                                    long existingEnd = existingStart + existing.NoteDurationTicks;
+
+                                    if (existingEnd > baseTick && existingStart < baseTick)
+                                    {
+                                        long desiredEnd = baseTick - 1;
+                                        int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
+                                        existing.NoteDurationTicks = newDuration;
+                                    }
+                                }
+
                                 notes.Add(new PartTrackEvent(
                                     noteNumber: rideCymbalNote,
                                     absoluteTimeTicks: baseTick,
-                                    noteDurationTicks: MusicConstants.TicksPerQuarterNote,
+                                    noteDurationTicks: noteDuration,
                                     noteOnVelocity: vel));
                                 break;
                             }
@@ -376,10 +498,30 @@ namespace Music.Generator
                                     vel = Math.Clamp(vel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
                                 }
 
+                                var noteDuration = MusicConstants.TicksPerQuarterNote;
+
+                                // Prevent overlap: trim previous notes of the same pitch (each tom has unique note number)
+                                for (int j = 0; j < notes.Count; j++)
+                                {
+                                    var existing = notes[j];
+                                    if (existing.Type != PartTrackEventType.NoteOn || existing.NoteNumber != tomNote)
+                                        continue;
+
+                                    long existingStart = existing.AbsoluteTimeTicks;
+                                    long existingEnd = existingStart + existing.NoteDurationTicks;
+
+                                    if (existingEnd > baseTick && existingStart < baseTick)
+                                    {
+                                        long desiredEnd = baseTick - 1;
+                                        int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
+                                        existing.NoteDurationTicks = newDuration;
+                                    }
+                                }
+
                                 notes.Add(new PartTrackEvent(
                                     noteNumber: tomNote,
                                     absoluteTimeTicks: baseTick,
-                                    noteDurationTicks: MusicConstants.TicksPerQuarterNote,
+                                    noteDurationTicks: noteDuration,
                                     noteOnVelocity: vel));
                                 break;
                             }
@@ -417,6 +559,24 @@ namespace Music.Generator
                                     ? MusicConstants.TicksPerQuarterNote / 16  // Very short for choke
                                     : MusicConstants.TicksPerQuarterNote * 2;   // Long sustain for crash
 
+                                // Prevent overlap: trim previous notes of the same pitch
+                                for (int j = 0; j < notes.Count; j++)
+                                {
+                                    var existing = notes[j];
+                                    if (existing.Type != PartTrackEventType.NoteOn || existing.NoteNumber != crashCymbal1Note)
+                                        continue;
+
+                                    long existingStart = existing.AbsoluteTimeTicks;
+                                    long existingEnd = existingStart + existing.NoteDurationTicks;
+
+                                    if (existingEnd > baseTick && existingStart < baseTick)
+                                    {
+                                        long desiredEnd = baseTick - 1;
+                                        int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
+                                        existing.NoteDurationTicks = newDuration;
+                                    }
+                                }
+
                                 notes.Add(new PartTrackEvent(
                                     noteNumber: crashCymbal1Note,
                                     absoluteTimeTicks: baseTick,
@@ -453,10 +613,30 @@ namespace Music.Generator
                                 if (hit.IsMain)
                                     vel = Math.Min(127, (int)(vel * 1.15));
 
+                                var noteDuration = MusicConstants.TicksPerQuarterNote * 2;
+
+                                // Prevent overlap: trim previous notes of the same pitch
+                                for (int j = 0; j < notes.Count; j++)
+                                {
+                                    var existing = notes[j];
+                                    if (existing.Type != PartTrackEventType.NoteOn || existing.NoteNumber != crashCymbal2Note)
+                                        continue;
+
+                                    long existingStart = existing.AbsoluteTimeTicks;
+                                    long existingEnd = existingStart + existing.NoteDurationTicks;
+
+                                    if (existingEnd > baseTick && existingStart < baseTick)
+                                    {
+                                        long desiredEnd = baseTick - 1;
+                                        int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
+                                        existing.NoteDurationTicks = newDuration;
+                                    }
+                                }
+
                                 notes.Add(new PartTrackEvent(
                                     noteNumber: crashCymbal2Note,
                                     absoluteTimeTicks: baseTick,
-                                    noteDurationTicks: MusicConstants.TicksPerQuarterNote * 2,
+                                    noteDurationTicks: noteDuration,
                                     noteOnVelocity: vel));
                                 break;
                             }

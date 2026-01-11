@@ -105,12 +105,36 @@ namespace Music.Generator
                         chordRealization = VoiceLeadingSelector.Select(previousVoicing, ctx, sectionProfile);
                     }
 
+                    var noteStart = (int)slot.StartTick;
+                    var noteDuration = slot.DurationTicks;
+
                     foreach (int midiNote in chordRealization.MidiNotes)
                     {
+                        // Prevent overlap: trim previous notes of the same pitch that would extend past this note-on
+                        for (int j = 0; j < notes.Count; j++)
+                        {
+                            var existing = notes[j];
+                            if (existing.Type != PartTrackEventType.NoteOn)
+                                continue;
+
+                            if (existing.NoteNumber != midiNote)
+                                continue;
+
+                            long existingStart = existing.AbsoluteTimeTicks;
+                            long existingEnd = existingStart + existing.NoteDurationTicks;
+
+                            if (existingEnd > noteStart && existingStart < noteStart)
+                            {
+                                long desiredEnd = noteStart - 1;
+                                int newDuration = (int)Math.Max(1, desiredEnd - existingStart);
+                                existing.NoteDurationTicks = newDuration;
+                            }
+                        }
+
                         notes.Add(new PartTrackEvent(
                             noteNumber: midiNote,
-                            absoluteTimeTicks: (int)slot.StartTick,
-                            noteDurationTicks: slot.DurationTicks,
+                            absoluteTimeTicks: noteStart,
+                            noteDurationTicks: noteDuration,
                             noteOnVelocity: 75));
                     }
 
