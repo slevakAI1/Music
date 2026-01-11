@@ -199,25 +199,228 @@
 
 ## Stage 7 — Section identity via energy/density (structured repetition)
 
-**Why now:** “music” is repetition + contrast, not just correct notes.
+**Why now:** “music” is repetition + contrast. To make later Stage 8 motifs and Stage 9 melody *land*, the accompaniment must already have intentional section-level identity and repeatable A/A’ variation.
 
-### Story 7.1 — `SectionEnergyProfile` drives each role
+Stage 7 formalizes *energy* (and the closely-related concept *tension*) into explicit, deterministic controls so the generator can deliberately shape emotion across time.
+
+### Research-based framing (what Stage 7 should capture)
+
+From songwriting/arranging perspectives, “energy” is not a constant force; it’s typically an **ebb-and-flow** shape (rising and falling) rather than a flat line. Energy is also **relative**: high-energy moments only feel high if there are lower-energy moments to contrast them.
+
+Practical definitions that matter for generation:
+- **Energy**: the perceived “spirit/vigor” of a song arising from momentum, tempo feel, intensity, strength, and arrangement choices.
+- **Tension**: a listener’s perceived need for release created by expectation. Tension can increase without increasing energy (e.g., filtering down into a breakdown).
+- **Energy Arc / Energy Map**: a time-series of intended energy levels across sections (and sometimes within sections), capturing the overall emotional “graph” of the song.
+
+A key insight is that energy is multi-factor and often cycles across different building blocks:
+- **Loudness/dynamics + instrumentation** (more/louder layers → higher energy)
+- **Rhythmic activity** (more subdivision activity/groove/busy-ness → higher energy)
+- **Melody register** (higher/higher-intensity melodic range → higher perceived energy)
+- **Harmony** (distance from tonic & harmonic instability influences perceived intensity/tension)
+- **Lyrics** (later stage, but Stage 7 must reserve knobs so lyric intensity can drive arrangement later)
+
+Stage 7 must provide a single framework that lets later stages “compose emotion” at the arrangement level.
+
+---
+
+### Stage 7 goal
+
+Introduce a shared, deterministic “section identity + energy shaping” framework that:
+- makes Verse vs Chorus (and Pre-chorus/Bridge) feel immediately different even with the same chords
+- supports **ebb/flow** (energy up/down) across the whole song
+- supports an explicit **Energy Arc** (“energy map”) that can be reused/modified per song
+- supports **structured repetition** (A / A’ / B) via bounded transforms
+- provides future contracts for Stage 8 motifs and Stage 9 melody/lyrics to request arrangement behavior
+
+**Design principles (must hold):**
+- **Determinism:** given `(seed, song structure, section index/type)`, output is repeatable. RNG only as a deterministic tie-break among valid options.
+- **Energy is relative:** changes are interpreted against baseline and nearby sections.
+- **Separation of concerns:** Stage 7 defines *intent*; roles apply intent.
+- **Safety rails:** energy changes must not violate musical constraints (muddy low register, lead space ceiling, drum density caps, etc.).
+
+---
+
+### Story 7.1 — `EnergyArc` + section-level energy targets
+
+**Intent:** make the “ebb/flow” explicit and controllable: every section has an intended energy target, not just an implicit section type.
 
 **Acceptance criteria:**
-- Create `SectionEnergyProfile` with simple knobs:
-  - `DensityMultiplier` per role
-  - `VelocityBias` per role
-  - `RegisterLift` per role
-  - `BusyProbability` per role
-- Apply across bass/comp/keys/pads/drums so verse/chorus differ immediately.
+- Create `EnergyArc` (or `SongEnergyArc`) representing the song-level energy plan.
+- It must support:
+  - **per-section** targets (Intro/Verse/PreChorus/Chorus/Bridge/Outro)
+  - optional **within-section** subtargets (phrase-level: start/middle/peak/cadence)
+- Provide a small library of default arcs keyed by common forms (e.g., Pop, Rock, EDM-ish) that the generator selects deterministically.
+- Energy scale guidance:
+  - store as `double` in `[0..1]` *or* an `int` scale such as `1..9` (common analysis method). Pick one and standardize.
 
-### Story 7.2 — A/A’ logic (repeat with controlled changes)
+**Notes/guidance:**
+- Keep arc selection deterministic by `(seed, style/groove, song form id)`.
+- The arc is a top-level “macro-energy” target; it will later inform tension planning and motif placement.
+
+---
+
+### Story 7.2 — `SectionEnergyProfile` (multi-factor, per-role), derived from the arc
+
+**Intent:** convert energy targets into actionable per-role controls that map to real musical levers (dynamics, density, register, orchestration, rhythmic activity).
 
 **Acceptance criteria:**
-- For repeated sections of same type (Verse 1 vs Verse 2):
-  - reuse core pattern choices
-  - apply small transforms (drop/add hits, slight register change, swap voicing fragment, etc.)
-- This is where “surprise” belongs: intentional transforms, not random notes.
+- Create/update `SectionEnergyProfile` as a small strongly-typed model computed per `SongSection`.
+- Inputs must include:
+  - `EnergyArc` target for this section
+  - `SectionType` + `SectionIndex`
+  - style/groove identity
+- Outputs must include (minimum viable set):
+  - A `Global` block (defaults) with:
+    - `double Energy` (target)
+    - `double TensionTarget` (optional but recommended)
+    - `double ContrastBias` (how much we allow the section to differ from previous)
+  - A per-role `RoleProfile` for `Bass`, `Comp`, `Keys`, `Pads`, `Drums` (and later `Lead`):
+    - `double DensityMultiplier`
+    - `int VelocityBias`
+    - `int RegisterLiftSemitones`
+    - `double BusyProbability`
+  - An `Orchestration` block:
+    - which roles are present/featured (e.g., pads absent in Verse 1, present in Chorus)
+    - cymbal language preference hints (ride vs hat) feeding Stage 6
+
+**Guidance (grounded in energy factors):**
+- Don’t make intensity only “velocity.” High energy usually needs *multiple* levers:
+  - more layers (orchestration)
+  - higher rhythmic activity
+  - register lift (melodic/voicing center up)
+  - selective density increases (not everywhere)
+
+---
+
+### Story 7.3 — Energy application pass (wire into all role renderers)
+
+**Intent:** ensure the energy profile affects audible output across all roles.
+
+**Acceptance criteria:**
+- Apply `SectionEnergyProfile` to:
+  - **Drums:** connect to existing Stage 6 knobs; add “micro-tension” support points (see Story 7.5).
+  - **Bass:** pattern selection and embellishment rate respond to density/busy; velocity bias applied; register lift clamped.
+  - **Comp:** rhythm pattern choice and slot selection respond to density/busy; voicing center responds to register; velocity applied.
+  - **Keys/Pads:** chord realization density and sustain respond to energy; register center responds to lift; velocity applied.
+- Implement role-specific **guardrails** (must not be violated):
+  - Bass range limits.
+  - Lead-space ceiling for comp/keys.
+  - Pads avoid the future vocal band (placeholder constraints now).
+  - Style-safe drum density caps.
+
+---
+
+### Story 7.4 — “Energy is relative”: section-to-section constraints
+
+**Intent:** enforce core songwriting/arranging energy heuristics that listeners expect.
+
+**Acceptance criteria:**
+- Add deterministic rules that shape the arc-derived profiles, e.g.:
+  - Verse 2 should have **≥** Verse 1 energy (often slightly more).
+  - After a chorus, the next verse energy should typically drop (to preserve contrast), unless the arc says otherwise.
+  - Final chorus should typically be a local maximum (or sustained peak).
+  - Bridge is allowed to either:
+    - exceed prior chorus (common), or
+    - intentionally drop energy for contrast, then rebuild (also common).
+- These rules must be parameterized per style and not hard-coded to one structure.
+
+**Guidance:**
+- Implement as adjustments to `EnergyArc` or as post-processing of `SectionEnergyProfile`.
+
+---
+
+### Story 7.5 — Tension planning hooks (macro vs micro) feeding later stages
+
+**Intent:** incorporate the tension/energy distinction so later stages can create anticipation and release.
+
+**Acceptance criteria:**
+- Add optional `TensionTarget` to `SectionEnergyProfile` (or a sibling `SectionTensionProfile`).
+- Provide two levels:
+  - **Macro-tension:** section transitions (pre-chorus builds, breakdowns, drop/chorus impacts)
+  - **Micro-tension:** within phrases (end-of-phrase kick dropout, small fills, impacts)
+- For now, Stage 7 should only:
+  - compute tension intent and expose hooks/parameters
+  - allow Stage 6 drums and existing roles to access it to bias small variations
+
+**Implementation-aligned examples:**
+- At phrase ends, increase probability of “pull” events (short fill, kick removal, accent) when `TensionTarget` is high.
+- At section transitions into high-energy sections, prefer orchestration “additions” and register lift.
+
+---
+
+### Story 7.6 — Structured repetition engine (A / A’ / B transforms)
+
+**Intent:** reuse section “core decisions” while making later repeats evolve in a controlled, musical way.
+
+**Acceptance criteria:**
+- Introduce a deterministic `SectionVariationPlan` per section instance:
+  - `BaseReferenceSectionIndex` (Verse 2 references Verse 1)
+  - per-role transform magnitudes, bounded
+- Transforms must be driven by:
+  - energy arc position (later repeats often slightly higher energy)
+  - phrase position (micro-arcs)
+- Examples of bounded transforms:
+  - Drums: slightly more hat openness / extra ghost candidates / higher fill probability near transitions.
+  - Bass: add occasional octave/approach notes at phrase peaks.
+  - Comp: add anticipations or an extra fragment hit on strong beats.
+  - Keys/Pads: small density increase (+1 note) or slight register lift.
+
+---
+
+### Story 7.7 — Phrase-level shaping inside sections (energy micro-arcs)
+
+**Intent:** energy should modulate within a section (start → build → peak → cadence), not be flat for 8 bars.
+
+**Acceptance criteria:**
+- Compute a deterministic per-section phrase map:
+  - phrase length defaults (4 or 8 bars) derived from section length
+  - per-bar position type: `Start`, `Middle`, `Peak`, `Cadence`
+- Apply subtle per-bar modulation:
+  - velocity lift at `Peak`
+  - slight density thinning at `Cadence`
+  - optional orchestration accents at `Start`/`Peak`
+
+---
+
+### Story 7.8 — Role interaction rules (prevent clutter; reserve melody/lead space)
+
+**Intent:** higher energy often means more parts; without explicit rules, arrangements become muddy.
+
+**Acceptance criteria:**
+- Add cross-role constraints:
+  - **Lead space reservation:** define a MIDI band reserved for future lead/vocal; non-lead roles avoid dense sustained notes there.
+  - **Low-end management:** prevent pads/keys/comp from occupying bass register.
+  - **Density budgets:** when multiple roles are busy on the same weak slots, deterministically thin one role.
+
+---
+
+### Story 7.9 — Diagnostics & explainability hooks
+
+**Intent:** Stage 7 becomes the backbone for later creative complexity; we need visibility into decisions.
+
+**Acceptance criteria:**
+- Implement opt-in diagnostics:
+  - dump chosen `EnergyArc`
+  - dump derived `SectionEnergyProfile` per section
+  - dump `SectionVariationPlan`
+  - summarize realized densities + average velocities per role per section
+- Must remain deterministic and must not affect generation.
+
+---
+
+### Story 7.10 — Stage 8/9 integration contracts (future-proofing)
+
+**Intent:** ensure later stages can “ask” Stage 7 for arrangement support to convey emotion without rewriting Stage 7.
+
+**Acceptance criteria:**
+- Motifs (Stage 8) can query:
+  - energy/tension targets
+  - phrase positions (Peak/Cadence)
+  - register intent for lead space
+- Melody/lyrics (Stage 9) can request:
+  - arrangement ducking (reduce comp/pads density under vocal phrases)
+  - shift pads/keys register away from vocal band
+- Add placeholders in data models (not full behaviors) if needed.
 
 ---
 
