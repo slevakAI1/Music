@@ -1,7 +1,10 @@
 // AI: purpose=Generate bass track using BassPatternLibrary for pattern selection and BassChordChangeDetector for approach notes.
 // AI: keep MIDI program number 33; patterns replace randomizer for more structured bass lines (Story 5.1 + 5.2); returns sorted by AbsoluteTimeTicks.
+// AI: Story 7.3=Now accepts section profiles and applies energy controls (density, velocity, busy) with bass range guardrails.
+// AI: Story 7.3=Now accepts section profiles and applies energy controls (density, velocity, busy) with bass range guardrails.
 
 using Music.MyMidi;
+using System.Diagnostics;
 
 namespace Music.Generator
 {
@@ -9,11 +12,14 @@ namespace Music.Generator
     {
         /// <summary>
         /// Generates bass track: pattern-based bass lines with optional approach notes to chord changes.
+        /// Updated for Story 7.3: energy profile integration with guardrails.
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
             BarTrack barTrack,
+            SectionTrack sectionTrack,
+            Dictionary<int, EnergySectionProfile> sectionProfiles,
             int totalBars,
             RandomizationSettings settings,
             HarmonyPolicy policy,
@@ -32,10 +38,33 @@ namespace Music.Generator
                 if (bassOnsets == null || bassOnsets.Count == 0)
                     continue;
 
-                // Get current section type for pattern selection (default to Verse if none)
+                // Get section and energy profile
                 MusicConstants.eSectionType sectionType = MusicConstants.eSectionType.Verse;
-                // Note: SectionTrack not passed to GenerateBassTrack yet, will use default for now
-                // TODO: Pass SectionTrack to enable section-aware pattern selection
+                Section? section = null;
+                if (sectionTrack.GetActiveSection(bar, out section) && section != null)
+                {
+                    sectionType = section.SectionType;
+                }
+
+                // Story 7.3: Get energy profile for this section
+                EnergySectionProfile? energyProfile = null;
+                if (section != null && sectionProfiles.TryGetValue(section.StartBar, out var profile))
+                {
+                    energyProfile = profile;
+                }
+
+                // Story 7.3: Check if bass is present in orchestration
+                if (energyProfile?.Orchestration != null && !energyProfile.Orchestration.BassPresent)
+                {
+                    // Skip bass for this bar if orchestration says bass not present
+                    continue;
+                }
+
+                // Get bass energy controls
+                var bassProfile = energyProfile?.Roles?.Bass;
+
+                // Story 7.3: Apply busy probability to approach note decisions
+                double effectiveBusyProbability = bassProfile?.BusyProbability ?? 0.5;
 
                 // Select bass pattern for this bar using BassPatternLibrary
                 var bassPattern = BassPatternLibrary.SelectPattern(
@@ -60,11 +89,16 @@ namespace Music.Generator
                     bassOctave,
                     policy);
 
+                Debug.WriteLine($"[BassTrack] Bar {bar}: Harmony={currentHarmony.Key}, Degree={currentHarmony.Degree}, KeyScale={string.Join(",", ctx.KeyScalePitchClasses)}");
+
                 // Get root MIDI note for pattern rendering
                 int rootMidi = ctx.ChordMidiNotes.Count > 0 ? ctx.ChordMidiNotes[0] : 36; // Default to C2
 
                 // Render pattern into bass hits
                 var patternHits = bassPattern.Render(rootMidi, onsetSlots.Count);
+
+                // Story 7.3: Create deterministic RNG for busy probability checks
+                var barRng = RandomHelpers.CreateLocalRng(settings.Seed, $"bass_{grooveEvent.Name}_{sectionType}", bar, 0m);
 
                 // Process each pattern hit and check for chord change opportunities
                 foreach (var hit in patternHits)
@@ -82,7 +116,11 @@ namespace Music.Generator
                         currentHarmony,
                         lookaheadBeats: 2m);
 
+                    // Story 7.3: Apply busy probability to approach note insertion
+                    bool busyAllowsApproach = barRng.NextDouble() < effectiveBusyProbability;
+
                     bool shouldInsertApproach = isChangeImminent &&
+                        busyAllowsApproach &&
                         BassChordChangeDetector.ShouldInsertApproach(
                             onsetSlots,
                             hit.SlotIndex,
@@ -110,6 +148,7 @@ namespace Music.Generator
 
                             int targetRoot = nextCtx.ChordMidiNotes.Count > 0 ? nextCtx.ChordMidiNotes[0] : rootMidi;
                             midiNote = BassChordChangeDetector.CalculateDiatonicApproach(targetRoot, approachFromBelow: true);
+                            Debug.WriteLine($"[BassTrack] Approach note inserted: MIDI={midiNote}, TargetRoot={targetRoot}");
                         }
                         else
                         {
@@ -121,6 +160,25 @@ namespace Music.Generator
                         midiNote = hit.MidiNote; // Use pattern note
                     }
 
+                    // Story 7.3: Apply bass range guardrail (no register lift for bass, but clamp to valid range)
+                    int originalMidi = midiNote;
+                    midiNote = ApplyBassRangeGuardrail(midiNote);
+                    if (originalMidi != midiNote)
+                    {
+                        Debug.WriteLine($"[BassTrack] Guardrail adjustment: {originalMidi} -> {midiNote}");
+                    }
+
+                    // Validate note is in scale
+                    int pc = PitchClassUtils.ToPitchClass(midiNote);
+                    if (!ctx.KeyScalePitchClasses.Contains(pc))
+                    {
+                        Debug.WriteLine($"[BassTrack] *** ERROR: Out-of-key bass note! MIDI={midiNote}, PC={pc}, KeyScale={string.Join(",", ctx.KeyScalePitchClasses)} ***");
+                    }
+
+                    // Story 7.3: Calculate velocity with energy bias
+                    int baseVelocity = 95;
+                    int velocity = ApplyVelocityBias(baseVelocity, bassProfile?.VelocityBias ?? 0);
+
                     var noteStart = (int)slot.StartTick;
                     var noteDuration = slot.DurationTicks;
 
@@ -131,7 +189,7 @@ namespace Music.Generator
                         noteNumber: midiNote,
                         absoluteTimeTicks: noteStart,
                         noteDurationTicks: noteDuration,
-                        noteOnVelocity: 95));
+                        noteOnVelocity: velocity));
                 }
             }
 
@@ -139,6 +197,34 @@ namespace Music.Generator
             notes = notes.OrderBy(e => e.AbsoluteTimeTicks).ToList();
 
             return new PartTrack(notes) { MidiProgramNumber = midiProgramNumber };
+        }
+
+        /// <summary>
+        /// Applies bass range guardrail to keep notes within audible bass register.
+        /// Story 7.3: Bass stays in E1 (MIDI 28) to E3 (MIDI 52) range.
+        /// Note: RegisterLift is 0 for bass in energy profile, so no lift applied.
+        /// This guardrail ensures pattern-generated notes stay in valid range.
+        /// </summary>
+        private static int ApplyBassRangeGuardrail(int midiNote)
+        {
+            // Define bass register limits
+            const int MinBassMidi = 28;  // E1 - low limit for bass clarity
+            const int MaxBassMidi = 52;  // E3 - high limit to avoid mid-range muddy zone
+
+            // Clamp to bass range
+            int adjustedNote = Math.Clamp(midiNote, MinBassMidi, MaxBassMidi);
+
+            return adjustedNote;
+        }
+
+        /// <summary>
+        /// Applies velocity bias from energy profile.
+        /// Story 7.3: Energy affects dynamics.
+        /// </summary>
+        private static int ApplyVelocityBias(int baseVelocity, int velocityBias)
+        {
+            int velocity = baseVelocity + velocityBias;
+            return Math.Clamp(velocity, 1, 127);
         }
     }
 }

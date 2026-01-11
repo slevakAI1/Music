@@ -65,7 +65,9 @@ namespace Music.Generator
         public EnergySectionTarget GetTargetForSection(Section section, int sectionIndex)
         {
             ArgumentNullException.ThrowIfNull(section);
-            return _template.GetTargetForSection(section.SectionType, sectionIndex);
+            var target = _template.GetTargetForSection(section.SectionType, sectionIndex);
+            System.Diagnostics.Debug.WriteLine($"[EnergyArc] GetTargetForSection: Section={section.SectionType}, Index={sectionIndex}, Energy={target.Energy:F2}");
+            return target;
         }
 
         /// <summary>

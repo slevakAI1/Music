@@ -17,6 +17,7 @@ namespace Music.Generator
     {
         // AI: Generate: validates harmony track before generation; fast-fail on invalid data prevents silent errors.
         // AI: behavior=Runs HarmonyValidator with default options (StrictDiatonicChordTones=true) to catch F# minor crashes.
+        // AI: Story 7.3=Now creates EnergyArc and builds section profiles to drive role energy parameters.
         public static GeneratorResult Generate(SongContext songContext)
         {
             // validate songcontext is not null
@@ -50,6 +51,16 @@ namespace Music.Generator
             var settings = RandomizationSettings.Default;
             var harmonyPolicy = HarmonyPolicy.Default;
 
+            // Story 7.3: Create energy arc and build section profiles
+            var grooveName = GetPrimaryGrooveName(songContext.GrooveTrack);
+            var energyArc = EnergyArc.Create(
+                songContext.SectionTrack,
+                grooveName,
+                seed: settings.Seed);
+
+            // Build section profiles dictionary for quick lookup
+            var sectionProfiles = BuildSectionProfiles(energyArc, songContext.SectionTrack);
+
             // Resolve MIDI program numbers from VoiceSet
             int bassProgramNumber = GetProgramNumberForRole(songContext.Voices, "Bass", defaultProgram: 33);
             int compProgramNumber = GetProgramNumberForRole(songContext.Voices, "Comp", defaultProgram: 27);
@@ -62,16 +73,19 @@ namespace Music.Generator
                     songContext.HarmonyTrack,
                     songContext.GrooveTrack,
                     songContext.BarTrack,
+                    songContext.SectionTrack,
+                    sectionProfiles,
                     totalBars,
                     settings,
                     harmonyPolicy,
-                    bassProgramNumber),            //  Randomization settings 
+                    bassProgramNumber),
 
                 GuitarTrack = GuitarTrackGenerator.Generate(
                     songContext.HarmonyTrack,
                     songContext.GrooveTrack,
                     songContext.BarTrack,
                     songContext.SectionTrack,
+                    sectionProfiles,
                     totalBars,
                     settings,
                     harmonyPolicy,
@@ -82,6 +96,7 @@ namespace Music.Generator
                     songContext.GrooveTrack,
                     songContext.BarTrack,
                     songContext.SectionTrack,
+                    sectionProfiles,
                     totalBars,
                     settings,
                     harmonyPolicy,
@@ -92,10 +107,73 @@ namespace Music.Generator
                     songContext.GrooveTrack,
                     songContext.BarTrack,
                     songContext.SectionTrack,
+                    sectionProfiles,
                     totalBars,
                     settings,
                     drumProgramNumber)
             };
+        }
+
+        /// <summary>
+        /// Builds section energy profiles for all sections.
+        /// Returns dictionary keyed by section StartBar for quick lookup.
+        /// </summary>
+        private static Dictionary<int, EnergySectionProfile> BuildSectionProfiles(
+            EnergyArc energyArc,
+            SectionTrack sectionTrack)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Generator] ========== BUILDING SECTION PROFILES ==========");
+            System.Diagnostics.Debug.WriteLine($"[Generator] Total sections: {sectionTrack.Sections.Count}");
+            
+            var profiles = new Dictionary<int, EnergySectionProfile>();
+            
+            // Track section indices by type for proper indexing
+            var sectionIndicesByType = new Dictionary<MusicConstants.eSectionType, int>();
+            
+            EnergySectionProfile? previousProfile = null;
+
+            foreach (var section in sectionTrack.Sections)
+            {
+                // Get or initialize index for this section type
+                if (!sectionIndicesByType.ContainsKey(section.SectionType))
+                {
+                    sectionIndicesByType[section.SectionType] = 0;
+                }
+                
+                int sectionIndex = sectionIndicesByType[section.SectionType];
+                
+                System.Diagnostics.Debug.WriteLine($"[Generator] Building profile for section: Type={section.SectionType}, Index={sectionIndex}, StartBar={section.StartBar}, BarCount={section.BarCount}");
+                
+                // Build profile for this section
+                var profile = EnergyProfileBuilder.BuildProfile(
+                    energyArc,
+                    section,
+                    sectionIndex,
+                    previousProfile);
+                
+                System.Diagnostics.Debug.WriteLine($"[Generator] Profile built: Energy={profile.Global.Energy:F2}, KeysPresent={profile.Orchestration.KeysPresent}");
+                
+                // Store by StartBar for quick lookup during generation
+                profiles[section.StartBar] = profile;
+                
+                // Increment index for this section type
+                sectionIndicesByType[section.SectionType]++;
+                
+                // Track for next iteration (contrast calculation)
+                previousProfile = profile;
+            }
+
+            System.Diagnostics.Debug.WriteLine($"[Generator] ========== SECTION PROFILES COMPLETE: {profiles.Count} profiles ==========");
+            return profiles;
+        }
+
+        /// <summary>
+        /// Gets the primary groove name from the groove track (first groove event).
+        /// </summary>
+        private static string GetPrimaryGrooveName(GrooveTrack grooveTrack)
+        {
+            var firstGroove = grooveTrack.Events.FirstOrDefault();
+            return firstGroove?.SourcePresetName ?? "Default";
         }
 
         // AI: GeneratorResult: required PartTracks returned; consumers expect these program numbers and ordering.

@@ -1,7 +1,9 @@
 // AI: purpose=Generate keys/pads track using VoiceLeadingSelector and SectionProfile for dynamic voicing per section.
 // AI: keep program number 4; tracks previous ChordRealization for voice-leading continuity; returns sorted by AbsoluteTimeTicks.
+// AI: Story 7.3=Now accepts section profiles and applies energy controls (density, velocity, register) with lead-space ceiling guardrail.
 
 using Music.MyMidi;
+using System.Diagnostics;
 
 namespace Music.Generator
 {
@@ -9,17 +11,28 @@ namespace Music.Generator
     {
         /// <summary>
         /// Generates keys/pads track: voice-led chord voicings with optional color tones per section profile.
+        /// Updated for Story 7.3: energy profile integration with guardrails.
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
             BarTrack barTrack,
             SectionTrack sectionTrack,
+            Dictionary<int, EnergySectionProfile> sectionProfiles,
             int totalBars,
             RandomizationSettings settings,
             HarmonyPolicy policy,
             int midiProgramNumber)
         {
+            Debug.WriteLine($"[KeysTrack] ========== STARTING KEYS TRACK GENERATION ==========");
+            Debug.WriteLine($"[KeysTrack] Total bars: {totalBars}");
+            Debug.WriteLine($"[KeysTrack] Section profiles count: {sectionProfiles.Count}");
+            
+            foreach (var kvp in sectionProfiles)
+            {
+                Debug.WriteLine($"[KeysTrack] Section profile at bar {kvp.Key}: Energy={kvp.Value.Global.Energy:F2}, KeysPresent={kvp.Value.Orchestration.KeysPresent}");
+            }
+
             var notes = new List<PartTrackEvent>();
             var randomizer = new PitchRandomizer(settings);
             const int keysOctave = 3;
@@ -29,17 +42,53 @@ namespace Music.Generator
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
+                // Get groove preset and pads onsets for the bar
                 var grooveEvent = grooveTrack.GetActiveGroovePreset(bar);
                 var padsOnsets = grooveEvent.AnchorLayer.PadsOnsets;
                 if (padsOnsets == null || padsOnsets.Count == 0)
-                    continue;
-
-                // Get section profile for current bar
-                SectionProfile? sectionProfile = null;
-                if (sectionTrack.GetActiveSection(bar, out var section) && section != null)
                 {
-                    sectionProfile = SectionProfile.GetForSectionType(section.SectionType);
+                    Debug.WriteLine($"[KeysTrack] Bar {bar}: No pads onsets, skipping");
+                    continue;
                 }
+
+                // Get section and energy profile
+                Section? section = null;
+                if (sectionTrack.GetActiveSection(bar, out section) && section != null)
+                {
+                    Debug.WriteLine($"[KeysTrack] Bar {bar}: Section '{section.SectionType}' (StartBar={section.StartBar}, BarCount={section.BarCount})");
+                }
+                else
+                {
+                    Debug.WriteLine($"[KeysTrack] Bar {bar}: No active section found");
+                }
+
+                // Story 7.3: Get energy profile for this section
+                EnergySectionProfile? energyProfile = null;
+                if (section != null && sectionProfiles.TryGetValue(section.StartBar, out var profile))
+                {
+                    energyProfile = profile;
+                    Debug.WriteLine($"[KeysTrack] Bar {bar}: Found energy profile - Energy={profile.Global.Energy:F2}, KeysPresent={profile.Orchestration.KeysPresent}");
+                }
+                else
+                {
+                    Debug.WriteLine($"[KeysTrack] Bar {bar}: No energy profile found (section start bar: {section?.StartBar})");
+                }
+
+                // Story 7.3: Check if keys/pads are present in orchestration
+                if (energyProfile?.Orchestration != null && !energyProfile.Orchestration.KeysPresent)
+                {
+                    Debug.WriteLine($"[KeysTrack] Bar {bar}: SKIPPING - KeysPresent=false in orchestration");
+                    // Skip keys for this bar if orchestration says keys not present
+                    continue;
+                }
+
+                // Get keys energy controls
+                var keysProfile = energyProfile?.Roles?.Keys;
+
+                // Story 7.3: Update section profile with energy adjustments
+                SectionProfile? sectionProfile = UpdateSectionProfileWithEnergy(
+                    section?.SectionType ?? MusicConstants.eSectionType.Verse,
+                    keysProfile);
 
                 // Build onset grid for this bar
                 var onsetSlots = OnsetGrid.Build(bar, padsOnsets, barTrack);
@@ -74,7 +123,6 @@ namespace Music.Generator
                         if (previousVoicing != null)
                         {
                             chordRealization = VoiceLeadingSelector.Select(previousVoicing, ctx, sectionProfile);
-                            
 
                             // Preserve color tone from randomizer if it was added
                             if (baseVoicing.HasColorTone && !chordRealization.HasColorTone)
@@ -105,8 +153,24 @@ namespace Music.Generator
                         chordRealization = VoiceLeadingSelector.Select(previousVoicing, ctx, sectionProfile);
                     }
 
+                    // Story 7.3: Apply lead-space ceiling guardrail to prevent clash with melody
+                    chordRealization = ApplyLeadSpaceGuardrail(chordRealization);
+
+                    // Validate all notes are in scale
+                    foreach (int midiNote in chordRealization.MidiNotes)
+                    {
+                        int pc = PitchClassUtils.ToPitchClass(midiNote);
+                        if (!ctx.KeyScalePitchClasses.Contains(pc))
+                        {
+                            Debug.WriteLine($"[KeysTrack] *** ERROR: Out-of-key note detected! MIDI={midiNote}, PC={pc}, KeyScale={string.Join(",", ctx.KeyScalePitchClasses)} ***");
+                        }
+                    }
                     var noteStart = (int)slot.StartTick;
                     var noteDuration = slot.DurationTicks;
+
+                    // Story 7.3: Calculate velocity with energy bias
+                    int baseVelocity = 75;
+                    int velocity = ApplyVelocityBias(baseVelocity, keysProfile?.VelocityBias ?? 0);
 
                     foreach (int midiNote in chordRealization.MidiNotes)
                     {
@@ -117,7 +181,7 @@ namespace Music.Generator
                             noteNumber: midiNote,
                             absoluteTimeTicks: noteStart,
                             noteDurationTicks: noteDuration,
-                            noteOnVelocity: 75));
+                            noteOnVelocity: velocity));
                     }
 
                     // Update previous voicing for next onset
@@ -132,6 +196,90 @@ namespace Music.Generator
             notes = notes.OrderBy(e => e.AbsoluteTimeTicks).ToList();
 
             return new PartTrack(notes) { MidiProgramNumber = midiProgramNumber };
+        }
+
+        /// <summary>
+        /// Updates SectionProfile with energy adjustments.
+        /// Story 7.3: Merges energy controls into section profile for voice leading selector.
+        /// </summary>
+        private static SectionProfile UpdateSectionProfileWithEnergy(
+            MusicConstants.eSectionType sectionType,
+            EnergyRoleProfile? keysProfile)
+        {
+            // Get base section profile
+            var baseProfile = SectionProfile.GetForSectionType(sectionType);
+
+            if (keysProfile == null)
+                return baseProfile;
+
+            // Apply energy adjustments to section profile
+            // RegisterLift: add energy lift to base register lift
+            int adjustedRegisterLift = baseProfile.RegisterLift + keysProfile.RegisterLiftSemitones;
+
+            // MaxDensity: scale by density multiplier
+            int adjustedMaxDensity = (int)Math.Round(baseProfile.MaxDensity * keysProfile.DensityMultiplier);
+            adjustedMaxDensity = Math.Clamp(adjustedMaxDensity, 2, 7); // Keep reasonable bounds
+
+            // ColorToneProbability: already in base profile, keep it
+            // (Could be adjusted by energy in future if desired)
+
+            return new SectionProfile
+            {
+                RegisterLift = adjustedRegisterLift,
+                MaxDensity = adjustedMaxDensity,
+                ColorToneProbability = baseProfile.ColorToneProbability
+            };
+        }
+
+        /// <summary>
+        /// Applies lead-space ceiling guardrail to chord realization.
+        /// Story 7.3: Prevents sustained pads/keys from occupying melody space (C5/MIDI 72 and above).
+        /// </summary>
+        private static ChordRealization ApplyLeadSpaceGuardrail(ChordRealization chordRealization)
+        {
+            if (chordRealization == null || chordRealization.MidiNotes.Count == 0)
+                return chordRealization;
+
+            // Define lead-space ceiling (C5 = MIDI 72, reserved for melody/lead)
+            const int LeadSpaceCeiling = 72;
+
+            // Check if any notes exceed the ceiling
+            var notes = chordRealization.MidiNotes.ToList();
+            int maxNote = notes.Max();
+
+            if (maxNote >= LeadSpaceCeiling)
+            {
+                // For sustained pads/keys, transpose notes that exceed ceiling down by octave
+                var adjustedNotes = notes.Select(n => n >= LeadSpaceCeiling ? n - 12 : n).ToList();
+
+                // Ensure all notes are still above minimum (C3 = MIDI 48)
+                const int KeysLowLimit = 48; // C3
+                int minNote = adjustedNotes.Min();
+                
+                if (minNote < KeysLowLimit)
+                {
+                    // Transpose all notes up an octave if too low
+                    adjustedNotes = adjustedNotes.Select(n => n + 12).ToList();
+                }
+
+                return chordRealization with
+                {
+                    MidiNotes = adjustedNotes,
+                    RegisterCenterMidi = (int)adjustedNotes.Average() // Update center
+                };
+            }
+
+            return chordRealization;
+        }
+
+        /// <summary>
+        /// Applies velocity bias from energy profile.
+        /// Story 7.3: Energy affects dynamics.
+        /// </summary>
+        private static int ApplyVelocityBias(int baseVelocity, int velocityBias)
+        {
+            int velocity = baseVelocity + velocityBias;
+            return Math.Clamp(velocity, 1, 127);
         }
     }
 }

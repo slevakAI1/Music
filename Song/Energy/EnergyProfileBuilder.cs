@@ -197,6 +197,8 @@ namespace Music.Generator
             MusicConstants.eSectionType sectionType,
             int sectionIndex)
         {
+            System.Diagnostics.Debug.WriteLine($"[EnergyOrchestration] Building orchestration: SectionType={sectionType}, SectionIndex={sectionIndex}, Energy={energy:F2}");
+            
             // Default: all roles present
             bool bassPresent = true;
             bool compPresent = true;
@@ -210,7 +212,8 @@ namespace Music.Generator
                 case MusicConstants.eSectionType.Intro:
                     // Intro: often sparse, build gradually
                     padsPresent = energy > 0.3;
-                    keysPresent = energy > 0.4;
+                    keysPresent = energy > 0.2;  // Lowered from 0.4 to 0.2
+                    System.Diagnostics.Debug.WriteLine($"[EnergyOrchestration] Intro section: keysPresent={keysPresent} (energy > 0.2 = {energy > 0.2})");
                     break;
 
                 case MusicConstants.eSectionType.Verse:
@@ -218,22 +221,30 @@ namespace Music.Generator
                     if (sectionIndex == 0)
                     {
                         padsPresent = energy > 0.4;
-                        keysPresent = energy > 0.5;
+                        keysPresent = energy > 0.3;  // Lowered from 0.5 to 0.3
+                        System.Diagnostics.Debug.WriteLine($"[EnergyOrchestration] Verse 1 section: keysPresent={keysPresent} (energy > 0.3 = {energy > 0.3})");
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[EnergyOrchestration] Verse {sectionIndex + 1} section: keysPresent={keysPresent} (default=true)");
                     }
                     break;
 
                 case MusicConstants.eSectionType.Chorus:
                     // Chorus: typically full arrangement
                     // All roles present by default
+                    System.Diagnostics.Debug.WriteLine($"[EnergyOrchestration] Chorus section: keysPresent={keysPresent} (default=true)");
                     break;
 
                 case MusicConstants.eSectionType.Bridge:
                     // Bridge: can vary, but typically full
+                    System.Diagnostics.Debug.WriteLine($"[EnergyOrchestration] Bridge section: keysPresent={keysPresent} (default=true)");
                     break;
 
                 case MusicConstants.eSectionType.Outro:
                     // Outro: often winds down
                     padsPresent = energy > 0.3;
+                    System.Diagnostics.Debug.WriteLine($"[EnergyOrchestration] Outro section: keysPresent={keysPresent} (default=true)");
                     break;
             }
 

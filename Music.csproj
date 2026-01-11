@@ -93,6 +93,7 @@
     <Folder Include="Files\NotionExchange\" />
     <Folder Include="Future Ideas\DraftLyrics\" />
     <Folder Include="Patches\" />
+    <Folder Include="Tests\" />
   </ItemGroup>
 
   <ItemGroup>

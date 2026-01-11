@@ -1,6 +1,7 @@
 // AI: purpose=Generate drum track: kick, snare, hi-hat, ride using DrumVariationEngine for living performance (Story 6.1+6.3).
 /// AI: invariants=Calls DrumVariationEngine per bar; integrates DrumFillEngine at section transitions; converts to MIDI PartTrackEvent list; returns sorted by AbsoluteTimeTicks.
 /// AI: deps=Uses DrumVariationEngine, DrumFillEngine, RandomHelpers, PitchRandomizer.SelectDrumVelocity for velocity shaping.
+/// AI: Story 7.3=Now accepts section profiles and applies energy controls (density, velocity, busy probability) to drum generation.
 
 using Music.MyMidi;
 
@@ -10,13 +11,14 @@ namespace Music.Generator
     {
         /// <summary>
         /// Generates drum track: kick, snare, hi-hat, ride with deterministic variations and fills.
-        /// Updated for Story 6.1 and Story 6.3 (section transition fills).
+        /// Updated for Story 6.1, Story 6.3 (section transition fills), and Story 7.3 (energy profiles).
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
             BarTrack barTrack,
             SectionTrack sectionTrack,
+            Dictionary<int, EnergySectionProfile> sectionProfiles,
             int totalBars,
             RandomizationSettings settings,
             int midiProgramNumber)
@@ -43,18 +45,36 @@ namespace Music.Generator
                 // Get section type and index for variation engine and fill engine
                 MusicConstants.eSectionType sectionType = MusicConstants.eSectionType.Verse; // Default
                 int sectionIndex = 0;
-                if (sectionTrack.GetActiveSection(bar, out var section) && section != null)
+                Section? section = null;
+                if (sectionTrack.GetActiveSection(bar, out section) && section != null)
                 {
                     sectionType = section.SectionType;
                     sectionIndex = section.SectionId;
                 }
+
+                // Story 7.3: Get energy profile for this section
+                EnergySectionProfile? energyProfile = null;
+                if (section != null && sectionProfiles.TryGetValue(section.StartBar, out var profile))
+                {
+                    energyProfile = profile;
+                }
+
+                // Story 7.3: Check if drums are present in orchestration
+                if (energyProfile?.Orchestration != null && !energyProfile.Orchestration.DrumsPresent)
+                {
+                    // Skip drums for this bar if orchestration says drums not present
+                    continue;
+                }
+
+                // Story 7.3: Build DrumRoleParameters from energy profile
+                var drumParameters = BuildDrumParameters(energyProfile, settings.DrumParameters);
 
                 // Create deterministic per-bar RNG so fill decisions remain deterministic when knobs change.
                 var barRng = RandomHelpers.CreateLocalRng(settings.Seed, $"{grooveEvent.SourcePresetName ?? "groove"}_{sectionType}", bar, 0m);
 
                 // Check if this bar should have a fill (Story 6.3) or if Stage 7 requests extra fills via parameter.
                 bool shouldFill = DrumFillEngine.ShouldGenerateFill(bar, totalBars, sectionTrack)
-                    || barRng.NextDouble() < (settings.DrumParameters?.FillProbability ?? 0.0);
+                    || barRng.NextDouble() < (drumParameters?.FillProbability ?? 0.0);
 
                 List<DrumVariationEngine.DrumHit> allHits;
 
@@ -68,7 +88,7 @@ namespace Music.Generator
                         sectionIndex,
                         settings.Seed,
                         totalBars,
-                        settings.DrumParameters);
+                        drumParameters);
 
                     // Safety: a fill should maintain pulse/timekeeping unless intentionally designed as a "stop-time" break.
                     // Real drummers keep at least hat/ride going during fills to anchor the band.
@@ -86,7 +106,7 @@ namespace Music.Generator
                             sectionType,
                             bar,
                             settings.Seed,
-                            settings.DrumParameters);
+                            drumParameters);
 
                         // Merge, keeping deterministic uniqueness by (Role, OnsetBeat, TimingOffsetTicks).
                         // Fills take priority (added first), groove fills in the gaps.
@@ -100,18 +120,19 @@ namespace Music.Generator
                 else
                 {
                     // Generate per-bar variation plan using DrumVariationEngine
-                    var variation = DrumVariationEngine.Generate(grooveEvent, sectionType, bar, settings.Seed, settings.DrumParameters);
+                    var variation = DrumVariationEngine.Generate(grooveEvent, sectionType, bar, settings.Seed, drumParameters);
                     allHits = variation.Hits;
                 }
 
-                // Add cymbal orchestration (Story 6.4)
-                var cymbalHits = CymbalOrchestrationEngine.GenerateCymbalHits(
+                // Story 7.3: Add cymbal orchestration with energy profile hints
+                var cymbalHits = GenerateCymbalHitsWithEnergyProfile(
                     bar,
                     totalBars,
                     sectionTrack,
                     sectionType,
                     grooveEvent.SourcePresetName ?? "default",
-                    settings.Seed);
+                    settings.Seed,
+                    energyProfile);
 
                 // Convert cymbal hits to DrumHit format and add to allHits
                 foreach (var cymbalHit in cymbalHits)
@@ -173,10 +194,11 @@ namespace Music.Generator
                                     isInFill: hit.IsInFill,
                                     fillProgress: hit.FillProgress);
                                 
+
                                 // Apply DrumRoleParameters velocity bias (Story 6.5 hook). Keep deterministic and simple.
-                                if (settings.DrumParameters != null && Math.Abs(settings.DrumParameters.VelocityBias) > 0.0001)
+                                if (drumParameters != null && Math.Abs(drumParameters.VelocityBias) > 0.0001)
                                 {
-                                    vel = Math.Clamp(vel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
+                                    vel = Math.Clamp(vel + (int)Math.Round(drumParameters.VelocityBias), 1, 127);
                                 }
 
                                 // Reduce velocity for non-main kicks
@@ -207,9 +229,9 @@ namespace Music.Generator
                                     int preVel = DrumVelocityShaper.FlamPreHitVelocity(mainVel, settings.Seed, slot.Bar, slot.OnsetBeat);
                                     
                                     // Apply velocity bias to flam pre-hit
-                                    if (settings.DrumParameters != null && Math.Abs(settings.DrumParameters.VelocityBias) > 0.0001)
+                                    if (drumParameters != null && Math.Abs(drumParameters.VelocityBias) > 0.0001)
                                     {
-                                        preVel = Math.Clamp(preVel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
+                                        preVel = Math.Clamp(preVel + (int)Math.Round(drumParameters.VelocityBias), 1, 127);
                                     }
                                     
                                     var noteDuration = MusicConstants.TicksPerQuarterNote;
@@ -230,9 +252,9 @@ namespace Music.Generator
                                     int vel = DrumVelocityShaper.GhostNoteVelocity(baseVel, settings.Seed, slot.Bar, slot.OnsetBeat);
                                     
                                     // Apply velocity bias to ghost notes
-                                    if (settings.DrumParameters != null && Math.Abs(settings.DrumParameters.VelocityBias) > 0.0001)
+                                    if (drumParameters != null && Math.Abs(drumParameters.VelocityBias) > 0.0001)
                                     {
-                                        vel = Math.Clamp(vel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
+                                        vel = Math.Clamp(vel + (int)Math.Round(drumParameters.VelocityBias), 1, 127);
                                     }
                                     
                                     var noteDuration = MusicConstants.TicksPerQuarterNote;
@@ -265,9 +287,9 @@ namespace Music.Generator
                                         fillProgress: hit.FillProgress);
                                     
                                     // Apply velocity bias
-                                    if (settings.DrumParameters != null && Math.Abs(settings.DrumParameters.VelocityBias) > 0.0001)
+                                    if (drumParameters != null && Math.Abs(drumParameters.VelocityBias) > 0.0001)
                                     {
-                                        vel = Math.Clamp(vel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
+                                        vel = Math.Clamp(vel + (int)Math.Round(drumParameters.VelocityBias), 1, 127);
                                     }
                                     
                                     if (!hit.IsMain)
@@ -306,9 +328,9 @@ namespace Music.Generator
                                     fillProgress: hit.FillProgress);
 
                                 // Apply velocity bias
-                                if (settings.DrumParameters != null && Math.Abs(settings.DrumParameters.VelocityBias) > 0.0001)
+                                if (drumParameters != null && Math.Abs(drumParameters.VelocityBias) > 0.0001)
                                 {
-                                    vel = Math.Clamp(vel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
+                                    vel = Math.Clamp(vel + (int)Math.Round(drumParameters.VelocityBias), 1, 127);
                                 }
                                 
                                 // Soften non-main hats
@@ -349,9 +371,9 @@ namespace Music.Generator
                                     fillProgress: hit.FillProgress);
 
                                 // Apply velocity bias
-                                if (settings.DrumParameters != null && Math.Abs(settings.DrumParameters.VelocityBias) > 0.0001)
+                                if (drumParameters != null && Math.Abs(drumParameters.VelocityBias) > 0.0001)
                                 {
-                                    vel = Math.Clamp(vel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
+                                    vel = Math.Clamp(vel + (int)Math.Round(drumParameters.VelocityBias), 1, 127);
                                 }
                                 
                                 // Soften non-main ride hits
@@ -400,9 +422,9 @@ namespace Music.Generator
                                     fillProgress: hit.FillProgress);
 
                                 // Apply velocity bias to toms
-                                if (settings.DrumParameters != null && Math.Abs(settings.DrumParameters.VelocityBias) > 0.0001)
+                                if (drumParameters != null && Math.Abs(drumParameters.VelocityBias) > 0.0001)
                                 {
-                                    vel = Math.Clamp(vel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
+                                    vel = Math.Clamp(vel + (int)Math.Round(drumParameters.VelocityBias), 1, 127);
                                 }
 
                                 var noteDuration = MusicConstants.TicksPerQuarterNote;
@@ -437,9 +459,9 @@ namespace Music.Generator
                                     fillProgress: hit.FillProgress);
 
                                 // Apply velocity bias to crashes
-                                if (settings.DrumParameters != null && Math.Abs(settings.DrumParameters.VelocityBias) > 0.0001)
+                                if (drumParameters != null && Math.Abs(drumParameters.VelocityBias) > 0.0001)
                                 {
-                                    vel = Math.Clamp(vel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
+                                    vel = Math.Clamp(vel + (int)Math.Round(drumParameters.VelocityBias), 1, 127);
                                 }
 
                                 // Boost velocity for accent hits (but not chokes)
@@ -481,9 +503,9 @@ namespace Music.Generator
                                     fillProgress: hit.FillProgress);
 
                                 // Apply velocity bias to crashes
-                                if (settings.DrumParameters != null && Math.Abs(settings.DrumParameters.VelocityBias) > 0.0001)
+                                if (drumParameters != null && Math.Abs(drumParameters.VelocityBias) > 0.0001)
                                 {
-                                    vel = Math.Clamp(vel + (int)Math.Round(settings.DrumParameters.VelocityBias), 1, 127);
+                                    vel = Math.Clamp(vel + (int)Math.Round(drumParameters.VelocityBias), 1, 127);
                                 }
 
                                 // Boost velocity for accent hits
@@ -510,6 +532,81 @@ namespace Music.Generator
             notes = notes.OrderBy(e => e.AbsoluteTimeTicks).ToList();
 
             return new PartTrack(notes) { MidiProgramNumber = midiProgramNumber };
+        }
+
+        /// <summary>
+        /// Builds DrumRoleParameters from energy profile, merging with existing settings.
+        /// Story 7.3: Maps energy profile to drum controls.
+        /// </summary>
+        private static DrumRoleParameters? BuildDrumParameters(
+            EnergySectionProfile? energyProfile,
+            DrumRoleParameters? existingParameters)
+        {
+            if (energyProfile?.Roles?.Drums == null)
+            {
+                return existingParameters ?? new DrumRoleParameters();
+            }
+
+            var drumsProfile = energyProfile.Roles.Drums;
+
+            // Merge energy profile with existing parameters
+            return new DrumRoleParameters
+            {
+                DensityMultiplier = drumsProfile.DensityMultiplier,
+                VelocityBias = drumsProfile.VelocityBias,
+                BusyProbability = drumsProfile.BusyProbability,
+                FillProbability = existingParameters?.FillProbability ?? 0.0,
+                FillComplexityMultiplier = existingParameters?.FillComplexityMultiplier ?? 1.0
+            };
+        }
+
+        /// <summary>
+        /// Generates cymbal hits incorporating energy profile hints.
+        /// Story 7.3: Uses energy orchestration profile for cymbal decisions.
+        /// </summary>
+        private static List<CymbalOrchestrationEngine.CymbalHit> GenerateCymbalHitsWithEnergyProfile(
+            int bar,
+            int totalBars,
+            SectionTrack sectionTrack,
+            MusicConstants.eSectionType sectionType,
+            string grooveName,
+            int seed,
+            EnergySectionProfile? energyProfile)
+        {
+            // Get base cymbal hits from existing engine
+            var hits = CymbalOrchestrationEngine.GenerateCymbalHits(
+                bar, totalBars, sectionTrack, sectionType, grooveName, seed);
+
+            // Story 7.3: Apply energy profile hints if available
+            if (energyProfile?.Orchestration != null)
+            {
+                var orchestration = energyProfile.Orchestration;
+
+                // Check if section needs crash on start
+                if (orchestration.CrashOnSectionStart)
+                {
+                    // Check if this is the first bar of the section
+                    if (sectionTrack.GetActiveSection(bar, out var section) && 
+                        section != null && section.StartBar == bar)
+                    {
+                        // Ensure crash hit exists at beat 1
+                        bool hasCrashAtStart = hits.Any(h => h.OnsetBeat == 1m && 
+                            (h.Type == "crash1" || h.Type == "crash2"));
+
+                        if (!hasCrashAtStart)
+                        {
+                            hits.Add(new CymbalOrchestrationEngine.CymbalHit
+                            {
+                                OnsetBeat = 1m,
+                                Type = "crash1",
+                                TimingOffsetTicks = 0
+                            });
+                        }
+                    }
+                }
+            }
+
+            return hits;
         }
     }
 }
