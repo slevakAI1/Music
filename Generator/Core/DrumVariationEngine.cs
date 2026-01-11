@@ -58,6 +58,7 @@ namespace Music.Generator
             // Use event layers, but if they are empty try resolving preset by name
             var anchor = grooveEvent.AnchorLayer ?? new GrooveInstanceLayer();
             var tension = grooveEvent.TensionLayer ?? new GrooveInstanceLayer();
+            bool usedPresetFallback = false;
 
             // If anchor appears empty and we have a preset name, load the preset template
             if (IsLayerEmpty(anchor) && !string.IsNullOrWhiteSpace(grooveEvent.SourcePresetName))
@@ -67,6 +68,7 @@ namespace Music.Generator
                 {
                     anchor = preset.AnchorLayer ?? anchor;
                     tension = preset.TensionLayer ?? tension;
+                    usedPresetFallback = true;
                 }
             }
 

@@ -10,6 +10,8 @@ namespace Music.Generator
     /// </summary>
     internal static class DrumFillEngine
     {
+        private const int MinTransitionFillDensity = 4;
+
         /// <summary>
         /// Describes the style characteristics of a fill mapped from groove name.
         /// </summary>
@@ -237,6 +239,11 @@ namespace Music.Generator
 
             // Clamp density to style max
             int targetDensity = Math.Min(complexity, style.MaxDensity);
+
+            // Policy: transition fills should not collapse into near-silent measures.
+            // The current low-density pickup is useful for subtle "pickup" moments, but for section transitions
+            // it creates audible gaps (e.g., only 2 snare hits) when the fill replaces the groove.
+            targetDensity = Math.Clamp(targetDensity, MinTransitionFillDensity, style.MaxDensity);
 
             // Generate fill shape based on style and density
             if (style.SupportsRoll16th && targetDensity >= 6)

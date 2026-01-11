@@ -6,7 +6,7 @@
 namespace Music.Generator
 {
     // AI: factory method: returns a GrooveTrack with a single event at bar 1 using PopRockBasic preset.
-    public static class GrooveTests
+    public static class GrooveTrackTestData
     {
         // AI: CreateTestGrooveD1 used in unit tests and default demos; keep commented multi-event example for manual testing.
         public static GrooveTrack CreateTestGrooveD1(BarTrack barTrack)

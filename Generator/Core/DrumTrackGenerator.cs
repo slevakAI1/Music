@@ -69,6 +69,33 @@ namespace Music.Generator
                         settings.Seed,
                         totalBars,
                         settings.DrumParameters);
+
+                    // Safety: a fill should maintain pulse/timekeeping unless intentionally designed as a "stop-time" break.
+                    // Real drummers keep at least hat/ride going during fills to anchor the band.
+                    // Count timekeeping hits (hat, ride, kick on downbeats) to determine if groove needs merging.
+                    int timekeepingHits = allHits.Count(h => 
+                        h.Role == "hat" || 
+                        h.Role == "ride" || 
+                        (h.Role == "kick" && (h.OnsetBeat == 1m || h.OnsetBeat == 3m)));
+
+                    // If fill has no timekeeping, merge in the base groove so the band doesn't lose pulse.
+                    if (timekeepingHits == 0)
+                    {
+                        var grooveVariation = DrumVariationEngine.Generate(
+                            grooveEvent,
+                            sectionType,
+                            bar,
+                            settings.Seed,
+                            settings.DrumParameters);
+
+                        // Merge, keeping deterministic uniqueness by (Role, OnsetBeat, TimingOffsetTicks).
+                        // Fills take priority (added first), groove fills in the gaps.
+                        allHits = allHits
+                            .Concat(grooveVariation.Hits)
+                            .GroupBy(h => (h.Role, h.OnsetBeat, h.TimingOffsetTicks))
+                            .Select(g => g.First())
+                            .ToList();
+                    }
                 }
                 else
                 {
