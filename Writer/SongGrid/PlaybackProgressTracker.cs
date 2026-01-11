@@ -64,21 +64,17 @@ internal sealed class PlaybackProgressTracker : IDisposable
     {
         using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(_pollIntervalMs));
 
-        System.Diagnostics.Debug.WriteLine("[PlaybackProgressTracker] RunAsync: Starting polling loop");
-
         try
         {
             while (await timer.WaitForNextTickAsync(cancellationToken))
             {
                 var isPlaying = _playbackService.IsPlaying;
-                System.Diagnostics.Debug.WriteLine($"[PlaybackProgressTracker] Poll: IsPlaying={isPlaying}");
 
                 if (!isPlaying)
                     continue;
 
                 var tick = _playbackService.CurrentTick;
                 var measure = TickToMeasure(tick);
-                System.Diagnostics.Debug.WriteLine($"[PlaybackProgressTracker] Tick={tick}, Measure={measure}, _currentMeasure={_currentMeasure}");
 
                 if (measure <= 0 || measure == _currentMeasure)
                     continue;
@@ -86,13 +82,12 @@ internal sealed class PlaybackProgressTracker : IDisposable
                 var previous = _currentMeasure;
                 _currentMeasure = measure;
 
-                System.Diagnostics.Debug.WriteLine($"[PlaybackProgressTracker] Raising MeasureChanged: Prev={previous}, Current={measure}");
                 RaiseMeasureChanged(previous, measure, tick);
             }
         }
         catch (OperationCanceledException)
         {
-            System.Diagnostics.Debug.WriteLine("[PlaybackProgressTracker] RunAsync: Cancelled");
+            // Cancellation is expected during shutdown; no diagnostics emitted.
         }
     }
 

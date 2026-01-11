@@ -394,61 +394,42 @@ namespace Music.Writer
 
         public static void ClearMeasureHighlight(DataGridView dgSong, int measureNumber)
         {
-            System.Diagnostics.Debug.WriteLine($"[SongGridManager] ClearMeasureHighlight: measureNumber={measureNumber}");
-            
             if (dgSong == null || measureNumber <= 0)
             {
-                System.Diagnostics.Debug.WriteLine($"[SongGridManager] ClearMeasureHighlight: SKIPPED (null grid or invalid measure)");
                 return;
             }
 
             int colIndex = MEASURE_START_COLUMN_INDEX + measureNumber - 1;
-            System.Diagnostics.Debug.WriteLine($"[SongGridManager] ClearMeasureHighlight: colIndex={colIndex}, TotalColumns={dgSong.Columns.Count}");
-            
             if (colIndex < MEASURE_START_COLUMN_INDEX || colIndex >= dgSong.Columns.Count)
             {
-                System.Diagnostics.Debug.WriteLine($"[SongGridManager] ClearMeasureHighlight: SKIPPED (column out of range)");
                 return;
             }
 
             // Highlight only FIXED_ROW_SEPARATOR_2 (row 7)
             dgSong.Rows[FIXED_ROW_SEPARATOR_2].Cells[colIndex].Style.BackColor = Color.Black;
-            
-            System.Diagnostics.Debug.WriteLine($"[SongGridManager] ClearMeasureHighlight: COMPLETED for row {FIXED_ROW_SEPARATOR_2}");
         }
 
         public static void HighlightCurrentMeasure(DataGridView dgSong, int measureNumber)
         {
-            System.Diagnostics.Debug.WriteLine($"[SongGridManager] HighlightCurrentMeasure: measureNumber={measureNumber}");
-            
             if (dgSong == null || measureNumber <= 0)
             {
-                System.Diagnostics.Debug.WriteLine($"[SongGridManager] HighlightCurrentMeasure: SKIPPED (null grid or invalid measure)");
                 return;
             }
 
             int colIndex = MEASURE_START_COLUMN_INDEX + measureNumber - 1;
-            System.Diagnostics.Debug.WriteLine($"[SongGridManager] HighlightCurrentMeasure: colIndex={colIndex}, TotalColumns={dgSong.Columns.Count}");
-            
             if (colIndex < MEASURE_START_COLUMN_INDEX || colIndex >= dgSong.Columns.Count)
             {
-                System.Diagnostics.Debug.WriteLine($"[SongGridManager] HighlightCurrentMeasure: SKIPPED (column out of range)");
                 return;
             }
 
             // Highlight only FIXED_ROW_SEPARATOR_2 (row 7)
             dgSong.Rows[FIXED_ROW_SEPARATOR_2].Cells[colIndex].Style.BackColor = Color.LimeGreen;
-            
-            System.Diagnostics.Debug.WriteLine($"[SongGridManager] HighlightCurrentMeasure: COMPLETED for row {FIXED_ROW_SEPARATOR_2}");
         }
 
         public static void ClearAllMeasureHighlights(DataGridView dgSong)
         {
-            System.Diagnostics.Debug.WriteLine($"[SongGridManager] ClearAllMeasureHighlights");
-            
             if (dgSong == null)
             {
-                System.Diagnostics.Debug.WriteLine($"[SongGridManager] ClearAllMeasureHighlights: SKIPPED (null grid)");
                 return;
             }
 
@@ -459,8 +440,6 @@ namespace Music.Writer
                 dgSong.Rows[FIXED_ROW_SEPARATOR_2].Cells[colIndex].Style.BackColor = Color.Black;
                 clearedCells++;
             }
-            
-            System.Diagnostics.Debug.WriteLine($"[SongGridManager] ClearAllMeasureHighlights: COMPLETED, cleared {clearedCells} cells in row {FIXED_ROW_SEPARATOR_2}");
         }
     }
 }
