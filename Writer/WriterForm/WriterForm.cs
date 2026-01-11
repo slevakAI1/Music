@@ -458,20 +458,16 @@ namespace Music.Writer
 
         private async Task StartPlaybackWithMeasureTrackingAsync()
         {
-            System.Diagnostics.Debug.WriteLine("[WriterForm] StartPlaybackWithMeasureTrackingAsync: BEGIN");
-            
             try
             {
                 // Extract time signature track from fixed row
                 var timeSignatureTrack = GridControlLinesManager.GetTimeSignatureTrack(dgSong);
-                System.Diagnostics.Debug.WriteLine($"[WriterForm] TimeSignatureTrack: {(timeSignatureTrack == null ? "NULL" : $"{timeSignatureTrack.Events.Count} events")}");
-                
+
                 // If no time signature track, proceed with playback but without measure tracking
                 bool enableTracking = timeSignatureTrack != null && timeSignatureTrack.Events.Count > 0;
-                
+
                 if (!enableTracking)
                 {
-                    System.Diagnostics.Debug.WriteLine("[WriterForm] No time signature track - proceeding with playback only (no measure tracking)");
                     await _eventHandlers.HandlePlayAsync(dgSong, _midiPlaybackService);
                     return;
                 }
@@ -481,18 +477,14 @@ namespace Music.Writer
 
                 SongGridManager.ClearAllMeasureHighlights(dgSong);
 
-                System.Diagnostics.Debug.WriteLine("[WriterForm] Creating PlaybackProgressTracker");
                 _progressTracker = new PlaybackProgressTracker(_midiPlaybackService, timeSignatureTrack, pollIntervalMs: 50);
                 _progressTracker.MeasureChanged += OnMeasureChanged;
                 _progressTracker.Start();
-                System.Diagnostics.Debug.WriteLine("[WriterForm] PlaybackProgressTracker started");
 
                 await _eventHandlers.HandlePlayAsync(dgSong, _midiPlaybackService);
-                System.Diagnostics.Debug.WriteLine("[WriterForm] HandlePlayAsync completed");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[WriterForm] StartPlaybackWithMeasureTrackingAsync: ERROR - {ex.Message}");
                 // If measure tracking setup fails, try playback without tracking
                 try
                 {
@@ -506,7 +498,6 @@ namespace Music.Writer
             }
             finally
             {
-                System.Diagnostics.Debug.WriteLine("[WriterForm] StartPlaybackWithMeasureTrackingAsync: FINALLY block");
                 _progressTracker?.Stop();
                 SongGridManager.ClearAllMeasureHighlights(dgSong);
             }
@@ -514,8 +505,6 @@ namespace Music.Writer
 
         private void OnMeasureChanged(object? sender, MeasureChangedEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine($"[WriterForm] OnMeasureChanged: Prev={e.PreviousMeasure}, Current={e.CurrentMeasure}, Tick={e.CurrentTick}");
-            
             try
             {
                 if (e.PreviousMeasure > 0)
@@ -528,9 +517,8 @@ namespace Music.Writer
                     SongGridManager.HighlightCurrentMeasure(dgSong, e.CurrentMeasure);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                System.Diagnostics.Debug.WriteLine($"[WriterForm] OnMeasureChanged: ERROR - {ex.Message}");
                 // Silently fail to avoid crashing the UI - measure tracking is non-critical
             }
         }
