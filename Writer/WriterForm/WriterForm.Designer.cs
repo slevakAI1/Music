@@ -34,6 +34,7 @@ namespace Music.Writer
             btnClearAll = new Button();
             btnPlayTracks = new Button();
             dgSong = new DataGridView();
+            btnSaveWav = new Button();
             groupBox3.SuspendLayout();
             gbSong.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgSong).BeginInit();
@@ -99,6 +100,7 @@ namespace Music.Writer
             // gbSong
             // 
             gbSong.BackColor = Color.Black;
+            gbSong.Controls.Add(btnSaveWav);
             gbSong.Controls.Add(btnLoadDesign);
             gbSong.Controls.Add(btnSaveDesign);
             gbSong.Controls.Add(btnPause);
@@ -122,7 +124,7 @@ namespace Music.Writer
             // btnLoadDesign
             // 
             btnLoadDesign.ForeColor = Color.FromArgb(0, 192, 0);
-            btnLoadDesign.Location = new Point(1089, 772);
+            btnLoadDesign.Location = new Point(1249, 772);
             btnLoadDesign.Name = "btnLoadDesign";
             btnLoadDesign.Size = new Size(89, 23);
             btnLoadDesign.TabIndex = 47;
@@ -133,7 +135,7 @@ namespace Music.Writer
             // btnSaveDesign
             // 
             btnSaveDesign.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSaveDesign.Location = new Point(994, 772);
+            btnSaveDesign.Location = new Point(1154, 772);
             btnSaveDesign.Name = "btnSaveDesign";
             btnSaveDesign.Size = new Size(85, 23);
             btnSaveDesign.TabIndex = 46;
@@ -144,7 +146,7 @@ namespace Music.Writer
             // btnPause
             // 
             btnPause.ForeColor = Color.FromArgb(0, 192, 0);
-            btnPause.Location = new Point(870, 774);
+            btnPause.Location = new Point(865, 774);
             btnPause.Name = "btnPause";
             btnPause.Size = new Size(72, 23);
             btnPause.TabIndex = 45;
@@ -252,6 +254,16 @@ namespace Music.Writer
             dgSong.TabIndex = 37;
             dgSong.CellDoubleClick += dgSong_CellDoubleClick;
             // 
+            // btnSaveWav
+            // 
+            btnSaveWav.ForeColor = Color.FromArgb(0, 192, 0);
+            btnSaveWav.Location = new Point(994, 772);
+            btnSaveWav.Name = "btnSaveWav";
+            btnSaveWav.Size = new Size(85, 23);
+            btnSaveWav.TabIndex = 48;
+            btnSaveWav.Text = "Save Wav";
+            btnSaveWav.UseVisualStyleBackColor = true;
+            // 
             // WriterForm
             // 
             BackColor = Color.White;
@@ -283,5 +295,6 @@ namespace Music.Writer
         private Button btnLoadDesign;
         private Button btnSaveDesign;
         private Button btnTestWordparser;
+        private Button btnSaveWav;
     }
 }
