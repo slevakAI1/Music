@@ -780,7 +780,7 @@ Make tension meaningful beyond drums while keeping implementation minimal and sa
 
 ---
 
-### Story 7.5.7 — Tension diagnostics
+### Story 7.5.7 — Tension diagnostics (COMPLETED)
 
 **Intent :make tension decisions debuggable and tunable, aligned with Story 7.9 direction.
 
@@ -795,221 +795,28 @@ Make tension meaningful beyond drums while keeping implementation minimal and sa
   - be deterministic
 - Add a unit test verifying diagnostics do not change generated tension values.
 
----
-
-### Story 7.5.8 — Stage 8/9 integration contract: tension queries
-
-**intent:Stage 8 requires a unified intent query; Stage 10/14 require versionable query contracts.
-Ensure future Stage 8 motif placement and Stage 9 melody/lyrics can request tension-aware arrangement behavior without refactoring Stage 7 again.
-
-**Acceptance criteria:**
-- Expand the query API to include:
-  - `GetTensionContext(sectionIndex, barIndexWithinSection)` returning:
-    - macro tension
-    - micro tension
-    - tension drivers
-    - section transition hint (`Build/Release/Sustain/Drop`)
-- Ensure implementations remain immutable and thread-safe.
-- Ensure the API can support :
-  - motif placement decisions (prefer high-energy + low tension release moments, or use high tension for anticipatory motifs)
-  - lyric-driven ducking later (when vocals present, reduce accompaniment density especially when tension is low and release is desired)
-
----
-
-## Story 7.6 — Structured repetition engine (A / A’ / B transforms)
-
-**Intent: Stage 9 motif/melody variation and Stage 15 iteration loops need a stable “variation plan” contract.
-Reuse section “core decisions” while making later repeats evolve in a controlled, musical way.
-
-**Acceptance criteria:**
-- Introduce `SectionVariationPlan` per section instance:
-  - `BaseReferenceSectionIndex` (may be null)
-  - per-role bounded multipliers/biases
-  - `double VariationIntensity` in `[0..1]`
-- Deterministic drivers:
-  - section type/index
-  - relative energy target
-  - tension transition hint
-- Must be safe:
-  - does not override guardrails (range, density caps)
-- Provide a query method:
-  - `GetVariationPlan(sectionIndex)`
-- Examples of bounded transforms 
-  - Drums: slightly more hat openness / extra ghost candidates / higher fill probability near transitions.
-  - Bass: add occasional octave/approach notes at phrase peaks.
-  - Comp: add anticipations or an extra fragment hit on strong beats.
-  - Keys/Pads: small density increase (+1 note) or slight register lift.
+**Implementation notes:**
+- Created `TensionDiagnostics` static class in `Song\Energy\TensionDiagnostics.cs` with 4 report methods:
+  - `GenerateFullReport`: Comprehensive section-by-section analysis showing macro tension, micro tension summary (min/max/avg/range), drivers, and phrase flags
+  - `GenerateSummaryReport`: High-level overview showing tension progression by section type, tension peak, high-tension count, and driver summary
+  - `GenerateCompactReport`: One-line-per-section format showing macro and micro tension ranges
+  - `GenerateTransitionHintSummary`: Section transition hints (Build/Release/Sustain/Drop)
+- All diagnostics follow same pattern as `EnergyConstraintDiagnostics` for consistency
+- Created comprehensive test file `TensionDiagnosticsTests.cs` with 8 test methods:
+  - `TestDiagnosticsDoNotAffectGeneration`: CRITICAL test verifying diagnostics don't mutate tension values
+  - `TestDiagnosticsDeterminism`: Verifies same inputs produce identical reports
+  - `TestFullReportGeneration`: Validates full report format and content
+  - `TestSummaryReportGeneration`: Validates summary report format
+  - `TestCompactReportGeneration`: Validates compact report format
+  - `TestArcComparison`: Verifies side-by-side comparison works correctly
+  - `TestEnergyChartGeneration`: Verifies ASCII chart rendering
+  - `TestReportsWithNeutralTension`: Verifies reports work with minimal/neutral data
+- All tests pass and build successful
+- Diagnostics are deterministic, non-invasive, and produce human-readable output
+- See implementation summary for full details
 
 ---
-
-## Story 7.7 — Phrase-level shaping inside sections (energy micro-arcs) 
-
-** Intent: Stage 8 introduces `PhraseMap` formally, but Stage 7 should standardize minimal phrase-position semantics (or at least standard outputs used later).
-Energy should modulate within a section (start → build → peak → cadence), not be flat for 8 bars.
-
-**Acceptance criteria:**
-- Provide a minimal per-section “micro-arc” representation usable by renderers:
-  - either as a bar-indexed list of `EnergyMicroDelta` values
-  - or as labeled positions (`Start/Middle/Peak/Cadence`) in a simple internal map
-- Must be deterministic from section length + style + energy target.
-- Must integrate with:
-  - tension micro map (7.5.3)
-  - variation plan (7.6)
-- Additional unchanged behavior requirements 
-  - phrase length defaults (4 or 8 bars) derived from section length
-  - apply subtle per-bar modulation:
-    - velocity lift at `Peak`
-    - slight density thinning at `Cadence`
-    - optional orchestration accents at `Start`/`Peak`
-
----
-
-## Story 7.8 — Role interaction rules (prevent clutter; reserve melody/lead space)
-
-**Intent: Stage 8+ depends on this becoming an actual enforceable contract, not just guidance.
-Higher energy often means more parts; without explicit rules, arrangements become muddy.
-
-**Acceptance criteria:**
-- Define explicit (queryable) constraints:
-  - lead/vocal reserved band (even before melody exists)
-  - low-end reserved band for bass
-  - per-role density caps
-- Provide a deterministic “conflict resolution policy” skeleton:
-  - priority order by role (configurable by style)
-  - deterministic tie-break function
-- Note (explicitly preserved): actual cross-role thinning is intended for Stage 8, but Stage 7 must expose:
-  - constraint inputs
-  - budgets
-  - intended precedence
-- Additional unchanged constraint scope
-  - **Lead space reservation:** define a MIDI band reserved for future lead/vocal; non-lead roles avoid dense sustained notes there.
-  - **Low-end management:** prevent pads/keys/comp from occupying bass register.
-  - **Density budgets:** when multiple roles are busy on the same weak slots, deterministically thin one role.
-
----
-
-## Story 7.9 — Diagnostics & explainability hooks
-
-**Intent: Stage 13/15 require a stable diagnostics bundle and regression-friendly outputs.
-Stage 7 becomes the backbone for later creative complexity; we need visibility into decisions.
-
-**Acceptance criteria:**
-- Add opt-in diagnostics that can dump:
-  - energy arc template + constrained energies
-  - derived `SectionEnergyProfile`
-  - derived `SectionTensionProfile` + drivers
-  - `MicroTensionMap` summary
-  - `SectionVariationPlan`
-  - transition hints per boundary
-- Must be deterministic and must not affect generation.
-- Unchanged diagnostic scope:
-  - dump chosen `EnergyArc`
-  - dump derived `SectionVariationPlan`
-  - summarize realized densities + average velocities per role per section
-
----
-
-## Story 7.10 — Stage 8/9 integration contracts (future-proofing)
-
-** Intent: Plan introduces a unified intent query used everywhere.
-Ensure later stages can “ask” Stage 7 for arrangement support to convey emotion without rewriting Stage 7.
-
-**Acceptance criteria:**
-- Provide a single Stage 7 query surface (name flexible) that can return an immutable context object for downstream stages:
-  - energy target
-  - tension target
-  - tension drivers
-  - transition hint
-  - variation plan summary
-  - role presence/orchestration hints
-  - reserved register bands + density caps
-- Must have:
-  - `GetSectionIntent(sectionIndex)`
-  - `GetBarIntent(sectionIndex, barIndexWithinSection)`
-- Keep Stage 7 as the owner of macro intent; Stage 8 may extend with phrase maps / cross-role thinning.
-- Additional unchanged integration requirements; informational but still consistent):
-  - Motifs can query energy/tension targets, phrase positions (Peak/Cadence), register intent for lead space.
-  - Melody/lyrics can request arrangement ducking (reduce comp/pads density under vocal phrases) and shift pads/keys register away from vocal band.
-
----
-
-## Story 7.11 — Energy lever vector (planning-only metadata)
-
-**Intent: align Stage 7 with the research model that energy is multi-factor, without forcing a rewrite.
-
-**Acceptance criteria:**
-- Add a planning-only `EnergyLeverVector` (or similarly named) that tracks intended contributors:
-  - instrumentation density intent
-  - rhythmic activity intent
-  - register lift intent
-  - harmonic rhythm intent (future)
-  - dynamics intent (velocity bias)
-- Derived deterministically from `EnergyArc` + style + section type.
-- Used only as metadata/hints at this stage; renderers may ignore fields they do not support yet.
-
----
-
-## Story 7.12 — Harmonic rhythm intent hooks
-
-**Intent:** research indicates chord-change rate is an energy lever. Stage 11 will do harmonic narrative, but Stage 7 should reserve the hook.
-
-**Acceptance criteria:**
-- Add a small intent field at section-level:
-  - `HarmonicRhythmMultiplier` (e.g., 1.0 baseline, 1.2 for chorus)
-- Deterministic mapping from section type + energy target.
-- No behavior change required yet unless harmony engine already supports it.
-
----
-
-## Story 7.13 — Dominant pedal tension hook reservation 
-
-**Intent:** the research compilation highlights dominant pedal as a repeatable tension technique. Stage 11 will implement; Stage 7 should reserve the hook.
-
-**Acceptance criteria:**
-- Add a section-transition intent hint:
-  - `bool SuggestDominantPedalLeadIn`
-  - optional `int LeadInBars`
-- Deterministic mapping:
-  - enabled in build contexts (e.g., PreChorus → Chorus) when tension high enough
-  - style gated
-- No harmony rewriting required yet.
-
----
-
-## Implementation order (recommended)
-
-1. 7.5.2 macro tension + drivers + transition hint
-2. 7.5.3 micro tension
-3. 7.5.4 tension hooks (with new hook fields)
-4. 7.6 variation plan
-5. 7.7 micro energy arcs
-6. 7.8 constraint exposure + precedence contract
-7. 7.10 unified intent query surface
-8. 7.9 diagnostics consolidation
-9. 7.11–7.13 planning-only metadata hooks
-
----
-
-## Notes
-
-- This revision intentionally keeps Stage 7 “planner-level.”
-- Stage 8 is where phrase maps and cross-role thinning are expected to become concrete algorithms.
-- Stories 7.11–7.13 are designed to prevent later refactors by reserving deterministic hooks now.
-
----
-
-# Music Generator Plan (Stage 8+)
-
-This plan assumes **Stage 7 is complete** and focuses on what comes next to reach the goal: **human-like, creative, unique music generation** driven by inputs + one or more seeds, while preserving strict determinism where required.
-
-Design principles retained:
-- **Determinism-first:** given `(seed(s), inputs, song structure)` outputs are repeatable. Use randomness only as deterministic tie-break among valid options.
-- **Safety rails:** avoid muddiness, preserve lead space, protect groove anchors, clamp ranges.
-- **Separation of concerns:** planning produces intent + constraints; renderers realize them.
-- **Explainability:** every major planner can emit diagnostics without affecting generation.
-
----
-
+ 
 ## Stage 8 — Phrase map + arrangement interaction (make Stage 7 usable by future melody/motifs)
 
 **Why now:** Stage 7 introduced energy/tension intent. Stage 8 turns that intent into a *time grid of musical meaning* (phrases, peaks, cadences) and adds cross-role interaction rules, so later melody/motif decisions can be made safely.
