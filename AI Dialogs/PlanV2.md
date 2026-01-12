@@ -443,7 +443,7 @@ Story 7.4 is decomposed into focused sub-stories to ensure proper implementation
 
 ---
 
-#### Story 7.4.4 — Constraint diagnostics and explainability - NOT STARTED
+#### Story 7.4.4 — Constraint diagnostics and explainability - COMPLETED
 
 **Intent:** Make energy constraint decisions visible for debugging and tuning.
 
@@ -466,178 +466,54 @@ Section: Verse 2 (index=1)
   Final energy: 0.50
 ```
 
----
+**Implementation notes:**
+- Created `EnergyConstraintDiagnostics` in `Song\Energy\EnergyConstraintDiagnostics.cs` with multiple report formats:
+  - **`GenerateFullReport(arc, includeUnchangedSections)`**: Complete section-by-section analysis showing:
+    - Arc template name, groove, policy name and enabled status
+    - Active rules with their strengths
+    - For each section: template energy, final energy, change amount/percentage, rules applied with diagnostics
+  - **`GenerateSummaryReport(arc)`**: High-level overview showing:
+    - Energy progression by section type (with monotonic validation)
+    - Energy peak location
+    - Count of sections with constraint adjustments
+  - **`GenerateCompactReport(arc)`**: One-line-per-section format suitable for logging:
+    - Shows template → final energy with visual marker (*) for adjusted sections
+  - **`CompareArcs(arc1, arc2, labels)`**: Side-by-side comparison of two arcs:
+    - Shows energy values and deltas for each section
+    - Useful for comparing different policies or templates
+  - **`GenerateEnergyChart(arc, height)`**: ASCII chart visualization:
+    - Visual bar chart showing energy flow across sections
+    - Section type labels on X-axis
+- Leverages existing `EnergyArc.GetConstraintDiagnostics(absoluteIndex)` method implemented in Story 7.4.2
+- All diagnostic methods are static and do not modify arc state
+- Created comprehensive tests in `EnergyConstraintDiagnosticsTests`:
+  - `TestFullReportGeneration()`: Verifies full report contains all required information
+  - `TestSummaryReportGeneration()`: Verifies summary format and content
+  - `TestCompactReportGeneration()`: Verifies compact one-line-per-section format
+  - `TestArcComparison()`: Verifies side-by-side comparison works correctly
+  - `TestEnergyChartGeneration()`: Verifies ASCII chart rendering
+  - `TestDiagnosticsDoNotAffectGeneration()`: **Critical test** verifying diagnostics don't change energy values
+  - `TestDiagnosticsDeterminism()`: Verifies report output is deterministic for same inputs
+- All tests pass and verify determinism
+- Diagnostics are completely non-invasive and maintain determinism
 
-#### Story 7.4.5 — Integration testing and validation - NOT STARTED
+**Usage examples:**
+```csharp
+// Full detailed report
+var arc = EnergyArc.Create(sectionTrack, "PopGroove", seed: 42);
+string report = EnergyConstraintDiagnostics.GenerateFullReport(arc);
+Console.WriteLine(report);
 
-**Intent:** Ensure constraints produce musically sensible results across varied song structures.
+// Summary for quick overview
+string summary = EnergyConstraintDiagnostics.GenerateSummaryReport(arc);
+Console.WriteLine(summary);
 
-**Acceptance criteria:**
-- Create test suite with various song structures:
-  - Standard pop (Intro-V-C-V-C-Bridge-C-Outro)
-  - Rock anthem (V-V-C-V-C-Solo-C-C)
-  - Minimal structure (V-C-V-C)
-  - Unusual structure (Intro-C-V-Bridge-V-C-C)
-- Verify for each structure:
-  - Constraints produce valid energy values [0..1]
-  - Musical heuristics are honored (verse progression, chorus contrast, etc.)
-  - Final chorus is at or near peak
-  - Results are deterministic (same seed → same output)
-- Test with different style policies to ensure style-specific behavior
+// Compare policies
+var popArc = EnergyArc.Create(sectionTrack, "PopGroove", seed: 42);
+var jazzArc = EnergyArc.Create(sectionTrack, "JazzGroove", seed: 42);
+string comparison = EnergyConstraintDiagnostics.CompareArcs(popArc, jazzArc, "Pop", "Jazz");
+Console.WriteLine(comparison);
 
----
-
-### Story 7.5 — Tension planning hooks (macro vs micro) feeding later stages
-
-**Intent:** incorporate the tension/energy distinction so later stages can create anticipation and release.
-
-**Acceptance criteria:**
-- Add optional `TensionTarget` to `SectionEnergyProfile` (or a sibling `SectionTensionProfile`).
-- Provide two levels:
-  - **Macro-tension:** section transitions (pre-chorus builds, breakdowns, drop/chorus impacts)
-  - **Micro-tension:** within phrases (end-of-phrase kick dropout, small fills, impacts)
-- For now, Stage 7 should only:
-  - compute tension intent and expose hooks/parameters
-  - allow Stage 6 drums and existing roles to access it to bias small variations
-
-**Implementation-aligned examples:**
-- At phrase ends, increase probability of "pull" events (short fill, kick removal, accent) when `TensionTarget` is high.
-- At section transitions into high-energy sections, prefer orchestration "additions" and register lift.
-
----
-
-### Story 7.6 — Structured repetition engine (A / A' / B transforms)
-
-**Intent:** reuse section "core decisions" while making later repeats evolve in a controlled, musical way.
-
-**Acceptance criteria:**
-- Introduce a deterministic `SectionVariationPlan` per section instance:
-  - `BaseReferenceSectionIndex` (Verse 2 references Verse 1)
-  - per-role transform magnitudes, bounded
-- Transforms must be driven by:
-  - energy arc position (later repeats often slightly higher energy)
-  - phrase position (micro-arcs)
-- Examples of bounded transforms:
-  - Drums: slightly more hat openness / extra ghost candidates / higher fill probability near transitions.
-  - Bass: add occasional octave/approach notes at phrase peaks.
-  - Comp: add anticipations or an extra fragment hit on strong beats.
-  - Keys/Pads: small density increase (+1 note) or slight register lift.
-
----
-
-### Story 7.7 — Phrase-level shaping inside sections (energy micro-arcs)
-
-**Intent:** energy should modulate within a section (start → build → peak → cadence), not be flat for 8 bars.
-
-**Acceptance criteria:**
-- Compute a deterministic per-section phrase map:
-  - phrase length defaults (4 or 8 bars) derived from section length
-  - per-bar position type: `Start`, `Middle`, `Peak`, `Cadence`
-- Apply subtle per-bar modulation:
-  - velocity lift at `Peak`
-  - slight density thinning at `Cadence`
-  - optional orchestration accents at `Start`/`Peak`
-
----
-
-### Story 7.8 — Role interaction rules (prevent clutter; reserve melody/lead space)
-
-**Intent:** higher energy often means more parts; without explicit rules, arrangements become muddy.
-
-**Acceptance criteria:**
-- Add cross-role constraints:
-  - **Lead space reservation:** define a MIDI band reserved for future lead/vocal; non-lead roles avoid dense sustained notes there.
-  - **Low-end management:** prevent pads/keys/comp from occupying bass register.
-  - **Density budgets:** when multiple roles are busy on the same weak slots, deterministically thin one role.
-
----
-
-### Story 7.9 — Diagnostics & explainability hooks
-
-**Intent:** Stage 7 becomes the backbone for later creative complexity; we need visibility into decisions.
-
-**Acceptance criteria:**
-- Implement opt-in diagnostics:
-  - dump chosen `EnergyArc`
-  - dump derived `SectionEnergyProfile` per section
-  - dump `SectionVariationPlan`
-  - summarize realized densities + average velocities per role per section
-- Must remain deterministic and must not affect generation.
-
----
-
-### Story 7.10 — Stage 8/9 integration contracts (future-proofing)
-
-**Intent:** ensure later stages can "ask" Stage 7 for arrangement support to convey emotion without rewriting Stage 7.
-
-**Acceptance criteria:**
-- Motifs (Stage 8) can query:
-  - energy/tension targets
-  - phrase positions (Peak/Cadence)
-  - register intent for lead space
-- Melody/lyrics (Stage 9) can request:
-  - arrangement ducking (reduce comp/pads density under vocal phrases)
-  - shift pads/keys register away from vocal band
-- Add placeholders in data models (not full behaviors) if needed.
-
----
-
-## Stage 8 — Motifs / hooks as first-class objects (only after accompaniment behaves)
-
-**Why now:** once accompaniment is credible, motifs actually land.
-
-### Story 8.1 — Motif model + placement policy
-
-**Acceptance criteria:**
-- Add `Motif`:
-  - `Role` (lead OR riff role like guitar hook)
-  - `TargetSections`
-  - `RhythmShape` (derived from onset slots)
-  - `ContourIntent` (up/down/arch)
-  - `Constraints` (range, chord-tone bias)
-- Placement: chorus hook; intro riff optional depending on style.
-
-### Story 8.2 — Motif renderer with variation
-
-**Acceptance criteria:**
-- Render motif against:
-  - `OnsetGrid`
-  - harmony at `(bar, beat)`
-  - section energy profile
-- Repeat recognizably; variation is operator-driven (Stage 7), not note roulette.
-
----
-
-## Stage 9 — Melody + lyric integration (optional major milestone after accompaniment)
-
-**Why now:** you already have syllable/phonetic infrastructure; melody requires rhythmic windows.
-
-### Story 9.1 — Syllable timing windows → onset slot mapping
-
-**Acceptance criteria:**
-- Convert syllable count/stress into a set of candidate onset slots per phrase.
-- Support "stretch" (melisma) only if there's space.
-
-### Story 9.2 — Melody generator MVP
-
-**Acceptance criteria:**
-- Strong beats: chord tones
-- Weak beats: controlled passing tones (policy gated)
-- Range driven by voice profile
-
-### Story 9.3 — Arrangement collision avoidance
-
-**Acceptance criteria:**
-- When melody exists:
-  - comp simplifies / drops density under vocal phrases
-  - pads move away in register
-  - bass avoids too much rhythmic density under dense lyric phrases
-
----
-
-## Bottom line
-
-- **Yes:** keep improving `Generator` incrementally.
-- **No:** don't build "hooks/riffs system" first; it will be premature and you'll rewrite it.
-- Use sections now to drive identity and variation; otherwise you're just generating a loop.
-- "Surprise" should come from structured transforms and section contrast, with RNG only as a tie-breaker among valid options.
+// Visual chart
+string chart = EnergyConstraintDiagnostics.GenerateEnergyChart(arc);
+Console.WriteLine(chart);
