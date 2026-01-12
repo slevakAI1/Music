@@ -59,7 +59,6 @@
     <None Remove="AI Dialogs\DrumFillStyleResearch.md" />
     <None Remove="AI Dialogs\HarmonyPolicy.md" />
     <None Remove="AI Dialogs\MeasureTrackerPlan.md" />
-    <None Remove="AI Dialogs\Plan.md" />
     <None Remove="AI Dialogs\PlanV1.md" />
     <None Remove="AI Dialogs\Story6.3-Implementation-Summary.md" />
   </ItemGroup>
