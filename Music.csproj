@@ -13,14 +13,20 @@
     <Compile Remove="Archives\MusicXml\**" />
     <Compile Remove="Files\OutputSamples\**" />
     <Compile Remove="Future Ideas\**" />
+    <Compile Remove="Patches\**" />
+    <Compile Remove="Tests\**" />
     <EmbeddedResource Remove="Archives\Arranger\**" />
     <EmbeddedResource Remove="Archives\MusicXml\**" />
     <EmbeddedResource Remove="Files\OutputSamples\**" />
     <EmbeddedResource Remove="Future Ideas\**" />
+    <EmbeddedResource Remove="Patches\**" />
+    <EmbeddedResource Remove="Tests\**" />
     <None Remove="Archives\Arranger\**" />
     <None Remove="Archives\MusicXml\**" />
     <None Remove="Files\OutputSamples\**" />
     <None Remove="Future Ideas\**" />
+    <None Remove="Patches\**" />
+    <None Remove="Tests\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -91,8 +97,6 @@
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
     <Folder Include="Future Ideas\DraftLyrics\" />
-    <Folder Include="Patches\" />
-    <Folder Include="Tests\" />
   </ItemGroup>
 
   <ItemGroup>
