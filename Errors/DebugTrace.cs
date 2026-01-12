@@ -1,10 +1,31 @@
+using System;
+using System.IO;
+
 namespace Music
 {
     /// <summary>
     /// Simple debug trace helper that appends text to a file under the project "Errors" folder.
     /// </summary>
-    public static class DebugTrace
+    public static class Tracer
     {
+        /// <summary>
+        /// Convenience helper that writes to the default debug trace file "DebugTrace.txt".
+        /// </summary>
+        /// <param name="text">The text to append.</param>
+        public static void DebugTrace(string text)
+        {
+            Write("DebugTrace.txt", text);
+        }
+
+        /// <summary>
+        /// Convenience helper that writes out-of-key warnings to "OutOfKeyWarnings.txt".
+        /// </summary>
+        /// <param name="text">The text to append.</param>
+        public static void OutOfKeyWarnings(string text)
+        {
+            Write("OutOfKeyWarnings.txt", text);
+        }
+
         /// <summary>
         /// Appends the provided text to the named file under the project "Errors" folder.
         /// If <paramref name="filename"/> is null or empty, "DebugTrace.txt" is used.
@@ -13,12 +34,8 @@ namespace Music
         /// <param name="text">The text to append.</param>
         public static void Write(string filename, string text)
         {
+            ArgumentNullException.ThrowIfNull(filename);
             ArgumentNullException.ThrowIfNull(text);
-
-            if (string.IsNullOrWhiteSpace(filename))
-            {
-                filename = "DebugTrace.txt";
-            }
 
             // Build path relative to project root: /Errors/{filename}
             string relativePath = Path.Combine("Errors", filename);
