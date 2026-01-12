@@ -728,7 +728,7 @@ Make tension meaningful beyond drums while keeping implementation minimal and sa
 - Apply tension hooks in at least one of:
   - comp/keys/pads: small velocity bias (accent bias) at phrase peaks/ends
   - bass: pickup/approach bias only on valid slots and only when energy allows
-- Additional valid constraint (merged from original):
+- Additional valid constraint
   - bass pickup/approach probability increases *only when groove has a valid slot* (policy-gated)
 - Ensure lead-space and register guardrails always win.
 - No changes that break existing role guardrails (register limits, lead-space ceiling, density caps).
@@ -769,7 +769,7 @@ Ensure future Stage 8 motif placement and Stage 9 melody/lyrics can request tens
     - tension drivers
     - section transition hint (`Build/Release/Sustain/Drop`)
 - Ensure implementations remain immutable and thread-safe.
-- Ensure the API can support (informational, merged from original because still consistent):
+- Ensure the API can support :
   - motif placement decisions (prefer high-energy + low tension release moments, or use high tension for anticipatory motifs)
   - lyric-driven ducking later (when vocals present, reduce accompaniment density especially when tension is low and release is desired)
 
@@ -861,14 +861,14 @@ Stage 7 becomes the backbone for later creative complexity; we need visibility i
   - `SectionVariationPlan`
   - transition hints per boundary
 - Must be deterministic and must not affect generation.
-- Unchanged diagnostic scope (merged from original; additive):
+- Unchanged diagnostic scope:
   - dump chosen `EnergyArc`
   - dump derived `SectionVariationPlan`
   - summarize realized densities + average velocities per role per section
 
 ---
 
-## Story 7.10 — Stage 8/9 integration contracts (future-proofing) (UPDATED)
+## Story 7.10 — Stage 8/9 integration contracts (future-proofing)
 
 ** Intent: Plan introduces a unified intent query used everywhere.
 Ensure later stages can “ask” Stage 7 for arrangement support to convey emotion without rewriting Stage 7.
@@ -886,7 +886,7 @@ Ensure later stages can “ask” Stage 7 for arrangement support to convey emot
   - `GetSectionIntent(sectionIndex)`
   - `GetBarIntent(sectionIndex, barIndexWithinSection)`
 - Keep Stage 7 as the owner of macro intent; Stage 8 may extend with phrase maps / cross-role thinning.
-- Additional unchanged integration requirements (merged from original; informational but still consistent):
+- Additional unchanged integration requirements; informational but still consistent):
   - Motifs can query energy/tension targets, phrase positions (Peak/Cadence), register intent for lead space.
   - Melody/lyrics can request arrangement ducking (reduce comp/pads density under vocal phrases) and shift pads/keys register away from vocal band.
 
