@@ -616,7 +616,7 @@ Guiding constraints (carry-over from Stage 7):
 
 ---
 
-### Story 7.5.2 — Compute section-level macro tension targets (deterministic) (NOT STARTED)
+### Story 7.5.2 — Compute section-level macro tension targets (deterministic)  (Completed)
 
 **intent:** ensure macro tension reflects *anticipation/release* distinct from energy and yields a stable “transition hint” used 
 in Stages 8–16. produce a musically plausible section-level tension plan that is distinct from energy so later stages can create 
@@ -647,8 +647,8 @@ anticipation/release.
   - driver flag coverage
 
 ---
-
-### Story 7.5.3 — Derive micro tension map per section 
+ 
+### Story 7.5.3 — Derive micro tension map per section (NOT STARTED)
 
 **intent:Stage 8/10 require phrase-aware bar-level hooks. Stage 7 should supply a default bar-level map even before Stage 8 phrase mapping exists. 
 provide within-section tension shaping so renderers can bias micro-events (fills, dropouts, impacts) at phrase boundaries and peaks.
