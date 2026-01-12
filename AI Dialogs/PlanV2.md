@@ -518,7 +518,7 @@ Console.WriteLine(comparison);
 string chart = EnergyConstraintDiagnostics.GenerateEnergyChart(arc);
 Console.WriteLine(chart);
 
-#### Story 7.4.5 — Integration testing and validation - NOT STARTED
+#### Story 7.4.5 — Integration testing and validation - COMPLETED
 
 **Intent:** Ensure constraints produce musically sensible results across varied song structures.
 
@@ -537,22 +537,190 @@ Console.WriteLine(chart);
 
 ---
 
-### Story 7.5 — Tension planning hooks (macro vs micro) feeding later stages
+# Story 7.5 : Tension planning hooks (macro vs micro)
 
-**Intent:** incorporate the tension/energy distinction so later stages can create anticipation and release.
+Introduce a **tension** concept distinct from energy, computed deterministically at the section/phrase level, and exposed via stable “hooks” that later stages (Stage 8 motifs, Stage 9 melody/lyrics, and future arranging passes) can query.
+
+Guiding constraints (carry-over from Stage 7):
+- **Deterministic:** same `(seed, song form/sections, groove/style)` => same targets and decisions.
+- **Separation of concerns:** Stage 7 computes intent; renderers consume it.
+- **Non-invasive:** tension hooks bias existing systems; they don’t require rewriting role logic.
+- **Future-proof:** Stage 8/9 must be able to query tension/phrase positions to drive motifs/melody and arrangement ducking.
+
+---
+
+## Story 7.5.1 — Define the tension model and public contracts - COMPLETED
+
+**Intent:** Introduce a strongly-typed tension representation that later systems can query without knowing how it was computed.
 
 **Acceptance criteria:**
-- Add optional `TensionTarget` to `SectionEnergyProfile` (or a sibling `SectionTensionProfile`).
-- Provide two levels:
-  - **Macro-tension:** section transitions (pre-chorus builds, breakdowns, drop/chorus impacts)
-  - **Micro-tension:** within phrases (end-of-phrase kick dropout, small fills, impacts)
-- For now, Stage 7 should only:
-  - compute tension intent and expose hooks/parameters
-  - allow Stage 6 drums and existing roles to access it to bias small variations
+- Add a new model (pick one approach and standardize):
+  - **Option A (simpler):** add `double TensionTarget` to `SectionEnergyProfile.Global`.
+  - **Option B (more explicit):** create `SectionTensionProfile` and reference it from `SectionEnergyProfile` (or from `SongSectionContext`).
+- The model must support:
+  - `double MacroTension` in `[0..1]` (section-level intent)
+  - `double MicroTension` in `[0..1]` as a **default bias** (phrase/bar-level intent can override)
+- Add a small enum describing *why* tension exists to support later explainability and policy tuning:
+  - `TensionDriver` (flags or enum): e.g., `PreChorusBuild`, `Breakdown`, `Drop`, `Cadence`, `BridgeContrast`, `None`
+- Add a stable query API that renderers can call without needing planner internals:
+  - `GetMacroTension(sectionIndex)`
+  - `GetMicroTension(sectionIndex, barIndexWithinSection)` (or phrase position)
+- Ensure models are immutable (prefer `record` / `record struct`) and live in the existing energy/tension namespace conventions.
 
-**Implementation-aligned examples:**
-- At phrase ends, increase probability of "pull" events (short fill, kick removal, accent) when `TensionTarget` is high.
-- At section transitions into high-energy sections, prefer orchestration "additions" and register lift.
+**Implementation notes:**
+- Chose **Option B**: Created explicit `SectionTensionProfile` for clear separation between energy and tension concepts
+- Created 5 core model files in `Song\Energy\`:
+  - `TensionDriver.cs` - Flags enum with 9 tension driver types
+  - `SectionTensionProfile.cs` - Section-level tension model with factory methods and clamping
+  - `MicroTensionMap.cs` - Per-bar tension map with phrase position flags
+  - `ITensionQuery.cs` - Query interface and `TensionContext` helper record
+  - `NeutralTensionQuery.cs` - Default implementation returning zero tension (placeholder for Story 7.5.2)
+- Created comprehensive test file `TensionModelTests.cs` with 64 test methods - all pass ✓
+- All models are immutable records
+- All tension values automatically clamped to [0..1]
+- Query API is deterministic and thread-safe
+- See `AI Dialogs\Story_7_5_1_Implementation_Summary.md` for full details
+
+---
+
+## Story 7.5.2 — Compute section-level macro tension targets (deterministic)
+
+**Intent:** Produce a musically plausible section-level tension plan that is distinct from energy so later stages can create anticipation/release.
+
+**Acceptance criteria:**
+- Implement deterministic macro-tension computation per section using only known inputs:
+  - `SectionType`, `SectionIndex`, song structure neighborhood (prev/next sections), groove/style identity, and existing `EnergyArc` target.
+- Macro-tension should not be a trivial copy of energy.
+- MVP heuristics (deterministic, style-tunable later):
+  - `PreChorus` tends to higher tension than preceding `Verse`.
+  - `Chorus` can have high energy but **tension may drop** (release) compared to `PreChorus`.
+  - `Bridge` tends to elevated or contrasting tension.
+  - `Outro` tends to decreasing tension.
+  - If a section is directly before a higher-energy section, allow higher tension (anticipation).
+- Clamp `[0..1]` and preserve determinism.
+- Add unit tests verifying:
+  - determinism
+  - valid range
+  - at least one non-trivial shape across a common pop form (Intro-V-PreC-C-V-PreC-C-Bridge-C-Outro)
+
+---
+
+## Story 7.5.3 — Derive phrase-/bar-level micro tension map for each section
+
+**Intent:** Provide within-section tension shaping so renderers can bias micro-events (fills, dropouts, impacts) at phrase boundaries and peaks.
+
+**Acceptance criteria:**
+- Define a deterministic within-section map keyed by bar index (or by phrase position derived from Story 7.7).
+- MVP shape rules:
+  - rising micro tension toward the end of each phrase
+  - “cadence window” at phrase end (last bar or last N beats) flagged for pull/impact decisions
+  - optional “peak window” near the phrase peak (if section length supports it)
+- Micro tension is derived from:
+  - macro tension
+  - phrase position class (`Start`, `Middle`, `Peak`, `Cadence`) when available (Stage 7.7), otherwise infer a simple 4-bar phrase segmentation
+- Output: per-section `MicroTensionMap` (e.g., `IReadOnlyList<double>` per bar) plus optional flags:
+  - `IsPhraseEnd`
+  - `IsSectionEnd`
+  - `IsSectionStart`
+- Add unit tests verifying:
+  - correct length for sections
+  - determinism by seed
+  - monotonic rise into phrase ends for basic phrase lengths (where applicable)
+
+---
+
+## Story 7.5.4 — Expose “tension hooks” as actionable, role-safe knobs
+
+**Intent:** Translate tension targets into bounded parameters that existing role generators (especially Stage 6 drums) can consume without new complex model dependencies.
+
+**Acceptance criteria:**
+- Add a small `TensionHooks` (or similar) object accessible to role renderers for a given `(section, bar)`:
+  - `double PullProbabilityBias` (increase chance of dropouts/mini-fills near phrase ends)
+  - `double ImpactProbabilityBias` (increase chance of crash/impact at section starts when tension resolves)
+  - `int VelocityAccentBias` (bounded, small)
+  - `double DensityThinningBias` (optional; supports “breakdown” tension without raising energy)
+- Hooks must be derived deterministically from macro+micro tension and clamped to safe ranges.
+- Hooks must be **style-safe** defaults:
+  - never exceed existing drum density caps
+  - never force kick removal; only bias optional events
+
+---
+
+## Story 7.5.5 — Wire tension hooks into Stage 6 drum variation (minimal, audible)
+
+**Intent:** Prove the tension framework affects audible output in a controlled way without destabilizing the groove.
+
+**Acceptance criteria:**
+- Use tension hooks to bias at least two existing drum behaviors (deterministically):
+  1. **Phrase-end pull events:** increase probability of a small fill, flam, or hat change (style-gated) when micro tension is high.
+  2. **Phrase-end dropout option:** allow a kick dropout or hat simplification on the last 1–2 subdivisions of a phrase when tension is high and energy is not maximal.
+- Guarantee groove protection:
+  - downbeats/backbeats remain protected unless already optional in the preset
+  - no event moves outside bar boundaries
+- Add tests that validate:
+  - determinism of event selection with identical inputs
+  - that tension biases increase the rate of eligible fill/dropout events vs. same scenario with tension forced to 0
+
+---
+
+## Story 7.5.6 — Wire tension hooks into non-drum roles (strictly optional, small)
+
+**Intent:** Make tension meaningful beyond drums while keeping implementation minimal and safe.
+
+**Acceptance criteria:**
+- Apply tension hooks in at least one non-drum role in a bounded way:
+  - **Comp/Keys/Pads:** small velocity accent bias at phrase peaks/ends.
+  - **Bass:** optional pickup/approach probability increases *only when groove has a valid slot* (policy-gated). 
+- No changes that break existing role guardrails (register limits, lead-space ceiling, density caps).
+- Determinism preserved.
+
+---
+
+## Story 7.5.7 — Diagnostics and explainability for tension targets
+
+**Intent:** Make tension decisions debuggable and tunable, aligned with Story 7.9 direction.
+
+**Acceptance criteria:**
+- Add an opt-in diagnostic report similar to energy diagnostics:
+  - section macro tension values
+  - per-section micro tension summary (min/max/avg)
+  - key flags (phrase ends, section-end)
+  - which heuristics/drivers contributed (via `TensionDriver`)
+- Diagnostics must:
+  - not affect generation
+  - be deterministic
+- Add a unit test verifying diagnostics do not change generated tension values.
+
+---
+
+## Story 7.5.8 — Stage 8/9 integration contract: tension queries for motifs and lyrics
+
+**Intent:** Ensure future Stage 8 motif placement and Stage 9 melody/lyrics can request tension-aware arrangement behavior without refactoring Stage 7 again.
+
+**Acceptance criteria:**
+- Define a minimal, stable API for later stages to query:
+  - `GetTensionContext(sectionIndex, barIndexWithinSection)` returning:
+    - macro tension
+    - micro tension
+    - phrase position (`Start/Middle/Peak/Cadence`) when available
+    - section transition hint (`Build`, `Release`, `Sustain`, `Drop`)
+- Ensure it can support:
+  - motif placement decisions (prefer high-energy + low tension release moments, or use high tension for anticipatory motifs)
+  - lyric-driven ducking later (when vocals present, reduce accompaniment density especially when tension is low and release is desired)
+- No behavioral changes required yet beyond exposing the contract.
+
+---
+
+## Suggested implementation order
+
+1. Story 7.5.1 (contracts)
+2. Story 7.5.2 (macro tension)
+3. Story 7.5.3 (micro tension map)
+4. Story 7.5.4 (hooks)
+5. Story 7.5.5 (drums integration)
+6. Story 7.5.6 (optional non-drums)
+7. Story 7.5.7 (diagnostics)
+8. Story 7.5.8 (Stage 8/9 query contract)
 
 ---
 
