@@ -748,7 +748,7 @@ translate tension targets into bounded parameters that existing role generators 
 
 ---
 
-### Story 7.5.6 — Wire tension hooks into non-drum roles
+### Story 7.5.6 — Wire tension hooks into non-drum roles (COMPLETED)
 
 **intent :Stage 12 performance rendering and Stage 10 melody ducking benefit from early, strictly-bounded integration.
 Make tension meaningful beyond drums while keeping implementation minimal and safe.
@@ -765,6 +765,18 @@ Make tension meaningful beyond drums while keeping implementation minimal and sa
 - Tests:
   - determinism
   - guardrails preserved
+
+**Implementation notes:**
+- Updated `GuitarTrackGenerator`, `KeysTrackGenerator`, `BassTrackGenerator` to accept tension query parameters
+- Applied `VelocityAccentBias` to comp and keys velocity calculations (additive to energy bias, clamped 1-127)
+- Applied `PullProbabilityBias` to bass approach note probability (additive to busy probability, clamped 0-1)
+- Updated `Generator.cs` to pass tension query and ramp intensity to all role generators
+- Created integration tests verifying:
+  - Comp: velocity increase at phrase ends, guardrails enforced, determinism
+  - Keys: velocity increase at phrase ends, guardrails enforced, determinism
+  - Bass: approach probability increase, policy gate respected, determinism, bounded output
+- All tests pass and build successful
+- See `AI Dialogs\Story_7_5_6_Implementation_Summary.md` for full details
 
 ---
 

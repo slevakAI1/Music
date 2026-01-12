@@ -1,6 +1,7 @@
 // AI: purpose=Generate bass track using BassPatternLibrary for pattern selection and BassChordChangeDetector for approach notes.
 // AI: keep MIDI program number 33; patterns replace randomizer for more structured bass lines (Story 5.1 + 5.2); returns sorted by AbsoluteTimeTicks.
 // AI: Story 7.3=Now accepts section profiles and applies energy controls (density, velocity, busy) with bass range guardrails.
+// AI: Story 7.5.6=Now accepts tension query; applies tension PullProbabilityBias to approach note insertion (only when groove slot allows).
 
 using Music.MyMidi;
 
@@ -11,6 +12,7 @@ namespace Music.Generator
         /// <summary>
         /// Generates bass track: pattern-based bass lines with optional approach notes to chord changes.
         /// Updated for Story 7.3: energy profile integration with guardrails.
+        /// Updated for Story 7.5.6: tension hooks for pickup/approach bias (slot-gated).
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
@@ -18,11 +20,15 @@ namespace Music.Generator
             BarTrack barTrack,
             SectionTrack sectionTrack,
             Dictionary<int, EnergySectionProfile> sectionProfiles,
+            ITensionQuery tensionQuery,
+            double microTensionPhraseRampIntensity,
             int totalBars,
             RandomizationSettings settings,
             HarmonyPolicy policy,
             int midiProgramNumber)
         {
+            ArgumentNullException.ThrowIfNull(tensionQuery);
+
             var notes = new List<PartTrackEvent>();
             const int bassOctave = 2;
 
@@ -39,9 +45,13 @@ namespace Music.Generator
                 // Get section and energy profile
                 MusicConstants.eSectionType sectionType = MusicConstants.eSectionType.Verse;
                 Section? section = null;
+                int absoluteSectionIndex = 0;
                 if (sectionTrack.GetActiveSection(bar, out section) && section != null)
                 {
                     sectionType = section.SectionType;
+                    absoluteSectionIndex = sectionTrack.Sections.IndexOf(section);
+                    if (absoluteSectionIndex < 0)
+                        absoluteSectionIndex = 0;
                 }
 
                 // Story 7.3: Get energy profile for this section
@@ -61,8 +71,21 @@ namespace Music.Generator
                 // Get bass energy controls
                 var bassProfile = energyProfile?.Roles?.Bass;
 
+                // Story 7.5.6: Derive tension hooks for this bar to bias approach note probability
+                int barIndexWithinSection = section != null ? (bar - section.StartBar) : 0;
+                var hooks = TensionHooksBuilder.Create(
+                    tensionQuery,
+                    absoluteSectionIndex,
+                    barIndexWithinSection,
+                    energyProfile,
+                    microTensionPhraseRampIntensity);
+
                 // Story 7.3: Apply busy probability to approach note decisions
-                double effectiveBusyProbability = bassProfile?.BusyProbability ?? 0.5;
+                // Story 7.5.6: Further biased by tension PullProbabilityBias (phrase-end anticipation)
+                double baseBusyProbability = bassProfile?.BusyProbability ?? 0.5;
+                double effectiveBusyProbability = ApplyTensionBiasToApproachProbability(
+                    baseBusyProbability,
+                    hooks.PullProbabilityBias);
 
                 // Select bass pattern for this bar using BassPatternLibrary
                 var bassPattern = BassPatternLibrary.SelectPattern(
@@ -212,6 +235,20 @@ namespace Music.Generator
         {
             int velocity = baseVelocity + velocityBias;
             return Math.Clamp(velocity, 1, 127);
+        }
+
+        /// <summary>
+        /// Applies tension pull probability bias to approach note insertion.
+        /// Story 7.5.6: Tension hooks increase pickup/approach probability at phrase peaks/ends.
+        /// CRITICAL: Bias only affects probability; never forces approach when slot invalid.
+        /// </summary>
+        private static double ApplyTensionBiasToApproachProbability(
+            double baseProbability,
+            double tensionPullBias)
+        {
+            // tensionPullBias is in range [-0.20, 0.20] per TensionHooksBuilder
+            double adjusted = baseProbability + tensionPullBias;
+            return Math.Clamp(adjusted, 0.0, 1.0);
         }
     }
 }

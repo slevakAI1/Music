@@ -1,6 +1,7 @@
 // AI: purpose=Generate keys/pads track using VoiceLeadingSelector and SectionProfile for dynamic voicing per section.
 // AI: keep program number 4; tracks previous ChordRealization for voice-leading continuity; returns sorted by AbsoluteTimeTicks.
 // AI: Story 7.3=Now accepts section profiles and applies energy controls (density, velocity, register) with lead-space ceiling guardrail.
+// AI: Story 7.5.6=Now accepts tension query and applies tension hooks for phrase-peak/end accent bias (velocity only).
 
 using Music.MyMidi;
 using System.Diagnostics;
@@ -12,6 +13,7 @@ namespace Music.Generator
         /// <summary>
         /// Generates keys/pads track: voice-led chord voicings with optional color tones per section profile.
         /// Updated for Story 7.3: energy profile integration with guardrails.
+        /// Updated for Story 7.5.6: tension hooks for accent bias at phrase peaks/ends.
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
@@ -19,11 +21,15 @@ namespace Music.Generator
             BarTrack barTrack,
             SectionTrack sectionTrack,
             Dictionary<int, EnergySectionProfile> sectionProfiles,
+            ITensionQuery tensionQuery,
+            double microTensionPhraseRampIntensity,
             int totalBars,
             RandomizationSettings settings,
             HarmonyPolicy policy,
             int midiProgramNumber)
         {
+            ArgumentNullException.ThrowIfNull(tensionQuery);
+
             var notes = new List<PartTrackEvent>();
             var randomizer = new PitchRandomizer(settings);
             const int keysOctave = 3;
@@ -43,8 +49,12 @@ namespace Music.Generator
 
                 // Get section and energy profile
                 Section? section = null;
+                int absoluteSectionIndex = 0;
                 if (sectionTrack.GetActiveSection(bar, out section) && section != null)
                 {
+                    absoluteSectionIndex = sectionTrack.Sections.IndexOf(section);
+                    if (absoluteSectionIndex < 0)
+                        absoluteSectionIndex = 0;
                 }
 
                 // Story 7.3: Get energy profile for this section
@@ -63,6 +73,15 @@ namespace Music.Generator
 
                 // Get keys energy controls
                 var keysProfile = energyProfile?.Roles?.Keys;
+
+                // Story 7.5.6: Derive tension hooks for this bar to bias accent velocity
+                int barIndexWithinSection = section != null ? (bar - section.StartBar) : 0;
+                var hooks = TensionHooksBuilder.Create(
+                    tensionQuery,
+                    absoluteSectionIndex,
+                    barIndexWithinSection,
+                    energyProfile,
+                    microTensionPhraseRampIntensity);
 
                 // Story 7.3: Update section profile with energy adjustments
                 SectionProfile? sectionProfile = UpdateSectionProfileWithEnergy(
@@ -149,6 +168,9 @@ namespace Music.Generator
                     // Story 7.3: Calculate velocity with energy bias
                     int baseVelocity = 75;
                     int velocity = ApplyVelocityBias(baseVelocity, keysProfile?.VelocityBias ?? 0);
+
+                    // Story 7.5.6: Apply tension accent bias for phrase peaks/ends (additive to energy bias)
+                    velocity = ApplyTensionAccentBias(velocity, hooks.VelocityAccentBias);
 
                     foreach (int midiNote in chordRealization.MidiNotes)
                     {
@@ -257,6 +279,16 @@ namespace Music.Generator
         private static int ApplyVelocityBias(int baseVelocity, int velocityBias)
         {
             int velocity = baseVelocity + velocityBias;
+            return Math.Clamp(velocity, 1, 127);
+        }
+
+        /// <summary>
+        /// Applies tension accent bias to velocity.
+        /// Story 7.5.6: Tension hooks provide phrase-peak/end accent bias (additive to energy bias).
+        /// </summary>
+        private static int ApplyTensionAccentBias(int velocity, int tensionAccentBias)
+        {
+            velocity += tensionAccentBias;
             return Math.Clamp(velocity, 1, 127);
         }
     }
