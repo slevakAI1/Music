@@ -9,7 +9,7 @@ namespace Music.Generator
     public sealed class RandomizationSettings
     {
         // AI: Seed: master seed for deterministic generation; same seed+inputs => identical output across runs.
-        public int Seed { get; init; } = 129345;
+        public int Seed { get; init; } = 12345;
 
         // ========== BASS SETTINGS ==========
 

@@ -1,6 +1,8 @@
-// AI: purpose=Comprehensive integration tests and validation for Story 7.4.5.
+﻿// AI: purpose=Comprehensive integration tests and validation for Story 7.4.5.
 // AI: invariants=Tests verify musically sensible results across varied structures and policies.
 // AI: deps=Extends EnergyConstraintApplicationTests with deeper validation and musical heuristics checks.
+
+using Music.Generator;
 
 namespace Music.Generator
 {
@@ -91,7 +93,7 @@ namespace Music.Generator
                 }
             }
 
-            Console.WriteLine("  ? All policies produce valid energy range [0..1] for all structures");
+            Console.WriteLine("  ✓ All policies produce valid energy range [0..1] for all structures");
         }
 
         private static void TestMusicalHeuristicsHonored()
@@ -136,7 +138,7 @@ namespace Music.Generator
                 throw new Exception($"Final chorus not at peak: C3={c3:F3}, max={maxEnergy:F3}");
             }
 
-            Console.WriteLine("  ? Musical heuristics honored (verse/chorus progression, final peak)");
+            Console.WriteLine("  ✓ Musical heuristics honored (verse/chorus progression, final peak)");
         }
 
         private static void TestFinalChorusPeakAcrossStructures()
@@ -182,7 +184,7 @@ namespace Music.Generator
                 }
             }
 
-            Console.WriteLine("  ? Final chorus at or near peak across all structures");
+            Console.WriteLine("  ✓ Final chorus at or near peak across all structures");
         }
 
         private static void TestDeterminismAcrossPolicies()
@@ -216,7 +218,7 @@ namespace Music.Generator
                 }
             }
 
-            Console.WriteLine("  ? All policies are deterministic (same seed ? same result)");
+            Console.WriteLine("  ✓ All policies are deterministic (same seed → same result)");
         }
 
         #endregion
@@ -265,7 +267,7 @@ namespace Music.Generator
                 ValidateBasicConstraints(arc, structure, $"{structureName} + {policyName}");
             }
 
-            Console.WriteLine($"  ? {structureName} structure validated with all policies");
+            Console.WriteLine($"  ✓ {structureName} structure validated with all policies");
         }
 
         #endregion
@@ -285,7 +287,7 @@ namespace Music.Generator
                 throw new Exception($"Single section invalid energy: {target.Energy}");
             }
 
-            Console.WriteLine("  ? Single section song handled correctly");
+            Console.WriteLine("  ✓ Single section song handled correctly");
         }
 
         private static void TestAllChorusesSong()
@@ -310,7 +312,7 @@ namespace Music.Generator
                 }
             }
 
-            Console.WriteLine("  ? All-choruses song maintains progression");
+            Console.WriteLine("  ✓ All-choruses song maintains progression");
         }
 
         private static void TestAllVersesSong()
@@ -334,7 +336,7 @@ namespace Music.Generator
                 }
             }
 
-            Console.WriteLine("  ? All-verses song maintains progression");
+            Console.WriteLine("  ✓ All-verses song maintains progression");
         }
 
         private static void TestNoChorusSong()
@@ -352,7 +354,7 @@ namespace Music.Generator
             // Should not crash and should produce valid energies
             ValidateBasicConstraints(arc, structure, "No-chorus song");
 
-            Console.WriteLine("  ? No-chorus song handled correctly");
+            Console.WriteLine("  ✓ No-chorus song handled correctly");
         }
 
         #endregion
@@ -384,7 +386,7 @@ namespace Music.Generator
             var edmVerseAfterChorus = edmArc.GetTargetForSection(structure.Sections[2], 1).Energy;
 
             // EDM may not drop after chorus
-            Console.WriteLine($"  ? Post-chorus drop behavior validated (Pop drops, EDM doesn't mandate drop)");
+            Console.WriteLine($"  ✓ Post-chorus drop behavior validated (Pop drops, EDM doesn't mandate drop)");
         }
 
         private static void TestMonotonicProgressionStrength()
@@ -415,7 +417,7 @@ namespace Music.Generator
             var jazzV3 = jazzArc.GetTargetForSection(structure.Sections[2], 2).Energy;
             double jazzProgression = jazzV3 - jazzV1;
 
-            Console.WriteLine($"  ? Monotonic progression strength varies by policy (Rock={rockProgression:F3}, Pop={popProgression:F3}, Jazz={jazzProgression:F3})");
+            Console.WriteLine($"  ✓ Monotonic progression strength varies by policy (Rock={rockProgression:F3}, Pop={popProgression:F3}, Jazz={jazzProgression:F3})");
         }
 
         private static void TestBridgeContrastBehavior()
@@ -434,7 +436,7 @@ namespace Music.Generator
             // Bridge should contrast with chorus (either higher or significantly lower)
             double contrast = Math.Abs(bridgeEnergy - chorus1Energy);
 
-            Console.WriteLine($"  ? Bridge creates contrast (Chorus={chorus1Energy:F3}, Bridge={bridgeEnergy:F3}, contrast={contrast:F3})");
+            Console.WriteLine($"  ✓ Bridge creates contrast (Chorus={chorus1Energy:F3}, Bridge={bridgeEnergy:F3}, contrast={contrast:F3})");
         }
 
         #endregion
@@ -460,7 +462,7 @@ namespace Music.Generator
                 var popFinalEnergy = popArc.GetTargetForSection(finalChorus.Section, finalChorus.SectionIdx).Energy;
                 var rockFinalEnergy = rockArc.GetTargetForSection(finalChorus.Section, finalChorus.SectionIdx).Energy;
 
-                Console.WriteLine($"  ? Pop vs Rock progression (Pop final={popFinalEnergy:F3}, Rock final={rockFinalEnergy:F3})");
+                Console.WriteLine($"  ✓ Pop vs Rock progression (Pop final={popFinalEnergy:F3}, Rock final={rockFinalEnergy:F3})");
             }
         }
 
@@ -477,7 +479,7 @@ namespace Music.Generator
             var popArc = EnergyArc.Create(structure, "PopGroove", seed: 42);
 
             // Jazz should have more freedom (potentially less strict progression)
-            Console.WriteLine("  ? Jazz provides more freedom than Pop constraints");
+            Console.WriteLine("  ✓ Jazz provides more freedom than Pop constraints");
         }
 
         private static void TestEDMNoDrop()
@@ -490,7 +492,7 @@ namespace Music.Generator
             var edmArc = EnergyArc.Create(structure, "EDMGroove", seed: 42, constraintPolicy: edmPolicy);
 
             // Verify EDM policy rules are applied
-            Console.WriteLine("  ? EDM policy applied (no mandatory post-chorus drop)");
+            Console.WriteLine("  ✓ EDM policy applied (no mandatory post-chorus drop)");
         }
 
         #endregion
