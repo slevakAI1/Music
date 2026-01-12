@@ -703,7 +703,7 @@ provide within-section tension shaping so renderers can bias micro-events (fills
 
 ---
 
-### Story 7.5.4 — Tension hooks derived from macro+micro 
+### Story 7.5.4 — Tension hooks derived from macro+micro (completed)
 
 **intent :align hooks with later stage needs (drums + non-drums + ducking) while keeping them bounded and safe.
 translate tension targets into bounded parameters that existing role generators (especially Stage 6 drums) can consume without new complex model dependencies.
@@ -731,7 +731,7 @@ translate tension targets into bounded parameters that existing role generators 
 
 ---
 
-### Story 7.5.5 — Wire tension hooks into Stage 6 drums (NOT STARTED)
+### Story 7.5.5 — Wire tension hooks into Stage 6 drums (COMPLETED)
 
 **Intent:prove the tension framework affects audible output in a controlled way without destabilizing the groove.
 

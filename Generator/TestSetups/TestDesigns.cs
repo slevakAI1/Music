@@ -13,7 +13,7 @@ namespace Music.Generator
     // Central defaults to keep tracks aligned
     public static class TestDesigns
     {
-        public const int TotalBars = 48;
+        public const int TotalBars = 48;  // TO DO THIS SHOULD BE COMPUTED FROM THE SECTION TRACK
         public const string GlobalTimeSignature = "4/4";
         public const int DefaultTempoBpm = 120;  // per ai, 120 is acutally an industry default
 
