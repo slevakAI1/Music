@@ -569,6 +569,11 @@ Research indicates energy is multi-factor (density, register, harmonic rhythm, i
 Later stages (motif placement, melody shaping, arrangement ducking) benefit from a stable, deterministic concept of *section transition feel*: `Build`, `Release`, `Sustain`, `Drop`.
 This can remain a lightweight enum computed as a **derived hint**, not a new large system.
 
+### DECISION D — Style controls micro-tension phrase ramps (new)
+Stage 7 micro tension default behavior must be style-tunable so it does not force rising tension in genres where it is undesirable.
+Introduce a deterministic knob: `MicroTensionPhraseRampIntensity` in `[0..1]` (0=flat micro map, 1=strong phrase ramps).
+Selection is deterministic from groove/style identity (and optionally section type/index if needed), without affecting EnergyArc constraints.
+
 
 # Story 7.5 : Tension planning hooks (macro vs micro)
 
@@ -694,6 +699,7 @@ provide within-section tension shaping so renderers can bias micro-events (fills
   - Jitter application (present when seed != 0, absent when seed = 0)
   - Integration with macro tension
 - All tests pass and verify determinism, correct map length, monotonic-ish rise
+- NOTE: When implementing style policies, apply `MicroTensionPhraseRampIntensity` so ramp strength is genre-appropriate (0=flat, 1=strong ramps).
 
 ---
 
@@ -714,6 +720,7 @@ translate tension targets into bounded parameters that existing role generators 
   - micro tension
   - transition hint (`Build/Release/Sustain/Drop`)
   - section energy (for safety clamping)
+  - `MicroTensionPhraseRampIntensity` (style knob; ramps may be reduced/disabled per genre)
 - Hooks must be clamped to safe ranges.
 - Hooks must be **style-safe** defaults:
   - never exceed existing drum density caps
