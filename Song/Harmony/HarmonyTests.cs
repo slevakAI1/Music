@@ -1,4 +1,4 @@
-// AI: purpose=Generate default 48-bar test harmony track used in demos/tests; pattern repeats I-V-vi-IV on odd bars.
+// AI: purpose=Generate default 52-bar test harmony track used in demos/tests; pattern repeats I-V-vi-IV on odd bars.
 // AI: invariants=Produces events at odd StartBar values 1..TotalBars; callers expect DurationBeats to cover two bars here.
 // AI: deps=Relies on HarmonyTrack.Add behavior and TestDesigns.TotalBars; renaming fields or constants breaks fixtures.
 // AI: change=If altering pattern or TotalBars update dependent tests and any test fixtures that assert these events.

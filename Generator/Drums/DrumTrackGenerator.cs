@@ -19,10 +19,14 @@ namespace Music.Generator
             BarTrack barTrack,
             SectionTrack sectionTrack,
             Dictionary<int, EnergySectionProfile> sectionProfiles,
+            ITensionQuery tensionQuery,
+            double microTensionPhraseRampIntensity,
             int totalBars,
             RandomizationSettings settings,
             int midiProgramNumber)
         {
+            ArgumentNullException.ThrowIfNull(tensionQuery);
+
             var notes = new List<PartTrackEvent>();
             var randomizer = new PitchRandomizer(settings);
 
@@ -45,11 +49,15 @@ namespace Music.Generator
                 // Get section type and index for variation engine and fill engine
                 MusicConstants.eSectionType sectionType = MusicConstants.eSectionType.Verse; // Default
                 int sectionIndex = 0;
+                int absoluteSectionIndex = 0;
                 Section? section = null;
                 if (sectionTrack.GetActiveSection(bar, out section) && section != null)
                 {
                     sectionType = section.SectionType;
                     sectionIndex = section.SectionId;
+                    absoluteSectionIndex = sectionTrack.Sections.IndexOf(section);
+                    if (absoluteSectionIndex < 0)
+                        absoluteSectionIndex = 0;
                 }
 
                 // Story 7.3: Get energy profile for this section
@@ -58,6 +66,15 @@ namespace Music.Generator
                 {
                     energyProfile = profile;
                 }
+
+                // Story 7.5.5: Derive hooks for this bar to bias optional behaviors only (fills/dropouts).
+                int barIndexWithinSection = section != null ? (bar - section.StartBar) : 0;
+                var hooks = TensionHooksBuilder.Create(
+                    tensionQuery,
+                    absoluteSectionIndex,
+                    barIndexWithinSection,
+                    energyProfile,
+                    microTensionPhraseRampIntensity);
 
                 // Story 7.3: Check if drums are present in orchestration
                 if (energyProfile?.Orchestration != null && !energyProfile.Orchestration.DrumsPresent)
@@ -72,9 +89,12 @@ namespace Music.Generator
                 // Create deterministic per-bar RNG so fill decisions remain deterministic when knobs change.
                 var barRng = RandomHelpers.CreateLocalRng(settings.Seed, $"{grooveEvent.SourcePresetName ?? "groove"}_{sectionType}", bar, 0m);
 
+                // Story 7.5.5: Phrase-end pull biases optional fill chance; this must not override transition fills.
+                double tensionFillExtraProbability = Math.Clamp(hooks.PullProbabilityBias, 0.0, 0.20);
+
                 // Check if this bar should have a fill (Story 6.3) or if Stage 7 requests extra fills via parameter.
                 bool shouldFill = DrumFillEngine.ShouldGenerateFill(bar, totalBars, sectionTrack)
-                    || barRng.NextDouble() < (drumParameters?.FillProbability ?? 0.0);
+                    || barRng.NextDouble() < (drumParameters?.FillProbability ?? 0.0) + tensionFillExtraProbability;
 
                 List<DrumVariationEngine.DrumHit> allHits;
 
@@ -122,6 +142,22 @@ namespace Music.Generator
                     // Generate per-bar variation plan using DrumVariationEngine
                     var variation = DrumVariationEngine.Generate(grooveEvent, sectionType, bar, settings.Seed, drumParameters);
                     allHits = variation.Hits;
+
+                    // Story 7.5.5: Phrase-end dropout option (bias-only): thin timekeeping late in bar when tension high and energy not max.
+                    // Guardrails: never remove anchor/main hits; never remove kick/snare; only remove non-main hat hits on late subdivisions.
+                    if (hooks.PullProbabilityBias > 0.0 && hooks.DensityThinningBias > 0.0001 && energyProfile?.Global.Energy is < 0.92)
+                    {
+                        double dropProb = Math.Clamp(hooks.DensityThinningBias * 1.5, 0.0, 0.30);
+                        if (barRng.NextDouble() < dropProb)
+                        {
+                            allHits = allHits
+                                .Where(h =>
+                                    h.Role != "hat"
+                                    || h.IsMain
+                                    || h.OnsetBeat < 4m)
+                                .ToList();
+                        }
+                    }
                 }
 
                 // Story 7.3: Add cymbal orchestration with energy profile hints

@@ -61,6 +61,10 @@ namespace Music.Generator
             // Build section profiles dictionary for quick lookup
             var sectionProfiles = BuildSectionProfiles(energyArc, songContext.SectionTrack);
 
+            // Story 7.5.x: Create deterministic tension query (used by Story 7.5.5 drums-only integration).
+            ITensionQuery tensionQuery = new DeterministicTensionQuery(energyArc, settings.Seed);
+            const double microTensionPhraseRampIntensity = 1.0;
+
             // Resolve MIDI program numbers from VoiceSet
             int bassProgramNumber = GetProgramNumberForRole(songContext.Voices, "Bass", defaultProgram: 33);
             int compProgramNumber = GetProgramNumberForRole(songContext.Voices, "Comp", defaultProgram: 27);
@@ -108,6 +112,8 @@ namespace Music.Generator
                     songContext.BarTrack,
                     songContext.SectionTrack,
                     sectionProfiles,
+                    tensionQuery,
+                    microTensionPhraseRampIntensity,
                     totalBars,
                     settings,
                     drumProgramNumber)
