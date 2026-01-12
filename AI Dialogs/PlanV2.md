@@ -318,7 +318,7 @@ Story 7.4 is decomposed into focused sub-stories to ensure proper implementation
 
 ---
 
-#### Story 7.4.1 — Energy constraint model and rules framework - NOT STARTED
+#### Story 7.4.1 — Energy constraint model and rules framework - COMPLETED
 
 **Intent:** Create the constraint model and rule engine infrastructure without yet applying it to generation.
 
@@ -343,9 +343,18 @@ Story 7.4 is decomposed into focused sub-stories to ensure proper implementation
 - Rules should compute suggested adjustments, not hard overrides (allows arc to have final say with explicit overrides)
 - Each rule should have a configurable "strength" or priority for conflict resolution
 
+**Implementation notes:**
+- Created `EnergyConstraintContext` providing all necessary context for rule evaluation
+- Created `EnergyConstraintResult` representing rule evaluation outcomes
+- Created abstract `EnergyConstraintRule` base class with deterministic evaluation contract
+- Implemented `EnergyConstraintPolicy` with strength-weighted blending for conflict resolution
+- Implemented all four specified rules in `Song\Energy\Rules\` namespace
+- Created comprehensive unit tests in `EnergyConstraintTests` covering all rules and edge cases
+- All tests pass and verify determinism
+
 ---
 
-#### Story 7.4.2 — Constraint application in EnergyArc resolution - NOT STARTED
+#### Story 7.4.2 — Constraint application in EnergyArc resolution - COMPLETED
 
 **Intent:** Wire constraint rules into the energy resolution pipeline so they actually affect generation.
 
@@ -369,9 +378,35 @@ Story 7.4 is decomposed into focused sub-stories to ensure proper implementation
 - When multiple rules conflict, use deterministic priority/averaging
 - When rules suggest impossible constraints (e.g., V2 must be > V1, but V1 is already 0.95), clamp gracefully
 
+**Implementation notes:**
+- Created `EnergyConstraintPolicyLibrary` with predefined policies:
+  - Pop/Rock (default): `SameTypeSectionsMonotonicRule` strength=1.0, `PostChorusDropRule` strength=1.2, `FinalChorusPeakRule` strength=1.5, `BridgeContrastRule` strength=0.8
+  - Rock: Stronger progression (strength=1.3, minIncrement=0.05), less strict post-chorus drop, strong final peak (strength=1.8, minEnergy=0.85)
+  - Jazz: Weak progression (strength=0.3, minIncrement=0.0), no `PostChorusDropRule`, relaxed final peak (strength=0.5, minEnergy=0.70)
+  - EDM: `PostChorusDropRule` completely disabled (not included), very strong final peak (strength=2.0, minEnergy=0.90)
+  - Minimal: Only `FinalChorusPeakRule` (strength=1.0)
+  - Empty: no constraints (for testing)
+- Modified `EnergyArc.Create` to accept optional `EnergyConstraintPolicy` parameter
+  - Defaults to policy selected by `EnergyConstraintPolicyLibrary.GetPolicyForGroove` based on groove name
+- Implemented pre-computation of constrained energies in `EnergyArc` constructor:
+  - Processes all sections in order, building context as it goes
+  - Each section gets constrained energy by applying policy rules
+  - Results cached in dictionary for O(1) lookup
+- Modified `EnergyArc.GetTargetForSection` to return cached constrained values
+- Added `GetConstraintDiagnostics` method for debugging/explainability
+- Updated `EnergySectionTarget` to include required `SectionType` and `SectionIndex` properties
+- Updated all existing callers in `EnergyArcTemplate`, `EnergyArcLibrary`, and test files
+- Created comprehensive integration tests in `EnergyConstraintApplicationTests`:
+  - Basic constraint application and flow-through
+  - Determinism verification
+  - Various song structures (standard pop, rock anthem, minimal, unusual)
+  - Style-specific policy behavior
+  - All tests pass
+- Energy constraints now affect all generation through `EnergyProfileBuilder.BuildProfile`
+
 ---
 
-#### Story 7.4.3 — Style-specific constraint policies - NOT STARTED
+#### Story 7.4.3 — Style-specific constraint policies - COMPLETED
 
 **Intent:** Make constraints parameterizable per style so different genres have different energy expectations.
 
@@ -385,9 +420,26 @@ Story 7.4 is decomposed into focused sub-stories to ensure proper implementation
 - Each policy enables/disables specific rules and configures rule strengths
 
 **Example policy differences:**
-- Pop: `SameTypeSectionsMonotonicRule` strength = High
-- Jazz: `SameTypeSectionsMonotonicRule` strength = Low (allow more freedom)
+- Pop: `SameTypeSectionsMonotonicRule` strength = High (1.0)
+- Jazz: `SameTypeSectionsMonotonicRule` strength = Low (0.3, allow more freedom)
 - EDM: `PostChorusDropRule` disabled (EDM often goes straight into build after drop)
+
+**Implementation notes:**
+- Story was implemented as part of Story 7.4.2
+- `EnergyConstraintPolicyLibrary` exists in `Song\Energy\EnergyConstraintPolicyLibrary.cs` with all required policies:
+  - **PopRock** (default): `SameTypeSectionsMonotonicRule` strength=1.0, `PostChorusDropRule` strength=1.2, `FinalChorusPeakRule` strength=1.5, `BridgeContrastRule` strength=0.8
+  - **Rock**: Stronger progression (strength=1.3, minIncrement=0.05), less strict post-chorus drop, strong final peak (strength=1.8, minEnergy=0.85)
+  - **Jazz**: Weak progression (strength=0.3, minIncrement=0.0), no `PostChorusDropRule`, relaxed final peak (strength=0.5, minEnergy=0.70)
+  - **EDM**: `PostChorusDropRule` completely disabled (not included), very strong final peak (strength=2.0, minEnergy=0.90)
+  - **Minimal**: Only `FinalChorusPeakRule` (strength=1.0)
+  - **Empty/None**: No constraints (for testing)
+- Policy selection methods:
+  - `GetPolicyForGroove(grooveName)`: Deterministic pattern matching on groove name (jazz/bossa/latin → Jazz, edm/house/techno → EDM, rock/punk/metal → Rock, default → PopRock)
+  - `GetDefaultPolicy()`: Returns PopRock
+  - `GetAllPolicies()`: Dictionary of all named policies for diagnostics
+- Each policy configures rule strengths and enables/disables specific rules as appropriate for style
+- Integration tests in `EnergyConstraintApplicationTests.TestStyleSpecificPolicies()` verify different policies produce different energy progressions
+- All tests pass and verify determinism
 
 ---
 

@@ -111,6 +111,8 @@ namespace Music.Generator
             // Create a section target with phrase micro-arc
             var target = EnergySectionTarget.WithPhraseMicroArc(
                 baseEnergy: 0.6,
+                sectionType: MusicConstants.eSectionType.Verse,
+                sectionIndex: 0,
                 startOffset: 0.0,
                 middleOffset: 0.05,
                 peakOffset: 0.15,
@@ -128,7 +130,7 @@ namespace Music.Generator
             }
 
             // Create uniform target (no phrase variation)
-            var uniformTarget = EnergySectionTarget.Uniform(0.5);
+            var uniformTarget = EnergySectionTarget.Uniform(0.5, MusicConstants.eSectionType.Verse, 0);
             if (uniformTarget.PhraseTargets != null)
             {
                 throw new Exception("Uniform target should have null phrase targets");

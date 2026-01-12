@@ -49,11 +49,11 @@ namespace Music.Generator
             // Fall back to default energy for section type
             if (DefaultEnergiesBySectionType.TryGetValue(sectionType, out var defaultEnergy))
             {
-                return EnergySectionTarget.Uniform(defaultEnergy);
+                return EnergySectionTarget.Uniform(defaultEnergy, sectionType, sectionIndex);
             }
 
             // Final fallback: medium energy
-            return EnergySectionTarget.Uniform(0.5);
+            return EnergySectionTarget.Uniform(0.5, sectionType, sectionIndex);
         }
     }
 }

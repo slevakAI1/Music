@@ -75,14 +75,16 @@ namespace Music.Generator
                 SectionTargets = new Dictionary<(MusicConstants.eSectionType, int), EnergySectionTarget>
                 {
                     // Verse 1: lower energy
-                    [(MusicConstants.eSectionType.Verse, 0)] = EnergySectionTarget.Uniform(0.4),
+                    [(MusicConstants.eSectionType.Verse, 0)] = EnergySectionTarget.Uniform(0.4, MusicConstants.eSectionType.Verse, 0),
 
-                    // Verse 2: slightly higher energy (typical pop progression)
-                    [(MusicConstants.eSectionType.Verse, 1)] = EnergySectionTarget.Uniform(0.5),
+                    // Verse 2 slightly higher (verse progression)
+                    [(MusicConstants.eSectionType.Verse, 1)] = EnergySectionTarget.Uniform(0.5, MusicConstants.eSectionType.Verse, 1),
 
                     // Final Chorus: peak energy
                     [(MusicConstants.eSectionType.Chorus, 2)] = EnergySectionTarget.WithPhraseMicroArc(
                         baseEnergy: 0.85,
+                        sectionType: MusicConstants.eSectionType.Chorus,
+                        sectionIndex: 2,
                         peakOffset: 0.1  // Crescendo at phrase peak
                     )
                 }
@@ -111,13 +113,25 @@ namespace Music.Generator
                     [MusicConstants.eSectionType.Custom] = 0.5
                 },
 
-                SectionTargets = new Dictionary<(MusicConstants.eSectionType, int), EnergySectionTarget>
+                SectionTargets = new()
                 {
-                    [(MusicConstants.eSectionType.Verse, 0)] = EnergySectionTarget.Uniform(0.35),
-                    [(MusicConstants.eSectionType.Verse, 1)] = EnergySectionTarget.Uniform(0.45),
-                    [(MusicConstants.eSectionType.Chorus, 0)] = EnergySectionTarget.Uniform(0.75),
-                    [(MusicConstants.eSectionType.Chorus, 1)] = EnergySectionTarget.Uniform(0.8),
-                    [(MusicConstants.eSectionType.Chorus, 2)] = EnergySectionTarget.Uniform(0.9),  // Final chorus peak
+                    [(MusicConstants.eSectionType.Verse, 0)] = EnergySectionTarget.WithPhraseMicroArc(
+                        baseEnergy: 0.3,
+                        sectionType: MusicConstants.eSectionType.Verse,
+                        sectionIndex: 0,
+                        startOffset: -0.05,
+                        peakOffset: 0.05,
+                        cadenceOffset: -0.05
+                    ),
+                    [(MusicConstants.eSectionType.Verse, 1)] = EnergySectionTarget.WithPhraseMicroArc(
+                        baseEnergy: 0.4,
+                        sectionType: MusicConstants.eSectionType.Verse,
+                        sectionIndex: 1,
+                        startOffset: -0.05,
+                        peakOffset: 0.10,
+                        cadenceOffset: -0.08
+                    ),
+                    [(MusicConstants.eSectionType.Chorus, 2)] = EnergySectionTarget.Uniform(1.0, MusicConstants.eSectionType.Chorus, 2)
                 }
             };
         }
@@ -183,11 +197,11 @@ namespace Music.Generator
 
                 SectionTargets = new Dictionary<(MusicConstants.eSectionType, int), EnergySectionTarget>
                 {
-                    [(MusicConstants.eSectionType.Verse, 0)] = EnergySectionTarget.Uniform(0.5),
-                    [(MusicConstants.eSectionType.Verse, 1)] = EnergySectionTarget.Uniform(0.6),
-                    [(MusicConstants.eSectionType.Chorus, 0)] = EnergySectionTarget.Uniform(0.8),
-                    [(MusicConstants.eSectionType.Chorus, 1)] = EnergySectionTarget.Uniform(0.85),
-                    [(MusicConstants.eSectionType.Chorus, 2)] = EnergySectionTarget.Uniform(0.95),  // Climax
+                    [(MusicConstants.eSectionType.Verse, 0)] = EnergySectionTarget.Uniform(0.5, MusicConstants.eSectionType.Verse, 0),
+                    [(MusicConstants.eSectionType.Verse, 1)] = EnergySectionTarget.Uniform(0.6, MusicConstants.eSectionType.Verse, 1),
+                    [(MusicConstants.eSectionType.Chorus, 0)] = EnergySectionTarget.Uniform(0.8, MusicConstants.eSectionType.Chorus, 0),
+                    [(MusicConstants.eSectionType.Chorus, 1)] = EnergySectionTarget.Uniform(0.85, MusicConstants.eSectionType.Chorus, 1),
+                    [(MusicConstants.eSectionType.Chorus, 2)] = EnergySectionTarget.Uniform(0.95, MusicConstants.eSectionType.Chorus, 2),  // Climax
                 }
             };
         }
@@ -281,6 +295,8 @@ namespace Music.Generator
                     // Verse as build-up with phrase-level energy increase
                     [(MusicConstants.eSectionType.Verse, 0)] = EnergySectionTarget.WithPhraseMicroArc(
                         baseEnergy: 0.3,
+                        sectionType: MusicConstants.eSectionType.Verse,
+                        sectionIndex: 0,
                         startOffset: 0.0,
                         peakOffset: 0.2  // Build at phrase peak
                     ),
@@ -288,11 +304,13 @@ namespace Music.Generator
                     // Second verse builds higher
                     [(MusicConstants.eSectionType.Verse, 1)] = EnergySectionTarget.WithPhraseMicroArc(
                         baseEnergy: 0.4,
+                        sectionType: MusicConstants.eSectionType.Verse,
+                        sectionIndex: 1,
                         peakOffset: 0.25
                     ),
 
                     // Final chorus: maximum energy
-                    [(MusicConstants.eSectionType.Chorus, 2)] = EnergySectionTarget.Uniform(1.0)
+                    [(MusicConstants.eSectionType.Chorus, 2)] = EnergySectionTarget.Uniform(1.0, MusicConstants.eSectionType.Chorus, 2)
                 }
             };
         }

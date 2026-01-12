@@ -14,7 +14,17 @@ namespace Music.Generator
         /// Overall energy target for the entire section [0..1].
         /// This is the primary energy value that drives arrangement decisions.
         /// </summary>
-        public double Energy { get; init; }
+        public required double Energy { get; init; }
+
+        /// <summary>
+        /// The section type this target applies to.
+        /// </summary>
+        public required MusicConstants.eSectionType SectionType { get; init; }
+
+        /// <summary>
+        /// 0-based index of this section instance among sections of the same type.
+        /// </summary>
+        public required int SectionIndex { get; init; }
 
         /// <summary>
         /// Optional phrase-level energy targets within the section.
@@ -26,11 +36,13 @@ namespace Music.Generator
         /// <summary>
         /// Creates a section target with uniform energy (no phrase variation).
         /// </summary>
-        public static EnergySectionTarget Uniform(double energy)
+        public static EnergySectionTarget Uniform(double energy, MusicConstants.eSectionType sectionType, int sectionIndex)
         {
             return new EnergySectionTarget
             {
                 Energy = energy,
+                SectionType = sectionType,
+                SectionIndex = sectionIndex,
                 PhraseTargets = null
             };
         }
@@ -40,6 +52,8 @@ namespace Music.Generator
         /// </summary>
         public static EnergySectionTarget WithPhraseMicroArc(
             double baseEnergy,
+            MusicConstants.eSectionType sectionType,
+            int sectionIndex,
             double startOffset = 0.0,
             double middleOffset = 0.0,
             double peakOffset = 0.0,
@@ -48,6 +62,8 @@ namespace Music.Generator
             return new EnergySectionTarget
             {
                 Energy = baseEnergy,
+                SectionType = sectionType,
+                SectionIndex = sectionIndex,
                 PhraseTargets = new EnergyPhraseTargets
                 {
                     StartOffset = startOffset,
