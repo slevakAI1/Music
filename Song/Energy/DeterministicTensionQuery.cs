@@ -194,9 +194,14 @@ namespace Music.Generator
                 var profile = SectionTensionProfile.WithMacroTension(adjusted, abs, driver);
                 _profiles[abs] = profile;
 
-                // Build micro tension map (fallback until Story 7.5.3)
-                var microBase = profile.MicroTensionDefault;
-                var micro = MicroTensionMap.WithSimplePhrases(Math.Max(1, section.BarCount), microBase, phraseLength: 4);
+                // Build micro tension map using Story 7.5.3 builder
+                int perSectionSeed = _seed ^ (abs * 397);
+                var micro = MicroTensionMap.Build(
+                    Math.Max(1, section.BarCount),
+                    profile.MacroTension,
+                    profile.MicroTensionDefault,
+                    phraseLength: null,
+                    seed: perSectionSeed);
                 _microMaps[abs] = micro;
 
                 // Compute transition hint

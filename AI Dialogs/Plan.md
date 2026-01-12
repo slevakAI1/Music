@@ -648,7 +648,7 @@ anticipation/release.
 
 ---
  
-### Story 7.5.3 — Derive micro tension map per section (NOT STARTED)
+### Story 7.5.3 — Derive micro tension map per section (COMPLETED)
 
 **intent:Stage 8/10 require phrase-aware bar-level hooks. Stage 7 should supply a default bar-level map even before Stage 8 phrase mapping exists. 
 provide within-section tension shaping so renderers can bias micro-events (fills, dropouts, impacts) at phrase boundaries and peaks.
@@ -660,8 +660,8 @@ provide within-section tension shaping so renderers can bias micro-events (fills
   2. **Fallback mode** (infer phrase segmentation deterministically: default 4-bar phrases, handle remainders)
 - MVP shape constraints:
   - rising micro tension toward the end of each phrase
-  - “cadence window” at phrase end (last bar or last N beats) flagged for pull/impact decisions
-  - optional “peak window” near the phrase peak (if section length supports it)
+  - "cadence window" at phrase end (last bar or last N beats) flagged for pull/impact decisions
+  - optional "peak window" near the phrase peak (if section length supports it)
 - Micro tension is derived from:
   - macro tension
   - phrase position class (`Start`, `Middle`, `Peak`, `Cadence`) when available, otherwise fallback inference
@@ -672,6 +672,28 @@ provide within-section tension shaping so renderers can bias micro-events (fills
   - correct map length for sections
   - determinism by seed
   - monotonic-ish rise into cadence for basic phrase lengths (allow small plateaus)
+
+**Implementation notes:**
+- Added `MicroTensionMap.Build(barCount, macroTension, microDefault, phraseLength?, seed)` method
+- Supports both phrase-aware mode (explicit phraseLength) and fallback mode (infers: 4 bars typical, 2 for 4-bar sections)
+- Produces rising tension within phrases using linear ramp (phraseFactor 0..1) with multiplier up to 1.4
+- Derives micro baseline from blend of microDefault and macroTension (lerp approach)
+- Applies deterministic tiny jitter (±0.01) when seed != 0 to avoid exact repeats
+- All tension values clamped to [0..1]
+- Flags set correctly: IsPhraseEnd at phrase boundaries + last bar, IsSectionStart/End at section boundaries
+- Updated `DeterministicTensionQuery.ComputeProfiles()` to use Build() with per-section seed derivation
+- Created comprehensive test file `MicroTensionMapTests.cs` with 24 test methods covering:
+  - Basic functionality and edge cases
+  - Determinism by seed
+  - Fallback mode phrase inference (4-bar default, 2-bar for 4-bar sections, irregular handling)
+  - Rising tension shape within phrases
+  - Influence of macro tension and micro default on baseline
+  - Phrase end and section boundary flags
+  - Map length matching bar count
+  - Valid tension range [0..1]
+  - Jitter application (present when seed != 0, absent when seed = 0)
+  - Integration with macro tension
+- All tests pass and verify determinism, correct map length, monotonic-ish rise
 
 ---
 

@@ -154,4 +154,74 @@ public sealed record MicroTensionMap
             IsSectionStart = sectionStarts
         };
     }
+
+    /// <summary>
+    /// Builds deterministic micro tension map from macro tension with phrase-aware or fallback modes.
+    /// Fallback: infers phrase length (4 bars typical, 2 for 4-bar sections). Seed controls tiny jitter.
+    /// Produces rising micro tension toward phrase ends, flags cadence windows for pull/impact decisions.
+    /// </summary>
+    public static MicroTensionMap Build(
+        int barCount,
+        double macroTension,
+        double microDefault,
+        int? phraseLength = null,
+        int seed = 0)
+    {
+        if (barCount <= 0)
+            throw new ArgumentOutOfRangeException(nameof(barCount), "Bar count must be positive");
+
+        macroTension = Math.Clamp(macroTension, 0.0, 1.0);
+        microDefault = Math.Clamp(microDefault, 0.0, 1.0);
+
+        // Fallback mode: infer sensible phrase length
+        int phr = phraseLength ?? (barCount == 4 ? 2 : 4);
+        if (phr <= 0) phr = 4;
+
+        var tensionValues = new double[barCount];
+        var phraseEnds = new bool[barCount];
+        var sectionEnds = new bool[barCount];
+        var sectionStarts = new bool[barCount];
+
+        sectionStarts[0] = true;
+        sectionEnds[barCount - 1] = true;
+
+        var rng = new SeededRandomSource(seed);
+
+        // Micro baseline biased toward microDefault but influenced by macro
+        double microBaseline = Math.Clamp((microDefault + (macroTension * 0.6)) * 0.5, 0.0, 1.0);
+
+        for (int i = 0; i < barCount; i++)
+        {
+            int barInPhrase = i % phr;
+            bool isLastBarInPhrase = (i + 1) % phr == 0 || i == barCount - 1;
+
+            // Phrase factor 0..1 rising within phrase
+            double phraseFactor = (double)barInPhrase / Math.Max(1, phr - 1);
+
+            // Tension ramps toward phrase end; maxMultiplier modest (1.4)
+            double tensionMultiplier = 1.0 + (phraseFactor * 0.4);
+
+            // Combine baseline with multiplier, nudge toward macro
+            double value = microBaseline * tensionMultiplier;
+            value = value * 0.8 + (macroTension * 0.2);
+
+            // Tiny seeded jitter to avoid exact repeats
+            if (seed != 0)
+            {
+                double jitter = (rng.NextDouble() - 0.5) * 0.02;
+                value += jitter;
+            }
+
+            tensionValues[i] = Math.Clamp(value, 0.0, 1.0);
+            phraseEnds[i] = isLastBarInPhrase;
+        }
+
+        return new MicroTensionMap
+        {
+            TensionByBar = tensionValues.ToList(),
+            IsPhraseEnd = phraseEnds,
+            IsSectionEnd = sectionEnds,
+            IsSectionStart = sectionStarts
+        };
+    }
 }
