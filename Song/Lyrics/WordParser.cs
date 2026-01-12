@@ -44,9 +44,7 @@ namespace Music.Generator
         {
             try
             {
-                var baseDir = AppContext.BaseDirectory;
-                var projectRoot = Path.GetFullPath(Path.Combine(baseDir, "..", "..", ".."));
-                var filePath = Path.Combine(projectRoot, "Generator", "cmudict.rep");
+                var filePath = Music.Helpers.ProjectPath(Path.Combine("Generator", "cmudict.rep"));
 
                 if (!File.Exists(filePath))
                 {

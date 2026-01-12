@@ -112,7 +112,7 @@ namespace Music.Writer
                     return; // Abort playback
                 }
 
-                // Valid program number (0-127 or 255 for drums) – safe to cast now
+                // Valid program number (0-127 or 255 for drums) ? safe to cast now
                 songTrack.MidiProgramNumber = (int)programNumber;
                 songTracks.Add(songTrack);
             }
@@ -302,8 +302,7 @@ namespace Music.Writer
                 var midiDoc = midiIoService.ImportFromFile(ofd.FileName);
 
                 // Resolve project root (same approach used elsewhere in the solution)
-                var projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
-                var debugDir = Path.Combine(projectRoot, "Files", "Debug");
+                var debugDir = Music.Helpers.ProjectPath(Path.Combine("Files", "Debug"));
                 Directory.CreateDirectory(debugDir);
 
                 // Convert MIDI document to PartTrack objects with MetaMidiEvent lists

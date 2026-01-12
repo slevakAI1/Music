@@ -52,9 +52,7 @@ namespace Music.Generator
             }
 
             // Use the project-root-based location (consistent with other code paths in the app).
-            var baseDir = AppContext.BaseDirectory;
-            var projectRoot = Path.GetFullPath(Path.Combine(baseDir, "..", "..", ".."));
-            var filePath = Path.Combine(projectRoot, MusicConstants.VoicesNotionJsonRelativePath);
+            var filePath = Music.Helpers.ProjectPath(MusicConstants.VoicesNotionJsonRelativePath);
 
             _cachedSourcePath = filePath;
             sourcePath = filePath;
