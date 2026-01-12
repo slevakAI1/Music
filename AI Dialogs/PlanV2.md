@@ -240,7 +240,7 @@ Introduce a shared, deterministic “section identity + energy shaping” framew
 
 ---
 
-### Story 7.1 — `EnergyArc` + section-level energy targets
+### Story 7.1 — `EnergyArc` + section-level energy targets - Completed
 
 **Intent:** make the “ebb/flow” explicit and controllable: every section has an intended energy target, not just an implicit section type.
 
@@ -259,7 +259,7 @@ Introduce a shared, deterministic “section identity + energy shaping” framew
 
 ---
 
-### Story 7.2 — `SectionEnergyProfile` (multi-factor, per-role), derived from the arc
+### Story 7.2 — `SectionEnergyProfile` (multi-factor, per-role), derived from the arc - Completed
 
 **Intent:** convert energy targets into actionable per-role controls that map to real musical levers (dynamics, density, register, orchestration, rhythmic activity).
 
@@ -292,7 +292,7 @@ Introduce a shared, deterministic “section identity + energy shaping” framew
 
 ---
 
-### Story 7.3 — Energy application pass (wire into all role renderers)
+### Story 7.3 — Energy application pass (wire into all role renderers) - Completed
 
 **Intent:** ensure the energy profile affects audible output across all roles.
 
@@ -310,22 +310,128 @@ Introduce a shared, deterministic “section identity + energy shaping” framew
 
 ---
 
-### Story 7.4 — “Energy is relative”: section-to-section constraints
+### Story 7.4 — "Energy is relative": section-to-section constraints
 
 **Intent:** enforce core songwriting/arranging energy heuristics that listeners expect.
 
-**Acceptance criteria:**
-- Add deterministic rules that shape the arc-derived profiles, e.g.:
-  - Verse 2 should have **≥** Verse 1 energy (often slightly more).
-  - After a chorus, the next verse energy should typically drop (to preserve contrast), unless the arc says otherwise.
-  - Final chorus should typically be a local maximum (or sustained peak).
-  - Bridge is allowed to either:
-    - exceed prior chorus (common), or
-    - intentionally drop energy for contrast, then rebuild (also common).
-- These rules must be parameterized per style and not hard-coded to one structure.
+Story 7.4 is decomposed into focused sub-stories to ensure proper implementation, testing, and maintainability:
 
-**Guidance:**
-- Implement as adjustments to `EnergyArc` or as post-processing of `SectionEnergyProfile`.
+---
+
+#### Story 7.4.1 — Energy constraint model and rules framework - NOT STARTED
+
+**Intent:** Create the constraint model and rule engine infrastructure without yet applying it to generation.
+
+**Acceptance criteria:**
+- Create `EnergyConstraintRule` abstraction representing a single heuristic (e.g., "Verse N+1 should be ≥ Verse N")
+- Create `EnergyConstraintPolicy` that groups rules by style/genre
+- Implement rule evaluation framework:
+  - Input: proposed energy value for section at index `i`
+  - Context: section type, index, and energies of related sections (previous same-type, previous any-type, next known sections)
+  - Output: adjusted energy value (clamped/modified) + optional diagnostic message
+- Rules must be **deterministic**: same input → same output
+- Rules must be **composable**: multiple rules can apply to same section
+
+**Specific rules to implement (initial set):**
+1. `SameTypeSectionsMonotonicRule`: Section N+1 of same type should have energy ≥ Section N (e.g., Verse 2 ≥ Verse 1)
+2. `PostChorusDropRule`: First section after a chorus should typically drop energy (unless arc explicitly overrides)
+3. `FinalChorusPeakRule`: Last chorus should be at or near the song's peak energy
+4. `BridgeContrastRule`: Bridge can either exceed prior chorus OR intentionally drop for contrast (both are valid)
+
+**Design notes:**
+- Rules should be able to return "no opinion" (rule doesn't apply to this section)
+- Rules should compute suggested adjustments, not hard overrides (allows arc to have final say with explicit overrides)
+- Each rule should have a configurable "strength" or priority for conflict resolution
+
+---
+
+#### Story 7.4.2 — Constraint application in EnergyArc resolution - NOT STARTED
+
+**Intent:** Wire constraint rules into the energy resolution pipeline so they actually affect generation.
+
+**Acceptance criteria:**
+- Modify `EnergyArc.GetTargetForSection` or `EnergyProfileBuilder.BuildProfile` to apply constraints
+- Constraints are applied **after** template lookup but **before** profile construction
+- Implementation must maintain determinism:
+  - Rule application order is deterministic
+  - Conflict resolution (when multiple rules suggest different adjustments) is deterministic
+- Add optional `EnergyConstraintPolicy` parameter to energy arc creation
+- Default policy should match common pop/rock expectations (safe defaults)
+
+**Processing flow:**
+1. Get base energy from template (existing behavior)
+2. Apply constraint rules in deterministic order
+3. Clamp to valid range [0..1]
+4. Proceed with profile building (existing behavior)
+
+**Edge cases to handle:**
+- When arc has explicit override for section, constraints should respect it (arc > constraints)
+- When multiple rules conflict, use deterministic priority/averaging
+- When rules suggest impossible constraints (e.g., V2 must be > V1, but V1 is already 0.95), clamp gracefully
+
+---
+
+#### Story 7.4.3 — Style-specific constraint policies - NOT STARTED
+
+**Intent:** Make constraints parameterizable per style so different genres have different energy expectations.
+
+**Acceptance criteria:**
+- Create `EnergyConstraintPolicyLibrary` with predefined policies for:
+  - **Pop**: moderate verse progression, strong chorus contrast, final chorus peak
+  - **Rock**: stronger verse progression, sustained high energy allowed
+  - **Jazz**: relaxed constraints, allow energy drops/rises more freely
+  - **EDM**: strong build emphasis, dramatic drops allowed
+- Policy selection is deterministic based on groove name or explicit style parameter
+- Each policy enables/disables specific rules and configures rule strengths
+
+**Example policy differences:**
+- Pop: `SameTypeSectionsMonotonicRule` strength = High
+- Jazz: `SameTypeSectionsMonotonicRule` strength = Low (allow more freedom)
+- EDM: `PostChorusDropRule` disabled (EDM often goes straight into build after drop)
+
+---
+
+#### Story 7.4.4 — Constraint diagnostics and explainability - NOT STARTED
+
+**Intent:** Make energy constraint decisions visible for debugging and tuning.
+
+**Acceptance criteria:**
+- Add optional diagnostics output showing:
+  - Which rules were evaluated for each section
+  - Which rules made adjustments (and why)
+  - Original template energy vs final constrained energy
+  - Any conflicts detected and how they were resolved
+- Diagnostics must not affect generation (determinism maintained)
+- Add to existing energy diagnostics from Story 7.9 (when implemented)
+
+**Output format (example):**
+```
+Section: Verse 2 (index=1)
+  Template energy: 0.45
+  Rules applied:
+    - SameTypeSectionsMonotonicRule: adjusted to 0.50 (Verse 1 was 0.48)
+    - PostChorusDropRule: no opinion (previous section was Verse)
+  Final energy: 0.50
+```
+
+---
+
+#### Story 7.4.5 — Integration testing and validation - NOT STARTED
+
+**Intent:** Ensure constraints produce musically sensible results across varied song structures.
+
+**Acceptance criteria:**
+- Create test suite with various song structures:
+  - Standard pop (Intro-V-C-V-C-Bridge-C-Outro)
+  - Rock anthem (V-V-C-V-C-Solo-C-C)
+  - Minimal structure (V-C-V-C)
+  - Unusual structure (Intro-C-V-Bridge-V-C-C)
+- Verify for each structure:
+  - Constraints produce valid energy values [0..1]
+  - Musical heuristics are honored (verse progression, chorus contrast, etc.)
+  - Final chorus is at or near peak
+  - Results are deterministic (same seed → same output)
+- Test with different style policies to ensure style-specific behavior
 
 ---
 
@@ -343,14 +449,14 @@ Introduce a shared, deterministic “section identity + energy shaping” framew
   - allow Stage 6 drums and existing roles to access it to bias small variations
 
 **Implementation-aligned examples:**
-- At phrase ends, increase probability of “pull” events (short fill, kick removal, accent) when `TensionTarget` is high.
-- At section transitions into high-energy sections, prefer orchestration “additions” and register lift.
+- At phrase ends, increase probability of "pull" events (short fill, kick removal, accent) when `TensionTarget` is high.
+- At section transitions into high-energy sections, prefer orchestration "additions" and register lift.
 
 ---
 
-### Story 7.6 — Structured repetition engine (A / A’ / B transforms)
+### Story 7.6 — Structured repetition engine (A / A' / B transforms)
 
-**Intent:** reuse section “core decisions” while making later repeats evolve in a controlled, musical way.
+**Intent:** reuse section "core decisions" while making later repeats evolve in a controlled, musical way.
 
 **Acceptance criteria:**
 - Introduce a deterministic `SectionVariationPlan` per section instance:
@@ -410,7 +516,7 @@ Introduce a shared, deterministic “section identity + energy shaping” framew
 
 ### Story 7.10 — Stage 8/9 integration contracts (future-proofing)
 
-**Intent:** ensure later stages can “ask” Stage 7 for arrangement support to convey emotion without rewriting Stage 7.
+**Intent:** ensure later stages can "ask" Stage 7 for arrangement support to convey emotion without rewriting Stage 7.
 
 **Acceptance criteria:**
 - Motifs (Stage 8) can query:
@@ -458,7 +564,7 @@ Introduce a shared, deterministic “section identity + energy shaping” framew
 
 **Acceptance criteria:**
 - Convert syllable count/stress into a set of candidate onset slots per phrase.
-- Support “stretch” (melisma) only if there’s space.
+- Support "stretch" (melisma) only if there's space.
 
 ### Story 9.2 — Melody generator MVP
 
@@ -480,6 +586,6 @@ Introduce a shared, deterministic “section identity + energy shaping” framew
 ## Bottom line
 
 - **Yes:** keep improving `Generator` incrementally.
-- **No:** don’t build “hooks/riffs system” first; it will be premature and you’ll rewrite it.
-- Use sections now to drive identity and variation; otherwise you’re just generating a loop.
-- “Surprise” should come from structured transforms and section contrast, with RNG only as a tie-breaker among valid options.
+- **No:** don't build "hooks/riffs system" first; it will be premature and you'll rewrite it.
+- Use sections now to drive identity and variation; otherwise you're just generating a loop.
+- "Surprise" should come from structured transforms and section contrast, with RNG only as a tie-breaker among valid options.
