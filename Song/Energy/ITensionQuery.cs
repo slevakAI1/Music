@@ -1,6 +1,7 @@
 // AI: purpose=Public stable API for querying tension information without requiring planner internals.
 // AI: invariants=All queries deterministic for same (sectionIndex, barIndex); thread-safe immutable reads.
 // AI: deps=Implemented by tension planner (Story 7.5.2/7.5.3); consumed by role renderers and Stage 8/9.
+// AI: change=Story 7.5.8 adds GetTensionContext unified query surface for Stage 8/9 motif/melody integration.
 
 namespace Music.Generator;
 
@@ -45,6 +46,23 @@ public interface ITensionQuery
         int barIndexWithinSection);
 
     /// <summary>
+    /// Gets the transition hint for a section boundary (transition FROM this section TO next).
+    /// Returns None for the last section.
+    /// </summary>
+    /// <param name="absoluteSectionIndex">Absolute 0-based section index in the song.</param>
+    /// <returns>Section transition hint (Build/Release/Sustain/Drop/None).</returns>
+    SectionTransitionHint GetTransitionHint(int absoluteSectionIndex);
+
+    /// <summary>
+    /// Gets unified tension context for a specific bar, combining all tension-related information.
+    /// This is the preferred query method for Stage 8/9 motif placement and melody generation.
+    /// </summary>
+    /// <param name="absoluteSectionIndex">Absolute 0-based section index in the song.</param>
+    /// <param name="barIndexWithinSection">0-based bar index within the section.</param>
+    /// <returns>Immutable context containing macro/micro tension, drivers, flags, and transition hint.</returns>
+    TensionContext GetTensionContext(int absoluteSectionIndex, int barIndexWithinSection);
+
+    /// <summary>
     /// Checks if tension data is available for a section.
     /// </summary>
     /// <param name="absoluteSectionIndex">Absolute 0-based section index in the song.</param>
@@ -60,6 +78,7 @@ public interface ITensionQuery
 /// <summary>
 /// Context object combining tension query with section/bar position information.
 /// Provided to role renderers for convenient access to all tension-related data.
+/// Story 7.5.8: Expanded to include SectionTransitionHint for Stage 8/9 integration.
 /// </summary>
 public sealed record TensionContext
 {
@@ -99,6 +118,19 @@ public sealed record TensionContext
     public required bool IsSectionStart { get; init; }
 
     /// <summary>
+    /// Section transition hint (Build/Release/Sustain/Drop) for the boundary FROM this section TO next.
+    /// Returns None if this is the last section or transition is not determined.
+    /// Used by Stage 8/9 for motif placement and melodic phrase shaping decisions.
+    /// </summary>
+    public required SectionTransitionHint TransitionHint { get; init; }
+
+    /// <summary>
+    /// Tension drivers explaining why this section has its tension value.
+    /// Derived from MacroTension.Driver for convenience.
+    /// </summary>
+    public TensionDriver TensionDrivers => MacroTension.Driver;
+
+    /// <summary>
     /// Creates a tension context from query and position.
     /// </summary>
     public static TensionContext Create(
@@ -110,6 +142,7 @@ public sealed record TensionContext
         var microTension = query.GetMicroTension(absoluteSectionIndex, barIndexWithinSection);
         var (isPhraseEnd, isSectionEnd, isSectionStart) = 
             query.GetPhraseFlags(absoluteSectionIndex, barIndexWithinSection);
+        var transitionHint = query.GetTransitionHint(absoluteSectionIndex);
 
         return new TensionContext
         {
@@ -119,7 +152,8 @@ public sealed record TensionContext
             MicroTension = microTension,
             IsPhraseEnd = isPhraseEnd,
             IsSectionEnd = isSectionEnd,
-            IsSectionStart = isSectionStart
+            IsSectionStart = isSectionStart,
+            TransitionHint = transitionHint
         };
     }
 }

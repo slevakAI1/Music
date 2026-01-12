@@ -72,6 +72,20 @@ public sealed class NeutralTensionQuery : ITensionQuery
     /// <inheritdoc/>
     public int SectionCount => _sectionCount;
 
+    /// <inheritdoc/>
+    public SectionTransitionHint GetTransitionHint(int absoluteSectionIndex)
+    {
+        ValidateSectionIndex(absoluteSectionIndex);
+        return SectionTransitionHint.None;
+    }
+
+    /// <inheritdoc/>
+    public TensionContext GetTensionContext(int absoluteSectionIndex, int barIndexWithinSection)
+    {
+        ValidateSectionIndex(absoluteSectionIndex);
+        return TensionContext.Create(this, absoluteSectionIndex, barIndexWithinSection);
+    }
+
     private void ValidateSectionIndex(int index)
     {
         if (index < 0 || index >= _sectionCount)

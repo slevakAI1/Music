@@ -78,14 +78,18 @@ namespace Music.Generator
         /// <inheritdoc/>
         public int SectionCount => _sectionCount;
 
-        /// <summary>
-        /// Gets the transition hint for a section boundary (transition FROM this section TO next).
-        /// Returns None for the last section.
-        /// </summary>
+        /// <inheritdoc/>
         public SectionTransitionHint GetTransitionHint(int absoluteSectionIndex)
         {
             ValidateSectionIndex(absoluteSectionIndex);
             return _transitionHints.TryGetValue(absoluteSectionIndex, out var hint) ? hint : SectionTransitionHint.None;
+        }
+
+        /// <inheritdoc/>
+        public TensionContext GetTensionContext(int absoluteSectionIndex, int barIndexWithinSection)
+        {
+            ValidateSectionIndex(absoluteSectionIndex);
+            return TensionContext.Create(this, absoluteSectionIndex, barIndexWithinSection);
         }
 
         private void ComputeProfiles()

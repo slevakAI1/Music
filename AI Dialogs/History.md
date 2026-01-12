@@ -98,7 +98,55 @@ Important pipeline invariant:
 
 ---
 
-## 5) Harmony Infrastructure (what exists now)
+## 5) Stage 3–6 Implementation Notes (migrated from Plan)
+
+### Stage 3 — Harmony sounds connected (keys/pads voice-leading)
+- `Song/Harmony/ChordRealization`
+  - Unit of harmony rendering for keys/pads (not raw chord-tone lists).
+  - Fields used by renderers: `MidiNotes`, `Inversion`, `RegisterCenterMidi`, color-tone metadata, `Density`.
+- `Song/Harmony/VoiceLeadingSelector`
+  - Selects successive `ChordRealization`s minimizing movement (cost-based), not randomness.
+  - Maintains independent previous-voicing state per role (keys vs pads) to avoid cross-role coupling.
+- Section arrangement hints (small profile)
+  - Per-section lift/density/color controls (chorus lifts; verse lighter) to avoid global-only behavior.
+
+### Stage 4 — Comp becomes comp (multi-note chord fragments)
+- `Song/Groove/CompRhythmPatternLibrary` + `Song/Groove/CompRhythmPattern`
+  - Groove onsets are candidates; patterns deterministically select subsets per bar/section.
+- `Song/Harmony/CompVoicingSelector`
+  - Outputs multi-note chord fragments (guide-tone bias on strong beats; root may be omitted).
+  - Guardrails: avoid muddy low voicings; keep top comp tone under lead-space ceiling.
+- `Song/Harmony/StrumTimingEngine`
+  - Deterministic micro-offset spread inside a chord to avoid block-chord feel.
+  - Applied to comp (and designed so keys can adopt later if desired).
+
+### Stage 5 — Bassline writing (groove-locked + harmony-aware)
+- `Song/Groove/BassPatternLibrary` + `Song/Groove/BassPattern`
+  - Small reusable pattern set (root anchors, fifth motion, octaves, approach notes).
+  - Pattern selection deterministic by section + bar; seed used only as tie-break.
+- `Song/Groove/BassChordChangeDetector`
+  - Detects upcoming chord changes within a window; enables diatonic approach/pickups.
+  - Approach insertion only when groove has a valid slot (policy/guardrail driven).
+
+### Stage 6 — Drums (template ? performance)
+- `Generator/Drums/DrumVariationEngine`
+  - Renders per-bar drum performance from groove template + section profile + seed.
+  - Variation keyed deterministically by `(seed, grooveName, sectionType, barIndex)`.
+- `Generator/Drums/DrumMicroTimingEngine`
+  - Deterministic push/pull micro-timing; clamped to avoid crossing bar boundaries.
+- `Generator/Drums/DrumVelocityShaper`
+  - Deterministic dynamics shaping: accents/ghosts; fill crescendos.
+- `Generator/Drums/DrumFillEngine`
+  - Fills at section ends or phrase ends; style-aware; density-capped.
+  - Structured fill shapes (8th/16th rolls, tom motion) with crash/ride + kick support on next downbeat.
+- `Generator/Drums/CymbalOrchestrationEngine`
+  - Deterministic crash/ride/hat language decisions tied to section energy and phrase peaks.
+- `Generator/Drums/DrumRoleParameters`
+  - Stable knob surface for Stage 7+/energy/tension to drive density/velocity/busy/fill behavior.
+
+---
+
+## 6) Harmony Infrastructure (what exists now)
 
 Key harmony modules (all under `Song/Harmony/`):
 - `HarmonyTrack` + `HarmonyEvent` as the timeline of harmony.
@@ -108,10 +156,10 @@ Key harmony modules (all under `Song/Harmony/`):
   - Holds MIDI notes + inversion/register metadata used across slots.
 - `VoiceLeadingSelector`
   - Chooses successive `ChordRealization`s with a movement-minimizing cost function.
-  - Enables “connected” harmony across time.
+  - Enables ?connected? harmony across time.
 - `CompVoicingSelector`
   - Returns chord fragments/guide-tone biased voicings for comp.
-  - Designed to output multi-note events per slot (not monophonic “lead-ish” comp).
+  - Designed to output multi-note events per slot (not monophonic ?lead-ish? comp).
 - `StrumTimingEngine`
   - Deterministic micro-offset spread within a chord (strum/roll feel).
 - `HarmonyValidator` + `HarmonyValidationOptions` + `HarmonyValidationResult`
@@ -122,11 +170,11 @@ Key harmony modules (all under `Song/Harmony/`):
 
 ---
 
-## 6) Groove Infrastructure (what exists now)
+## 7) Groove Infrastructure (what exists now)
 
 Key groove modules (under `Song/Groove/`):
 - `GroovePreset`
-  - Declarative groove “template” with at least two layers:
+  - Declarative groove ?template? with at least two layers:
     - `AnchorLayer`
     - `TensionLayer`
 - `OnsetGrid` / `OnsetSlot`
@@ -140,7 +188,7 @@ Key groove modules (under `Song/Groove/`):
 
 ---
 
-## 7) Stage 7 Energy System (implemented)
+## 8) Stage 7 Energy System (implemented)
 
 ### Energy arc selection and constraint application
 - `Song/Energy/EnergyArc.cs`
