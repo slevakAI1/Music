@@ -755,7 +755,174 @@ Notes:
 
 ---
 
-## Story 7.7 — Phrase-level shaping inside sections (energy micro-arcs) 
+# Stage 7.7 — Audible Part Intelligence Pass (Comp + Keys)  (Completed)
+**Goal:** Make Verse vs Chorus vs PreChorus differences **clearly audible** before building motif/melody systems.  
+**Rationale:** Stage 7 computes energy/tension intent, but current render logic barely uses it audibly. This pass ensures infrastructure produces real musical contrast.
+
+---
+
+## Current Problems (Why It Sounds Same-y)
+
+### Problem 1: Comp (GuitarTrackGenerator) rhythm selection is not audibly varied
+**Location:** `Generator\Guitar\GuitarTrackGenerator.cs`, method `ApplyDensityToPattern()` (lines 184-209)  
+**Issue:** Always takes "first N" indices from `pattern.IncludedOnsetIndices`, so:
+- Different seeds don't change which slots are chosen
+- Different sections use the same "most important" hits
+- Density changes sound like "same pattern, slightly busier" not "different comp behavior"
+
+### Problem 2: Register lift rounded to octaves, then often undone by guardrails
+**Location:** `Generator\Guitar\GuitarTrackGenerator.cs`, method `ApplyRegisterWithGuardrail()` (lines 217-260)  
+**Issue:** 
+- `RegisterLiftSemitones` is rounded to nearest octave (line 229: `int octaveShift = (int)Math.Round(registerLiftSemitones / 12.0) * 12`)
+- Values like +2, +4, +7 become 0
+- Lead-space ceiling (line 237-244) can push lifted voicings back down
+- Net result: register lift rarely produces audible change
+
+### Problem 3: Keys uses pads onsets directly with no rhythm variation
+**Location:** `Generator\Keys\KeysTrackGenerator.cs` (lines 41-46)  
+**Issue:** Keys just uses `grooveEvent.AnchorLayer.PadsOnsets` as-is. No pattern library, no density-based filtering, no behavioral modes. Every bar in a section sounds rhythmically identical.
+
+### Problem 4: Duration is always "slot duration" — no sustain/chop variation
+**Location:** Both generators use `slot.DurationTicks` directly (GuitarTrackGenerator line 157, KeysTrackGenerator line 171)  
+**Issue:** Energy/tension never affects duration. High energy should mean shorter durations (more re-attacks), low energy should mean longer sustains.
+
+### Problem 5: Seed doesn't meaningfully affect rhythm choices
+**Current state:** Seed affects velocity jitter and some pitch randomization, but not which slots are played or how duration/behavior changes. Different seeds ? nearly identical output.
+
+---
+
+## Stories
+
+### Story 7.7.1 — Create `CompBehavior` enum and deterministic selector (Completed)
+
+**Intent:** Define audibly-distinct comp behaviors that energy/tension/section can choose from.
+
+**New file:** `Generator\Guitar\CompBehavior.cs`
+
+**Acceptance criteria:**
+// AI: purpose=Deterministic selection of comp playing behavior based on energy/tension/section.
+// AI: invariants=Selection is deterministic by (sectionType, absoluteSectionIndex, barIndex, energy, busyProbability, seed).
+// AI: change=Add new behaviors by extending enum and updating SelectBehavior logic.
+
+**Tests required:**
+- Determinism: same inputs ? same behavior
+- Different sections ? different behaviors (at least 2 distinct behaviors across typical pop form)
+- Seed affects variation within section
+
+---
+
+### Story 7.7.2 — Create `CompBehaviorRealizer` to apply behavior to onset selection + duration  (Completed)
+
+**Intent:** Convert behavior + available onsets into actual onset selection and duration shaping.
+
+**New file:** `Generator\Guitar\CompBehaviorRealizer.cs`
+
+**Acceptance criteria:**
+// AI: purpose=Applies CompBehavior to onset selection and duration shaping.
+// AI: invariants=Output onsets are valid subset of input; durations bounded by slot constraints; deterministic.
+// AI: deps=Consumes CompBehavior, CompRhythmPattern, compOnsets; produces filtered onsets and duration multiplier.
+
+**Tests required:**
+- Each behavior produces different onset selection for same input
+- Duration multiplier is behavior-specific
+- Determinism preserved
+- Edge cases: empty onsets, 1 onset, all strong beats, all offbeats
+
+---
+
+### Story 7.7.3 — Update `GuitarTrackGenerator` to use behavior system + duration shaping  (Completed)
+
+**Intent:** Wire behavior selector and realizer into actual generation.
+
+**File:** `Generator\Guitar\GuitarTrackGenerator.cs`
+
+**Changes:**
+
+1. **Add behavior selection** (after getting energy profile, before pattern lookup):
+2. **Replace `ApplyDensityToPattern` with `CompBehaviorRealizer`**:
+3. **Apply duration multiplier**:
+4. **Remove `ApplyDensityToPattern` method** (replaced by `CompBehaviorRealizer`):
+
+**Tests required:**
+- Different sections produce different comp behaviors
+- Different seeds produce audibly different bar-to-bar variation
+- Duration multiplier affects note lengths
+- Existing guardrails (lead-space, register) still work
+
+---
+
+### Story 7.7.4 — Create `KeysRoleMode` enum and deterministic selector  (Completed)
+
+**Intent:** Define audibly-distinct keys/pads playing modes.
+
+**New file:** `Generator\Keys\KeysRoleMode.cs`
+
+---
+
+### Story 7.7.5 — Create `KeysModeRealizer` to apply mode to onset selection + duration  (Completed)
+
+**Intent:** Convert mode + available onsets into actual onset filtering and duration shaping.
+
+**New file:** `Generator\Keys\KeysModeRealizer.cs`
+
+**Acceptance criteria:**
+// AI: purpose=Applies KeysRoleMode to onset selection and duration shaping for keys/pads.
+// AI: invariants=Output onsets are valid subset of input; durations bounded; deterministic.
+
+---
+
+### Story 7.7.6 — Update `KeysTrackGenerator` to use mode system + duration shaping  (Completed)
+
+**Intent:** Wire mode selector and realizer into actual generation.
+
+**File:** `Generator\Keys\KeysTrackGenerator.cs`
+
+**Changes:**
+
+1. **Add mode selection** (after getting energy profile):
+2. **Add mode realization** (before building onset grid):
+3. **Apply duration multiplier in the note creation loop**:
+4. **Handle SplitVoicing mode** (in the slot loop):
+
+**Tests required:**
+- Different sections produce different modes
+- Duration multiplier affects sustain/chop
+- SplitVoicing correctly splits the chord
+- Existing guardrails (lead-space, register) still work
+
+---
+
+### Story  7.7.7 — Seed sensitivity audit and test coverage  (Completed)
+
+**Intent:** Verify seed meaningfully affects output.
+**New test file:** `Generator\Tests\SeedSensitivityTests.cs` (or add to existing test location)
+**Acceptance criteria:**
+
+---
+
+## Key Invariants (Must Not Break)
+
+1. **Determinism**: Same `(seed, song structure, groove)` ? identical output
+2. **Lead-space ceiling**: Comp/keys never exceed MIDI 72 (C5)
+3. **Bass register floor**: Comp never below MIDI 52 (E3)
+4. **Scale membership**: All notes remain diatonic (octave shifts only)
+5. **Sorted output**: `PartTrack.PartTrackNoteEvents` sorted by `AbsoluteTimeTicks`
+6. **No overlaps**: Notes of same pitch don't overlap (via `NoteOverlapHelper`)
+
+---
+
+## Expected Audible Results
+
+After implementation:
+- **Verse**: Sparse anchors or standard comp, sustain/pulse keys ? calm, spacious
+- **Chorus**: Syncopated chop or driving full comp, rhythmic keys ? energetic, busy
+- **PreChorus/Bridge**: Anticipate comp, possible split voicing keys ? building tension
+- **Different seeds**: Noticeably different bar-to-bar patterns within same structure
+- **Different sections**: Obviously different rhythmic density and note length
+
+---
+
+## Story 7.8 — Phrase-level shaping inside sections (energy micro-arcs) 
 
 ** Intent: Stage 8 introduces `PhraseMap` formally, but Stage 7 should standardize minimal phrase-position semantics (or at least standard outputs used later).
 Energy should modulate within a section (start → build → peak → cadence), not be flat for 8 bars.
@@ -777,7 +944,7 @@ Energy should modulate within a section (start → build → peak → cadence), 
 
 ---
 
-## Story 7.8 — Role interaction rules (prevent clutter; reserve melody/lead space)
+## Story 7.9 — Role interaction rules (prevent clutter; reserve melody/lead space)
 
 **Intent: Stage 8+ depends on this becoming an actual enforceable contract, not just guidance.
 Higher energy often means more parts; without explicit rules, arrangements become muddy.
@@ -801,7 +968,7 @@ Higher energy often means more parts; without explicit rules, arrangements becom
 
 ---
 
-## Story 7.9 — Diagnostics & explainability hooks
+## Story 7.10 — Diagnostics & explainability hooks
 
 **Intent: Stage 13/15 require a stable diagnostics bundle and regression-friendly outputs.
 Stage 7 becomes the backbone for later creative complexity; we need visibility into decisions.
@@ -822,7 +989,7 @@ Stage 7 becomes the backbone for later creative complexity; we need visibility i
 
 ---
 
-## Story 7.10 — Stage 8/9 integration contracts (future-proofing)
+## Story 7.11 — Stage 8/9 integration contracts (future-proofing)
 
 ** Intent: Plan introduces a unified intent query used everywhere.
 Ensure later stages can “ask” Stage 7 for arrangement support to convey emotion without rewriting Stage 7.
@@ -846,7 +1013,7 @@ Ensure later stages can “ask” Stage 7 for arrangement support to convey emot
 
 ---
 
-## Story 7.11 — Energy lever vector (planning-only metadata)
+## Story 7.12 — Energy lever vector (planning-only metadata)
 
 **Intent: align Stage 7 with the research model that energy is multi-factor, without forcing a rewrite.
 
@@ -862,7 +1029,7 @@ Ensure later stages can “ask” Stage 7 for arrangement support to convey emot
 
 ---
 
-## Story 7.12 — Harmonic rhythm intent hooks
+## Story 7.13 — Harmonic rhythm intent hooks
 
 **Intent:** research indicates chord-change rate is an energy lever. Stage 11 will do harmonic narrative, but Stage 7 should reserve the hook.
 
@@ -874,7 +1041,7 @@ Ensure later stages can “ask” Stage 7 for arrangement support to convey emot
 
 ---
 
-## Story 7.13 — Dominant pedal tension hook reservation 
+## Story 7.14 — Dominant pedal tension hook reservation 
 
 **Intent:** the research compilation highlights dominant pedal as a repeatable tension technique. Stage 11 will implement; Stage 7 should reserve the hook.
 
@@ -895,11 +1062,11 @@ Ensure later stages can “ask” Stage 7 for arrangement support to convey emot
 2. 7.5.3 micro tension
 3. 7.5.4 tension hooks (with new hook fields)
 4. 7.6 variation plan
-5. 7.7 micro energy arcs
-6. 7.8 constraint exposure + precedence contract
-7. 7.10 unified intent query surface
-8. 7.9 diagnostics consolidation
-9. 7.11–7.13 planning-only metadata hooks
+5. 7.8 micro energy arcs
+6. 7.9 constraint exposure + precedence contract
+7. 7.11 unified intent query surface
+8. 7.10 diagnostics consolidation
+9. 7.12–7.14 planning-only metadata hooks
 
 ---
 
