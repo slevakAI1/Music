@@ -72,6 +72,66 @@ From `Music.csproj`:
   - Represents one instrument/role output track.
   - Contains `MidiProgramName`, `MidiProgramNumber`, and `List<PartTrackEvent> PartTrackNoteEvents`.
   - These events are the canonical source for MIDI conversion.
+  - **Story M1 additions**:
+    - `PartTrackId` (nested record struct): stable identity across editing sessions; GUID-based string value
+    - `Meta` (property): carries domain/kind/provenance metadata with backward-compatible defaults
+    - Defaults to `SongAbsolute` domain and `RoleTrack` kind for existing code compatibility
+
+### Material fragments system (Story M1 - data definitions only)
+- **Purpose**: Establish explicit data types for reusable material fragments/variants as first-class citizens alongside song role tracks
+- **Status**: Data layer complete; not yet connected to generation or UI
+
+#### Core metadata types (under `Song/Material/`)
+- `PartTrackDomain` enum
+  - `SongAbsolute`: events in absolute song time (ticks from song start)
+  - `MaterialLocal`: events in local material time (ticks from fragment start, always >= 0)
+  - **Critical invariant**: `AbsoluteTimeTicks` meaning depends on domain
+- `PartTrackKind` enum
+  - `RoleTrack`: rendered role track for song playback (Bass/Comp/Keys/Drums)
+  - `MaterialFragment`: reusable template-like fragment in local time
+  - `MaterialVariant`: transformed output derived from a fragment
+- `MaterialKind` enum
+  - Optional classification: `Unknown`, `Riff`, `Hook`, `MelodyPhrase`, `DrumFill`, `BassFill`, `CompPattern`, `KeysPattern`
+- `PartTrack.PartTrackId` (nested in PartTrack)
+  - Record struct with string value (GUID format "N")
+  - `NewId()` factory method for unique ID generation
+- `MaterialProvenance` record
+  - Seed/transform metadata for future locking/regenerate features
+  - Fields: `BaseSeed`, `DerivedSeed`, `AttemptIndex`, `SourceFragmentId`, `TransformTags`
+  - Not used by generation yet; exists for future deterministic regeneration
+- `PartTrackMeta` record
+  - Complete metadata for PartTrack: `TrackId`, `Name`, `Description`, `IntendedRole`
+  - Domain/kind classification: `Domain`, `Kind`, `MaterialKind`
+  - Optional `Provenance` and `Tags` for searching/filtering
+  - **Defaults ensure backward compatibility**: `SongAbsolute` + `RoleTrack` + auto-generated TrackId
+
+#### Validation and storage
+- `PartTrackMaterialValidation`
+  - Non-throwing validation helper for material-specific constraints
+  - Validates: material tracks should use `MaterialLocal` domain; no negative ticks allowed
+  - Returns list of issue descriptions (empty if valid)
+- `MaterialBank`
+  - In-memory container for fragments/variants
+  - Keyed by `PartTrackId`; supports filtering by `Kind`, `MaterialKind`, and `IntendedRole` (case-insensitive)
+  - Methods: `Add`, `Remove`, `Contains`, `TryGet`, `GetByKind`, `GetByMaterialKind`, `GetByRole`, `Clear`
+  - Not connected to generation or serialization yet
+
+#### Design principles
+- **Backward compatible**: Existing `new PartTrack(notes)` calls work unchanged with safe defaults
+- **Explicit over implicit**: Domain/kind enums make track intent clear (no guessing from tick values)
+- **Deterministic-friendly**: Provenance fields exist now for future locking/regenerate without refactors
+- **Serialization-ready**: All types use records/enums suitable for JSON/serialization (serializer not chosen yet)
+- **PartTrack remains usable**: Fragments are just PartTrack objects with different Domain/Kind; existing grids/players/export work as-is
+
+#### Tests
+- `Song/Material/Tests/MaterialDefinitionsTests.cs`
+  - 13 test cases covering:
+    - Backward compatibility: default Meta values for new PartTrack
+    - ID uniqueness and non-empty values
+    - Validation rules: domain mismatch, negative ticks
+    - MaterialBank operations: add/remove/filter/round-trip
+    - Provenance defaults
+    - Tag support
 
 ---
 
@@ -508,13 +568,14 @@ All tests in `Generator/Tests/SeedSensitivityTests.cs` verify:
 ## 18) File/Folder Map (for quick navigation)
 
 - `Generator/`
-- `Core/` (entrypoint generator, overlap preventers, randomization helpers)
-- `Bass/`, `Guitar/`, `Keys/`, `Drums/` (role generators)
-- `Tests/` (SeedSensitivityTests and other validation tests)
+  - `Core/` (entrypoint generator, overlap preventers, randomization helpers)
+  - `Bass/`, `Guitar/`, `Keys/`, `Drums/` (role generators)
+  - `Tests/` (SeedSensitivityTests and other validation tests)
 - `Song/`
   - `Energy/` (EnergyArc, constraints, profiles, tension contracts)
   - `Harmony/` (contexts, voicing, validation, diagnostics)
   - `Groove/` (presets, onset grid, pattern libraries)
+  - `Material/` (fragment metadata, MaterialBank, validation; Story M1 data layer)
   - `Section/`, `Tempo/`, `Timing/`, `PartTrack/`, `Voices/`, `Lyrics/`
 - `Converters/` (PartTrack<->MIDI pipelines)
 - `Midi/` (import/export/playback wrappers)
