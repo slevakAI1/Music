@@ -1,95 +1,117 @@
 # Story 7.6 — Structured repetition engine (decomposition)
 
-Goal: implement `SectionVariationPlan` and deterministic A / A’ / B transforms so repeated sections evolve in a controlled, musical way while preserving guardrails.
+Goal: implement `SectionVariationPlan` and deterministic A / A’ / B transforms so repeated sections reuse a stable "base" while evolving in bounded, style-safe ways.
 
-Overview: This task is decomposed into six stories to keep scope small, testable, and align with existing Stage 7 contracts.
+Constraints:
+- Deterministic: same `(seed, groove/style, sectionTrack)` => same plans.
+- Safe: plans must not override existing role guardrails (range, density caps, lead-space ceilings).
+- Planner-only: this is intent metadata + bounded knobs; core role algorithms remain unchanged.
+- Minimal surface: expose a stable query contract so later stages can consume without refactors.
 
-## 7.6.1 — `SectionVariationPlan` model & storage
+Overview: This work is decomposed into five stories to keep changes small, testable, and aligned with existing Stage 7 query patterns.
 
-Intent: define the immutable data model and storage contract for per-section variation plans.
+## 7.6.1 — `SectionVariationPlan` model (immutable + bounded)
+
+Intent: define a compact, serialization-friendly model expressing section-to-section reuse and bounded per-role intent deltas.
 
 Acceptance criteria:
 - Add `SectionVariationPlan` record with:
-  - `int? BaseReferenceSectionIndex`
+  - `int AbsoluteSectionIndex`
+  - `int? BaseReferenceSectionIndex` (null => no reuse)
   - `double VariationIntensity` in [0..1]
-  - `Dictionary<string, double> RoleMultipliers` (role name -> multiplier)
-  - `Dictionary<string, int> RoleBiases` (optional integer biases)
-  - `IReadOnlyList<string> Flags` (small intent tags)
-- Provide serialization-friendly layout and a factory helper `SectionVariationPlan.Create(...)`.
-- Add unit tests verifying immutability, value clamping, and JSON round-trip.
+  - per-role bounded controls (minimum viable set):
+    - `double? DensityMultiplier`
+    - `int? VelocityBias`
+    - `int? RegisterLiftSemitones`
+    - `double? BusyProbability`
+  - `IReadOnlySet<string> Tags` (small, stable intent tags like `A`, `Aprime`, `B`, `Lift`, `Thin`, `Breakdown`)
+- Provide `Create(...)` helper(s) that clamp all numeric fields.
+- Add unit tests verifying:
+  - clamping/range enforcement
+  - immutability
+  - deterministic JSON round-trip (if the repo already has a JSON approach; otherwise skip JSON and just test invariants)
 
-Notes: keep model lightweight; use role keys consistent with `VoiceSet` names.
+Notes:
+- Prefer strongly-typed role fields over dictionaries to reduce ambiguity for later stages.
+- Keep role set aligned with Stage 7: `Bass`, `Comp`, `Keys`, `Pads`, `Drums`.
 
-## 7.6.2 — Deterministic Variation Planner (core algorithm)
+## 7.6.2 — Base-reference selection (A / A’ / B mapping)
 
-Intent: build the planner that deterministically generates a `SectionVariationPlan` for each section.
-
-Acceptance criteria:
-- Implement `SectionVariationPlanner` with method `GetPlan(SectionTrack, int absoluteSectionIndex, EnergySectionProfile, EnergyArc, seed)`.
-- Planner uses deterministic drivers: section type/index, energy target, tension transition hint, groove/style, and seed as tie-break.
-- Planner outputs bounded multipliers/biases obeying `VariationIntensity`.
-- Planner exposes `GetAllPlans(sectionTrack, energyArc, seed)` convenience method.
-- Add unit tests verifying determinism, idempotence, and safe bounds.
-
-Notes: keep algorithm simple (weighted rules + deterministic hashing) to start; make it pluggable.
-
-## 7.6.3 — Per-role transform executors (application surface)
-
-Intent: implement small, role-specific transform adapters that apply `SectionVariationPlan` to role generators without changing their core logic.
+Intent: deterministically choose which section instances reuse which earlier "base" section so later renderers can repeat core decisions.
 
 Acceptance criteria:
-- For each role (`Drums`, `Bass`, `Comp`, `Keys`): implement a thin adapter that maps plan fields into existing role knobs:
-  - `Drums`: adjust `DensityMultiplier`, `FillProbability`, `FillComplexity`.
-  - `Bass`: adjust approach/octave chance, busy probability.
-  - `Comp`: adjust `DensityMultiplier`, anticipateProbability, strum variations.
-  - `Keys`: adjust `DensityMultiplier`, register lift semitones.
-- Adapters must be pure mapping functions that return a new parameter object; they must not mutate global state.
-- Update role generator constructors or parameter inputs to accept optional variation overrides.
-- Add integration tests asserting that applying a plan modifies parameters within allowed guardrails.
+- Implement deterministic `BaseReferenceSectionIndex` selection rules:
+  - same `SectionType` repeats tend to reference the earliest prior instance (A) unless contrast is required (B).
+  - allow a deterministic B-case for `Bridge`/`Solo`/explicit contrasts.
+  - ties resolved deterministically via stable keys (sectionType/index + groove/style + seed).
+- Produce stable `Tags` at least including `A`, `Aprime`, and `B` where applicable.
+- Add unit tests verifying:
+  - determinism
+  - expected mapping on common forms (e.g., Intro-V-C-V-C-Bridge-C-Outro)
 
-Notes: map only—do not change generator core algorithms; this keeps behavior additive and safe.
+Notes:
+- This story does not apply the plan to generation; it only computes the reuse graph.
 
-## 7.6.4 — Query API: `GetVariationPlan(sectionIndex)` and caching
+## 7.6.3 — Variation intensity + per-role deltas (bounded planner)
 
-Intent: provide a stable, fast query surface used by generators and diagnostics.
-
-Acceptance criteria:
-- Add `IVariationQuery` with `SectionVariationPlan GetVariationPlan(int absoluteSectionIndex)` and `IReadOnlyList<SectionVariationPlan> GetAllPlans()`.
-- Implement `DeterministicVariationQuery` that precomputes plans for all sections and caches them (constructed from `SectionTrack`, `EnergyArc`, `seed`).
-- Ensure thread-safe immutable reads.
-- Wire `Generator` to accept an optional `IVariationQuery` and use plan values when present.
-- Add tests verifying cached results are deterministic and thread-safe.
-
-Notes: follow existing pattern used by `EnergyArc` and `ITensionQuery` for consistency.
-
-## 7.6.5 — Guardrails, precedence, and conflict resolution
-
-Intent: ensure variation never violates existing guardrails (lead-space, low-end, density caps) and resolves conflicts deterministically.
+Intent: compute per-section bounded per-role deltas driven by existing Stage 7 intent (energy/tension/transition hint).
 
 Acceptance criteria:
-- Implement `VariationGuardrail` helpers that clamp role multipliers/biases against `EnergyProfile` and global caps.
-- Define precedence rules (configurable via policy): e.g., `Bass` low-end > `Comp` density > `Keys` density.
-- Integrate guardrails into the planner and per-role adapters so final parameters are safe.
-- Add tests validating guardrail enforcement and deterministic tie-breaks.
+- Implement `SectionVariationPlanner` that outputs a `SectionVariationPlan` for each section.
+- Deterministic drivers (no new systems):
+  - section type/index and its base/reference selection (7.6.2)
+  - section energy target (from `EnergyArc` / `EnergySectionProfile`)
+  - tension transition hint (from existing tension query contract) when available
+  - groove/style identity
+  - seed used only for deterministic tie-breaks
+- Rules must be conservative and clamped:
+  - `VariationIntensity` stays small by default; only rises near transitions or higher-energy sections.
+  - per-role deltas are bounded and optional (null means "no change").
+- Unit tests:
+  - determinism
+  - values always in valid ranges
+  - variation differs across repeats in at least one controlled way (A vs A’) while staying bounded
 
-Notes: keep defaults conservative; expose policy hooks for later tuning.
+Notes:
+- This is planning; do not encode bar/slot-level behavior here.
 
-## 7.6.6 — Diagnostics, test coverage, and examples
+## 7.6.4 — Query surface + generator wiring
 
-Intent: add diagnostics and tests so behavior is observable and regression-safe.
+Intent: expose a stable query method `GetVariationPlan(sectionIndex)` and integrate it into the pipeline without changing existing behavior when absent.
 
 Acceptance criteria:
-- Add `VariationDiagnostics` to dump per-section `SectionVariationPlan` and explain which rules contributed and final clamped values.
-- Add unit and integration tests covering:
-  - model round-trip
-  - planner determinism under varying seeds/styles
-  - adapter mapping correctness
-  - guardrail enforcement
-  - generator integration smoke test (ensures no runtime errors and parameters applied)
-- Provide a small example script/snippet in docs showing how to create a `DeterministicVariationQuery` and consume plans in a generator run.
+- Add `IVariationQuery` with:
+  - `SectionVariationPlan GetVariationPlan(int absoluteSectionIndex)`
+- Implement `DeterministicVariationQuery` that precomputes and caches plans for the whole `SectionTrack`.
+- Update generator entrypoint(s) to optionally accept/use `IVariationQuery`.
+  - If not provided, generation remains unchanged.
+- Add tests verifying:
+  - determinism of cached plans
+  - no plan => no behavior change (where test harness allows; otherwise validate by comparing parameters passed into role generators)
 
-Notes: diagnostics must be opt-in and must not affect generation results.
+Notes:
+- Mirror the architecture style used by `EnergyArc` caching and `ITensionQuery`.
+
+## 7.6.5 — Role-parameter application adapters + minimal diagnostics
+
+Intent: apply `SectionVariationPlan` to existing role parameter objects in a safe, non-invasive way and make it debuggable.
+
+Acceptance criteria:
+- Add thin, pure mapping helpers that take:
+  - existing role profile/parameters (from Stage 7 energy/tension)
+  - optional `SectionVariationPlan`
+  - output adjusted parameters with clamps/guardrails preserved
+- Apply in at least: `Drums`, `Bass`, `Comp`, `Keys/Pads` (as feasible with current parameter surfaces).
+- Add minimal opt-in diagnostics:
+  - one-line-per-section dump: baseRef + intensity + non-null per-role deltas
+  - diagnostics must not affect generation results
+- Add tests verifying:
+  - applying a plan adjusts parameters only within caps
+  - determinism
+
+Notes:
+- Keep mapping intentionally shallow: bias existing knobs (density/velocity/busy/register), do not add new musical logic.
 
 ---
 
-Total stories: 6 (7.6.1 through 7.6.6). Each is designed to be independently implementable and testable, and together they realize the intent of Story 7.6 while preserving existing guardrails and determinism.
+Total stories: 5 (7.6.1 through 7.6.5). Together they implement Story 7.6 intent (structured repetition with safe evolution) while keeping scope planner-level and preserving determinism.
