@@ -922,7 +922,7 @@ After implementation:
 
 ---
 
-## Story 7.8 — Phrase-level shaping inside sections (energy micro-arcs) 
+## Story 7.8 — Phrase-level shaping inside sections (energy micro-arcs)  (not started)
 
 ** Intent: Stage 8 introduces `PhraseMap` formally, but Stage 7 should standardize minimal phrase-position semantics (or at least standard outputs used later).
 Energy should modulate within a section (start → build → peak → cadence), not be flat for 8 bars.
@@ -944,52 +944,7 @@ Energy should modulate within a section (start → build → peak → cadence), 
 
 ---
 
-## Story 7.9 — Role interaction rules (prevent clutter; reserve melody/lead space)
-
-**Intent: Stage 8+ depends on this becoming an actual enforceable contract, not just guidance.
-Higher energy often means more parts; without explicit rules, arrangements become muddy.
-
-**Acceptance criteria:**
-- Define explicit (queryable) constraints:
-  - lead/vocal reserved band (even before melody exists)
-  - low-end reserved band for bass
-  - per-role density caps
-- Provide a deterministic “conflict resolution policy” skeleton:
-  - priority order by role (configurable by style)
-  - deterministic tie-break function
-- Note (explicitly preserved): actual cross-role thinning is intended for Stage 8, but Stage 7 must expose:
-  - constraint inputs
-  - budgets
-  - intended precedence
-- Additional unchanged constraint scope
-  - **Lead space reservation:** define a MIDI band reserved for future lead/vocal; non-lead roles avoid dense sustained notes there.
-  - **Low-end management:** prevent pads/keys/comp from occupying bass register.
-  - **Density budgets:** when multiple roles are busy on the same weak slots, deterministically thin one role.
-
----
-
-## Story 7.10 — Diagnostics & explainability hooks
-
-**Intent: Stage 13/15 require a stable diagnostics bundle and regression-friendly outputs.
-Stage 7 becomes the backbone for later creative complexity; we need visibility into decisions.
-
-**Acceptance criteria:**
-- Add opt-in diagnostics that can dump:
-  - energy arc template + constrained energies
-  - derived `SectionEnergyProfile`
-  - derived `SectionTensionProfile` + drivers
-  - `MicroTensionMap` summary
-  - `SectionVariationPlan`
-  - transition hints per boundary
-- Must be deterministic and must not affect generation.
-- Unchanged diagnostic scope:
-  - dump chosen `EnergyArc`
-  - dump derived `SectionVariationPlan`
-  - summarize realized densities + average velocities per role per section
-
----
-
-## Story 7.11 — Stage 8/9 integration contracts (future-proofing)
+## Story 7.9 — Stage 8/9 integration contracts (future proofing)  (not started)
 
 ** Intent: Plan introduces a unified intent query used everywhere.
 Ensure later stages can “ask” Stage 7 for arrangement support to convey emotion without rewriting Stage 7.
@@ -1013,153 +968,11 @@ Ensure later stages can “ask” Stage 7 for arrangement support to convey emot
 
 ---
 
-## Story 7.12 — Energy lever vector (planning-only metadata)
-
-**Intent: align Stage 7 with the research model that energy is multi-factor, without forcing a rewrite.
-
-**Acceptance criteria:**
-- Add a planning-only `EnergyLeverVector` (or similarly named) that tracks intended contributors:
-  - instrumentation density intent
-  - rhythmic activity intent
-  - register lift intent
-  - harmonic rhythm intent (future)
-  - dynamics intent (velocity bias)
-- Derived deterministically from `EnergyArc` + style + section type.
-- Used only as metadata/hints at this stage; renderers may ignore fields they do not support yet.
-
----
-
-## Story 7.13 — Harmonic rhythm intent hooks
-
-**Intent:** research indicates chord-change rate is an energy lever. Stage 11 will do harmonic narrative, but Stage 7 should reserve the hook.
-
-**Acceptance criteria:**
-- Add a small intent field at section-level:
-  - `HarmonicRhythmMultiplier` (e.g., 1.0 baseline, 1.2 for chorus)
-- Deterministic mapping from section type + energy target.
-- No behavior change required yet unless harmony engine already supports it.
-
----
-
-## Story 7.14 — Dominant pedal tension hook reservation 
-
-**Intent:** the research compilation highlights dominant pedal as a repeatable tension technique. Stage 11 will implement; Stage 7 should reserve the hook.
-
-**Acceptance criteria:**
-- Add a section-transition intent hint:
-  - `bool SuggestDominantPedalLeadIn`
-  - optional `int LeadInBars`
-- Deterministic mapping:
-  - enabled in build contexts (e.g., PreChorus → Chorus) when tension high enough
-  - style gated
-- No harmony rewriting required yet.
-
----
-
-## Implementation order (recommended)
-
-1. 7.5.2 macro tension + drivers + transition hint
-2. 7.5.3 micro tension
-3. 7.5.4 tension hooks (with new hook fields)
-4. 7.6 variation plan
-5. 7.8 micro energy arcs
-6. 7.9 constraint exposure + precedence contract
-7. 7.11 unified intent query surface
-8. 7.10 diagnostics consolidation
-9. 7.12–7.14 planning-only metadata hooks
-
----
-
 ## Notes
 
 - This revision intentionally keeps Stage 7 “planner-level.”
 - Stage 8 is where phrase maps and cross-role thinning are expected to become concrete algorithms.
 - Stories 7.11–7.13 are designed to prevent later refactors by reserving deterministic hooks now.
-
----
-
-# Music Generator Plan (Stage 8+)
-
-This plan assumes **Stage 7 is complete** and focuses on what comes next to reach the goal: **human-like, creative, unique music generation** driven by inputs + one or more seeds, while preserving strict determinism where required.
-
-Design principles retained:
-- **Determinism-first:** given `(seed(s), inputs, song structure)` outputs are repeatable. Use randomness only as deterministic tie-break among valid options.
-- **Safety rails:** avoid muddiness, preserve lead space, protect groove anchors, clamp ranges.
-- **Separation of concerns:** planning produces intent + constraints; renderers realize them.
-- **Explainability:** every major planner can emit diagnostics without affecting generation.
-
----
- 
-## Stage 8 — Phrase map + arrangement interaction (make Stage 7 usable by future melody/motifs)
-
-**Why now:** Stage 7 introduced energy/tension intent. Stage 8 turns that intent into a *time grid of musical meaning* (phrases, peaks, cadences) and adds cross-role interaction rules, so later melody/motif decisions can be made safely.
-
-### Story 8.1 — `PhraseMap` (within-section) as a first-class model
-
-**Intent:** later systems need to ask “where am I in the phrase?” deterministically.
-
-**Acceptance criteria:**
-- Create a `PhraseMap` model for each `SongSection`:
-  - Bar-level positions: `Start`, `Middle`, `Peak`, `Cadence`.
-  - Flags: `IsPhraseStart`, `IsPhraseEnd`, `IsSectionStart`, `IsSectionEnd`.
-  - Phrase identity: `PhraseIndex`, `BarIndexInPhrase`, `PhraseLengthBars`.
-- Default behavior when not specified by user:
-  - Infer phrases deterministically using section length (common cases: 4-bar phrase for 8/16 bar sections, 2-bar for 4 bar sections).
-  - Allow style/groove to influence defaults (e.g., EDM often 8-bar builds).
-- Must support irregular sections (e.g., 6 bars) by producing best-effort segmentation.
-- Add tests:
-  - correct map length
-  - determinism
-  - reasonable distribution of `Peak`/`Cadence` for common sizes
-
-### Story 8.2 — `SectionArc` (micro-energy within section) derived from Stage 7 + `PhraseMap`
-
-**Intent:** energy/tension shouldn’t be flat across the whole section.
-
-**Acceptance criteria:**
-- Create a `SectionArc` (bar-level modifiers) that provides small per-bar deltas:
-  - `EnergyDelta` and `TensionDelta` (bounded)
-  - derived deterministically from `SectionEnergyProfile`, `SectionTensionProfile`, and `PhraseMap`.
-- Ensure deltas are subtle (e.g., `±0.05` scale) and clamped.
-- Wire into role renderers as a *bias*:
-  - drums: fill/pull/impact bias at phrase ends and section starts
-  - comp/keys/pads: velocity/density bias at `Peak`, thinning at `Cadence`
-  - bass: pickup probability increase at `Cadence` only if a valid slot exists
-
-### Story 8.3 — Cross-role constraints + “density budget” engine
-
-**Intent:** as more musical intelligence is added, arrangements can become crowded.
-
-**Acceptance criteria:**
-- Implement a small cross-role constraint pass operating per `(section, bar, slot)`:
-  - **Lead space reservation:** define a register band reserved for future lead/vocal.
-  - **Low-end management:** prevent pads/comp/keys from colliding with bass.
-  - **Simultaneous busy-ness:** when multiple roles are dense on weak slots, deterministically thin one role.
-- Introduce a `RoleDensityBudget`:
-  - per section (from Stage 7 orchestration)
-  - optionally per bar (from `SectionArc`)
-- Deterministic thinning policy:
-  - choose which role yields using stable precedence rules + deterministic tie-break.
-- Tests:
-  - determinism
-  - budget never exceeded
-  - bass/lead space constraints never violated
-
-### Story 8.4 — Expose a unified query contract for later stages
-
-**Intent:** avoid future refactors by giving a stable “ask the planner” API.
-
-**Acceptance criteria:**
-- Create a `SongIntentQuery` (or similarly named) API that returns a single immutable `IntentContext`:
-  - energy target + tension target
-  - micro energy/tension deltas (from `SectionArc`)
-  - phrase position (from `PhraseMap`)
-  - orchestration hints (roles present, density multipliers)
-  - reserved register bands (lead/vocal)
-- Provide methods:
-  - `GetIntentContext(sectionIndex, barIndexWithinSection)`
-  - `GetIntentContext(absoluteBarIndex)` (optional convenience)
-- Must not require renderers to know planner internals.
 
 ---
 
@@ -1294,6 +1107,180 @@ Design principles retained:
   - Verse 2 melody = Verse 1 melody + bounded variation ops
   - Final chorus can lift register or add melodic extensions
 - Variation ops remain deterministic and constrained.
+---
+
+# Music Generator Plan (Stage 8+)
+
+This plan assumes **Stage 7 is complete** and focuses on what comes next to reach the goal: **human-like, creative, unique music generation** driven by inputs + one or more seeds, while preserving strict determinism where required.
+
+Design principles retained:
+- **Determinism-first:** given `(seed(s), inputs, song structure)` outputs are repeatable. Use randomness only as deterministic tie-break among valid options.
+- **Safety rails:** avoid muddiness, preserve lead space, protect groove anchors, clamp ranges.
+- **Separation of concerns:** planning produces intent + constraints; renderers realize them.
+- **Explainability:** every major planner can emit diagnostics without affecting generation.
+
+---
+
+(THIS WAS MOVED HERE PENDING FURTHER ANALYSIS) 
+## Stage ? — Phrase map + arrangement interaction (make Stage 7 usable by future melody/motifs)
+
+**Why now:** Stage 7 introduced energy/tension intent. Stage 8 turns that intent into a *time grid of musical meaning* (phrases, peaks, cadences) and adds cross-role interaction rules, so later melody/motif decisions can be made safely.
+
+### Story ?.1 — Cross-role constraints + “density budget” engine
+
+**Intent:** as more musical intelligence is added, arrangements can become crowded.
+
+**Acceptance criteria:**
+- Implement a small cross-role constraint pass operating per `(section, bar, slot)`:
+  - **Lead space reservation:** define a register band reserved for future lead/vocal.
+  - **Low-end management:** prevent pads/comp/keys from colliding with bass.
+  - **Simultaneous busy-ness:** when multiple roles are dense on weak slots, deterministically thin one role.
+- Introduce a `RoleDensityBudget`:
+  - per section (from Stage 7 orchestration)
+  - optionally per bar (from `SectionArc`)
+- Deterministic thinning policy:
+  - choose which role yields using stable precedence rules + deterministic tie-break.
+- Tests:
+  - determinism
+  - budget never exceeded
+  - bass/lead space constraints never violated
+
+### Story ?.2 — `PhraseMap` (within-section) as a first-class model
+
+**Intent:** later systems need to ask “where am I in the phrase?” deterministically.
+
+**Acceptance criteria:**
+- Create a `PhraseMap` model for each `SongSection`:
+  - Bar-level positions: `Start`, `Middle`, `Peak`, `Cadence`.
+  - Flags: `IsPhraseStart`, `IsPhraseEnd`, `IsSectionStart`, `IsSectionEnd`.
+  - Phrase identity: `PhraseIndex`, `BarIndexInPhrase`, `PhraseLengthBars`.
+- Default behavior when not specified by user:
+  - Infer phrases deterministically using section length (common cases: 4-bar phrase for 8/16 bar sections, 2-bar for 4 bar sections).
+  - Allow style/groove to influence defaults (e.g., EDM often 8-bar builds).
+- Must support irregular sections (e.g., 6 bars) by producing best-effort segmentation.
+- Add tests:
+  - correct map length
+  - determinism
+  - reasonable distribution of `Peak`/`Cadence` for common sizes
+
+### Story ?.3 — `SectionArc` (micro-energy within section) derived from Stage 7 + `PhraseMap`
+
+**Intent:** energy/tension shouldn’t be flat across the whole section.
+
+**Acceptance criteria:**
+- Create a `SectionArc` (bar-level modifiers) that provides small per-bar deltas:
+  - `EnergyDelta` and `TensionDelta` (bounded)
+  - derived deterministically from `SectionEnergyProfile`, `SectionTensionProfile`, and `PhraseMap`.
+- Ensure deltas are subtle (e.g., `±0.05` scale) and clamped.
+- Wire into role renderers as a *bias*:
+  - drums: fill/pull/impact bias at phrase ends and section starts
+  - comp/keys/pads: velocity/density bias at `Peak`, thinning at `Cadence`
+  - bass: pickup probability increase at `Cadence` only if a valid slot exists
+
+### Story ?.4 — Expose a unified query contract for later stages
+
+**Intent:** avoid future refactors by giving a stable “ask the planner” API.
+
+**Acceptance criteria:**
+- Create a `SongIntentQuery` (or similarly named) API that returns a single immutable `IntentContext`:
+  - energy target + tension target
+  - micro energy/tension deltas (from `SectionArc`)
+  - phrase position (from `PhraseMap`)
+  - orchestration hints (roles present, density multipliers)
+  - reserved register bands (lead/vocal)
+- Provide methods:
+  - `GetIntentContext(sectionIndex, barIndexWithinSection)`
+  - `GetIntentContext(absoluteBarIndex)` (optional convenience)
+- Must not require renderers to know planner internals.
+
+---
+
+(THIS WAS MOVED HERE PENDING FURTHER ANALYSIS)
+## Story ?.1 — Role interaction rules (prevent clutter; reserve melody/lead space)
+
+**Intent: Stage 8+ depends on this becoming an actual enforceable contract, not just guidance.
+Higher energy often means more parts; without explicit rules, arrangements become muddy.
+
+**Acceptance criteria:**
+- Define explicit (queryable) constraints:
+  - lead/vocal reserved band (even before melody exists)
+  - low-end reserved band for bass
+  - per-role density caps
+- Provide a deterministic “conflict resolution policy” skeleton:
+  - priority order by role (configurable by style)
+  - deterministic tie-break function
+- Note (explicitly preserved): actual cross-role thinning is intended for Stage 8, but Stage 7 must expose:
+  - constraint inputs
+  - budgets
+  - intended precedence
+- Additional unchanged constraint scope
+  - **Lead space reservation:** define a MIDI band reserved for future lead/vocal; non-lead roles avoid dense sustained notes there.
+  - **Low-end management:** prevent pads/keys/comp from occupying bass register.
+  - **Density budgets:** when multiple roles are busy on the same weak slots, deterministically thin one role.
+
+---
+
+## Story ?.10 — Diagnostics & explainability hooks
+
+**Intent: Stage 13/15 require a stable diagnostics bundle and regression-friendly outputs.
+Stage 7 becomes the backbone for later creative complexity; we need visibility into decisions.
+
+**Acceptance criteria:**
+- Add opt-in diagnostics that can dump:
+  - energy arc template + constrained energies
+  - derived `SectionEnergyProfile`
+  - derived `SectionTensionProfile` + drivers
+  - `MicroTensionMap` summary
+  - `SectionVariationPlan`
+  - transition hints per boundary
+- Must be deterministic and must not affect generation.
+- Unchanged diagnostic scope:
+  - dump chosen `EnergyArc`
+  - dump derived `SectionVariationPlan`
+  - summarize realized densities + average velocities per role per section
+
+---
+
+## Story ?.12 — Energy lever vector (planning-only metadata)
+
+**Intent: align Stage 7 with the research model that energy is multi-factor, without forcing a rewrite.
+
+**Acceptance criteria:**
+- Add a planning-only `EnergyLeverVector` (or similarly named) that tracks intended contributors:
+  - instrumentation density intent
+  - rhythmic activity intent
+  - register lift intent
+  - harmonic rhythm intent (future)
+  - dynamics intent (velocity bias)
+- Derived deterministically from `EnergyArc` + style + section type.
+- Used only as metadata/hints at this stage; renderers may ignore fields they do not support yet.
+
+---
+
+## Story ?.13 — Harmonic rhythm intent hooks
+
+**Intent:** research indicates chord-change rate is an energy lever. Stage 11 will do harmonic narrative, but Stage 7 should reserve the hook.
+
+**Acceptance criteria:**
+- Add a small intent field at section-level:
+  - `HarmonicRhythmMultiplier` (e.g., 1.0 baseline, 1.2 for chorus)
+- Deterministic mapping from section type + energy target.
+- No behavior change required yet unless harmony engine already supports it.
+
+---
+
+## Story ?.14 — Dominant pedal tension hook reservation 
+
+**Intent:** the research compilation highlights dominant pedal as a repeatable tension technique. Stage 11 will implement; Stage 7 should reserve the hook.
+
+**Acceptance criteria:**
+- Add a section-transition intent hint:
+  - `bool SuggestDominantPedalLeadIn`
+  - optional `int LeadInBars`
+- Deterministic mapping:
+  - enabled in build contexts (e.g., PreChorus → Chorus) when tension high enough
+  - style gated
+- No harmony rewriting required yet.
 
 ---
 
