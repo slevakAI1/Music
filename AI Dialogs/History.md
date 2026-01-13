@@ -288,9 +288,34 @@ Key bass modules:
 
 Key comp modules:
 - `Generator/Guitar/GuitarTrackGenerator.cs`
+  - Uses `CompBehaviorSelector` to select playing behavior (Story 8.0.1)
+  - Uses `CompBehaviorRealizer` for onset filtering and duration shaping (Story 8.0.2)
+  - Applies behavior-specific duration multipliers to note events (Story 8.0.3)
 - `Song/Groove/CompRhythmPatternLibrary.cs` and `Song/Groove/CompRhythmPattern.cs`
 - `Song/Harmony/CompVoicingSelector.cs`
 - `Song/Harmony/StrumTimingEngine.cs` (micro roll offsets applied to comp chords)
+
+### Stage 8.0 Comp Behavior System (implemented)
+- `Generator/Guitar/CompBehavior.cs`
+  - Enum defining five distinct playing behaviors:
+    - `SparseAnchors`: mostly strong beats, fewer hits, longer sustains (Verse low energy, Intro, Outro)
+    - `Standard`: balanced strong/weak beats, moderate sustains (Verse mid energy, Bridge)
+    - `Anticipate`: adds anticipations, shorter notes (PreChorus, build sections)
+    - `SyncopatedChop`: more offbeats, short durations, frequent re-attacks (Chorus high energy)
+    - `DrivingFull`: all available onsets, consistent attacks, driving feel (Chorus max energy, Outro)
+  - `CompBehaviorSelector`: deterministic selection by `(sectionType, absoluteSectionIndex, barIndex, energy, busyProbability, seed)`
+    - Section-type specific thresholds and biases
+    - Per-bar variation every 4th bar (30% chance, hash-based)
+    - Upgrade/downgrade logic for natural evolution
+- `Generator/Guitar/CompBehaviorRealizer.cs`
+  - `CompRealizationResult` record: `SelectedOnsets` list + `DurationMultiplier` [0.25..1.5]
+  - Behavior-specific onset selection strategies:
+    - `SparseAnchors`: prefer strong beats only, limit to max 2 onsets, duration *1.3
+    - `Standard`: pattern-based with rotation by bar+seed, duration *1.0
+    - `Anticipate`: interleave anticipations and strong beats, duration *0.75
+    - `SyncopatedChop`: prefer offbeats (70% target), duration *0.5
+    - `DrivingFull`: all/nearly all onsets, duration *0.65
+  - All onset selections clamped and deterministic
 
 ---
 
@@ -298,9 +323,33 @@ Key comp modules:
 
 Key keys modules:
 - `Generator/Keys/KeysTrackGenerator.cs`
+  - Uses `KeysRoleModeSelector` to select playing mode (Story 8.0.4)
+  - Uses `KeysModeRealizer` for onset filtering and duration shaping (Story 8.0.5)
+  - Applies mode-specific duration multipliers and split-voicing logic (Story 8.0.6)
 - Harmony dependencies:
   - `ChordRealization` and `VoiceLeadingSelector`
   - `HarmonyPitchContextBuilder`
+
+### Stage 8.0 Keys Role Mode System (implemented)
+- `Generator/Keys/KeysRoleMode.cs`
+  - Enum defining four distinct playing modes:
+    - `Sustain`: hold chord across bar/half-bar, minimal re-attacks (low energy, intros, outros)
+    - `Pulse`: re-strike on selected beats, moderate sustain (verses, mid-energy sections)
+    - `Rhythmic`: follow pad onsets closely, shorter notes (choruses, high-energy sections)
+    - `SplitVoicing`: split voicing across 2 hits (builds, transitions, dramatic moments)
+  - `KeysRoleModeSelector`: deterministic selection by `(sectionType, absoluteSectionIndex, barIndex, energy, busyProbability, seed)`
+    - Section-type specific mode selection (Verse: Sustain?Pulse?Rhythmic; Chorus: Pulse?Rhythmic)
+    - Bridge special case: 40% chance of SplitVoicing on first bar when energy > 0.5
+- `Generator/Keys/KeysModeRealizer.cs`
+  - `KeysRealizationResult` record: `SelectedOnsets` list + `DurationMultiplier` [0.5..2.0] + `SplitUpperOnsetIndex`
+  - Mode-specific onset selection and duration:
+    - `Sustain`: only first onset, duration *2.0 (extended beyond slot)
+    - `Pulse`: prefer strong beats, deterministic offbeat selection by seed, duration *1.0
+    - `Rhythmic`: use most/all onsets (up to 130% density), duration *0.7
+    - `SplitVoicing`: two onsets (first + middle), duration *1.2, marks second onset as upper voicing
+  - Integration in `KeysTrackGenerator`: splits chord realization when `SplitVoicing` mode active
+    - Lower onset: lower half + middle note
+    - Upper onset: upper half of voicing
 
 ---
 
@@ -399,6 +448,52 @@ There is also an import-only converter:
 
 ---
 
+## 16.5) Stage 8.0 Audibility Pass (Comp + Keys Intelligence)
+
+**Priority:** Immediately after Stage 7 (before Stage 8 PhraseMap work)  
+**Goal:** Make Verse vs Chorus vs PreChorus differences clearly audible through behavior-based rhythm variation and duration shaping.
+
+### Problems Solved
+1. **Comp rhythm selection**: Previously always took "first N" indices; now uses behavior-specific strategies (sparse anchors, anticipations, syncopated chop, etc.)
+2. **Register lift ineffectiveness**: Rounded to octaves and often undone by guardrails; now behavior system provides audible variety through rhythm and duration instead
+3. **Keys static rhythm**: Previously used pads onsets directly; now filters through mode system (sustain, pulse, rhythmic, split voicing)
+4. **No duration variation**: Previously always used slot duration; now applies behavior/mode-specific duration multipliers (0.25x to 2.0x)
+5. **Seed insensitivity**: Seed now affects per-bar variation, onset rotation, and mode selection chances
+
+### Implementation Stories (all completed)
+- **Story 8.0.1**: `CompBehavior` enum + `CompBehaviorSelector` (deterministic behavior selection)
+- **Story 8.0.2**: `CompBehaviorRealizer` (onset filtering + duration shaping per behavior)
+- **Story 8.0.3**: Integration into `GuitarTrackGenerator` (behavior selection, realization, duration application)
+- **Story 8.0.4**: `KeysRoleMode` enum + `KeysRoleModeSelector` (deterministic mode selection)
+- **Story 8.0.5**: `KeysModeRealizer` (onset filtering + duration shaping per mode)
+- **Story 8.0.6**: Integration into `KeysTrackGenerator` (mode selection, realization, split voicing)
+- **Story 8.0.7**: `SeedSensitivityTests` (12 tests verifying seed sensitivity and determinism)
+
+### Key Modules
+- `Generator/Guitar/CompBehavior.cs` (behavior enum + selector)
+- `Generator/Guitar/CompBehaviorRealizer.cs` (realization logic)
+- `Generator/Keys/KeysRoleMode.cs` (mode enum + selector)
+- `Generator/Keys/KeysModeRealizer.cs` (realization logic)
+- `Generator/Tests/SeedSensitivityTests.cs` (cross-role seed sensitivity validation)
+
+### Test Coverage
+All tests in `Generator/Tests/SeedSensitivityTests.cs` verify:
+- Determinism: same seed ? identical output
+- Seed sensitivity: different seeds ? different behaviors/modes/onset selections
+- Section contrast: Verse vs Chorus produce audibly different behaviors (sparse vs syncopated/driving)
+- Bridge special cases: SplitVoicing chance varies by seed
+- Every-4th-bar variation in comp behavior selection
+- All output meets invariants: sorted events, no overlaps, valid ranges
+
+### Expected Audible Results
+- **Verse**: Sparse anchors or standard comp, sustain/pulse keys ? calm, spacious
+- **Chorus**: Syncopated chop or driving full comp, rhythmic keys ? energetic, busy
+- **PreChorus/Bridge**: Anticipate comp, possible split voicing keys ? building tension
+- **Different seeds**: Noticeably different bar-to-bar patterns within same structure
+- **Duration contrast**: High energy = shorter notes (choppier); low energy = longer sustains
+
+---
+
 ## 17) Notable Architectural Conventions / Contracts
 
 - **Determinism pattern**: variation engines and planners typically treat randomness as a tie-break; inputs include seed + stable keys (e.g., grooveName, sectionType/index, barIndex).
@@ -413,8 +508,9 @@ There is also an import-only converter:
 ## 18) File/Folder Map (for quick navigation)
 
 - `Generator/`
-  - `Core/` (entrypoint generator, overlap preventers, randomization helpers)
-  - `Bass/`, `Guitar/`, `Keys/`, `Drums/` (role generators)
+- `Core/` (entrypoint generator, overlap preventers, randomization helpers)
+- `Bass/`, `Guitar/`, `Keys/`, `Drums/` (role generators)
+- `Tests/` (SeedSensitivityTests and other validation tests)
 - `Song/`
   - `Energy/` (EnergyArc, constraints, profiles, tension contracts)
   - `Harmony/` (contexts, voicing, validation, diagnostics)
