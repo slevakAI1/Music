@@ -618,7 +618,7 @@ Ensure future Stage 8 motif placement and Stage 9 melody/lyrics can request tens
 
 ---
 
-# Story 7.6 — Structured repetition engine 
+# Story 7.6 — Structured repetition engine  (COMPLETED)
 
 Goal: implement `SectionVariationPlan` and deterministic A / A’ / B transforms so repeated sections reuse a stable "base" while evolving in bounded, style-safe ways.
 
@@ -716,7 +716,7 @@ Notes:
 - Build successful
 - See `AI Dialogs/Story_7_6_3_Implementation_Summary.md`, `AI Dialogs/Story_7_6_3_Acceptance_Criteria_Verification.md`, and `AI Dialogs/Story_7_6_3_Final_Report.md` for complete details
 
-## 7.6.4 — Query surface + generator wiring
+## 7.6.4 — Query surface + generator wiring (completed)
 
 Intent: expose a stable query method `GetVariationPlan(sectionIndex)` and integrate it into the pipeline without changing existing behavior when absent.
 
@@ -733,7 +733,7 @@ Acceptance criteria:
 Notes:
 - Mirror the architecture style used by `EnergyArc` caching and `ITensionQuery`.
 
-## 7.6.5 — Role-parameter application adapters + minimal diagnostics
+## 7.6.5 — Role-parameter application adapters + minimal diagnostics  (completed)
 
 Intent: apply `SectionVariationPlan` to existing role parameter objects in a safe, non-invasive way and make it debuggable.
 
