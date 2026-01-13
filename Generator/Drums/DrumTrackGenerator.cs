@@ -12,6 +12,7 @@ namespace Music.Generator
         /// <summary>
         /// Generates drum track: kick, snare, hi-hat, ride with deterministic variations and fills.
         /// Updated for Story 6.1, Story 6.3 (section transition fills), and Story 7.3 (energy profiles).
+        /// Updated for Story 7.6.4: accepts optional variation query for future parameter adaptation.
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
@@ -21,6 +22,7 @@ namespace Music.Generator
             Dictionary<int, EnergySectionProfile> sectionProfiles,
             ITensionQuery tensionQuery,
             double microTensionPhraseRampIntensity,
+            IVariationQuery? variationQuery,
             int totalBars,
             RandomizationSettings settings,
             int midiProgramNumber)
@@ -85,6 +87,13 @@ namespace Music.Generator
 
                 // Story 7.3: Build DrumRoleParameters from energy profile
                 var drumParameters = BuildDrumParameters(energyProfile, settings.DrumParameters);
+
+                // Story 7.6.5: Apply variation deltas if available
+                if (variationQuery != null && drumParameters != null)
+                {
+                    var variationPlan = variationQuery.GetVariationPlan(absoluteSectionIndex);
+                    drumParameters = VariationParameterAdapter.ApplyVariationToDrums(drumParameters, variationPlan.Roles.Drums);
+                }
 
                 // Create deterministic per-bar RNG so fill decisions remain deterministic when knobs change.
                 var barRng = RandomHelpers.CreateLocalRng(settings.Seed, $"{grooveEvent.SourcePresetName ?? "groove"}_{sectionType}", bar, 0m);

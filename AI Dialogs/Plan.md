@@ -672,7 +672,18 @@ Acceptance criteria:
 Notes:
 - This story does not apply the plan to generation; it only computes the reuse graph.
 
-## 7.6.3 — Variation intensity + per-role deltas (bounded planner)
+**Implementation notes:**
+- Created `BaseReferenceSelectorRules.cs` with deterministic selection logic
+- Implemented 3 core rules:
+  1. First occurrence of any section type → null (A tag)
+  2. Bridge/Solo can be contrasting → deterministic via seed/groove hash (B tag)
+  3. Repeated sections → reference earliest prior instance (A' tag)
+- Hash-based tie-breaking: `HashCode.Combine(seed, grooveName, sectionIndex, sectionType)`
+- Created `BaseReferenceSelectorRulesTests.cs` with 23 test methods
+- All tests pass and verify determinism
+- See `AI Dialogs/Story_7_6_2_Implementation_Summary.md` and `AI Dialogs/Story_7_6_2_Final_Verification.md` for details
+
+## 7.6.3 — Variation intensity + per-role deltas (bounded planner) - COMPLETED
 
 Intent: compute per-section bounded per-role deltas driven by existing Stage 7 intent (energy/tension/transition hint).
 
@@ -694,6 +705,16 @@ Acceptance criteria:
 
 Notes:
 - This is planning; do not encode bar/slot-level behavior here.
+
+**Implementation notes (COMPLETED):**
+- Created `Song\Energy\SectionVariationPlanner.cs` with deterministic `ComputePlans()` method
+- Variation intensity formula: base 0.15, practical max 0.6, multi-factor (energy/tension/transition/section type/repeat distance)
+- Per-role deltas: magnitudes scaled by intensity, direction bias from transition hints, conservative ranges
+- Hash-based deterministic role selection: higher intensity → more roles vary
+- Created `Song\Energy\SectionVariationPlannerTests.cs` with 14 comprehensive test methods
+- All tests pass and verify determinism, bounds, and A/A'/B variation patterns
+- Build successful
+- See `AI Dialogs/Story_7_6_3_Implementation_Summary.md`, `AI Dialogs/Story_7_6_3_Acceptance_Criteria_Verification.md`, and `AI Dialogs/Story_7_6_3_Final_Report.md` for complete details
 
 ## 7.6.4 — Query surface + generator wiring
 

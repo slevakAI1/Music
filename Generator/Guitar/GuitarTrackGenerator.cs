@@ -15,6 +15,7 @@ namespace Music.Generator
         /// Generates guitar/comp track: rhythm pattern-based chord voicings with strum timing.
         /// Updated for Story 7.3: energy profile integration with guardrails.
         /// Updated for Story 7.5.6: tension hooks for accent bias at phrase peaks/ends.
+        /// Updated for Story 7.6.4: accepts optional variation query for future parameter adaptation.
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
@@ -24,6 +25,7 @@ namespace Music.Generator
             Dictionary<int, EnergySectionProfile> sectionProfiles,
             ITensionQuery tensionQuery,
             double microTensionPhraseRampIntensity,
+            IVariationQuery? variationQuery,
             int totalBars,
             RandomizationSettings settings,
             HarmonyPolicy policy,
@@ -69,6 +71,13 @@ namespace Music.Generator
 
                 // Get comp energy controls
                 var compProfile = energyProfile?.Roles?.Comp;
+
+                // Story 7.6.5: Apply variation deltas if available
+                if (variationQuery != null && compProfile != null)
+                {
+                    var variationPlan = variationQuery.GetVariationPlan(absoluteSectionIndex);
+                    compProfile = VariationParameterAdapter.ApplyVariation(compProfile, variationPlan.Roles.Comp);
+                }
 
                 // Story 7.5.6: Derive tension hooks for this bar to bias accent velocity
                 int barIndexWithinSection = section != null ? (bar - section.StartBar) : 0;

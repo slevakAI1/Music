@@ -13,6 +13,7 @@ namespace Music.Generator
         /// Generates bass track: pattern-based bass lines with optional approach notes to chord changes.
         /// Updated for Story 7.3: energy profile integration with guardrails.
         /// Updated for Story 7.5.6: tension hooks for pickup/approach bias (slot-gated).
+        /// Updated for Story 7.6.4: accepts optional variation query for future parameter adaptation.
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
@@ -22,6 +23,7 @@ namespace Music.Generator
             Dictionary<int, EnergySectionProfile> sectionProfiles,
             ITensionQuery tensionQuery,
             double microTensionPhraseRampIntensity,
+            IVariationQuery? variationQuery,
             int totalBars,
             RandomizationSettings settings,
             HarmonyPolicy policy,
@@ -70,6 +72,13 @@ namespace Music.Generator
 
                 // Get bass energy controls
                 var bassProfile = energyProfile?.Roles?.Bass;
+
+                // Story 7.6.5: Apply variation deltas if available
+                if (variationQuery != null && bassProfile != null)
+                {
+                    var variationPlan = variationQuery.GetVariationPlan(absoluteSectionIndex);
+                    bassProfile = VariationParameterAdapter.ApplyVariation(bassProfile, variationPlan.Roles.Bass);
+                }
 
                 // Story 7.5.6: Derive tension hooks for this bar to bias approach note probability
                 int barIndexWithinSection = section != null ? (bar - section.StartBar) : 0;

@@ -65,6 +65,14 @@ namespace Music.Generator
             ITensionQuery tensionQuery = new DeterministicTensionQuery(energyArc, settings.Seed);
             const double microTensionPhraseRampIntensity = 1.0;
 
+            // Story 7.6.4: Create deterministic variation query for section variation plans
+            IVariationQuery variationQuery = new DeterministicVariationQuery(
+                songContext.SectionTrack,
+                energyArc,
+                tensionQuery,
+                grooveName,
+                settings.Seed);
+
             // Resolve MIDI program numbers from VoiceSet
             int bassProgramNumber = GetProgramNumberForRole(songContext.Voices, "Bass", defaultProgram: 33);
             int compProgramNumber = GetProgramNumberForRole(songContext.Voices, "Comp", defaultProgram: 27);
@@ -81,6 +89,7 @@ namespace Music.Generator
                     sectionProfiles,
                     tensionQuery,
                     microTensionPhraseRampIntensity,
+                    variationQuery,
                     totalBars,
                     settings,
                     harmonyPolicy,
@@ -94,6 +103,7 @@ namespace Music.Generator
                     sectionProfiles,
                     tensionQuery,
                     microTensionPhraseRampIntensity,
+                    variationQuery,
                     totalBars,
                     settings,
                     harmonyPolicy,
@@ -107,6 +117,7 @@ namespace Music.Generator
                     sectionProfiles,
                     tensionQuery,
                     microTensionPhraseRampIntensity,
+                    variationQuery,
                     totalBars,
                     settings,
                     harmonyPolicy,
@@ -120,6 +131,7 @@ namespace Music.Generator
                     sectionProfiles,
                     tensionQuery,
                     microTensionPhraseRampIntensity,
+                    variationQuery,
                     totalBars,
                     settings,
                     drumProgramNumber)
