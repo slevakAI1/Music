@@ -70,6 +70,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Future Ideas\DraftLyrics\TestSongLyrics.txt" />
     <Content Include="Future Ideas\Resource Links.txt" />
   </ItemGroup>
 
@@ -100,7 +101,6 @@
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
-    <Folder Include="Future Ideas\DraftLyrics\" />
   </ItemGroup>
 
   <ItemGroup>
