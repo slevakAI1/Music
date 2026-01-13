@@ -114,4 +114,4 @@ Notes:
 
 ---
 
-Total stories: 5 (7.6.1 through 7.6.5). Together they implement Story 7.6 intent (structured repetition with safe evolution) while keeping scope planner-level and preserving determinism.
+
