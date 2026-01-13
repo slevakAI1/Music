@@ -3,6 +3,7 @@
 // AI: applies strum timing offsets to chord voicings for humanized feel (Story 4.3).
 // AI: Story 7.3=Now accepts section profiles and applies energy controls (density, velocity, register, busy) with lead-space ceiling guardrail.
 // AI: Story 7.5.6=Now accepts tension query and applies tension hooks for phrase-peak/end accent bias (velocity only).
+// AI: Story 8.0.3=Now uses CompBehavior system for onset selection and duration shaping; replaces ApplyDensityToPattern.
 
 using Music.MyMidi;
 using System.Diagnostics;
@@ -16,6 +17,7 @@ namespace Music.Generator
         /// Updated for Story 7.3: energy profile integration with guardrails.
         /// Updated for Story 7.5.6: tension hooks for accent bias at phrase peaks/ends.
         /// Updated for Story 7.6.4: accepts optional variation query for future parameter adaptation.
+        /// Updated for Story 8.0.3: uses CompBehavior system for onset selection and duration shaping.
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
@@ -97,18 +99,30 @@ namespace Music.Generator
                     sectionType,
                     bar);
 
-                // Story 7.3: Apply density multiplier to pattern slot selection
-                var filteredOnsets = ApplyDensityToPattern(
+                // Story 8.0.3: Select comp behavior based on energy/tension/section
+                var behavior = CompBehaviorSelector.SelectBehavior(
+                    sectionType,
+                    absoluteSectionIndex,
+                    barIndexWithinSection,
+                    energyProfile?.Global.Energy ?? 0.5,
+                    compProfile?.BusyProbability ?? 0.5,
+                    settings.Seed);
+
+                // Story 8.0.3: Use behavior realizer for onset selection and duration
+                var realization = CompBehaviorRealizer.Realize(
+                    behavior,
                     compOnsets,
                     pattern,
-                    compProfile?.DensityMultiplier ?? 1.0);
+                    compProfile?.DensityMultiplier ?? 1.0,
+                    bar,
+                    settings.Seed);
 
-                // Skip this bar if pattern resulted in no onsets
-                if (filteredOnsets.Count == 0)
+                // Story 8.0.3: Skip if no onsets selected
+                if (realization.SelectedOnsets.Count == 0)
                     continue;
 
-                // Build onset grid from filtered onsets
-                var onsetSlots = OnsetGrid.Build(bar, filteredOnsets, barTrack);
+                // Story 8.0.3: Build onset grid from realized onsets
+                var onsetSlots = OnsetGrid.Build(bar, realization.SelectedOnsets, barTrack);
 
                 foreach (var slot in onsetSlots)
                 {
@@ -163,7 +177,10 @@ namespace Music.Generator
                         int strumOffset = strumOffsets[i];
 
                         var noteStart = (int)slot.StartTick + strumOffset;
-                        var noteDuration = slot.DurationTicks;
+                        
+                        // Story 8.0.3: Apply behavior duration multiplier
+                        var noteDuration = (int)(slot.DurationTicks * realization.DurationMultiplier);
+                        noteDuration = Math.Max(noteDuration, 60); // Minimum ~30ms at 120bpm
 
                         // Prevent overlap: trim previous notes of the same pitch that would extend past this note-on
                         NoteOverlapHelper.PreventOverlap(notes, midiNote, noteStart);
@@ -184,38 +201,6 @@ namespace Music.Generator
             notes = notes.OrderBy(e => e.AbsoluteTimeTicks).ToList();
 
             return new PartTrack(notes) { MidiProgramNumber = midiProgramNumber };
-        }
-
-        /// <summary>
-        /// Applies density multiplier to rhythm pattern slot selection.
-        /// Story 7.3: Higher density = more slots, lower density = fewer slots.
-        /// </summary>
-        private static List<decimal> ApplyDensityToPattern(
-            List<decimal> compOnsets,
-            CompRhythmPattern pattern,
-            double densityMultiplier)
-        {
-            // Calculate target number of onsets based on density
-            int targetOnsetCount = (int)Math.Round(pattern.IncludedOnsetIndices.Count * densityMultiplier);
-            
-            // Clamp to valid range: at least 1 onset, at most all available onsets
-            targetOnsetCount = Math.Max(1, Math.Min(targetOnsetCount, compOnsets.Count));
-
-            var filteredOnsets = new List<decimal>();
-
-            // Take the first N indices from the pattern (patterns are ordered by importance)
-            int slotsToTake = Math.Min(targetOnsetCount, pattern.IncludedOnsetIndices.Count);
-            
-            for (int i = 0; i < slotsToTake; i++)
-            {
-                int index = pattern.IncludedOnsetIndices[i];
-                if (index >= 0 && index < compOnsets.Count)
-                {
-                    filteredOnsets.Add(compOnsets[index]);
-                }
-            }
-
-            return filteredOnsets;
         }
 
         /// <summary>
