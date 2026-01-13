@@ -2,6 +2,7 @@
 // AI: keep program number 4; tracks previous ChordRealization for voice-leading continuity; returns sorted by AbsoluteTimeTicks.
 // AI: Story 7.3=Now accepts section profiles and applies energy controls (density, velocity, register) with lead-space ceiling guardrail.
 // AI: Story 7.5.6=Now accepts tension query and applies tension hooks for phrase-peak/end accent bias (velocity only).
+// AI: Story 8.0.6=Now uses KeysRoleMode system for audibly distinct playing behaviors (Sustain/Pulse/Rhythmic/SplitVoicing).
 
 using Music.MyMidi;
 using System.Diagnostics;
@@ -15,6 +16,7 @@ namespace Music.Generator
         /// Updated for Story 7.3: energy profile integration with guardrails.
         /// Updated for Story 7.5.6: tension hooks for accent bias at phrase peaks/ends.
         /// Updated for Story 7.6.4: accepts optional variation query for future parameter adaptation.
+        /// Updated for Story 8.0.6: uses KeysRoleMode system for distinct playing behaviors.
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
@@ -92,20 +94,47 @@ namespace Music.Generator
                     energyProfile,
                     microTensionPhraseRampIntensity);
 
+                // Story 8.0.6: Select keys mode based on energy/section
+                var mode = KeysRoleModeSelector.SelectMode(
+                    section?.SectionType ?? MusicConstants.eSectionType.Verse,
+                    absoluteSectionIndex,
+                    barIndexWithinSection,
+                    energyProfile?.Global.Energy ?? 0.5,
+                    keysProfile?.BusyProbability ?? 0.5,
+                    settings.Seed);
+
+                // Story 8.0.6: Realize mode into onset selection and duration
+                var realization = KeysModeRealizer.Realize(
+                    mode,
+                    padsOnsets,
+                    keysProfile?.DensityMultiplier ?? 1.0,
+                    bar,
+                    settings.Seed);
+
+                // Skip if no onsets selected
+                if (realization.SelectedOnsets.Count == 0)
+                    continue;
+
                 // Story 7.3: Update section profile with energy adjustments
                 SectionProfile? sectionProfile = UpdateSectionProfileWithEnergy(
                     section?.SectionType ?? MusicConstants.eSectionType.Verse,
                     keysProfile);
 
-                // Build onset grid for this bar
-                var onsetSlots = OnsetGrid.Build(bar, padsOnsets, barTrack);
+                // Story 8.0.6: Build onset grid from realized onsets
+                var onsetSlots = OnsetGrid.Build(bar, realization.SelectedOnsets, barTrack);
+
+                // Story 8.0.6: Track slot index for SplitVoicing mode
+                int slotIndex = 0;
 
                 foreach (var slot in onsetSlots)
                 {
                     // Find active harmony at this bar+beat
                     var harmonyEvent = harmonyTrack.GetActiveHarmonyEvent(slot.Bar, slot.OnsetBeat);
                     if (harmonyEvent == null)
+                    {
+                        slotIndex++;
                         continue;
+                    }
 
                     bool isFirstOnset = previousHarmony == null ||
                         harmonyEvent.StartBar != previousHarmony.StartBar ||
@@ -163,6 +192,34 @@ namespace Music.Generator
                     // Story 7.3: Apply lead-space ceiling guardrail to prevent clash with melody
                     chordRealization = ApplyLeadSpaceGuardrail(chordRealization);
 
+                    // Story 8.0.6: For SplitVoicing mode, split voicing between onsets
+                    bool isSplitUpperOnset = mode == KeysRoleMode.SplitVoicing && 
+                        slotIndex == realization.SplitUpperOnsetIndex;
+
+                    List<int> notesToPlay;
+                    if (mode == KeysRoleMode.SplitVoicing && realization.SplitUpperOnsetIndex >= 0)
+                    {
+                        // Split the voicing
+                        var sortedNotes = chordRealization.MidiNotes.OrderBy(n => n).ToList();
+                        int splitPoint = sortedNotes.Count / 2;
+
+                        if (isSplitUpperOnset)
+                        {
+                            // Use only upper half of voicing
+                            notesToPlay = sortedNotes.Skip(splitPoint).ToList();
+                        }
+                        else
+                        {
+                            // Use only lower half of voicing (include middle note for odd counts)
+                            notesToPlay = sortedNotes.Take(splitPoint + 1).ToList();
+                        }
+                    }
+                    else
+                    {
+                        // Use full voicing
+                        notesToPlay = chordRealization.MidiNotes.ToList();
+                    }
+
                     // Validate all notes are in scale
                     foreach (int midiNote in chordRealization.MidiNotes)
                     {
@@ -172,7 +229,12 @@ namespace Music.Generator
                         }
                     }
                     var noteStart = (int)slot.StartTick;
-                    var noteDuration = slot.DurationTicks;
+
+                    // Story 8.0.6: Apply mode duration multiplier
+                    var noteDuration = (int)(slot.DurationTicks * realization.DurationMultiplier);
+                    // Clamp to avoid overlapping into next bar
+                    var maxDuration = (int)barTrack.GetBarEndTick(bar) - noteStart;
+                    noteDuration = Math.Clamp(noteDuration, 60, Math.Max(60, maxDuration));
 
                     // Story 7.3: Calculate velocity with energy bias
                     int baseVelocity = 75;
@@ -181,7 +243,8 @@ namespace Music.Generator
                     // Story 7.5.6: Apply tension accent bias for phrase peaks/ends (additive to energy bias)
                     velocity = ApplyTensionAccentBias(velocity, hooks.VelocityAccentBias);
 
-                    foreach (int midiNote in chordRealization.MidiNotes)
+                    // Story 8.0.6: Use split notes for SplitVoicing mode, full voicing otherwise
+                    foreach (int midiNote in notesToPlay)
                     {
                         // Prevent overlap: trim previous notes of the same pitch that would extend past this note-on
                         NoteOverlapHelper.PreventOverlap(notes, midiNote, noteStart);
@@ -195,6 +258,9 @@ namespace Music.Generator
 
                     // Update previous voicing for next onset
                     previousVoicing = chordRealization;
+
+                    // Story 8.0.6: Increment slot index
+                    slotIndex++;
                 }
 
                 // Update previousHarmony to the first event active at the bar start (bar,1)

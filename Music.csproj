@@ -70,6 +70,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Future Ideas\Resource Links.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DiffPlex" Version="1.9.0" />
     <PackageReference Include="Melanchall.DryWetMidi" Version="8.0.2" />
     <PackageReference Include="MeltySynth" Version="2.4.1" />
