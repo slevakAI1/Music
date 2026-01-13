@@ -58,8 +58,8 @@ namespace Music.Generator
                 grooveName,
                 seed: settings.Seed);
 
-            // Build section profiles dictionary for quick lookup
-            var sectionProfiles = BuildSectionProfiles(energyArc, songContext.SectionTrack);
+            // Build section profiles dictionary for quick lookup (Story 7.8: pass seed for micro-arc)
+            var sectionProfiles = BuildSectionProfiles(energyArc, songContext.SectionTrack, settings.Seed);
 
             // Story 7.5.x: Create deterministic tension query (used by Story 7.5.5 drums-only integration).
             ITensionQuery tensionQuery = new DeterministicTensionQuery(energyArc, settings.Seed);
@@ -144,7 +144,8 @@ namespace Music.Generator
         /// </summary>
         private static Dictionary<int, EnergySectionProfile> BuildSectionProfiles(
             EnergyArc energyArc,
-            SectionTrack sectionTrack)
+            SectionTrack sectionTrack,
+            int seed)
         {
             var profiles = new Dictionary<int, EnergySectionProfile>();
             
@@ -163,12 +164,13 @@ namespace Music.Generator
                 
                 int sectionIndex = sectionIndicesByType[section.SectionType];
 
-                // Build profile for this section
+                // Build profile for this section (Story 7.8: pass seed for micro-arc)
                 var profile = EnergyProfileBuilder.BuildProfile(
                     energyArc,
                     section,
                     sectionIndex,
-                    previousProfile);
+                    previousProfile,
+                    seed);
 
                 // Store by StartBar for quick lookup during generation
                 profiles[section.StartBar] = profile;

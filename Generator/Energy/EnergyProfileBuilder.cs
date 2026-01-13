@@ -18,11 +18,13 @@ namespace Music.Generator
         /// <param name="section">The section to build profile for.</param>
         /// <param name="sectionIndex">0-based index of this section among same-type sections.</param>
         /// <param name="previousProfile">Optional previous section profile for contrast calculation.</param>
+        /// <param name="seed">Seed for micro-arc deterministic jitter (Story 7.8).</param>
         public static EnergySectionProfile BuildProfile(
             EnergyArc energyArc,
             Section section,
             int sectionIndex,
-            EnergySectionProfile? previousProfile = null)
+            EnergySectionProfile? previousProfile = null,
+            int seed = 0)
         {
             ArgumentNullException.ThrowIfNull(energyArc);
             ArgumentNullException.ThrowIfNull(section);
@@ -45,13 +47,17 @@ namespace Music.Generator
                 section.SectionType,
                 sectionIndex);
 
+            // Story 7.8: Build micro-arc for phrase-level shaping
+            var microArc = BuildMicroArc(section, globalTargets.Energy, seed);
+
             return new EnergySectionProfile
             {
                 Global = globalTargets,
                 Roles = roleProfiles,
                 Orchestration = orchestration,
                 Section = section,
-                SectionIndex = sectionIndex
+                SectionIndex = sectionIndex,
+                MicroArc = microArc
             };
         }
 
@@ -330,6 +336,29 @@ namespace Music.Generator
 
             // Clamp to [0..1]
             return Math.Clamp(difference, 0.0, 1.0);
+        }
+
+        /// <summary>
+        /// Builds per-bar energy micro-arc for phrase-level shaping (Story 7.8).
+        /// Provides phrase positions and subtle energy deltas for within-section modulation.
+        /// </summary>
+        private static SectionEnergyMicroArc BuildMicroArc(
+            Section section,
+            double sectionEnergy,
+            int seed)
+        {
+            int barCount = section.BarCount;
+            if (barCount <= 0)
+                return SectionEnergyMicroArc.Flat(1);
+
+            // Use same seed derivation as micro tension for consistency
+            int microArcSeed = seed != 0 ? HashCode.Combine(seed, section.StartBar, "microarc") : 0;
+
+            return SectionEnergyMicroArc.Build(
+                barCount,
+                sectionEnergy,
+                phraseLength: null, // Let it infer (4 bars typical, 2 for 4-bar sections)
+                microArcSeed);
         }
 
         #endregion

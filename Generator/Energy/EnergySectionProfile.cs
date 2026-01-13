@@ -36,6 +36,13 @@ namespace Music.Generator
         /// Used for A/A'/B variation logic (Story 7.6).
         /// </summary>
         public int SectionIndex { get; init; }
+
+        /// <summary>
+        /// Per-bar energy micro-arc for phrase-level shaping within the section.
+        /// Story 7.8: provides phrase positions (Start/Middle/Peak/Cadence) and subtle energy deltas.
+        /// Null if micro-arc not computed; renderers should treat as Flat.
+        /// </summary>
+        public SectionEnergyMicroArc? MicroArc { get; init; }
     }
 
     /// <summary>

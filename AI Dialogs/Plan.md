@@ -944,7 +944,7 @@ Energy should modulate within a section (start → build → peak → cadence), 
 
 ---
 
-## Story 7.9 — Stage 8/9 integration contracts (future proofing)  (not started)
+## Story 7.9 — Stage 8/9 integration contracts (future proofing)  (Completed)
 
 ** Intent: Plan introduces a unified intent query used everywhere.
 Ensure later stages can “ask” Stage 7 for arrangement support to convey emotion without rewriting Stage 7.
@@ -965,6 +965,18 @@ Ensure later stages can “ask” Stage 7 for arrangement support to convey emot
 - Additional unchanged integration requirements; informational but still consistent):
   - Motifs can query energy/tension targets, phrase positions (Peak/Cadence), register intent for lead space.
   - Melody/lyrics can request arrangement ducking (reduce comp/pads density under vocal phrases) and shift pads/keys register away from vocal band.
+
+**Implementation notes:**
+- Created `ISongIntentQuery` interface with `GetSectionIntent` and `GetBarIntent` methods
+- Created context records: `SectionIntentContext` (section-level), `BarIntentContext` (bar-level)
+- Created supporting records: `RolePresenceHints`, `RegisterConstraints`, `RoleDensityCaps`
+- Implemented `DeterministicSongIntentQuery` that precomputes and caches section contexts
+- Aggregates existing `EnergySectionProfile`, `ITensionQuery`, `IVariationQuery` - no new planners
+- Standardized existing ad-hoc register constraints (lead ceiling=72, bass floor=52, vocal band=60-76)
+- Density caps derived from section energy level (low/mid/high)
+- Created comprehensive test suite `SongIntentQueryTests` with 16 test methods - all pass ✓
+- Build successful, no dependencies added
+- See `AI Dialogs/Story_7_9_Implementation_Summary.md` for usage guide and examples
 
 ---
 
