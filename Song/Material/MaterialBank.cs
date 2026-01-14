@@ -10,7 +10,7 @@ namespace Music.Song.Material;
 /// In-memory container for reusable material (fragments and variants).
 /// Not connected to generation yet.
 /// </summary>
-internal sealed class MaterialBank
+public sealed class MaterialBank
 {
     private readonly Dictionary<PartTrack.PartTrackId, PartTrack> _tracks = [];
 

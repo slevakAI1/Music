@@ -1,4 +1,5 @@
 ﻿using MusicGen.Lyrics;
+using Music.Song.Material;
 
 namespace Music.Generator
 {
@@ -32,5 +33,8 @@ namespace Music.Generator
 
         // AI: Voices: design-time voice set used to map roles to instruments; keep VoiceName stable for MIDI mapping.
         public VoiceSet Voices { get; set; } = new();
+
+        // AI: MaterialBank: in-memory container for reusable material fragments (motifs, riffs, fills); Stage 8+9 motif system.
+        public MaterialBank MaterialBank { get; set; } = new();
     }
 }
