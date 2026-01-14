@@ -1,4 +1,4 @@
-# Completed (Current State of the Music Generator)
+﻿# Completed (Current State of the Music Generator)
 
 This document describes what currently exists in the codebase (important concepts, designs, hooks, and major modules), focusing on items that are **not** already fully captured by `AI Dialogs/Plan.md`.
 
@@ -158,9 +158,9 @@ Important pipeline invariant:
 
 ---
 
-## 5) Stage 3�6 Implementation Notes (migrated from Plan)
+## 5) Stage 3–6 Implementation Notes (migrated from Plan)
 
-### Stage 3 � Harmony sounds connected (keys/pads voice-leading)
+### Stage 3 — Harmony sounds connected (keys/pads voice-leading)
 - `Song/Harmony/ChordRealization`
   - Unit of harmony rendering for keys/pads (not raw chord-tone lists).
   - Fields used by renderers: `MidiNotes`, `Inversion`, `RegisterCenterMidi`, color-tone metadata, `Density`.
@@ -170,7 +170,7 @@ Important pipeline invariant:
 - Section arrangement hints (small profile)
   - Per-section lift/density/color controls (chorus lifts; verse lighter) to avoid global-only behavior.
 
-### Stage 4 � Comp becomes comp (multi-note chord fragments)
+### Stage 4 — Comp becomes comp (multi-note chord fragments)
 - `Song/Groove/CompRhythmPatternLibrary` + `Song/Groove/CompRhythmPattern`
   - Groove onsets are candidates; patterns deterministically select subsets per bar/section.
 - `Song/Harmony/CompVoicingSelector`
@@ -180,7 +180,7 @@ Important pipeline invariant:
   - Deterministic micro-offset spread inside a chord to avoid block-chord feel.
   - Applied to comp (and designed so keys can adopt later if desired).
 
-### Stage 5 � Bassline writing (groove-locked + harmony-aware)
+### Stage 5 — Bassline writing (groove-locked + harmony-aware)
 - `Song/Groove/BassPatternLibrary` + `Song/Groove/BassPattern`
   - Small reusable pattern set (root anchors, fifth motion, octaves, approach notes).
   - Pattern selection deterministic by section + bar; seed used only as tie-break.
@@ -188,7 +188,7 @@ Important pipeline invariant:
   - Detects upcoming chord changes within a window; enables diatonic approach/pickups.
   - Approach insertion only when groove has a valid slot (policy/guardrail driven).
 
-### Stage 6 � Drums (template ? performance)
+### Stage 6 — Drums (template ? performance)
 - `Generator/Drums/DrumVariationEngine`
   - Renders per-bar drum performance from groove template + section profile + seed.
   - Variation keyed deterministically by `(seed, grooveName, sectionType, barIndex)`.
@@ -248,67 +248,242 @@ Key groove modules (under `Song/Groove/`):
 
 ---
 
-## 8) Stage 7 Energy System (implemented)
+## 8) Stage 7 Energy, Tension, and Section Identity System (fully implemented)
 
-### Energy arc selection and constraint application
+Stage 7 provides deterministic section-level identity through energy/tension planning, structured repetition (A/A'/B), and audible musical contrast. All components are production-ready and wired into generation.
+
+### 8.1) Energy Arc and Constraint System
+
+**Core energy planning:**
 - `Song/Energy/EnergyArc.cs`
-  - Deterministically selects an `EnergyArcTemplate` from `EnergyArcLibrary` by `(seed, grooveName, songFormId)`.
-  - Applies an `EnergyConstraintPolicy` (selected by `EnergyConstraintPolicyLibrary.GetPolicyForGroove(grooveName)` by default).
-  - Pre-computes constrained energies in order and caches:
-    - `Dictionary<int, double> _constrainedEnergies`
-    - `Dictionary<int, List<string>> _constraintDiagnostics`
-  - Preferred API for constrained energy:
-    - `GetTargetForSection(Section section, int sectionIndex)`.
+  - Deterministically selects `EnergyArcTemplate` from `EnergyArcLibrary` by `(seed, grooveName, songFormId)`
+  - Applies `EnergyConstraintPolicy` (auto-selected by groove or explicit override)
+  - Pre-computes and caches constrained energies per section
+  - API: `GetTargetForSection(Section, sectionIndex)` returns constrained energy value
 
-### Constraint framework
-- `EnergyConstraintPolicy`, `EnergyConstraintRule`, `EnergyConstraintContext`, `EnergyConstraintResult`.
-- Implemented rule set in `Song/Energy/Rules/`:
-  - `SameTypeSectionsMonotonicRule`
-  - `PostChorusDropRule`
-  - `FinalChorusPeakRule`
-  - `BridgeContrastRule`
-- Diagnostics:
-  - `EnergyConstraintDiagnostics` (full report, compact report, summaries, ASCII chart, arc comparisons).
+**Constraint framework (Story 7.4):**
+- `EnergyConstraintPolicy` - groups rules with configurable strengths per style
+- `EnergyConstraintPolicyLibrary` - predefined policies:
+  - PopRock (default): moderate verse progression, strong chorus peaks
+  - Rock: stronger progression, higher final peak
+  - Jazz: relaxed constraints, allow energy freedom
+  - EDM: no post-chorus drop, very strong final peak
+  - Policy selection: `GetPolicyForGroove(grooveName)` deterministic by name pattern
+- Four implemented rules (`Song/Energy/Rules/`):
+  - `SameTypeSectionsMonotonicRule` - Verse 2 ? Verse 1, etc.
+  - `PostChorusDropRule` - first section after chorus drops energy
+  - `FinalChorusPeakRule` - last chorus at/near song peak
+  - `BridgeContrastRule` - bridge either exceeds or intentionally contrasts
+- Rule evaluation:
+  - Strength-weighted blending when multiple rules apply
+  - Deterministic conflict resolution
+  - Returns adjusted energy + diagnostics
+- Constraint application:
+  - Occurs during `EnergyArc.Create()` before profile building
+  - Processes sections in order, building context progressively
+  - Results cached in `_constrainedEnergies` dictionary
 
-### Section energy profiles (consumed by generators)
-- `EnergyProfileBuilder` produces `EnergySectionProfile` per `Section`.
-  - `Global`: includes `Energy`, `TensionTarget` (current placeholder mapping), `ContrastBias`.
-  - `Roles`: `Bass`, `Comp`, `Keys`, `Pads`, `Drums` each as `EnergyRoleProfile`:
-    - `DensityMultiplier`, `VelocityBias`, `RegisterLiftSemitones`, `BusyProbability`.
-  - `Orchestration`: `EnergyOrchestrationProfile` with per-role presence flags and cymbal language hinting.
+**Diagnostics (Story 7.4.4):**
+- `EnergyConstraintDiagnostics` with multiple report formats:
+  - `GenerateFullReport()` - section-by-section with rule applications
+  - `GenerateSummaryReport()` - high-level energy progression overview
+  - `GenerateCompactReport()` - one-line-per-section for logging
+  - `CompareArcs()` - side-by-side arc comparison
+  - `GenerateEnergyChart()` - ASCII bar chart visualization
+- All diagnostics non-invasive (read-only, no generation impact)
 
-### Tests (in main project)
-Energy system tests exists as compiled test-like classes under `Song/Energy/`:
-- `EnergyArcTests`, `EnergySectionProfileTests`.
-- Constraint tests:
-  - `EnergyConstraintTests`, `EnergyConstraintApplicationTests`, `EnergyConstraintValidationTests`, `EnergyConstraintDiagnosticsTests`.
+**Section energy profiles:**
+- `EnergyProfileBuilder` produces `EnergySectionProfile` per section
+- Profile structure:
+  - `Global`: `Energy`, `TensionTarget`, `ContrastBias`
+  - Per-role profiles (`Bass`, `Comp`, `Keys`, `Pads`, `Drums`):
+    - `DensityMultiplier`, `VelocityBias`, `RegisterLiftSemitones`, `BusyProbability`
+  - `Orchestration`: role presence flags, cymbal language hints
 
-Note: These tests are not in a separate test project; they compile into the main WinForms project (the `.csproj` explicitly excludes a `Tests/` folder).
+### 8.2) Tension System (Story 7.5)
 
----
+**Purpose:** Tension is distinct from energy - represents anticipation/release, not just intensity.
 
-## 8) Tension Contracts (present, computation mostly pending)
+**Tension model (`Song/Energy/`):**
+- `SectionTensionProfile` - section-level tension with explainability
+  - `MacroTension` [0..1] - overall section tension
+  - `MicroTensionDefault` [0..1] - baseline for bar-level
+  - `Driver` - flags enum explaining why tension exists
+  - `AbsoluteSectionIndex`
+- `TensionDriver` (flags enum) - explainability:
+  - `PreChorusBuild`, `Breakdown`, `Drop`, `Cadence`, `BridgeContrast`, `Anticipation`, `Release`, `Suspense`, `None`
+- `MicroTensionMap` - per-bar tension within section:
+  - Per-bar `Tension` value [0..1]
+  - Flags: `IsPhraseEnd`, `IsSectionStart`, `IsSectionEnd`
+  - Supports phrase-aware and fallback modes
+  - `Build()` method: deterministic tension shaping with rising phrases
+- `ITensionQuery` - stable query interface:
+  - `GetMacroTension(sectionIndex)`
+  - `GetMicroTension(sectionIndex, barIndex)`
+  - `GetMicroTensionMap(sectionIndex)`
+  - `GetTensionContext(sectionIndex, barIndex)` - complete context
+- `DeterministicTensionQuery` - production implementation:
+  - Pre-computes all tension profiles on construction
+  - Caches `SectionTensionProfile` + `MicroTensionMap` per section
+  - Derives macro tension from energy deltas and section relationships
+  - Computes `SectionTransitionHint` per boundary: `Build`, `Release`, `Sustain`, `Drop`
+- `NeutralTensionQuery` - placeholder returning zero tension
 
-A tension model exists as a contract for later stages.
+**Tension computation (Story 7.5.2):**
+- Macro tension derived from:
+  - Section type/index and local neighborhood
+  - Energy targets from `EnergyArc`
+  - Groove/style identity
+  - Deterministic rules:
+    - PreChorus tension > preceding Verse
+    - Chorus often drops vs PreChorus (release)
+    - Bridge either high tension or contrasting
+    - Outro trends downward
+    - Anticipation before higher-energy sections
+- Micro tension map (Story 7.5.3):
+  - Rising tension toward phrase ends
+  - Phrase-aware mode or fallback (4-bar default, 2-bar for short sections)
+  - Derived from blend of `microDefault` and `macroTension`
+  - Deterministic tiny jitter (±0.01) when seed ? 0
+  - All values clamped [0..1]
 
-### Types / contracts
-- `Song/Energy/SectionTensionProfile.cs`
-  - Immutable record: `MacroTension`, `MicroTensionDefault`, `Driver`, `AbsoluteSectionIndex`.
-- `Song/Energy/TensionDriver.cs`
-  - Flags enum used for explainability (why tension is high/low).
-- `Song/Energy/MicroTensionMap.cs`
-  - Bar-level tension map with per-bar flags (phrase/section start/end) + helper creators (e.g., `Flat`).
-- `Song/Energy/ITensionQuery.cs`
-  - Stable query surface for renderers:
-    - `GetMacroTension(section)`
-    - `GetMicroTension(section, barInSection)`
-    - `GetMicroTensionMap(section)`
-    - `GetPhraseFlags(section, barInSection)`
-- `Song/Energy/NeutralTensionQuery.cs`
-  - Placeholder implementation returning neutral tension and precomputed flat maps.
+**Tension hooks for rendering (Story 7.5.4):**
+- Tension translated to bounded rendering biases
+- Used by drums (Story 7.5.5):
+  - `PullProbabilityBias` - phrase-end fills/flams/hat changes
+  - `ImpactProbabilityBias` - section-start accents
+  - Groove protection: never removes downbeats/backbeats
+- Used by non-drums (Story 7.5.6):
+  - Comp/Keys: `VelocityAccentBias` at phrase peaks/ends
+  - Bass: `PullProbabilityBias` for approach notes (only when groove has valid slot)
+  - All biases clamped and additive to energy biases
 
-### Tests
-- `Song/Energy/TensionModelTests.cs` (many test cases validating shape/ranges/determinism of the model layer).
+**Tension diagnostics (Story 7.5.7):**
+- `TensionDiagnostics` reports:
+  - Section macro tension values
+  - Per-section micro tension summaries (min/max/avg)
+  - Key flags (phrase ends, section ends)
+  - Driver contributions
+- Non-invasive and deterministic
+
+**Integration contract (Story 7.5.8):**
+- Tension queries support Stage 8+ motif/melody placement
+- API enables requesting arrangement behavior based on tension
+- Thread-safe, immutable implementations
+
+### 8.3) Structured Repetition and Variation System (Story 7.6)
+
+**Purpose:** A/A'/B logic for section reuse with bounded variation.
+
+**Core models (`Song/Energy/`):**
+- `SectionVariationPlan` - per-section variation metadata:
+  - `AbsoluteSectionIndex`
+  - `BaseReferenceSectionIndex` (null = no reuse, else = A section index)
+  - `VariationIntensity` [0..1]
+  - Per-role deltas: `DensityMultiplier`, `VelocityBias`, `RegisterLiftSemitones`, `BusyProbability`
+  - `Tags`: `A`, `Aprime`, `B`, `Lift`, `Thin`, `Breakdown`
+- `IVariationQuery` - query interface:
+  - `GetVariationPlan(absoluteSectionIndex)`
+- `DeterministicVariationQuery` - production implementation:
+  - Pre-computes plans for entire `SectionTrack`
+  - Caches plans for O(1) lookup
+
+**Base reference selection (Story 7.6.2):**
+- `BaseReferenceSelectorRules` - deterministic A/A'/B mapping:
+  - First occurrence of section type ? null (A tag)
+  - Repeated sections ? reference earliest prior instance (A' tag)
+  - Bridge/Solo can be contrasting ? hash-based decision (B tag)
+  - Tie-breaking: `HashCode.Combine(seed, grooveName, sectionIndex, sectionType)`
+
+**Variation planning (Story 7.6.3):**
+- `SectionVariationPlanner.ComputePlans()`:
+  - Inputs: section track, energy arc, tension query, groove, seed
+  - Variation intensity formula:
+    - Base: 0.15, practical max: 0.6
+    - Multi-factor: energy + tension + transition hint + section type + repeat distance
+  - Per-role deltas:
+    - Magnitude scaled by intensity
+    - Direction bias from transition hints
+    - Conservative ranges (density ±0.2, velocity ±10, register ±6, busy ±0.15)
+  - Hash-based role selection: higher intensity ? more roles vary
+  - All deterministic and bounded
+
+**Application (Story 7.6.4-7.6.5):**
+- Role generators consume variation plans optionally
+- Thin mapping helpers adjust parameters within guardrails
+- Applied to: Drums, Bass, Comp, Keys/Pads
+- Diagnostics: one-line-per-section dump (baseRef + intensity + deltas)
+
+### 8.4) Unified Song Intent Query (Story 7.9)
+
+**Purpose:** Single query surface for all Stage 7 intent, used by all later stages.
+
+**Core API (`Song/Energy/`):**
+- `ISongIntentQuery` interface:
+  - `GetSectionIntent(sectionIndex)` ? `SectionIntentContext`
+  - `GetBarIntent(sectionIndex, barIndex)` ? `BarIntentContext`
+- `DeterministicSongIntentQuery` - production implementation:
+  - Aggregates `EnergySectionProfile`, `ITensionQuery`, `IVariationQuery`
+  - Pre-computes and caches section contexts
+  - No new planners - pure aggregation layer
+
+**Context records:**
+- `SectionIntentContext`:
+  - Energy target
+  - Tension profile (macro + micro default + drivers + transition hint)
+  - Variation plan summary
+  - Role presence hints
+  - Register constraints (lead ceiling, bass floor, vocal band)
+  - Density caps (low/mid/high energy tiers)
+- `BarIntentContext`:
+  - Everything from section context
+  - Bar-specific micro tension
+  - Phrase position flags
+- Supporting records:
+  - `RolePresenceHints` - which roles active/featured
+  - `RegisterConstraints` - standardized constraints:
+    - Lead ceiling: MIDI 72 (C5)
+    - Bass floor: MIDI 52 (E3)
+    - Vocal band: MIDI 60-76 (C4-E5)
+  - `RoleDensityCaps` - max density per role by energy level
+
+**Usage:**
+- Created once per generation with `SectionTrack`, energy arc, tension/variation queries
+- Queried by role generators and future motif/melody systems
+- Thread-safe, immutable
+- See `AI Dialogs/Story_7_9_Implementation_Summary.md` for detailed usage examples
+
+### 8.5) Tests
+
+All Stage 7 components have comprehensive test coverage (compiled into main project):
+- **Energy system:**
+  - `EnergyArcTests`, `EnergySectionProfileTests`
+  - `EnergyConstraintTests`, `EnergyConstraintApplicationTests`
+  - `EnergyConstraintValidationTests`, `EnergyConstraintDiagnosticsTests`
+- **Tension system:**
+  - `TensionModelTests` (64 test methods)
+  - `MicroTensionMapTests` (24 test methods)
+- **Variation system:**
+  - `BaseReferenceSelectorRulesTests` (23 test methods)
+  - `SectionVariationPlannerTests` (14 test methods)
+- **Intent query:**
+  - `SongIntentQueryTests` (16 test methods)
+- **Integration:**
+  - Tension hooks tested in drum/comp/keys/bass generators
+  - All tests verify determinism and bounded output
+
+### 8.6) Key Architectural Decisions
+
+- **Determinism first:** All systems deterministic by `(seed, song structure, groove, style)`
+- **Separation of concerns:** Stage 7 computes intent; renderers apply it
+- **Energy ? Tension:** Energy is intensity/vigor; tension is anticipation/release
+- **Constraints are relative:** Energy/tension meaningful only in context of neighbors
+- **Bounded variation:** A' varies from A within strict guardrails
+- **Non-invasive diagnostics:** All diagnostic systems read-only, deterministic
+- **Query pattern:** Stable query APIs shield later stages from planner internals
+- **Style-aware:** Policies/behaviors differ by genre (Pop, Rock, Jazz, EDM)
+
+Note: Stage 7.7 (Audibility Pass - Comp/Keys behavior system) is documented separately in section 16.5 as it was implemented as Stage 8.0.
 
 ---
 
@@ -441,7 +616,7 @@ Key keys modules:
 Implemented as an explicit 3-step pipeline under `Converters/`.
 
 - `ConvertPartTracksToMidiSongDocument_For_Play_And_Export.cs`
-  - Orchestrates Steps 1�3.
+  - Orchestrates Steps 1–3.
   - Validates each `PartTrack.PartTrackNoteEvents` list is sorted by `AbsoluteTimeTicks` before converting (shows an error dialog and returns null on violation).
 
 - `ConvertPartTracksToMidiSongDocument_Step_1.cs`
@@ -560,8 +735,13 @@ All tests in `Generator/Tests/SeedSensitivityTests.cs` verify:
 - **1-based bars** across UI and track data structures.
 - **`BarTrack` is a timing ruler** built by editor/import pipelines and treated read-only by the generator.
 - **Validation-first**: harmony is validated before generation; MIDI export validates sorted PartTrack event time ordering.
-- **Energy intent separation**: Stage 7 computes energy intent; role generators consume role profiles + orchestration hints.
-- **Tension query is a stable contract** already present even if full macro/micro computation is not yet wired into generation.
+- **Energy intent separation**: Stage 7 computes energy/tension/variation intent; role generators consume profiles + orchestration hints.
+- **Tension ≠ Energy**: Tension is anticipation/release; energy is intensity/vigor. Both are first-class concepts.
+- **Constraints are relative**: Energy constraints enforce musically-sensible section relationships (verse progression, chorus peaks, etc.).
+- **Query pattern for intent**: Stable query APIs (`ISongIntentQuery`, `ITensionQuery`, `IVariationQuery`) shield later stages from planner internals.
+- **A/A'/B variation**: Structured repetition with bounded deltas; repeated sections reference "base" section with deterministic variation.
+- **Style-aware policies**: Energy constraints, tension ramps, and behaviors differ by genre (Pop, Rock, Jazz, EDM).
+- **Non-invasive diagnostics**: All diagnostic systems are read-only, deterministic, and do not affect generation output.
 
 ---
 
@@ -572,7 +752,17 @@ All tests in `Generator/Tests/SeedSensitivityTests.cs` verify:
   - `Bass/`, `Guitar/`, `Keys/`, `Drums/` (role generators)
   - `Tests/` (SeedSensitivityTests and other validation tests)
 - `Song/`
-  - `Energy/` (EnergyArc, constraints, profiles, tension contracts)
+  - `Energy/` (Stage 7 complete implementation):
+    - `EnergyArc`, `EnergyArcLibrary`, `EnergyArcTemplate` (energy planning)
+    - `EnergyConstraintPolicy`, `EnergyConstraintRule`, `Rules/` (constraint framework)
+    - `EnergyConstraintDiagnostics` (diagnostics)
+    - `EnergySectionProfile`, `EnergyProfileBuilder` (per-section profiles)
+    - `SectionTensionProfile`, `TensionDriver`, `MicroTensionMap` (tension model)
+    - `ITensionQuery`, `DeterministicTensionQuery` (tension queries)
+    - `SectionVariationPlan`, `IVariationQuery`, `DeterministicVariationQuery` (A/A'/B variation)
+    - `BaseReferenceSelectorRules`, `SectionVariationPlanner` (variation planning)
+    - `ISongIntentQuery`, `DeterministicSongIntentQuery` (unified intent query)
+    - `Tests/` (comprehensive test suite for all Stage 7 systems)
   - `Harmony/` (contexts, voicing, validation, diagnostics)
   - `Groove/` (presets, onset grid, pattern libraries)
   - `Material/` (fragment metadata, MaterialBank, validation; Story M1 data layer)
