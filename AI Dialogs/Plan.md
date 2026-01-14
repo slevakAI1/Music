@@ -944,7 +944,7 @@ Energy should modulate within a section (start → build → peak → cadence), 
 
 ---
 
-## Story 7.9 — Stage 8/9 integration contracts (future proofing)  (Completed)
+## Story 7.9 — Integration contracts (future proofing)  (Completed)
 
 ** Intent: Plan introduces a unified intent query used everywhere.
 Ensure later stages can “ask” Stage 7 for arrangement support to convey emotion without rewriting Stage 7.
@@ -978,13 +978,6 @@ Ensure later stages can “ask” Stage 7 for arrangement support to convey emot
 - Build successful, no dependencies added
 - See `AI Dialogs/Story_7_9_Implementation_Summary.md` for usage guide and examples
 
----
-
-## Notes
-
-- This revision intentionally keeps Stage 7 “planner-level.”
-- Stage 8 is where phrase maps and cross-role thinning are expected to become concrete algorithms.
-- Stories 7.11–7.13 are designed to prevent later refactors by reserving deterministic hooks now.
 
 ---
 
