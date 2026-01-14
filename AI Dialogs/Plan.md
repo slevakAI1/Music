@@ -48,7 +48,7 @@ REMAINING STORIES (in rough order, pending further analysis and refinement):
 
 ---
 
-### Story 8.1 — `MotifSpec` model (immutable, material-aware, simplified from old 9.1)
+### Story 8.1 — `MotifSpec` model (immutable, material-aware)
 
 **Intent:** Define a compact, immutable motif specification that integrates with existing Material system.
 
