@@ -65,8 +65,10 @@
     <None Remove="AI Dialogs\DrumFillStyleResearch.md" />
     <None Remove="AI Dialogs\HarmonyPolicy.md" />
     <None Remove="AI Dialogs\MeasureTrackerPlan.md" />
+    <None Remove="AI Dialogs\musical_energy_compilation.md" />
     <None Remove="AI Dialogs\PlanV1.md" />
     <None Remove="AI Dialogs\Story6.3-Implementation-Summary.md" />
+    <None Remove="AI Dialogs\Story_7_5_8_Usage_Guide.md" />
     <None Remove="Archives\PlanV1.md" />
     <None Remove="Archives\Stage 7 Stories.md" />
   </ItemGroup>
