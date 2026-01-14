@@ -19,6 +19,11 @@ public sealed record MotifPlacement
     public required PartTrack.PartTrackId MotifId { get; init; }
 
     /// <summary>
+    /// The motif specification. Set during placement planning.
+    /// </summary>
+    public required MotifSpec MotifSpec { get; init; }
+
+    /// <summary>
     /// Absolute section index (0-based) where motif appears.
     /// </summary>
     public required int AbsoluteSectionIndex { get; init; }
@@ -50,13 +55,14 @@ public sealed record MotifPlacement
     /// Creates a motif placement with validation.
     /// </summary>
     public static MotifPlacement Create(
-        PartTrack.PartTrackId motifId,
+        MotifSpec motifSpec,
         int absoluteSectionIndex,
         int startBarWithinSection,
         int durationBars,
         double variationIntensity = 0.0,
         IEnumerable<string>? transformTags = null)
     {
+        ArgumentNullException.ThrowIfNull(motifSpec);
         if (absoluteSectionIndex < 0)
             throw new ArgumentOutOfRangeException(nameof(absoluteSectionIndex), "Must be >= 0");
         if (startBarWithinSection < 0)
@@ -66,7 +72,8 @@ public sealed record MotifPlacement
 
         return new MotifPlacement
         {
-            MotifId = motifId,
+            MotifId = motifSpec.MotifId,
+            MotifSpec = motifSpec,
             AbsoluteSectionIndex = absoluteSectionIndex,
             StartBarWithinSection = startBarWithinSection,
             DurationBars = durationBars,

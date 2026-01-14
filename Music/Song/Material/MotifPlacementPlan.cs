@@ -65,6 +65,32 @@ public sealed record MotifPlacementPlan
     }
 
     /// <summary>
+    /// Gets placement for a specific role and bar (absolute section index + bar within section).
+    /// Returns null if no motif placed for this role at this position.
+    /// </summary>
+    public MotifPlacement? GetPlacementForRoleAndBar(string intendedRole, int absoluteSectionIndex, int barWithinSection)
+    {
+        return Placements.FirstOrDefault(p =>
+            string.Equals(p.MotifSpec.IntendedRole, intendedRole, StringComparison.OrdinalIgnoreCase) &&
+            p.AbsoluteSectionIndex == absoluteSectionIndex &&
+            barWithinSection >= p.StartBarWithinSection &&
+            barWithinSection < p.StartBarWithinSection + p.DurationBars);
+    }
+
+    /// <summary>
+    /// Gets all placements active at a specific bar within a section.
+    /// </summary>
+    public IReadOnlyList<MotifPlacement> GetPlacementsForBar(int absoluteSectionIndex, int barWithinSection)
+    {
+        return Placements
+            .Where(p =>
+                p.AbsoluteSectionIndex == absoluteSectionIndex &&
+                barWithinSection >= p.StartBarWithinSection &&
+                barWithinSection < p.StartBarWithinSection + p.DurationBars)
+            .ToList();
+    }
+
+    /// <summary>
     /// Checks if any motif is placed in a specific section.
     /// </summary>
     public bool HasMotifInSection(int absoluteSectionIndex)

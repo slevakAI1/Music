@@ -168,7 +168,7 @@ public static class MotifRendererTests
 
         // High variation intensity
         var placement = MotifPlacement.Create(
-            spec.MotifId,
+            spec,
             absoluteSectionIndex: 0,
             startBarWithinSection: 0,
             durationBars: 2,
@@ -237,7 +237,7 @@ public static class MotifRendererTests
 
         // Placement referencing non-existent section
         var invalidPlacement = MotifPlacement.Create(
-            spec.MotifId,
+            spec,
             absoluteSectionIndex: 999, // Does not exist
             startBarWithinSection: 0,
             durationBars: 1);
@@ -411,14 +411,14 @@ public static class MotifRendererTests
         var (spec, _, harmony, barTrack, groove, intent, sectionTrack) = CreateTestContext();
 
         var noTransformPlacement = MotifPlacement.Create(
-            spec.MotifId,
+            spec,
             absoluteSectionIndex: 0,
             startBarWithinSection: 0,
             durationBars: 1,
             variationIntensity: 0.0);
 
         var octaveUpPlacement = MotifPlacement.Create(
-            spec.MotifId,
+            spec,
             absoluteSectionIndex: 0,
             startBarWithinSection: 0,
             durationBars: 1,
@@ -451,7 +451,7 @@ public static class MotifRendererTests
         sectionTrack.Add(MusicConstants.eSectionType.Chorus, 8);
 
         var placement = MotifPlacement.Create(
-            spec.MotifId,
+            spec,
             absoluteSectionIndex: 0,
             startBarWithinSection: 0,
             durationBars: 2);

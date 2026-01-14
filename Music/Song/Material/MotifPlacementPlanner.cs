@@ -211,8 +211,13 @@ public static class MotifPlacementPlanner
         // Determine transform tags based on variation and context
         var transformTags = DetermineTransformTags(intent, seed);
 
+        // Convert PartTrack to MotifSpec for the placement
+        var motifSpec = MotifConversion.FromPartTrack(motif);
+        if (motifSpec == null)
+            return null;
+
         return MotifPlacement.Create(
-            motif.Meta.TrackId,
+            motifSpec,
             sectionIndex,
             startBar,
             durationBars,

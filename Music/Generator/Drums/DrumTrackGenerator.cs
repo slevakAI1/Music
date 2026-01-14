@@ -4,6 +4,7 @@
 /// AI: Story 7.3=Now accepts section profiles and applies energy controls (density, velocity, busy probability) to drum generation.
 
 using Music.MyMidi;
+using Music.Song.Material;
 
 namespace Music.Generator
 {
@@ -13,6 +14,7 @@ namespace Music.Generator
         /// Generates drum track: kick, snare, hi-hat, ride with deterministic variations and fills.
         /// Updated for Story 6.1, Story 6.3 (section transition fills), and Story 7.3 (energy profiles).
         /// Updated for Story 7.6.4: accepts optional variation query for future parameter adaptation.
+        /// Updated for Story 9.3: accepts motifPresence for ducking awareness.
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
@@ -23,6 +25,8 @@ namespace Music.Generator
             ITensionQuery tensionQuery,
             double microTensionPhraseRampIntensity,
             IVariationQuery? variationQuery,
+            MotifPlacementPlan? motifPlan,
+            MotifPresenceMap? motifPresence,
             int totalBars,
             RandomizationSettings settings,
             int midiProgramNumber)
@@ -94,6 +98,10 @@ namespace Music.Generator
                     var variationPlan = variationQuery.GetVariationPlan(absoluteSectionIndex);
                     drumParameters = VariationParameterAdapter.ApplyVariationToDrums(drumParameters, variationPlan.Roles.Drums);
                 }
+
+                // Story 9.3: Check if lead motif is active for ducking
+                bool hasLeadMotif = motifPresence?.HasLeadMotif(absoluteSectionIndex, barIndexWithinSection) ?? false;
+                double duckingMultiplier = hasLeadMotif ? 0.7 : 1.0; // Thin optional hits by 30% when lead motif active
 
                 // Create deterministic per-bar RNG so fill decisions remain deterministic when knobs change.
                 var barRng = RandomHelpers.CreateLocalRng(settings.Seed, $"{grooveEvent.SourcePresetName ?? "groove"}_{sectionType}", bar, 0m);
@@ -202,6 +210,25 @@ namespace Music.Generator
                         FillProgress = 0.0,
                         IsChoke = isChoke
                     });
+                }
+
+                // Story 9.3: Apply ducking when lead motif active (thin optional hat hits)
+                if (hasLeadMotif)
+                {
+                    var localRng = RandomHelpers.CreateLocalRng(settings.Seed, $"duck_{bar}", bar, 0m);
+                    allHits = allHits.Where(h =>
+                    {
+                        // Never remove groove anchors (main hits, kick, snare)
+                        if (h.IsMain || h.Role == "kick" || h.Role == "snare")
+                            return true;
+
+                        // Thin optional hat hits deterministically
+                        if (h.Role == "hat")
+                            return localRng.NextDouble() < duckingMultiplier;
+
+                        // Keep all other hits
+                        return true;
+                    }).ToList();
                 }
 
                 // Convert hits to MIDI events

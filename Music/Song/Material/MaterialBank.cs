@@ -18,6 +18,8 @@ public sealed class MaterialBank
 
     public int Count => _tracks.Count;
 
+    public IReadOnlyList<PartTrack> GetAll() => _tracks.Values.ToList();
+
     public void Add(PartTrack track)
     {
         ArgumentNullException.ThrowIfNull(track);

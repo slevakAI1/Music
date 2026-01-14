@@ -10,6 +10,7 @@
 // upstream integrity issues and is intentionally avoided.
 
 using Music.MyMidi;
+using Music.Song.Material;
 
 namespace Music.Generator
 {
@@ -73,6 +74,17 @@ namespace Music.Generator
                 grooveName,
                 settings.Seed);
 
+            // Story 9.2: Create motif placement plan and presence map
+            var materialBank = InitializeMaterialBank();
+            var motifPlan = CreateMotifPlacementPlan(
+                materialBank,
+                songContext.SectionTrack,
+                energyArc,
+                tensionQuery,
+                variationQuery,
+                settings.Seed);
+            var motifPresence = new MotifPresenceMap(motifPlan);
+
             // Resolve MIDI program numbers from VoiceSet
             int bassProgramNumber = GetProgramNumberForRole(songContext.Voices, "Bass", defaultProgram: 33);
             int compProgramNumber = GetProgramNumberForRole(songContext.Voices, "Comp", defaultProgram: 27);
@@ -90,6 +102,8 @@ namespace Music.Generator
                     tensionQuery,
                     microTensionPhraseRampIntensity,
                     variationQuery,
+                    motifPlan,
+                    motifPresence,
                     totalBars,
                     settings,
                     harmonyPolicy,
@@ -104,6 +118,8 @@ namespace Music.Generator
                     tensionQuery,
                     microTensionPhraseRampIntensity,
                     variationQuery,
+                    motifPlan,
+                    motifPresence,
                     totalBars,
                     settings,
                     harmonyPolicy,
@@ -118,6 +134,8 @@ namespace Music.Generator
                     tensionQuery,
                     microTensionPhraseRampIntensity,
                     variationQuery,
+                    motifPlan,
+                    motifPresence,
                     totalBars,
                     settings,
                     harmonyPolicy,
@@ -132,6 +150,8 @@ namespace Music.Generator
                     tensionQuery,
                     microTensionPhraseRampIntensity,
                     variationQuery,
+                    motifPlan,
+                    motifPresence,
                     totalBars,
                     settings,
                     drumProgramNumber)
@@ -140,7 +160,7 @@ namespace Music.Generator
 
         /// <summary>
         /// Builds section energy profiles for all sections.
-        /// Returns dictionary keyed by section StartBar for quick lookup.
+        /// Returns dictionary keyed by absolute section index for intent query.
         /// </summary>
         private static Dictionary<int, EnergySectionProfile> BuildSectionProfiles(
             EnergyArc energyArc,
@@ -154,8 +174,10 @@ namespace Music.Generator
             
             EnergySectionProfile? previousProfile = null;
 
-            foreach (var section in sectionTrack.Sections)
+            for (int absoluteSectionIndex = 0; absoluteSectionIndex < sectionTrack.Sections.Count; absoluteSectionIndex++)
             {
+                var section = sectionTrack.Sections[absoluteSectionIndex];
+                
                 // Get or initialize index for this section type
                 if (!sectionIndicesByType.ContainsKey(section.SectionType))
                 {
@@ -172,8 +194,8 @@ namespace Music.Generator
                     previousProfile,
                     seed);
 
-                // Store by StartBar for quick lookup during generation
-                profiles[section.StartBar] = profile;
+                // Store by absolute section index (for DeterministicSongIntentQuery)
+                profiles[absoluteSectionIndex] = profile;
 
                 // Increment index for this section type
                 sectionIndicesByType[section.SectionType]++;
@@ -192,6 +214,59 @@ namespace Music.Generator
         {
             var firstGroove = grooveTrack.Events.FirstOrDefault();
             return firstGroove?.SourcePresetName ?? "Default";
+        }
+
+        /// <summary>
+        /// Initializes MaterialBank with test motifs for Story 9.2.
+        /// </summary>
+        private static MaterialBank InitializeMaterialBank()
+        {
+            var bank = new MaterialBank();
+
+            // Add test motifs from MotifLibrary (Story 8.3)
+            var chorusHook = MotifLibrary.ClassicRockHookA().ToPartTrack();
+            bank.Add(chorusHook);
+
+            var verseRiff = MotifLibrary.SteadyVerseRiffA().ToPartTrack();
+            bank.Add(verseRiff);
+
+            var synthHook = MotifLibrary.BrightSynthHookA().ToPartTrack();
+            bank.Add(synthHook);
+
+            return bank;
+        }
+
+        /// <summary>
+        /// Creates motif placement plan using MotifPlacementPlanner (Story 9.1).
+        /// </summary>
+        private static MotifPlacementPlan CreateMotifPlacementPlan(
+            MaterialBank materialBank,
+            SectionTrack sectionTrack,
+            EnergyArc energyArc,
+            ITensionQuery tensionQuery,
+            IVariationQuery variationQuery,
+            int seed)
+        {
+            if (materialBank.Count == 0)
+            {
+                return MotifPlacementPlan.Empty(seed);
+            }
+
+            // Build section profiles for intent query
+            var sectionProfiles = BuildSectionProfiles(energyArc, sectionTrack, seed);
+
+            // Create intent query for placement planner
+            ISongIntentQuery intentQuery = new DeterministicSongIntentQuery(
+                sectionProfiles,
+                tensionQuery,
+                variationQuery);
+
+            // Use static CreatePlan method
+            return MotifPlacementPlanner.CreatePlan(
+                sectionTrack,
+                intentQuery,
+                materialBank,
+                seed);
         }
 
         // AI: GeneratorResult: required PartTracks returned; consumers expect these program numbers and ordering.

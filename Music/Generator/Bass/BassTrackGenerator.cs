@@ -4,6 +4,7 @@
 // AI: Story 7.5.6=Now accepts tension query; applies tension PullProbabilityBias to approach note insertion (only when groove slot allows).
 
 using Music.MyMidi;
+using Music.Song.Material;
 
 namespace Music.Generator
 {
@@ -14,6 +15,7 @@ namespace Music.Generator
         /// Updated for Story 7.3: energy profile integration with guardrails.
         /// Updated for Story 7.5.6: tension hooks for pickup/approach bias (slot-gated).
         /// Updated for Story 7.6.4: accepts optional variation query for future parameter adaptation.
+        /// Updated for Story 9.2: uses MotifRenderer when motif placed for Bass role.
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
@@ -24,6 +26,8 @@ namespace Music.Generator
             ITensionQuery tensionQuery,
             double microTensionPhraseRampIntensity,
             IVariationQuery? variationQuery,
+            MotifPlacementPlan? motifPlan,
+            MotifPresenceMap? motifPresence,
             int totalBars,
             RandomizationSettings settings,
             HarmonyPolicy policy,
@@ -39,8 +43,8 @@ namespace Music.Generator
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
-                var grooveEvent = grooveTrack.GetActiveGroovePreset(bar);
-                var bassOnsets = grooveEvent.AnchorLayer.BassOnsets;
+                var groovePreset = grooveTrack.GetActiveGroovePreset(bar);
+                var bassOnsets = groovePreset.AnchorLayer.BassOnsets;
                 if (bassOnsets == null || bassOnsets.Count == 0)
                     continue;
 
@@ -68,6 +72,31 @@ namespace Music.Generator
                 {
                     // Skip bass for this bar if orchestration says bass not present
                     continue;
+                }
+
+                // Story 9.2: Check if motif is placed for Bass role in this bar
+                int barWithinSection = section != null ? (bar - section.StartBar) : 0;
+                var motifPlacement = motifPlan?.GetPlacementForRoleAndBar("Bass", absoluteSectionIndex, barWithinSection);
+
+                if (motifPlacement != null)
+                {
+                    // Render motif for this bar using MotifRenderer
+                    var motifNotes = RenderMotifForBar(
+                        motifPlacement,
+                        harmonyTrack,
+                        groovePreset,
+                        barTrack,
+                        bar,
+                        barWithinSection,
+                        absoluteSectionIndex,
+                        energyProfile,
+                        tensionQuery,
+                        microTensionPhraseRampIntensity,
+                        settings,
+                        policy);
+
+                    notes.AddRange(motifNotes);
+                    continue; // Skip pattern-based generation for this bar
                 }
 
                 // Get bass energy controls
@@ -98,7 +127,7 @@ namespace Music.Generator
 
                 // Select bass pattern for this bar using BassPatternLibrary
                 var bassPattern = BassPatternLibrary.SelectPattern(
-                    grooveEvent.Name,
+                    groovePreset.Name,
                     sectionType,
                     bar,
                     allowPolicyGated: allowApproaches);
@@ -126,7 +155,7 @@ namespace Music.Generator
                 var patternHits = bassPattern.Render(rootMidi, onsetSlots.Count);
 
                 // Story 7.3: Create deterministic RNG for busy probability checks
-                var barRng = RandomHelpers.CreateLocalRng(settings.Seed, $"bass_{grooveEvent.Name}_{sectionType}", bar, 0m);
+                var barRng = RandomHelpers.CreateLocalRng(settings.Seed, $"bass_{groovePreset.Name}_{sectionType}", bar, 0m);
 
                 // Process each pattern hit and check for chord change opportunities
                 foreach (var hit in patternHits)
@@ -258,6 +287,71 @@ namespace Music.Generator
             // tensionPullBias is in range [-0.20, 0.20] per TensionHooksBuilder
             double adjusted = baseProbability + tensionPullBias;
             return Math.Clamp(adjusted, 0.0, 1.0);
+        }
+
+        /// <summary>
+        /// Renders motif notes for a specific bar using MotifRenderer.
+        /// Story 9.2: Converts motif spec to actual note events for this bar.
+        /// </summary>
+        private static List<PartTrackEvent> RenderMotifForBar(
+            MotifPlacement placement,
+            HarmonyTrack harmonyTrack,
+            GroovePreset groovePreset,
+            BarTrack barTrack,
+            int bar,
+            int barWithinSection,
+            int absoluteSectionIndex,
+            EnergySectionProfile? energyProfile,
+            ITensionQuery tensionQuery,
+            double microTensionPhraseRampIntensity,
+            RandomizationSettings settings,
+            HarmonyPolicy policy)
+        {
+            // Build onset grid from bass onsets
+            var bassOnsets = groovePreset.AnchorLayer.BassOnsets;
+            if (bassOnsets == null || bassOnsets.Count == 0)
+                return new List<PartTrackEvent>();
+
+            var onsetGrid = OnsetGrid.Build(bar, bassOnsets, barTrack);
+
+            // Build harmony contexts for this bar
+            var harmonyContexts = new List<HarmonyPitchContext>();
+            foreach (var slot in onsetGrid)
+            {
+                var harmonyEvent = harmonyTrack.GetActiveHarmonyEvent(slot.Bar, slot.OnsetBeat);
+                if (harmonyEvent != null)
+                {
+                    var ctx = HarmonyPitchContextBuilder.Build(
+                        harmonyEvent.Key,
+                        harmonyEvent.Degree,
+                        harmonyEvent.Quality,
+                        harmonyEvent.Bass,
+                        baseOctave: 2, // Bass octave
+                        policy);
+                    harmonyContexts.Add(ctx);
+                }
+            }
+
+            // Get intent context for energy/tension biases
+            var hooks = TensionHooksBuilder.Create(
+                tensionQuery,
+                absoluteSectionIndex,
+                barWithinSection,
+                energyProfile,
+                microTensionPhraseRampIntensity);
+
+            // Render motif using MotifRenderer
+            var motifTrack = MotifRenderer.Render(
+                placement.MotifSpec,
+                placement,
+                harmonyContexts,
+                onsetGrid,
+                energyProfile?.Global.Energy ?? 0.5,
+                hooks.VelocityAccentBias,
+                settings.Seed);
+
+            // Convert to list and return
+            return motifTrack.PartTrackNoteEvents.ToList();
         }
     }
 }

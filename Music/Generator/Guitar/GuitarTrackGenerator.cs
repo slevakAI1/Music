@@ -6,6 +6,7 @@
 // AI: Story 8.0.3=Now uses CompBehavior system for onset selection and duration shaping; replaces ApplyDensityToPattern.
 
 using Music.MyMidi;
+using Music.Song.Material;
 using System.Diagnostics;
 
 namespace Music.Generator
@@ -18,6 +19,7 @@ namespace Music.Generator
         /// Updated for Story 7.5.6: tension hooks for accent bias at phrase peaks/ends.
         /// Updated for Story 7.6.4: accepts optional variation query for future parameter adaptation.
         /// Updated for Story 8.0.3: uses CompBehavior system for onset selection and duration shaping.
+        /// Updated for Story 9.2: uses MotifRenderer when motif placed for Comp role.
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
@@ -28,6 +30,8 @@ namespace Music.Generator
             ITensionQuery tensionQuery,
             double microTensionPhraseRampIntensity,
             IVariationQuery? variationQuery,
+            MotifPlacementPlan? motifPlan,
+            MotifPresenceMap? motifPresence,
             int totalBars,
             RandomizationSettings settings,
             HarmonyPolicy policy,
@@ -68,6 +72,32 @@ namespace Music.Generator
                 if (energyProfile?.Orchestration != null && !energyProfile.Orchestration.CompPresent)
                 {
                     // Skip comp for this bar if orchestration says comp not present
+                    continue;
+                }
+
+                // Story 9.2: Check if motif is placed for Comp role in this bar
+                int barWithinSection = section != null ? (bar - section.StartBar) : 0;
+                var motifPlacement = motifPlan?.GetPlacementForRoleAndBar("Comp", absoluteSectionIndex, barWithinSection);
+
+                if (motifPlacement != null)
+                {
+                    // Render motif for this bar
+                    var motifNotes = RenderMotifForBar(
+                        motifPlacement,
+                        harmonyTrack,
+                        groovePreset,
+                        barTrack,
+                        bar,
+                        barWithinSection,
+                        absoluteSectionIndex,
+                        energyProfile,
+                        tensionQuery,
+                        microTensionPhraseRampIntensity,
+                        settings,
+                        policy);
+
+                    notes.AddRange(motifNotes);
+                    previousVoicing = null; // Reset voice leading after motif
                     continue;
                 }
 
@@ -116,6 +146,37 @@ namespace Music.Generator
                     compProfile?.DensityMultiplier ?? 1.0,
                     bar,
                     settings.Seed);
+
+                // Story 9.3: Apply ducking when lead motif active
+                bool hasLeadMotif = motifPresence?.HasLeadMotif(absoluteSectionIndex, barIndexWithinSection) ?? false;
+                if (hasLeadMotif && realization.SelectedOnsets.Count > 2)
+                {
+                    // Thin weak-beat onsets by ~30% when lead motif active
+                    var localRng = RandomHelpers.CreateLocalRng(settings.Seed, $"comp_duck_{bar}", bar, 0m);
+                    var duckedOnsets = realization.SelectedOnsets
+                        .Where((onset, idx) =>
+                        {
+                            // Always keep strong beats (1 and 3)
+                            decimal beat = onset - (int)onset + 1; // Convert to 1-based beat
+                            bool isStrongBeat = beat == 1m || beat == 3m;
+                            if (isStrongBeat)
+                                return true;
+
+                            // Thin weak beats deterministically (keep 70%)
+                            return localRng.NextDouble() < 0.7;
+                        })
+                        .ToList();
+
+                    // Update realization with ducked onsets (keep original duration multiplier)
+                    if (duckedOnsets.Count > 0)
+                    {
+                        realization = new CompRealizationResult
+                        {
+                            SelectedOnsets = duckedOnsets,
+                            DurationMultiplier = realization.DurationMultiplier
+                        };
+                    }
+                }
 
                 // Story 8.0.3: Skip if no onsets selected
                 if (realization.SelectedOnsets.Count == 0)
@@ -269,6 +330,70 @@ namespace Music.Generator
         {
             velocity += tensionAccentBias;
             return Math.Clamp(velocity, 1, 127);
+        }
+
+        /// <summary>
+        /// Renders motif notes for a specific bar using MotifRenderer.
+        /// Story 9.2: Converts motif spec to actual note events for this bar.
+        /// </summary>
+        private static List<PartTrackEvent> RenderMotifForBar(
+            MotifPlacement placement,
+            HarmonyTrack harmonyTrack,
+            GroovePreset groovePreset,
+            BarTrack barTrack,
+            int bar,
+            int barWithinSection,
+            int absoluteSectionIndex,
+            EnergySectionProfile? energyProfile,
+            ITensionQuery tensionQuery,
+            double microTensionPhraseRampIntensity,
+            RandomizationSettings settings,
+            HarmonyPolicy policy)
+        {
+            // Build onset grid from comp onsets
+            var compOnsets = groovePreset.AnchorLayer.CompOnsets;
+            if (compOnsets == null || compOnsets.Count == 0)
+                return new List<PartTrackEvent>();
+
+            var onsetGrid = OnsetGrid.Build(bar, compOnsets, barTrack);
+
+            // Build harmony contexts for this bar
+            var harmonyContexts = new List<HarmonyPitchContext>();
+            foreach (var slot in onsetGrid)
+            {
+                var harmonyEvent = harmonyTrack.GetActiveHarmonyEvent(slot.Bar, slot.OnsetBeat);
+                if (harmonyEvent != null)
+                {
+                    var ctx = HarmonyPitchContextBuilder.Build(
+                        harmonyEvent.Key,
+                        harmonyEvent.Degree,
+                        harmonyEvent.Quality,
+                        harmonyEvent.Bass,
+                        baseOctave: 4, // Guitar octave
+                        policy);
+                    harmonyContexts.Add(ctx);
+                }
+            }
+
+            // Get intent context
+            var hooks = TensionHooksBuilder.Create(
+                tensionQuery,
+                absoluteSectionIndex,
+                barWithinSection,
+                energyProfile,
+                microTensionPhraseRampIntensity);
+
+            // Render motif
+            var motifTrack = MotifRenderer.Render(
+                placement.MotifSpec,
+                placement,
+                harmonyContexts,
+                onsetGrid,
+                energyProfile?.Global.Energy ?? 0.5,
+                hooks.VelocityAccentBias,
+                settings.Seed);
+
+            return motifTrack.PartTrackNoteEvents.ToList();
         }
     }
 }

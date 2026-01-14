@@ -15,6 +15,101 @@ namespace Music.Song.Material;
 public static class MotifRenderer
 {
     /// <summary>
+    /// Renders a placed motif into a PartTrack (simplified generator-friendly overload).
+    /// Used by role generators that have already built harmony contexts and onset grids.
+    /// </summary>
+    public static PartTrack Render(
+        MotifSpec spec,
+        MotifPlacement placement,
+        IReadOnlyList<HarmonyPitchContext> harmonyContexts,
+        IReadOnlyList<OnsetSlot> onsetGrid,
+        double energy,
+        int velocityAccentBias,
+        int seed)
+    {
+        var events = new List<PartTrackEvent>();
+
+        if (harmonyContexts.Count == 0 || onsetGrid.Count == 0)
+            return CreateEmptyTrack(spec, placement, 0);
+
+        int previousPitch = spec.Register.CenterMidiNote;
+
+        // Render each onset
+        for (int onsetIndex = 0; onsetIndex < onsetGrid.Count && onsetIndex < harmonyContexts.Count; onsetIndex++)
+        {
+            var slot = onsetGrid[onsetIndex];
+            var harmonyContext = harmonyContexts[onsetIndex];
+
+            // Calculate contour position (0..1 across all notes)
+            double contourPosition = onsetGrid.Count > 1 ? (double)onsetIndex / (onsetGrid.Count - 1) : 0.5;
+
+            // Select pitch
+            int pitch = SelectPitch(
+                spec,
+                harmonyContext,
+                contourPosition,
+                slot.IsStrongBeat,
+                previousPitch,
+                0, // barOffset
+                onsetIndex,
+                seed);
+
+            // Apply variation
+            pitch = ApplyVariation(
+                pitch,
+                spec,
+                placement,
+                harmonyContext,
+                contourPosition,
+                0, // barOffset
+                onsetIndex,
+                seed);
+
+            // Calculate velocity
+            int velocity = 70 + (int)(energy * 30) + velocityAccentBias;
+            if (slot.IsStrongBeat)
+                velocity += 10;
+            velocity = Math.Clamp(velocity, 40, 127);
+
+            // Duration from slot
+            int duration = slot.DurationTicks;
+            duration = ApplyDurationVariation(duration, placement);
+
+            // Prevent overlaps
+            duration = PreventOverlaps(events, slot.StartTick, duration);
+
+            if (duration > 0)
+            {
+                events.Add(new PartTrackEvent(
+                    noteNumber: pitch,
+                    absoluteTimeTicks: (int)slot.StartTick,
+                    noteDurationTicks: duration,
+                    noteOnVelocity: velocity));
+
+                previousPitch = pitch;
+            }
+        }
+
+        var sortedEvents = events.OrderBy(e => e.AbsoluteTimeTicks).ToList();
+
+        return new PartTrack(sortedEvents)
+        {
+            MidiProgramNumber = 0,
+            MidiProgramName = spec.IntendedRole,
+            Meta = new PartTrackMeta
+            {
+                TrackId = PartTrack.PartTrackId.NewId(),
+                Name = $"{spec.Name} (rendered)",
+                IntendedRole = spec.IntendedRole,
+                Domain = PartTrackDomain.SongAbsolute,
+                Kind = PartTrackKind.RoleTrack,
+                MaterialKind = spec.Kind,
+                Tags = spec.Tags
+            }
+        };
+    }
+
+    /// <summary>
     /// Renders a placed motif into a PartTrack with actual pitches and timing.
     /// </summary>
     /// <param name="spec">The motif specification (rhythm, contour, register, tone policy).</param>
