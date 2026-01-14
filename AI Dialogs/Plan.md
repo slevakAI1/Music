@@ -44,6 +44,7 @@ REMAINING STORIES (in rough order, pending further analysis and refinement):
 - **Deterministic-friendly:** All motif properties are immutable records suitable for deterministic selection
 - **Serialization-ready:** Types use records/enums for future persistence (serializer not chosen yet)
 - **PartTrack-based:** Motifs are PartTracks with `Kind = MaterialFragment` and `MaterialKind = Riff/Hook/MelodyPhrase`
+- **Lockable material:** stored motifs are authoritative inputs; future stages must not mutate them (derive variants via provenance instead)
 
 ---
 
@@ -124,12 +125,14 @@ REMAINING STORIES (in rough order, pending further analysis and refinement):
     - Rhythmically memorable (e.g., "da-da DUM" syncopated pattern)
     - Contour: Arch or ZigZag
     - 2-4 bar phrase length
-    - Example inspiration: opening riff from "Smoke on the Water", "Seven Nation Army", or "Come As You Are"
+    - Example inspiration: classic hook archetypes (e.g., "Smoke on the Water" / "Seven Nation Army" / "Come As You Are")
+    - Non-derivative rule: do not transcribe or replicate any recognizable riff; use archetype-level rhythm/contour only
   - **Verse riff** (Guitar or Bass role):
     - Steady, repeating pattern
     - Contour: Flat or slight Up/Down
     - 1-2 bar loop
-    - Example inspiration: "Sunshine of Your Love" bass riff
+    - Example inspiration: classic riff archetypes (e.g., "Sunshine of Your Love")
+    - Non-derivative rule: do not transcribe or replicate any recognizable riff; use archetype-level rhythm/contour only
   - **Optional: Synth hook** (Keys role):
     - Bright, energetic pattern
     - Contour: Up or Arch
@@ -139,6 +142,7 @@ REMAINING STORIES (in rough order, pending further analysis and refinement):
   - Clear rhythm shape (onset ticks)
   - Appropriate register intent
   - Sensible tone policy (chord-tone bias, passing tone rules)
+  - At least one intent tag indicating memorability purpose (e.g., `hooky`, `chorus-hook`) so later stages can prioritize deterministically
 - Add tests:
   - Each test motif can be stored in MaterialBank
   - Each test motif has valid structure (all fields in range)
