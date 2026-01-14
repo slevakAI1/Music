@@ -42,5 +42,22 @@ internal sealed class MaterialBank
             .Where(t => string.Equals(t.Meta.IntendedRole, intendedRole, StringComparison.OrdinalIgnoreCase))
             .ToList();
 
+    // AI: Motif-specific query methods (Story 8.2)
+    public IReadOnlyList<PartTrack> GetMotifsByRole(string intendedRole)
+        => GetByRole(intendedRole)
+            .Where(t => t.Meta.Kind == PartTrackKind.MaterialFragment)
+            .ToList();
+
+    public IReadOnlyList<PartTrack> GetMotifsByKind(MaterialKind kind)
+        => GetByMaterialKind(kind)
+            .Where(t => t.Meta.Kind == PartTrackKind.MaterialFragment)
+            .ToList();
+
+    public PartTrack? GetMotifByName(string name)
+        => _tracks.Values
+            .FirstOrDefault(t =>
+                t.Meta.Kind == PartTrackKind.MaterialFragment &&
+                string.Equals(t.Meta.Name, name, StringComparison.OrdinalIgnoreCase));
+
     public void Clear() => _tracks.Clear();
 }
