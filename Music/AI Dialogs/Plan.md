@@ -32,7 +32,7 @@ See History.md for the full history of how this plan evolved. This is remaining 
 REMAINING STORIES (in rough order, pending further analysis and refinement):
 ============================================================================================================================
 
-## Stage 8 — Material motifs: data definitions and test fixtures (Story M2)
+## Stage 8 — Material motifs: data definitions and test fixtures (Story M2)  (completed)
 
 **Why now:** Stage 7 provided energy/tension/phrase intent; Stage 8 will place and render motifs. Before placement logic, establish motifs as first-class material objects stored in MaterialBank
 
@@ -48,7 +48,7 @@ REMAINING STORIES (in rough order, pending further analysis and refinement):
 
 ---
 
-### Story 8.1 — `MotifSpec` model (immutable, material-aware)
+### Story 8.1 — `MotifSpec` model (immutable, material-aware) (completed)
 
 **Intent:** Define a compact, immutable motif specification that integrates with existing Material system.
 
@@ -81,7 +81,7 @@ REMAINING STORIES (in rough order, pending further analysis and refinement):
 
 ---
 
-### Story 8.2 — Motif storage and retrieval in MaterialBank
+### Story 8.2 — Motif storage and retrieval in MaterialBank (completed)
 
 **Intent:** Extend MaterialBank to properly store and query motifs as a specialized type of material fragment.
 
@@ -114,7 +114,7 @@ REMAINING STORIES (in rough order, pending further analysis and refinement):
 
 ---
 
-### Story 8.3 — Create hardcoded test motifs (popular patterns)
+### Story 8.3 — Create hardcoded test motifs (popular patterns) (completed)
 
 **Intent:** Provide at least one real, usable motif for testing Stage 9 placement and rendering without needing a motif generator.
 
@@ -155,7 +155,7 @@ REMAINING STORIES (in rough order, pending further analysis and refinement):
 
 ---
 
-### Story 8.4 — Motif validation helpers
+### Story 8.4 — Motif validation helpers (completed)
 
 **Intent:** Provide non-throwing validation for motif-specific constraints (parallel to `PartTrackMaterialValidation` from Story M1).
 
@@ -177,7 +177,7 @@ REMAINING STORIES (in rough order, pending further analysis and refinement):
 
 ---
 
-### Story 8.5 — Motif definition tests and MaterialBank integration
+### Story 8.5 — Motif definition tests and MaterialBank integration (completed)
 
 **Intent:** Ensure motif data layer is solid before Stage 9 placement work.
 
@@ -195,7 +195,7 @@ REMAINING STORIES (in rough order, pending further analysis and refinement):
 
 ---
 
-## Stage 9 — Motif placement and rendering (where and how motifs appear)
+## Stage 9 — Motif placement and rendering (where and how motifs appear)  (in progress)
 
 **Why now:** Stage 8 established motifs as material objects. Stage 9 makes them musically functional by placing them in the song structure and rendering them into actual note sequences.
 
@@ -203,7 +203,7 @@ REMAINING STORIES (in rough order, pending further analysis and refinement):
 
 ---
 
-### Story 9.1 — `MotifPlacementPlanner` (where motifs appear)
+### Story 9.1 — `MotifPlacementPlanner` (where motifs appear)   (completed)
 
 **Intent:** Motifs should be intentional: chorus hook, intro answer, pre-chorus lift. Determine WHICH motifs appear WHERE in the song.
 
