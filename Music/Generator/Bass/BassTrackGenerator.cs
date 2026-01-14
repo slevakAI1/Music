@@ -35,6 +35,20 @@ namespace Music.Generator
         {
             ArgumentNullException.ThrowIfNull(tensionQuery);
 
+            // DIAGNOSTIC: Log motif plan info at start
+            if (motifPlan == null)
+            {
+                Tracer.DebugTrace("BassTrackGenerator: motifPlan is NULL");
+            }
+            else
+            {
+                Tracer.DebugTrace($"BassTrackGenerator: motifPlan has {motifPlan.Placements.Count} placements");
+                foreach (var p in motifPlan.Placements)
+                {
+                    Tracer.DebugTrace($"  Placement: Role={p.MotifSpec.IntendedRole}, Section={p.AbsoluteSectionIndex}, Bar={p.StartBarWithinSection}, Duration={p.DurationBars}");
+                }
+            }
+
             var notes = new List<PartTrackEvent>();
             const int bassOctave = 2;
 
@@ -76,7 +90,21 @@ namespace Music.Generator
 
                 // Story 9.2: Check if motif is placed for Bass role in this bar
                 int barWithinSection = section != null ? (bar - section.StartBar) : 0;
+                
+                // DIAGNOSTIC: Log lookup attempt
+                Tracer.DebugTrace($"Bar {bar}: Looking for Bass motif at section={absoluteSectionIndex}, barWithinSection={barWithinSection}");
+                
                 var motifPlacement = motifPlan?.GetPlacementForRoleAndBar("Bass", absoluteSectionIndex, barWithinSection);
+
+                // DIAGNOSTIC: Log result
+                if (motifPlacement != null)
+                {
+                    Tracer.DebugTrace($"  FOUND Bass motif: {motifPlacement.MotifSpec.Name}");
+                }
+                else
+                {
+                    Tracer.DebugTrace($"  No Bass motif found");
+                }
 
                 if (motifPlacement != null)
                 {

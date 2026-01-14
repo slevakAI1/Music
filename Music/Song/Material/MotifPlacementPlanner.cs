@@ -43,52 +43,88 @@ public static class MotifPlacementPlanner
         ArgumentNullException.ThrowIfNull(intentQuery);
         ArgumentNullException.ThrowIfNull(motifBank);
 
+        Tracer.DebugTrace("=== MotifPlacementPlanner.CreatePlan ===");
+        Tracer.DebugTrace($"MaterialBank has {motifBank.Count} items:");
+        foreach (var motif in motifBank.Tracks)
+        {
+            Tracer.DebugTrace($"  Motif: Name={motif.Meta.Name}, Role={motif.Meta.IntendedRole}, Kind={motif.Meta.MaterialKind}");
+        }
+
         var placements = new List<MotifPlacement>();
 
-        // Track which motifs have been used per section type for A/A' logic
-        var motifUsageByType = new Dictionary<MusicConstants.eSectionType, PartTrack.PartTrackId>();
+        // Track which motifs have been used per section type AND role for A/A' logic
+        var motifUsageByTypeAndRole = new Dictionary<(MusicConstants.eSectionType, string), PartTrack.PartTrackId>();
+
+        // Roles to attempt placement for (in priority order)
+        var rolesToPlace = new[] { "Lead", "Bass", "Guitar", "Keys" };
 
         for (int sectionIndex = 0; sectionIndex < sectionTrack.Sections.Count; sectionIndex++)
         {
             var section = sectionTrack.Sections[sectionIndex];
             var intent = intentQuery.GetSectionIntent(sectionIndex);
 
+            Tracer.DebugTrace($"Section {sectionIndex} ({section.SectionType}): Energy={intent.Energy:F2}");
+
             // Check if motif should be placed in this section
-            if (!ShouldPlaceMotif(section.SectionType, intent, seed))
+            bool shouldPlace = ShouldPlaceMotif(section.SectionType, intent, seed);
+            Tracer.DebugTrace($"  ShouldPlaceMotif? {shouldPlace}");
+            
+            if (!shouldPlace)
                 continue;
 
-            // Select motif for this section
-            var motif = SelectMotifForSection(
-                section.SectionType,
-                intent,
-                motifBank,
-                motifUsageByType,
-                seed);
-
-            if (motif == null)
-                continue;
-
-            // Check orchestration constraints
-            if (!IsRolePresent(intent.RolePresence, motif.Meta.IntendedRole))
-                continue;
-
-            // Create placement
-            var placement = CreatePlacementForSection(
-                motif,
-                sectionIndex,
-                section,
-                intent,
-                seed);
-
-            if (placement != null)
+            // Try to place motifs for each role
+            foreach (var targetRole in rolesToPlace)
             {
-                placements.Add(placement);
+                Tracer.DebugTrace($"  Trying role: {targetRole}");
+                
+                // Check orchestration constraints first
+                bool rolePresent = IsRolePresent(intent.RolePresence, targetRole);
+                Tracer.DebugTrace($"    IsRolePresent? {rolePresent}");
+                
+                if (!rolePresent)
+                    continue;
 
-                // Track usage for A/A' logic
-                motifUsageByType[section.SectionType] = motif.Meta.TrackId;
+                // Select motif for this section and role
+                var motif = SelectMotifForSectionAndRole(
+                    section.SectionType,
+                    targetRole,
+                    intent,
+                    motifBank,
+                    motifUsageByTypeAndRole,
+                    seed);
+
+                if (motif == null)
+                {
+                    Tracer.DebugTrace($"    No motif selected for role {targetRole}");
+                    continue;
+                }
+
+                Tracer.DebugTrace($"    Selected: {motif.Meta.Name}");
+
+                // Create placement
+                var placement = CreatePlacementForSection(
+                    motif,
+                    sectionIndex,
+                    section,
+                    intent,
+                    seed);
+
+                if (placement != null)
+                {
+                    placements.Add(placement);
+                    Tracer.DebugTrace($"    Placement created: bars {placement.StartBarWithinSection}-{placement.StartBarWithinSection + placement.DurationBars - 1}");
+
+                    // Track usage for A/A' logic
+                    motifUsageByTypeAndRole[(section.SectionType, targetRole)] = motif.Meta.TrackId;
+                }
+                else
+                {
+                    Tracer.DebugTrace($"    Placement creation failed");
+                }
             }
         }
 
+        Tracer.DebugTrace($"=== Total placements: {placements.Count} ===");
         return MotifPlacementPlan.Create(placements, seed);
     }
 
@@ -130,41 +166,71 @@ public static class MotifPlacementPlanner
     }
 
     /// <summary>
-    /// Selects appropriate motif for section, respecting A/A' reuse and variation.
+    /// Selects appropriate motif for section and specific role, respecting A/A' reuse and variation.
     /// </summary>
-    private static PartTrack? SelectMotifForSection(
+    private static PartTrack? SelectMotifForSectionAndRole(
         MusicConstants.eSectionType sectionType,
+        string targetRole,
         SectionIntentContext intent,
         MaterialBank motifBank,
-        Dictionary<MusicConstants.eSectionType, PartTrack.PartTrackId> motifUsageByType,
+        Dictionary<(MusicConstants.eSectionType, string), PartTrack.PartTrackId> motifUsageByTypeAndRole,
         int seed)
     {
         // Determine preferred material kind based on section type
         var preferredKind = GetPreferredMaterialKind(sectionType, intent);
+        Tracer.DebugTrace($"      PreferredKind for {sectionType}: {preferredKind}");
 
-        // Get candidate motifs
-        var candidates = motifBank.GetMotifsByKind(preferredKind);
-
-        // Prefer role-specific motifs if available
-        var leadMotifs = candidates.Where(m => IsLeadRole(m.Meta.IntendedRole)).ToList();
-        if (leadMotifs.Any())
-            candidates = leadMotifs;
+        // For lead roles, filter strictly by MaterialKind
+        // For accompaniment roles (Bass, Guitar, Keys), be more flexible
+        bool isLeadRole = IsLeadRole(targetRole);
+        
+        List<PartTrack> candidates;
+        
+        if (isLeadRole)
+        {
+            // Lead: strict MaterialKind filtering
+            var allMotifs = motifBank.GetMotifsByKind(preferredKind);
+            Tracer.DebugTrace($"      Found {allMotifs.Count} motifs with kind={preferredKind}");
+            
+            candidates = allMotifs
+                .Where(m => string.Equals(m.Meta.IntendedRole, targetRole, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+        else
+        {
+            // Accompaniment roles: filter by role only, accept any compatible MaterialKind
+            candidates = motifBank.Tracks
+                .Where(m => string.Equals(m.Meta.IntendedRole, targetRole, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            
+            Tracer.DebugTrace($"      Found {candidates.Count} motifs with role={targetRole} (any kind)");
+        }
+        
+        Tracer.DebugTrace($"      After role filter ({targetRole}): {candidates.Count} candidates");
+        foreach (var c in candidates)
+        {
+            Tracer.DebugTrace($"        Candidate: {c.Meta.Name} (Kind={c.Meta.MaterialKind})");
+        }
 
         if (!candidates.Any())
             return null;
 
         // Check for A/A' reuse
-        if (motifUsageByType.TryGetValue(sectionType, out var previousMotifId) &&
+        if (motifUsageByTypeAndRole.TryGetValue((sectionType, targetRole), out var previousMotifId) &&
             intent.BaseReferenceSectionIndex.HasValue)
         {
             // Reuse same motif for A' variation
             if (motifBank.TryGet(previousMotifId, out var previousMotif))
+            {
+                Tracer.DebugTrace($"      Reusing previous motif for A/A'");
                 return previousMotif;
+            }
         }
 
         // Select deterministically by hash
-        var hash = HashCode.Combine(seed, intent.AbsoluteSectionIndex, sectionType);
+        var hash = HashCode.Combine(seed, intent.AbsoluteSectionIndex, sectionType, targetRole);
         var index = Math.Abs(hash) % candidates.Count;
+        Tracer.DebugTrace($"      Selected index {index} of {candidates.Count}");
         return candidates[index];
     }
 

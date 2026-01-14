@@ -233,6 +233,9 @@ namespace Music.Generator
             var synthHook = MotifLibrary.BrightSynthHookA().ToPartTrack();
             bank.Add(synthHook);
 
+            var bassFill = MotifLibrary.BassTransitionFillA().ToPartTrack();
+            bank.Add(bassFill);
+
             return bank;
         }
 
@@ -247,8 +250,11 @@ namespace Music.Generator
             IVariationQuery variationQuery,
             int seed)
         {
+            Tracer.DebugTrace($"CreateMotifPlacementPlan: MaterialBank has {materialBank.Count} items");
+            
             if (materialBank.Count == 0)
             {
+                Tracer.DebugTrace("CreateMotifPlacementPlan: Returning empty plan (no motifs in bank)");
                 return MotifPlacementPlan.Empty(seed);
             }
 
@@ -262,11 +268,19 @@ namespace Music.Generator
                 variationQuery);
 
             // Use static CreatePlan method
-            return MotifPlacementPlanner.CreatePlan(
+            var plan = MotifPlacementPlanner.CreatePlan(
                 sectionTrack,
                 intentQuery,
                 materialBank,
                 seed);
+            
+            Tracer.DebugTrace($"CreateMotifPlacementPlan: Created plan with {plan.Placements.Count} placements");
+            foreach (var p in plan.Placements)
+            {
+                Tracer.DebugTrace($"  Planned: Role={p.MotifSpec.IntendedRole}, Section={p.AbsoluteSectionIndex}, Bar={p.StartBarWithinSection}-{p.StartBarWithinSection + p.DurationBars - 1}");
+            }
+            
+            return plan;
         }
 
         // AI: GeneratorResult: required PartTracks returned; consumers expect these program numbers and ordering.
