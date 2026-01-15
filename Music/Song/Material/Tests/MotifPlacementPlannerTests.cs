@@ -404,18 +404,7 @@ public static class MotifPlacementPlannerTests
 
         public BarIntentContext GetBarIntent(int absoluteSectionIndex, int barIndexWithinSection)
         {
-            var sectionIntent = GetSectionIntent(absoluteSectionIndex);
-            return new BarIntentContext
-            {
-                Section = sectionIntent,
-                BarIndexWithinSection = barIndexWithinSection,
-                MicroTension = 0.5,
-                EnergyDelta = 0.0,
-                PhrasePosition = PhrasePosition.Middle,
-                IsPhraseEnd = false,
-                IsSectionEnd = false,
-                IsSectionStart = barIndexWithinSection == 0
-            };
+            throw new NotImplementedException("BarIntentContext removed as part of energy disconnect.");
         }
 
         private static RolePresenceHints CreateDefaultRolePresence()
@@ -497,18 +486,7 @@ public static class MotifPlacementPlannerTests
 
         public BarIntentContext GetBarIntent(int absoluteSectionIndex, int barIndexWithinSection)
         {
-            var sectionIntent = GetSectionIntent(absoluteSectionIndex);
-            return new BarIntentContext
-            {
-                Section = sectionIntent,
-                BarIndexWithinSection = barIndexWithinSection,
-                MicroTension = 0.5,
-                EnergyDelta = 0.0,
-                PhrasePosition = PhrasePosition.Middle,
-                IsPhraseEnd = false,
-                IsSectionEnd = false,
-                IsSectionStart = barIndexWithinSection == 0
-            };
+            throw new NotImplementedException("BarIntentContext removed as part of energy disconnect.");
         }
 
         private static RolePresenceHints CreateDefaultRolePresence()

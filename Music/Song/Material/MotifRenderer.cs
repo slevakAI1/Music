@@ -162,9 +162,8 @@ public static class MotifRenderer
             if (!barTrack.TryGetBar(absoluteBar, out var bar))
                 continue;
 
-            // Get bar-level intent
+            // Get bar-level context
             int barIndexWithinSection = placement.StartBarWithinSection + barOffset;
-            var barIntent = intentQuery.GetBarIntent(placement.AbsoluteSectionIndex, barIndexWithinSection);
 
             // Get harmony for this bar
             var harmonyEvent = harmonyTrack.GetActiveHarmonyEvent(absoluteBar, 1m);
@@ -212,9 +211,8 @@ public static class MotifRenderer
                     onsetIndex,
                     seed);
 
-                // Calculate velocity from energy/tension
+                // Calculate velocity
                 int velocity = CalculateVelocity(
-                    barIntent,
                     isStrongBeat,
                     contourPosition,
                     seed);
@@ -652,9 +650,9 @@ public static class MotifRenderer
     }
 
     /// <summary>
-    /// Calculates velocity based on tension and beat strength.
+    /// Calculates velocity based on beat strength.
     /// </summary>
-    private static int CalculateVelocity(BarIntentContext barIntent, bool isStrongBeat, double contourPosition, int seed)
+    private static int CalculateVelocity(bool isStrongBeat, double contourPosition, int seed)
     {
         // Base velocity
         int baseVelocity = 85;
@@ -662,13 +660,6 @@ public static class MotifRenderer
         // Strong beat accent
         if (isStrongBeat)
             baseVelocity += 10;
-
-        // Tension-based bias
-        baseVelocity += (int)(barIntent.MicroTension * 10);
-
-        // Phrase peak/end accents
-        if (barIntent.IsPhraseEnd && contourPosition > 0.7)
-            baseVelocity += 8;
 
         // Deterministic micro-variation
         var hash = HashCode.Combine(seed, "velocity", contourPosition);

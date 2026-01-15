@@ -544,17 +544,7 @@ public static class MotifRendererTests
 
         public BarIntentContext GetBarIntent(int absoluteSectionIndex, int barIndexWithinSection)
         {
-            return new BarIntentContext
-            {
-                Section = GetSectionIntent(absoluteSectionIndex),
-                BarIndexWithinSection = barIndexWithinSection,
-                MicroTension = 0.5,
-                EnergyDelta = 0.0,
-                PhrasePosition = PhrasePosition.Middle,
-                IsPhraseEnd = false,
-                IsSectionEnd = false,
-                IsSectionStart = barIndexWithinSection == 0
-            };
+            throw new NotImplementedException("BarIntentContext removed as part of energy disconnect.");
         }
     }
 }
