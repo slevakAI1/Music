@@ -121,7 +121,7 @@
 
 ---
 
-### Story 2.2: Remove Energy from KeysTrackGenerator
+### Story 2.2: Remove Energy from KeysTrackGenerator ✓ COMPLETE
 
 **File**: `Music\Generator\Keys\KeysTrackGenerator.cs`
 
@@ -138,19 +138,26 @@
 
 ---
 
-### Story 2.3: Remove Energy from BassTrackGenerator
+### Story 2.3: Remove Energy from BassTrackGenerator ✓ COMPLETE
 
 **File**: `Music\Generator\Bass\BassTrackGenerator.cs`
 
-**Changes**:
-- Remove `Dictionary<int, EnergySectionProfile> sectionProfiles` parameter from `Generate()`
-- Delete `EnergySectionProfile? energyProfile = null;` and profile lookup
-- Delete orchestration presence check
-- Delete `energyProfile` parameter from internal method calls
-- Delete velocity energy bias calculation
-- Remove AI comments referencing energy
+**Changes completed**:
+- Removed `Dictionary<int, EnergySectionProfile> sectionProfiles` parameter from `Generate()`
+- Deleted `EnergySectionProfile? energyProfile = null;` and profile lookup
+- Deleted orchestration presence check (`energyProfile?.Orchestration.BassPresent`)
+- Deleted `energyProfile` parameter from `RenderMotifForBar()` and `TensionHooksBuilder.Create()` calls (passed `null` instead)
+- Removed bassProfile retrieval and variation query logic that depended on energy
+- Changed approach probability to use fixed busyProbability (0.5)
+- Removed velocity bias calculation (`ApplyVelocityBias()`) and deleted the method
+- Updated velocity to use fixed base value (95) with clamp
+- Removed register lift/guardrail application (kept guardrail logic but removed energy comments)
+- Updated `MotifRenderer.Render()` call to use fixed energy value (0.5)
+- Updated AI comments to remove "Story 7.3" and energy references
 
-**Callers to update**: `Generator.cs`
+**Caller updated**: `Generator.cs` - removed `sectionProfiles` argument from `BassTrackGenerator.Generate()` call
+
+**Result**: Bass track generation no longer varies by energy. Uses fixed busyProbability (0.5), no velocity bias, and base velocity of 95 with only range guardrail applied.
 
 ---
 

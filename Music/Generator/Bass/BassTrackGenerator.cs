@@ -1,7 +1,6 @@
 // AI: purpose=Generate bass track using BassPatternLibrary for pattern selection and BassChordChangeDetector for approach notes.
 // AI: keep MIDI program number 33; patterns replace randomizer for more structured bass lines (Story 5.1 + 5.2); returns sorted by AbsoluteTimeTicks.
-// AI: Story 7.3=Now accepts section profiles and applies energy controls (density, velocity, busy) with bass range guardrails.
-// AI: Story 7.5.6=Now accepts tension query; applies tension PullProbabilityBias to approach note insertion (only when groove slot allows).
+// AI: tension query applies PullProbabilityBias to approach note insertion (only when groove slot allows).
 
 using Music.MyMidi;
 using Music.Song.Material;
@@ -12,17 +11,15 @@ namespace Music.Generator
     {
         /// <summary>
         /// Generates bass track: pattern-based bass lines with optional approach notes to chord changes.
-        /// Updated for Story 7.3: energy profile integration with guardrails.
-        /// Updated for Story 7.5.6: tension hooks for pickup/approach bias (slot-gated).
-        /// Updated for Story 7.6.4: accepts optional variation query for future parameter adaptation.
-        /// Updated for Story 9.2: uses MotifRenderer when motif placed for Bass role.
+        /// Tension hooks provide pickup/approach bias (slot-gated).
+        /// Accepts optional variation query for future parameter adaptation.
+        /// Uses MotifRenderer when motif placed for Bass role.
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
             BarTrack barTrack,
             SectionTrack sectionTrack,
-            Dictionary<int, EnergySectionProfile> sectionProfiles,
             ITensionQuery tensionQuery,
             double microTensionPhraseRampIntensity,
             IVariationQuery? variationQuery,
@@ -62,7 +59,7 @@ namespace Music.Generator
                 if (bassOnsets == null || bassOnsets.Count == 0)
                     continue;
 
-                // Get section and energy profile
+                // Get section
                 MusicConstants.eSectionType sectionType = MusicConstants.eSectionType.Verse;
                 Section? section = null;
                 int absoluteSectionIndex = 0;
@@ -72,20 +69,6 @@ namespace Music.Generator
                     absoluteSectionIndex = sectionTrack.Sections.IndexOf(section);
                     if (absoluteSectionIndex < 0)
                         absoluteSectionIndex = 0;
-                }
-
-                // Story 7.3: Get energy profile for this section
-                EnergySectionProfile? energyProfile = null;
-                if (section != null && sectionProfiles.TryGetValue(section.StartBar, out var profile))
-                {
-                    energyProfile = profile;
-                }
-
-                // Story 7.3: Check if bass is present in orchestration
-                if (energyProfile?.Orchestration != null && !energyProfile.Orchestration.BassPresent)
-                {
-                    // Skip bass for this bar if orchestration says bass not present
-                    continue;
                 }
 
                 // Story 9.2: Check if motif is placed for Bass role in this bar
@@ -117,7 +100,6 @@ namespace Music.Generator
                         bar,
                         barWithinSection,
                         absoluteSectionIndex,
-                        energyProfile,
                         tensionQuery,
                         microTensionPhraseRampIntensity,
                         settings,
@@ -127,28 +109,18 @@ namespace Music.Generator
                     continue; // Skip pattern-based generation for this bar
                 }
 
-                // Get bass energy controls
-                var bassProfile = energyProfile?.Roles?.Bass;
-
-                // Story 7.6.5: Apply variation deltas if available
-                if (variationQuery != null && bassProfile != null)
-                {
-                    var variationPlan = variationQuery.GetVariationPlan(absoluteSectionIndex);
-                    bassProfile = VariationParameterAdapter.ApplyVariation(bassProfile, variationPlan.Roles.Bass);
-                }
-
-                // Story 7.5.6: Derive tension hooks for this bar to bias approach note probability
+                // Derive tension hooks for this bar to bias approach note probability
                 int barIndexWithinSection = section != null ? (bar - section.StartBar) : 0;
                 var hooks = TensionHooksBuilder.Create(
                     tensionQuery,
                     absoluteSectionIndex,
                     barIndexWithinSection,
-                    energyProfile,
+                    null,
                     microTensionPhraseRampIntensity);
 
-                // Story 7.3: Apply busy probability to approach note decisions
-                // Story 7.5.6: Further biased by tension PullProbabilityBias (phrase-end anticipation)
-                double baseBusyProbability = bassProfile?.BusyProbability ?? 0.5;
+                // Apply busy probability to approach note decisions
+                // Further biased by tension PullProbabilityBias (phrase-end anticipation)
+                double baseBusyProbability = 0.5;
                 double effectiveBusyProbability = ApplyTensionBiasToApproachProbability(
                     baseBusyProbability,
                     hooks.PullProbabilityBias);
@@ -201,7 +173,7 @@ namespace Music.Generator
                         currentHarmony,
                         lookaheadBeats: 2m);
 
-                    // Story 7.3: Apply busy probability to approach note insertion
+                    // Apply busy probability to approach note insertion
                     bool busyAllowsApproach = barRng.NextDouble() < effectiveBusyProbability;
 
                     bool shouldInsertApproach = isChangeImminent &&
@@ -244,16 +216,16 @@ namespace Music.Generator
                         midiNote = hit.MidiNote; // Use pattern note
                     }
 
-                    // Story 7.3: Apply bass range guardrail (no register lift for bass, but clamp to valid range)
+                    // Apply bass range guardrail (clamp to valid range)
                     int originalMidi = midiNote;
                     midiNote = ApplyBassRangeGuardrail(midiNote);
 
                     // Validate note is in scale
                     int pc = PitchClassUtils.ToPitchClass(midiNote);
                     
-                    // Story 7.3: Calculate velocity with energy bias
+                    // Calculate velocity with fixed base value
                     int baseVelocity = 95;
-                    int velocity = ApplyVelocityBias(baseVelocity, bassProfile?.VelocityBias ?? 0);
+                    int velocity = Math.Clamp(baseVelocity, 1, 127);
 
                     var noteStart = (int)slot.StartTick;
                     var noteDuration = slot.DurationTicks;
@@ -277,8 +249,7 @@ namespace Music.Generator
 
         /// <summary>
         /// Applies bass range guardrail to keep notes within audible bass register.
-        /// Story 7.3: Bass stays in E1 (MIDI 28) to E3 (MIDI 52) range.
-        /// Note: RegisterLift is 0 for bass in energy profile, so no lift applied.
+        /// Bass stays in E1 (MIDI 28) to E3 (MIDI 52) range.
         /// This guardrail ensures pattern-generated notes stay in valid range.
         /// </summary>
         private static int ApplyBassRangeGuardrail(int midiNote)
@@ -294,18 +265,8 @@ namespace Music.Generator
         }
 
         /// <summary>
-        /// Applies velocity bias from energy profile.
-        /// Story 7.3: Energy affects dynamics.
-        /// </summary>
-        private static int ApplyVelocityBias(int baseVelocity, int velocityBias)
-        {
-            int velocity = baseVelocity + velocityBias;
-            return Math.Clamp(velocity, 1, 127);
-        }
-
-        /// <summary>
         /// Applies tension pull probability bias to approach note insertion.
-        /// Story 7.5.6: Tension hooks increase pickup/approach probability at phrase peaks/ends.
+        /// Tension hooks increase pickup/approach probability at phrase peaks/ends.
         /// CRITICAL: Bias only affects probability; never forces approach when slot invalid.
         /// </summary>
         private static double ApplyTensionBiasToApproachProbability(
@@ -319,7 +280,7 @@ namespace Music.Generator
 
         /// <summary>
         /// Renders motif notes for a specific bar using MotifRenderer.
-        /// Story 9.2: Converts motif spec to actual note events for this bar.
+        /// Converts motif spec to actual note events for this bar.
         /// </summary>
         private static List<PartTrackEvent> RenderMotifForBar(
             MotifPlacement placement,
@@ -329,7 +290,6 @@ namespace Music.Generator
             int bar,
             int barWithinSection,
             int absoluteSectionIndex,
-            EnergySectionProfile? energyProfile,
             ITensionQuery tensionQuery,
             double microTensionPhraseRampIntensity,
             RandomizationSettings settings,
@@ -360,12 +320,12 @@ namespace Music.Generator
                 }
             }
 
-            // Get intent context for energy/tension biases
+            // Get tension hooks for velocity accent bias
             var hooks = TensionHooksBuilder.Create(
                 tensionQuery,
                 absoluteSectionIndex,
                 barWithinSection,
-                energyProfile,
+                null,
                 microTensionPhraseRampIntensity);
 
             // Render motif using MotifRenderer
@@ -374,7 +334,7 @@ namespace Music.Generator
                 placement,
                 harmonyContexts,
                 onsetGrid,
-                energyProfile?.Global.Energy ?? 0.5,
+                0.5,
                 hooks.VelocityAccentBias,
                 settings.Seed);
 

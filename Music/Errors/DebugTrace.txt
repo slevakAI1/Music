@@ -4234,3 +4234,429 @@
 [2026-01-15T10:44:06.1402624-05:00]   No Bass motif found
 [2026-01-15T10:44:06.1404976-05:00] Bar 64: Looking for Bass motif at section=7, barWithinSection=7
 [2026-01-15T10:44:06.1407076-05:00]   No Bass motif found
+[2026-01-15T10:58:00.1296221-05:00] CreateMotifPlacementPlan: MaterialBank has 4 items
+[2026-01-15T10:58:00.1349099-05:00] === MotifPlacementPlanner.CreatePlan ===
+[2026-01-15T10:58:00.1352786-05:00] MaterialBank has 4 items:
+[2026-01-15T10:58:00.1376127-05:00]   Motif: Name=Classic Rock Hook A, Role=Lead, Kind=Hook
+[2026-01-15T10:58:00.1379493-05:00]   Motif: Name=Steady Verse Riff A, Role=Guitar, Kind=Riff
+[2026-01-15T10:58:00.1381551-05:00]   Motif: Name=Bright Synth Hook A, Role=Keys, Kind=Hook
+[2026-01-15T10:58:00.1384241-05:00]   Motif: Name=Bass Transition Fill A, Role=Bass, Kind=BassFill
+[2026-01-15T10:58:00.1395790-05:00] Section 0 (Intro): Energy=0.40
+[2026-01-15T10:58:00.1400814-05:00]   ShouldPlaceMotif? False
+[2026-01-15T10:58:00.1403426-05:00] Section 1 (Verse): Energy=0.50
+[2026-01-15T10:58:00.1406323-05:00]   ShouldPlaceMotif? True
+[2026-01-15T10:58:00.1408517-05:00]   Trying role: Lead
+[2026-01-15T10:58:00.1413274-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1423830-05:00]       PreferredKind for Verse: MelodyPhrase
+[2026-01-15T10:58:00.1432892-05:00]       Found 0 motifs with kind=MelodyPhrase
+[2026-01-15T10:58:00.1435328-05:00]       After role filter (Lead): 0 candidates
+[2026-01-15T10:58:00.1439126-05:00]     No motif selected for role Lead
+[2026-01-15T10:58:00.1441864-05:00]   Trying role: Bass
+[2026-01-15T10:58:00.1445065-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1447694-05:00]       PreferredKind for Verse: MelodyPhrase
+[2026-01-15T10:58:00.1451550-05:00]       Found 1 motifs with role=Bass (any kind)
+[2026-01-15T10:58:00.1453943-05:00]       PreferredKind=MelodyPhrase, IsTransitionBarOrFill=
+[2026-01-15T10:58:00.1456493-05:00]       After role filter (Bass): 1 candidates
+[2026-01-15T10:58:00.1458723-05:00]         Candidate: Bass Transition Fill A (Kind=BassFill)
+[2026-01-15T10:58:00.1468590-05:00]       Selected index 0 of 1
+[2026-01-15T10:58:00.1470950-05:00]     Selected: Bass Transition Fill A
+[2026-01-15T10:58:00.1500413-05:00]     Placement created: bars 0-7
+[2026-01-15T10:58:00.1509822-05:00]   Trying role: Guitar
+[2026-01-15T10:58:00.1512563-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1515591-05:00]       PreferredKind for Verse: MelodyPhrase
+[2026-01-15T10:58:00.1517904-05:00]       Found 1 motifs with role=Guitar (any kind)
+[2026-01-15T10:58:00.1520444-05:00]       PreferredKind=MelodyPhrase, IsTransitionBarOrFill=
+[2026-01-15T10:58:00.1523106-05:00]       After role filter (Guitar): 1 candidates
+[2026-01-15T10:58:00.1525750-05:00]         Candidate: Steady Verse Riff A (Kind=Riff)
+[2026-01-15T10:58:00.1528903-05:00]       Selected index 0 of 1
+[2026-01-15T10:58:00.1531280-05:00]     Selected: Steady Verse Riff A
+[2026-01-15T10:58:00.1533528-05:00]     Placement created: bars 0-7
+[2026-01-15T10:58:00.1536087-05:00]   Trying role: Keys
+[2026-01-15T10:58:00.1538971-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1541162-05:00]       PreferredKind for Verse: MelodyPhrase
+[2026-01-15T10:58:00.1544859-05:00]       Found 1 motifs with role=Keys (any kind)
+[2026-01-15T10:58:00.1547468-05:00]       PreferredKind=MelodyPhrase, IsTransitionBarOrFill=
+[2026-01-15T10:58:00.1550137-05:00]       After role filter (Keys): 1 candidates
+[2026-01-15T10:58:00.1552826-05:00]         Candidate: Bright Synth Hook A (Kind=Hook)
+[2026-01-15T10:58:00.1554722-05:00]       Selected index 0 of 1
+[2026-01-15T10:58:00.1556956-05:00]     Selected: Bright Synth Hook A
+[2026-01-15T10:58:00.1559344-05:00]     Placement created: bars 0-7
+[2026-01-15T10:58:00.1562438-05:00] Section 2 (Chorus): Energy=0.80
+[2026-01-15T10:58:00.1565561-05:00]   ShouldPlaceMotif? True
+[2026-01-15T10:58:00.1567968-05:00]   Trying role: Lead
+[2026-01-15T10:58:00.1570422-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1572619-05:00]       PreferredKind for Chorus: Hook
+[2026-01-15T10:58:00.1577076-05:00]       Found 2 motifs with kind=Hook
+[2026-01-15T10:58:00.1580491-05:00]       After role filter (Lead): 1 candidates
+[2026-01-15T10:58:00.1583046-05:00]         Candidate: Classic Rock Hook A (Kind=Hook)
+[2026-01-15T10:58:00.1585263-05:00]       Selected index 0 of 1
+[2026-01-15T10:58:00.1587649-05:00]     Selected: Classic Rock Hook A
+[2026-01-15T10:58:00.1589944-05:00]     Placement created: bars 0-7
+[2026-01-15T10:58:00.1596195-05:00]   Trying role: Bass
+[2026-01-15T10:58:00.1598695-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1600672-05:00]       PreferredKind for Chorus: Hook
+[2026-01-15T10:58:00.1603413-05:00]       Found 1 motifs with role=Bass (any kind)
+[2026-01-15T10:58:00.1605776-05:00]       PreferredKind=Hook, IsTransitionBarOrFill=
+[2026-01-15T10:58:00.1607775-05:00]       After role filter (Bass): 1 candidates
+[2026-01-15T10:58:00.1609963-05:00]         Candidate: Bass Transition Fill A (Kind=BassFill)
+[2026-01-15T10:58:00.1612471-05:00]       Selected index 0 of 1
+[2026-01-15T10:58:00.1614642-05:00]     Selected: Bass Transition Fill A
+[2026-01-15T10:58:00.1617513-05:00]     Placement created: bars 0-7
+[2026-01-15T10:58:00.1619595-05:00]   Trying role: Guitar
+[2026-01-15T10:58:00.1621989-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1624966-05:00]       PreferredKind for Chorus: Hook
+[2026-01-15T10:58:00.1627237-05:00]       Found 1 motifs with role=Guitar (any kind)
+[2026-01-15T10:58:00.1629645-05:00]       PreferredKind=Hook, IsTransitionBarOrFill=
+[2026-01-15T10:58:00.1632467-05:00]       After role filter (Guitar): 1 candidates
+[2026-01-15T10:58:00.1635147-05:00]         Candidate: Steady Verse Riff A (Kind=Riff)
+[2026-01-15T10:58:00.1638349-05:00]       Selected index 0 of 1
+[2026-01-15T10:58:00.1640896-05:00]     Selected: Steady Verse Riff A
+[2026-01-15T10:58:00.1643528-05:00]     Placement created: bars 0-7
+[2026-01-15T10:58:00.1645597-05:00]   Trying role: Keys
+[2026-01-15T10:58:00.1647880-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1650339-05:00]       PreferredKind for Chorus: Hook
+[2026-01-15T10:58:00.1652867-05:00]       Found 1 motifs with role=Keys (any kind)
+[2026-01-15T10:58:00.1654911-05:00]       PreferredKind=Hook, IsTransitionBarOrFill=
+[2026-01-15T10:58:00.1657357-05:00]       After role filter (Keys): 1 candidates
+[2026-01-15T10:58:00.1659937-05:00]         Candidate: Bright Synth Hook A (Kind=Hook)
+[2026-01-15T10:58:00.1663665-05:00]       Selected index 0 of 1
+[2026-01-15T10:58:00.1665687-05:00]     Selected: Bright Synth Hook A
+[2026-01-15T10:58:00.1668317-05:00]     Placement created: bars 0-7
+[2026-01-15T10:58:00.1671769-05:00] Section 3 (Verse): Energy=0.60
+[2026-01-15T10:58:00.1674262-05:00]   ShouldPlaceMotif? False
+[2026-01-15T10:58:00.1676456-05:00] Section 4 (Chorus): Energy=0.85
+[2026-01-15T10:58:00.1679109-05:00]   ShouldPlaceMotif? True
+[2026-01-15T10:58:00.1682372-05:00]   Trying role: Lead
+[2026-01-15T10:58:00.1684961-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1687223-05:00]       PreferredKind for Chorus: Hook
+[2026-01-15T10:58:00.1689470-05:00]       Found 2 motifs with kind=Hook
+[2026-01-15T10:58:00.1692008-05:00]       After role filter (Lead): 1 candidates
+[2026-01-15T10:58:00.1694236-05:00]         Candidate: Classic Rock Hook A (Kind=Hook)
+[2026-01-15T10:58:00.1709147-05:00]       Reusing previous motif for A/A'
+[2026-01-15T10:58:00.1711864-05:00]     Selected: Classic Rock Hook A
+[2026-01-15T10:58:00.1715083-05:00]     Placement created: bars 2-7
+[2026-01-15T10:58:00.1718513-05:00]   Trying role: Bass
+[2026-01-15T10:58:00.1720704-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1723069-05:00]       PreferredKind for Chorus: Hook
+[2026-01-15T10:58:00.1726317-05:00]       Found 1 motifs with role=Bass (any kind)
+[2026-01-15T10:58:00.1729153-05:00]       PreferredKind=Hook, IsTransitionBarOrFill=
+[2026-01-15T10:58:00.1731719-05:00]       After role filter (Bass): 1 candidates
+[2026-01-15T10:58:00.1733786-05:00]         Candidate: Bass Transition Fill A (Kind=BassFill)
+[2026-01-15T10:58:00.1736357-05:00]       Reusing previous motif for A/A'
+[2026-01-15T10:58:00.1738557-05:00]     Selected: Bass Transition Fill A
+[2026-01-15T10:58:00.1740952-05:00]     Placement created: bars 2-7
+[2026-01-15T10:58:00.1743698-05:00]   Trying role: Guitar
+[2026-01-15T10:58:00.1747095-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1750160-05:00]       PreferredKind for Chorus: Hook
+[2026-01-15T10:58:00.1752584-05:00]       Found 1 motifs with role=Guitar (any kind)
+[2026-01-15T10:58:00.1755135-05:00]       PreferredKind=Hook, IsTransitionBarOrFill=
+[2026-01-15T10:58:00.1757484-05:00]       After role filter (Guitar): 1 candidates
+[2026-01-15T10:58:00.1759837-05:00]         Candidate: Steady Verse Riff A (Kind=Riff)
+[2026-01-15T10:58:00.1763156-05:00]       Reusing previous motif for A/A'
+[2026-01-15T10:58:00.1765864-05:00]     Selected: Steady Verse Riff A
+[2026-01-15T10:58:00.1768218-05:00]     Placement created: bars 2-7
+[2026-01-15T10:58:00.1771040-05:00]   Trying role: Keys
+[2026-01-15T10:58:00.1774041-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1776218-05:00]       PreferredKind for Chorus: Hook
+[2026-01-15T10:58:00.1779104-05:00]       Found 1 motifs with role=Keys (any kind)
+[2026-01-15T10:58:00.1781366-05:00]       PreferredKind=Hook, IsTransitionBarOrFill=
+[2026-01-15T10:58:00.1783943-05:00]       After role filter (Keys): 1 candidates
+[2026-01-15T10:58:00.1786311-05:00]         Candidate: Bright Synth Hook A (Kind=Hook)
+[2026-01-15T10:58:00.1788588-05:00]       Reusing previous motif for A/A'
+[2026-01-15T10:58:00.1791636-05:00]     Selected: Bright Synth Hook A
+[2026-01-15T10:58:00.1794134-05:00]     Placement created: bars 2-7
+[2026-01-15T10:58:00.1796542-05:00] Section 5 (Bridge): Energy=0.69
+[2026-01-15T10:58:00.1799246-05:00]   ShouldPlaceMotif? True
+[2026-01-15T10:58:00.1801724-05:00]   Trying role: Lead
+[2026-01-15T10:58:00.1804762-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1806865-05:00]       PreferredKind for Bridge: Hook
+[2026-01-15T10:58:00.1809436-05:00]       Found 2 motifs with kind=Hook
+[2026-01-15T10:58:00.1811726-05:00]       After role filter (Lead): 1 candidates
+[2026-01-15T10:58:00.1813711-05:00]         Candidate: Classic Rock Hook A (Kind=Hook)
+[2026-01-15T10:58:00.1816211-05:00]       Selected index 0 of 1
+[2026-01-15T10:58:00.1818217-05:00]     Selected: Classic Rock Hook A
+[2026-01-15T10:58:00.1820628-05:00]     Placement created: bars 0-7
+[2026-01-15T10:58:00.1822602-05:00]   Trying role: Bass
+[2026-01-15T10:58:00.1824367-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1826394-05:00]       PreferredKind for Bridge: Hook
+[2026-01-15T10:58:00.1828118-05:00]       Found 1 motifs with role=Bass (any kind)
+[2026-01-15T10:58:00.1829734-05:00]       PreferredKind=Hook, IsTransitionBarOrFill=
+[2026-01-15T10:58:00.1831353-05:00]       After role filter (Bass): 1 candidates
+[2026-01-15T10:58:00.1832933-05:00]         Candidate: Bass Transition Fill A (Kind=BassFill)
+[2026-01-15T10:58:00.1835077-05:00]       Selected index 0 of 1
+[2026-01-15T10:58:00.1837987-05:00]     Selected: Bass Transition Fill A
+[2026-01-15T10:58:00.1840220-05:00]     Placement created: bars 0-7
+[2026-01-15T10:58:00.1842827-05:00]   Trying role: Guitar
+[2026-01-15T10:58:00.1845159-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1847749-05:00]       PreferredKind for Bridge: Hook
+[2026-01-15T10:58:00.1849631-05:00]       Found 1 motifs with role=Guitar (any kind)
+[2026-01-15T10:58:00.1851933-05:00]       PreferredKind=Hook, IsTransitionBarOrFill=
+[2026-01-15T10:58:00.1854256-05:00]       After role filter (Guitar): 1 candidates
+[2026-01-15T10:58:00.1856893-05:00]         Candidate: Steady Verse Riff A (Kind=Riff)
+[2026-01-15T10:58:00.1859123-05:00]       Selected index 0 of 1
+[2026-01-15T10:58:00.1861884-05:00]     Selected: Steady Verse Riff A
+[2026-01-15T10:58:00.1864330-05:00]     Placement created: bars 0-7
+[2026-01-15T10:58:00.1866521-05:00]   Trying role: Keys
+[2026-01-15T10:58:00.1868634-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1870949-05:00]       PreferredKind for Bridge: Hook
+[2026-01-15T10:58:00.1873746-05:00]       Found 1 motifs with role=Keys (any kind)
+[2026-01-15T10:58:00.1877078-05:00]       PreferredKind=Hook, IsTransitionBarOrFill=
+[2026-01-15T10:58:00.1879746-05:00]       After role filter (Keys): 1 candidates
+[2026-01-15T10:58:00.1881596-05:00]         Candidate: Bright Synth Hook A (Kind=Hook)
+[2026-01-15T10:58:00.1884482-05:00]       Selected index 0 of 1
+[2026-01-15T10:58:00.1886331-05:00]     Selected: Bright Synth Hook A
+[2026-01-15T10:58:00.1888717-05:00]     Placement created: bars 0-7
+[2026-01-15T10:58:00.1891041-05:00] Section 6 (Chorus): Energy=0.95
+[2026-01-15T10:58:00.1893327-05:00]   ShouldPlaceMotif? True
+[2026-01-15T10:58:00.1895655-05:00]   Trying role: Lead
+[2026-01-15T10:58:00.1897772-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1899712-05:00]       PreferredKind for Chorus: Hook
+[2026-01-15T10:58:00.1901667-05:00]       Found 2 motifs with kind=Hook
+[2026-01-15T10:58:00.1904274-05:00]       After role filter (Lead): 1 candidates
+[2026-01-15T10:58:00.1906842-05:00]         Candidate: Classic Rock Hook A (Kind=Hook)
+[2026-01-15T10:58:00.1909657-05:00]       Reusing previous motif for A/A'
+[2026-01-15T10:58:00.1911557-05:00]     Selected: Classic Rock Hook A
+[2026-01-15T10:58:00.1914060-05:00]     Placement created: bars 0-7
+[2026-01-15T10:58:00.1916175-05:00]   Trying role: Bass
+[2026-01-15T10:58:00.1919243-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1921280-05:00]       PreferredKind for Chorus: Hook
+[2026-01-15T10:58:00.1924421-05:00]       Found 1 motifs with role=Bass (any kind)
+[2026-01-15T10:58:00.1926803-05:00]       PreferredKind=Hook, IsTransitionBarOrFill=
+[2026-01-15T10:58:00.1929346-05:00]       After role filter (Bass): 1 candidates
+[2026-01-15T10:58:00.1931224-05:00]         Candidate: Bass Transition Fill A (Kind=BassFill)
+[2026-01-15T10:58:00.1933859-05:00]       Reusing previous motif for A/A'
+[2026-01-15T10:58:00.1936213-05:00]     Selected: Bass Transition Fill A
+[2026-01-15T10:58:00.1939168-05:00]     Placement created: bars 0-7
+[2026-01-15T10:58:00.1942140-05:00]   Trying role: Guitar
+[2026-01-15T10:58:00.1944346-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1946582-05:00]       PreferredKind for Chorus: Hook
+[2026-01-15T10:58:00.1948807-05:00]       Found 1 motifs with role=Guitar (any kind)
+[2026-01-15T10:58:00.1951715-05:00]       PreferredKind=Hook, IsTransitionBarOrFill=
+[2026-01-15T10:58:00.1953722-05:00]       After role filter (Guitar): 1 candidates
+[2026-01-15T10:58:00.1956035-05:00]         Candidate: Steady Verse Riff A (Kind=Riff)
+[2026-01-15T10:58:00.1958323-05:00]       Reusing previous motif for A/A'
+[2026-01-15T10:58:00.1961144-05:00]     Selected: Steady Verse Riff A
+[2026-01-15T10:58:00.1963635-05:00]     Placement created: bars 0-7
+[2026-01-15T10:58:00.1966094-05:00]   Trying role: Keys
+[2026-01-15T10:58:00.1968335-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1970916-05:00]       PreferredKind for Chorus: Hook
+[2026-01-15T10:58:00.1972738-05:00]       Found 1 motifs with role=Keys (any kind)
+[2026-01-15T10:58:00.1975132-05:00]       PreferredKind=Hook, IsTransitionBarOrFill=
+[2026-01-15T10:58:00.1977039-05:00]       After role filter (Keys): 1 candidates
+[2026-01-15T10:58:00.1979157-05:00]         Candidate: Bright Synth Hook A (Kind=Hook)
+[2026-01-15T10:58:00.1981041-05:00]       Reusing previous motif for A/A'
+[2026-01-15T10:58:00.1983508-05:00]     Selected: Bright Synth Hook A
+[2026-01-15T10:58:00.1985610-05:00]     Placement created: bars 0-7
+[2026-01-15T10:58:00.1988470-05:00] Section 7 (Outro): Energy=0.60
+[2026-01-15T10:58:00.1990766-05:00]   ShouldPlaceMotif? True
+[2026-01-15T10:58:00.1993484-05:00]   Trying role: Lead
+[2026-01-15T10:58:00.1996067-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.1998287-05:00]       PreferredKind for Outro: BassFill
+[2026-01-15T10:58:00.2000669-05:00]       Found 1 motifs with kind=BassFill
+[2026-01-15T10:58:00.2002823-05:00]       After role filter (Lead): 0 candidates
+[2026-01-15T10:58:00.2005700-05:00]     No motif selected for role Lead
+[2026-01-15T10:58:00.2007881-05:00]   Trying role: Bass
+[2026-01-15T10:58:00.2010157-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.2012537-05:00]       PreferredKind for Outro: BassFill
+[2026-01-15T10:58:00.2015156-05:00]       Found 1 motifs with role=Bass (any kind)
+[2026-01-15T10:58:00.2017153-05:00]       PreferredKind=BassFill, IsTransitionBarOrFill=
+[2026-01-15T10:58:00.2019828-05:00]       After role filter (Bass): 1 candidates
+[2026-01-15T10:58:00.2021802-05:00]         Candidate: Bass Transition Fill A (Kind=BassFill)
+[2026-01-15T10:58:00.2024463-05:00]       Selected index 0 of 1
+[2026-01-15T10:58:00.2026613-05:00]     Selected: Bass Transition Fill A
+[2026-01-15T10:58:00.2028925-05:00]     Placement created: bars 0-3
+[2026-01-15T10:58:00.2030822-05:00]   Trying role: Guitar
+[2026-01-15T10:58:00.2033577-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.2035708-05:00]       PreferredKind for Outro: BassFill
+[2026-01-15T10:58:00.2037938-05:00]       Found 1 motifs with role=Guitar (any kind)
+[2026-01-15T10:58:00.2040108-05:00]       PreferredKind=BassFill, IsTransitionBarOrFill=
+[2026-01-15T10:58:00.2042939-05:00]       After role filter (Guitar): 1 candidates
+[2026-01-15T10:58:00.2045392-05:00]         Candidate: Steady Verse Riff A (Kind=Riff)
+[2026-01-15T10:58:00.2048973-05:00]       Selected index 0 of 1
+[2026-01-15T10:58:00.2051857-05:00]     Selected: Steady Verse Riff A
+[2026-01-15T10:58:00.2055096-05:00]     Placement created: bars 0-3
+[2026-01-15T10:58:00.2057124-05:00]   Trying role: Keys
+[2026-01-15T10:58:00.2059561-05:00]     IsRolePresent? True
+[2026-01-15T10:58:00.2062268-05:00]       PreferredKind for Outro: BassFill
+[2026-01-15T10:58:00.2065490-05:00]       Found 1 motifs with role=Keys (any kind)
+[2026-01-15T10:58:00.2068048-05:00]       PreferredKind=BassFill, IsTransitionBarOrFill=
+[2026-01-15T10:58:00.2070585-05:00]       After role filter (Keys): 1 candidates
+[2026-01-15T10:58:00.2072691-05:00]         Candidate: Bright Synth Hook A (Kind=Hook)
+[2026-01-15T10:58:00.2074848-05:00]       Selected index 0 of 1
+[2026-01-15T10:58:00.2076742-05:00]     Selected: Bright Synth Hook A
+[2026-01-15T10:58:00.2079248-05:00]     Placement created: bars 0-3
+[2026-01-15T10:58:00.2081160-05:00] === Total placements: 22 ===
+[2026-01-15T10:58:00.2092156-05:00] CreateMotifPlacementPlan: Created plan with 22 placements
+[2026-01-15T10:58:00.2095571-05:00]   Planned: Role=Bass, Section=1, Bar=0-7
+[2026-01-15T10:58:00.2098154-05:00]   Planned: Role=Guitar, Section=1, Bar=0-7
+[2026-01-15T10:58:00.2100173-05:00]   Planned: Role=Keys, Section=1, Bar=0-7
+[2026-01-15T10:58:00.2102281-05:00]   Planned: Role=Lead, Section=2, Bar=0-7
+[2026-01-15T10:58:00.2104046-05:00]   Planned: Role=Bass, Section=2, Bar=0-7
+[2026-01-15T10:58:00.2106067-05:00]   Planned: Role=Guitar, Section=2, Bar=0-7
+[2026-01-15T10:58:00.2109126-05:00]   Planned: Role=Keys, Section=2, Bar=0-7
+[2026-01-15T10:58:00.2111305-05:00]   Planned: Role=Lead, Section=4, Bar=2-7
+[2026-01-15T10:58:00.2113791-05:00]   Planned: Role=Bass, Section=4, Bar=2-7
+[2026-01-15T10:58:00.2116417-05:00]   Planned: Role=Guitar, Section=4, Bar=2-7
+[2026-01-15T10:58:00.2118760-05:00]   Planned: Role=Keys, Section=4, Bar=2-7
+[2026-01-15T10:58:00.2121290-05:00]   Planned: Role=Lead, Section=5, Bar=0-7
+[2026-01-15T10:58:00.2123558-05:00]   Planned: Role=Bass, Section=5, Bar=0-7
+[2026-01-15T10:58:00.2125906-05:00]   Planned: Role=Guitar, Section=5, Bar=0-7
+[2026-01-15T10:58:00.2128041-05:00]   Planned: Role=Keys, Section=5, Bar=0-7
+[2026-01-15T10:58:00.2130195-05:00]   Planned: Role=Lead, Section=6, Bar=0-7
+[2026-01-15T10:58:00.2132610-05:00]   Planned: Role=Bass, Section=6, Bar=0-7
+[2026-01-15T10:58:00.2134652-05:00]   Planned: Role=Guitar, Section=6, Bar=0-7
+[2026-01-15T10:58:00.2136850-05:00]   Planned: Role=Keys, Section=6, Bar=0-7
+[2026-01-15T10:58:00.2138826-05:00]   Planned: Role=Bass, Section=7, Bar=0-3
+[2026-01-15T10:58:00.2141324-05:00]   Planned: Role=Guitar, Section=7, Bar=0-3
+[2026-01-15T10:58:00.2143876-05:00]   Planned: Role=Keys, Section=7, Bar=0-3
+[2026-01-15T10:58:00.2195048-05:00] BassTrackGenerator: motifPlan has 22 placements
+[2026-01-15T10:58:00.2197452-05:00]   Placement: Role=Bass, Section=1, Bar=0, Duration=8
+[2026-01-15T10:58:00.2199846-05:00]   Placement: Role=Guitar, Section=1, Bar=0, Duration=8
+[2026-01-15T10:58:00.2202392-05:00]   Placement: Role=Keys, Section=1, Bar=0, Duration=8
+[2026-01-15T10:58:00.2204561-05:00]   Placement: Role=Lead, Section=2, Bar=0, Duration=8
+[2026-01-15T10:58:00.2206974-05:00]   Placement: Role=Bass, Section=2, Bar=0, Duration=8
+[2026-01-15T10:58:00.2209289-05:00]   Placement: Role=Guitar, Section=2, Bar=0, Duration=8
+[2026-01-15T10:58:00.2212450-05:00]   Placement: Role=Keys, Section=2, Bar=0, Duration=8
+[2026-01-15T10:58:00.2214497-05:00]   Placement: Role=Lead, Section=4, Bar=2, Duration=6
+[2026-01-15T10:58:00.2218000-05:00]   Placement: Role=Bass, Section=4, Bar=2, Duration=6
+[2026-01-15T10:58:00.2220438-05:00]   Placement: Role=Guitar, Section=4, Bar=2, Duration=6
+[2026-01-15T10:58:00.2222501-05:00]   Placement: Role=Keys, Section=4, Bar=2, Duration=6
+[2026-01-15T10:58:00.2225252-05:00]   Placement: Role=Lead, Section=5, Bar=0, Duration=8
+[2026-01-15T10:58:00.2227513-05:00]   Placement: Role=Bass, Section=5, Bar=0, Duration=8
+[2026-01-15T10:58:00.2230594-05:00]   Placement: Role=Guitar, Section=5, Bar=0, Duration=8
+[2026-01-15T10:58:00.2232998-05:00]   Placement: Role=Keys, Section=5, Bar=0, Duration=8
+[2026-01-15T10:58:00.2235452-05:00]   Placement: Role=Lead, Section=6, Bar=0, Duration=8
+[2026-01-15T10:58:00.2237707-05:00]   Placement: Role=Bass, Section=6, Bar=0, Duration=8
+[2026-01-15T10:58:00.2239920-05:00]   Placement: Role=Guitar, Section=6, Bar=0, Duration=8
+[2026-01-15T10:58:00.2242643-05:00]   Placement: Role=Keys, Section=6, Bar=0, Duration=8
+[2026-01-15T10:58:00.2245434-05:00]   Placement: Role=Bass, Section=7, Bar=0, Duration=4
+[2026-01-15T10:58:00.2248233-05:00]   Placement: Role=Guitar, Section=7, Bar=0, Duration=4
+[2026-01-15T10:58:00.2251315-05:00]   Placement: Role=Keys, Section=7, Bar=0, Duration=4
+[2026-01-15T10:58:00.2271069-05:00] Bar 1: Looking for Bass motif at section=0, barWithinSection=0
+[2026-01-15T10:58:00.2277380-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2354418-05:00] Bar 2: Looking for Bass motif at section=0, barWithinSection=1
+[2026-01-15T10:58:00.2358000-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2361677-05:00] Bar 3: Looking for Bass motif at section=0, barWithinSection=2
+[2026-01-15T10:58:00.2364226-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2367994-05:00] Bar 4: Looking for Bass motif at section=0, barWithinSection=3
+[2026-01-15T10:58:00.2371288-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2374767-05:00] Bar 5: Looking for Bass motif at section=0, barWithinSection=4
+[2026-01-15T10:58:00.2377694-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2381290-05:00] Bar 6: Looking for Bass motif at section=0, barWithinSection=5
+[2026-01-15T10:58:00.2384074-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2390453-05:00] Bar 7: Looking for Bass motif at section=0, barWithinSection=6
+[2026-01-15T10:58:00.2395677-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2399648-05:00] Bar 8: Looking for Bass motif at section=0, barWithinSection=7
+[2026-01-15T10:58:00.2402355-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2406254-05:00] Bar 9: Looking for Bass motif at section=1, barWithinSection=0
+[2026-01-15T10:58:00.2408462-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2447480-05:00] Bar 10: Looking for Bass motif at section=1, barWithinSection=1
+[2026-01-15T10:58:00.2450167-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2453751-05:00] Bar 11: Looking for Bass motif at section=1, barWithinSection=2
+[2026-01-15T10:58:00.2455751-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2458464-05:00] Bar 12: Looking for Bass motif at section=1, barWithinSection=3
+[2026-01-15T10:58:00.2460617-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2463684-05:00] Bar 13: Looking for Bass motif at section=1, barWithinSection=4
+[2026-01-15T10:58:00.2466065-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2469197-05:00] Bar 14: Looking for Bass motif at section=1, barWithinSection=5
+[2026-01-15T10:58:00.2471869-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2474651-05:00] Bar 15: Looking for Bass motif at section=1, barWithinSection=6
+[2026-01-15T10:58:00.2476724-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2479890-05:00] Bar 16: Looking for Bass motif at section=1, barWithinSection=7
+[2026-01-15T10:58:00.2482408-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2485479-05:00] Bar 17: Looking for Bass motif at section=2, barWithinSection=0
+[2026-01-15T10:58:00.2487900-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2491446-05:00] Bar 18: Looking for Bass motif at section=2, barWithinSection=1
+[2026-01-15T10:58:00.2494818-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2499163-05:00] Bar 19: Looking for Bass motif at section=2, barWithinSection=2
+[2026-01-15T10:58:00.2501465-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2504561-05:00] Bar 20: Looking for Bass motif at section=2, barWithinSection=3
+[2026-01-15T10:58:00.2506829-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2510103-05:00] Bar 21: Looking for Bass motif at section=2, barWithinSection=4
+[2026-01-15T10:58:00.2512590-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2516346-05:00] Bar 22: Looking for Bass motif at section=2, barWithinSection=5
+[2026-01-15T10:58:00.2519513-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2522767-05:00] Bar 23: Looking for Bass motif at section=2, barWithinSection=6
+[2026-01-15T10:58:00.2525221-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2528211-05:00] Bar 24: Looking for Bass motif at section=2, barWithinSection=7
+[2026-01-15T10:58:00.2530926-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2533861-05:00] Bar 25: Looking for Bass motif at section=3, barWithinSection=0
+[2026-01-15T10:58:00.2536178-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2538848-05:00] Bar 26: Looking for Bass motif at section=3, barWithinSection=1
+[2026-01-15T10:58:00.2541605-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2546023-05:00] Bar 27: Looking for Bass motif at section=3, barWithinSection=2
+[2026-01-15T10:58:00.2548281-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2551188-05:00] Bar 28: Looking for Bass motif at section=3, barWithinSection=3
+[2026-01-15T10:58:00.2553575-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2556530-05:00] Bar 29: Looking for Bass motif at section=3, barWithinSection=4
+[2026-01-15T10:58:00.2558740-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2562046-05:00] Bar 30: Looking for Bass motif at section=3, barWithinSection=5
+[2026-01-15T10:58:00.2564244-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2566914-05:00] Bar 31: Looking for Bass motif at section=3, barWithinSection=6
+[2026-01-15T10:58:00.2568942-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2571273-05:00] Bar 32: Looking for Bass motif at section=3, barWithinSection=7
+[2026-01-15T10:58:00.2573157-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2576088-05:00] Bar 33: Looking for Bass motif at section=4, barWithinSection=0
+[2026-01-15T10:58:00.2579134-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2581672-05:00] Bar 34: Looking for Bass motif at section=4, barWithinSection=1
+[2026-01-15T10:58:00.2584247-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2587559-05:00] Bar 35: Looking for Bass motif at section=4, barWithinSection=2
+[2026-01-15T10:58:00.2589853-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2600403-05:00] Bar 36: Looking for Bass motif at section=4, barWithinSection=3
+[2026-01-15T10:58:00.2603524-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2607091-05:00] Bar 37: Looking for Bass motif at section=4, barWithinSection=4
+[2026-01-15T10:58:00.2609418-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2612838-05:00] Bar 38: Looking for Bass motif at section=4, barWithinSection=5
+[2026-01-15T10:58:00.2615357-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2618924-05:00] Bar 39: Looking for Bass motif at section=4, barWithinSection=6
+[2026-01-15T10:58:00.2621772-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2625283-05:00] Bar 40: Looking for Bass motif at section=4, barWithinSection=7
+[2026-01-15T10:58:00.2627624-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2630789-05:00] Bar 41: Looking for Bass motif at section=5, barWithinSection=0
+[2026-01-15T10:58:00.2633249-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2636265-05:00] Bar 42: Looking for Bass motif at section=5, barWithinSection=1
+[2026-01-15T10:58:00.2638821-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2641652-05:00] Bar 43: Looking for Bass motif at section=5, barWithinSection=2
+[2026-01-15T10:58:00.2644438-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2648340-05:00] Bar 44: Looking for Bass motif at section=5, barWithinSection=3
+[2026-01-15T10:58:00.2651456-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2654545-05:00] Bar 45: Looking for Bass motif at section=5, barWithinSection=4
+[2026-01-15T10:58:00.2656784-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2659885-05:00] Bar 46: Looking for Bass motif at section=5, barWithinSection=5
+[2026-01-15T10:58:00.2662012-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2665492-05:00] Bar 47: Looking for Bass motif at section=5, barWithinSection=6
+[2026-01-15T10:58:00.2668745-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2671954-05:00] Bar 48: Looking for Bass motif at section=5, barWithinSection=7
+[2026-01-15T10:58:00.2674407-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2677569-05:00] Bar 49: Looking for Bass motif at section=6, barWithinSection=0
+[2026-01-15T10:58:00.2679791-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2682735-05:00] Bar 50: Looking for Bass motif at section=6, barWithinSection=1
+[2026-01-15T10:58:00.2685602-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2689082-05:00] Bar 51: Looking for Bass motif at section=6, barWithinSection=2
+[2026-01-15T10:58:00.2692141-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2695050-05:00] Bar 52: Looking for Bass motif at section=6, barWithinSection=3
+[2026-01-15T10:58:00.2696944-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2700115-05:00] Bar 53: Looking for Bass motif at section=6, barWithinSection=4
+[2026-01-15T10:58:00.2702837-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2706163-05:00] Bar 54: Looking for Bass motif at section=6, barWithinSection=5
+[2026-01-15T10:58:00.2708680-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2711988-05:00] Bar 55: Looking for Bass motif at section=6, barWithinSection=6
+[2026-01-15T10:58:00.2714321-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2717447-05:00] Bar 56: Looking for Bass motif at section=6, barWithinSection=7
+[2026-01-15T10:58:00.2719966-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2723336-05:00] Bar 57: Looking for Bass motif at section=7, barWithinSection=0
+[2026-01-15T10:58:00.2726042-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2729038-05:00] Bar 58: Looking for Bass motif at section=7, barWithinSection=1
+[2026-01-15T10:58:00.2731518-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2735401-05:00] Bar 59: Looking for Bass motif at section=7, barWithinSection=2
+[2026-01-15T10:58:00.2738000-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2740909-05:00] Bar 60: Looking for Bass motif at section=7, barWithinSection=3
+[2026-01-15T10:58:00.2743489-05:00]   FOUND Bass motif: Bass Transition Fill A
+[2026-01-15T10:58:00.2746610-05:00] Bar 61: Looking for Bass motif at section=7, barWithinSection=4
+[2026-01-15T10:58:00.2749185-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2752146-05:00] Bar 62: Looking for Bass motif at section=7, barWithinSection=5
+[2026-01-15T10:58:00.2754641-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2757380-05:00] Bar 63: Looking for Bass motif at section=7, barWithinSection=6
+[2026-01-15T10:58:00.2759620-05:00]   No Bass motif found
+[2026-01-15T10:58:00.2762820-05:00] Bar 64: Looking for Bass motif at section=7, barWithinSection=7
+[2026-01-15T10:58:00.2765240-05:00]   No Bass motif found
