@@ -1,7 +1,7 @@
 // AI: purpose=Deterministic variation query implementation precomputing and caching all section variation plans.
 // AI: invariants=Plans precomputed at construction; deterministic for same inputs; thread-safe immutable reads; plans cached in dictionary.
-// AI: deps=Consumes SectionTrack, EnergyArc, ITensionQuery; uses SectionVariationPlanner.ComputePlans; implements IVariationQuery.
-// AI: change=Story 7.6.4 query implementation mirroring DeterministicTensionQuery architecture.
+// AI: deps=Consumes SectionTrack, ITensionQuery; uses SectionVariationPlanner.ComputePlans; implements IVariationQuery.
+// AI: change=Energy removed - variation based on section type and tension only.
 
 namespace Music.Generator;
 
@@ -26,19 +26,16 @@ public sealed class DeterministicVariationQuery : IVariationQuery
     /// Creates a DeterministicVariationQuery by precomputing all variation plans.
     /// </summary>
     /// <param name="sectionTrack">The song's section track.</param>
-    /// <param name="energyArc">The song's energy arc (for energy-driven variation intensity).</param>
     /// <param name="tensionQuery">Tension query (for transition hints driving variation decisions).</param>
     /// <param name="grooveName">Groove/style name for deterministic decisions.</param>
     /// <param name="seed">Seed for deterministic tie-breaking.</param>
     public DeterministicVariationQuery(
         SectionTrack sectionTrack,
-        EnergyArc energyArc,
         ITensionQuery tensionQuery,
         string grooveName,
         int seed)
     {
         ArgumentNullException.ThrowIfNull(sectionTrack);
-        ArgumentNullException.ThrowIfNull(energyArc);
         ArgumentNullException.ThrowIfNull(tensionQuery);
         ArgumentNullException.ThrowIfNull(grooveName);
 
@@ -47,7 +44,6 @@ public sealed class DeterministicVariationQuery : IVariationQuery
         // Precompute all plans using SectionVariationPlanner
         var planList = SectionVariationPlanner.ComputePlans(
             sectionTrack,
-            energyArc,
             tensionQuery,
             grooveName,
             seed);

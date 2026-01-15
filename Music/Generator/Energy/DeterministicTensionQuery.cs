@@ -1,19 +1,19 @@
-// AI: purpose=Deterministic tension planner computing section-level macro tension and micro maps (Story 7.5.2).
-// AI: invariants=Deterministic by (EnergyArc + seed); tensions clamped [0..1]; drivers explain why value changed.
-// AI: deps=Consumes EnergyArc (constrained energies) and Section objects; does not mutate inputs.
-// AI: change=adds planner only; NeutralTensionQuery remains for fallback/testing.
+// AI: purpose=Deterministic tension planner computing section-level macro tension and micro maps.
+// AI: invariants=Deterministic by (SectionTrack + seed); tensions clamped [0..1]; drivers explain why value changed.
+// AI: deps=Consumes SectionTrack; does not mutate inputs.
+// AI: change=Energy removed - uses section type for tension values.
 
 namespace Music.Generator
 {
     /// <summary>
     /// Deterministic tension query implementation that computes section-level macro tension
-    /// using constrained energy targets from an EnergyArc plus simple, style-aware heuristics.
+    /// using section type with simple, style-aware heuristics.
     /// Produces SectionTensionProfile and fallback MicroTensionMap per section.
     /// Also computes SectionTransitionHint per section boundary.
     /// </summary>
     public sealed class DeterministicTensionQuery : ITensionQuery
     {
-        private readonly EnergyArc _arc;
+        private readonly SectionTrack _sectionTrack;
         private readonly int _seed;
         private readonly int _sectionCount;
         private readonly Dictionary<int, SectionTensionProfile> _profiles;
@@ -21,15 +21,15 @@ namespace Music.Generator
         private readonly Dictionary<int, SectionTransitionHint> _transitionHints;
 
         /// <summary>
-        /// Creates a DeterministicTensionQuery using a resolved EnergyArc and a seed.
+        /// Creates a DeterministicTensionQuery using a SectionTrack and a seed.
         /// The seed is used only for deterministic tie-breaks and minor stochastic decisions.
         /// </summary>
-        public DeterministicTensionQuery(EnergyArc arc, int seed)
+        public DeterministicTensionQuery(SectionTrack sectionTrack, int seed)
         {
-            ArgumentNullException.ThrowIfNull(arc);
-            _arc = arc;
+            ArgumentNullException.ThrowIfNull(sectionTrack);
+            _sectionTrack = sectionTrack;
             _seed = seed;
-            _sectionCount = arc.SectionTrack.Sections.Count;
+            _sectionCount = sectionTrack.Sections.Count;
             _profiles = new Dictionary<int, SectionTensionProfile>(_sectionCount);
             _microMaps = new Dictionary<int, MicroTensionMap>(_sectionCount);
             _transitionHints = new Dictionary<int, SectionTransitionHint>(_sectionCount);
@@ -98,104 +98,70 @@ namespace Music.Generator
 
             for (int abs = 0; abs < _sectionCount; abs++)
             {
-                var section = _arc.SectionTrack.Sections[abs];
-                int sectionIndex = ComputeSectionIndex(section.SectionType, abs);
-
-                // Get constrained energy from EnergyArc
-                var target = _arc.GetTargetForSection(section, sectionIndex);
-                double baseEnergy = Math.Clamp(target.Energy, 0.0, 1.0);
+                var section = _sectionTrack.Sections[abs];
 
                 TensionDriver driver = TensionDriver.None;
-                double adjusted = baseEnergy;
+                double baseTension = 0.5; // Default neutral tension
 
-                // Apply type-specific tension biases (distinct from energy)
+                // Apply type-specific tension values (simplified, no energy dependency)
                 switch (section.SectionType)
                 {
                     case MusicConstants.eSectionType.Intro:
-                        adjusted += 0.05;
+                        baseTension = 0.55;
                         driver |= TensionDriver.Opening;
                         break;
 
                     case MusicConstants.eSectionType.Verse:
-                        // Verses are typically lower tension (stable)
-                        adjusted -= 0.05;
+                        baseTension = 0.45;
                         break;
 
                     case MusicConstants.eSectionType.Chorus:
-                        // Chorus often releases tension vs PreChorus
-                        if (abs > 0 && _arc.SectionTrack.Sections[abs - 1].SectionType == MusicConstants.eSectionType.Chorus)
-                        {
-                            // Repeated chorus - check if we're building or sustaining
-                            var prevEnergy = _arc.GetTargetForSection(_arc.SectionTrack.Sections[abs - 1], sectionIndex - 1).Energy;
-                            if (baseEnergy > prevEnergy + 0.05)
-                            {
-                                adjusted += 0.03; // Building toward final chorus
-                                driver |= TensionDriver.Peak;
-                            }
-                            else
-                            {
-                                adjusted -= 0.08; // Release
-                                driver |= TensionDriver.Resolution;
-                            }
-                        }
-                        else
-                        {
-                            adjusted -= 0.08;
-                            driver |= TensionDriver.Resolution;
-                        }
+                        baseTension = 0.42;
+                        driver |= TensionDriver.Resolution;
                         break;
 
                     case MusicConstants.eSectionType.Bridge:
-                        adjusted += 0.12;
+                        baseTension = 0.62;
                         driver |= TensionDriver.BridgeContrast;
                         break;
 
                     case MusicConstants.eSectionType.Solo:
-                        adjusted += 0.07;
+                        baseTension = 0.57;
                         driver |= TensionDriver.Peak;
                         break;
 
                     case MusicConstants.eSectionType.Outro:
-                        adjusted -= 0.15;
+                        baseTension = 0.35;
                         driver |= TensionDriver.Resolution;
                         break;
                 }
 
-                // Anticipation: if next section has higher energy, raise tension
+                // Anticipation: if next section is Chorus after Verse, raise tension
                 if (abs < _sectionCount - 1)
                 {
-                    int nextIdx = ComputeSectionIndex(_arc.SectionTrack.Sections[abs + 1].SectionType, abs + 1);
-                    var nextTarget = _arc.GetTargetForSection(_arc.SectionTrack.Sections[abs + 1], nextIdx);
-                    double nextEnergy = nextTarget.Energy;
-
-                    if (nextEnergy - baseEnergy > 0.10)
+                    var nextSection = _sectionTrack.Sections[abs + 1];
+                    if (section.SectionType == MusicConstants.eSectionType.Verse && 
+                        nextSection.SectionType == MusicConstants.eSectionType.Chorus)
                     {
-                        double bump = Math.Min(0.15, (nextEnergy - baseEnergy) * 0.7);
-                        adjusted += bump;
-                        driver |= TensionDriver.Anticipation;
-                    }
-                }
-
-                // PreChorus must have higher tension than preceding Verse
-                if (section.SectionType == MusicConstants.eSectionType.Chorus && abs > 0)
-                {
-                    var prev = _arc.SectionTrack.Sections[abs - 1];
-                    if (prev.SectionType == MusicConstants.eSectionType.Verse)
-                    {
-                        // Ensure tension rises from verse to chorus entry point
-                        adjusted += 0.10;
+                        baseTension += 0.10;
                         driver |= TensionDriver.PreChorusBuild | TensionDriver.Anticipation;
+                    }
+                    else if (nextSection.SectionType == MusicConstants.eSectionType.Chorus ||
+                             nextSection.SectionType == MusicConstants.eSectionType.Bridge)
+                    {
+                        baseTension += 0.05;
+                        driver |= TensionDriver.Anticipation;
                     }
                 }
 
                 // Deterministic jitter to avoid flat lines
                 double jitter = (rng.NextDouble() - 0.5) * 0.03;
-                adjusted += jitter;
+                baseTension += jitter;
 
                 // Clamp and store
-                adjusted = Math.Clamp(adjusted, 0.0, 1.0);
+                baseTension = Math.Clamp(baseTension, 0.0, 1.0);
 
-                var profile = SectionTensionProfile.WithMacroTension(adjusted, abs, driver);
+                var profile = SectionTensionProfile.WithMacroTension(baseTension, abs, driver);
                 _profiles[abs] = profile;
 
                 // Build micro tension map using Story 7.5.3 builder
@@ -211,7 +177,7 @@ namespace Music.Generator
                 // Compute transition hint
                 if (abs < _sectionCount - 1)
                 {
-                    _transitionHints[abs] = ComputeTransitionHint(abs, profile, baseEnergy);
+                    _transitionHints[abs] = ComputeTransitionHint(abs, profile, baseTension);
                 }
                 else
                 {
@@ -220,59 +186,36 @@ namespace Music.Generator
             }
         }
 
-        private SectionTransitionHint ComputeTransitionHint(int absoluteIndex, SectionTensionProfile currentProfile, double currentEnergy)
+        private SectionTransitionHint ComputeTransitionHint(int absoluteIndex, SectionTensionProfile currentProfile, double currentTension)
         {
             if (absoluteIndex >= _sectionCount - 1)
                 return SectionTransitionHint.None;
 
-            var nextSection = _arc.SectionTrack.Sections[absoluteIndex + 1];
-            int nextIdx = ComputeSectionIndex(nextSection.SectionType, absoluteIndex + 1);
-            var nextTarget = _arc.GetTargetForSection(nextSection, nextIdx);
-            double nextEnergy = nextTarget.Energy;
+            var nextSection = _sectionTrack.Sections[absoluteIndex + 1];
 
             var nextProfile = _profiles.ContainsKey(absoluteIndex + 1) 
                 ? _profiles[absoluteIndex + 1] 
                 : SectionTensionProfile.Neutral(absoluteIndex + 1);
 
-            double energyDelta = nextEnergy - currentEnergy;
             double tensionDelta = nextProfile.MacroTension - currentProfile.MacroTension;
 
-            // Build: both energy and tension increasing
-            if (energyDelta > 0.08 && tensionDelta > 0.05)
+            // Build: tension increasing
+            if (tensionDelta > 0.05)
                 return SectionTransitionHint.Build;
 
-            // Drop: significant energy/tension decrease
-            if (energyDelta < -0.12 || tensionDelta < -0.15)
+            // Drop: significant tension decrease
+            if (tensionDelta < -0.15)
                 return SectionTransitionHint.Drop;
 
-            // Release: tension drops but energy may sustain
+            // Release: moderate tension drop
             if (tensionDelta < -0.08)
                 return SectionTransitionHint.Release;
 
             // Sustain: minimal change
-            if (Math.Abs(energyDelta) < 0.08 && Math.Abs(tensionDelta) < 0.08)
+            if (Math.Abs(tensionDelta) < 0.08)
                 return SectionTransitionHint.Sustain;
 
-            // Default: Build if moving toward higher energy
-            if (energyDelta > 0)
-                return SectionTransitionHint.Build;
-
             return SectionTransitionHint.Sustain;
-        }
-
-        private int ComputeSectionIndex(MusicConstants.eSectionType sectionType, int absoluteIndex)
-        {
-            int count = 0;
-            for (int i = 0; i <= absoluteIndex; i++)
-            {
-                if (_arc.SectionTrack.Sections[i].SectionType == sectionType)
-                {
-                    if (i == absoluteIndex)
-                        return count;
-                    count++;
-                }
-            }
-            return 0;
         }
 
         private void ValidateSectionIndex(int index)

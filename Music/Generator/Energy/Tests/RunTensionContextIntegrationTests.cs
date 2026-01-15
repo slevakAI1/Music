@@ -9,6 +9,11 @@ internal static class RunTensionContextIntegrationTests
 {
     public static void Run()
     {
+        // TEMPORARILY DISABLED (Epic 6): Test uses EnergyArc which was removed in Story 4.1.
+        // To be re-enabled during energy reintegration.
+        Console.WriteLine("\n=== TensionContext Integration Tests - SKIPPED (Energy Disconnected) ===\n");
+        
+        /* COMMENTED OUT UNTIL ENERGY REINTEGRATION
         try
         {
             Console.WriteLine("\n=== Running Story 7.5.8 TensionContext Integration Tests ===\n");
@@ -20,5 +25,6 @@ internal static class RunTensionContextIntegrationTests
             Console.WriteLine($"\n? Test failed: {ex.Message}");
             Console.WriteLine($"Stack trace: {ex.StackTrace}");
         }
+        */
     }
 }

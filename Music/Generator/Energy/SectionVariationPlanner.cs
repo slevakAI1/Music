@@ -1,20 +1,20 @@
-// AI: purpose=Deterministic planner computing per-section SectionVariationPlan driven by energy/tension/transition hints.
-// AI: invariants=Same inputs yield same plans; all outputs within bounded ranges; variation intensity rises near transitions and in higher-energy sections.
-// AI: deps=Consumes EnergyArc, ITensionQuery, BaseReferenceSelectorRules; produces SectionVariationPlan consumed via IVariationQuery (Story 7.6.4).
+// AI: purpose=Deterministic planner computing per-section SectionVariationPlan driven by tension/transition hints.
+// AI: invariants=Same inputs yield same plans; all outputs within bounded ranges; variation intensity rises near transitions.
+// AI: deps=Consumes SectionTrack, ITensionQuery, BaseReferenceSelectorRules; produces SectionVariationPlan consumed via IVariationQuery.
 // AI: constraints=Conservative defaults; per-role deltas optional (null=no change); respects style/groove identity; seed used only for tie-breaks.
 
 namespace Music.Generator;
 
 /// <summary>
 /// Deterministic planner that computes SectionVariationPlan for each section in a song.
-/// Drives variation intensity and per-role deltas from existing Stage 7 intent:
-/// energy targets, tension profiles, transition hints, section type/index, and groove/style.
+/// Drives variation intensity and per-role deltas from tension profiles, transition hints,
+/// section type/index, and groove/style.
 /// </summary>
 /// <remarks>
-/// Story 7.6.3 acceptance criteria:
+/// Acceptance criteria:
 /// - Deterministic: same inputs ? same plans
-/// - Driven by energy (EnergyArc/EnergySectionProfile), tension (ITensionQuery), transition hints
-/// - Conservative and clamped: VariationIntensity stays small by default, rises near transitions or high-energy
+/// - Driven by tension (ITensionQuery), transition hints, section type
+/// - Conservative and clamped: VariationIntensity stays small by default, rises near transitions
 /// - Per-role deltas bounded and optional (null = no change)
 /// - Seed used only for deterministic tie-breaks
 /// - No new musical behavior encoded here (planning only)
@@ -25,20 +25,17 @@ public static class SectionVariationPlanner
     /// Computes a complete set of variation plans for all sections in a song.
     /// </summary>
     /// <param name="sectionTrack">The song's section track.</param>
-    /// <param name="energyArc">The song's energy arc.</param>
     /// <param name="tensionQuery">Tension query for transition hints.</param>
     /// <param name="grooveName">Groove/style name for deterministic decisions.</param>
     /// <param name="seed">Seed for deterministic tie-breaking.</param>
     /// <returns>List of variation plans, one per section, in section order.</returns>
     public static List<SectionVariationPlan> ComputePlans(
         SectionTrack sectionTrack,
-        EnergyArc energyArc,
         ITensionQuery tensionQuery,
         string grooveName,
         int seed)
     {
         ArgumentNullException.ThrowIfNull(sectionTrack);
-        ArgumentNullException.ThrowIfNull(energyArc);
         ArgumentNullException.ThrowIfNull(tensionQuery);
         ArgumentNullException.ThrowIfNull(grooveName);
 
@@ -73,8 +70,8 @@ public static class SectionVariationPlanner
                 baseReferenceIndex,
                 sections);
 
-            // Get energy target for this section
-            var energyTarget = energyArc.GetTargetForSection(section, sectionTypeIndex);
+            // Use fixed energy value (no longer depends on EnergyArc)
+            double fixedEnergy = 0.5;
 
             // Get tension context (macro tension + transition hint)
             var macroTension = tensionQuery.GetMacroTension(absoluteIndex);
@@ -84,7 +81,7 @@ public static class SectionVariationPlanner
             double variationIntensity = ComputeVariationIntensity(
                 absoluteIndex,
                 baseReferenceIndex,
-                energyTarget.Energy,
+                fixedEnergy,
                 macroTension.MacroTension,
                 transitionHint,
                 section.SectionType,
@@ -94,7 +91,7 @@ public static class SectionVariationPlanner
             // Compute per-role deltas
             var roleDeltas = ComputeRoleDeltas(
                 variationIntensity,
-                energyTarget.Energy,
+                fixedEnergy,
                 macroTension.MacroTension,
                 transitionHint,
                 section.SectionType,

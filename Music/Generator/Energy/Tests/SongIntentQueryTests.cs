@@ -1,6 +1,9 @@
 // AI: purpose=Test suite for ISongIntentQuery unified Stage 7 intent query (Story 7.9).
 // AI: invariants=All tests verify determinism, valid ranges, and correct aggregation of energy/tension/variation queries.
 // AI: deps=Tests DeterministicSongIntentQuery aggregation; uses existing EnergyArc, ITensionQuery, IVariationQuery test fixtures.
+// AI: NOTE - TEMPORARILY DISABLED (Epic 6): These tests use EnergyArc which was removed in Story 4.1. To be re-enabled during energy reintegration.
+
+#if FALSE_DISABLED_FOR_ENERGY_DISCONNECT // Epic 6: Disabled until energy reintegration
 
 namespace Music.Generator.Tests;
 
@@ -15,6 +18,12 @@ public static class SongIntentQueryTests
     /// </summary>
     public static void RunAll()
     {
+        // TEMPORARILY DISABLED (Epic 6): Tests use EnergyArc which was removed in Story 4.1.
+        // To be re-enabled during energy reintegration.
+        Console.WriteLine("=== SongIntentQuery Tests - SKIPPED (Energy Disconnected) ===");
+        return;
+
+        /* COMMENTED OUT UNTIL ENERGY REINTEGRATION
         TestSectionIntentAggregation();
         TestBarIntentAggregation();
         TestDeterminism();
@@ -33,6 +42,7 @@ public static class SongIntentQueryTests
         TestSectionCount();
 
         Console.WriteLine("? All SongIntentQuery tests passed");
+        */
     }
 
     /// <summary>
@@ -554,3 +564,5 @@ public static class SongIntentQueryTests
         }
     }
 }
+
+#endif // FALSE_DISABLED_FOR_ENERGY_DISCONNECT

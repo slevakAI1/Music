@@ -220,53 +220,91 @@
 
 ## Epic 4: Remove Energy from Core Generator
 
-### Story 4.1: Remove Energy Arc and Profiles from Generator.cs
+### Story 4.1: Remove Energy Arc and Profiles from Generator.cs ✓ COMPLETE
 
 **File**: `Music\Generator\Core\Generator.cs`
 
-**Changes**:
-- Delete `EnergyArc.Create()` call and `energyArc` variable
-- Delete `BuildSectionProfiles()` call and `sectionProfiles` variable
-- Delete `BuildSectionProfiles()` method entirely
-- Remove `sectionProfiles` argument from all track generator calls
-- Remove `energyArc` argument from `DeterministicTensionQuery` constructor
-- Remove `energyArc` argument from `DeterministicVariationQuery` constructor
-- Remove `energyArc` argument from `CreateMotifPlacementPlan()` call
-- Update AI comments to remove energy references
+**Changes completed**:
+- Deleted `EnergyArc.Create()` call and `energyArc` variable
+- Deleted `BuildSectionProfiles()` call and `sectionProfiles` variable
+- Deleted `BuildSectionProfiles()` method entirely
+- Removed `sectionProfiles` argument from all track generator calls (already done in Stories 2.1-2.4)
+- Removed `energyArc` argument from `DeterministicTensionQuery` constructor
+- Removed `energyArc` argument from `DeterministicVariationQuery` constructor
+- Removed `energyArc` argument from `CreateMotifPlacementPlan()` call
+- Updated AI comments to remove energy references
 
-**Dependent changes**: `DeterministicTensionQuery`, `DeterministicVariationQuery` constructors may need parameter removal
+**Dependent changes completed**:
+- `DeterministicTensionQuery.cs` - removed `EnergyArc` parameter, replaced with `SectionTrack`; uses simplified tension based on section type only
+- `DeterministicVariationQuery.cs` - removed `EnergyArc` parameter; uses fixed energy value (0.5)
+- `SectionVariationPlanner.cs` - removed `EnergyArc` parameter; uses fixed energy value (0.5)
+- `DeterministicSongIntentQuery.cs` - removed `EnergySectionProfile` dictionary parameter, replaced with `SectionTrack`; returns fixed `Energy = 0.5` and `EnergyDelta = 0.0`
+
+**Result**: Generator.cs no longer creates or uses EnergyArc or EnergySectionProfile. All energy-based calculations replaced with fixed values or section-type-based logic. Energy module tests expected to fail (Epic 6).
 
 ---
 
-### Story 4.2: Remove Energy from DeterministicTensionQuery
+### Story 4.2: Remove Energy from DeterministicTensionQuery ✓ COMPLETE
 
 **File**: `Music\Generator\Energy\DeterministicTensionQuery.cs`
 
-**Changes**:
-- Remove `EnergyArc` parameter from constructor
-- Remove energy-based tension calculations
-- Return fixed/simplified tension values based on section type only
+**Changes completed**:
+- Removed `EnergyArc` parameter from constructor, replaced with `SectionTrack`
+- Removed energy-based tension calculations
+- Implemented simplified tension values based on section type only
+- Updated `ComputeProfiles()` to use fixed tension values per section type
+- Simplified `ComputeTransitionHint()` to use tension delta only (no energy delta)
+- Removed `ComputeSectionIndex()` method (no longer needed)
+
+**Result**: Tension calculation now uses section type only. Intro=0.55, Verse=0.45, Chorus=0.42, Bridge=0.62, Solo=0.57, Outro=0.35, with anticipation adjustments for transitions.
 
 ---
 
-### Story 4.3: Remove Energy from DeterministicVariationQuery
+### Story 4.3: Remove Energy from DeterministicVariationQuery ✓ COMPLETE
 
 **File**: `Music\Generator\Energy\DeterministicVariationQuery.cs`
 
-**Changes**:
-- Remove `EnergyArc` parameter from constructor
-- Remove energy-based variation calculations
+**Changes completed**:
+- Removed `EnergyArc` parameter from constructor
+- Updated `ComputePlans()` call to `SectionVariationPlanner` to not pass `energyArc`
+- Updated AI comments to remove energy references
+
+**Dependent file**: `Music\Generator\Energy\SectionVariationPlanner.cs`
+- Removed `EnergyArc` parameter from `ComputePlans()` method
+- Replaced energy target lookup with fixed energy value (0.5)
+- Updated AI comments and XML docs to remove energy references
+
+**Result**: Variation planning no longer depends on energy. Uses fixed energy value (0.5) for all variation intensity calculations.
 
 ---
 
-### Story 4.4: Remove Energy from DeterministicSongIntentQuery
+### Story 4.4: Remove Energy from DeterministicSongIntentQuery ✓ COMPLETE
 
 **File**: `Music\Generator\Energy\DeterministicSongIntentQuery.cs`
 
-**Changes**:
-- Remove `EnergySectionProfile` dictionary from constructor
-- `GetSectionIntent()` - return fixed `Energy = 0.5` or remove Energy property usage
-- `GetBarIntent()` - return fixed `EnergyDelta = 0.0`
+**Changes completed**:
+- Removed `EnergySectionProfile` dictionary parameter from constructor
+- Added `SectionTrack` parameter to access section types
+- Updated `GetSectionIntent()` to return fixed `Energy = 0.5`
+- Updated `GetBarIntent()` to return fixed `EnergyDelta = 0.0` and `PhrasePosition = Middle`
+- Updated `BuildSectionContext()` to use section from SectionTrack and fixed energy value
+- Updated `BuildRolePresenceHints()` to return all roles present (no orchestration gating)
+- Updated `BuildDensityCaps()` to use fixed energy value (0.5)
+- Updated AI comments to remove energy references
+
+**Caller updated**: `Generator.cs` - now passes `sectionTrack` to `DeterministicSongIntentQuery` constructor
+
+**Result**: Song intent query now returns fixed energy values and all roles present. No energy-based orchestration or density gating.
+
+**Note**: Energy module test files temporarily disabled using `#if FALSE_DISABLED_FOR_ENERGY_DISCONNECT` directive to allow build to succeed. Test files preserved for future energy reintegration:
+- `Music\Generator\Energy\Tests\SectionVariationPlannerTests.cs`
+- `Music\Generator\Energy\Tests\SongIntentQueryTests.cs`
+- `Music\Generator\Energy\Tests\TensionDiagnosticsTests.cs`
+- `Music\Generator\Energy\Tests\VariationParameterAdapterTests.cs`
+- `Music\Generator\Energy\Tests\VariationQueryTests.cs`
+- `Music\Generator\Energy\Tests\TensionContextIntegrationTests.cs`
+- `Music.Tests\Generator\Energy\DeterministicTensionQueryTests.cs`
+- Test runners updated to skip tests: `RunTensionContextIntegrationTests.cs`, `RunSongIntentQueryTests.cs`
 
 ---
 

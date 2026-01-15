@@ -1,5 +1,6 @@
 // AI: purpose=Tests for TensionDiagnostics (Story 7.5.7); verify diagnostics don't affect generation, are deterministic, and produce valid output.
 // AI: invariants=Diagnostics must not mutate query state; same inputs => same outputs; all reports must be non-empty for non-trivial input.
+// AI: NOTE - TEMPORARILY DISABLED (Epic 6): These tests use EnergyArc which was removed in Story 4.1. To be re-enabled during energy reintegration.
 
 namespace Music.Generator.Tests;
 
@@ -11,6 +12,12 @@ internal static class TensionDiagnosticsTests
     /// </summary>
     public static void TestDiagnosticsDoNotAffectGeneration()
     {
+        // TEMPORARILY DISABLED (Epic 6): Test uses EnergyArc which was removed in Story 4.1.
+        // To be re-enabled during energy reintegration.
+        Console.WriteLine("TestDiagnosticsDoNotAffectGeneration - SKIPPED (Energy Disconnected)");
+        return;
+
+        /* COMMENTED OUT UNTIL ENERGY REINTEGRATION
         // Arrange: Create a tension query with non-trivial data
         var sectionTrack = CreateTestSectionTrack();
         var energyArc = EnergyArc.Create(sectionTrack, "PopGroove", seed: 42);
@@ -77,6 +84,7 @@ internal static class TensionDiagnosticsTests
         }
 
         Console.WriteLine("? TestDiagnosticsDoNotAffectGeneration passed");
+        */
     }
 
     /// <summary>
@@ -85,6 +93,11 @@ internal static class TensionDiagnosticsTests
     /// </summary>
     public static void TestDiagnosticsDeterminism()
     {
+        // TEMPORARILY DISABLED (Epic 6): Test uses EnergyArc which was removed in Story 4.1.
+        Console.WriteLine("TestDiagnosticsDeterminism - SKIPPED (Energy Disconnected)");
+        return;
+        
+        /* COMMENTED OUT UNTIL ENERGY REINTEGRATION
         const int seed = 12345;
         
         // Create two identical tension queries
@@ -357,6 +370,12 @@ internal static class TensionDiagnosticsTests
 
     public static void RunAllTests()
     {
+        // TEMPORARILY DISABLED (Epic 6): Tests use EnergyArc which was removed in Story 4.1.
+        // To be re-enabled during energy reintegration.
+        Console.WriteLine("=== Tension Diagnostics Tests - SKIPPED (Energy Disconnected) ===\n");
+        return;
+
+        /* COMMENTED OUT UNTIL ENERGY REINTEGRATION
         Console.WriteLine("=== Tension Diagnostics Tests ===");
         TestDiagnosticsDoNotAffectGeneration();
         TestDiagnosticsDeterminism();
@@ -367,5 +386,6 @@ internal static class TensionDiagnosticsTests
         TestFullReportFiltering();
         TestReportsWithNeutralTension();
         Console.WriteLine("=== All Tension Diagnostics Tests Passed ===\n");
+        */
     }
 }

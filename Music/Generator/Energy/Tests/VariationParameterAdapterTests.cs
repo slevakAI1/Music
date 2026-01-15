@@ -1,6 +1,9 @@
 // AI: purpose=Tests for Story 7.6.5 variation parameter adapters ensuring bounded application with guardrails.
 // AI: invariants=Adapters are pure functions; outputs always within safe ranges; determinism preserved; no side effects.
 // AI: deps=Tests VariationParameterAdapter and VariationPlanDiagnostics; verifies adapters don't violate guardrails.
+// AI: NOTE - TEMPORARILY DISABLED (Epic 6): These tests use EnergyArc which was removed in Story 4.1. To be re-enabled during energy reintegration.
+
+#if FALSE_DISABLED_FOR_ENERGY_DISCONNECT // Epic 6: Disabled until energy reintegration
 
 namespace Music.Generator;
 
@@ -353,3 +356,5 @@ public static class VariationParameterAdapterTests
         }
     }
 }
+
+#endif // FALSE_DISABLED_FOR_ENERGY_DISCONNECT

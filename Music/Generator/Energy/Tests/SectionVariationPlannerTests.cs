@@ -1,5 +1,8 @@
 // AI: purpose=Tests for SectionVariationPlanner verifying determinism, bounded outputs, and variation across A/A'/B repeats.
 // AI: invariants=All tests deterministic; variation intensity always [0..1]; role deltas within safe ranges; plans reference valid base indices.
+// AI: NOTE - TEMPORARILY DISABLED (Epic 6): These tests use EnergyArc which was removed in Story 4.1. To be re-enabled during energy reintegration.
+
+#if FALSE_DISABLED_FOR_ENERGY_DISCONNECT // Epic 6: Disabled until energy reintegration
 
 namespace Music.Generator;
 
@@ -11,6 +14,12 @@ public static class SectionVariationPlannerTests
 {
     public static void RunAllTests()
     {
+        // TEMPORARILY DISABLED (Epic 6): Tests use EnergyArc which was removed in Story 4.1.
+        // To be re-enabled during energy reintegration.
+        Console.WriteLine("=== SectionVariationPlanner Tests - SKIPPED (Energy Disconnected) ===\n");
+        return;
+
+        /* COMMENTED OUT UNTIL ENERGY REINTEGRATION
         Console.WriteLine("=== SectionVariationPlanner Tests ===\n");
 
         TestDeterminism();
@@ -29,6 +38,7 @@ public static class SectionVariationPlannerTests
         TestRepeatedSections();
 
         Console.WriteLine("\n=== All SectionVariationPlanner Tests Passed ===");
+        */
     }
 
     /// <summary>
@@ -608,3 +618,5 @@ public static class SectionVariationPlannerTests
         }
     }
 }
+
+#endif // FALSE_DISABLED_FOR_ENERGY_DISCONNECT

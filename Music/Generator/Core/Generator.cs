@@ -1,6 +1,6 @@
 // AI: purpose=Generate PartTracks using Harmony, Groove, Section+Bar timing; deterministic via seed.
 // AI: invariants=Harmony->Groove->Bar timing must align; BarTrack is read-only and must NOT be rebuilt here.
-// AI: deps=HarmonyValidator, EnergyArc, EnergyProfileBuilder, MotifPlacementPlanner, MusicConstants.TicksPerQuarterNote.
+// AI: deps=HarmonyValidator, MotifPlacementPlanner, MusicConstants.TicksPerQuarterNote.
 // AI: perf=Single-run generation; avoid allocations in inner loops; use seed for deterministic results.
 // TODO? confirm behavior when groove/pads onsets null vs empty; current code treats both as skip.
 
@@ -13,7 +13,6 @@ namespace Music.Generator
     {
         // AI: Generate: validates harmony track before generation; fast-fail on invalid data prevents silent errors.
         // AI: behavior=Runs HarmonyValidator with default options (StrictDiatonicChordTones=true) to catch F# minor crashes.
-        // AI: Story 7.3=Now creates EnergyArc and builds section profiles to drive role energy parameters.
         public static GeneratorResult Generate(SongContext songContext)
         {
             // validate songcontext is not null
@@ -47,24 +46,15 @@ namespace Music.Generator
             var settings = RandomizationSettings.Default;
             var harmonyPolicy = HarmonyPolicy.Default;
 
-            // Story 7.3: Create energy arc and build section profiles
             var grooveName = GetPrimaryGrooveName(songContext.GrooveTrack);
-            var energyArc = EnergyArc.Create(
-                songContext.SectionTrack,
-                grooveName,
-                seed: settings.Seed);
 
-            // Build section profiles dictionary for quick lookup (Story 7.8: pass seed for micro-arc)
-            var sectionProfiles = BuildSectionProfiles(energyArc, songContext.SectionTrack, settings.Seed);
-
-            // Story 7.5.x: Create deterministic tension query (used by Story 7.5.5 drums-only integration).
-            ITensionQuery tensionQuery = new DeterministicTensionQuery(energyArc, settings.Seed);
+            // Create deterministic tension query
+            ITensionQuery tensionQuery = new DeterministicTensionQuery(songContext.SectionTrack, settings.Seed);
             const double microTensionPhraseRampIntensity = 1.0;
 
-            // Story 7.6.4: Create deterministic variation query for section variation plans
+            // Create deterministic variation query for section variation plans
             IVariationQuery variationQuery = new DeterministicVariationQuery(
                 songContext.SectionTrack,
-                energyArc,
                 tensionQuery,
                 grooveName,
                 settings.Seed);
@@ -74,7 +64,6 @@ namespace Music.Generator
             var motifPlan = CreateMotifPlacementPlan(
                 materialBank,
                 songContext.SectionTrack,
-                energyArc,
                 tensionQuery,
                 variationQuery,
                 settings.Seed);
@@ -149,52 +138,6 @@ namespace Music.Generator
             };
         }
 
-        // AI: builds EnergySectionProfile per absolute section index; sectionIndex per type increments; seed for micro-arc; previousProfile for contrast
-        private static Dictionary<int, EnergySectionProfile> BuildSectionProfiles(
-            EnergyArc energyArc,
-            SectionTrack sectionTrack,
-            int seed)
-        {
-            var profiles = new Dictionary<int, EnergySectionProfile>();
-            
-            // Track section indices by type for proper indexing
-            var sectionIndicesByType = new Dictionary<MusicConstants.eSectionType, int>();
-            
-            EnergySectionProfile? previousProfile = null;
-
-            for (int absoluteSectionIndex = 0; absoluteSectionIndex < sectionTrack.Sections.Count; absoluteSectionIndex++)
-            {
-                var section = sectionTrack.Sections[absoluteSectionIndex];
-                
-                // Get or initialize index for this section type
-                if (!sectionIndicesByType.ContainsKey(section.SectionType))
-                {
-                    sectionIndicesByType[section.SectionType] = 0;
-                }
-                
-                int sectionIndex = sectionIndicesByType[section.SectionType];
-
-                // Build profile for this section (Story 7.8: pass seed for micro-arc)
-                var profile = EnergyProfileBuilder.BuildProfile(
-                    energyArc,
-                    section,
-                    sectionIndex,
-                    previousProfile,
-                    seed);
-
-                // Store by absolute section index (for DeterministicSongIntentQuery)
-                profiles[absoluteSectionIndex] = profile;
-
-                // Increment index for this section type
-                sectionIndicesByType[section.SectionType]++;
-
-                // Track for next iteration (contrast calculation)
-                previousProfile = profile;
-            }
-
-            return profiles;
-        }
-
         // AI: returns SourcePresetName of first groove event or "Default"; used as primary groove key
         private static string GetPrimaryGrooveName(GrooveTrack grooveTrack)
         {
@@ -227,7 +170,6 @@ namespace Music.Generator
         private static MotifPlacementPlan CreateMotifPlacementPlan(
             MaterialBank materialBank,
             SectionTrack sectionTrack,
-            EnergyArc energyArc,
             ITensionQuery tensionQuery,
             IVariationQuery variationQuery,
             int seed)
@@ -240,12 +182,9 @@ namespace Music.Generator
                 return MotifPlacementPlan.Empty(seed);
             }
 
-            // Build section profiles for intent query
-            var sectionProfiles = BuildSectionProfiles(energyArc, sectionTrack, seed);
-
             // Create intent query for placement planner
             ISongIntentQuery intentQuery = new DeterministicSongIntentQuery(
-                sectionProfiles,
+                sectionTrack,
                 tensionQuery,
                 variationQuery);
 

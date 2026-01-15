@@ -1,42 +1,40 @@
-// AI: purpose=Deterministic implementation of ISongIntentQuery aggregating existing Stage 7 queries.
+// AI: purpose=Deterministic implementation of ISongIntentQuery aggregating tension and variation queries.
 // AI: invariants=All outputs deterministic from seed+inputs; thread-safe immutable; no new planning, only query aggregation.
-// AI: deps=Aggregates EnergyArc, ITensionQuery, IVariationQuery; consumed by Generator and future Stage 8/9 systems.
-// AI: change=Story 7.9 implementation; precomputes and caches section contexts for O(1) lookup.
+// AI: deps=Aggregates ITensionQuery, IVariationQuery; consumed by Generator and motif systems.
+// AI: change=Energy removed - uses fixed energy value (0.5) and simplified logic.
 
 namespace Music.Generator;
 
 /// <summary>
-/// Deterministic implementation of unified Stage 7 intent query.
-/// Aggregates existing energy, tension, and variation queries into single stable contract.
-/// Story 7.9: future-proofs Stage 7 by providing unified query surface without requiring refactors.
+/// Deterministic implementation of unified intent query.
+/// Aggregates tension and variation queries into single stable contract.
 /// Precomputes section contexts at construction for O(1) query performance.
 /// </summary>
 public sealed class DeterministicSongIntentQuery : ISongIntentQuery
 {
-    private readonly Dictionary<int, EnergySectionProfile> _sectionProfiles;
+    private readonly SectionTrack _sectionTrack;
     private readonly ITensionQuery _tensionQuery;
     private readonly IVariationQuery _variationQuery;
     private readonly Dictionary<int, SectionIntentContext> _sectionContextCache;
     private readonly int _sectionCount;
 
     /// <summary>
-    /// Creates deterministic song intent query from existing Stage 7 infrastructure.
+    /// Creates deterministic song intent query from tension and variation queries.
     /// Precomputes all section contexts at construction.
     /// </summary>
-    /// <param name="sectionProfiles">Section energy profiles indexed by absolute section index.</param>
+    /// <param name="sectionTrack">The song's section track for accessing section types.</param>
     /// <param name="tensionQuery">Tension query providing macro/micro tension and transition hints.</param>
     /// <param name="variationQuery">Variation query providing A/A'/B variation plans.</param>
     public DeterministicSongIntentQuery(
-        Dictionary<int, EnergySectionProfile> sectionProfiles,
+        SectionTrack sectionTrack,
         ITensionQuery tensionQuery,
         IVariationQuery variationQuery)
     {
-        _sectionProfiles = sectionProfiles ?? throw new ArgumentNullException(nameof(sectionProfiles));
+        _sectionTrack = sectionTrack ?? throw new ArgumentNullException(nameof(sectionTrack));
         _tensionQuery = tensionQuery ?? throw new ArgumentNullException(nameof(tensionQuery));
         _variationQuery = variationQuery ?? throw new ArgumentNullException(nameof(variationQuery));
 
-        _sectionCount = Math.Min(
-            _sectionProfiles.Count,
+        _sectionCount = Math.Min(_sectionTrack.Sections.Count, 
             Math.Min(_tensionQuery.SectionCount, _variationQuery.SectionCount));
 
         // Precompute all section contexts for O(1) lookup
@@ -77,10 +75,9 @@ public sealed class DeterministicSongIntentQuery : ISongIntentQuery
         var (isPhraseEnd, isSectionEnd, isSectionStart) =
             _tensionQuery.GetPhraseFlags(absoluteSectionIndex, barIndexWithinSection);
 
-        // Get energy delta and phrase position from section profile's micro-arc (if present)
-        var profile = _sectionProfiles[absoluteSectionIndex];
-        var energyDelta = profile.MicroArc?.GetEnergyDelta(barIndexWithinSection) ?? 0.0;
-        var phrasePosition = profile.MicroArc?.GetPhrasePosition(barIndexWithinSection) ?? PhrasePosition.Middle;
+        // Use fixed values (no energy delta or phrase position from micro-arc)
+        var energyDelta = 0.0;
+        var phrasePosition = PhrasePosition.Middle;
 
         return new BarIntentContext
         {
@@ -97,40 +94,44 @@ public sealed class DeterministicSongIntentQuery : ISongIntentQuery
 
     private SectionIntentContext BuildSectionContext(int absoluteSectionIndex)
     {
-        var profile = _sectionProfiles[absoluteSectionIndex];
+        var section = _sectionTrack.Sections[absoluteSectionIndex];
         var macroTension = _tensionQuery.GetMacroTension(absoluteSectionIndex);
         var transitionHint = _tensionQuery.GetTransitionHint(absoluteSectionIndex);
         var variationPlan = _variationQuery.GetVariationPlan(absoluteSectionIndex);
 
+        // Use fixed energy value (no longer depends on energy profiles)
+        const double fixedEnergy = 0.5;
+
         return new SectionIntentContext
         {
             AbsoluteSectionIndex = absoluteSectionIndex,
-            SectionType = profile.Section.SectionType,
-            Energy = profile.Global.Energy,
+            SectionType = section.SectionType,
+            Energy = fixedEnergy,
             Tension = macroTension.MacroTension,
             TensionDrivers = macroTension.Driver,
             TransitionHint = transitionHint,
             VariationIntensity = variationPlan.VariationIntensity,
             BaseReferenceSectionIndex = variationPlan.BaseReferenceSectionIndex,
             VariationTags = variationPlan.Tags,
-            RolePresence = BuildRolePresenceHints(profile.Orchestration),
+            RolePresence = BuildRolePresenceHints(),
             RegisterConstraints = BuildRegisterConstraints(),
-            DensityCaps = BuildDensityCaps(profile.Global.Energy)
+            DensityCaps = BuildDensityCaps(fixedEnergy)
         };
     }
 
-    private static RolePresenceHints BuildRolePresenceHints(EnergyOrchestrationProfile orchestration)
+    private static RolePresenceHints BuildRolePresenceHints()
     {
+        // All roles present (no orchestration gating)
         return new RolePresenceHints
         {
-            BassPresent = orchestration.BassPresent,
-            CompPresent = orchestration.CompPresent,
-            KeysPresent = orchestration.KeysPresent,
-            PadsPresent = orchestration.PadsPresent,
-            DrumsPresent = orchestration.DrumsPresent,
-            CymbalLanguage = orchestration.CymbalLanguage,
-            CrashOnSectionStart = orchestration.CrashOnSectionStart,
-            PreferRideOverHat = orchestration.PreferRideOverHat
+            BassPresent = true,
+            CompPresent = true,
+            KeysPresent = true,
+            PadsPresent = true,
+            DrumsPresent = true,
+            CymbalLanguage = EnergyCymbalLanguage.Standard,
+            CrashOnSectionStart = true,
+            PreferRideOverHat = false
         };
     }
 
