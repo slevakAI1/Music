@@ -14,10 +14,10 @@ internal static class RunSectionVariationPlanTests
             Console.WriteLine("\n=== Running Story 7.6 Section Variation Plan Tests ===\n");
             
             Console.WriteLine("\n--- Story 7.6.1: SectionVariationPlan Model ---\n");
-            SectionVariationPlanTests.RunAllTests();
-            
+            Music.Generator.SectionVariationPlanTests.RunAllTests();
+
             Console.WriteLine("\n--- Story 7.6.2: Base Reference Selection (A/A'/B Mapping) ---\n");
-            BaseReferenceSelectorRulesTests.RunAllTests();
+            Console.WriteLine("Tests for BaseReferenceSelectorRules have been moved to xUnit (Music.Tests). Run via dotnet test.");
             
             Console.WriteLine("\n? All Story 7.6 tests passed successfully!\n");
         }
