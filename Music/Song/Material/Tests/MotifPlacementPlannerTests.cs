@@ -20,10 +20,7 @@ public static class MotifPlacementPlannerTests
         TestEmptyBankProducesEmptyPlan();
         TestPlacementRespectsOrchestration();
         TestChorusAlmostAlwaysGetsMotif();
-        TestVerseHighEnergyGetsMotif();
-        TestVerseLowEnergyRarelyGetsMotif();
         TestBridgeGetsMotif();
-        TestIntroLowEnergyGetsOptionalMotif();
         TestCommonFormProducesSensiblePlacement();
         TestDifferentSeedsProduceDifferentChoices();
         TestVariationIntensityFromIntent();
@@ -120,7 +117,7 @@ public static class MotifPlacementPlannerTests
         var sectionTrack = new SectionTrack();
         sectionTrack.Add(MusicConstants.eSectionType.Chorus, 8);
 
-        var intentQuery = CreateTestIntentQuery(sectionTrack, chorusEnergy: 0.8);
+        var intentQuery = CreateTestIntentQuery(sectionTrack);
         var motifBank = CreateTestMotifBank();
 
         var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, intentQuery, motifBank, seed: 42);
@@ -129,41 +126,6 @@ public static class MotifPlacementPlannerTests
             throw new Exception("Chorus should get motif placement");
 
         Console.WriteLine("✓ Chorus almost always gets motif");
-    }
-
-    /// <summary>
-    /// Test: Verse with high energy gets motif.
-    /// </summary>
-    private static void TestVerseHighEnergyGetsMotif()
-    {
-        var sectionTrack = new SectionTrack();
-        sectionTrack.Add(MusicConstants.eSectionType.Verse, 8);
-
-        var intentQuery = CreateTestIntentQuery(sectionTrack, verseEnergy: 0.7);
-        var motifBank = CreateTestMotifBank();
-
-        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, intentQuery, motifBank, seed: 42);
-
-        // High energy verse should likely get motif (not guaranteed but probable)
-        // Test passes if plan is deterministic (already tested)
-        Console.WriteLine("✓ Verse high energy deterministically decides motif placement");
-    }
-
-    /// <summary>
-    /// Test: Verse with low energy rarely gets motif.
-    /// </summary>
-    private static void TestVerseLowEnergyRarelyGetsMotif()
-    {
-        var sectionTrack = new SectionTrack();
-        sectionTrack.Add(MusicConstants.eSectionType.Verse, 8);
-
-        var intentQuery = CreateTestIntentQuery(sectionTrack, verseEnergy: 0.3);
-        var motifBank = CreateTestMotifBank();
-
-        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, intentQuery, motifBank, seed: 42);
-
-        // Low energy verse rarely gets motif (deterministic decision)
-        Console.WriteLine("✓ Verse low energy deterministically decides motif placement");
     }
 
     /// <summary>
@@ -181,23 +143,6 @@ public static class MotifPlacementPlannerTests
 
         // Bridge may or may not get motif (deterministic by seed)
         Console.WriteLine("✓ Bridge motif placement is deterministic");
-    }
-
-    /// <summary>
-    /// Test: Intro with low energy gets optional motif.
-    /// </summary>
-    private static void TestIntroLowEnergyGetsOptionalMotif()
-    {
-        var sectionTrack = new SectionTrack();
-        sectionTrack.Add(MusicConstants.eSectionType.Intro, 4);
-
-        var intentQuery = CreateTestIntentQuery(sectionTrack, introEnergy: 0.2);
-        var motifBank = CreateTestMotifBank();
-
-        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, intentQuery, motifBank, seed: 42);
-
-        // Intro placement is optional and deterministic
-        Console.WriteLine("✓ Intro motif placement is deterministic");
     }
 
     /// <summary>
@@ -366,13 +311,9 @@ public static class MotifPlacementPlannerTests
         return track;
     }
 
-    private static ISongIntentQuery CreateTestIntentQuery(
-        SectionTrack sectionTrack,
-        double introEnergy = 0.3,
-        double verseEnergy = 0.5,
-        double chorusEnergy = 0.8)
+    private static ISongIntentQuery CreateTestIntentQuery(SectionTrack sectionTrack)
     {
-        return new TestSongIntentQuery(sectionTrack, introEnergy, verseEnergy, chorusEnergy);
+        return new TestSongIntentQuery(sectionTrack);
     }
 
     private static ISongIntentQuery CreateTestIntentQueryWithVariation(SectionTrack sectionTrack)
@@ -429,16 +370,10 @@ public static class MotifPlacementPlannerTests
     private class TestSongIntentQuery : ISongIntentQuery
     {
         private readonly SectionTrack _sectionTrack;
-        private readonly double _introEnergy;
-        private readonly double _verseEnergy;
-        private readonly double _chorusEnergy;
 
-        public TestSongIntentQuery(SectionTrack sectionTrack, double introEnergy, double verseEnergy, double chorusEnergy)
+        public TestSongIntentQuery(SectionTrack sectionTrack)
         {
             _sectionTrack = sectionTrack;
-            _introEnergy = introEnergy;
-            _verseEnergy = verseEnergy;
-            _chorusEnergy = chorusEnergy;
         }
 
         public int SectionCount => _sectionTrack.Sections.Count;
@@ -449,13 +384,12 @@ public static class MotifPlacementPlannerTests
         public SectionIntentContext GetSectionIntent(int absoluteSectionIndex)
         {
             var section = _sectionTrack.Sections[absoluteSectionIndex];
-            var energy = GetEnergyForSectionType(section.SectionType);
 
             return new SectionIntentContext
             {
                 AbsoluteSectionIndex = absoluteSectionIndex,
                 SectionType = section.SectionType,
-                Energy = energy,
+                Energy = 0.5,
                 Tension = 0.5,
                 TensionDrivers = TensionDriver.None,
                 TransitionHint = SectionTransitionHint.Sustain,
@@ -481,20 +415,6 @@ public static class MotifPlacementPlannerTests
                 IsPhraseEnd = false,
                 IsSectionEnd = false,
                 IsSectionStart = barIndexWithinSection == 0
-            };
-        }
-
-        private double GetEnergyForSectionType(MusicConstants.eSectionType sectionType)
-        {
-            return sectionType switch
-            {
-                MusicConstants.eSectionType.Intro => _introEnergy,
-                MusicConstants.eSectionType.Verse => _verseEnergy,
-                MusicConstants.eSectionType.Chorus => _chorusEnergy,
-                MusicConstants.eSectionType.Bridge => 0.7,
-                MusicConstants.eSectionType.Solo => 0.8,
-                MusicConstants.eSectionType.Outro => 0.4,
-                _ => 0.5
             };
         }
 

@@ -370,14 +370,18 @@
 
 ---
 
-### Story 5.5: Update MotifPlacementPlannerTests
+### Story 5.5: Update MotifPlacementPlannerTests ✓ COMPLETE
 
 **File**: `Music\Song\Material\Tests\MotifPlacementPlannerTests.cs`
 
-**Changes**:
-- Remove `introEnergy`, `verseEnergy`, `chorusEnergy` parameters from `CreateTestIntentQuery()`
-- Delete or update tests: `TestVerseHighEnergyGetsMotif()`, `TestVerseLowEnergyRarelyGetsMotif()`, `TestIntroLowEnergyGetsOptionalMotif()`
-- Update `TestSongIntentQuery` to not use energy
+**Changes completed**:
+- Removed `introEnergy`, `verseEnergy`, `chorusEnergy` parameters from `CreateTestIntentQuery()` - now uses no parameters
+- Deleted energy-dependent tests: `TestVerseHighEnergyGetsMotif()`, `TestVerseLowEnergyRarelyGetsMotif()`, `TestIntroLowEnergyGetsOptionalMotif()`
+- Updated `TestSongIntentQuery` to use fixed `Energy = 0.5` for all section types (removed energy fields, constructor parameters, and `GetEnergyForSectionType()` method)
+- Updated `TestChorusAlmostAlwaysGetsMotif()` to call `CreateTestIntentQuery()` without energy parameters
+- Removed calls to deleted tests from `RunAllTests()`
+
+**Result**: Test file has no energy references. All remaining tests verify motif placement determinism, constraint compliance, A/A' variation, and placement bounds without energy dependency. All sections now use fixed energy value (0.5) in tests.
 
 ---
 
