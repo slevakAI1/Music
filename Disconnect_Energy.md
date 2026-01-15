@@ -310,16 +310,18 @@
 
 ## Epic 5: Update Tests
 
-### Story 5.1: Update CompBehaviorTests and CompBehaviorIntegrationTests
+### Story 5.1: Update CompBehaviorTests and CompBehaviorIntegrationTests ✓ COMPLETE
 
 **Files**: 
 - `Music\Generator\Guitar\CompBehaviorTests.cs`
 - `Music\Generator\Guitar\CompBehaviorIntegrationTests.cs`
 
-**Changes**:
-- Remove `energy` argument from all `SelectBehavior()` calls
-- Delete tests that specifically test energy affects behavior (`Test_Energy_AffectsBehaviorSelection`, `Test_EdgeCase_ZeroEnergy`, `Test_EdgeCase_MaxEnergy`)
-- Update remaining tests to work without energy parameter
+**Changes completed**:
+- Verified no `energy` arguments in any `SelectBehavior()` calls
+- Confirmed energy-related tests (`Test_Energy_AffectsBehaviorSelection`, `Test_EdgeCase_ZeroEnergy`, `Test_EdgeCase_MaxEnergy`) were already removed in Story 1.1
+- All tests work without energy parameter and compile successfully
+
+**Result**: Both test files have no energy references. All tests pass and verify CompBehavior selection determinism, section type variation, seed sensitivity, busy probability effects, behavior variation timing, and integration with CompBehaviorRealizer.
 
 ---
 
