@@ -32,7 +32,7 @@ internal static class DrumTensionHooksIntegrationTests
             isPhraseEnd: true,
             isSectionStart: false,
             transitionHint: SectionTransitionHint.Build,
-            sectionEnergy: 0.55,
+            sectionEnergy: 0.5,
             microTensionPhraseRampIntensity: 1.0);
 
         double tensionExtra = Math.Clamp(hooks.PullProbabilityBias, 0.0, 0.20);
@@ -68,7 +68,7 @@ internal static class DrumTensionHooksIntegrationTests
             isPhraseEnd: true,
             isSectionStart: false,
             transitionHint: SectionTransitionHint.Build,
-            sectionEnergy: 0.55,
+            sectionEnergy: 0.5,
             microTensionPhraseRampIntensity: 1.0);
 
         var barRng = RandomHelpers.CreateLocalRng(seed, $"{grooveName}_{MusicConstants.eSectionType.Verse}", barIndex, 0m);
@@ -76,7 +76,7 @@ internal static class DrumTensionHooksIntegrationTests
         // Deterministically mirror DrumTrackGenerator dropout gate.
         bool shouldDrop = hooks.PullProbabilityBias > 0.0
             && hooks.DensityThinningBias > 0.0001
-            && 0.55 < 0.92
+            && 0.5 < 0.92
             && barRng.NextDouble() < Math.Clamp(hooks.DensityThinningBias * 1.5, 0.0, 0.30);
 
         var after = shouldDrop

@@ -31,7 +31,7 @@ internal static class BassTensionHooksIntegrationTests
             isPhraseEnd: true,
             isSectionStart: false,
             transitionHint: SectionTransitionHint.Build,
-            sectionEnergy: 0.55,
+            sectionEnergy: 0.5,
             microTensionPhraseRampIntensity: 1.0);
         
         // Apply tension bias to approach probability (mirrors BassTrackGenerator logic)
@@ -71,7 +71,7 @@ internal static class BassTensionHooksIntegrationTests
             isPhraseEnd: true,
             isSectionStart: false,
             transitionHint: SectionTransitionHint.Build,
-            sectionEnergy: 0.55,
+            sectionEnergy: 0.5,
             microTensionPhraseRampIntensity: 1.0);
         
         // Verify pull bias is positive (would increase approach probability if policy allows)
@@ -104,7 +104,7 @@ internal static class BassTensionHooksIntegrationTests
             isPhraseEnd: true,
             isSectionStart: false,
             transitionHint: SectionTransitionHint.Build,
-            sectionEnergy: 0.60,
+            sectionEnergy: 0.5,
             microTensionPhraseRampIntensity: 1.0);
         
         var hooks2 = TensionHooksBuilder.Create(
@@ -113,7 +113,7 @@ internal static class BassTensionHooksIntegrationTests
             isPhraseEnd: true,
             isSectionStart: false,
             transitionHint: SectionTransitionHint.Build,
-            sectionEnergy: 0.60,
+            sectionEnergy: 0.5,
             microTensionPhraseRampIntensity: 1.0);
         
         // Assert: identical inputs produce identical hooks
@@ -148,7 +148,7 @@ internal static class BassTensionHooksIntegrationTests
             isPhraseEnd: true,
             isSectionStart: true,
             transitionHint: SectionTransitionHint.Build,
-            sectionEnergy: 1.0,
+            sectionEnergy: 0.5,
             microTensionPhraseRampIntensity: 1.0);
         
         var hooksMin = TensionHooksBuilder.Create(
@@ -157,7 +157,7 @@ internal static class BassTensionHooksIntegrationTests
             isPhraseEnd: false,
             isSectionStart: false,
             transitionHint: SectionTransitionHint.Drop,
-            sectionEnergy: 0.0,
+            sectionEnergy: 0.5,
             microTensionPhraseRampIntensity: 1.0);
         
         // Assert: PullProbabilityBias in range [-0.20, 0.20] per TensionHooksBuilder

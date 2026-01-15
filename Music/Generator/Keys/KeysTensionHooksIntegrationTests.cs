@@ -12,7 +12,6 @@ internal static class KeysTensionHooksIntegrationTests
     public static void Test_TensionHooks_Increase_Velocity_At_Phrase_End()
     {
         const int baseVelocity = 75;
-        const int energyBias = 5;
         
         // Neutral tension (no accent bias)
         var neutralHooks = TensionHooksBuilder.Create(
@@ -31,12 +30,12 @@ internal static class KeysTensionHooksIntegrationTests
             isPhraseEnd: true,
             isSectionStart: false,
             transitionHint: SectionTransitionHint.Build,
-            sectionEnergy: 0.55,
+            sectionEnergy: 0.5,
             microTensionPhraseRampIntensity: 1.0);
         
         // Apply velocity calculation (mirrors KeysTrackGenerator logic)
-        int neutralVelocity = baseVelocity + energyBias + neutralHooks.VelocityAccentBias;
-        int tensionVelocity = baseVelocity + energyBias + tensionHooks.VelocityAccentBias;
+        int neutralVelocity = baseVelocity + neutralHooks.VelocityAccentBias;
+        int tensionVelocity = baseVelocity + tensionHooks.VelocityAccentBias;
         
         neutralVelocity = Math.Clamp(neutralVelocity, 1, 127);
         tensionVelocity = Math.Clamp(tensionVelocity, 1, 127);
@@ -57,7 +56,6 @@ internal static class KeysTensionHooksIntegrationTests
     public static void Test_VelocityGuardrails_Enforced()
     {
         const int baseVelocity = 75;
-        const int energyBias = 20; // High energy bias
         
         // Extreme high tension
         var maxHooks = TensionHooksBuilder.Create(
@@ -66,7 +64,7 @@ internal static class KeysTensionHooksIntegrationTests
             isPhraseEnd: true,
             isSectionStart: true,
             transitionHint: SectionTransitionHint.Build,
-            sectionEnergy: 1.0,
+            sectionEnergy: 0.5,
             microTensionPhraseRampIntensity: 1.0);
         
         // Extreme low tension
@@ -76,11 +74,11 @@ internal static class KeysTensionHooksIntegrationTests
             isPhraseEnd: false,
             isSectionStart: false,
             transitionHint: SectionTransitionHint.Drop,
-            sectionEnergy: 0.0,
+            sectionEnergy: 0.5,
             microTensionPhraseRampIntensity: 1.0);
         
-        int maxVelocity = Math.Clamp(baseVelocity + energyBias + maxHooks.VelocityAccentBias, 1, 127);
-        int minVelocity = Math.Clamp(baseVelocity - energyBias + minHooks.VelocityAccentBias, 1, 127);
+        int maxVelocity = Math.Clamp(baseVelocity + maxHooks.VelocityAccentBias, 1, 127);
+        int minVelocity = Math.Clamp(baseVelocity + minHooks.VelocityAccentBias, 1, 127);
         
         // Assert: velocities must be in valid MIDI range
         if (maxVelocity < 1 || maxVelocity > 127)
@@ -103,7 +101,6 @@ internal static class KeysTensionHooksIntegrationTests
     public static void Test_TensionIntegration_Determinism()
     {
         const int baseVelocity = 75;
-        const int energyBias = 5;
         
         // Create hooks twice with identical inputs
         var hooks1 = TensionHooksBuilder.Create(
@@ -112,7 +109,7 @@ internal static class KeysTensionHooksIntegrationTests
             isPhraseEnd: true,
             isSectionStart: false,
             transitionHint: SectionTransitionHint.Build,
-            sectionEnergy: 0.60,
+            sectionEnergy: 0.5,
             microTensionPhraseRampIntensity: 1.0);
         
         var hooks2 = TensionHooksBuilder.Create(
@@ -121,11 +118,11 @@ internal static class KeysTensionHooksIntegrationTests
             isPhraseEnd: true,
             isSectionStart: false,
             transitionHint: SectionTransitionHint.Build,
-            sectionEnergy: 0.60,
+            sectionEnergy: 0.5,
             microTensionPhraseRampIntensity: 1.0);
         
-        int velocity1 = Math.Clamp(baseVelocity + energyBias + hooks1.VelocityAccentBias, 1, 127);
-        int velocity2 = Math.Clamp(baseVelocity + energyBias + hooks2.VelocityAccentBias, 1, 127);
+        int velocity1 = Math.Clamp(baseVelocity + hooks1.VelocityAccentBias, 1, 127);
+        int velocity2 = Math.Clamp(baseVelocity + hooks2.VelocityAccentBias, 1, 127);
         
         // Assert: identical inputs produce identical velocities
         if (velocity1 != velocity2)

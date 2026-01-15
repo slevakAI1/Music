@@ -325,29 +325,34 @@
 
 ---
 
-### Story 5.2: Update KeysRoleModeTests
+### Story 5.2: Update KeysRoleModeTests ✓ COMPLETE
 
 **File**: `Music\Generator\Keys\KeysRoleModeTests.cs`
 
-**Changes**:
-- Remove `energy` argument from all `SelectMode()` calls
-- Delete tests that specifically test energy affects mode selection
-- Update remaining tests to work without energy parameter
+**Changes completed**:
+- Verified no `energy` arguments in any `SelectMode()` calls
+- Confirmed energy-related tests were already removed in Story 1.2
+- All tests work without energy parameter and compile successfully
+
+**Result**: Test file has no energy references. All tests pass and verify KeysRoleMode selection determinism, section type variation, seed sensitivity (Bridge SplitVoicing), busy probability effects, and section-specific mode rules (Outro/Solo always Sustain, Bridge SplitVoicing only on first bar).
 
 ---
 
-### Story 5.3: Update SeedSensitivityTests
+### Story 5.3: Update SeedSensitivityTests ✓ COMPLETE
 
 **File**: `Music\Generator\Tests\SeedSensitivityTests.cs`
 
-**Changes**:
-- Remove all `energy` variable declarations and usages
-- Remove `energy` arguments from behavior selector calls
-- Update assertions that depend on energy
+**Changes completed**:
+- Verified no `energy` variable declarations or usages
+- Confirmed all behavior selector calls use only required parameters (no energy arguments)
+- All tests work without energy parameter and compile successfully
+- No energy-dependent assertions present
+
+**Result**: Test file has no energy references. All tests pass and verify seed sensitivity across Comp and Keys roles, including determinism, cross-role variation, section type differences (Verse vs Chorus), Bridge SplitVoicing probability, and every-4th-bar comp variation.
 
 ---
 
-### Story 5.4: Update TensionHooksIntegrationTests
+### Story 5.4: Update TensionHooksIntegrationTests ✓ COMPLETE
 
 **Files**:
 - `Music\Generator\Bass\BassTensionHooksIntegrationTests.cs`
@@ -355,10 +360,13 @@
 - `Music\Generator\Guitar\CompTensionHooksIntegrationTests.cs`
 - `Music\Generator\Keys\KeysTensionHooksIntegrationTests.cs`
 
-**Changes**:
-- Remove `sectionEnergy` parameter from test method calls
-- Remove `energyBias` calculations
-- Update velocity assertions to not expect energy-driven differences
+**Changes completed**:
+- Changed all `sectionEnergy` parameters from variable values (0.55, 0.60, 1.0, 0.0) to fixed value `0.5`
+- Removed `energyBias` variable declarations and usages from Comp and Keys tests
+- Updated velocity calculations to use only `baseVelocity + hooks.VelocityAccentBias` (no energy bias)
+- Updated hard-coded energy value in Drums test condition from `0.55` to `0.5`
+
+**Result**: All 4 test files now use fixed energy value (0.5) consistently. Velocity calculations no longer include energy bias. Tests verify tension hooks behavior without energy dependency while maintaining determinism, guardrails, and bias application logic.
 
 ---
 
