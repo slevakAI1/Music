@@ -38,10 +38,10 @@ public static class MotifRendererTests
     /// </summary>
     private static void TestDeterminism()
     {
-        var (spec, placement, harmony, barTrack, groove, intent, sectionTrack) = CreateTestContext();
+        var (spec, placement, harmony, barTrack, groove, sectionTrack) = CreateTestContext();
 
-        var result1 = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, intent, sectionTrack, seed: 42);
-        var result2 = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, intent, sectionTrack, seed: 42);
+        var result1 = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, sectionTrack, seed: 42);
+        var result2 = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, sectionTrack, seed: 42);
 
         if (result1.PartTrackNoteEvents.Count != result2.PartTrackNoteEvents.Count)
             throw new Exception("Determinism failed: event count differs");
@@ -68,9 +68,9 @@ public static class MotifRendererTests
     /// </summary>
     private static void TestValidMidiRange()
     {
-        var (spec, placement, harmony, barTrack, groove, intent, sectionTrack) = CreateTestContext();
+        var (spec, placement, harmony, barTrack, groove, sectionTrack) = CreateTestContext();
 
-        var result = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, intent, sectionTrack, seed: 42);
+        var result = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, sectionTrack, seed: 42);
 
         foreach (var evt in result.PartTrackNoteEvents)
         {
@@ -98,9 +98,9 @@ public static class MotifRendererTests
             chordToneBias: 1.0, // Always chord tones
             allowPassingTones: false);
 
-        var (_, placement, harmony, barTrack, groove, intent, sectionTrack) = CreateTestContext();
+        var (_, placement, harmony, barTrack, groove, sectionTrack) = CreateTestContext();
 
-        var result = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, intent, sectionTrack, seed: 42);
+        var result = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, sectionTrack, seed: 42);
 
         // C major chord: C, E, G (pitch classes 0, 4, 7)
         var chordPitchClasses = new HashSet<int> { 0, 4, 7 };
@@ -140,9 +140,9 @@ public static class MotifRendererTests
             chordToneBias: 0.5,
             allowPassingTones: true);
 
-        var (_, placement, harmony, barTrack, groove, intent, sectionTrack) = CreateTestContext();
+        var (_, placement, harmony, barTrack, groove, sectionTrack) = CreateTestContext();
 
-        var result = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, intent, sectionTrack, seed: 42);
+        var result = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, sectionTrack, seed: 42);
 
         int minAllowed = 67 - 6;
         int maxAllowed = 67 + 6;
@@ -163,7 +163,7 @@ public static class MotifRendererTests
     private static void TestVariationStaysInBounds()
     {
         var spec = MotifLibrary.ClassicRockHookA();
-        var (_, _, harmony, barTrack, groove, intent, sectionTrack) = CreateTestContext();
+        var (_, _, harmony, barTrack, groove, sectionTrack) = CreateTestContext();
 
         // High variation intensity
         var placement = MotifPlacement.Create(
@@ -174,7 +174,7 @@ public static class MotifRendererTests
             variationIntensity: 1.0,
             transformTags: new[] { "OctaveUp" });
 
-        var result = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, intent, sectionTrack, seed: 42);
+        var result = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, sectionTrack, seed: 42);
 
         foreach (var evt in result.PartTrackNoteEvents)
         {
@@ -190,9 +190,9 @@ public static class MotifRendererTests
     /// </summary>
     private static void TestNoNoteOverlaps()
     {
-        var (spec, placement, harmony, barTrack, groove, intent, sectionTrack) = CreateTestContext();
+        var (spec, placement, harmony, barTrack, groove, sectionTrack) = CreateTestContext();
 
-        var result = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, intent, sectionTrack, seed: 42);
+        var result = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, sectionTrack, seed: 42);
 
         for (int i = 1; i < result.PartTrackNoteEvents.Count; i++)
         {
@@ -214,9 +214,9 @@ public static class MotifRendererTests
     /// </summary>
     private static void TestEventsSortedByTime()
     {
-        var (spec, placement, harmony, barTrack, groove, intent, sectionTrack) = CreateTestContext();
+        var (spec, placement, harmony, barTrack, groove, sectionTrack) = CreateTestContext();
 
-        var result = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, intent, sectionTrack, seed: 42);
+        var result = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, sectionTrack, seed: 42);
 
         for (int i = 1; i < result.PartTrackNoteEvents.Count; i++)
         {
@@ -232,7 +232,7 @@ public static class MotifRendererTests
     /// </summary>
     private static void TestEmptyOutputForInvalidPlacement()
     {
-        var (spec, _, harmony, barTrack, groove, intent, sectionTrack) = CreateTestContext();
+        var (spec, _, harmony, barTrack, groove, sectionTrack) = CreateTestContext();
 
         // Placement referencing non-existent section
         var invalidPlacement = MotifPlacement.Create(
@@ -241,7 +241,7 @@ public static class MotifRendererTests
             startBarWithinSection: 0,
             durationBars: 1);
 
-        var result = MotifRenderer.Render(spec, invalidPlacement, harmony, barTrack, groove, intent, sectionTrack, seed: 42);
+        var result = MotifRenderer.Render(spec, invalidPlacement, harmony, barTrack, groove, sectionTrack, seed: 42);
 
         if (result.PartTrackNoteEvents.Count != 0)
             throw new Exception("Invalid placement should produce empty track");
@@ -265,9 +265,9 @@ public static class MotifRendererTests
             chordToneBias: 0.0, // Pure contour, no chord bias
             allowPassingTones: true);
 
-        var (_, placement, harmony, barTrack, groove, intent, sectionTrack) = CreateTestContext();
+        var (_, placement, harmony, barTrack, groove, sectionTrack) = CreateTestContext();
 
-        var result = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, intent, sectionTrack, seed: 42);
+        var result = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, sectionTrack, seed: 42);
 
         if (result.PartTrackNoteEvents.Count >= 2)
         {
@@ -296,9 +296,9 @@ public static class MotifRendererTests
             chordToneBias: 0.0,
             allowPassingTones: true);
 
-        var (_, placement, harmony, barTrack, groove, intent, sectionTrack) = CreateTestContext();
+        var (_, placement, harmony, barTrack, groove, sectionTrack) = CreateTestContext();
 
-        var result = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, intent, sectionTrack, seed: 42);
+        var result = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, sectionTrack, seed: 42);
 
         if (result.PartTrackNoteEvents.Count >= 2)
         {
@@ -327,9 +327,9 @@ public static class MotifRendererTests
             chordToneBias: 0.0,
             allowPassingTones: true);
 
-        var (_, placement, harmony, barTrack, groove, intent, sectionTrack) = CreateTestContext();
+        var (_, placement, harmony, barTrack, groove, sectionTrack) = CreateTestContext();
 
-        var result = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, intent, sectionTrack, seed: 42);
+        var result = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, sectionTrack, seed: 42);
 
         if (result.PartTrackNoteEvents.Count >= 4)
         {
@@ -352,10 +352,10 @@ public static class MotifRendererTests
     /// </summary>
     private static void TestDifferentSeedsProduceDifferentPitches()
     {
-        var (spec, placement, harmony, barTrack, groove, intent, sectionTrack) = CreateTestContext();
+        var (spec, placement, harmony, barTrack, groove, sectionTrack) = CreateTestContext();
 
-        var result1 = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, intent, sectionTrack, seed: 1);
-        var result2 = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, intent, sectionTrack, seed: 2);
+        var result1 = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, sectionTrack, seed: 1);
+        var result2 = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, sectionTrack, seed: 2);
 
         bool anyDifferent = false;
         int minCount = Math.Min(result1.PartTrackNoteEvents.Count, result2.PartTrackNoteEvents.Count);
@@ -380,7 +380,7 @@ public static class MotifRendererTests
     /// </summary>
     private static void TestTransformTagOctaveUp()
     {
-        var (spec, _, harmony, barTrack, groove, intent, sectionTrack) = CreateTestContext();
+        var (spec, _, harmony, barTrack, groove, sectionTrack) = CreateTestContext();
 
         var noTransformPlacement = MotifPlacement.Create(
             spec,
@@ -397,8 +397,8 @@ public static class MotifRendererTests
             variationIntensity: 1.0, // Need high intensity for transform to apply
             transformTags: new[] { "OctaveUp" });
 
-        var noTransformResult = MotifRenderer.Render(spec, noTransformPlacement, harmony, barTrack, groove, intent, sectionTrack, seed: 42);
-        var octaveUpResult = MotifRenderer.Render(spec, octaveUpPlacement, harmony, barTrack, groove, intent, sectionTrack, seed: 42);
+        var noTransformResult = MotifRenderer.Render(spec, noTransformPlacement, harmony, barTrack, groove, sectionTrack, seed: 42);
+        var octaveUpResult = MotifRenderer.Render(spec, octaveUpPlacement, harmony, barTrack, groove, sectionTrack, seed: 42);
 
         // OctaveUp should generally produce higher pitches (within register bounds)
         if (noTransformResult.PartTrackNoteEvents.Count > 0 && octaveUpResult.PartTrackNoteEvents.Count > 0)
@@ -415,7 +415,7 @@ public static class MotifRendererTests
 
     // ========== Test Helpers ==========
 
-    private static (MotifSpec, MotifPlacement, HarmonyTrack, BarTrack, GroovePreset, ISongIntentQuery, SectionTrack) CreateTestContext()
+    private static (MotifSpec, MotifPlacement, HarmonyTrack, BarTrack, GroovePreset, SectionTrack) CreateTestContext()
     {
         var spec = MotifLibrary.ClassicRockHookA();
 
@@ -431,9 +431,8 @@ public static class MotifRendererTests
         var harmony = CreateTestHarmonyTrack();
         var barTrack = CreateTestBarTrack();
         var groove = CreateTestGroovePreset();
-        var intent = CreateTestIntentQuery(sectionTrack);
 
-        return (spec, placement, harmony, barTrack, groove, intent, sectionTrack);
+        return (spec, placement, harmony, barTrack, groove, sectionTrack);
     }
 
     private static HarmonyTrack CreateTestHarmonyTrack()
@@ -474,77 +473,5 @@ public static class MotifRendererTests
             }
         };
     }
-
-    private static ISongIntentQuery CreateTestIntentQuery(SectionTrack sectionTrack)
-    {
-        return new TestSongIntentQuery(sectionTrack);
-    }
-
-    /// <summary>
-    /// Minimal ISongIntentQuery implementation for testing.
-    /// </summary>
-    private sealed class TestSongIntentQuery : ISongIntentQuery
-    {
-        private readonly SectionTrack _sectionTrack;
-
-        public TestSongIntentQuery(SectionTrack sectionTrack)
-        {
-            _sectionTrack = sectionTrack;
-        }
-
-        public int SectionCount => _sectionTrack.Sections.Count;
-
-        public bool HasIntentData(int absoluteSectionIndex) =>
-            absoluteSectionIndex >= 0 && absoluteSectionIndex < _sectionTrack.Sections.Count;
-
-        public SectionIntentContext GetSectionIntent(int absoluteSectionIndex)
-        {
-            var section = absoluteSectionIndex < _sectionTrack.Sections.Count
-                ? _sectionTrack.Sections[absoluteSectionIndex]
-                : null;
-
-            return new SectionIntentContext
-            {
-                AbsoluteSectionIndex = absoluteSectionIndex,
-                SectionType = section?.SectionType ?? MusicConstants.eSectionType.Chorus,
-                Energy = 0.5,
-                Tension = 0.5,
-                TensionDrivers = TensionDriver.None,
-                TransitionHint = SectionTransitionHint.Sustain,
-                VariationIntensity = 0.0,
-                BaseReferenceSectionIndex = null,
-                VariationTags = new HashSet<string>(),
-                RolePresence = new RolePresenceHints
-                {
-                    BassPresent = true,
-                    CompPresent = true,
-                    KeysPresent = true,
-                    PadsPresent = true,
-                    DrumsPresent = true,
-                    CymbalLanguage = EnergyCymbalLanguage.Standard,
-                    CrashOnSectionStart = true,
-                    PreferRideOverHat = false
-                },
-                RegisterConstraints = new RegisterConstraints
-                {
-                    LeadSpaceCeiling = 72,
-                    BassFloor = 52,
-                    VocalBand = (60, 76)
-                },
-                DensityCaps = new RoleDensityCaps
-                {
-                    Bass = 1.0,
-                    Comp = 1.0,
-                    Keys = 1.0,
-                    Pads = 1.0,
-                    Drums = 1.0
-                }
-            };
-        }
-
-        public BarIntentContext GetBarIntent(int absoluteSectionIndex, int barIndexWithinSection)
-        {
-            throw new NotImplementedException("BarIntentContext removed as part of energy disconnect.");
-        }
-    }
 }
+

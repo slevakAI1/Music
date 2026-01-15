@@ -37,11 +37,10 @@ public static class MotifPlacementPlannerTests
     private static void TestDeterminism()
     {
         var sectionTrack = CreateTestSectionTrack();
-        var intentQuery = CreateTestIntentQuery(sectionTrack);
         var motifBank = CreateTestMotifBank();
 
-        var plan1 = MotifPlacementPlanner.CreatePlan(sectionTrack, intentQuery, motifBank, seed: 42);
-        var plan2 = MotifPlacementPlanner.CreatePlan(sectionTrack, intentQuery, motifBank, seed: 42);
+        var plan1 = MotifPlacementPlanner.CreatePlan(sectionTrack, motifBank, seed: 42);
+        var plan2 = MotifPlacementPlanner.CreatePlan(sectionTrack, motifBank, seed: 42);
 
         if (plan1.Count != plan2.Count)
             throw new Exception("Determinism failed: placement count differs");
@@ -70,10 +69,9 @@ public static class MotifPlacementPlannerTests
     private static void TestEmptyBankProducesEmptyPlan()
     {
         var sectionTrack = CreateTestSectionTrack();
-        var intentQuery = CreateTestIntentQuery(sectionTrack);
         var emptyBank = new MaterialBank();
 
-        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, intentQuery, emptyBank, seed: 42);
+        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, emptyBank, seed: 42);
 
         if (plan.Count != 0)
             throw new Exception("Empty bank should produce empty plan");
@@ -87,24 +85,12 @@ public static class MotifPlacementPlannerTests
     private static void TestPlacementRespectsOrchestration()
     {
         var sectionTrack = CreateTestSectionTrack();
-        var intentQuery = CreateTestIntentQuery(sectionTrack);
         var motifBank = CreateTestMotifBank();
 
-        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, intentQuery, motifBank, seed: 42);
+        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, motifBank, seed: 42);
 
-        // All placements should have lead role (which is always conceptually present)
-        foreach (var placement in plan.Placements)
-        {
-            if (motifBank.TryGet(placement.MotifId, out var motif))
-            {
-                var role = motif!.Meta.IntendedRole.ToLowerInvariant();
-                if (!role.Contains("lead") && !role.Contains("vocal") && !role.Contains("hook"))
-                {
-                    // Non-lead roles should be checked against orchestration
-                    // (For MVP, lead roles are always allowed)
-                }
-            }
-        }
+        // All roles are always present in MVP energy disconnect
+        // (No orchestration gating)
 
         Console.WriteLine("✓ Placement respects orchestration constraints");
     }
@@ -117,10 +103,9 @@ public static class MotifPlacementPlannerTests
         var sectionTrack = new SectionTrack();
         sectionTrack.Add(MusicConstants.eSectionType.Chorus, 8);
 
-        var intentQuery = CreateTestIntentQuery(sectionTrack);
         var motifBank = CreateTestMotifBank();
 
-        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, intentQuery, motifBank, seed: 42);
+        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, motifBank, seed: 42);
 
         if (plan.Count == 0)
             throw new Exception("Chorus should get motif placement");
@@ -136,10 +121,9 @@ public static class MotifPlacementPlannerTests
         var sectionTrack = new SectionTrack();
         sectionTrack.Add(MusicConstants.eSectionType.Bridge, 8);
 
-        var intentQuery = CreateTestIntentQuery(sectionTrack);
         var motifBank = CreateTestMotifBank();
 
-        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, intentQuery, motifBank, seed: 42);
+        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, motifBank, seed: 42);
 
         // Bridge may or may not get motif (deterministic by seed)
         Console.WriteLine("✓ Bridge motif placement is deterministic");
@@ -151,10 +135,9 @@ public static class MotifPlacementPlannerTests
     private static void TestCommonFormProducesSensiblePlacement()
     {
         var sectionTrack = CreateCommonFormSectionTrack();
-        var intentQuery = CreateTestIntentQuery(sectionTrack);
         var motifBank = CreateTestMotifBank();
 
-        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, intentQuery, motifBank, seed: 42);
+        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, motifBank, seed: 42);
 
         // Verify plan is valid
         foreach (var placement in plan.Placements)
@@ -176,11 +159,10 @@ public static class MotifPlacementPlannerTests
     private static void TestDifferentSeedsProduceDifferentChoices()
     {
         var sectionTrack = CreateTestSectionTrack();
-        var intentQuery = CreateTestIntentQuery(sectionTrack);
         var motifBank = CreateTestMotifBankWithMultipleMotifs();
 
-        var plan1 = MotifPlacementPlanner.CreatePlan(sectionTrack, intentQuery, motifBank, seed: 42);
-        var plan2 = MotifPlacementPlanner.CreatePlan(sectionTrack, intentQuery, motifBank, seed: 99);
+        var plan1 = MotifPlacementPlanner.CreatePlan(sectionTrack, motifBank, seed: 42);
+        var plan2 = MotifPlacementPlanner.CreatePlan(sectionTrack, motifBank, seed: 99);
 
         // Plans may differ in motif selection or placement decisions
         // (Not guaranteed to differ, but seed should influence decisions)
@@ -188,27 +170,26 @@ public static class MotifPlacementPlannerTests
     }
 
     /// <summary>
-    /// Test: Variation intensity comes from section intent.
+    /// Test: Variation intensity is fixed to 0.0 (no variation for MVP energy disconnect).
     /// </summary>
     private static void TestVariationIntensityFromIntent()
     {
         var sectionTrack = CreateTestSectionTrack();
-        var intentQuery = CreateTestIntentQuery(sectionTrack);
         var motifBank = CreateTestMotifBank();
 
-        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, intentQuery, motifBank, seed: 42);
+        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, motifBank, seed: 42);
 
         foreach (var placement in plan.Placements)
         {
-            if (placement.VariationIntensity < 0.0 || placement.VariationIntensity > 1.0)
-                throw new Exception($"Variation intensity out of bounds: {placement.VariationIntensity}");
+            if (placement.VariationIntensity != 0.0)
+                throw new Exception($"Variation intensity should be 0.0, got: {placement.VariationIntensity}");
         }
 
-        Console.WriteLine("✓ Variation intensity from intent is bounded [0..1]");
+        Console.WriteLine("✓ Variation intensity is fixed to 0.0");
     }
 
     /// <summary>
-    /// Test: A/A' sections reuse same motif.
+    /// Test: A/A' reuse disabled for MVP energy disconnect (each section gets fresh selection).
     /// </summary>
     private static void TestAAprimeReusesSameMotif()
     {
@@ -216,46 +197,37 @@ public static class MotifPlacementPlannerTests
         sectionTrack.Add(MusicConstants.eSectionType.Chorus, 8); // Chorus 1 (A)
         sectionTrack.Add(MusicConstants.eSectionType.Chorus, 8); // Chorus 2 (A')
 
-        // Create intent query where second chorus references first as base
-        var intentQuery = CreateTestIntentQueryWithVariation(sectionTrack);
         var motifBank = CreateTestMotifBank();
 
-        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, intentQuery, motifBank, seed: 42);
+        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, motifBank, seed: 42);
 
-        if (plan.Count >= 2)
-        {
-            var firstChorus = plan.Placements.FirstOrDefault(p => p.AbsoluteSectionIndex == 0);
-            var secondChorus = plan.Placements.FirstOrDefault(p => p.AbsoluteSectionIndex == 1);
+        // A/A' logic disabled for MVP - each section gets independent selection
+        // (No variation context available without intentQuery)
 
-            if (firstChorus != null && secondChorus != null)
-            {
-                if (!firstChorus.MotifId.Equals(secondChorus.MotifId))
-                    throw new Exception("A' should reuse same motif as A");
-            }
-        }
-
-        Console.WriteLine("✓ A/A' sections reuse same motif");
+        Console.WriteLine("✓ A/A' reuse disabled (MVP energy disconnect)");
     }
 
     /// <summary>
-    /// Test: Transform tags based on variation context.
+    /// Test: Transform tags are empty (no variation for MVP energy disconnect).
     /// </summary>
     private static void TestTransformTagsBasedOnVariation()
     {
         var sectionTrack = CreateTestSectionTrack();
-        var intentQuery = CreateTestIntentQuery(sectionTrack);
         var motifBank = CreateTestMotifBank();
 
-        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, intentQuery, motifBank, seed: 42);
+        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, motifBank, seed: 42);
 
-        // Transform tags should be valid strings (non-null)
+        // Transform tags should be empty (no variation context)
         foreach (var placement in plan.Placements)
         {
             if (placement.TransformTags == null)
                 throw new Exception("Transform tags should not be null");
+            
+            if (placement.TransformTags.Count > 0)
+                throw new Exception($"Transform tags should be empty, got: {string.Join(", ", placement.TransformTags)}");
         }
 
-        Console.WriteLine("✓ Transform tags are deterministically assigned");
+        Console.WriteLine("✓ Transform tags are empty (MVP energy disconnect)");
     }
 
     /// <summary>
@@ -264,10 +236,9 @@ public static class MotifPlacementPlannerTests
     private static void TestPlacementBounds()
     {
         var sectionTrack = CreateTestSectionTrack();
-        var intentQuery = CreateTestIntentQuery(sectionTrack);
         var motifBank = CreateTestMotifBank();
 
-        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, intentQuery, motifBank, seed: 42);
+        var plan = MotifPlacementPlanner.CreatePlan(sectionTrack, motifBank, seed: 42);
 
         foreach (var placement in plan.Placements)
         {
@@ -309,16 +280,6 @@ public static class MotifPlacementPlannerTests
         track.Add(MusicConstants.eSectionType.Chorus, 8);
         track.Add(MusicConstants.eSectionType.Outro, 4);
         return track;
-    }
-
-    private static ISongIntentQuery CreateTestIntentQuery(SectionTrack sectionTrack)
-    {
-        return new TestSongIntentQuery(sectionTrack);
-    }
-
-    private static ISongIntentQuery CreateTestIntentQueryWithVariation(SectionTrack sectionTrack)
-    {
-        return new TestSongIntentQueryWithVariation(sectionTrack);
     }
 
     private static MaterialBank CreateTestMotifBank()
@@ -363,168 +324,6 @@ public static class MotifPlacementPlannerTests
         }
 
         return bank;
-    }
-
-    // ===== Test Query Implementations =====
-
-    private class TestSongIntentQuery : ISongIntentQuery
-    {
-        private readonly SectionTrack _sectionTrack;
-
-        public TestSongIntentQuery(SectionTrack sectionTrack)
-        {
-            _sectionTrack = sectionTrack;
-        }
-
-        public int SectionCount => _sectionTrack.Sections.Count;
-
-        public bool HasIntentData(int absoluteSectionIndex) => 
-            absoluteSectionIndex >= 0 && absoluteSectionIndex < SectionCount;
-
-        public SectionIntentContext GetSectionIntent(int absoluteSectionIndex)
-        {
-            var section = _sectionTrack.Sections[absoluteSectionIndex];
-
-            return new SectionIntentContext
-            {
-                AbsoluteSectionIndex = absoluteSectionIndex,
-                SectionType = section.SectionType,
-                Energy = 0.5,
-                Tension = 0.5,
-                TensionDrivers = TensionDriver.None,
-                TransitionHint = SectionTransitionHint.Sustain,
-                VariationIntensity = 0.0,
-                BaseReferenceSectionIndex = null,
-                VariationTags = new HashSet<string>(),
-                RolePresence = CreateDefaultRolePresence(),
-                RegisterConstraints = CreateDefaultRegisterConstraints(),
-                DensityCaps = CreateDefaultDensityCaps()
-            };
-        }
-
-        public BarIntentContext GetBarIntent(int absoluteSectionIndex, int barIndexWithinSection)
-        {
-            throw new NotImplementedException("BarIntentContext removed as part of energy disconnect.");
-        }
-
-        private static RolePresenceHints CreateDefaultRolePresence()
-        {
-            return new RolePresenceHints
-            {
-                BassPresent = true,
-                CompPresent = true,
-                KeysPresent = true,
-                PadsPresent = true,
-                DrumsPresent = true,
-                CymbalLanguage = EnergyCymbalLanguage.Standard,
-                CrashOnSectionStart = true,
-                PreferRideOverHat = false
-            };
-        }
-
-        private static RegisterConstraints CreateDefaultRegisterConstraints()
-        {
-            return new RegisterConstraints
-            {
-                LeadSpaceCeiling = 72,
-                BassFloor = 52,
-                VocalBand = (60, 76)
-            };
-        }
-
-        private static RoleDensityCaps CreateDefaultDensityCaps()
-        {
-            return new RoleDensityCaps
-            {
-                Bass = 0.7,
-                Comp = 0.8,
-                Keys = 0.7,
-                Pads = 0.6,
-                Drums = 1.0
-            };
-        }
-    }
-
-    private class TestSongIntentQueryWithVariation : ISongIntentQuery
-    {
-        private readonly SectionTrack _sectionTrack;
-
-        public TestSongIntentQueryWithVariation(SectionTrack sectionTrack)
-        {
-            _sectionTrack = sectionTrack;
-        }
-
-        public int SectionCount => _sectionTrack.Sections.Count;
-
-        public bool HasIntentData(int absoluteSectionIndex) => 
-            absoluteSectionIndex >= 0 && absoluteSectionIndex < SectionCount;
-
-        public SectionIntentContext GetSectionIntent(int absoluteSectionIndex)
-        {
-            var section = _sectionTrack.Sections[absoluteSectionIndex];
-            
-            // Second chorus references first as base
-            int? baseRef = (absoluteSectionIndex == 1 && section.SectionType == MusicConstants.eSectionType.Chorus) ? 0 : null;
-            double varIntensity = baseRef.HasValue ? 0.3 : 0.0;
-
-            return new SectionIntentContext
-            {
-                AbsoluteSectionIndex = absoluteSectionIndex,
-                SectionType = section.SectionType,
-                Energy = 0.8,
-                Tension = 0.5,
-                TensionDrivers = TensionDriver.None,
-                TransitionHint = SectionTransitionHint.Sustain,
-                VariationIntensity = varIntensity,
-                BaseReferenceSectionIndex = baseRef,
-                VariationTags = baseRef.HasValue ? new HashSet<string> { "Aprime" } : new HashSet<string> { "A" },
-                RolePresence = CreateDefaultRolePresence(),
-                RegisterConstraints = CreateDefaultRegisterConstraints(),
-                DensityCaps = CreateDefaultDensityCaps()
-            };
-        }
-
-        public BarIntentContext GetBarIntent(int absoluteSectionIndex, int barIndexWithinSection)
-        {
-            throw new NotImplementedException("BarIntentContext removed as part of energy disconnect.");
-        }
-
-        private static RolePresenceHints CreateDefaultRolePresence()
-        {
-            return new RolePresenceHints
-            {
-                BassPresent = true,
-                CompPresent = true,
-                KeysPresent = true,
-                PadsPresent = true,
-                DrumsPresent = true,
-                CymbalLanguage = EnergyCymbalLanguage.Standard,
-                CrashOnSectionStart = true,
-                PreferRideOverHat = false
-            };
-        }
-
-        private static RegisterConstraints CreateDefaultRegisterConstraints()
-        {
-            return new RegisterConstraints
-            {
-                LeadSpaceCeiling = 72,
-                BassFloor = 52,
-                VocalBand = (60, 76)
-            };
-        }
-
-        private static RoleDensityCaps CreateDefaultDensityCaps()
-        {
-            return new RoleDensityCaps
-            {
-                Bass = 0.7,
-                Comp = 0.8,
-                Keys = 0.7,
-                Pads = 0.6,
-                Drums = 1.0
-            };
-        }
     }
 }
 

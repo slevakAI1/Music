@@ -1,6 +1,6 @@
 // AI: purpose=Deterministic motif placement planner; selects WHICH motifs appear WHERE.
 // AI: invariants=All outputs deterministic by seed; placement respects orchestration/register constraints; collision-free within register bands.
-// AI: deps=Consumes SectionTrack, ISongIntentQuery, MaterialBank; produces MotifPlacementPlan for renderer.
+// AI: deps=Consumes SectionTrack, MaterialBank; produces MotifPlacementPlan for renderer.
 
 using Music.Generator;
 
@@ -29,18 +29,15 @@ public static class MotifPlacementPlanner
     /// Creates a deterministic motif placement plan for the song.
     /// </summary>
     /// <param name="sectionTrack">Song structure (section types, lengths).</param>
-    /// <param name="intentQuery">Tension/variation/orchestration intent.</param>
     /// <param name="motifBank">Available motifs (filtered by role/kind).</param>
     /// <param name="seed">Seed for deterministic tie-breaking.</param>
     /// <returns>Complete placement plan.</returns>
     public static MotifPlacementPlan CreatePlan(
         SectionTrack sectionTrack,
-        ISongIntentQuery intentQuery,
         MaterialBank motifBank,
         int seed)
     {
         ArgumentNullException.ThrowIfNull(sectionTrack);
-        ArgumentNullException.ThrowIfNull(intentQuery);
         ArgumentNullException.ThrowIfNull(motifBank);
 
         Tracer.DebugTrace("=== MotifPlacementPlanner.CreatePlan ===");
@@ -61,10 +58,9 @@ public static class MotifPlacementPlanner
         for (int sectionIndex = 0; sectionIndex < sectionTrack.Sections.Count; sectionIndex++)
         {
             var section = sectionTrack.Sections[sectionIndex];
-            var intent = intentQuery.GetSectionIntent(sectionIndex);
 
             // Check if motif should be placed in this section
-            bool shouldPlace = ShouldPlaceMotif(section.SectionType, intent, seed);
+            bool shouldPlace = ShouldPlaceMotif(section.SectionType, sectionIndex, seed);
             Tracer.DebugTrace($"  ShouldPlaceMotif? {shouldPlace}");
             
             if (!shouldPlace)
@@ -75,18 +71,14 @@ public static class MotifPlacementPlanner
             {
                 Tracer.DebugTrace($"  Trying role: {targetRole}");
                 
-                // Check orchestration constraints first
-                bool rolePresent = IsRolePresent(intent.RolePresence, targetRole);
-                Tracer.DebugTrace($"    IsRolePresent? {rolePresent}");
-                
-                if (!rolePresent)
-                    continue;
+                // All roles present (no orchestration gating)
+                Tracer.DebugTrace($"    IsRolePresent? true");
 
                 // Select motif for this section and role
                 var motif = SelectMotifForSectionAndRole(
                     section.SectionType,
                     targetRole,
-                    intent,
+                    sectionIndex,
                     motifBank,
                     motifUsageByTypeAndRole,
                     seed);
@@ -104,7 +96,6 @@ public static class MotifPlacementPlanner
                     motif,
                     sectionIndex,
                     section,
-                    intent,
                     seed);
 
                 if (placement != null)
@@ -132,11 +123,11 @@ public static class MotifPlacementPlanner
     /// </summary>
     private static bool ShouldPlaceMotif(
         MusicConstants.eSectionType sectionType,
-        SectionIntentContext intent,
+        int sectionIndex,
         int seed)
     {
         // Hash for deterministic per-section decision
-        var hash = HashCode.Combine(seed, intent.AbsoluteSectionIndex, sectionType);
+        var hash = HashCode.Combine(seed, sectionIndex, sectionType);
         var roll = (double)(Math.Abs(hash) % 100) / 100.0;
 
         return sectionType switch
@@ -169,13 +160,15 @@ public static class MotifPlacementPlanner
     private static PartTrack? SelectMotifForSectionAndRole(
         MusicConstants.eSectionType sectionType,
         string targetRole,
-        SectionIntentContext intent,
+        int sectionIndex,
         MaterialBank motifBank,
         Dictionary<(MusicConstants.eSectionType, string), PartTrack.PartTrackId> motifUsageByTypeAndRole,
         int seed)
     {
-        // Determine preferred material kind based on section type
-        var preferredKind = GetPreferredMaterialKind(sectionType, intent);
+        Tracer.DebugTrace($"    SelectMotifForSectionAndRole: sectionType={sectionType}, role={targetRole}");
+        
+        // Get preferred material kind for this section type
+        var preferredKind = GetPreferredMaterialKind(sectionType, sectionIndex);
         Tracer.DebugTrace($"      PreferredKind for {sectionType}: {preferredKind}");
 
         // For lead roles, filter strictly by MaterialKind
@@ -214,20 +207,16 @@ public static class MotifPlacementPlanner
         if (!candidates.Any())
             return null;
 
-        // Check for A/A' reuse
-        if (motifUsageByTypeAndRole.TryGetValue((sectionType, targetRole), out var previousMotifId) &&
-            intent.BaseReferenceSectionIndex.HasValue)
+        // Check for A/A' reuse (simplified: no BaseReferenceSectionIndex available)
+        // For MVP, each section gets its own motif selection
+        if (motifUsageByTypeAndRole.TryGetValue((sectionType, targetRole), out var previousMotifId))
         {
-            // Reuse same motif for A' variation
-            if (motifBank.TryGet(previousMotifId, out var previousMotif))
-            {
-                Tracer.DebugTrace($"      Reusing previous motif for A/A'");
-                return previousMotif;
-            }
+            // Could reuse, but without variation context we select fresh
+            // (A/A' logic disabled for MVP energy disconnect)
         }
 
         // Select deterministically by hash
-        var hash = HashCode.Combine(seed, intent.AbsoluteSectionIndex, sectionType, targetRole);
+        var hash = HashCode.Combine(seed, sectionIndex, sectionType, targetRole);
         var index = Math.Abs(hash) % candidates.Count;
         Tracer.DebugTrace($"      Selected index {index} of {candidates.Count}");
         return candidates[index];
@@ -239,7 +228,7 @@ public static class MotifPlacementPlanner
     /// </summary>
     private static MaterialKind GetPreferredMaterialKind(
         MusicConstants.eSectionType sectionType,
-        SectionIntentContext intent)
+        int sectionIndex)
     {
         return sectionType switch
         {
@@ -260,23 +249,22 @@ public static class MotifPlacementPlanner
         PartTrack motif,
         int sectionIndex,
         Section section,
-        SectionIntentContext intent,
         int seed)
     {
         // Determine duration (typically full section or half section)
-        var durationBars = DetermineDuration(section, intent, seed);
+        var durationBars = DetermineDuration(section, sectionIndex, seed);
 
-        // Determine start bar (typically bar 0, or delayed for builds)
-        var startBar = DetermineStartBar(section, intent, seed);
+        // Determine start bar (typically bar 0)
+        var startBar = DetermineStartBar(section, sectionIndex, seed);
 
         if (startBar + durationBars > section.BarCount)
             durationBars = Math.Max(1, section.BarCount - startBar);
 
-        // Determine variation intensity from section intent
-        var variationIntensity = intent.VariationIntensity;
+        // Use fixed variation intensity (no variation for MVP energy disconnect)
+        var variationIntensity = 0.0;
 
-        // Determine transform tags based on variation and context
-        var transformTags = DetermineTransformTags(intent, seed);
+        // No transform tags (no variation context)
+        var transformTags = new HashSet<string>();
 
         // Convert PartTrack to MotifSpec for the placement
         var motifSpec = MotifConversion.FromPartTrack(motif);
@@ -297,14 +285,14 @@ public static class MotifPlacementPlanner
     /// </summary>
     private static int DetermineDuration(
         Section section,
-        SectionIntentContext intent,
+        int sectionIndex,
         int seed)
     {
-        var hash = HashCode.Combine(seed, intent.AbsoluteSectionIndex, "duration");
+        var hash = HashCode.Combine(seed, sectionIndex, "duration");
         var roll = (double)(Math.Abs(hash) % 100) / 100.0;
 
         // Chorus typically uses full section
-        if (intent.SectionType == MusicConstants.eSectionType.Chorus)
+        if (section.SectionType == MusicConstants.eSectionType.Chorus)
             return section.BarCount;
 
         // Other sections may use half section
@@ -319,68 +307,14 @@ public static class MotifPlacementPlanner
     /// </summary>
     private static int DetermineStartBar(
         Section section,
-        SectionIntentContext intent,
+        int sectionIndex,
         int seed)
     {
-        var hash = HashCode.Combine(seed, intent.AbsoluteSectionIndex, "startbar");
-        var roll = (double)(Math.Abs(hash) % 100) / 100.0;
-
-        // PreChorus builds often delay entry
-        if (intent.TensionDrivers.HasFlag(TensionDriver.PreChorusBuild) && roll < 0.3)
-            return Math.Min(2, section.BarCount - 2);
-
-        // Default: start at beginning
+        // Default: start at beginning (no delayed entry for MVP energy disconnect)
         return 0;
     }
 
     /// <summary>
-    /// Determines transform tags based on variation intent and context.
-    /// </summary>
-    private static HashSet<string> DetermineTransformTags(
-        SectionIntentContext intent,
-        int seed)
-    {
-        var tags = new HashSet<string>();
-        var hash = HashCode.Combine(seed, intent.AbsoluteSectionIndex, "transform");
-        var roll = (double)(Math.Abs(hash) % 100) / 100.0;
-
-        // High variation intensity enables transforms
-        if (intent.VariationIntensity > 0.6)
-        {
-            if (roll < 0.3)
-                tags.Add("Syncopate");
-            else if (roll < 0.5)
-                tags.Add("OctaveUp");
-        }
-
-        // Lift tag suggests register lift
-        if (intent.VariationTags.Contains("Lift") && roll < 0.4)
-            tags.Add("OctaveUp");
-
-        return tags;
-    }
-
-    /// <summary>
-    /// Checks if role is present in orchestration.
-    /// </summary>
-    private static bool IsRolePresent(RolePresenceHints rolePresence, string intendedRole)
-    {
-        if (string.IsNullOrWhiteSpace(intendedRole))
-            return true; // No specific role constraint
-
-        return intendedRole.ToLowerInvariant() switch
-        {
-            "lead" => true, // Lead always conceptually present (motifs reserve space)
-            "vocal" => true,
-            "bass" => rolePresence.BassPresent,
-            "comp" => rolePresence.CompPresent,
-            "keys" => rolePresence.KeysPresent,
-            "pads" => rolePresence.PadsPresent,
-            "drums" => rolePresence.DrumsPresent,
-            _ => true // Unknown role, allow
-        };
-    }
-
     /// <summary>
     /// Checks if role is a lead role (melody/hook carrier).
     /// </summary>

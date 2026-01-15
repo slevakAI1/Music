@@ -182,16 +182,9 @@ namespace Music.Generator
                 return MotifPlacementPlan.Empty(seed);
             }
 
-            // Create intent query for placement planner
-            ISongIntentQuery intentQuery = new DeterministicSongIntentQuery(
-                sectionTrack,
-                tensionQuery,
-                variationQuery);
-
             // Use static CreatePlan method
             var plan = MotifPlacementPlanner.CreatePlan(
                 sectionTrack,
-                intentQuery,
                 materialBank,
                 seed);
             

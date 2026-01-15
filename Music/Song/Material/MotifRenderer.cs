@@ -1,6 +1,6 @@
 // AI: purpose=Renders placed motifs into actual note events against harmony and groove context.
 // AI: invariants=Output deterministic by inputs+seed; events sorted by AbsoluteTimeTicks; no overlaps; valid MIDI range.
-// AI: deps=Consumes MotifSpec, MotifPlacement, HarmonyTrack, BarTrack, GroovePreset, ISongIntentQuery; produces PartTrack.
+// AI: deps=Consumes MotifSpec, MotifPlacement, HarmonyTrack, BarTrack, GroovePreset, SectionTrack; produces PartTrack.
 // AI: change=Story 9.2 implementation; converts MaterialLocal motif specs to SongAbsolute rendered tracks.
 
 using Music.Generator;
@@ -116,7 +116,6 @@ public static class MotifRenderer
     /// <param name="harmonyTrack">Song harmony for pitch realization.</param>
     /// <param name="barTrack">Timing ruler for tick calculation.</param>
     /// <param name="groovePreset">Groove preset for onset slot alignment.</param>
-    /// <param name="intentQuery">Tension/phrase context.</param>
     /// <param name="sectionTrack">Song section structure.</param>
     /// <param name="seed">Seed for deterministic pitch selection.</param>
     /// <param name="midiProgramNumber">MIDI program number for output track.</param>
@@ -127,7 +126,6 @@ public static class MotifRenderer
         HarmonyTrack harmonyTrack,
         BarTrack barTrack,
         GroovePreset groovePreset,
-        ISongIntentQuery intentQuery,
         SectionTrack sectionTrack,
         int seed,
         int midiProgramNumber = 0)
@@ -137,7 +135,6 @@ public static class MotifRenderer
         ArgumentNullException.ThrowIfNull(harmonyTrack);
         ArgumentNullException.ThrowIfNull(barTrack);
         ArgumentNullException.ThrowIfNull(groovePreset);
-        ArgumentNullException.ThrowIfNull(intentQuery);
         ArgumentNullException.ThrowIfNull(sectionTrack);
 
         var events = new List<PartTrackEvent>();
@@ -148,9 +145,6 @@ public static class MotifRenderer
 
         var section = sectionTrack.Sections[placement.AbsoluteSectionIndex];
         int absoluteStartBar = section.StartBar + placement.StartBarWithinSection;
-
-        // Get intent context for this section
-        var sectionIntent = intentQuery.GetSectionIntent(placement.AbsoluteSectionIndex);
 
         // Track previous pitch for voice-leading
         int previousPitch = spec.Register.CenterMidiNote;
