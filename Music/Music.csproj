@@ -65,6 +65,7 @@
 
   <ItemGroup>
     <None Remove="AI Dialogs\Backlog.md" />
+    <None Remove="AI Dialogs\Disconnect_Energy.md" />
     <None Remove="AI Dialogs\DrumFillStyleResearch.md" />
     <None Remove="AI Dialogs\HarmonyPolicy.md" />
     <None Remove="AI Dialogs\MeasureTrackerPlan.md" />
@@ -72,13 +73,9 @@
     <None Remove="AI Dialogs\PlanV1.md" />
     <None Remove="AI Dialogs\Story6.3-Implementation-Summary.md" />
     <None Remove="AI Dialogs\Story_7_5_8_Usage_Guide.md" />
+    <None Remove="AI Dialogs\Story_9_1_Implementation_Summary.md" />
     <None Remove="Archives\PlanV1.md" />
     <None Remove="Archives\Stage 7 Stories.md" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Future Ideas\DraftLyrics\TestSongLyrics.txt" />
-    <Content Include="Future Ideas\Resource Links.txt" />
   </ItemGroup>
 
   <ItemGroup>
