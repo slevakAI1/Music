@@ -26,14 +26,13 @@ internal static class CompBehaviorIntegrationTests
         const int seed = 42;
         const int absoluteSectionIndex = 0;
         const int barIndexWithinSection = 0;
-        const double energy = 0.6;
         const double busyProb = 0.5;
         
         var verseBehavior = CompBehaviorSelector.SelectBehavior(
-            MusicConstants.eSectionType.Verse, absoluteSectionIndex, barIndexWithinSection, energy, busyProb, seed);
+            MusicConstants.eSectionType.Verse, absoluteSectionIndex, barIndexWithinSection, busyProb, seed);
         
         var chorusBehavior = CompBehaviorSelector.SelectBehavior(
-            MusicConstants.eSectionType.Chorus, absoluteSectionIndex, barIndexWithinSection, energy, busyProb, seed);
+            MusicConstants.eSectionType.Chorus, absoluteSectionIndex, barIndexWithinSection, busyProb, seed);
         
         if (verseBehavior == chorusBehavior)
         {
@@ -50,14 +49,13 @@ internal static class CompBehaviorIntegrationTests
     {
         const int absoluteSectionIndex = 0;
         const int barIndexWithinSection = 4; // Variation-eligible bar
-        const double energy = 0.5;
         const double busyProb = 0.5;
         
         var behavior1 = CompBehaviorSelector.SelectBehavior(
-            MusicConstants.eSectionType.Verse, absoluteSectionIndex, barIndexWithinSection, energy, busyProb, seed: 10);
+            MusicConstants.eSectionType.Verse, absoluteSectionIndex, barIndexWithinSection, busyProb, seed: 10);
         
         var behavior2 = CompBehaviorSelector.SelectBehavior(
-            MusicConstants.eSectionType.Verse, absoluteSectionIndex, barIndexWithinSection, energy, busyProb, seed: 500);
+            MusicConstants.eSectionType.Verse, absoluteSectionIndex, barIndexWithinSection, busyProb, seed: 500);
         
         // May be same or different due to 30% variation chance, but verify no exception
         Console.WriteLine($"  ? Seed variation: Seed=10 ? {behavior1}, Seed=500 ? {behavior2}");

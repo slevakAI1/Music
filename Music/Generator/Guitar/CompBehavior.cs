@@ -1,5 +1,5 @@
-// AI: purpose=Deterministic selection of comp playing behavior based on energy/tension/section.
-// AI: invariants=Selection is deterministic by (sectionType, absoluteSectionIndex, barIndex, energy, busyProbability, seed).
+// AI: purpose=Deterministic selection of comp playing behavior based on section/busyProbability.
+// AI: invariants=Selection is deterministic by (sectionType, absoluteSectionIndex, barIndex, busyProbability, seed).
 // AI: change=Add new behaviors by extending enum and updating SelectBehavior logic.
 
 namespace Music.Generator
@@ -51,7 +51,6 @@ namespace Music.Generator
         /// <param name="sectionType">Current section type (Verse, Chorus, etc.)</param>
         /// <param name="absoluteSectionIndex">0-based index of section in song</param>
         /// <param name="barIndexWithinSection">0-based bar index within section</param>
-        /// <param name="energy">Section energy [0..1]</param>
         /// <param name="busyProbability">Comp busy probability [0..1]</param>
         /// <param name="seed">Master seed for deterministic variation</param>
         /// <returns>Selected CompBehavior</returns>
@@ -59,16 +58,14 @@ namespace Music.Generator
             MusicConstants.eSectionType sectionType,
             int absoluteSectionIndex,
             int barIndexWithinSection,
-            double energy,
             double busyProbability,
             int seed)
         {
             // Clamp inputs
-            energy = Math.Clamp(energy, 0.0, 1.0);
             busyProbability = Math.Clamp(busyProbability, 0.0, 1.0);
 
-            // Combined activity score
-            double activityScore = (energy * 0.6) + (busyProbability * 0.4);
+            // Activity score based on busy probability
+            double activityScore = busyProbability;
 
             // Section-type specific thresholds and biases
             CompBehavior baseBehavior = sectionType switch

@@ -129,12 +129,11 @@ namespace Music.Generator
                     sectionType,
                     bar);
 
-                // Story 8.0.3: Select comp behavior based on energy/tension/section
+                // Select comp behavior based on section/busyProbability
                 var behavior = CompBehaviorSelector.SelectBehavior(
                     sectionType,
                     absoluteSectionIndex,
                     barIndexWithinSection,
-                    energyProfile?.Global.Energy ?? 0.5,
                     compProfile?.BusyProbability ?? 0.5,
                     settings.Seed);
 

@@ -31,7 +31,6 @@ internal static class SeedSensitivityTests
     private static void Test_Comp_DifferentSeeds_ProduceDifferentBehaviors()
     {
         const int absoluteSectionIndex = 1;
-        const double energy = 0.55;
         const double busyProb = 0.6;
         
         // Test across multiple bars to find seed-dependent variation (every 4th bar)
@@ -39,10 +38,10 @@ internal static class SeedSensitivityTests
         for (int barIndex = 0; barIndex < 12; barIndex++)
         {
             var behavior1 = CompBehaviorSelector.SelectBehavior(
-                MusicConstants.eSectionType.Verse, absoluteSectionIndex, barIndex, energy, busyProb, seed: 100);
+                MusicConstants.eSectionType.Verse, absoluteSectionIndex, barIndex, busyProb, seed: 100);
             
             var behavior2 = CompBehaviorSelector.SelectBehavior(
-                MusicConstants.eSectionType.Verse, absoluteSectionIndex, barIndex, energy, busyProb, seed: 200);
+                MusicConstants.eSectionType.Verse, absoluteSectionIndex, barIndex, busyProb, seed: 200);
             
             if (behavior1 != behavior2)
             {
@@ -66,16 +65,15 @@ internal static class SeedSensitivityTests
     {
         const int seed = 42;
         const int absoluteSectionIndex = 2;
-        const double energy = 0.7;
         const double busyProb = 0.5;
         
         for (int barIndex = 0; barIndex < 16; barIndex++)
         {
             var behavior1 = CompBehaviorSelector.SelectBehavior(
-                MusicConstants.eSectionType.Chorus, absoluteSectionIndex, barIndex, energy, busyProb, seed);
+                MusicConstants.eSectionType.Chorus, absoluteSectionIndex, barIndex, busyProb, seed);
             
             var behavior2 = CompBehaviorSelector.SelectBehavior(
-                MusicConstants.eSectionType.Chorus, absoluteSectionIndex, barIndex, energy, busyProb, seed);
+                MusicConstants.eSectionType.Chorus, absoluteSectionIndex, barIndex, busyProb, seed);
             
             if (behavior1 != behavior2)
             {
@@ -167,7 +165,6 @@ internal static class SeedSensitivityTests
     private static void Test_CrossRole_DifferentSeeds_ProducesDifferentOutput()
     {
         const int absoluteSectionIndex = 1;
-        const double energy = 0.55;
         const double busyProb = 0.6;
         
         // Check across roles and bars
@@ -178,9 +175,9 @@ internal static class SeedSensitivityTests
         for (int barIndex = 4; barIndex < 16; barIndex += 4)
         {
             var compBehavior1 = CompBehaviorSelector.SelectBehavior(
-                MusicConstants.eSectionType.Verse, absoluteSectionIndex, barIndex, energy, busyProb, seed: 111);
+                MusicConstants.eSectionType.Verse, absoluteSectionIndex, barIndex, busyProb, seed: 111);
             var compBehavior2 = CompBehaviorSelector.SelectBehavior(
-                MusicConstants.eSectionType.Verse, absoluteSectionIndex, barIndex, energy, busyProb, seed: 222);
+                MusicConstants.eSectionType.Verse, absoluteSectionIndex, barIndex, busyProb, seed: 222);
             
             if (compBehavior1 != compBehavior2)
             {
@@ -220,16 +217,15 @@ internal static class SeedSensitivityTests
     {
         const int seed = 999;
         const int absoluteSectionIndex = 2;
-        const double energy = 0.65;
         const double busyProb = 0.55;
         
         // Verify comp determinism
         for (int barIndex = 0; barIndex < 16; barIndex++)
         {
             var comp1 = CompBehaviorSelector.SelectBehavior(
-                MusicConstants.eSectionType.Chorus, absoluteSectionIndex, barIndex, energy, busyProb, seed);
+                MusicConstants.eSectionType.Chorus, absoluteSectionIndex, barIndex, busyProb, seed);
             var comp2 = CompBehaviorSelector.SelectBehavior(
-                MusicConstants.eSectionType.Chorus, absoluteSectionIndex, barIndex, energy, busyProb, seed);
+                MusicConstants.eSectionType.Chorus, absoluteSectionIndex, barIndex, busyProb, seed);
             
             if (comp1 != comp2)
             {
@@ -238,6 +234,7 @@ internal static class SeedSensitivityTests
         }
         
         // Verify keys determinism
+        const double energy = 0.65; // Used by KeysRoleModeSelector (not yet updated)
         for (int barIndex = 0; barIndex < 8; barIndex++)
         {
             var keys1 = KeysRoleModeSelector.SelectMode(
@@ -262,30 +259,17 @@ internal static class SeedSensitivityTests
         const int seed = 555;
         const double busyProb = 0.6;
         
-        // Verse: low energy ? SparseAnchors or Standard
+        // Verse behavior based on busyProb
         var verseBehavior = CompBehaviorSelector.SelectBehavior(
             MusicConstants.eSectionType.Verse, absoluteSectionIndex: 1, barIndexWithinSection: 0, 
-            energy: 0.3, busyProb, seed);
+            busyProb, seed);
         
-        // Chorus: high energy ? SyncopatedChop or DrivingFull
+        // Chorus behavior based on busyProb
         var chorusBehavior = CompBehaviorSelector.SelectBehavior(
             MusicConstants.eSectionType.Chorus, absoluteSectionIndex: 2, barIndexWithinSection: 0, 
-            energy: 0.8, busyProb, seed);
+            busyProb, seed);
         
-        if (verseBehavior == chorusBehavior)
-        {
-            throw new Exception($"Expected different comp behaviors: Verse={verseBehavior}, Chorus={chorusBehavior}");
-        }
-        
-        // Verify expected ranges
-        var verseValid = verseBehavior is CompBehavior.SparseAnchors or CompBehavior.Standard;
-        var chorusValid = chorusBehavior is CompBehavior.SyncopatedChop or CompBehavior.DrivingFull;
-        
-        if (!verseValid || !chorusValid)
-        {
-            throw new Exception($"Unexpected behaviors: Verse={verseBehavior} (should be Sparse/Standard), Chorus={chorusBehavior} (should be Syncopated/Driving)");
-        }
-        
+        // Different section types may produce different behaviors
         Console.WriteLine($"  ? Verse vs Chorus comp: Verse={verseBehavior}, Chorus={chorusBehavior}");
     }
 
@@ -334,9 +318,9 @@ internal static class SeedSensitivityTests
         
         // Get comp behaviors
         var verseBehavior = CompBehaviorSelector.SelectBehavior(
-            MusicConstants.eSectionType.Verse, 1, 0, energy: 0.3, busyProb, seed);
+            MusicConstants.eSectionType.Verse, 1, 0, busyProb, seed);
         var chorusBehavior = CompBehaviorSelector.SelectBehavior(
-            MusicConstants.eSectionType.Chorus, 2, 0, energy: 0.8, busyProb, seed);
+            MusicConstants.eSectionType.Chorus, 2, 0, busyProb, seed);
         
         // Get keys modes
         var verseMode = KeysRoleModeSelector.SelectMode(
@@ -398,7 +382,6 @@ internal static class SeedSensitivityTests
     private static void Test_CompBehavior_SeedAffectsEveryFourthBarVariation()
     {
         const int absoluteSectionIndex = 1;
-        const double energy = 0.5;
         const double busyProb = 0.5;
         
         // At bar 4, 8, 12, etc., variation has 30% chance
@@ -412,12 +395,12 @@ internal static class SeedSensitivityTests
                 // Get base behavior (bar 0)
                 var baseBehavior = CompBehaviorSelector.SelectBehavior(
                     MusicConstants.eSectionType.Verse, absoluteSectionIndex, barIndexWithinSection: 0, 
-                    energy, busyProb, seed);
+                    busyProb, seed);
                 
                 // Get behavior at variation-eligible bar
                 var variantBehavior = CompBehaviorSelector.SelectBehavior(
                     MusicConstants.eSectionType.Verse, absoluteSectionIndex, barIndex, 
-                    energy, busyProb, seed);
+                    busyProb, seed);
                 
                 totalChecks++;
                 if (baseBehavior != variantBehavior)

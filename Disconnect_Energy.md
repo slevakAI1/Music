@@ -32,17 +32,22 @@
 
 ## Epic 1: Remove Energy from Behavior Selectors
 
-### Story 1.1: Remove `energy` Parameter from CompBehaviorSelector
+### Story 1.1: Remove `energy` Parameter from CompBehaviorSelector ✓ COMPLETE
 
 **File**: `Music\Generator\Guitar\CompBehavior.cs`
 
-**Changes**:
-- Remove `energy` parameter from `SelectBehavior()` method signature
-- Remove `energy = Math.Clamp(energy, 0.0, 1.0);` line
-- Change `activityScore` calculation to use only `busyProbability`
-- Update callers to not pass energy argument
+**Changes completed**:
+- Removed `energy` parameter from `SelectBehavior()` method signature
+- Removed `energy = Math.Clamp(energy, 0.0, 1.0);` line
+- Changed `activityScore` calculation to use only `busyProbability`
+- Updated all callers to not pass energy argument
 
-**Callers to update**: `GuitarTrackGenerator.cs`, `CompBehaviorTests.cs`, `CompBehaviorIntegrationTests.cs`, `SeedSensitivityTests.cs`
+**Files updated**:
+- `Music\Generator\Guitar\CompBehavior.cs` - method signature and logic
+- `Music\Generator\Guitar\GuitarTrackGenerator.cs` - caller
+- `Music\Generator\Guitar\CompBehaviorTests.cs` - removed energy tests
+- `Music\Generator\Guitar\CompBehaviorIntegrationTests.cs` - updated calls
+- `Music\Generator\Tests\SeedSensitivityTests.cs` - updated calls
 
 ---
 
