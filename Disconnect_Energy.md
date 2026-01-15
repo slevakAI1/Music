@@ -198,14 +198,23 @@
 
 ---
 
-### Story 3.2: Remove Energy from MotifRenderer
+### Story 3.2: Remove Energy from MotifRenderer ✓ COMPLETE
 
 **File**: `Music\Song\Material\MotifRenderer.cs`
 
-**Changes**:
-- `Render()` overload with `energy` parameter - remove parameter or use fixed value
-- `CalculateVelocity()` - remove `barIntent.EffectiveEnergy` usage, use fixed base velocity
-- Remove energy references from comments
+**Changes completed**:
+- Removed `energy` parameter from simplified `Render()` overload (lines 21-110)
+- Updated simplified `Render()` velocity calculation to use fixed base value (85) instead of energy-based calculation
+- Removed `barIntent.EffectiveEnergy` usage from `CalculateVelocity()` - now uses fixed base velocity (85)
+- Updated XML doc comment to remove energy reference from `intentQuery` parameter
+- Updated callers in `GuitarTrackGenerator.cs`, `BassTrackGenerator.cs`, and `KeysTrackGenerator.cs` to remove energy argument
+
+**Test file updated**: `Music\Song\Material\Tests\MotifRendererTests.cs`
+- Removed `energy` parameter from `CreateTestIntentQuery()`
+- Deleted `TestVelocityFromEnergyTension()` test
+- Updated `TestSongIntentQuery` to use fixed energy value (0.5)
+
+**Result**: Motif rendering no longer varies by energy. Uses fixed base velocity of 85 with tension-based modulation and beat strength accents. All rendered notes use consistent velocity calculation regardless of section energy levels.
 
 ---
 

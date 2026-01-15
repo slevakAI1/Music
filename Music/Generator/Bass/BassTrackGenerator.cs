@@ -334,7 +334,6 @@ namespace Music.Generator
                 placement,
                 harmonyContexts,
                 onsetGrid,
-                0.5,
                 hooks.VelocityAccentBias,
                 settings.Seed);
 

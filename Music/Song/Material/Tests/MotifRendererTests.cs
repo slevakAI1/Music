@@ -27,7 +27,6 @@ public static class MotifRendererTests
         TestContourUp();
         TestContourDown();
         TestContourArch();
-        TestVelocityFromEnergyTension();
         TestDifferentSeedsProduceDifferentPitches();
         TestTransformTagOctaveUp();
 
@@ -349,33 +348,6 @@ public static class MotifRendererTests
     }
 
     /// <summary>
-    /// Test: Velocity reflects energy and tension.
-    /// </summary>
-    private static void TestVelocityFromEnergyTension()
-    {
-        var (spec, placement, harmony, barTrack, groove, _, sectionTrack) = CreateTestContext();
-
-        // Low energy intent
-        var lowEnergyIntent = CreateTestIntentQuery(sectionTrack, energy: 0.2);
-        var lowResult = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, lowEnergyIntent, sectionTrack, seed: 42);
-
-        // High energy intent
-        var highEnergyIntent = CreateTestIntentQuery(sectionTrack, energy: 0.9);
-        var highResult = MotifRenderer.Render(spec, placement, harmony, barTrack, groove, highEnergyIntent, sectionTrack, seed: 42);
-
-        if (lowResult.PartTrackNoteEvents.Count > 0 && highResult.PartTrackNoteEvents.Count > 0)
-        {
-            double lowAvgVelocity = lowResult.PartTrackNoteEvents.Average(e => e.NoteOnVelocity);
-            double highAvgVelocity = highResult.PartTrackNoteEvents.Average(e => e.NoteOnVelocity);
-
-            if (highAvgVelocity <= lowAvgVelocity)
-                throw new Exception($"High energy should have higher velocity: low={lowAvgVelocity:F1}, high={highAvgVelocity:F1}");
-        }
-
-        Console.WriteLine("✓ Velocity: Higher energy produces higher velocity");
-    }
-
-    /// <summary>
     /// Test: Different seeds produce different pitches.
     /// </summary>
     private static void TestDifferentSeedsProduceDifferentPitches()
@@ -503,9 +475,9 @@ public static class MotifRendererTests
         };
     }
 
-    private static ISongIntentQuery CreateTestIntentQuery(SectionTrack sectionTrack, double energy = 0.7)
+    private static ISongIntentQuery CreateTestIntentQuery(SectionTrack sectionTrack)
     {
-        return new TestSongIntentQuery(sectionTrack, energy);
+        return new TestSongIntentQuery(sectionTrack);
     }
 
     /// <summary>
@@ -514,12 +486,10 @@ public static class MotifRendererTests
     private sealed class TestSongIntentQuery : ISongIntentQuery
     {
         private readonly SectionTrack _sectionTrack;
-        private readonly double _energy;
 
-        public TestSongIntentQuery(SectionTrack sectionTrack, double energy = 0.7)
+        public TestSongIntentQuery(SectionTrack sectionTrack)
         {
             _sectionTrack = sectionTrack;
-            _energy = energy;
         }
 
         public int SectionCount => _sectionTrack.Sections.Count;
@@ -537,7 +507,7 @@ public static class MotifRendererTests
             {
                 AbsoluteSectionIndex = absoluteSectionIndex,
                 SectionType = section?.SectionType ?? MusicConstants.eSectionType.Chorus,
-                Energy = _energy,
+                Energy = 0.5,
                 Tension = 0.5,
                 TensionDrivers = TensionDriver.None,
                 TransitionHint = SectionTransitionHint.Sustain,

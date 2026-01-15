@@ -23,7 +23,6 @@ public static class MotifRenderer
         MotifPlacement placement,
         IReadOnlyList<HarmonyPitchContext> harmonyContexts,
         IReadOnlyList<OnsetSlot> onsetGrid,
-        double energy,
         int velocityAccentBias,
         int seed)
     {
@@ -66,7 +65,7 @@ public static class MotifRenderer
                 seed);
 
             // Calculate velocity
-            int velocity = 70 + (int)(energy * 30) + velocityAccentBias;
+            int velocity = 85 + velocityAccentBias;
             if (slot.IsStrongBeat)
                 velocity += 10;
             velocity = Math.Clamp(velocity, 40, 127);
@@ -117,7 +116,7 @@ public static class MotifRenderer
     /// <param name="harmonyTrack">Song harmony for pitch realization.</param>
     /// <param name="barTrack">Timing ruler for tick calculation.</param>
     /// <param name="groovePreset">Groove preset for onset slot alignment.</param>
-    /// <param name="intentQuery">Stage 7 energy/tension/phrase context.</param>
+    /// <param name="intentQuery">Tension/phrase context.</param>
     /// <param name="sectionTrack">Song section structure.</param>
     /// <param name="seed">Seed for deterministic pitch selection.</param>
     /// <param name="midiProgramNumber">MIDI program number for output track.</param>
@@ -653,12 +652,12 @@ public static class MotifRenderer
     }
 
     /// <summary>
-    /// Calculates velocity based on energy, tension, and beat strength.
+    /// Calculates velocity based on tension and beat strength.
     /// </summary>
     private static int CalculateVelocity(BarIntentContext barIntent, bool isStrongBeat, double contourPosition, int seed)
     {
-        // Base velocity from energy
-        int baseVelocity = 70 + (int)(barIntent.EffectiveEnergy * 30); // 70-100 range
+        // Base velocity
+        int baseVelocity = 85;
 
         // Strong beat accent
         if (isStrongBeat)
