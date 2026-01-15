@@ -1,6 +1,6 @@
 // AI: purpose=Deterministically derive bounded TensionHooks from macro+micro tension and transition hint.
 // AI: invariants=Bias-only (never forces events); clamps outputs; optional knobs must not exceed existing role caps.
-// AI: deps=Uses ITensionQuery (+ optional DeterministicTensionQuery for transition hint); consumes EnergySectionProfile for safety.
+// AI: deps=Uses ITensionQuery? (nullable for energy disconnect, returns zero biases when null); consumes EnergySectionProfile for safety.
 
 namespace Music.Generator;
 
@@ -79,15 +79,24 @@ public static class TensionHooksBuilder
             VariationIntensityBias: variationBias);
     }
 
-    // AI: purpose=Convenience overload wiring to existing query types/drivers without changing renderers yet.
+    // AI: purpose=Convenience overload wiring to existing query types/drivers; accepts null tensionQuery for fixed values (energy disconnect).
     public static TensionHooks Create(
-        ITensionQuery tensionQuery,
+        ITensionQuery? tensionQuery,
         int absoluteSectionIndex,
         int barIndexWithinSection,
         EnergySectionProfile? energyProfile,
         double microTensionPhraseRampIntensity)
     {
-        ArgumentNullException.ThrowIfNull(tensionQuery);
+        // Energy disconnect: when tensionQuery is null, return zero biases (fixed approach)
+        if (tensionQuery == null)
+        {
+            return new TensionHooks(
+                PullProbabilityBias: 0.0,
+                ImpactProbabilityBias: 0.0,
+                VelocityAccentBias: 0,
+                DensityThinningBias: 0.0,
+                VariationIntensityBias: 0.0);
+        }
 
         var macro = tensionQuery.GetMacroTension(absoluteSectionIndex);
         double micro = tensionQuery.GetMicroTension(absoluteSectionIndex, barIndexWithinSection);

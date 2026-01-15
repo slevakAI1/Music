@@ -1,8 +1,8 @@
 // AI: purpose=Generate guitar/comp track using CompRhythmPatternLibrary + CompVoicingSelector for multi-note comp voicings.
 // AI: keep program number 27 for Electric Guitar; tracks previousVoicing for voice-leading continuity across bars; returns sorted by AbsoluteTimeTicks.
 // AI: applies strum timing offsets to chord voicings for humanized feel (Story 4.3).
-// AI: Story 7.5.6=Now accepts tension query and applies tension hooks for phrase-peak/end accent bias (velocity only).
-// AI: Story 8.0.3=Now uses CompBehavior system for onset selection and duration shaping; replaces ApplyDensityToPattern.
+// AI: uses fixed busy probability; no tension/energy variation.
+// AI: uses CompBehavior system for onset selection and duration shaping; replaces ApplyDensityToPattern.
 
 using Music.MyMidi;
 using Music.Song.Material;
@@ -14,19 +14,15 @@ namespace Music.Generator
     {
         /// <summary>
         /// Generates guitar/comp track: rhythm pattern-based chord voicings with strum timing.
-        /// Updated for Story 7.5.6: tension hooks for accent bias at phrase peaks/ends.
-        /// Updated for Story 7.6.4: accepts optional variation query for future parameter adaptation.
-        /// Updated for Story 8.0.3: uses CompBehavior system for onset selection and duration shaping.
-        /// Updated for Story 9.2: uses MotifRenderer when motif placed for Comp role.
+        /// Uses fixed busy probability (no tension/energy variation).
+        /// Uses CompBehavior system for onset selection and duration shaping.
+        /// Uses MotifRenderer when motif placed for Comp role.
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
             BarTrack barTrack,
             SectionTrack sectionTrack,
-            ITensionQuery tensionQuery,
-            double microTensionPhraseRampIntensity,
-            IVariationQuery? variationQuery,
             MotifPlacementPlan? motifPlan,
             MotifPresenceMap? motifPresence,
             int totalBars,
@@ -34,7 +30,6 @@ namespace Music.Generator
             HarmonyPolicy policy,
             int midiProgramNumber)
         {
-            ArgumentNullException.ThrowIfNull(tensionQuery);
 
             var notes = new List<PartTrackEvent>();
             List<int>? previousVoicing = null; // Track previous voicing for voice-leading continuity
@@ -73,8 +68,6 @@ namespace Music.Generator
                         bar,
                         barWithinSection,
                         absoluteSectionIndex,
-                        tensionQuery,
-                        microTensionPhraseRampIntensity,
                         settings,
                         policy);
 
@@ -83,14 +76,14 @@ namespace Music.Generator
                     continue;
                 }
 
-                // Story 7.5.6: Derive tension hooks for this bar to bias accent velocity
+                // Use fixed approach for velocity accent (no tension/energy variation)
                 int barIndexWithinSection = section != null ? (bar - section.StartBar) : 0;
                 var hooks = TensionHooksBuilder.Create(
-                    tensionQuery,
+                    null,
                     absoluteSectionIndex,
                     barIndexWithinSection,
                     null,
-                    microTensionPhraseRampIntensity);
+                    0.0);
 
                 // Section profile for voicing selection
                 SectionProfile? sectionProfile = SectionProfile.GetForSectionType(sectionType);
@@ -290,7 +283,7 @@ namespace Music.Generator
 
         /// <summary>
         /// Renders motif notes for a specific bar using MotifRenderer.
-        /// Story 9.2: Converts motif spec to actual note events for this bar.
+        /// Converts motif spec to actual note events for this bar.
         /// </summary>
         private static List<PartTrackEvent> RenderMotifForBar(
             MotifPlacement placement,
@@ -300,8 +293,6 @@ namespace Music.Generator
             int bar,
             int barWithinSection,
             int absoluteSectionIndex,
-            ITensionQuery tensionQuery,
-            double microTensionPhraseRampIntensity,
             RandomizationSettings settings,
             HarmonyPolicy policy)
         {
@@ -330,13 +321,13 @@ namespace Music.Generator
                 }
             }
 
-            // Get intent context
+            // Get tension hooks for velocity accent bias (no tension query = 0.0 bias)
             var hooks = TensionHooksBuilder.Create(
-                tensionQuery,
+                null,
                 absoluteSectionIndex,
                 barWithinSection,
                 null,
-                microTensionPhraseRampIntensity);
+                0.0);
 
             // Render motif
             var motifTrack = MotifRenderer.Render(

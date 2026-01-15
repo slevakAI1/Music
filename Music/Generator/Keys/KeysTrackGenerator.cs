@@ -1,7 +1,7 @@
 // AI: purpose=Generate keys/pads track using VoiceLeadingSelector and SectionProfile for dynamic voicing per section.
 // AI: keep program number 4; tracks previous ChordRealization for voice-leading continuity; returns sorted by AbsoluteTimeTicks.
-// AI: Now accepts tension query and applies tension hooks for phrase-peak/end accent bias (velocity only).
-// AI: Now uses KeysRoleMode system for audibly distinct playing behaviors (Sustain/Pulse/Rhythmic/SplitVoicing).
+// AI: uses fixed busy probability; no tension/energy variation.
+// AI: uses KeysRoleMode system for audibly distinct playing behaviors (Sustain/Pulse/Rhythmic/SplitVoicing).
 
 using Music.MyMidi;
 using Music.Song.Material;
@@ -13,8 +13,7 @@ namespace Music.Generator
     {
         /// <summary>
         /// Generates keys/pads track: voice-led chord voicings with optional color tones per section profile.
-        /// Accepts tension query and applies tension hooks for accent bias at phrase peaks/ends.
-        /// Accepts optional variation query for future parameter adaptation.
+        /// Uses fixed busy probability (no tension/energy variation).
         /// Uses KeysRoleMode system for distinct playing behaviors.
         /// Uses MotifRenderer when motif placed for Keys role.
         /// </summary>
@@ -23,9 +22,6 @@ namespace Music.Generator
             GrooveTrack grooveTrack,
             BarTrack barTrack,
             SectionTrack sectionTrack,
-            ITensionQuery tensionQuery,
-            double microTensionPhraseRampIntensity,
-            IVariationQuery? variationQuery,
             MotifPlacementPlan? motifPlan,
             MotifPresenceMap? motifPresence,
             int totalBars,
@@ -33,7 +29,6 @@ namespace Music.Generator
             HarmonyPolicy policy,
             int midiProgramNumber)
         {
-            ArgumentNullException.ThrowIfNull(tensionQuery);
 
             var notes = new List<PartTrackEvent>();
             var randomizer = new PitchRandomizer(settings);
@@ -77,8 +72,6 @@ namespace Music.Generator
                         bar,
                         barIndexWithinSection,
                         absoluteSectionIndex,
-                        tensionQuery,
-                        microTensionPhraseRampIntensity,
                         settings,
                         policy);
 
@@ -87,13 +80,13 @@ namespace Music.Generator
                     continue;
                 }
 
-                // Derive tension hooks for this bar to bias accent velocity
+                // Use fixed approach for velocity accent (no tension/energy variation)
                 var hooks = TensionHooksBuilder.Create(
-                    tensionQuery,
+                    null,
                     absoluteSectionIndex,
                     barIndexWithinSection,
                     null,
-                    microTensionPhraseRampIntensity);
+                    0.0);
 
                 // Select keys mode based on section/busyProbability
                 var mode = KeysRoleModeSelector.SelectMode(
@@ -368,8 +361,6 @@ namespace Music.Generator
             int bar,
             int barWithinSection,
             int absoluteSectionIndex,
-            ITensionQuery tensionQuery,
-            double microTensionPhraseRampIntensity,
             RandomizationSettings settings,
             HarmonyPolicy policy)
         {
@@ -398,13 +389,13 @@ namespace Music.Generator
                 }
             }
 
-            // Get intent context
+            // Get tension hooks for velocity accent bias (no tension query = 0.0 bias)
             var hooks = TensionHooksBuilder.Create(
-                tensionQuery,
+                null,
                 absoluteSectionIndex,
                 barWithinSection,
                 null,
-                microTensionPhraseRampIntensity);
+                0.0);
 
             // Render motif
             var motifTrack = MotifRenderer.Render(

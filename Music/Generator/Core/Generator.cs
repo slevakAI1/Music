@@ -48,24 +48,11 @@ namespace Music.Generator
 
             var grooveName = GetPrimaryGrooveName(songContext.GrooveTrack);
 
-            // Create deterministic tension query
-            ITensionQuery tensionQuery = new DeterministicTensionQuery(songContext.SectionTrack, settings.Seed);
-            const double microTensionPhraseRampIntensity = 1.0;
-
-            // Create deterministic variation query for section variation plans
-            IVariationQuery variationQuery = new DeterministicVariationQuery(
-                songContext.SectionTrack,
-                tensionQuery,
-                grooveName,
-                settings.Seed);
-
             // Story 9.2: Create motif placement plan and presence map
             var materialBank = InitializeMaterialBank();
             var motifPlan = CreateMotifPlacementPlan(
                 materialBank,
                 songContext.SectionTrack,
-                tensionQuery,
-                variationQuery,
                 settings.Seed);
             var motifPresence = new MotifPresenceMap(motifPlan);
 
@@ -82,9 +69,6 @@ namespace Music.Generator
                     songContext.GrooveTrack,
                     songContext.BarTrack,
                     songContext.SectionTrack,
-                    tensionQuery,
-                    microTensionPhraseRampIntensity,
-                    variationQuery,
                     motifPlan,
                     motifPresence,
                     totalBars,
@@ -97,9 +81,6 @@ namespace Music.Generator
                     songContext.GrooveTrack,
                     songContext.BarTrack,
                     songContext.SectionTrack,
-                    tensionQuery,
-                    microTensionPhraseRampIntensity,
-                    variationQuery,
                     motifPlan,
                     motifPresence,
                     totalBars,
@@ -112,9 +93,6 @@ namespace Music.Generator
                     songContext.GrooveTrack,
                     songContext.BarTrack,
                     songContext.SectionTrack,
-                    tensionQuery,
-                    microTensionPhraseRampIntensity,
-                    variationQuery,
                     motifPlan,
                     motifPresence,
                     totalBars,
@@ -127,9 +105,6 @@ namespace Music.Generator
                     songContext.GrooveTrack,
                     songContext.BarTrack,
                     songContext.SectionTrack,
-                    tensionQuery,
-                    microTensionPhraseRampIntensity,
-                    variationQuery,
                     motifPlan,
                     motifPresence,
                     totalBars,
@@ -166,12 +141,10 @@ namespace Music.Generator
             return bank;
         }
 
-        // AI: creates MotifPlacementPlan using DeterministicSongIntentQuery; returns Empty when materialBank empty; logs placements
+        // AI: creates MotifPlacementPlan; returns Empty when materialBank empty; logs placements
         private static MotifPlacementPlan CreateMotifPlacementPlan(
             MaterialBank materialBank,
             SectionTrack sectionTrack,
-            ITensionQuery tensionQuery,
-            IVariationQuery variationQuery,
             int seed)
         {
             Tracer.DebugTrace($"CreateMotifPlacementPlan: MaterialBank has {materialBank.Count} items");

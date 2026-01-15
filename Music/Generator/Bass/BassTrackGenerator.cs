@@ -1,6 +1,6 @@
 // AI: purpose=Generate bass track using BassPatternLibrary for pattern selection and BassChordChangeDetector for approach notes.
 // AI: keep MIDI program number 33; patterns replace randomizer for more structured bass lines (Story 5.1 + 5.2); returns sorted by AbsoluteTimeTicks.
-// AI: tension query applies PullProbabilityBias to approach note insertion (only when groove slot allows).
+// AI: uses fixed approach note probability; no tension/energy variation.
 
 using Music.MyMidi;
 using Music.Song.Material;
@@ -11,8 +11,7 @@ namespace Music.Generator
     {
         /// <summary>
         /// Generates bass track: pattern-based bass lines with optional approach notes to chord changes.
-        /// Tension hooks provide pickup/approach bias (slot-gated).
-        /// Accepts optional variation query for future parameter adaptation.
+        /// Uses fixed approach note probability (slot-gated).
         /// Uses MotifRenderer when motif placed for Bass role.
         /// </summary>
         public static PartTrack Generate(
@@ -20,9 +19,6 @@ namespace Music.Generator
             GrooveTrack grooveTrack,
             BarTrack barTrack,
             SectionTrack sectionTrack,
-            ITensionQuery tensionQuery,
-            double microTensionPhraseRampIntensity,
-            IVariationQuery? variationQuery,
             MotifPlacementPlan? motifPlan,
             MotifPresenceMap? motifPresence,
             int totalBars,
@@ -30,7 +26,6 @@ namespace Music.Generator
             HarmonyPolicy policy,
             int midiProgramNumber)
         {
-            ArgumentNullException.ThrowIfNull(tensionQuery);
 
             // DIAGNOSTIC: Log motif plan info at start
             if (motifPlan == null)
@@ -100,8 +95,6 @@ namespace Music.Generator
                         bar,
                         barWithinSection,
                         absoluteSectionIndex,
-                        tensionQuery,
-                        microTensionPhraseRampIntensity,
                         settings,
                         policy);
 
@@ -109,17 +102,16 @@ namespace Music.Generator
                     continue; // Skip pattern-based generation for this bar
                 }
 
-                // Derive tension hooks for this bar to bias approach note probability
+                // Use fixed approach note probability
                 int barIndexWithinSection = section != null ? (bar - section.StartBar) : 0;
                 var hooks = TensionHooksBuilder.Create(
-                    tensionQuery,
+                    null,
                     absoluteSectionIndex,
                     barIndexWithinSection,
                     null,
-                    microTensionPhraseRampIntensity);
+                    0.0);
 
-                // Apply busy probability to approach note decisions
-                // Further biased by tension PullProbabilityBias (phrase-end anticipation)
+                // Apply fixed busy probability to approach note decisions
                 double baseBusyProbability = 0.5;
                 double effectiveBusyProbability = ApplyTensionBiasToApproachProbability(
                     baseBusyProbability,
@@ -265,16 +257,16 @@ namespace Music.Generator
         }
 
         /// <summary>
-        /// Applies tension pull probability bias to approach note insertion.
-        /// Tension hooks increase pickup/approach probability at phrase peaks/ends.
+        /// Applies pull probability bias to approach note insertion.
+        /// Bias from TensionHooksBuilder (with null tensionQuery, returns 0.0).
         /// CRITICAL: Bias only affects probability; never forces approach when slot invalid.
         /// </summary>
         private static double ApplyTensionBiasToApproachProbability(
             double baseProbability,
-            double tensionPullBias)
+            double pullBias)
         {
-            // tensionPullBias is in range [-0.20, 0.20] per TensionHooksBuilder
-            double adjusted = baseProbability + tensionPullBias;
+            // pullBias is in range [-0.20, 0.20] per TensionHooksBuilder (0.0 when no tension query)
+            double adjusted = baseProbability + pullBias;
             return Math.Clamp(adjusted, 0.0, 1.0);
         }
 
@@ -290,8 +282,6 @@ namespace Music.Generator
             int bar,
             int barWithinSection,
             int absoluteSectionIndex,
-            ITensionQuery tensionQuery,
-            double microTensionPhraseRampIntensity,
             RandomizationSettings settings,
             HarmonyPolicy policy)
         {
@@ -320,13 +310,13 @@ namespace Music.Generator
                 }
             }
 
-            // Get tension hooks for velocity accent bias
+            // Get tension hooks for velocity accent bias (no tension query = 0.0 bias)
             var hooks = TensionHooksBuilder.Create(
-                tensionQuery,
+                null,
                 absoluteSectionIndex,
                 barWithinSection,
                 null,
-                microTensionPhraseRampIntensity);
+                0.0);
 
             // Render motif using MotifRenderer
             var motifTrack = MotifRenderer.Render(

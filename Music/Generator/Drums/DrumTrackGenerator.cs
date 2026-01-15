@@ -1,6 +1,7 @@
-// AI: purpose=Generate drum track: kick, snare, hi-hat, ride using DrumVariationEngine for living performance (Story 6.1+6.3).
+// AI: purpose=Generate drum track: kick, snare, hi-hat, ride using DrumVariationEngine for living performance.
 /// AI: invariants=Calls DrumVariationEngine per bar; integrates DrumFillEngine at section transitions; converts to MIDI PartTrackEvent list; returns sorted by AbsoluteTimeTicks.
 /// AI: deps=Uses DrumVariationEngine, DrumFillEngine, RandomHelpers, PitchRandomizer.SelectDrumVelocity for velocity shaping.
+/// AI: uses fixed variation parameters; no tension/energy dependency.
 
 using Music.MyMidi;
 using Music.Song.Material;
@@ -11,25 +12,20 @@ namespace Music.Generator
     {
         /// <summary>
         /// Generates drum track: kick, snare, hi-hat, ride with deterministic variations and fills.
-        /// Updated for Story 6.1, Story 6.3 (section transition fills).
-        /// Updated for Story 7.6.4: accepts optional variation query for future parameter adaptation.
-        /// Updated for Story 9.3: accepts motifPresence for ducking awareness.
+        /// Uses fixed variation parameters (no tension/energy dependency).
+        /// Accepts motifPresence for ducking awareness.
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
             BarTrack barTrack,
             SectionTrack sectionTrack,
-            ITensionQuery tensionQuery,
-            double microTensionPhraseRampIntensity,
-            IVariationQuery? variationQuery,
             MotifPlacementPlan? motifPlan,
             MotifPresenceMap? motifPresence,
             int totalBars,
             RandomizationSettings settings,
             int midiProgramNumber)
         {
-            ArgumentNullException.ThrowIfNull(tensionQuery);
 
             var notes = new List<PartTrackEvent>();
             var randomizer = new PitchRandomizer(settings);
@@ -64,24 +60,17 @@ namespace Music.Generator
                         absoluteSectionIndex = 0;
                 }
 
-                // Story 7.5.5: Derive hooks for this bar to bias optional behaviors only (fills/dropouts).
+                // Use fixed approach for tension hooks (no tension/energy variation)
                 int barIndexWithinSection = section != null ? (bar - section.StartBar) : 0;
                 var hooks = TensionHooksBuilder.Create(
-                    tensionQuery,
+                    null,
                     absoluteSectionIndex,
                     barIndexWithinSection,
                     null,
-                    microTensionPhraseRampIntensity);
+                    0.0);
 
                 // Use default drum parameters
                 var drumParameters = settings.DrumParameters ?? new DrumRoleParameters();
-
-                // Story 7.6.5: Apply variation deltas if available
-                if (variationQuery != null && drumParameters != null)
-                {
-                    var variationPlan = variationQuery.GetVariationPlan(absoluteSectionIndex);
-                    drumParameters = VariationParameterAdapter.ApplyVariationToDrums(drumParameters, variationPlan.Roles.Drums);
-                }
 
                 // Story 9.3: Check if lead motif is active for ducking
                 bool hasLeadMotif = motifPresence?.HasLeadMotif(absoluteSectionIndex, barIndexWithinSection) ?? false;
@@ -90,7 +79,7 @@ namespace Music.Generator
                 // Create deterministic per-bar RNG so fill decisions remain deterministic when knobs change.
                 var barRng = RandomHelpers.CreateLocalRng(settings.Seed, $"{grooveEvent.SourcePresetName ?? "groove"}_{sectionType}", bar, 0m);
 
-                // Story 7.5.5: Phrase-end pull biases optional fill chance; this must not override transition fills.
+                // Phrase-end pull biases optional fill chance (with null tension query, bias is 0.0); this must not override transition fills.
                 double tensionFillExtraProbability = Math.Clamp(hooks.PullProbabilityBias, 0.0, 0.20);
 
                 // Check if this bar should have a fill (Story 6.3) or if Stage 7 requests extra fills via parameter.
