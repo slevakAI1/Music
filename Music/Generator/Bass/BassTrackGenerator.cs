@@ -104,18 +104,14 @@ namespace Music.Generator
 
                 // Use fixed approach note probability
                 int barIndexWithinSection = section != null ? (bar - section.StartBar) : 0;
-                var hooks = TensionHooksBuilder.Create(
-                    null,
-                    absoluteSectionIndex,
-                    barIndexWithinSection,
-                    null,
-                    0.0);
+                // Use fixed pull probability bias (no tension/energy variation)
+                double pullProbabilityBias = 0.0;
 
                 // Apply fixed busy probability to approach note decisions
                 double baseBusyProbability = 0.5;
                 double effectiveBusyProbability = ApplyTensionBiasToApproachProbability(
                     baseBusyProbability,
-                    hooks.PullProbabilityBias);
+                    pullProbabilityBias);
 
                 // Select bass pattern for this bar using BassPatternLibrary
                 var bassPattern = BassPatternLibrary.SelectPattern(
@@ -311,12 +307,8 @@ namespace Music.Generator
             }
 
             // Get tension hooks for velocity accent bias (no tension query = 0.0 bias)
-            var hooks = TensionHooksBuilder.Create(
-                null,
-                absoluteSectionIndex,
-                barWithinSection,
-                null,
-                0.0);
+            // Use fixed accent bias (no tension/energy variation)
+            int tensionAccentBias = 0;
 
             // Render motif using MotifRenderer
             var motifTrack = MotifRenderer.Render(
@@ -324,7 +316,7 @@ namespace Music.Generator
                 placement,
                 harmonyContexts,
                 onsetGrid,
-                hooks.VelocityAccentBias,
+                tensionAccentBias,
                 settings.Seed);
 
             // Convert to list and return

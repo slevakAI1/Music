@@ -78,12 +78,8 @@ namespace Music.Generator
 
                 // Use fixed approach for velocity accent (no tension/energy variation)
                 int barIndexWithinSection = section != null ? (bar - section.StartBar) : 0;
-                var hooks = TensionHooksBuilder.Create(
-                    null,
-                    absoluteSectionIndex,
-                    barIndexWithinSection,
-                    null,
-                    0.0);
+                // Use fixed accent bias (no tension/energy variation)
+                int tensionAccentBias = 0;
 
                 // Section profile for voicing selection
                 SectionProfile? sectionProfile = SectionProfile.GetForSectionType(sectionType);
@@ -188,7 +184,7 @@ namespace Music.Generator
                     int velocity = baseVelocity;
 
                     // Story 7.5.6: Apply tension accent bias for phrase peaks/ends
-                    velocity = ApplyTensionAccentBias(velocity, hooks.VelocityAccentBias);
+                    velocity = ApplyTensionAccentBias(velocity, tensionAccentBias);
 
                     // Add all notes from the voicing with strum timing offsets
                     for (int i = 0; i < voicing.Count; i++)
@@ -322,12 +318,8 @@ namespace Music.Generator
             }
 
             // Get tension hooks for velocity accent bias (no tension query = 0.0 bias)
-            var hooks = TensionHooksBuilder.Create(
-                null,
-                absoluteSectionIndex,
-                barWithinSection,
-                null,
-                0.0);
+            // Use fixed accent bias (no tension/energy variation)
+            int tensionAccentBias = 0;
 
             // Render motif
             var motifTrack = MotifRenderer.Render(
@@ -335,7 +327,7 @@ namespace Music.Generator
                 placement,
                 harmonyContexts,
                 onsetGrid,
-                hooks.VelocityAccentBias,
+                tensionAccentBias,
                 settings.Seed);
 
             return motifTrack.PartTrackNoteEvents.ToList();

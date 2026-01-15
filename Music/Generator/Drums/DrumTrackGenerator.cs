@@ -62,12 +62,8 @@ namespace Music.Generator
 
                 // Use fixed approach for tension hooks (no tension/energy variation)
                 int barIndexWithinSection = section != null ? (bar - section.StartBar) : 0;
-                var hooks = TensionHooksBuilder.Create(
-                    null,
-                    absoluteSectionIndex,
-                    barIndexWithinSection,
-                    null,
-                    0.0);
+                // Use fixed pull probability bias (no tension/energy variation)
+                double pullProbabilityBias = 0.0;
 
                 // Use default drum parameters
                 var drumParameters = settings.DrumParameters ?? new DrumRoleParameters();
@@ -80,7 +76,7 @@ namespace Music.Generator
                 var barRng = RandomHelpers.CreateLocalRng(settings.Seed, $"{grooveEvent.SourcePresetName ?? "groove"}_{sectionType}", bar, 0m);
 
                 // Phrase-end pull biases optional fill chance (with null tension query, bias is 0.0); this must not override transition fills.
-                double tensionFillExtraProbability = Math.Clamp(hooks.PullProbabilityBias, 0.0, 0.20);
+                double tensionFillExtraProbability = Math.Clamp(pullProbabilityBias, 0.0, 0.20);
 
                 // Check if this bar should have a fill (Story 6.3) or if Stage 7 requests extra fills via parameter.
                 bool shouldFill = DrumFillEngine.ShouldGenerateFill(bar, totalBars, sectionTrack)
@@ -135,9 +131,10 @@ namespace Music.Generator
 
                     // Story 7.5.5: Phrase-end dropout option (bias-only): thin timekeeping late in bar when tension high.
                     // Guardrails: never remove anchor/main hits; never remove kick/snare; only remove non-main hat hits on late subdivisions.
-                    if (hooks.PullProbabilityBias > 0.0 && hooks.DensityThinningBias > 0.0001)
+                    // No tension/energy bias: always false
+                    if (false)
                     {
-                        double dropProb = Math.Clamp(hooks.DensityThinningBias * 1.5, 0.0, 0.30);
+                        double dropProb = 0.0;
                         if (barRng.NextDouble() < dropProb)
                         {
                             allHits = allHits

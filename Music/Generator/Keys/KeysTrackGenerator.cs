@@ -80,13 +80,8 @@ namespace Music.Generator
                     continue;
                 }
 
-                // Use fixed approach for velocity accent (no tension/energy variation)
-                var hooks = TensionHooksBuilder.Create(
-                    null,
-                    absoluteSectionIndex,
-                    barIndexWithinSection,
-                    null,
-                    0.0);
+                // Use fixed accent bias (no tension/energy variation)
+                int tensionAccentBias = 0;
 
                 // Select keys mode based on section/busyProbability
                 var mode = KeysRoleModeSelector.SelectMode(
@@ -266,7 +261,7 @@ namespace Music.Generator
 
                     // Calculate base velocity and apply tension accent bias
                     int baseVelocity = 75;
-                    int velocity = ApplyTensionAccentBias(baseVelocity, hooks.VelocityAccentBias);
+                    int velocity = ApplyTensionAccentBias(baseVelocity, tensionAccentBias);
 
                     // Use split notes for SplitVoicing mode, full voicing otherwise
                     foreach (int midiNote in notesToPlay)
@@ -390,12 +385,8 @@ namespace Music.Generator
             }
 
             // Get tension hooks for velocity accent bias (no tension query = 0.0 bias)
-            var hooks = TensionHooksBuilder.Create(
-                null,
-                absoluteSectionIndex,
-                barWithinSection,
-                null,
-                0.0);
+            // Use fixed accent bias (no tension/energy variation)
+            int tensionAccentBias = 0;
 
             // Render motif
             var motifTrack = MotifRenderer.Render(
@@ -403,7 +394,7 @@ namespace Music.Generator
                 placement,
                 harmonyContexts,
                 onsetGrid,
-                hooks.VelocityAccentBias,
+                tensionAccentBias,
                 settings.Seed);
 
             return motifTrack.PartTrackNoteEvents.ToList();
