@@ -83,14 +83,17 @@
 
 ---
 
-### Story 1.4: Remove Energy Logic from DrumVelocityShaper
+### Story 1.4: Remove Energy Logic from DrumVelocityShaper ✓ COMPLETE
 
 **File**: `Music\Generator\Drums\DrumVelocityShaper.cs`
 
-**Changes**:
-- `ApplySectionEnergyBoost()` - return input velocity unchanged (or inline deletion)
-- Remove call to `ApplySectionEnergyBoost()` from `CalculateVelocity()`
-- Remove "energy" references from comments
+**Changes completed**:
+- `ApplySectionEnergyBoost()` - now returns input velocity unchanged (section-based boost disabled)
+- Removed call to `ApplySectionEnergyBoost()` from `ShapeVelocity()` to eliminate dead code path
+- Updated AI comments to remove "energy context" references
+- Updated inline comments to remove energy descriptions
+
+**Result**: Drum velocities no longer vary by section type. All sections use the same base velocities with only hand pattern accents and humanization applied. Chorus (kick +10, snare +12, hat +8), Bridge (kick +8, snare +10), Solo (kick +7, snare +9), Intro (-5), and Outro (-8) boosts are now disabled.
 
 ---
 

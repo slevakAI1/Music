@@ -1,6 +1,6 @@
 // AI: purpose=Deterministic velocity shaping for drums (Story 6.2); provides hand patterns, accents, ghost note velocities.
 // AI: invariants=All velocity values deterministic for (seed, role, bar, onset); clamped to MIDI 1..127 range.
-// AI: deps=RandomHelpers for seeding, MusicConstants.eSectionType for energy context.
+// AI: deps=RandomHelpers for seeding, MusicConstants.eSectionType for section context.
 // AI: perf=Called per drum hit; keep lightweight.
 
 namespace Music.Generator
@@ -19,7 +19,7 @@ namespace Music.Generator
         /// <param name="bar">Bar number</param>
         /// <param name="onsetBeat">Beat position in bar</param>
         /// <param name="seed">Randomization seed</param>
-        /// <param name="sectionType">Section type for energy context</param>
+        /// <param name="sectionType">Section type for context</param>
         /// <param name="isStrongBeat">True if this is a strong beat</param>
         /// <param name="isGhost">True if this is a ghost note</param>
         /// <param name="isInFill">True if this hit is part of a fill</param>
@@ -61,9 +61,6 @@ namespace Music.Generator
                 velocity = ApplyHandPatternAccent(velocity, onsetBeat, sectionType, isStrongBeat);
             }
 
-            // Apply section energy boost
-            velocity = ApplySectionEnergyBoost(velocity, sectionType, role);
-
             // Add small humanization variation (±5%)
             int variation = (int)(velocity * 0.05);
             velocity += rng.NextInt(-variation, variation + 1);
@@ -98,55 +95,11 @@ namespace Music.Generator
             // Offbeat accent pattern (for funk/disco feel)
             else if (isOffbeat && (sectionType == MusicConstants.eSectionType.Chorus))
             {
-                // Accent offbeats in chorus for more energy
+                // Accent offbeats in chorus for more activity
                 velocity += 5;
             }
 
             return velocity;
-        }
-
-        /// <summary>
-        /// Applies section-specific energy boost to velocity.
-        /// Higher energy sections get louder drums.
-        /// </summary>
-        private static int ApplySectionEnergyBoost(
-            int velocity,
-            MusicConstants.eSectionType sectionType,
-            string role)
-        {
-            int boost = sectionType switch
-            {
-                MusicConstants.eSectionType.Chorus => role switch
-                {
-                    "kick" => 10,
-                    "snare" => 12,
-                    "hat" => 8,
-                    "ride" => 10,
-                    _ => 5
-                },
-                MusicConstants.eSectionType.Bridge => role switch
-                {
-                    "kick" => 8,
-                    "snare" => 10,
-                    "hat" => 6,
-                    "ride" => 8,
-                    _ => 4
-                },
-                MusicConstants.eSectionType.Solo => role switch
-                {
-                    "kick" => 7,
-                    "snare" => 9,
-                    "hat" => 7,
-                    "ride" => 9,
-                    _ => 5
-                },
-                MusicConstants.eSectionType.Verse => 0, // No boost
-                MusicConstants.eSectionType.Intro => -5, // Slightly quieter
-                MusicConstants.eSectionType.Outro => -8, // Fade out feel
-                _ => 0
-            };
-
-            return velocity + boost;
         }
 
         /// <summary>
