@@ -149,8 +149,8 @@ public static class MotifPlacementPlanner
             // Intro: optional teaser if energy low and sparse
             MusicConstants.eSectionType.Intro => intent.Energy < 0.4 && roll < 0.5,
 
-            // Verse: optional riff if mid-high energy
-            MusicConstants.eSectionType.Verse => intent.Energy > 0.5 && roll < 0.6,
+            // Verse: optional riff if mid-high energy, or bass fill for transitions
+            MusicConstants.eSectionType.Verse => intent.Energy > 0.4 && roll < 0.7,
 
             // Bridge: place if contrast or new material
             MusicConstants.eSectionType.Bridge => roll < 0.7,
@@ -158,8 +158,8 @@ public static class MotifPlacementPlanner
             // Solo: usually place (it's the featured section)
             MusicConstants.eSectionType.Solo => roll < 0.8,
 
-            // Outro: optional if not too sparse
-            MusicConstants.eSectionType.Outro => intent.Energy > 0.3 && roll < 0.4,
+            // Outro: place bass fills and outros frequently for satisfying endings
+            MusicConstants.eSectionType.Outro => intent.Energy > 0.2 || roll < 0.7,
 
             _ => false
         };
@@ -204,6 +204,7 @@ public static class MotifPlacementPlanner
                 .ToList();
             
             Tracer.DebugTrace($"      Found {candidates.Count} motifs with role={targetRole} (any kind)");
+            Tracer.DebugTrace($"      PreferredKind={preferredKind}, IsTransitionBarOrFill=");
         }
         
         Tracer.DebugTrace($"      After role filter ({targetRole}): {candidates.Count} candidates");
@@ -236,6 +237,7 @@ public static class MotifPlacementPlanner
 
     /// <summary>
     /// Gets preferred material kind based on section type and energy.
+    /// AI: BassFill prioritized at section transitions; Outro commonly uses fills.
     /// </summary>
     private static MaterialKind GetPreferredMaterialKind(
         MusicConstants.eSectionType sectionType,
@@ -248,6 +250,7 @@ public static class MotifPlacementPlanner
             MusicConstants.eSectionType.Verse => intent.Energy > 0.6 ? MaterialKind.Riff : MaterialKind.MelodyPhrase,
             MusicConstants.eSectionType.Solo => MaterialKind.Riff,
             MusicConstants.eSectionType.Intro => MaterialKind.Hook,
+            MusicConstants.eSectionType.Outro => MaterialKind.BassFill,  // Use bass fills for outros/transitions
             _ => MaterialKind.Hook
         };
     }

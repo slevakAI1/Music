@@ -372,6 +372,7 @@ public static class MotifRenderer
 
     /// <summary>
     /// Selects pitch based on contour intent, harmony context, and tone policy.
+    /// AI: Filters harmony chord/scale tones to motif register range before selection; prevents out-of-register notes.
     /// </summary>
     private static int SelectPitch(
         MotifSpec spec,
@@ -397,8 +398,34 @@ public static class MotifRenderer
             ? roll < tonePolicy.ChordToneBias
             : roll < tonePolicy.ChordToneBias * 0.5;
 
-        // Get candidate pitches
-        var chordTones = harmony.ChordMidiNotes;
+        // AI: CRITICAL - Filter chord/scale tones to register range BEFORE selecting
+        // This prevents bass motifs from selecting chord tones in higher octaves
+        int minRegister = register.CenterMidiNote - register.RangeSemitones;
+        int maxRegister = register.CenterMidiNote + register.RangeSemitones;
+
+        // Get candidate pitches, filtered to register range
+        var chordTones = harmony.ChordMidiNotes
+            .Where(n => n >= minRegister && n <= maxRegister)
+            .ToList();
+        
+        // If no chord tones in range, transpose them by octaves to fit
+        if (chordTones.Count == 0 && harmony.ChordMidiNotes.Count > 0)
+        {
+            foreach (var note in harmony.ChordMidiNotes)
+            {
+                // Try octave transpositions
+                for (int octaveShift = -3; octaveShift <= 3; octaveShift++)
+                {
+                    int transposed = note + (octaveShift * 12);
+                    if (transposed >= minRegister && transposed <= maxRegister)
+                    {
+                        chordTones.Add(transposed);
+                    }
+                }
+            }
+            chordTones = chordTones.Distinct().OrderBy(n => n).ToList();
+        }
+        
         var scaleTones = GetScaleTones(harmony, register);
 
         int selectedPitch;
