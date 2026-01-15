@@ -69,15 +69,17 @@
 
 ---
 
-### Story 1.3: Remove Energy Logic from DrumVariationEngine
+### Story 1.3: Remove Energy Logic from DrumVariationEngine ✓ COMPLETE
 
 **File**: `Music\Generator\Drums\DrumVariationEngine.cs`
 
-**Changes**:
-- `IsHighEnergySection()` - delete method or make it return `false`
-- `ShouldUseRide()` - simplify to not depend on section type energy mapping
-- `GetOpenHatProbability()` - return fixed value (e.g., 0.1)
-- Remove "energy" references from comments
+**Changes completed**:
+- `IsHighEnergySection()` - returns `false` (disables flams)
+- `ShouldUseRide()` - simplified to return fixed probability (0.15) regardless of section type
+- `OpenHatProbabilityForSection()` - returns fixed value (0.1) regardless of section type
+- Removed "energy" references from AI comments
+
+**Result**: Drum variation no longer varies by section energy - all sections use consistent probabilities for ride usage, open hats, and flams (disabled).
 
 ---
 

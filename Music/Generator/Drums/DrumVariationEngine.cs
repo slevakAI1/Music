@@ -1,6 +1,6 @@
 // AI: purpose=Deterministic drum variation engine for Story 6.1; transforms static groove templates into living drum performances.
 // AI: invariants=All variation choices deterministic for (seed, grooveName, sectionType, barIndex); RNG only for tie-breaking valid options.
-// AI: deps=Uses RandomHelpers for seeding, GrooveEvent for template, MusicConstants.eSectionType for energy context.
+// AI: deps=Uses RandomHelpers for seeding, GrooveEvent for template, MusicConstants.eSectionType for section context.
 // AI: perf=Called once per bar during generation; keep candidate generation lightweight.
 
 namespace Music.Generator
@@ -164,7 +164,7 @@ namespace Music.Generator
                 {
                     var snareRng = RandomHelpers.CreateLocalRng(seed, $"{grooveEvent.SourcePresetName ?? "snare"}_{sectionKey}", barIndex, onset);
                     
-                    // Flams on high-energy sections (policy-gated)
+                    // Flams (currently disabled)
                     bool allowFlam = IsHighEnergySection(sectionType);
                     bool flam = allowFlam && snareRng.NextDouble() < 0.22;
                     bool isStrongBeat = RandomHelpers.IsStrongBeat(onset);
@@ -257,7 +257,7 @@ namespace Music.Generator
                 {
                     var hatRng = RandomHelpers.CreateLocalRng(seed, $"{grooveEvent.SourcePresetName ?? role}_{sectionKey}", barIndex, onset);
 
-                    // Open hat probability depends on section energy (ride doesn't use open articulation)
+                    // Open hat probability (ride doesn't use open articulation)
                     bool open = false;
                     if (!useRide)
                     {
@@ -332,43 +332,31 @@ namespace Music.Generator
         }
 
         /// <summary>
-        /// Determines if ride should be used instead of hi-hat based on section energy.
-        /// Chorus/Bridge sections have higher probability of using ride.
+        /// Determines if ride should be used instead of hi-hat.
+        /// Returns fixed low probability regardless of section type.
         /// </summary>
         private static bool ShouldUseRide(MusicConstants.eSectionType sectionType, IRandomSource rng)
         {
-            double rideProb = sectionType switch
-            {
-                MusicConstants.eSectionType.Chorus => 0.70,
-                MusicConstants.eSectionType.Bridge => 0.50,
-                MusicConstants.eSectionType.Solo => 0.60,
-                _ => 0.15
-            };
+            double rideProb = 0.15;
             return rng.NextDouble() < rideProb;
         }
 
         /// <summary>
-        /// Determines if section type is high-energy (for flam policy).
+        /// Determines if section type allows flams.
+        /// Returns false (flams disabled).
         /// </summary>
         private static bool IsHighEnergySection(MusicConstants.eSectionType sectionType)
         {
-            return sectionType == MusicConstants.eSectionType.Chorus
-                || sectionType == MusicConstants.eSectionType.Bridge;
+            return false;
         }
 
         /// <summary>
-        /// Returns open hat probability based on section energy.
+        /// Returns open hat probability.
+        /// Returns fixed value regardless of section type.
         /// </summary>
         private static double OpenHatProbabilityForSection(MusicConstants.eSectionType sectionType)
         {
-            return sectionType switch
-            {
-                MusicConstants.eSectionType.Chorus => 0.22,
-                MusicConstants.eSectionType.Bridge => 0.12,
-                MusicConstants.eSectionType.Verse => 0.06,
-                MusicConstants.eSectionType.Solo => 0.15,
-                _ => 0.10
-            };
+            return 0.1;
         }
 
         /// <summary>
