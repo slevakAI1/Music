@@ -123,12 +123,11 @@ namespace Music.Generator
                     energyProfile,
                     microTensionPhraseRampIntensity);
 
-                // Story 8.0.6: Select keys mode based on energy/section
+                // Select keys mode based on section/busyProbability
                 var mode = KeysRoleModeSelector.SelectMode(
                     section?.SectionType ?? MusicConstants.eSectionType.Verse,
                     absoluteSectionIndex,
                     barIndexWithinSection,
-                    energyProfile?.Global.Energy ?? 0.5,
                     keysProfile?.BusyProbability ?? 0.5,
                     settings.Seed);
 

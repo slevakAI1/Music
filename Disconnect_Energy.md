@@ -51,17 +51,21 @@
 
 ---
 
-### Story 1.2: Remove `energy` Parameter from KeysRoleModeSelector
+### Story 1.2: Remove `energy` Parameter from KeysRoleModeSelector ✓ COMPLETE
 
 **File**: `Music\Generator\Keys\KeysRoleMode.cs`
 
-**Changes**:
-- Remove `energy` parameter from `SelectMode()` method signature
-- Remove `energy = Math.Clamp(energy, 0.0, 1.0);` line
-- Change `activityScore` calculation to use only `busyProbability`
-- Update callers to not pass energy argument
+**Changes completed**:
+- Removed `energy` parameter from `SelectMode()` method signature
+- Removed `energy = Math.Clamp(energy, 0.0, 1.0);` line
+- Changed `activityScore` calculation to use only `busyProbability`
+- Updated all callers to not pass energy argument
 
-**Callers to update**: `KeysTrackGenerator.cs`, `KeysRoleModeTests.cs`, `SeedSensitivityTests.cs`
+**Files updated**:
+- `Music\Generator\Keys\KeysRoleMode.cs` - method signature and logic
+- `Music\Generator\Keys\KeysTrackGenerator.cs` - caller
+- `Music\Generator\Keys\KeysRoleModeTests.cs` - removed energy tests
+- `Music\Generator\Tests\SeedSensitivityTests.cs` - updated calls
 
 ---
 
