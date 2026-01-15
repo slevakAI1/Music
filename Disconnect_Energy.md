@@ -99,20 +99,25 @@
 
 ## Epic 2: Remove Energy from Track Generators
 
-### Story 2.1: Remove Energy from GuitarTrackGenerator
+### Story 2.1: Remove Energy from GuitarTrackGenerator ✓ COMPLETE
 
 **File**: `Music\Generator\Guitar\GuitarTrackGenerator.cs`
 
-**Changes**:
-- Remove `Dictionary<int, EnergySectionProfile> sectionProfiles` parameter from `Generate()`
-- Delete `EnergySectionProfile? energyProfile = null;` and profile lookup
-- Delete orchestration presence check (`energyProfile?.Orchestration`)
-- Delete `energyProfile` parameter from internal method calls
-- Delete velocity energy bias calculation (`energyProfile?.Global.Energy`)
-- Update `CompBehaviorSelector.SelectBehavior()` call to not pass energy
-- Remove AI comments referencing "Story 7.3" and energy
+**Changes completed**:
+- Removed `Dictionary<int, EnergySectionProfile> sectionProfiles` parameter from `Generate()`
+- Deleted `EnergySectionProfile? energyProfile = null;` and profile lookup
+- Deleted orchestration presence check (`energyProfile?.Orchestration.CompPresent`)
+- Deleted `energyProfile` parameter from `RenderMotifForBar()` and `TensionHooksBuilder.Create()` calls
+- Removed compProfile retrieval and variation query logic that depended on energy
+- Changed behavior/realization calls to use fixed values (0.5 for busyProbability, 1.0 for densityMultiplier)
+- Removed register lift (`ApplyRegisterWithGuardrail`) and velocity bias (`ApplyVelocityBias`) applications
+- Deleted `ApplyVelocityBias()` method
+- Updated `MotifRenderer.Render()` call to use fixed energy value (0.5)
+- Updated AI comments to remove "Story 7.3" and energy references
 
-**Callers to update**: `Generator.cs`
+**Caller updated**: `Generator.cs` - removed `sectionProfiles` argument from `GuitarTrackGenerator.Generate()` call
+
+**Result**: Guitar/comp track generation no longer varies by energy. Uses fixed busyProbability (0.5), densityMultiplier (1.0), no register lift, and base velocity of 85 with only tension-based accent bias applied.
 
 ---
 

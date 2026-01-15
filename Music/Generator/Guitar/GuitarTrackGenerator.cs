@@ -1,7 +1,6 @@
 // AI: purpose=Generate guitar/comp track using CompRhythmPatternLibrary + CompVoicingSelector for multi-note comp voicings.
 // AI: keep program number 27 for Electric Guitar; tracks previousVoicing for voice-leading continuity across bars; returns sorted by AbsoluteTimeTicks.
 // AI: applies strum timing offsets to chord voicings for humanized feel (Story 4.3).
-// AI: Story 7.3=Now accepts section profiles and applies energy controls (density, velocity, register, busy) with lead-space ceiling guardrail.
 // AI: Story 7.5.6=Now accepts tension query and applies tension hooks for phrase-peak/end accent bias (velocity only).
 // AI: Story 8.0.3=Now uses CompBehavior system for onset selection and duration shaping; replaces ApplyDensityToPattern.
 
@@ -15,7 +14,6 @@ namespace Music.Generator
     {
         /// <summary>
         /// Generates guitar/comp track: rhythm pattern-based chord voicings with strum timing.
-        /// Updated for Story 7.3: energy profile integration with guardrails.
         /// Updated for Story 7.5.6: tension hooks for accent bias at phrase peaks/ends.
         /// Updated for Story 7.6.4: accepts optional variation query for future parameter adaptation.
         /// Updated for Story 8.0.3: uses CompBehavior system for onset selection and duration shaping.
@@ -26,7 +24,6 @@ namespace Music.Generator
             GrooveTrack grooveTrack,
             BarTrack barTrack,
             SectionTrack sectionTrack,
-            Dictionary<int, EnergySectionProfile> sectionProfiles,
             ITensionQuery tensionQuery,
             double microTensionPhraseRampIntensity,
             IVariationQuery? variationQuery,
@@ -61,20 +58,6 @@ namespace Music.Generator
                         absoluteSectionIndex = 0;
                 }
 
-                // Story 7.3: Get energy profile for this section
-                EnergySectionProfile? energyProfile = null;
-                if (section != null && sectionProfiles.TryGetValue(section.StartBar, out var profile))
-                {
-                    energyProfile = profile;
-                }
-
-                // Story 7.3: Check if comp is present in orchestration
-                if (energyProfile?.Orchestration != null && !energyProfile.Orchestration.CompPresent)
-                {
-                    // Skip comp for this bar if orchestration says comp not present
-                    continue;
-                }
-
                 // Story 9.2: Check if motif is placed for Comp role in this bar
                 int barWithinSection = section != null ? (bar - section.StartBar) : 0;
                 var motifPlacement = motifPlan?.GetPlacementForRoleAndBar("Comp", absoluteSectionIndex, barWithinSection);
@@ -90,7 +73,6 @@ namespace Music.Generator
                         bar,
                         barWithinSection,
                         absoluteSectionIndex,
-                        energyProfile,
                         tensionQuery,
                         microTensionPhraseRampIntensity,
                         settings,
@@ -101,23 +83,13 @@ namespace Music.Generator
                     continue;
                 }
 
-                // Get comp energy controls
-                var compProfile = energyProfile?.Roles?.Comp;
-
-                // Story 7.6.5: Apply variation deltas if available
-                if (variationQuery != null && compProfile != null)
-                {
-                    var variationPlan = variationQuery.GetVariationPlan(absoluteSectionIndex);
-                    compProfile = VariationParameterAdapter.ApplyVariation(compProfile, variationPlan.Roles.Comp);
-                }
-
                 // Story 7.5.6: Derive tension hooks for this bar to bias accent velocity
                 int barIndexWithinSection = section != null ? (bar - section.StartBar) : 0;
                 var hooks = TensionHooksBuilder.Create(
                     tensionQuery,
                     absoluteSectionIndex,
                     barIndexWithinSection,
-                    energyProfile,
+                    null,
                     microTensionPhraseRampIntensity);
 
                 // Section profile for voicing selection
@@ -134,7 +106,7 @@ namespace Music.Generator
                     sectionType,
                     absoluteSectionIndex,
                     barIndexWithinSection,
-                    compProfile?.BusyProbability ?? 0.5,
+                    0.5,
                     settings.Seed);
 
                 // Story 8.0.3: Use behavior realizer for onset selection and duration
@@ -142,7 +114,7 @@ namespace Music.Generator
                     behavior,
                     compOnsets,
                     pattern,
-                    compProfile?.DensityMultiplier ?? 1.0,
+                    1.0,
                     bar,
                     settings.Seed);
 
@@ -204,36 +176,31 @@ namespace Music.Generator
                     // Select comp voicing (2-4 note chord fragment)
                     var voicing = CompVoicingSelector.Select(ctx, slot, previousVoicing, sectionProfile);
 
-                    // Story 7.3: Apply register lift with lead-space ceiling guardrail
-                    var adjustedVoicing = ApplyRegisterWithGuardrail(
-                        voicing,
-                        compProfile?.RegisterLiftSemitones ?? 0);
-
                     // Validate all notes are in scale
-                    foreach (int midiNote in adjustedVoicing)
+                    foreach (int midiNote in voicing)
                     {
                         int pc = PitchClassUtils.ToPitchClass(midiNote);
                     }
 
                     // Calculate strum timing offsets for this chord
                     var strumOffsets = StrumTimingEngine.CalculateStrumOffsets(
-                        adjustedVoicing,
+                        voicing,
                         slot.Bar,
                         slot.OnsetBeat,
                         "comp",
                         settings.Seed);
 
-                    // Story 7.3: Calculate velocity with energy bias
+                    // Calculate base velocity
                     int baseVelocity = 85;
-                    int velocity = ApplyVelocityBias(baseVelocity, compProfile?.VelocityBias ?? 0);
+                    int velocity = baseVelocity;
 
-                    // Story 7.5.6: Apply tension accent bias for phrase peaks/ends (additive to energy bias)
+                    // Story 7.5.6: Apply tension accent bias for phrase peaks/ends
                     velocity = ApplyTensionAccentBias(velocity, hooks.VelocityAccentBias);
 
                     // Add all notes from the voicing with strum timing offsets
-                    for (int i = 0; i < adjustedVoicing.Count; i++)
+                    for (int i = 0; i < voicing.Count; i++)
                     {
-                        int midiNote = adjustedVoicing[i];
+                        int midiNote = voicing[i];
                         int strumOffset = strumOffsets[i];
 
                         var noteStart = (int)slot.StartTick + strumOffset;
@@ -252,8 +219,8 @@ namespace Music.Generator
                             noteOnVelocity: velocity));
                     }
 
-                    // Update previous voicing for next onset (use adjusted voicing)
-                    previousVoicing = adjustedVoicing;
+                    // Update previous voicing for next onset
+                    previousVoicing = voicing;
                 }
             }
 
@@ -312,18 +279,8 @@ namespace Music.Generator
         }
 
         /// <summary>
-        /// Applies velocity bias from energy profile.
-        /// Story 7.3: Energy affects dynamics.
-        /// </summary>
-        private static int ApplyVelocityBias(int baseVelocity, int velocityBias)
-        {
-            int velocity = baseVelocity + velocityBias;
-            return Math.Clamp(velocity, 1, 127);
-        }
-
-        /// <summary>
         /// Applies tension accent bias to velocity.
-        /// Story 7.5.6: Tension hooks provide phrase-peak/end accent bias (additive to energy bias).
+        /// Story 7.5.6: Tension hooks provide phrase-peak/end accent bias.
         /// </summary>
         private static int ApplyTensionAccentBias(int velocity, int tensionAccentBias)
         {
@@ -343,7 +300,6 @@ namespace Music.Generator
             int bar,
             int barWithinSection,
             int absoluteSectionIndex,
-            EnergySectionProfile? energyProfile,
             ITensionQuery tensionQuery,
             double microTensionPhraseRampIntensity,
             RandomizationSettings settings,
@@ -379,7 +335,7 @@ namespace Music.Generator
                 tensionQuery,
                 absoluteSectionIndex,
                 barWithinSection,
-                energyProfile,
+                null,
                 microTensionPhraseRampIntensity);
 
             // Render motif
@@ -388,7 +344,7 @@ namespace Music.Generator
                 placement,
                 harmonyContexts,
                 onsetGrid,
-                energyProfile?.Global.Energy ?? 0.5,
+                0.5,
                 hooks.VelocityAccentBias,
                 settings.Seed);
 

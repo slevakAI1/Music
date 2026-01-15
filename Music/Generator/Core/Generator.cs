@@ -109,7 +109,6 @@ namespace Music.Generator
                     songContext.GrooveTrack,
                     songContext.BarTrack,
                     songContext.SectionTrack,
-                    sectionProfiles,
                     tensionQuery,
                     microTensionPhraseRampIntensity,
                     variationQuery,
