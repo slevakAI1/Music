@@ -161,20 +161,23 @@
 
 ---
 
-### Story 2.4: Remove Energy from DrumTrackGenerator
+### Story 2.4: Remove Energy from DrumTrackGenerator ✓ COMPLETE
 
 **File**: `Music\Generator\Drums\DrumTrackGenerator.cs`
 
-**Changes**:
-- Remove `Dictionary<int, EnergySectionProfile> sectionProfiles` parameter from `Generate()`
-- Delete `EnergySectionProfile? energyProfile = null;` and profile lookup
-- Delete orchestration presence check
-- Delete `BuildDrumParameters()` energy profile merging (use defaults)
-- Delete `GenerateCymbalHitsWithEnergyProfile()` energy hints (simplify to basic call)
-- Delete phrase-end dropout energy threshold check
-- Remove AI comments referencing energy
+**Changes completed**:
+- Removed `Dictionary<int, EnergySectionProfile> sectionProfiles` parameter from `Generate()`
+- Deleted `EnergySectionProfile? energyProfile = null;` and profile lookup
+- Deleted orchestration presence check (`energyProfile?.Orchestration.DrumsPresent`)
+- Deleted `BuildDrumParameters()` method - now uses default `settings.DrumParameters`
+- Replaced `GenerateCymbalHitsWithEnergyProfile()` with direct call to `CymbalOrchestrationEngine.GenerateCymbalHits()`
+- Deleted both energy-specific methods entirely
+- Removed energy threshold check from phrase-end dropout logic (simplified condition from `energyProfile?.Global.Energy is < 0.92` to always allow)
+- Updated AI comments to remove "Story 7.3" and energy references
 
-**Callers to update**: `Generator.cs`
+**Caller updated**: `Generator.cs` - removed `sectionProfiles` argument from `DrumTrackGenerator.Generate()` call
+
+**Result**: Drum track generation no longer varies by energy. Uses default drum parameters from settings, no orchestration gating, and simplified cymbal generation without energy hints. Phrase-end dropout now only depends on tension hooks, not energy levels.
 
 ---
 

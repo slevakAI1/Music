@@ -1,7 +1,6 @@
 // AI: purpose=Generate drum track: kick, snare, hi-hat, ride using DrumVariationEngine for living performance (Story 6.1+6.3).
 /// AI: invariants=Calls DrumVariationEngine per bar; integrates DrumFillEngine at section transitions; converts to MIDI PartTrackEvent list; returns sorted by AbsoluteTimeTicks.
 /// AI: deps=Uses DrumVariationEngine, DrumFillEngine, RandomHelpers, PitchRandomizer.SelectDrumVelocity for velocity shaping.
-/// AI: Story 7.3=Now accepts section profiles and applies energy controls (density, velocity, busy probability) to drum generation.
 
 using Music.MyMidi;
 using Music.Song.Material;
@@ -12,7 +11,7 @@ namespace Music.Generator
     {
         /// <summary>
         /// Generates drum track: kick, snare, hi-hat, ride with deterministic variations and fills.
-        /// Updated for Story 6.1, Story 6.3 (section transition fills), and Story 7.3 (energy profiles).
+        /// Updated for Story 6.1, Story 6.3 (section transition fills).
         /// Updated for Story 7.6.4: accepts optional variation query for future parameter adaptation.
         /// Updated for Story 9.3: accepts motifPresence for ducking awareness.
         /// </summary>
@@ -21,7 +20,6 @@ namespace Music.Generator
             GrooveTrack grooveTrack,
             BarTrack barTrack,
             SectionTrack sectionTrack,
-            Dictionary<int, EnergySectionProfile> sectionProfiles,
             ITensionQuery tensionQuery,
             double microTensionPhraseRampIntensity,
             IVariationQuery? variationQuery,
@@ -66,31 +64,17 @@ namespace Music.Generator
                         absoluteSectionIndex = 0;
                 }
 
-                // Story 7.3: Get energy profile for this section
-                EnergySectionProfile? energyProfile = null;
-                if (section != null && sectionProfiles.TryGetValue(section.StartBar, out var profile))
-                {
-                    energyProfile = profile;
-                }
-
                 // Story 7.5.5: Derive hooks for this bar to bias optional behaviors only (fills/dropouts).
                 int barIndexWithinSection = section != null ? (bar - section.StartBar) : 0;
                 var hooks = TensionHooksBuilder.Create(
                     tensionQuery,
                     absoluteSectionIndex,
                     barIndexWithinSection,
-                    energyProfile,
+                    null,
                     microTensionPhraseRampIntensity);
 
-                // Story 7.3: Check if drums are present in orchestration
-                if (energyProfile?.Orchestration != null && !energyProfile.Orchestration.DrumsPresent)
-                {
-                    // Skip drums for this bar if orchestration says drums not present
-                    continue;
-                }
-
-                // Story 7.3: Build DrumRoleParameters from energy profile
-                var drumParameters = BuildDrumParameters(energyProfile, settings.DrumParameters);
+                // Use default drum parameters
+                var drumParameters = settings.DrumParameters ?? new DrumRoleParameters();
 
                 // Story 7.6.5: Apply variation deltas if available
                 if (variationQuery != null && drumParameters != null)
@@ -160,9 +144,9 @@ namespace Music.Generator
                     var variation = DrumVariationEngine.Generate(grooveEvent, sectionType, bar, settings.Seed, drumParameters);
                     allHits = variation.Hits;
 
-                    // Story 7.5.5: Phrase-end dropout option (bias-only): thin timekeeping late in bar when tension high and energy not max.
+                    // Story 7.5.5: Phrase-end dropout option (bias-only): thin timekeeping late in bar when tension high.
                     // Guardrails: never remove anchor/main hits; never remove kick/snare; only remove non-main hat hits on late subdivisions.
-                    if (hooks.PullProbabilityBias > 0.0 && hooks.DensityThinningBias > 0.0001 && energyProfile?.Global.Energy is < 0.92)
+                    if (hooks.PullProbabilityBias > 0.0 && hooks.DensityThinningBias > 0.0001)
                     {
                         double dropProb = Math.Clamp(hooks.DensityThinningBias * 1.5, 0.0, 0.30);
                         if (barRng.NextDouble() < dropProb)
@@ -177,15 +161,14 @@ namespace Music.Generator
                     }
                 }
 
-                // Story 7.3: Add cymbal orchestration with energy profile hints
-                var cymbalHits = GenerateCymbalHitsWithEnergyProfile(
+                // Add cymbal orchestration
+                var cymbalHits = CymbalOrchestrationEngine.GenerateCymbalHits(
                     bar,
                     totalBars,
                     sectionTrack,
                     sectionType,
                     grooveEvent.SourcePresetName ?? "default",
-                    settings.Seed,
-                    energyProfile);
+                    settings.Seed);
 
                 // Convert cymbal hits to DrumHit format and add to allHits
                 foreach (var cymbalHit in cymbalHits)
@@ -604,81 +587,6 @@ namespace Music.Generator
             notes = notes.OrderBy(e => e.AbsoluteTimeTicks).ToList();
 
             return new PartTrack(notes) { MidiProgramNumber = midiProgramNumber };
-        }
-
-        /// <summary>
-        /// Builds DrumRoleParameters from energy profile, merging with existing settings.
-        /// Story 7.3: Maps energy profile to drum controls.
-        /// </summary>
-        private static DrumRoleParameters? BuildDrumParameters(
-            EnergySectionProfile? energyProfile,
-            DrumRoleParameters? existingParameters)
-        {
-            if (energyProfile?.Roles?.Drums == null)
-            {
-                return existingParameters ?? new DrumRoleParameters();
-            }
-
-            var drumsProfile = energyProfile.Roles.Drums;
-
-            // Merge energy profile with existing parameters
-            return new DrumRoleParameters
-            {
-                DensityMultiplier = drumsProfile.DensityMultiplier,
-                VelocityBias = drumsProfile.VelocityBias,
-                BusyProbability = drumsProfile.BusyProbability,
-                FillProbability = existingParameters?.FillProbability ?? 0.0,
-                FillComplexityMultiplier = existingParameters?.FillComplexityMultiplier ?? 1.0
-            };
-        }
-
-        /// <summary>
-        /// Generates cymbal hits incorporating energy profile hints.
-        /// Story 7.3: Uses energy orchestration profile for cymbal decisions.
-        /// </summary>
-        private static List<CymbalOrchestrationEngine.CymbalHit> GenerateCymbalHitsWithEnergyProfile(
-            int bar,
-            int totalBars,
-            SectionTrack sectionTrack,
-            MusicConstants.eSectionType sectionType,
-            string grooveName,
-            int seed,
-            EnergySectionProfile? energyProfile)
-        {
-            // Get base cymbal hits from existing engine
-            var hits = CymbalOrchestrationEngine.GenerateCymbalHits(
-                bar, totalBars, sectionTrack, sectionType, grooveName, seed);
-
-            // Story 7.3: Apply energy profile hints if available
-            if (energyProfile?.Orchestration != null)
-            {
-                var orchestration = energyProfile.Orchestration;
-
-                // Check if section needs crash on start
-                if (orchestration.CrashOnSectionStart)
-                {
-                    // Check if this is the first bar of the section
-                    if (sectionTrack.GetActiveSection(bar, out var section) && 
-                        section != null && section.StartBar == bar)
-                    {
-                        // Ensure crash hit exists at beat 1
-                        bool hasCrashAtStart = hits.Any(h => h.OnsetBeat == 1m && 
-                            (h.Type == "crash1" || h.Type == "crash2"));
-
-                        if (!hasCrashAtStart)
-                        {
-                            hits.Add(new CymbalOrchestrationEngine.CymbalHit
-                            {
-                                OnsetBeat = 1m,
-                                Type = "crash1",
-                                TimingOffsetTicks = 0
-                            });
-                        }
-                    }
-                }
-            }
-
-            return hits;
         }
     }
 }
