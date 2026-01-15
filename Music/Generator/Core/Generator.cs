@@ -1,13 +1,8 @@
-// AI: purpose=Generate PartTracks for parts using harmony, groove, and timing; uses controlled randomness via PitchRandomizer.
-// AI: invariants=Order: Harmony->Groove->Bar must align; totalBars derived from SectionTrack; tick calc uses (onsetBeat-1)*TicksPerQuarterNote.
-// AI: deps=Relies on HarmonyTrack.GetActiveHarmonyEvent, GrooveTrack.GetActiveGroovePreset, BarTrack.GetBar, MusicConstants.TicksPerQuarterNote.
-// AI: perf=Not real-time; called once per song generation; avoid heavy allocations in inner loops.
-// TODO? confirm behavior when groove/pads onsets null vs empty; current code skips in both cases.
-// IMPORTANT: Generator MUST NOT rebuild or mutate `BarTrack`.
-// The `BarTrack` is considered a read-only timing "ruler" for generation and must be built
-// by the caller (e.g., editor/export pipeline) via `BarTrack.RebuildFromTimingTrack(...)` before
-// calling `Generator.Generate(...)`. Rebuilding `BarTrack` inside the generator would mask
-// upstream integrity issues and is intentionally avoided.
+// AI: purpose=Generate PartTracks using Harmony, Groove, Section+Bar timing; deterministic via seed.
+// AI: invariants=Harmony->Groove->Bar timing must align; BarTrack is read-only and must NOT be rebuilt here.
+// AI: deps=HarmonyValidator, EnergyArc, EnergyProfileBuilder, MotifPlacementPlanner, MusicConstants.TicksPerQuarterNote.
+// AI: perf=Single-run generation; avoid allocations in inner loops; use seed for deterministic results.
+// TODO? confirm behavior when groove/pads onsets null vs empty; current code treats both as skip.
 
 using Music.MyMidi;
 using Music.Song.Material;
@@ -158,10 +153,7 @@ namespace Music.Generator
             };
         }
 
-        /// <summary>
-        /// Builds section energy profiles for all sections.
-        /// Returns dictionary keyed by absolute section index for intent query.
-        /// </summary>
+        // AI: builds EnergySectionProfile per absolute section index; sectionIndex per type increments; seed for micro-arc; previousProfile for contrast
         private static Dictionary<int, EnergySectionProfile> BuildSectionProfiles(
             EnergyArc energyArc,
             SectionTrack sectionTrack,
@@ -207,18 +199,14 @@ namespace Music.Generator
             return profiles;
         }
 
-        /// <summary>
-        /// Gets the primary groove name from the groove track (first groove event).
-        /// </summary>
+        // AI: returns SourcePresetName of first groove event or "Default"; used as primary groove key
         private static string GetPrimaryGrooveName(GrooveTrack grooveTrack)
         {
             var firstGroove = grooveTrack.Events.FirstOrDefault();
             return firstGroove?.SourcePresetName ?? "Default";
         }
 
-        /// <summary>
-        /// Initializes MaterialBank with test motifs for Story 9.2.
-        /// </summary>
+        // AI: creates MaterialBank with example motifs used by motif planner; safe to return non-empty test bank
         private static MaterialBank InitializeMaterialBank()
         {
             var bank = new MaterialBank();
@@ -239,9 +227,7 @@ namespace Music.Generator
             return bank;
         }
 
-        /// <summary>
-        /// Creates motif placement plan using MotifPlacementPlanner (Story 9.1).
-        /// </summary>
+        // AI: creates MotifPlacementPlan using DeterministicSongIntentQuery; returns Empty when materialBank empty; logs placements
         private static MotifPlacementPlan CreateMotifPlacementPlan(
             MaterialBank materialBank,
             SectionTrack sectionTrack,
@@ -328,10 +314,7 @@ namespace Music.Generator
 
         #endregion
 
-        /// <summary>
-        /// Resolves MIDI program number from VoiceSet by matching GrooveRole.
-        /// Returns defaultProgram if role not found or voice name cannot be mapped.
-        /// </summary>
+        // AI: resolves MIDI program by GrooveRole->VoiceName match (case-insensitive); returns defaultProgram on not found
         private static int GetProgramNumberForRole(VoiceSet voices, String grooveRole, int defaultProgram)
         {
             // Find voice with matching groove role
