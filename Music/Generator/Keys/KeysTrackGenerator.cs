@@ -1,8 +1,7 @@
 // AI: purpose=Generate keys/pads track using VoiceLeadingSelector and SectionProfile for dynamic voicing per section.
 // AI: keep program number 4; tracks previous ChordRealization for voice-leading continuity; returns sorted by AbsoluteTimeTicks.
-// AI: Story 7.3=Now accepts section profiles and applies energy controls (density, velocity, register) with lead-space ceiling guardrail.
-// AI: Story 7.5.6=Now accepts tension query and applies tension hooks for phrase-peak/end accent bias (velocity only).
-// AI: Story 8.0.6=Now uses KeysRoleMode system for audibly distinct playing behaviors (Sustain/Pulse/Rhythmic/SplitVoicing).
+// AI: Now accepts tension query and applies tension hooks for phrase-peak/end accent bias (velocity only).
+// AI: Now uses KeysRoleMode system for audibly distinct playing behaviors (Sustain/Pulse/Rhythmic/SplitVoicing).
 
 using Music.MyMidi;
 using Music.Song.Material;
@@ -14,18 +13,16 @@ namespace Music.Generator
     {
         /// <summary>
         /// Generates keys/pads track: voice-led chord voicings with optional color tones per section profile.
-        /// Updated for Story 7.3: energy profile integration with guardrails.
-        /// Updated for Story 7.5.6: tension hooks for accent bias at phrase peaks/ends.
-        /// Updated for Story 7.6.4: accepts optional variation query for future parameter adaptation.
-        /// Updated for Story 8.0.6: uses KeysRoleMode system for distinct playing behaviors.
-        /// Updated for Story 9.2: uses MotifRenderer when motif placed for Keys role.
+        /// Accepts tension query and applies tension hooks for accent bias at phrase peaks/ends.
+        /// Accepts optional variation query for future parameter adaptation.
+        /// Uses KeysRoleMode system for distinct playing behaviors.
+        /// Uses MotifRenderer when motif placed for Keys role.
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
             BarTrack barTrack,
             SectionTrack sectionTrack,
-            Dictionary<int, EnergySectionProfile> sectionProfiles,
             ITensionQuery tensionQuery,
             double microTensionPhraseRampIntensity,
             IVariationQuery? variationQuery,
@@ -55,7 +52,7 @@ namespace Music.Generator
                     continue;
                 }
 
-                // Get section and energy profile
+                // Get section
                 Section? section = null;
                 int absoluteSectionIndex = 0;
                 if (sectionTrack.GetActiveSection(bar, out section) && section != null)
@@ -63,20 +60,6 @@ namespace Music.Generator
                     absoluteSectionIndex = sectionTrack.Sections.IndexOf(section);
                     if (absoluteSectionIndex < 0)
                         absoluteSectionIndex = 0;
-                }
-
-                // Story 7.3: Get energy profile for this section
-                EnergySectionProfile? energyProfile = null;
-                if (section != null && sectionProfiles.TryGetValue(section.StartBar, out var profile))
-                {
-                    energyProfile = profile;
-                }
-
-                // Story 7.3: Check if keys/pads are present in orchestration
-                if (energyProfile?.Orchestration != null && !energyProfile.Orchestration.KeysPresent)
-                {
-                    // Skip keys for this bar if orchestration says keys not present
-                    continue;
                 }
 
                 // Story 9.2: Check if motif is placed for Keys role in this bar
@@ -94,7 +77,6 @@ namespace Music.Generator
                         bar,
                         barIndexWithinSection,
                         absoluteSectionIndex,
-                        energyProfile,
                         tensionQuery,
                         microTensionPhraseRampIntensity,
                         settings,
@@ -105,22 +87,12 @@ namespace Music.Generator
                     continue;
                 }
 
-                // Get keys energy controls
-                var keysProfile = energyProfile?.Roles?.Keys;
-
-                // Story 7.6.5: Apply variation deltas if available
-                if (variationQuery != null && keysProfile != null)
-                {
-                    var variationPlan = variationQuery.GetVariationPlan(absoluteSectionIndex);
-                    keysProfile = VariationParameterAdapter.ApplyVariation(keysProfile, variationPlan.Roles.Keys);
-                }
-
-                // Story 7.5.6: Derive tension hooks for this bar to bias accent velocity
+                // Derive tension hooks for this bar to bias accent velocity
                 var hooks = TensionHooksBuilder.Create(
                     tensionQuery,
                     absoluteSectionIndex,
                     barIndexWithinSection,
-                    energyProfile,
+                    null,
                     microTensionPhraseRampIntensity);
 
                 // Select keys mode based on section/busyProbability
@@ -128,14 +100,14 @@ namespace Music.Generator
                     section?.SectionType ?? MusicConstants.eSectionType.Verse,
                     absoluteSectionIndex,
                     barIndexWithinSection,
-                    keysProfile?.BusyProbability ?? 0.5,
+                    0.5,
                     settings.Seed);
 
-                // Story 8.0.6: Realize mode into onset selection and duration
+                // Realize mode into onset selection and duration
                 var realization = KeysModeRealizer.Realize(
                     mode,
                     padsOnsets,
-                    keysProfile?.DensityMultiplier ?? 1.0,
+                    1.0,
                     bar,
                     settings.Seed);
 
@@ -179,10 +151,9 @@ namespace Music.Generator
                 if (realization.SelectedOnsets.Count == 0)
                     continue;
 
-                // Story 7.3: Update section profile with energy adjustments
-                SectionProfile? sectionProfile = UpdateSectionProfileWithEnergy(
-                    section?.SectionType ?? MusicConstants.eSectionType.Verse,
-                    keysProfile);
+                // Get section profile
+                SectionProfile? sectionProfile = SectionProfile.GetForSectionType(
+                    section?.SectionType ?? MusicConstants.eSectionType.Verse);
 
                 // Story 8.0.6: Build onset grid from realized onsets
                 var onsetSlots = OnsetGrid.Build(bar, realization.SelectedOnsets, barTrack);
@@ -253,10 +224,10 @@ namespace Music.Generator
                         chordRealization = VoiceLeadingSelector.Select(previousVoicing, ctx, sectionProfile);
                     }
 
-                    // Story 7.3: Apply lead-space ceiling guardrail to prevent clash with melody
+                    // Apply lead-space ceiling guardrail to prevent clash with melody
                     chordRealization = ApplyLeadSpaceGuardrail(chordRealization);
 
-                    // Story 8.0.6: For SplitVoicing mode, split voicing between onsets
+                    // For SplitVoicing mode, split voicing between onsets
                     bool isSplitUpperOnset = mode == KeysRoleMode.SplitVoicing && 
                         slotIndex == realization.SplitUpperOnsetIndex;
 
@@ -294,20 +265,17 @@ namespace Music.Generator
                     }
                     var noteStart = (int)slot.StartTick;
 
-                    // Story 8.0.6: Apply mode duration multiplier
+                    // Apply mode duration multiplier
                     var noteDuration = (int)(slot.DurationTicks * realization.DurationMultiplier);
                     // Clamp to avoid overlapping into next bar
                     var maxDuration = (int)barTrack.GetBarEndTick(bar) - noteStart;
                     noteDuration = Math.Clamp(noteDuration, 60, Math.Max(60, maxDuration));
 
-                    // Story 7.3: Calculate velocity with energy bias
+                    // Calculate base velocity and apply tension accent bias
                     int baseVelocity = 75;
-                    int velocity = ApplyVelocityBias(baseVelocity, keysProfile?.VelocityBias ?? 0);
+                    int velocity = ApplyTensionAccentBias(baseVelocity, hooks.VelocityAccentBias);
 
-                    // Story 7.5.6: Apply tension accent bias for phrase peaks/ends (additive to energy bias)
-                    velocity = ApplyTensionAccentBias(velocity, hooks.VelocityAccentBias);
-
-                    // Story 8.0.6: Use split notes for SplitVoicing mode, full voicing otherwise
+                    // Use split notes for SplitVoicing mode, full voicing otherwise
                     foreach (int midiNote in notesToPlay)
                     {
                         // Prevent overlap: trim previous notes of the same pitch that would extend past this note-on
@@ -323,7 +291,7 @@ namespace Music.Generator
                     // Update previous voicing for next onset
                     previousVoicing = chordRealization;
 
-                    // Story 8.0.6: Increment slot index
+                    // Increment slot index
                     slotIndex++;
                 }
 
@@ -338,41 +306,8 @@ namespace Music.Generator
         }
 
         /// <summary>
-        /// Updates SectionProfile with energy adjustments.
-        /// Story 7.3: Merges energy controls into section profile for voice leading selector.
-        /// </summary>
-        private static SectionProfile UpdateSectionProfileWithEnergy(
-            MusicConstants.eSectionType sectionType,
-            EnergyRoleProfile? keysProfile)
-        {
-            // Get base section profile
-            var baseProfile = SectionProfile.GetForSectionType(sectionType);
-
-            if (keysProfile == null)
-                return baseProfile;
-
-            // Apply energy adjustments to section profile
-            // RegisterLift: add energy lift to base register lift
-            int adjustedRegisterLift = baseProfile.RegisterLift + keysProfile.RegisterLiftSemitones;
-
-            // MaxDensity: scale by density multiplier
-            int adjustedMaxDensity = (int)Math.Round(baseProfile.MaxDensity * keysProfile.DensityMultiplier);
-            adjustedMaxDensity = Math.Clamp(adjustedMaxDensity, 2, 7); // Keep reasonable bounds
-
-            // ColorToneProbability: already in base profile, keep it
-            // (Could be adjusted by energy in future if desired)
-
-            return new SectionProfile
-            {
-                RegisterLift = adjustedRegisterLift,
-                MaxDensity = adjustedMaxDensity,
-                ColorToneProbability = baseProfile.ColorToneProbability
-            };
-        }
-
-        /// <summary>
         /// Applies lead-space ceiling guardrail to chord realization.
-        /// Story 7.3: Prevents sustained pads/keys from occupying melody space (C5/MIDI 72 and above).
+        /// Prevents sustained pads/keys from occupying melody space (C5/MIDI 72 and above).
         /// </summary>
         private static ChordRealization ApplyLeadSpaceGuardrail(ChordRealization chordRealization)
         {
@@ -412,18 +347,8 @@ namespace Music.Generator
         }
 
         /// <summary>
-        /// Applies velocity bias from energy profile.
-        /// Story 7.3: Energy affects dynamics.
-        /// </summary>
-        private static int ApplyVelocityBias(int baseVelocity, int velocityBias)
-        {
-            int velocity = baseVelocity + velocityBias;
-            return Math.Clamp(velocity, 1, 127);
-        }
-
-        /// <summary>
         /// Applies tension accent bias to velocity.
-        /// Story 7.5.6: Tension hooks provide phrase-peak/end accent bias (additive to energy bias).
+        /// Tension hooks provide phrase-peak/end accent bias.
         /// </summary>
         private static int ApplyTensionAccentBias(int velocity, int tensionAccentBias)
         {
@@ -433,7 +358,7 @@ namespace Music.Generator
 
         /// <summary>
         /// Renders motif notes for a specific bar using MotifRenderer.
-        /// Story 9.2: Converts motif spec to actual note events for this bar.
+        /// Converts motif spec to actual note events for this bar.
         /// </summary>
         private static List<PartTrackEvent> RenderMotifForBar(
             MotifPlacement placement,
@@ -443,7 +368,6 @@ namespace Music.Generator
             int bar,
             int barWithinSection,
             int absoluteSectionIndex,
-            EnergySectionProfile? energyProfile,
             ITensionQuery tensionQuery,
             double microTensionPhraseRampIntensity,
             RandomizationSettings settings,
@@ -479,7 +403,7 @@ namespace Music.Generator
                 tensionQuery,
                 absoluteSectionIndex,
                 barWithinSection,
-                energyProfile,
+                null,
                 microTensionPhraseRampIntensity);
 
             // Render motif
@@ -488,7 +412,7 @@ namespace Music.Generator
                 placement,
                 harmonyContexts,
                 onsetGrid,
-                energyProfile?.Global.Energy ?? 0.5,
+                0.5,
                 hooks.VelocityAccentBias,
                 settings.Seed);
 
