@@ -183,15 +183,18 @@
 
 ## Epic 3: Remove Energy from Motif Components
 
-### Story 3.1: Remove Energy from MotifPlacementPlanner
+### Story 3.1: Remove Energy from MotifPlacementPlanner ✓ COMPLETE
 
 **File**: `Music\Song\Material\MotifPlacementPlanner.cs`
 
-**Changes**:
-- `ShouldPlaceMotif()` - remove `intent.Energy` checks, use section type only
-- `GetPreferredMaterialKind()` - remove `intent.Energy` checks
-- `DetermineMotifScope()` - remove `intent.Energy > 0.7` check
-- Remove energy trace logging
+**Changes completed**:
+- `ShouldPlaceMotif()` - removed `intent.Energy` checks, now uses section type only
+- `GetPreferredMaterialKind()` - removed `intent.Energy > 0.6` check for Verse section (always uses MelodyPhrase)
+- `DetermineMotifScope()` - removed `intent.Energy > 0.7` check (Chorus only now determines full section)
+- Removed energy trace logging (`Section {sectionIndex} ({section.SectionType}): Energy={intent.Energy:F2}`)
+- Updated AI comments and XML docs to remove energy references
+
+**Result**: Motif placement now uses section type only for decisions. Chorus gets hooks with high probability (0.8), Intro gets teasers (0.5), Verse gets riffs/phrases (0.7), Bridge gets contrast (0.7), Solo gets featured motifs (0.8), Outro gets fills (0.7). Verse always uses MelodyPhrase material kind. Duration determined by Chorus section type only, not energy level.
 
 ---
 

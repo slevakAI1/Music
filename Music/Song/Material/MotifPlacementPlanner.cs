@@ -1,22 +1,22 @@
-// AI: purpose=Deterministic motif placement planner for Story 9.1; selects WHICH motifs appear WHERE.
+// AI: purpose=Deterministic motif placement planner; selects WHICH motifs appear WHERE.
 // AI: invariants=All outputs deterministic by seed; placement respects orchestration/register constraints; collision-free within register bands.
-// AI: deps=Consumes SectionTrack, ISongIntentQuery, MaterialBank; produces MotifPlacementPlan for Story 9.2 renderer.
+// AI: deps=Consumes SectionTrack, ISongIntentQuery, MaterialBank; produces MotifPlacementPlan for renderer.
 
 using Music.Generator;
 
 namespace Music.Song.Material;
 
 /// <summary>
-/// Deterministically places motifs in song structure based on section types, energy/tension, and orchestration.
+/// Deterministically places motifs in song structure based on section types, tension, and orchestration.
 /// Story 9.1: WHICH motifs WHERE; Story 9.2 handles rendering notes.
 /// </summary>
 /// <remarks>
 /// MVP placement heuristics:
-/// - Chorus: primary hook motif almost always (highest energy)
-/// - Intro: optional motif teaser if energy low and arrangement sparse
+/// - Chorus: primary hook motif almost always
+/// - Intro: optional motif teaser
 /// - Pre-chorus: motif fragment or rhythmic foreshadowing (build anticipation)
 /// - Bridge: either new motif or transformed existing motif (contrast)
-/// - Verse: optional riff if verse energy mid-high
+/// - Verse: optional riff
 /// 
 /// Collision checks:
 /// - do not place when role absent in orchestration
@@ -29,7 +29,7 @@ public static class MotifPlacementPlanner
     /// Creates a deterministic motif placement plan for the song.
     /// </summary>
     /// <param name="sectionTrack">Song structure (section types, lengths).</param>
-    /// <param name="intentQuery">Stage 7 energy/tension/variation/orchestration intent.</param>
+    /// <param name="intentQuery">Tension/variation/orchestration intent.</param>
     /// <param name="motifBank">Available motifs (filtered by role/kind).</param>
     /// <param name="seed">Seed for deterministic tie-breaking.</param>
     /// <returns>Complete placement plan.</returns>
@@ -62,8 +62,6 @@ public static class MotifPlacementPlanner
         {
             var section = sectionTrack.Sections[sectionIndex];
             var intent = intentQuery.GetSectionIntent(sectionIndex);
-
-            Tracer.DebugTrace($"Section {sectionIndex} ({section.SectionType}): Energy={intent.Energy:F2}");
 
             // Check if motif should be placed in this section
             bool shouldPlace = ShouldPlaceMotif(section.SectionType, intent, seed);
@@ -129,8 +127,8 @@ public static class MotifPlacementPlanner
     }
 
     /// <summary>
-    /// Determines if a motif should be placed in this section type/energy context.
-    /// MVP heuristics: Chorus almost always, Verse if mid-high energy, etc.
+    /// Determines if a motif should be placed in this section type.
+    /// MVP heuristics based on section type only.
     /// </summary>
     private static bool ShouldPlaceMotif(
         MusicConstants.eSectionType sectionType,
@@ -144,13 +142,13 @@ public static class MotifPlacementPlanner
         return sectionType switch
         {
             // Chorus: almost always place hook
-            MusicConstants.eSectionType.Chorus => intent.Energy > 0.3 || roll < 0.8,
+            MusicConstants.eSectionType.Chorus => roll < 0.8,
 
-            // Intro: optional teaser if energy low and sparse
-            MusicConstants.eSectionType.Intro => intent.Energy < 0.4 && roll < 0.5,
+            // Intro: optional teaser
+            MusicConstants.eSectionType.Intro => roll < 0.5,
 
-            // Verse: optional riff if mid-high energy, or bass fill for transitions
-            MusicConstants.eSectionType.Verse => intent.Energy > 0.4 && roll < 0.7,
+            // Verse: optional riff or bass fill for transitions
+            MusicConstants.eSectionType.Verse => roll < 0.7,
 
             // Bridge: place if contrast or new material
             MusicConstants.eSectionType.Bridge => roll < 0.7,
@@ -159,7 +157,7 @@ public static class MotifPlacementPlanner
             MusicConstants.eSectionType.Solo => roll < 0.8,
 
             // Outro: place bass fills and outros frequently for satisfying endings
-            MusicConstants.eSectionType.Outro => intent.Energy > 0.2 || roll < 0.7,
+            MusicConstants.eSectionType.Outro => roll < 0.7,
 
             _ => false
         };
@@ -236,7 +234,7 @@ public static class MotifPlacementPlanner
     }
 
     /// <summary>
-    /// Gets preferred material kind based on section type and energy.
+    /// Gets preferred material kind based on section type.
     /// AI: BassFill prioritized at section transitions; Outro commonly uses fills.
     /// </summary>
     private static MaterialKind GetPreferredMaterialKind(
@@ -247,7 +245,7 @@ public static class MotifPlacementPlanner
         {
             MusicConstants.eSectionType.Chorus => MaterialKind.Hook,
             MusicConstants.eSectionType.Bridge => MaterialKind.Hook,
-            MusicConstants.eSectionType.Verse => intent.Energy > 0.6 ? MaterialKind.Riff : MaterialKind.MelodyPhrase,
+            MusicConstants.eSectionType.Verse => MaterialKind.MelodyPhrase,
             MusicConstants.eSectionType.Solo => MaterialKind.Riff,
             MusicConstants.eSectionType.Intro => MaterialKind.Hook,
             MusicConstants.eSectionType.Outro => MaterialKind.BassFill,  // Use bass fills for outros/transitions
@@ -305,11 +303,11 @@ public static class MotifPlacementPlanner
         var hash = HashCode.Combine(seed, intent.AbsoluteSectionIndex, "duration");
         var roll = (double)(Math.Abs(hash) % 100) / 100.0;
 
-        // Chorus and high-energy sections typically use full section
-        if (intent.SectionType == MusicConstants.eSectionType.Chorus || intent.Energy > 0.7)
+        // Chorus typically uses full section
+        if (intent.SectionType == MusicConstants.eSectionType.Chorus)
             return section.BarCount;
 
-        // Verse and lower energy may use half section
+        // Other sections may use half section
         if (section.BarCount >= 4 && roll < 0.5)
             return section.BarCount / 2;
 
