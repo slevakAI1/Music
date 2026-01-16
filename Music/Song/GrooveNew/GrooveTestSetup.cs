@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Music.GrooveModel;
+﻿using Music.GrooveModel;
 
 namespace Music.Grooves
 {
