@@ -1,38 +1,32 @@
-﻿using Music.GrooveModel;
+﻿using Music.Generator;
+using Music.GrooveModel;
 
 namespace Music.Grooves
 {
     public static class GrooveSetupFactory
     {
         /// <summary>
-        /// Builds a complete PopRockBasic groove definition + segment profiles for your test form:
-        /// Intro, Verse, Chorus, Verse, Chorus, Bridge, Outro; each 8 bars; 4/4.
-        ///
+        /// Builds a complete PopRockBasic groove definition + segment profiles.
         /// This is DEFINITIONS ONLY: no selection algorithms yet.
         /// </summary>
+        /// <param name="sectionTrack">The SectionTrack containing the song sections.</param>
+        /// <param name="segmentProfiles">Output: segment profiles for each section.</param>
+        /// <param name="beatsPerBar">Beats per bar for the groove (default 4/4 time).</param>
         public static GroovePresetDefinition BuildPopRockBasicGrooveForTestSong(
-            out IReadOnlyList<SegmentGrooveProfile> segmentProfiles)
+            SectionTrack sectionTrack,
+            out IReadOnlyList<SegmentGrooveProfile> segmentProfiles,
+            int beatsPerBar = 4)
         {
             // =========================
             // INPUTS (everything here)
             // =========================
 
-            // Song form (your current test) ---------------------------------------
-            var sections = new List<SectionSpec>                             // Standard
-            {
-                new("Intro",  8, 4),
-                new("Verse",  8, 4),
-                new("Chorus", 8, 4),
-                new("Verse",  8, 4),
-                new("Chorus", 8, 4),
-                new("Bridge", 8, 4),
-                new("Outro",  8, 4),
-            };
+            // Song form (from actual sections) ------------------------------------
+            var sections = ConvertSectionsToSpecs(sectionTrack.Sections, beatsPerBar);
 
             // Groove identity ----------------------------------------------------
             string presetName = "PopRockBasic";                              // Standard
             string styleFamily = "PopRock";                                  // Standard
-            int beatsPerBar = 4;                                             // Standard
             var identityTags = new List<string>                              // Standard
             {
                 "Backbeat",
@@ -145,10 +139,10 @@ namespace Music.Grooves
             };
         }
 
-        private static GrooveInstanceLayer BuildPopRockBasicAnchorLayer()
+        private static Music.GrooveModel.GrooveInstanceLayer BuildPopRockBasicAnchorLayer()
         {
             // Your current PopRockBasic anchors.
-            return new GrooveInstanceLayer
+            return new Music.GrooveModel.GrooveInstanceLayer
             {
                 KickOnsets = new List<decimal> { 1m, 3m },
                 SnareOnsets = new List<decimal> { 2m, 4m },
@@ -640,5 +634,23 @@ namespace Music.Grooves
 
         // Local helper type so inputs stay in one place in the main method
         private sealed record SectionSpec(string SectionType, int Bars, int BeatsPerBar);
+
+        /// <summary>
+        /// Converts Section objects from SectionTrack to internal SectionSpec format.
+        /// </summary>
+        private static List<SectionSpec> ConvertSectionsToSpecs(List<Section> sections, int beatsPerBar)
+        {
+            var result = new List<SectionSpec>();
+            foreach (var section in sections)
+            {
+                // Use Name if available, otherwise convert enum to string
+                string sectionType = !string.IsNullOrWhiteSpace(section.Name)
+                    ? section.Name
+                    : section.SectionType.ToString();
+
+                result.Add(new SectionSpec(sectionType, section.BarCount, beatsPerBar));
+            }
+            return result;
+        }
     }
 }
