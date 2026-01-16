@@ -16,7 +16,7 @@ namespace Music.Generator
             ValidateSongContext(songContext);
             ValidateSectionTrack(songContext.SectionTrack);
             ValidateTimeSignatureTrack(songContext.Song.TimeSignatureTrack);
-            //ValidateGrooveTrack(songContext.GroovePresetDefinition);   TO DO 
+            ValidateGrooveTrack(songContext.GroovePresetDefinition);
 
             // Get total bars from section track
             int totalBars = songContext.SectionTrack.TotalBars;
@@ -67,16 +67,20 @@ namespace Music.Generator
                 throw new ArgumentException("Time signature track must have events", nameof(timeSignatureTrack));
         }
 
-        private static void ValidateGrooveTrack(GrooveTrack grooveTrack)
-        {
-            if (grooveTrack == null || grooveTrack.Events.Count == 0)
-                throw new ArgumentException("Groove track must have events", nameof(grooveTrack));
-        }
-
         // ValidateSongContext: ensures caller provided a non-null SongContext; throws ArgumentNullException when null.
         private static void ValidateSongContext(SongContext songContext)
         {
             ArgumentNullException.ThrowIfNull(songContext);
+        }
+
+        // ValidateGrooveTrack: ensures a preset definition exists and contains an anchor layer
+        private static void ValidateGrooveTrack(GroovePresetDefinition groovePresetDefinition)
+        {
+            if (groovePresetDefinition == null)
+                throw new ArgumentException("Groove preset definition must be provided", nameof(groovePresetDefinition));
+
+            if (groovePresetDefinition.AnchorLayer == null)
+                throw new ArgumentException("Groove preset must include an AnchorLayer", nameof(groovePresetDefinition));
         }
 
         #endregion
