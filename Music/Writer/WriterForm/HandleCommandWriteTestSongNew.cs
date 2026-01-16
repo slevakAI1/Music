@@ -26,7 +26,7 @@ namespace Music.Writer
                 songContext.SegmentGrooveProfiles = segmentProfiles; // ✅ Store it
 
 
-                var result = Generator.GeneratorNew.Generate(songContext);
+                var result = Generator.Generator.Generate(songContext);
 
                 songContext.Song.PartTracks.Add(result);
 
