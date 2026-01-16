@@ -33,7 +33,13 @@ namespace Music.Generator
         // AI: MIDI drum note numbers (General MIDI standard); extend mapping as roles are added.
         private const int KickMidiNote = 36;
         private const int SnareMidiNote = 38;
-        private const int HatMidiNote = 42;
+        private const int ClosedHatMidiNote = 42;
+        private const int OpenHatMidiNote = 46;
+        private const int RideMidiNote = 51;
+        private const int CrashMidiNote = 49;
+        private const int TomHighMidiNote = 50;
+        private const int TomMidMidiNote = 47;
+        private const int TomLowMidiNote = 45;
 
         /// <summary>
         /// Generates drum track from groove preset anchor patterns.
@@ -61,7 +67,7 @@ namespace Music.Generator
         {
             DrumRole.Kick => KickMidiNote,
             DrumRole.Snare => SnareMidiNote,
-            DrumRole.ClosedHat => HatMidiNote,
+            DrumRole.ClosedHat => ClosedHatMidiNote,
             _ => throw new ArgumentOutOfRangeException(nameof(role), $"Unknown drum role: {role}")
         };
     }
