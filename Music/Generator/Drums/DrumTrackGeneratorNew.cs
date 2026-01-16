@@ -64,6 +64,7 @@ namespace Music.Generator
         /// Story 6: adds role presence check (orchestration policy).
         /// Story 8: adds protection hierarchy merger.
         /// Story 9: adds protection enforcement (must-hits, never-remove, never-add).
+        /// Story 10: applies subdivision grid filter to onsets.
         /// </summary>
         public static PartTrack Generate(
             BarTrack barTrack,
@@ -83,6 +84,9 @@ namespace Music.Generator
 
             // Story 2: Extract anchor patterns from GroovePreset per bar
             var allOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars);
+
+            // Story 10: Filter onsets by allowed subdivision grid (pre-anchor/variation filter step)
+            allOnsets = ApplySubdivisionFilter(allOnsets, groovePresetDefinition.ProtectionPolicy.SubdivisionPolicy, groovePresetDefinition.Identity.BeatsPerBar);
 
             // Story 6: Filter onsets by role presence (orchestration policy)
             var filteredOnsets = ApplyRolePresenceFilter(allOnsets, barContexts, groovePresetDefinition.ProtectionPolicy.OrchestrationPolicy);
@@ -138,6 +142,78 @@ namespace Music.Generator
             }
 
             return allOnsets;
+        }
+
+        // AI: ApplySubdivisionFilter restricts onsets to positions allowed by the subdivision policy flags.
+        // AI: Quarter=1,2,3,4; Eighth=+0.5; Sixteenth=+0.25; EighthTriplet=+0.33; SixteenthTriplet=+0.167.
+        // AI: Uses epsilon comparison for recurring fractions (1/3, 1/6).
+        private static List<DrumOnset> ApplySubdivisionFilter(
+            List<DrumOnset> onsets,
+            GrooveSubdivisionPolicy? subdivisionPolicy,
+            int beatsPerBar)
+        {
+            if (onsets == null || onsets.Count == 0)
+                return new List<DrumOnset>();
+
+            if (subdivisionPolicy == null)
+                return onsets;
+
+            var allowed = subdivisionPolicy.AllowedSubdivisions;
+
+            // If none specified, return empty (explicit deny) to follow strict policy intent.
+            if (allowed == AllowedSubdivision.None)
+                return new List<DrumOnset>();
+
+            // Build set of valid beat positions (double) for a single bar (1-based beats).
+            var validPositions = new HashSet<double>();
+
+            void AddPositions(int divisionsPerBeat)
+            {
+                if (divisionsPerBeat <= 0) return;
+
+                for (int beat = 1; beat <= beatsPerBar; beat++)
+                {
+                    for (int k = 0; k < divisionsPerBeat; k++)
+                    {
+                        double pos = beat + (double)k / divisionsPerBeat;
+                        // Only include positions within this bar
+                        if (pos < beatsPerBar + 1 - 1e-9)
+                            validPositions.Add(Math.Round(pos, 6));
+                    }
+                }
+            }
+
+            // Quarter: 1 division per beat (positions 1, 2, 3, 4)
+            if (allowed.HasFlag(AllowedSubdivision.Quarter))
+                AddPositions(1);
+
+            // Eighth: 2 divisions per beat (positions 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5)
+            if (allowed.HasFlag(AllowedSubdivision.Eighth))
+                AddPositions(2);
+
+            // Sixteenth: 4 divisions per beat (positions 1, 1.25, 1.5, 1.75, 2, 2.25, ...)
+            if (allowed.HasFlag(AllowedSubdivision.Sixteenth))
+                AddPositions(4);
+
+            // EighthTriplet: 3 divisions per beat (positions 1, 1.33, 1.67, 2, 2.33, ...)
+            if (allowed.HasFlag(AllowedSubdivision.EighthTriplet))
+                AddPositions(3);
+
+            // SixteenthTriplet: 6 divisions per beat (finer triplet grid)
+            if (allowed.HasFlag(AllowedSubdivision.SixteenthTriplet))
+                AddPositions(6);
+
+            // Compare with small epsilon due to recurring fractions like 1/3, 1/6.
+            const double epsilon = 0.002;
+
+            var filtered = onsets.Where(o =>
+            {
+                double beatVal = (double)o.Beat;
+                // Accept if any valid position is within epsilon of onset beat.
+                return validPositions.Any(p => Math.Abs(p - beatVal) <= epsilon);
+            }).ToList();
+
+            return filtered;
         }
 
         // AI: BuildBarContexts builds per-bar context for Story 5; maps bar → section, calculates phrase position, resolves segment profile.

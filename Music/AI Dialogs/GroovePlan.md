@@ -476,22 +476,31 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 10: Implement Subdivision Grid Filter
+### Story 10: Implement Subdivision Grid Filter (COMPLETED)
 **As a** generator  
 **I want** to filter onsets by allowed subdivision grid  
 **So that** only valid beat positions are used
 
 **Acceptance Criteria:**
-- [ ] Parse `AllowedSubdivision` flags to determine valid beat fractions
-- [ ] Quarter: 1, 2, 3, 4
-- [ ] Eighth: 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5
-- [ ] Sixteenth: 1, 1.25, 1.5, 1.75, 2, 2.25, ...
-- [ ] EighthTriplet: 1, 1.33, 1.67, 2, 2.33, ...
-- [ ] SixteenthTriplet: finer grid
-- [ ] Filter candidate onsets to valid positions only
+- [x] Parse `AllowedSubdivision` flags to determine valid beat fractions
+- [x] Quarter: 1, 2, 3, 4
+- [x] Eighth: 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5
+- [x] Sixteenth: 1, 1.25, 1.5, 1.75, 2, 2.25, ...
+- [x] EighthTriplet: 1, 1.33, 1.67, 2, 2.33, ...
+- [x] SixteenthTriplet: finer grid
+- [x] Filter candidate onsets to valid positions only
 
 **Settings Handled:**
 - `GrooveSubdivisionPolicy.AllowedSubdivisions` (all 5 flag values)
+
+**Implementation notes:**
+- `Music/Generator/Drums/DrumTrackGeneratorNew.cs` implements `ApplySubdivisionFilter` method.
+- Filter is applied after `ExtractAnchorOnsets` in the `Generate` pipeline (before role presence and protection enforcement).
+- Builds valid beat positions using divisionsPerBeat: Quarter=1, Eighth=2, Sixteenth=4, EighthTriplet=3, SixteenthTriplet=6.
+- Uses epsilon comparison (0.002 beats) to handle recurring fractions (1/3, 1/6).
+- Returns empty list if `AllowedSubdivision.None` to enforce strict policy intent.
+- Null subdivision policy bypasses filter (returns original onsets).
+- **Audible difference**: If subdivision policy restricts grid (e.g., Quarter only), offbeat onsets will be filtered out.
 
 ---
 
