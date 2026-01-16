@@ -607,7 +607,13 @@ namespace Music.Generator
                     EndBar = barCursor + s.Bars - 1,
 
                     EnabledVariationTags = enabledTags,
-                    EnabledProtectionTags = new List<string>(),
+
+
+                    // THIS WILL BE A TEST FOR AFTER Story 9 implemented
+                    //EnabledProtectionTags = new List<string>(),
+                    EnabledProtectionTags = new List<string> { "Drive" }, // enables PopRockRefine layer for that segment
+
+
 
                     DensityTargets = new List<RoleDensityTarget>
                     {
