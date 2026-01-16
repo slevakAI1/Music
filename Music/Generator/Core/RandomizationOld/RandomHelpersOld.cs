@@ -6,7 +6,7 @@
 
 namespace Music.Generator
 {
-    public static class RandomHelpers
+    public static class RandomHelpersOld
     {
         // AI: seed:bar/onset uses bar+decimal onset to separate subdivided beats; absoluteTicks overload for tick-based decisions.
         public static int StableSeed(int baseSeed, string partRole, int bar, decimal onsetBeat)
@@ -36,15 +36,15 @@ namespace Music.Generator
         }
 
         // AI: CreateLocalRng returns a deterministic IRandomSource for the provided decision context.
-        public static IRandomSource CreateLocalRng(int baseSeed, string partRole, int bar, decimal onsetBeat)
+        public static IRandomSourceOld CreateLocalRng(int baseSeed, string partRole, int bar, decimal onsetBeat)
         {
-            return new SeededRandomSource(StableSeed(baseSeed, partRole, bar, onsetBeat));
+            return new SeededRandomSourceOld(StableSeed(baseSeed, partRole, bar, onsetBeat));
         }
 
         // AI: CreateLocalRng(ticks) variant; keep behavior identical to bar/onset variant for determinism.
-        public static IRandomSource CreateLocalRng(int baseSeed, string partRole, long absoluteTicks)
+        public static IRandomSourceOld CreateLocalRng(int baseSeed, string partRole, long absoluteTicks)
         {
-            return new SeededRandomSource(StableSeed(baseSeed, partRole, absoluteTicks));
+            return new SeededRandomSourceOld(StableSeed(baseSeed, partRole, absoluteTicks));
         }
 
         // AI: strongBeat: true only when onsetBeat is an exact integer; relies on decimal modulus equality (no epsilon).
@@ -54,7 +54,7 @@ namespace Music.Generator
         }
 
         // AI: weightedChoice: if totalWeight <= 0 returns first item; keep this deterministic fallback.
-        public static int WeightedChoice(IRandomSource rng, (int value, double weight)[] items)
+        public static int WeightedChoice(IRandomSourceOld rng, (int value, double weight)[] items)
         {
             if (items == null || items.Length == 0)
                 throw new ArgumentException("Items array cannot be empty", nameof(items));
@@ -131,7 +131,7 @@ namespace Music.Generator
         }
 
         // AI: ChooseRandom throws on empty list; callers expect ArgumentException for invalid input.
-        public static T ChooseRandom<T>(IRandomSource rng, IReadOnlyList<T> items)
+        public static T ChooseRandom<T>(IRandomSourceOld rng, IReadOnlyList<T> items)
         {
             if (items == null || items.Count == 0)
                 throw new ArgumentException("Items list cannot be empty", nameof(items));

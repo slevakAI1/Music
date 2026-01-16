@@ -6,12 +6,12 @@
 
 namespace Music.Generator
 {
-    public sealed class SeededRandomSource : IRandomSource
+    public sealed class SeededRandomSourceOld : IRandomSourceOld
     {
         private readonly Random _rng;
 
         // AI: ctor: seed is a 32-bit int; changing how seed is derived or mixed breaks repeatability.
-        public SeededRandomSource(int seed)
+        public SeededRandomSourceOld(int seed)
         {
             _rng = new Random(seed);
         }

@@ -6,7 +6,7 @@
 namespace Music.Generator
 {
     // AI: class=immutable init-only settings; changing defaults will materially change generated music across repo.
-    public sealed class RandomizationSettings
+    public sealed class RandomizationSettingsOld
     {
         // AI: Seed: master seed for deterministic generation; same seed+inputs => identical output across runs.
         public int Seed { get; init; } = 123456;
@@ -37,6 +37,6 @@ namespace Music.Generator
         public DrumRoleParameters DrumParameters { get; init; } = new DrumRoleParameters();
 
         // AI: Default returns a minimal-randomness settings instance; callers expect stable defaults.
-        public static RandomizationSettings Default => new();
+        public static RandomizationSettingsOld Default => new();
     }
 }

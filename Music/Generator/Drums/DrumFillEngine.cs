@@ -229,7 +229,7 @@ namespace Music.Generator
             var style = GetFillStyle(grooveName);
 
             // Deterministic RNG for this fill
-            var fillRng = RandomHelpers.CreateLocalRng(seed, $"fill_{grooveName}", sectionIndex, bar);
+            var fillRng = RandomHelpersOld.CreateLocalRng(seed, $"fill_{grooveName}", sectionIndex, bar);
 
             // Determine fill complexity based on section type and allow Stage 7 to scale it.
             int complexity = GetFillComplexity(sectionType, fillRng);
@@ -300,7 +300,7 @@ namespace Music.Generator
         /// <summary>
         /// Determines fill complexity (target density) based on section type.
         /// </summary>
-        private static int GetFillComplexity(MusicConstants.eSectionType sectionType, IRandomSource rng)
+        private static int GetFillComplexity(MusicConstants.eSectionType sectionType, IRandomSourceOld rng)
         {
             int baseComplexity = sectionType switch
             {
@@ -326,7 +326,7 @@ namespace Music.Generator
             List<DrumVariationEngine.DrumHit> hits,
             int bar,
             FillStyle style,
-            IRandomSource rng,
+            IRandomSourceOld rng,
             int targetDensity)
         {
             // Generate 16th note positions across last 2 beats (beats 3-4)
@@ -381,7 +381,7 @@ namespace Music.Generator
             List<DrumVariationEngine.DrumHit> hits,
             int bar,
             FillStyle style,
-            IRandomSource rng,
+            IRandomSourceOld rng,
             int targetDensity)
         {
             // Generate 8th note positions across last 2 beats
@@ -432,7 +432,7 @@ namespace Music.Generator
             List<DrumVariationEngine.DrumHit> hits,
             int bar,
             FillStyle style,
-            IRandomSource rng)
+            IRandomSourceOld rng)
         {
             // Simple pattern: snare on beat 4 and 4.5
             hits.Add(new DrumVariationEngine.DrumHit

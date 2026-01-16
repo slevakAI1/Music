@@ -8,7 +8,7 @@ namespace Music.Generator
     // AI: contract=NextInt returns int in [minInclusive,maxExclusive); NextDouble returns double in [0,1).
     // AI: errors=Implementations may throw for invalid ranges (min>=max); callers should validate inputs.
     // AI: thread=No built-in thread-safety guarantee; synchronize if same instance is shared across threads.
-    public interface IRandomSource
+    public interface IRandomSourceOld
     {
         int NextInt(int minInclusive, int maxExclusive);
 

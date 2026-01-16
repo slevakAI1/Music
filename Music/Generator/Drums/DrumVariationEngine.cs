@@ -75,7 +75,7 @@ namespace Music.Generator
             // Bar-level deterministic RNG for consistent bar-wide choices
             // FIX: include sectionType in RNG seed for full determinism over (seed, grooveName, sectionType, barIndex)
             string sectionKey = sectionType.ToString();
-            var barRng = RandomHelpers.CreateLocalRng(seed, $"{grooveEvent.SourcePresetName ?? "groove"}_{sectionKey}", barIndex, 0m);
+            var barRng = RandomHelpersOld.CreateLocalRng(seed, $"{grooveEvent.SourcePresetName ?? "groove"}_{sectionKey}", barIndex, 0m);
 
             // Determine if this bar uses ride instead of hat (based on section energy)
             bool useRide = ShouldUseRide(sectionType, barRng);
@@ -85,7 +85,7 @@ namespace Music.Generator
             {
                 foreach (var onset in anchor.KickOnsets)
                 {
-                    bool isStrongBeat = RandomHelpers.IsStrongBeat(onset);
+                    bool isStrongBeat = RandomHelpersOld.IsStrongBeat(onset);
                     int timingOffset = DrumMicroTimingEngine.GetTimingOffset(
                         "kick", 
                         grooveEvent.SourcePresetName ?? "default",
@@ -110,7 +110,7 @@ namespace Music.Generator
             {
                 foreach (var onset in tension.KickOnsets)
                 {
-                    bool isStrongBeat = RandomHelpers.IsStrongBeat(onset);
+                    bool isStrongBeat = RandomHelpersOld.IsStrongBeat(onset);
                     int timingOffset = DrumMicroTimingEngine.GetTimingOffset(
                         "kick",
                         grooveEvent.SourcePresetName ?? "default",
@@ -137,8 +137,8 @@ namespace Music.Generator
                 double extraKickChance = (0.12 * drumParams.DensityMultiplier) + drumParams.BusyProbability;
                 if (candidates.Count > 0 && barRng.NextDouble() < Math.Clamp(extraKickChance, 0.0, 0.95))
                 {
-                    var pick = RandomHelpers.ChooseRandom(barRng, candidates);
-                    bool isStrongBeat = RandomHelpers.IsStrongBeat(pick);
+                    var pick = RandomHelpersOld.ChooseRandom(barRng, candidates);
+                    bool isStrongBeat = RandomHelpersOld.IsStrongBeat(pick);
                     int timingOffset = DrumMicroTimingEngine.GetTimingOffset(
                         "kick",
                         grooveEvent.SourcePresetName ?? "default",
@@ -162,12 +162,12 @@ namespace Music.Generator
             {
                 foreach (var onset in anchor.SnareOnsets)
                 {
-                    var snareRng = RandomHelpers.CreateLocalRng(seed, $"{grooveEvent.SourcePresetName ?? "snare"}_{sectionKey}", barIndex, onset);
+                    var snareRng = RandomHelpersOld.CreateLocalRng(seed, $"{grooveEvent.SourcePresetName ?? "snare"}_{sectionKey}", barIndex, onset);
                     
                     // Flams (currently disabled)
                     bool allowFlam = IsHighEnergySection(sectionType);
                     bool flam = allowFlam && snareRng.NextDouble() < 0.22;
-                    bool isStrongBeat = RandomHelpers.IsStrongBeat(onset);
+                    bool isStrongBeat = RandomHelpersOld.IsStrongBeat(onset);
 
                     if (flam)
                     {
@@ -214,7 +214,7 @@ namespace Music.Generator
                 var ghostCandidates = anchor.HatOnsets ?? new List<decimal>();
                 if (ghostCandidates.Count > 0)
                 {
-                    var ghostRng = RandomHelpers.CreateLocalRng(seed, $"{grooveEvent.SourcePresetName ?? "ghost"}_{sectionKey}", barIndex, 0m);
+                    var ghostRng = RandomHelpersOld.CreateLocalRng(seed, $"{grooveEvent.SourcePresetName ?? "ghost"}_{sectionKey}", barIndex, 0m);
                     // Base 0-2 ghosts per bar, scaled by density multiplier
                     int maxGhostBase = 2;
                     int maxGhost = Math.Max(0, (int)Math.Round(maxGhostBase * drumParams.DensityMultiplier));
@@ -222,12 +222,12 @@ namespace Music.Generator
                     
                     for (int i = 0; i < ghostCount; i++)
                     {
-                        var pick = RandomHelpers.ChooseRandom(ghostRng, ghostCandidates);
+                        var pick = RandomHelpersOld.ChooseRandom(ghostRng, ghostCandidates);
                         
                         // Avoid ghost on strong beats (where main snare typically hits)
-                        if (RandomHelpers.IsStrongBeat(pick)) continue;
+                        if (RandomHelpersOld.IsStrongBeat(pick)) continue;
                         
-                        bool ghostIsStrongBeat = RandomHelpers.IsStrongBeat(pick);
+                        bool ghostIsStrongBeat = RandomHelpersOld.IsStrongBeat(pick);
                         int ghostTimingOffset = DrumMicroTimingEngine.GetTimingOffset(
                             "snare",
                             grooveEvent.SourcePresetName ?? "default",
@@ -255,7 +255,7 @@ namespace Music.Generator
 
                 foreach (var onset in anchor.HatOnsets)
                 {
-                    var hatRng = RandomHelpers.CreateLocalRng(seed, $"{grooveEvent.SourcePresetName ?? role}_{sectionKey}", barIndex, onset);
+                    var hatRng = RandomHelpersOld.CreateLocalRng(seed, $"{grooveEvent.SourcePresetName ?? role}_{sectionKey}", barIndex, onset);
 
                     // Open hat probability (ride doesn't use open articulation)
                     bool open = false;
@@ -266,11 +266,11 @@ namespace Music.Generator
                     }
 
                     // Occasionally skip hats/ride for flow (never skip strong beats)
-                    bool skip = !RandomHelpers.IsStrongBeat(onset) && hatRng.NextDouble() < 0.06;
+                    bool skip = !RandomHelpersOld.IsStrongBeat(onset) && hatRng.NextDouble() < 0.06;
 
                     if (!skip)
                     {
-                        bool isStrongBeat = RandomHelpers.IsStrongBeat(onset);
+                        bool isStrongBeat = RandomHelpersOld.IsStrongBeat(onset);
                         int timingOffset = DrumMicroTimingEngine.GetTimingOffset(
                             role,
                             grooveEvent.SourcePresetName ?? "default",
@@ -294,9 +294,9 @@ namespace Music.Generator
                 double extraHatChance = (0.08 * drumParams.DensityMultiplier) + drumParams.BusyProbability;
                 if (anchor.HatOnsets.Count > 0 && barRng.NextDouble() < Math.Clamp(extraHatChance, 0.0, 0.95))
                 {
-                    var pickBase = RandomHelpers.ChooseRandom(barRng, anchor.HatOnsets);
+                    var pickBase = RandomHelpersOld.ChooseRandom(barRng, anchor.HatOnsets);
                     decimal extraOnset = pickBase + 0.25m; // quarter subdivision ahead
-                    bool isStrongBeat = RandomHelpers.IsStrongBeat(extraOnset);
+                    bool isStrongBeat = RandomHelpersOld.IsStrongBeat(extraOnset);
                     int timingOffset = DrumMicroTimingEngine.GetTimingOffset(
                         role,
                         grooveEvent.SourcePresetName ?? "default",
@@ -335,7 +335,7 @@ namespace Music.Generator
         /// Determines if ride should be used instead of hi-hat.
         /// Returns fixed low probability regardless of section type.
         /// </summary>
-        private static bool ShouldUseRide(MusicConstants.eSectionType sectionType, IRandomSource rng)
+        private static bool ShouldUseRide(MusicConstants.eSectionType sectionType, IRandomSourceOld rng)
         {
             double rideProb = 0.15;
             return rng.NextDouble() < rideProb;

@@ -43,7 +43,7 @@ namespace Music.Generator
             int totalBars = songContext.SectionTrack.TotalBars;
 
             // Use default randomization settings and harmony policy
-            var settings = RandomizationSettings.Default;
+            var settings = RandomizationSettingsOld.Default;
             var harmonyPolicy = HarmonyPolicy.Default;
 
             var grooveName = GetPrimaryGrooveName(songContext.GrooveTrack);

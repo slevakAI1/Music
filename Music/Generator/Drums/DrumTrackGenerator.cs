@@ -23,12 +23,12 @@ namespace Music.Generator
             MotifPlacementPlan? motifPlan,
             MotifPresenceMap? motifPresence,
             int totalBars,
-            RandomizationSettings settings,
+            RandomizationSettingsOld settings,
             int midiProgramNumber)
         {
 
             var notes = new List<PartTrackEvent>();
-            var randomizer = new PitchRandomizer(settings);
+            var randomizer = new PitchRandomizerOld(settings);
 
             // MIDI drum note numbers (General MIDI)
             const int kickNote = 36;
@@ -73,7 +73,7 @@ namespace Music.Generator
                 double duckingMultiplier = hasLeadMotif ? 0.7 : 1.0; // Thin optional hits by 30% when lead motif active
 
                 // Create deterministic per-bar RNG so fill decisions remain deterministic when knobs change.
-                var barRng = RandomHelpers.CreateLocalRng(settings.Seed, $"{grooveEvent.SourcePresetName ?? "groove"}_{sectionType}", bar, 0m);
+                var barRng = RandomHelpersOld.CreateLocalRng(settings.Seed, $"{grooveEvent.SourcePresetName ?? "groove"}_{sectionType}", bar, 0m);
 
                 // Phrase-end pull biases optional fill chance (with null tension query, bias is 0.0); this must not override transition fills.
                 double tensionFillExtraProbability = Math.Clamp(pullProbabilityBias, 0.0, 0.20);
@@ -184,7 +184,7 @@ namespace Music.Generator
                 // Story 9.3: Apply ducking when lead motif active (thin optional hat hits)
                 if (hasLeadMotif)
                 {
-                    var localRng = RandomHelpers.CreateLocalRng(settings.Seed, $"duck_{bar}", bar, 0m);
+                    var localRng = RandomHelpersOld.CreateLocalRng(settings.Seed, $"duck_{bar}", bar, 0m);
                     allHits = allHits.Where(h =>
                     {
                         // Never remove groove anchors (main hits, kick, snare)
@@ -219,7 +219,7 @@ namespace Music.Generator
                     {
                         case "kick":
                             {
-                                bool isStrongBeat = RandomHelpers.IsStrongBeat(slot.OnsetBeat);
+                                bool isStrongBeat = RandomHelpersOld.IsStrongBeat(slot.OnsetBeat);
                                 int baseVel = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "kick", baseVelocity: 100);
                                 
                                 // Apply velocity shaping
@@ -261,7 +261,7 @@ namespace Music.Generator
 
                         case "snare":
                             {
-                                bool isStrongBeat = RandomHelpers.IsStrongBeat(slot.OnsetBeat);
+                                bool isStrongBeat = RandomHelpersOld.IsStrongBeat(slot.OnsetBeat);
 
                                 if (hit.IsFlam)
                                 {
@@ -352,7 +352,7 @@ namespace Music.Generator
 
                         case "hat":
                             {
-                                bool isStrongBeat = RandomHelpers.IsStrongBeat(slot.OnsetBeat);
+                                bool isStrongBeat = RandomHelpersOld.IsStrongBeat(slot.OnsetBeat);
                                 int baseVel = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "hat", baseVelocity: 70);
 
                                 // Apply velocity shaping with hand pattern accents
@@ -395,7 +395,7 @@ namespace Music.Generator
 
                         case "ride":
                             {
-                                bool isStrongBeat = RandomHelpers.IsStrongBeat(slot.OnsetBeat);
+                                bool isStrongBeat = RandomHelpersOld.IsStrongBeat(slot.OnsetBeat);
                                 int baseVel = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "ride", baseVelocity: 75);
 
                                 // Apply velocity shaping with hand pattern accents
@@ -446,7 +446,7 @@ namespace Music.Generator
                                     _ => tomMidNote
                                 };
 
-                                bool isStrongBeat = RandomHelpers.IsStrongBeat(slot.OnsetBeat);
+                                bool isStrongBeat = RandomHelpersOld.IsStrongBeat(slot.OnsetBeat);
                                 int baseVel = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "snare", baseVelocity: 85);
 
                                 // Apply velocity shaping (use snare-like shaping for toms)
@@ -483,7 +483,7 @@ namespace Music.Generator
 
                         case "crash_cymbal_1":
                             {
-                                bool isStrongBeat = RandomHelpers.IsStrongBeat(slot.OnsetBeat);
+                                bool isStrongBeat = RandomHelpersOld.IsStrongBeat(slot.OnsetBeat);
                                 int baseVel = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "crash", baseVelocity: 80);
 
                                 // Apply velocity shaping
@@ -527,7 +527,7 @@ namespace Music.Generator
 
                         case "crash_cymbal_2":
                             {
-                                bool isStrongBeat = RandomHelpers.IsStrongBeat(slot.OnsetBeat);
+                                bool isStrongBeat = RandomHelpersOld.IsStrongBeat(slot.OnsetBeat);
                                 int baseVel = randomizer.SelectDrumVelocity(slot.Bar, slot.OnsetBeat, "crash", baseVelocity: 80);
 
                                 // Apply velocity shaping

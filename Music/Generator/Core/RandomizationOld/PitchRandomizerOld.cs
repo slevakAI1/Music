@@ -9,9 +9,9 @@ using System.Diagnostics;
 namespace Music.Generator
 {
     // AI: class:stateless wrapper around RandomHelpers; do NOT change algorithmic choices or assertions.
-    public sealed class PitchRandomizer
+    public sealed class PitchRandomizerOld
     {
-        private readonly RandomizationSettings _settings;
+        private readonly RandomizationSettingsOld _settings;
 
         // AI: registers: min/max/preferred center are absolute MIDI numbers; keep these when tuning ranges.
         private const int BassMinMidi = 28;  // E1
@@ -28,22 +28,22 @@ namespace Music.Generator
         private const int KeysMaxMidi = 84;  // C6
         private const int KeysPreferredCenter = 60; // C4
 
-        public PitchRandomizer(RandomizationSettings? settings = null)
+        public PitchRandomizerOld(RandomizationSettingsOld? settings = null)
         {
-            _settings = settings ?? RandomizationSettings.Default;
+            _settings = settings ?? RandomizationSettingsOld.Default;
         }
 
         // AI: bass:choice mapping=0=root,1=fifth,2=octave; weights come from settings; octave biases center up 12.
         // AI: must preserve Debug.Assert that resulting pc equals root or fifth; used by downstream harmony consumers.
         public int SelectBassPitch(HarmonyPitchContext ctx, int bar, decimal onsetBeat)
         {
-            var rng = RandomHelpers.CreateLocalRng(_settings.Seed, "bass", bar, onsetBeat);
+            var rng = RandomHelpersOld.CreateLocalRng(_settings.Seed, "bass", bar, onsetBeat);
 
             int rootPc = ctx.ChordRootPitchClass;
             int fifthPc = (rootPc + 7) % 12;
 
             // Weighted choice: 0=root, 1=fifth, 2=octave (root in higher register)
-            int choice = RandomHelpers.WeightedChoice(rng, [
+            int choice = RandomHelpersOld.WeightedChoice(rng, [
                 (0, _settings.BassRootWeight),
                 (1, _settings.BassFifthWeight),
                 (2, _settings.BassOctaveWeight)
@@ -66,7 +66,7 @@ namespace Music.Generator
                     break;
             }
 
-            int midi = RandomHelpers.PickMidiNearRange(targetPc, BassMinMidi, BassMaxMidi, center);
+            int midi = RandomHelpersOld.PickMidiNearRange(targetPc, BassMinMidi, BassMaxMidi, center);
 
             // Validation: pitch class must be root or fifth, and in scale
             Debug.Assert(
@@ -85,8 +85,8 @@ namespace Music.Generator
             decimal onsetBeat, 
             int? previousPitchClass)
         {
-            var rng = RandomHelpers.CreateLocalRng(_settings.Seed, "guitar", bar, onsetBeat);
-            bool isStrong = RandomHelpers.IsStrongBeat(onsetBeat);
+            var rng = RandomHelpersOld.CreateLocalRng(_settings.Seed, "guitar", bar, onsetBeat);
+            bool isStrong = RandomHelpersOld.IsStrongBeat(onsetBeat);
 
             int pc;
 
@@ -94,7 +94,7 @@ namespace Music.Generator
             {
                 // Strong beat: chord tones only
                 var chordTones = ctx.ChordPitchClasses.ToList();
-                pc = RandomHelpers.ChooseRandom(rng, chordTones);
+                pc = RandomHelpersOld.ChooseRandom(rng, chordTones);
             }
             else
             {
@@ -104,44 +104,44 @@ namespace Music.Generator
 
                 if (usePassingTone)
                 {
-                    var neighbors = RandomHelpers.GetDiatonicNeighbors(
+                    var neighbors = RandomHelpersOld.GetDiatonicNeighbors(
                         previousPitchClass!.Value, 
                         ctx.KeyScalePitchClasses);
 
                     // Prefer neighbors that are NOT chord tones (true passing tones)
                     var nonChordNeighbors = neighbors
-                        .Where(n => !RandomHelpers.IsChordTone(n, ctx))
+                        .Where(n => !RandomHelpersOld.IsChordTone(n, ctx))
                         .ToList();
 
                     if (nonChordNeighbors.Count > 0)
                     {
-                        pc = RandomHelpers.ChooseRandom(rng, nonChordNeighbors);
+                        pc = RandomHelpersOld.ChooseRandom(rng, nonChordNeighbors);
                     }
                     else if (neighbors.Count > 0)
                     {
-                        pc = RandomHelpers.ChooseRandom(rng, neighbors);
+                        pc = RandomHelpersOld.ChooseRandom(rng, neighbors);
                     }
                     else
                     {
                         // Fallback to chord tone
-                        pc = RandomHelpers.ChooseRandom(rng, ctx.ChordPitchClasses.ToList());
+                        pc = RandomHelpersOld.ChooseRandom(rng, ctx.ChordPitchClasses.ToList());
                     }
                 }
                 else
                 {
                     // Use chord tone
-                    pc = RandomHelpers.ChooseRandom(rng, ctx.ChordPitchClasses.ToList());
+                    pc = RandomHelpersOld.ChooseRandom(rng, ctx.ChordPitchClasses.ToList());
                 }
             }
 
-            int midi = RandomHelpers.PickMidiNearRange(pc, GuitarMinMidi, GuitarMaxMidi, GuitarPreferredCenter);
+            int midi = RandomHelpersOld.PickMidiNearRange(pc, GuitarMinMidi, GuitarMaxMidi, GuitarPreferredCenter);
 
             // Validation
             Debug.Assert(
-                RandomHelpers.IsInScale(pc, ctx),
+                RandomHelpersOld.IsInScale(pc, ctx),
                 $"Guitar pitch class {pc} is not in scale");
             Debug.Assert(
-                !isStrong || RandomHelpers.IsChordTone(pc, ctx),
+                !isStrong || RandomHelpersOld.IsChordTone(pc, ctx),
                 $"Guitar pitch class {pc} on strong beat is not a chord tone");
 
             return (midi, pc);
@@ -157,7 +157,7 @@ namespace Music.Generator
             bool isFirstOnsetOfHarmony,
             SectionProfile? sectionProfile = null)
         {
-            var rng = RandomHelpers.CreateLocalRng(_settings.Seed, "keys", bar, onsetBeat);
+            var rng = RandomHelpersOld.CreateLocalRng(_settings.Seed, "keys", bar, onsetBeat);
 
             // Start with the base chord voicing
             var midiNotes = ctx.ChordMidiNotes.ToList();
@@ -173,7 +173,7 @@ namespace Music.Generator
             if (isFirstOnsetOfHarmony && rng.NextDouble() < colorToneProbability)
             {
                 int rootPc = ctx.ChordRootPitchClass;
-                int scaleIdx = RandomHelpers.FindScaleIndex(rootPc, ctx.KeyScalePitchClasses);
+                int scaleIdx = RandomHelpersOld.FindScaleIndex(rootPc, ctx.KeyScalePitchClasses);
 
                 if (scaleIdx >= 0)
                 {
@@ -181,7 +181,7 @@ namespace Music.Generator
                     int ninthPc = ctx.KeyScalePitchClasses[(scaleIdx + 1) % 7];
 
                     // Place 9th above the chord (in the upper register)
-                    int ninthMidi = RandomHelpers.PickMidiNearRange(
+                    int ninthMidi = RandomHelpersOld.PickMidiNearRange(
                         ninthPc, 
                         KeysMinMidi + 12,  // Above bass range of chord
                         KeysMaxMidi, 
@@ -222,7 +222,7 @@ namespace Music.Generator
         // AI: inversion: options depend on chord size; keep mapping stable as callers expect these string values.
         public string SelectChordInversion(HarmonyPitchContext ctx, int bar, decimal onsetBeat)
         {
-            var rng = RandomHelpers.CreateLocalRng(_settings.Seed, "keys-inversion", bar, onsetBeat);
+            var rng = RandomHelpersOld.CreateLocalRng(_settings.Seed, "keys-inversion", bar, onsetBeat);
 
             // Determine available inversions based on chord size
             var options = ctx.ChordPitchClasses.Count >= 4
@@ -236,7 +236,7 @@ namespace Music.Generator
         // AI: drums:humanize=±10% baseVelocity clamped to 1..127; rng key includes drum type for consistent variation.
         public int SelectDrumVelocity(int bar, decimal onsetBeat, string drumType, int baseVelocity)
         {
-            var rng = RandomHelpers.CreateLocalRng(_settings.Seed, $"drum_{drumType}", bar, onsetBeat);
+            var rng = RandomHelpersOld.CreateLocalRng(_settings.Seed, $"drum_{drumType}", bar, onsetBeat);
             
             // Apply ±10% variation for humanization
             int variation = (int)(baseVelocity * 0.1);

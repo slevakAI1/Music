@@ -239,7 +239,7 @@ namespace Music.Generator
             // Add slight deterministic variation: not every phrase peak gets a crash
             if (isPhrasePeak)
             {
-                var rng = RandomHelpers.CreateLocalRng(seed, $"{grooveName}_crash", bar, 0m);
+                var rng = RandomHelpersOld.CreateLocalRng(seed, $"{grooveName}_crash", bar, 0m);
                 return rng.NextDouble() < 0.7;  // 70% probability
             }
 

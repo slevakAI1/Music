@@ -1,0 +1,709 @@
+# Groove-Driven Drum Generator Plan
+
+## 1. Design Overview
+
+### 1.1 Architecture
+
+The drum generator will follow a **pipeline architecture** with distinct phases:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           DRUM GENERATION PIPELINE                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Phase 1: INITIALIZATION                                                    │
+│  ├── Load GroovePresetDefinition + SegmentGrooveProfiles                   │
+│  ├── Resolve meter/timing from SongContext                                  │
+│  └── Build per-bar context (section, phrase position, segment profile)     │
+│                                                                             │
+│  Phase 2: ANCHOR GENERATION (per bar)                                       │
+│  ├── Copy base onsets from AnchorLayer (Kick, Snare, Hat)                  │
+│  ├── Apply protection rules (MustHitOnsets, NeverRemoveOnsets)             │
+│  └── Output: base onset list per role                                       │
+│                                                                             │
+│  Phase 3: VARIATION SELECTION (per bar)                                     │
+│  ├── Filter candidates by EnabledVariationTags                             │
+│  ├── Apply density targets to select/prune candidates                       │
+│  ├── Respect MaxAddsPerBar caps at group and candidate level               │
+│  ├── Use ProbabilityBias for deterministic weighted selection              │
+│  └── Output: additional onsets to add                                       │
+│                                                                             │
+│  Phase 4: CONSTRAINT ENFORCEMENT (per bar)                                  │
+│  ├── Enforce MaxHitsPerBar / MaxHitsPerBeat                                │
+│  ├── Filter by AllowedSubdivisions grid                                     │
+│  ├── Apply syncopation/anticipation rules                                   │
+│  ├── Protect phrase-end anchors if configured                              │
+│  └── Output: validated onset list                                           │
+│                                                                             │
+│  Phase 5: VELOCITY SHAPING (per onset)                                      │
+│  ├── Classify onset strength (Downbeat, Backbeat, Offbeat, Ghost, etc.)    │
+│  ├── Look up VelocityRule for role + strength                              │
+│  ├── Apply AccentBias adjustments                                           │
+│  └── Output: velocity per onset                                             │
+│                                                                             │
+│  Phase 6: TIMING ADJUSTMENT (per onset)                                     │
+│  ├── Apply Feel (Swing/Shuffle offset for offbeats)                        │
+│  ├── Apply RoleTimingBiasTicks per role                                     │
+│  ├── Clamp by MaxAbsTimingBiasTicks                                         │
+│  └── Output: final tick position per onset                                  │
+│                                                                             │
+│  Phase 7: MIDI EVENT EMISSION                                               │
+│  ├── Convert role + onset to MIDI note number                              │
+│  ├── Create PartTrackEvent for each note                                    │
+│  └── Output: PartTrack with all drum events                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 1.2 Key Design Decisions
+
+1. **Deterministic generation**: Use seed-based selection for probability; same inputs = same output
+2. **Per-bar processing**: Each bar processed independently with its segment context
+3. **Role-based handling**: Kick, Snare, Hat processed separately then merged
+4. **Layered protection**: Protection hierarchy applied additively (base → refine → specific)
+
+---
+
+## 2. Settings Inventory
+
+### 2.1 Enums (Multiple Choice)
+
+| Enum | Values | Handler Required |
+|------|--------|-----------------|
+| `GrooveFeel` | Straight, Swing, Shuffle, TripletFeel | 4 timing behaviors |
+| `AllowedSubdivision` | Quarter, Eighth, Sixteenth, EighthTriplet, SixteenthTriplet | Grid filter (flags) |
+| `OnsetStrength` | Downbeat, Backbeat, Strong, Offbeat, Pickup, Ghost | Velocity lookup key |
+| `TimingFeel` | Ahead, OnTop, Behind, LaidBack | Micro-timing direction |
+
+### 2.2 Boolean Settings
+
+| Class | Property | True Behavior | False Behavior |
+|-------|----------|---------------|----------------|
+| `RoleRhythmVocabulary` | AllowSyncopation | Offbeat onsets permitted | Offbeat onsets filtered |
+| `RoleRhythmVocabulary` | AllowAnticipation | Pickup onsets permitted | Pickup onsets filtered |
+| `RoleRhythmVocabulary` | SnapStrongBeatsToChordTones | (pitched roles only) | N/A for drums |
+| `GroovePhraseHookPolicy` | AllowFillsAtPhraseEnd | Fill candidates active in window | Fills disabled |
+| `GroovePhraseHookPolicy` | AllowFillsAtSectionEnd | Section-end fills active | Section fills disabled |
+| `GroovePhraseHookPolicy` | ProtectDownbeatOnPhraseEnd | Beat 1 never removed | Beat 1 can be removed |
+| `GroovePhraseHookPolicy` | ProtectBackbeatOnPhraseEnd | Backbeats never removed | Backbeats can be removed |
+| `GrooveProtectionLayer` | IsAdditiveOnly | Layer only adds protections | Layer can override |
+| `GrooveVariationLayer` | IsAdditiveOnly | Layer only adds candidates | Layer can replace |
+| `GrooveOverrideMergePolicy` | OverrideReplacesLists | Segment replaces base lists | Union/append |
+| `GrooveOverrideMergePolicy` | OverrideCanRemoveProtectedOnsets | Segment can remove protected | Protected items safe |
+| `GrooveOverrideMergePolicy` | OverrideCanRelaxConstraints | Segment can raise caps | Caps enforced strictly |
+| `GrooveOverrideMergePolicy` | OverrideCanChangeFeel | Segment can change swing | Feel locked to base |
+| `SectionRolePresenceDefaults` | RolePresent[role] | Role generates notes | Role silent |
+
+### 2.3 Numeric Settings
+
+| Class | Property | Type | Usage |
+|-------|----------|------|-------|
+| `GroovePresetIdentity` | BeatsPerBar | int | Meter numerator |
+| `GrooveSubdivisionPolicy` | SwingAmount01 | double | Swing intensity 0-1 |
+| `VelocityRule` | Min, Max, Typical | int | Velocity bounds |
+| `VelocityRule` | AccentBias | int | Additive velocity adjustment |
+| `GrooveTimingPolicy` | MaxAbsTimingBiasTicks | int | Timing clamp |
+| `GrooveTimingPolicy` | RoleTimingBiasTicks[role] | int | Per-role tick offset |
+| `RoleRhythmVocabulary` | MaxHitsPerBar | int | Hard cap per bar |
+| `RoleRhythmVocabulary` | MaxHitsPerBeat | int | Density cap per beat |
+| `GrooveRoleConstraintPolicy` | RoleMaxDensityPerBar[role] | int | Global density cap |
+| `GroovePhraseHookPolicy` | PhraseEndBarsWindow | int | Fill window size |
+| `GroovePhraseHookPolicy` | SectionEndBarsWindow | int | Section fill window |
+| `SectionRolePresenceDefaults` | RoleDensityMultiplier[role] | double | Section density scaling |
+| `GrooveOnsetCandidate` | OnsetBeat | decimal | Beat position |
+| `GrooveOnsetCandidate` | MaxAddsPerBar | int | Candidate cap |
+| `GrooveCandidateGroup` | MaxAddsPerBar | int | Group cap |
+| `RoleDensityTarget` | Density01 | double | Target density |
+| `RoleDensityTarget` | MaxEventsPerBar | int | Segment cap |
+| `SegmentGrooveProfile` | StartBar, EndBar | int? | Bar range |
+| `SegmentGrooveProfile` | OverrideSwingAmount01 | double? | Segment swing override |
+
+### 2.4 Probability Settings
+
+| Class | Property | Type | Effect |
+|-------|----------|------|--------|
+| `GrooveOnsetCandidate` | ProbabilityBias | double | Selection weight |
+| `GrooveCandidateGroup` | BaseProbabilityBias | double | Group weight multiplier |
+
+### 2.5 List/Collection Settings
+
+| Class | Property | Type | Usage |
+|-------|----------|------|-------|
+| `GrooveInstanceLayer` | KickOnsets, SnareOnsets, HatOnsets | List<decimal> | Base pattern |
+| `RoleProtectionSet` | MustHitOnsets | List<decimal> | Required onsets |
+| `RoleProtectionSet` | ProtectedOnsets | List<decimal> | Discouraged removal |
+| `RoleProtectionSet` | NeverRemoveOnsets | List<decimal> | Hard protection |
+| `RoleProtectionSet` | NeverAddOnsets | List<decimal> | Forbidden additions |
+| `GroovePhraseHookPolicy` | EnabledFillTags | List<string> | Active fill tag filter |
+| `SegmentGrooveProfile` | EnabledVariationTags | List<string> | Active variation tags |
+| `SegmentGrooveProfile` | EnabledProtectionTags | List<string> | Active protection tags |
+| `GrooveProtectionPolicy` | HierarchyLayers | List<GrooveProtectionLayer> | Layered protections |
+| `GrooveVariationCatalog` | HierarchyLayers | List<GrooveVariationLayer> | Layered candidates |
+
+---
+
+## 3. Setting Precedence (Ordered)
+
+Settings are applied in this order. Earlier settings establish constraints; later settings operate within those constraints.
+
+### Tier 1: Identity & Meter (Immutable Context)
+1. `GroovePresetIdentity.BeatsPerBar` - establishes grid
+2. `SectionTrack` / `BarTrack` - bar boundaries
+
+### Tier 2: Role Presence (On/Off Gate)
+3. `GrooveOrchestrationPolicy.DefaultsBySectionType[section].RolePresent[role]` - skip if false
+4. `SegmentGrooveProfile.SectionIndex` - map bar to segment
+
+### Tier 3: Protection Rules (Hard Constraints)
+5. `GrooveProtectionPolicy.HierarchyLayers` - merge layered protections
+6. `RoleProtectionSet.MustHitOnsets` - always include these
+7. `RoleProtectionSet.NeverRemoveOnsets` - cannot be removed by variation
+8. `RoleProtectionSet.NeverAddOnsets` - cannot be added by variation
+
+### Tier 4: Subdivision Grid (Filter)
+9. `GrooveSubdivisionPolicy.AllowedSubdivisions` - filter invalid beat positions
+10. `RoleRhythmVocabulary.AllowSyncopation` - filter offbeat candidates
+11. `RoleRhythmVocabulary.AllowAnticipation` - filter pickup candidates
+
+### Tier 5: Anchor Layer (Base Pattern)
+12. `GrooveInstanceLayer.KickOnsets/SnareOnsets/HatOnsets` - base onsets
+
+### Tier 6: Phrase/Section Context
+13. `GroovePhraseHookPolicy.AllowFillsAtPhraseEnd` + window - enable fills
+14. `GroovePhraseHookPolicy.AllowFillsAtSectionEnd` + window - enable section fills
+15. `GroovePhraseHookPolicy.ProtectDownbeatOnPhraseEnd` - protect beat 1
+16. `GroovePhraseHookPolicy.ProtectBackbeatOnPhraseEnd` - protect 2/4
+
+### Tier 7: Variation Selection
+17. `SegmentGrooveProfile.EnabledVariationTags` - filter active groups
+18. `GrooveVariationCatalog.HierarchyLayers` - merge candidate pools
+19. `GrooveCandidateGroup.GroupTags` - match against enabled tags
+20. `GrooveOnsetCandidate.Tags` - additional tag filter
+21. `GrooveOnsetCandidate.ProbabilityBias` × `GrooveCandidateGroup.BaseProbabilityBias` - selection weight
+
+### Tier 8: Density Enforcement
+22. `RoleDensityTarget.Density01` - target fill level
+23. `RoleDensityTarget.MaxEventsPerBar` - segment cap
+24. `GrooveRoleConstraintPolicy.RoleMaxDensityPerBar[role]` - global cap
+25. `RoleRhythmVocabulary.MaxHitsPerBar` - vocabulary cap
+26. `RoleRhythmVocabulary.MaxHitsPerBeat` - per-beat cap
+27. `GrooveOnsetCandidate.MaxAddsPerBar` - per-candidate cap
+28. `GrooveCandidateGroup.MaxAddsPerBar` - per-group cap
+29. `SectionRolePresenceDefaults.RoleDensityMultiplier[role]` - scale target
+
+### Tier 9: Velocity Shaping
+30. `GrooveAccentPolicy.RoleStrengthVelocity[role][strength]` - lookup rule
+31. `VelocityRule.Typical` - base velocity
+32. `VelocityRule.Min/Max` - bounds
+33. `VelocityRule.AccentBias` - adjustment
+34. `GrooveAccentPolicy.RoleGhostVelocity[role]` - ghost note velocity
+
+### Tier 10: Timing/Feel Adjustment
+35. `SegmentGrooveProfile.OverrideFeel` ?? `GrooveSubdivisionPolicy.Feel` - swing mode
+36. `SegmentGrooveProfile.OverrideSwingAmount01` ?? `GrooveSubdivisionPolicy.SwingAmount01` - swing amount
+37. `GrooveTimingPolicy.RoleTimingFeel[role]` - micro-timing direction
+38. `GrooveTimingPolicy.RoleTimingBiasTicks[role]` - tick offset
+39. `GrooveTimingPolicy.MaxAbsTimingBiasTicks` - clamp
+
+### Tier 11: Merge Policy (Override Rules)
+40. `GrooveOverrideMergePolicy.*` - governs how segment overrides apply
+
+---
+
+## 4. User Stories
+
+### Epic: Groove-Driven Drum Generation
+
+---
+
+### Story 1: Scaffold DrumGeneratorNew Class Structure
+**As a** developer  
+**I want** a well-organized generator class with clear phase methods  
+**So that** each pipeline phase is testable and maintainable
+
+**Acceptance Criteria:**
+- [ ] Create `DrumGeneratorNew` static class in `Music.Generator` namespace
+- [ ] Define phase method stubs: `Initialize`, `GenerateAnchors`, `SelectVariations`, `EnforceConstraints`, `ShapeVelocity`, `AdjustTiming`, `EmitEvents`
+- [ ] Create `DrumBarContext` record to hold per-bar state (bar number, section, segment profile, phrase position)
+- [ ] Create `DrumOnset` record (role, beat, strength, velocity, tickPosition)
+- [ ] Update `GeneratorNew.Generate` to call `DrumGeneratorNew.Generate`
+
+**Tasks:**
+1. Create DrumGeneratorNew.cs with class structure
+2. Define DrumBarContext and DrumOnset types
+3. Implement main Generate method that orchestrates phases
+4. Wire into GeneratorNew
+
+---
+
+### Story 2: Implement Initialization Phase
+**As a** generator  
+**I want** to build per-bar context from SongContext  
+**So that** each bar knows its section, segment profile, and phrase position
+
+**Acceptance Criteria:**
+- [ ] Read `SectionTrack.Sections` to map bar → section
+- [ ] Read `SegmentGrooveProfiles` to map bar → segment profile
+- [ ] Calculate phrase position (bar within section, bars until section end)
+- [ ] Handle `GroovePresetIdentity.BeatsPerBar` for grid calculation
+- [ ] Return `List<DrumBarContext>` for all bars
+
+**Settings Handled:**
+- `GroovePresetIdentity.BeatsPerBar`
+- `SectionTrack.Sections`
+- `SegmentGrooveProfile.StartBar/EndBar/SectionIndex`
+
+---
+
+### Story 3: Implement Role Presence Check
+**As a** generator  
+**I want** to skip roles that are disabled for a section type  
+**So that** orchestration policy controls which instruments play
+
+**Acceptance Criteria:**
+- [ ] Look up `GrooveOrchestrationPolicy.DefaultsBySectionType` by section name
+- [ ] Check `RolePresent[role]` for Kick, Snare, Hat, DrumKit
+- [ ] If role not present, emit no notes for that role in that bar
+- [ ] Handle missing section type gracefully (default to present)
+
+**Settings Handled:**
+- `GrooveOrchestrationPolicy.DefaultsBySectionType`
+- `SectionRolePresenceDefaults.RolePresent`
+
+---
+
+### Story 4: Implement Anchor Generation Phase
+**As a** generator  
+**I want** to copy base onsets from AnchorLayer  
+**So that** each bar starts with the core groove pattern
+
+**Acceptance Criteria:**
+- [ ] Copy `GrooveInstanceLayer.KickOnsets` for Kick role
+- [ ] Copy `GrooveInstanceLayer.SnareOnsets` for Snare role
+- [ ] Copy `GrooveInstanceLayer.HatOnsets` for Hat role
+- [ ] Normalize onset beats to bar-relative (1-based within bar)
+- [ ] Return `List<DrumOnset>` per role
+
+**Settings Handled:**
+- `GroovePresetDefinition.AnchorLayer`
+- `GrooveInstanceLayer.KickOnsets/SnareOnsets/HatOnsets`
+
+---
+
+### Story 5: Implement Protection Hierarchy Merger
+**As a** generator  
+**I want** to merge protection layers respecting IsAdditiveOnly  
+**So that** refined protections layer on base protections
+
+**Acceptance Criteria:**
+- [ ] Iterate `GrooveProtectionPolicy.HierarchyLayers` in order
+- [ ] For each layer, check `AppliesWhenTagsAll` against enabled tags
+- [ ] If `IsAdditiveOnly=true`, union onsets; else replace
+- [ ] Merge `MustHitOnsets`, `ProtectedOnsets`, `NeverRemoveOnsets`, `NeverAddOnsets`
+- [ ] Return merged `RoleProtectionSet` per role
+
+**Settings Handled:**
+- `GrooveProtectionPolicy.HierarchyLayers`
+- `GrooveProtectionLayer.LayerId/AppliesWhenTagsAll/IsAdditiveOnly`
+- `RoleProtectionSet.*`
+
+---
+
+### Story 6: Apply Must-Hit and Protection Rules
+**As a** generator  
+**I want** MustHitOnsets always included and NeverRemove protected  
+**So that** essential groove anchors are preserved
+
+**Acceptance Criteria:**
+- [ ] Ensure all `MustHitOnsets` are in the onset list
+- [ ] Mark `NeverRemoveOnsets` as protected (cannot be pruned)
+- [ ] Filter variation candidates against `NeverAddOnsets`
+- [ ] `ProtectedOnsets` are discouraged but not forbidden to remove
+
+**Settings Handled:**
+- `RoleProtectionSet.MustHitOnsets`
+- `RoleProtectionSet.NeverRemoveOnsets`
+- `RoleProtectionSet.NeverAddOnsets`
+- `RoleProtectionSet.ProtectedOnsets`
+
+---
+
+### Story 7: Implement Subdivision Grid Filter
+**As a** generator  
+**I want** to filter onsets by allowed subdivision grid  
+**So that** only valid beat positions are used
+
+**Acceptance Criteria:**
+- [ ] Parse `AllowedSubdivision` flags to determine valid beat fractions
+- [ ] Quarter: 1, 2, 3, 4
+- [ ] Eighth: 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5
+- [ ] Sixteenth: 1, 1.25, 1.5, 1.75, 2, 2.25, ...
+- [ ] EighthTriplet: 1, 1.33, 1.67, 2, 2.33, ...
+- [ ] SixteenthTriplet: finer grid
+- [ ] Filter candidate onsets to valid positions only
+
+**Settings Handled:**
+- `GrooveSubdivisionPolicy.AllowedSubdivisions` (all 5 flag values)
+
+---
+
+### Story 8: Implement Syncopation and Anticipation Filter
+**As a** generator  
+**I want** to filter candidates by syncopation/anticipation rules  
+**So that** rhythm vocabulary is respected
+
+**Acceptance Criteria:**
+- [ ] If `AllowSyncopation=false`, filter onsets with `Strength=Offbeat`
+- [ ] If `AllowAnticipation=false`, filter onsets with `Strength=Pickup`
+- [ ] Apply per-role from `RoleRhythmVocabulary`
+- [ ] Handle both true/false cases correctly
+
+**Settings Handled:**
+- `RoleRhythmVocabulary.AllowSyncopation` (true/false)
+- `RoleRhythmVocabulary.AllowAnticipation` (true/false)
+
+---
+
+### Story 9: Implement Phrase Hook Policy
+**As a** generator  
+**I want** fills enabled only in designated windows  
+**So that** phrase structure is respected
+
+**Acceptance Criteria:**
+- [ ] Calculate if bar is within `PhraseEndBarsWindow` of section end
+- [ ] If `AllowFillsAtPhraseEnd=false`, disable fill tags in that window
+- [ ] If `AllowFillsAtSectionEnd=false`, disable at section boundary
+- [ ] If `ProtectDownbeatOnPhraseEnd=true`, add beat 1 to NeverRemove
+- [ ] If `ProtectBackbeatOnPhraseEnd=true`, add beats 2,4 to NeverRemove
+- [ ] Filter candidates by `EnabledFillTags`
+
+**Settings Handled:**
+- `GroovePhraseHookPolicy.AllowFillsAtPhraseEnd` (true/false)
+- `GroovePhraseHookPolicy.PhraseEndBarsWindow`
+- `GroovePhraseHookPolicy.AllowFillsAtSectionEnd` (true/false)
+- `GroovePhraseHookPolicy.SectionEndBarsWindow`
+- `GroovePhraseHookPolicy.ProtectDownbeatOnPhraseEnd` (true/false)
+- `GroovePhraseHookPolicy.ProtectBackbeatOnPhraseEnd` (true/false)
+- `GroovePhraseHookPolicy.EnabledFillTags`
+
+---
+
+### Story 10: Implement Variation Catalog Merger
+**As a** generator  
+**I want** to merge variation layers respecting IsAdditiveOnly  
+**So that** refined variations layer on base candidates
+
+**Acceptance Criteria:**
+- [ ] Iterate `GrooveVariationCatalog.HierarchyLayers` in order
+- [ ] For each layer, check `AppliesWhenTagsAll` against enabled tags
+- [ ] If `IsAdditiveOnly=true`, union groups; else replace
+- [ ] Return merged list of `GrooveCandidateGroup`
+
+**Settings Handled:**
+- `GrooveVariationCatalog.HierarchyLayers`
+- `GrooveVariationLayer.LayerId/AppliesWhenTagsAll/IsAdditiveOnly`
+- `GrooveVariationLayer.CandidateGroups`
+
+---
+
+### Story 11: Implement Variation Tag Filter
+**As a** generator  
+**I want** candidates filtered by segment's enabled tags  
+**So that** only appropriate variations are considered
+
+**Acceptance Criteria:**
+- [ ] Read `SegmentGrooveProfile.EnabledVariationTags`
+- [ ] Filter `GrooveCandidateGroup` where any `GroupTags` match enabled
+- [ ] Filter `GrooveOnsetCandidate` where any `Tags` match (if specified)
+- [ ] Handle empty tag lists as "match all"
+
+**Settings Handled:**
+- `SegmentGrooveProfile.EnabledVariationTags`
+- `GrooveCandidateGroup.GroupTags`
+- `GrooveOnsetCandidate.Tags`
+
+---
+
+### Story 12: Implement Probability-Weighted Selection
+**As a** generator  
+**I want** candidates selected by weighted probability  
+**So that** variation is deterministic but configurable
+
+**Acceptance Criteria:**
+- [ ] Calculate weight = `GrooveOnsetCandidate.ProbabilityBias` × `GrooveCandidateGroup.BaseProbabilityBias`
+- [ ] Use seeded RNG for deterministic selection
+- [ ] Select candidates proportional to weight
+- [ ] Order by weight for tie-breaking
+
+**Settings Handled:**
+- `GrooveOnsetCandidate.ProbabilityBias` (probability)
+- `GrooveCandidateGroup.BaseProbabilityBias` (probability)
+
+---
+
+### Story 13: Implement Density Target Selection
+**As a** generator  
+**I want** variation count driven by density targets  
+**So that** sections have appropriate activity levels
+
+**Acceptance Criteria:**
+- [ ] Read `RoleDensityTarget.Density01` for role
+- [ ] Calculate target onset count = Density01 × MaxEventsPerBar
+- [ ] Apply `SectionRolePresenceDefaults.RoleDensityMultiplier` scaling
+- [ ] Select candidates until target reached or pool exhausted
+- [ ] Never exceed `MaxEventsPerBar`
+
+**Settings Handled:**
+- `RoleDensityTarget.Density01`
+- `RoleDensityTarget.MaxEventsPerBar`
+- `SectionRolePresenceDefaults.RoleDensityMultiplier`
+
+---
+
+### Story 14: Implement MaxHits Caps Enforcement
+**As a** generator  
+**I want** density caps strictly enforced  
+**So that** bars don't become overcrowded
+
+**Acceptance Criteria:**
+- [ ] Enforce `RoleRhythmVocabulary.MaxHitsPerBar` - prune excess
+- [ ] Enforce `RoleRhythmVocabulary.MaxHitsPerBeat` - no beat overcrowding
+- [ ] Enforce `GrooveRoleConstraintPolicy.RoleMaxDensityPerBar[role]`
+- [ ] Enforce `GrooveOnsetCandidate.MaxAddsPerBar` per candidate
+- [ ] Enforce `GrooveCandidateGroup.MaxAddsPerBar` per group
+- [ ] Prefer protected onsets when pruning
+
+**Settings Handled:**
+- `RoleRhythmVocabulary.MaxHitsPerBar`
+- `RoleRhythmVocabulary.MaxHitsPerBeat`
+- `GrooveRoleConstraintPolicy.RoleMaxDensityPerBar`
+- `GrooveOnsetCandidate.MaxAddsPerBar`
+- `GrooveCandidateGroup.MaxAddsPerBar`
+
+---
+
+### Story 15: Implement Onset Strength Classification
+**As a** generator  
+**I want** each onset classified by strength  
+**So that** velocity shaping is applied correctly
+
+**Acceptance Criteria:**
+- [ ] Classify beat 1 as `Downbeat`
+- [ ] Classify beats 2, 4 as `Backbeat` (4/4)
+- [ ] Classify beat 3 as `Strong`
+- [ ] Classify .5 positions as `Offbeat`
+- [ ] Classify .75 positions as `Pickup` if before strong beat
+- [ ] Read `GrooveOnsetCandidate.Strength` for variation candidates
+- [ ] Handle `Ghost` strength explicitly
+
+**Settings Handled:**
+- `OnsetStrength` enum (all 6 values)
+- `GrooveOnsetCandidate.Strength`
+
+---
+
+### Story 16: Implement Velocity Shaping
+**As a** generator  
+**I want** velocity determined by role and strength  
+**So that** dynamics reflect the groove feel
+
+**Acceptance Criteria:**
+- [ ] Look up `GrooveAccentPolicy.RoleStrengthVelocity[role][strength]`
+- [ ] Use `VelocityRule.Typical` as base
+- [ ] Add `VelocityRule.AccentBias`
+- [ ] Clamp to `VelocityRule.Min/Max`
+- [ ] For Ghost, use `RoleGhostVelocity[role]` if defined
+- [ ] Handle missing lookups with sensible defaults
+
+**Settings Handled:**
+- `GrooveAccentPolicy.RoleStrengthVelocity`
+- `VelocityRule.Min/Max/Typical/AccentBias`
+- `GrooveAccentPolicy.RoleGhostVelocity`
+
+---
+
+### Story 17: Implement Feel/Swing Timing
+**As a** generator  
+**I want** swing/shuffle feel applied to timing  
+**So that** the groove has the right pocket
+
+**Acceptance Criteria:**
+- [ ] Read `SegmentGrooveProfile.OverrideFeel` ?? `GrooveSubdivisionPolicy.Feel`
+- [ ] If `Straight`: no timing adjustment
+- [ ] If `Swing`: shift offbeats later by SwingAmount01 factor
+- [ ] If `Shuffle`: triplet-feel offbeat timing
+- [ ] If `TripletFeel`: all subdivisions on triplet grid
+- [ ] Apply `OverrideSwingAmount01` if specified
+
+**Settings Handled:**
+- `GrooveFeel` enum (all 4 values)
+- `GrooveSubdivisionPolicy.Feel`
+- `GrooveSubdivisionPolicy.SwingAmount01`
+- `SegmentGrooveProfile.OverrideFeel`
+- `SegmentGrooveProfile.OverrideSwingAmount01`
+
+---
+
+### Story 18: Implement Role Timing Bias
+**As a** generator  
+**I want** per-role micro-timing applied  
+**So that** instruments have distinct pocket feel
+
+**Acceptance Criteria:**
+- [ ] Read `GrooveTimingPolicy.RoleTimingFeel[role]`
+- [ ] If `Ahead`: negative tick offset
+- [ ] If `OnTop`: zero offset
+- [ ] If `Behind`: positive tick offset
+- [ ] If `LaidBack`: larger positive offset
+- [ ] Add `RoleTimingBiasTicks[role]` 
+- [ ] Clamp by `MaxAbsTimingBiasTicks`
+
+**Settings Handled:**
+- `TimingFeel` enum (all 4 values)
+- `GrooveTimingPolicy.RoleTimingFeel`
+- `GrooveTimingPolicy.RoleTimingBiasTicks`
+- `GrooveTimingPolicy.MaxAbsTimingBiasTicks`
+
+---
+
+### Story 19: Implement MIDI Event Emission
+**As a** generator  
+**I want** DrumOnsets converted to PartTrackEvents  
+**So that** the output is a valid PartTrack
+
+**Acceptance Criteria:**
+- [ ] Map role → MIDI note number (Kick=36, Snare=38, Hat=42, etc.)
+- [ ] Convert beat position to absolute tick (using BarTrack)
+- [ ] Create `PartTrackEvent.CreateNoteOn` for each onset
+- [ ] Set velocity from shaped value
+- [ ] Create corresponding `PartTrackEvent.CreateNoteOff`
+- [ ] Add `PartTrackEvent.CreateProgramChange` for drums (channel 10)
+- [ ] Sort events by absolute tick
+- [ ] Return complete `PartTrack`
+
+**Settings Handled:**
+- All timing and velocity from previous phases
+
+---
+
+### Story 20: Implement Merge Policy Enforcement
+**As a** generator  
+**I want** segment overrides governed by merge policy  
+**So that** override behavior is predictable
+
+**Acceptance Criteria:**
+- [ ] If `OverrideReplacesLists=true`, segment lists replace base
+- [ ] If `OverrideCanRemoveProtectedOnsets=true`, allow removal
+- [ ] If `OverrideCanRelaxConstraints=true`, use segment caps
+- [ ] If `OverrideCanChangeFeel=true`, use segment feel
+- [ ] Handle all 4 booleans correctly for both values
+
+**Settings Handled:**
+- `GrooveOverrideMergePolicy.OverrideReplacesLists` (true/false)
+- `GrooveOverrideMergePolicy.OverrideCanRemoveProtectedOnsets` (true/false)
+- `GrooveOverrideMergePolicy.OverrideCanRelaxConstraints` (true/false)
+- `GrooveOverrideMergePolicy.OverrideCanChangeFeel` (true/false)
+
+---
+
+### Story 21: Integration and Wiring
+**As a** developer  
+**I want** GeneratorNew to use the new drum generator  
+**So that** the system is fully connected
+
+**Acceptance Criteria:**
+- [ ] Update `GeneratorNew.Generate` to call `DrumGeneratorNew.Generate`
+- [ ] Pass `SongContext` with `GroovePresetDefinition` and `SegmentGrooveProfiles`
+- [ ] Return generated `PartTrack` for drums
+- [ ] Remove/comment old drum generation code
+- [ ] Verify end-to-end with test song
+
+---
+
+### Story 22: Unit Tests for Core Phases
+**As a** developer  
+**I want** unit tests for each phase  
+**So that** behavior is verified and regressions caught
+
+**Acceptance Criteria:**
+- [ ] Test anchor generation copies onsets correctly
+- [ ] Test protection merger respects IsAdditiveOnly
+- [ ] Test subdivision filter for each flag combination
+- [ ] Test syncopation/anticipation filters (true/false)
+- [ ] Test density selection respects caps
+- [ ] Test velocity shaping lookups
+- [ ] Test timing feel adjustments (all 4 enum values)
+- [ ] Test swing amounts at 0, 0.5, 1.0
+
+---
+
+## 5. Story Dependencies
+
+```
+Story 1 (Scaffold)
+    ├── Story 2 (Initialization)
+    │   └── Story 3 (Role Presence)
+    ├── Story 4 (Anchors)
+    │   └── Story 5 (Protection Merge)
+    │       └── Story 6 (Apply Protection)
+    ├── Story 7 (Subdivision Filter)
+    │   └── Story 8 (Syncopation Filter)
+    │       └── Story 9 (Phrase Hooks)
+    ├── Story 10 (Variation Merge)
+    │   └── Story 11 (Tag Filter)
+    │       └── Story 12 (Probability Selection)
+    │           └── Story 13 (Density Selection)
+    │               └── Story 14 (MaxHits Caps)
+    ├── Story 15 (Strength Classification)
+    │   └── Story 16 (Velocity Shaping)
+    ├── Story 17 (Feel/Swing)
+    │   └── Story 18 (Role Timing)
+    └── Story 19 (MIDI Emission)
+        └── Story 20 (Merge Policy)
+            └── Story 21 (Integration)
+                └── Story 22 (Tests)
+```
+
+---
+
+## 6. Estimated Effort
+
+| Story | Complexity | Points |
+|-------|------------|--------|
+| 1. Scaffold | Medium | 3 |
+| 2. Initialization | Medium | 3 |
+| 3. Role Presence | Small | 1 |
+| 4. Anchors | Small | 2 |
+| 5. Protection Merge | Medium | 3 |
+| 6. Apply Protection | Medium | 3 |
+| 7. Subdivision Filter | Medium | 3 |
+| 8. Syncopation Filter | Small | 2 |
+| 9. Phrase Hooks | Medium | 5 |
+| 10. Variation Merge | Medium | 3 |
+| 11. Tag Filter | Small | 2 |
+| 12. Probability Selection | Medium | 3 |
+| 13. Density Selection | Medium | 3 |
+| 14. MaxHits Caps | Medium | 3 |
+| 15. Strength Classification | Small | 2 |
+| 16. Velocity Shaping | Medium | 3 |
+| 17. Feel/Swing | Medium | 5 |
+| 18. Role Timing | Small | 2 |
+| 19. MIDI Emission | Medium | 3 |
+| 20. Merge Policy | Medium | 3 |
+| 21. Integration | Small | 2 |
+| 22. Tests | Large | 8 |
+| **Total** | | **67** |
+
+---
+
+## 7. Definition of Done
+
+- [ ] All settings from Groove.cs are implemented
+- [ ] Each enum value has distinct behavior
+- [ ] Each boolean has true/false handling
+- [ ] Probability settings affect selection weights only
+- [ ] Numeric settings constrain or configure behavior
+- [ ] Build passes with no errors
+- [ ] Unit tests pass
+- [ ] End-to-end test generates valid MIDI
+- [ ] Changing any setting produces different output (except probabilities which affect likelihood)

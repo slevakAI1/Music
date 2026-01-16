@@ -26,7 +26,7 @@ namespace Music.Generator
             MotifPlacementPlan? motifPlan,
             MotifPresenceMap? motifPresence,
             int totalBars,
-            RandomizationSettings settings,
+            RandomizationSettingsOld settings,
             HarmonyPolicy policy,
             int midiProgramNumber)
         {
@@ -112,7 +112,7 @@ namespace Music.Generator
                 if (hasLeadMotif && realization.SelectedOnsets.Count > 2)
                 {
                     // Thin weak-beat onsets by ~30% when lead motif active
-                    var localRng = RandomHelpers.CreateLocalRng(settings.Seed, $"comp_duck_{bar}", bar, 0m);
+                    var localRng = RandomHelpersOld.CreateLocalRng(settings.Seed, $"comp_duck_{bar}", bar, 0m);
                     var duckedOnsets = realization.SelectedOnsets
                         .Where((onset, idx) =>
                         {
@@ -289,7 +289,7 @@ namespace Music.Generator
             int bar,
             int barWithinSection,
             int absoluteSectionIndex,
-            RandomizationSettings settings,
+            RandomizationSettingsOld settings,
             HarmonyPolicy policy)
         {
             // Build onset grid from comp onsets

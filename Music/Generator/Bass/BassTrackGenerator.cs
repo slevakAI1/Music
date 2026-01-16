@@ -22,7 +22,7 @@ namespace Music.Generator
             MotifPlacementPlan? motifPlan,
             MotifPresenceMap? motifPresence,
             int totalBars,
-            RandomizationSettings settings,
+            RandomizationSettingsOld settings,
             HarmonyPolicy policy,
             int midiProgramNumber)
         {
@@ -143,7 +143,7 @@ namespace Music.Generator
                 var patternHits = bassPattern.Render(rootMidi, onsetSlots.Count);
 
                 // Story 7.3: Create deterministic RNG for busy probability checks
-                var barRng = RandomHelpers.CreateLocalRng(settings.Seed, $"bass_{groovePreset.Name}_{sectionType}", bar, 0m);
+                var barRng = RandomHelpersOld.CreateLocalRng(settings.Seed, $"bass_{groovePreset.Name}_{sectionType}", bar, 0m);
 
                 // Process each pattern hit and check for chord change opportunities
                 foreach (var hit in patternHits)
@@ -278,7 +278,7 @@ namespace Music.Generator
             int bar,
             int barWithinSection,
             int absoluteSectionIndex,
-            RandomizationSettings settings,
+            RandomizationSettingsOld settings,
             HarmonyPolicy policy)
         {
             // Build onset grid from bass onsets

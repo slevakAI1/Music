@@ -43,7 +43,7 @@ namespace Music.Generator
                 return ClampVelocity((int)(baseVelocity * 0.3));
             }
 
-            var rng = RandomHelpers.CreateLocalRng(seed, $"velocity_{role}", bar, onsetBeat);
+            var rng = RandomHelpersOld.CreateLocalRng(seed, $"velocity_{role}", bar, onsetBeat);
 
             int velocity = baseVelocity;
 
@@ -107,7 +107,7 @@ namespace Music.Generator
         /// </summary>
         public static int GhostNoteVelocity(int baseVelocity, int seed, int bar, decimal onset)
         {
-            var rng = RandomHelpers.CreateLocalRng(seed, "ghost", bar, onset);
+            var rng = RandomHelpersOld.CreateLocalRng(seed, "ghost", bar, onset);
             
             // Ghost notes: 25-35% of base velocity with slight variation
             int velocity = (int)(baseVelocity * 0.30);
@@ -122,7 +122,7 @@ namespace Music.Generator
         /// </summary>
         public static int FlamPreHitVelocity(int mainHitVelocity, int seed, int bar, decimal onset)
         {
-            var rng = RandomHelpers.CreateLocalRng(seed, "flam", bar, onset);
+            var rng = RandomHelpersOld.CreateLocalRng(seed, "flam", bar, onset);
             
             // Flam pre-hit: 55-65% of main hit velocity
             int velocity = (int)(mainHitVelocity * 0.60);

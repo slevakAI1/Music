@@ -25,13 +25,13 @@ namespace Music.Generator
             MotifPlacementPlan? motifPlan,
             MotifPresenceMap? motifPresence,
             int totalBars,
-            RandomizationSettings settings,
+            RandomizationSettingsOld settings,
             HarmonyPolicy policy,
             int midiProgramNumber)
         {
 
             var notes = new List<PartTrackEvent>();
-            var randomizer = new PitchRandomizer(settings);
+            var randomizer = new PitchRandomizerOld(settings);
             const int keysOctave = 3;
 
             HarmonyEvent? previousHarmony = null;
@@ -110,7 +110,7 @@ namespace Music.Generator
                     var duckedOnsets = realization.SelectedOnsets;
                     if (realization.SelectedOnsets.Count > 2)
                     {
-                        var localRng = RandomHelpers.CreateLocalRng(settings.Seed, $"keys_duck_{bar}", bar, 0m);
+                        var localRng = RandomHelpersOld.CreateLocalRng(settings.Seed, $"keys_duck_{bar}", bar, 0m);
                         duckedOnsets = realization.SelectedOnsets
                             .Where((onset, idx) =>
                             {
@@ -356,7 +356,7 @@ namespace Music.Generator
             int bar,
             int barWithinSection,
             int absoluteSectionIndex,
-            RandomizationSettings settings,
+            RandomizationSettingsOld settings,
             HarmonyPolicy policy)
         {
             // Build onset grid from pads onsets

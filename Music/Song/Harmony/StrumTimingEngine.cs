@@ -50,7 +50,7 @@ namespace Music.Generator
                 return new List<int> { 0 };
 
             // Create deterministic RNG for this chord onset
-            var rng = RandomHelpers.CreateLocalRng(baseSeed, role, bar, onsetBeat);
+            var rng = RandomHelpersOld.CreateLocalRng(baseSeed, role, bar, onsetBeat);
 
             // Strategy: distribute offsets across 0 to maxSpreadTicks
             // Use slight randomization to avoid mechanical feel while keeping deterministic

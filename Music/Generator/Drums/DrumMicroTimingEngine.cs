@@ -36,7 +36,7 @@ namespace Music.Generator
             int seed,
             bool isStrongBeat)
         {
-            var rng = RandomHelpers.CreateLocalRng(seed, $"timing_{role}", bar, onsetBeat);
+            var rng = RandomHelpersOld.CreateLocalRng(seed, $"timing_{role}", bar, onsetBeat);
 
             int maxOffset = role switch
             {
