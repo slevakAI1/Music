@@ -56,6 +56,7 @@ namespace Music.Generator
         /// MVP: extracts anchor onsets and emits MIDI events with default velocity.
         /// Story 5: adds per-bar context building for section/phrase awareness.
         /// Story 6: adds role presence check (orchestration policy).
+        /// Story 8: adds protection hierarchy merger.
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
@@ -71,6 +72,9 @@ namespace Music.Generator
 
             // Story 5: Build per-bar context (section, phrase position, segment profile)
             var barContexts = BuildBarContexts(sectionTrack, segmentProfiles.ToList(), totalBars);
+
+            // Story 8: Merge protection hierarchy layers (will be used in Story 9 for protection enforcement)
+            var mergedProtections = MergeProtectionLayersPerBar(barContexts, groovePresetDefinition.ProtectionPolicy);
 
             // Story 2: Extract anchor patterns from GroovePreset per bar
             var allOnsets = ExtractAnchorOnsets(grooveTrack, totalBars);
@@ -181,6 +185,30 @@ namespace Music.Generator
             }
 
             return contexts;
+        }
+
+        // AI: MergeProtectionLayersPerBar merges protection hierarchy for each bar using enabled tags from segment profile.
+        // AI: deps=ProtectionPolicyMerger.MergeProtectionLayers; returns dictionary of bar → role → merged protections.
+        private static Dictionary<int, Dictionary<string, RoleProtectionSet>> MergeProtectionLayersPerBar(
+            List<DrumBarContext> barContexts,
+            GrooveProtectionPolicy protectionPolicy)
+        {
+            var result = new Dictionary<int, Dictionary<string, RoleProtectionSet>>();
+
+            foreach (var barContext in barContexts)
+            {
+                // Get enabled protection tags from segment profile (or use empty list)
+                var enabledTags = barContext.SegmentProfile?.EnabledProtectionTags ?? new List<string>();
+
+                // Merge protection layers for this bar
+                var mergedProtections = ProtectionPolicyMerger.MergeProtectionLayers(
+                    protectionPolicy,
+                    enabledTags);
+
+                result[barContext.BarNumber] = mergedProtections;
+            }
+
+            return result;
         }
 
         // AI: ApplyRolePresenceFilter removes onsets for roles disabled by orchestration policy per section; Story 6 implementation.
