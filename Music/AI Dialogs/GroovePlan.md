@@ -502,6 +502,18 @@ Settings are applied in this order. Earlier settings establish constraints; late
 - Null subdivision policy bypasses filter (returns original onsets).
 - **Audible difference**: If subdivision policy restricts grid (e.g., Quarter only), offbeat onsets will be filtered out.
 
+**Test coverage:**
+- `Music.Tests/Generator/Drums/SubdivisionGridFilterTests.cs` - 15 tests covering:
+  - Null/empty input handling
+  - Each individual subdivision flag (Quarter, Eighth, Sixteenth, EighthTriplet, SixteenthTriplet)
+  - Combined flags (Quarter + Eighth, all flags)
+  - None flag returns empty
+  - Null policy bypasses filter
+  - Multiple bars filtering
+  - Different time signatures (3/4)
+  - Epsilon comparison for triplet recurring fractions
+  - Preservation of onset properties (velocity, tick position, protection flags)
+
 ---
 
 ### Story 11: Implement Syncopation and Anticipation Filter
