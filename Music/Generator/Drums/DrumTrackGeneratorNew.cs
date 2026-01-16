@@ -68,6 +68,12 @@ namespace Music.Generator
             DrumRole.Kick => KickMidiNote,
             DrumRole.Snare => SnareMidiNote,
             DrumRole.ClosedHat => ClosedHatMidiNote,
+            DrumRole.OpenHat => OpenHatMidiNote,
+            DrumRole.Ride => RideMidiNote,
+            DrumRole.Crash => CrashMidiNote,
+            DrumRole.TomHigh => TomHighMidiNote,
+            DrumRole.TomMid => TomMidMidiNote,
+            DrumRole.TomLow => TomLowMidiNote,
             _ => throw new ArgumentOutOfRangeException(nameof(role), $"Unknown drum role: {role}")
         };
     }
