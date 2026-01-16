@@ -66,7 +66,6 @@ namespace Music.Generator
         /// Story 9: adds protection enforcement (must-hits, never-remove, never-add).
         /// </summary>
         public static PartTrack Generate(
-            HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
             BarTrack barTrack,
             SectionTrack sectionTrack,

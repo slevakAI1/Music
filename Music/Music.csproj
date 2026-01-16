@@ -9,28 +9,28 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Archives\Arranger\**" />
-    <Compile Remove="Archives\MusicXml\**" />
+    <Compile Remove="Archives\**" />
     <Compile Remove="Files\OutputSamples\**" />
     <Compile Remove="Future Ideas\**" />
+    <Compile Remove="Generator\Core\RandomizationOld\**" />
     <Compile Remove="Generator\DrumsOld\**" />
     <Compile Remove="Generator\Energy\**" />
     <Compile Remove="Generator\Guitar\**" />
     <Compile Remove="Patches\**" />
     <Compile Remove="Tests\**" />
-    <EmbeddedResource Remove="Archives\Arranger\**" />
-    <EmbeddedResource Remove="Archives\MusicXml\**" />
+    <EmbeddedResource Remove="Archives\**" />
     <EmbeddedResource Remove="Files\OutputSamples\**" />
     <EmbeddedResource Remove="Future Ideas\**" />
+    <EmbeddedResource Remove="Generator\Core\RandomizationOld\**" />
     <EmbeddedResource Remove="Generator\DrumsOld\**" />
     <EmbeddedResource Remove="Generator\Energy\**" />
     <EmbeddedResource Remove="Generator\Guitar\**" />
     <EmbeddedResource Remove="Patches\**" />
     <EmbeddedResource Remove="Tests\**" />
-    <None Remove="Archives\Arranger\**" />
-    <None Remove="Archives\MusicXml\**" />
+    <None Remove="Archives\**" />
     <None Remove="Files\OutputSamples\**" />
     <None Remove="Future Ideas\**" />
+    <None Remove="Generator\Core\RandomizationOld\**" />
     <None Remove="Generator\DrumsOld\**" />
     <None Remove="Generator\Energy\**" />
     <None Remove="Generator\Guitar\**" />
@@ -39,30 +39,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Archives\AppendNoteEventsToScoreParams.cs" />
-    <Compile Remove="Archives\AppendNotes.cs" />
-    <Compile Remove="Archives\AppendNotesHelper.cs" />
-    <Compile Remove="Archives\CommandHarmonySyncTest.cs" />
-    <Compile Remove="Archives\ConvertHarmonyEventToSongTrackNoteEvents.cs" />
-    <Compile Remove="Archives\CreateTestFile.cs" />
-    <Compile Remove="Archives\CreateTestFile2.cs" />
-    <Compile Remove="Archives\CreateTestsFile1.cs" />
-    <Compile Remove="Archives\DesignerFileManager.cs" />
-    <Compile Remove="Archives\DesignerReport.cs" />
-    <Compile Remove="Archives\DesignerSerialization.cs" />
-    <Compile Remove="Archives\FileManager.cs" />
-    <Compile Remove="Archives\MusicXmlParser - Backup.cs" />
-    <Compile Remove="Archives\MusicXmlParserTests.cs" />
-    <Compile Remove="Archives\MusicXmlSerializerTests.cs" />
-    <Compile Remove="Archives\RandomizationValidator.cs" />
-    <Compile Remove="Archives\ScoreDesign_original draft.cs" />
-    <Compile Remove="Archives\SerializerTestForm.cs" />
-    <Compile Remove="Archives\SerializerTestForm.Designer.cs" />
-    <Compile Remove="Archives\UpdateWriterFormDataFromDesigner.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Remove="Archives\SerializerTestForm.resx" />
     <EmbeddedResource Remove="Writer\WriterForm\ConsoleTransform.resx" />
     <EmbeddedResource Remove="Writer\WriterForm\WriterForm.DataBinder.resx" />
     <EmbeddedResource Remove="Writer\WriterForm\WriterFormEvents.resx" />
@@ -80,8 +56,6 @@
     <None Remove="AI Dialogs\Story6.3-Implementation-Summary.md" />
     <None Remove="AI Dialogs\Story_7_5_8_Usage_Guide.md" />
     <None Remove="AI Dialogs\Story_9_1_Implementation_Summary.md" />
-    <None Remove="Archives\PlanV1.md" />
-    <None Remove="Archives\Stage 7 Stories.md" />
   </ItemGroup>
 
   <ItemGroup>
@@ -107,7 +81,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Archives\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />

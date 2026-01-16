@@ -18,25 +18,15 @@ namespace Music.Generator
             ValidateTimeSignatureTrack(songContext.Song.TimeSignatureTrack);
             //ValidateGrooveTrack(songContext.GroovePresetDefinition);   TO DO 
 
-
-
             // Get total bars from section track
             int totalBars = songContext.SectionTrack.TotalBars;
-
-            // Use default randomization settings and harmony policy
-            var settings = RandomizationSettingsOld.Default;
-            var harmonyPolicy = HarmonyPolicy.Default;
 
             var grooveName = GetPrimaryGrooveName(songContext.GrooveTrack);
 
             // Resolve MIDI program numbers from VoiceSet
-            //int bassProgramNumber = GetProgramNumberForRole(songContext.Voices, "Bass", defaultProgram: 33);
-            //int compProgramNumber = GetProgramNumberForRole(songContext.Voices, "Comp", defaultProgram: 27);
-            //int padsProgramNumber = GetProgramNumberForRole(songContext.Voices, "Pads", defaultProgram: 4);
             int drumProgramNumber = GetProgramNumberForRole(songContext.Voices, "DrumKit", defaultProgram: 255);
 
             var drumTrack = DrumTrackGeneratorNew.Generate(
-                 songContext.HarmonyTrack,
                  songContext.GrooveTrack,
                  songContext.BarTrack,
                  songContext.SectionTrack,
