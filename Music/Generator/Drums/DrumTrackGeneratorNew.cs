@@ -55,6 +55,7 @@ namespace Music.Generator
         /// Generates drum track from groove preset anchor patterns.
         /// MVP: extracts anchor onsets and emits MIDI events with default velocity.
         /// Story 5: adds per-bar context building for section/phrase awareness.
+        /// Story 6: adds role presence check (orchestration policy).
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
@@ -62,6 +63,7 @@ namespace Music.Generator
             BarTrack barTrack,
             SectionTrack sectionTrack,
             IReadOnlyList<SegmentGrooveProfile> segmentProfiles,
+            GroovePresetDefinition groovePresetDefinition,
             int totalBars,
             int midiProgramNumber)
         {
@@ -73,8 +75,11 @@ namespace Music.Generator
             // Story 2: Extract anchor patterns from GroovePreset per bar
             var allOnsets = ExtractAnchorOnsets(grooveTrack, totalBars);
 
+            // Story 6: Filter onsets by role presence (orchestration policy)
+            var filteredOnsets = ApplyRolePresenceFilter(allOnsets, barContexts, groovePresetDefinition.ProtectionPolicy.OrchestrationPolicy);
+
             // Story 3: Convert onsets to MIDI events
-            ConvertOnsetsToMidiEvents(allOnsets, barTrack, notes);
+            ConvertOnsetsToMidiEvents(filteredOnsets, barTrack, notes);
 
             return new PartTrack(notes) { MidiProgramNumber = midiProgramNumber };
         }
@@ -176,6 +181,61 @@ namespace Music.Generator
             }
 
             return contexts;
+        }
+
+        // AI: ApplyRolePresenceFilter removes onsets for roles disabled by orchestration policy per section; Story 6 implementation.
+        // AI: deps=GrooveOrchestrationPolicy.DefaultsBySectionType; returns filtered onset list with only present roles.
+        private static List<DrumOnset> ApplyRolePresenceFilter(
+            List<DrumOnset> onsets,
+            List<DrumBarContext> barContexts,
+            GrooveOrchestrationPolicy orchestrationPolicy)
+        {
+            var filtered = new List<DrumOnset>();
+            var barContextDict = barContexts.ToDictionary(ctx => ctx.BarNumber);
+
+            foreach (var onset in onsets)
+            {
+                // Look up bar context
+                if (!barContextDict.TryGetValue(onset.BarNumber, out var barContext))
+                {
+                    // No context for this bar, default to present
+                    filtered.Add(onset);
+                    continue;
+                }
+
+                // Get section type (use SectionType enum value as string)
+                string sectionType = barContext.Section?.SectionType.ToString() ?? "";
+
+                // Find matching orchestration defaults for this section type
+                var sectionDefaults = orchestrationPolicy.DefaultsBySectionType
+                    .FirstOrDefault(d => string.Equals(d.SectionType, sectionType, StringComparison.OrdinalIgnoreCase));
+
+                // Check if role is present (default to true if not specified)
+                bool isRolePresent = true;
+
+                if (sectionDefaults != null)
+                {
+                    string roleName = onset.Role.ToString();
+
+                    // Check individual role first (Kick, Snare, Hat, etc.)
+                    if (sectionDefaults.RolePresent.TryGetValue(roleName, out bool rolePresent))
+                    {
+                        isRolePresent = rolePresent;
+                    }
+                    // Also check DrumKit (master switch for all drums)
+                    else if (sectionDefaults.RolePresent.TryGetValue("DrumKit", out bool drumKitPresent))
+                    {
+                        isRolePresent = drumKitPresent;
+                    }
+                }
+
+                if (isRolePresent)
+                {
+                    filtered.Add(onset);
+                }
+            }
+
+            return filtered;
         }
 
         // AI: ConvertOnsetsToMidiEvents converts DrumOnset list to PartTrackEvent notes using BarTrack for tick conversion.

@@ -349,20 +349,30 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 6: Implement Role Presence Check
+### Story 6: Implement Role Presence Check (COMPLETED)
 **As a** generator  
 **I want** to skip roles that are disabled for a section type  
 **So that** orchestration policy controls which instruments play
 
 **Acceptance Criteria:**
-- [ ] Look up `GrooveOrchestrationPolicy.DefaultsBySectionType` by section name
-- [ ] Check `RolePresent[role]` for Kick, Snare, Hat, DrumKit
-- [ ] If role not present, emit no notes for that role in that bar
-- [ ] Handle missing section type gracefully (default to present)
+- [x] Look up `GrooveOrchestrationPolicy.DefaultsBySectionType` by section name
+- [x] Check `RolePresent[role]` for Kick, Snare, Hat, DrumKit
+- [x] If role not present, emit no notes for that role in that bar
+- [x] Handle missing section type gracefully (default to present)
 
 **Settings Handled:**
 - `GrooveOrchestrationPolicy.DefaultsBySectionType`
 - `SectionRolePresenceDefaults.RolePresent`
+
+**Implementation notes:**
+- `ApplyRolePresenceFilter` method added to encapsulate filtering logic.
+- Looks up section type from `DrumBarContext.Section.SectionType`.
+- Finds matching `SectionRolePresenceDefaults` by case-insensitive section type match.
+- Checks `RolePresent` dictionary for individual role (Kick, Snare, Hat, etc.).
+- Falls back to `DrumKit` master switch if individual role not specified.
+- Defaults to present (true) if no orchestration policy or section defaults found.
+- Generator signature updated to accept `GroovePresetDefinition` for access to `ProtectionPolicy.OrchestrationPolicy`.
+- **Audible difference**: If orchestration policy disables a role for a section (e.g., Hat in verse), that role will be silent.
 
 ---
 
