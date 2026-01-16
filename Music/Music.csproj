@@ -57,6 +57,7 @@
     <None Remove="AI Dialogs\musical_energy_compilation.md" />
     <None Remove="AI Dialogs\PlanV1.md" />
     <None Remove="AI Dialogs\Story6.3-Implementation-Summary.md" />
+    <None Remove="AI Dialogs\Story9TestsSummary.md" />
     <None Remove="AI Dialogs\Story_7_5_8_Usage_Guide.md" />
     <None Remove="AI Dialogs\Story_9_1_Implementation_Summary.md" />
   </ItemGroup>

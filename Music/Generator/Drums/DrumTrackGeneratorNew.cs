@@ -44,7 +44,7 @@ namespace Music.Generator
         int BarWithinSection,
         int BarsUntilSectionEnd);
 
-    internal static class DrumTrackGeneratorNew
+    public static class DrumTrackGeneratorNew
     {
         // AI: MIDI drum note numbers (General MIDI standard); extend mapping as roles are added.
         private const int KickMidiNote = 36;
