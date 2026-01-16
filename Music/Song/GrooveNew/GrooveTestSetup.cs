@@ -1,0 +1,644 @@
+﻿using Music.GrooveModel;
+
+namespace Music.Grooves
+{
+    public static class GrooveSetupFactory
+    {
+        /// <summary>
+        /// Builds a complete PopRockBasic groove definition + segment profiles for your test form:
+        /// Intro, Verse, Chorus, Verse, Chorus, Bridge, Outro; each 8 bars; 4/4.
+        ///
+        /// This is DEFINITIONS ONLY: no selection algorithms yet.
+        /// </summary>
+        public static GroovePresetDefinition BuildPopRockBasicGrooveForTestSong(
+            out IReadOnlyList<SegmentGrooveProfile> segmentProfiles)
+        {
+            // =========================
+            // INPUTS (everything here)
+            // =========================
+
+            // Song form (your current test) ---------------------------------------
+            var sections = new List<SectionSpec>                             // Standard
+            {
+                new("Intro",  8, 4),
+                new("Verse",  8, 4),
+                new("Chorus", 8, 4),
+                new("Verse",  8, 4),
+                new("Chorus", 8, 4),
+                new("Bridge", 8, 4),
+                new("Outro",  8, 4),
+            };
+
+            // Groove identity ----------------------------------------------------
+            string presetName = "PopRockBasic";                              // Standard
+            string styleFamily = "PopRock";                                  // Standard
+            int beatsPerBar = 4;                                             // Standard
+            var identityTags = new List<string>                              // Standard
+            {
+                "Backbeat",
+                "Straight8",
+                "PopRock",
+                "4_4"
+            };
+
+            // Subdivision / feel -------------------------------------------------
+            var allowedSubdivisions = AllowedSubdivision.Quarter             // Standard
+                                    | AllowedSubdivision.Eighth              // Standard
+                                    | AllowedSubdivision.Sixteenth;          // Intelligent choice (allow 16ths for fills/drive)
+            GrooveFeel feel = GrooveFeel.Straight;                           // Standard (for this preset)
+            double swingAmount01 = 0.0;                                      // Standard (Straight)
+
+            // Phrase hooks (fill windows) ---------------------------------------
+            bool allowPhraseEndFills = true;                                 // Intelligent choice
+            int phraseEndBarsWindow = 1;                                     // Intelligent choice
+            bool allowSectionEndFills = true;                                // Intelligent choice
+            int sectionEndBarsWindow = 1;                                    // Intelligent choice
+            bool protectDownbeatOnPhraseEnd = true;                          // Standard
+            bool protectBackbeatOnPhraseEnd = true;                          // Standard
+            var enabledFillTags = new List<string> { "Fill", "Pickup" };     // Intelligent choice
+
+            // Role constraints / vocab ------------------------------------------
+            // (These are caps + constraints, not “targets”.)
+            bool allowSyncopation = true;                                    // Intelligent choice
+            bool allowAnticipation = true;                                   // Intelligent choice
+
+            // Protection hierarchy depth ----------------------------------------
+            // [0]=parent base, [1]=child refine, [2]=grandchild refine
+            int hierarchyDepth = 3;                                          // Standard
+
+            // Segment defaults (targets; later tuned by algorithms/UI) ----------
+            // These are “what we want”, not hard caps.
+            double verseCompDensity01 = 0.50;                                // Intelligent choice
+            double chorusCompDensity01 = 0.70;                               // Intelligent choice
+            double verseDrumDensity01 = 0.70;                                // Intelligent choice
+            double chorusDrumDensity01 = 0.85;                               // Intelligent choice
+            double verseBassDensity01 = 0.45;                                // Intelligent choice
+            double chorusBassDensity01 = 0.55;                               // Intelligent choice
+
+            // =========================
+            // BUILD (helpers)
+            // =========================
+
+            var identity = BuildPopRockBasicIdentity(
+                presetName, styleFamily, beatsPerBar, identityTags);
+
+            var anchor = BuildPopRockBasicAnchorLayer(); // your hardcoded onsets
+
+            var protectionPolicy = BuildPopRockBasicProtectionPolicy(
+                identity,
+                hierarchyDepth,
+                allowedSubdivisions,
+                feel,
+                swingAmount01,
+                allowPhraseEndFills,
+                phraseEndBarsWindow,
+                allowSectionEndFills,
+                sectionEndBarsWindow,
+                protectDownbeatOnPhraseEnd,
+                protectBackbeatOnPhraseEnd,
+                enabledFillTags,
+                allowSyncopation,
+                allowAnticipation);
+
+            var variationCatalog = BuildPopRockBasicVariationCatalog(identity, hierarchyDepth);
+
+            segmentProfiles = BuildSegmentProfilesForTestSong(
+                sections,
+                verseCompDensity01,
+                chorusCompDensity01,
+                verseDrumDensity01,
+                chorusDrumDensity01,
+                verseBassDensity01,
+                chorusBassDensity01);
+
+            return new GroovePresetDefinition
+            {
+                Identity = identity,
+                AnchorLayer = anchor,
+                ProtectionPolicy = protectionPolicy,
+                VariationCatalog = variationCatalog
+            };
+        }
+
+        // ---------------------------------------------------------------------
+        // HELPERS
+        // ---------------------------------------------------------------------
+
+        private static GroovePresetIdentity BuildPopRockBasicIdentity(
+            string presetName,
+            string styleFamily,
+            int beatsPerBar,
+            List<string> tags)
+        {
+            return new GroovePresetIdentity
+            {
+                Name = presetName,
+                StyleFamily = styleFamily,
+                BeatsPerBar = beatsPerBar,
+                Tags = tags,
+                CompatibilityTags = new List<string>
+                {
+                    "NoTripletsByDefault",
+                    "BackbeatProtected",
+                    "SafeForSimpleMotifs"
+                }
+            };
+        }
+
+        private static GrooveInstanceLayer BuildPopRockBasicAnchorLayer()
+        {
+            // Your current PopRockBasic anchors.
+            return new GrooveInstanceLayer
+            {
+                KickOnsets = new List<decimal> { 1m, 3m },
+                SnareOnsets = new List<decimal> { 2m, 4m },
+                HatOnsets = new List<decimal> { 1m, 1.5m, 2m, 2.5m, 3m, 3.5m, 4m, 4.5m },
+                BassOnsets = new List<decimal> { 1m, 3m },
+                CompOnsets = new List<decimal> { 1.5m, 2.5m, 3.5m, 4.5m },
+                PadsOnsets = new List<decimal> { 1m, 3m }
+            };
+        }
+
+        private static GrooveProtectionPolicy BuildPopRockBasicProtectionPolicy(
+            GroovePresetIdentity identity,
+            int hierarchyDepth,
+            AllowedSubdivision allowedSubdivisions,
+            GrooveFeel feel,
+            double swingAmount01,
+            bool allowPhraseEndFills,
+            int phraseEndBarsWindow,
+            bool allowSectionEndFills,
+            int sectionEndBarsWindow,
+            bool protectDownbeatOnPhraseEnd,
+            bool protectBackbeatOnPhraseEnd,
+            List<string> enabledFillTags,
+            bool allowSyncopation,
+            bool allowAnticipation)
+        {
+            var policy = new GrooveProtectionPolicy
+            {
+                Identity = identity,
+
+                // (#1) subdivision / feel
+                SubdivisionPolicy = new GrooveSubdivisionPolicy
+                {
+                    AllowedSubdivisions = allowedSubdivisions,
+                    Feel = feel,
+                    SwingAmount01 = swingAmount01
+                },
+
+                // (#4) role constraints / vocab
+                RoleConstraintPolicy = BuildDefaultRoleConstraints(allowSyncopation, allowAnticipation),
+
+                // (#7) phrase hooks
+                PhraseHookPolicy = new GroovePhraseHookPolicy
+                {
+                    AllowFillsAtPhraseEnd = allowPhraseEndFills,
+                    PhraseEndBarsWindow = phraseEndBarsWindow,
+                    AllowFillsAtSectionEnd = allowSectionEndFills,
+                    SectionEndBarsWindow = sectionEndBarsWindow,
+                    ProtectDownbeatOnPhraseEnd = protectDownbeatOnPhraseEnd,
+                    ProtectBackbeatOnPhraseEnd = protectBackbeatOnPhraseEnd,
+                    EnabledFillTags = enabledFillTags
+                },
+
+                // (#6) timing feel (keep neutral for now)
+                TimingPolicy = new GrooveTimingPolicy
+                {
+                    MaxAbsTimingBiasTicks = 0, // set >0 later when you add microtiming
+                    RoleTimingFeel = new Dictionary<string, TimingFeel>
+                    {
+                        [GrooveRoles.DrumKit] = TimingFeel.OnTop,
+                        [GrooveRoles.Bass] = TimingFeel.OnTop,
+                        [GrooveRoles.Comp] = TimingFeel.OnTop,
+                        [GrooveRoles.Pads] = TimingFeel.OnTop
+                    },
+                    RoleTimingBiasTicks = new Dictionary<string, int>
+                    {
+                        [GrooveRoles.DrumKit] = 0,
+                        [GrooveRoles.Bass] = 0,
+                        [GrooveRoles.Comp] = 0,
+                        [GrooveRoles.Pads] = 0
+                    }
+                },
+
+                // (#5) accents / dynamics
+                AccentPolicy = BuildDefaultAccentPolicy(),
+
+                // (#8) orchestration defaults by section type
+                OrchestrationPolicy = BuildDefaultOrchestrationPolicy(),
+
+                // override merge policy (conservative defaults)
+                MergePolicy = new GrooveOverrideMergePolicy
+                {
+                    OverrideReplacesLists = false,
+                    OverrideCanRemoveProtectedOnsets = false,
+                    OverrideCanRelaxConstraints = false,
+                    OverrideCanChangeFeel = false
+                }
+            };
+
+            // Protection hierarchy layers: base -> refined -> more refined.
+            policy.HierarchyLayers = BuildProtectionHierarchyLayers(hierarchyDepth);
+
+            return policy;
+        }
+
+        private static GrooveRoleConstraintPolicy BuildDefaultRoleConstraints(
+            bool allowSyncopation,
+            bool allowAnticipation)
+        {
+            return new GrooveRoleConstraintPolicy
+            {
+                RoleVocabulary = new Dictionary<string, RoleRhythmVocabulary>
+                {
+                    // Drums (conceptually): allow syncopation/anticipation as optional events later
+                    [GrooveRoles.DrumKit] = new RoleRhythmVocabulary
+                    {
+                        MaxHitsPerBar = 32,
+                        MaxHitsPerBeat = 4,
+                        AllowSyncopation = allowSyncopation,
+                        AllowAnticipation = allowAnticipation,
+                        SnapStrongBeatsToChordTones = false
+                    },
+
+                    // Bass: conservative
+                    [GrooveRoles.Bass] = new RoleRhythmVocabulary
+                    {
+                        MaxHitsPerBar = 8,
+                        MaxHitsPerBeat = 2,
+                        AllowSyncopation = allowSyncopation,
+                        AllowAnticipation = allowAnticipation,
+                        SnapStrongBeatsToChordTones = true
+                    },
+
+                    // Comp: moderate
+                    [GrooveRoles.Comp] = new RoleRhythmVocabulary
+                    {
+                        MaxHitsPerBar = 12,
+                        MaxHitsPerBeat = 3,
+                        AllowSyncopation = allowSyncopation,
+                        AllowAnticipation = allowAnticipation,
+                        SnapStrongBeatsToChordTones = true
+                    },
+
+                    // Pads: sparse
+                    [GrooveRoles.Pads] = new RoleRhythmVocabulary
+                    {
+                        MaxHitsPerBar = 4,
+                        MaxHitsPerBeat = 1,
+                        AllowSyncopation = false,
+                        AllowAnticipation = false,
+                        SnapStrongBeatsToChordTones = true
+                    }
+                },
+
+                // Hard caps (can be enforced later)
+                RoleMaxDensityPerBar = new Dictionary<string, int>
+                {
+                    [GrooveRoles.DrumKit] = 32,
+                    [GrooveRoles.Bass] = 8,
+                    [GrooveRoles.Comp] = 12,
+                    [GrooveRoles.Pads] = 4
+                },
+
+                // Sustain caps (for pads/keys)
+                RoleMaxSustainSlots = new Dictionary<string, int>
+                {
+                    [GrooveRoles.Pads] = 2,
+                    [GrooveRoles.Comp] = 2
+                }
+            };
+        }
+
+        private static GrooveAccentPolicy BuildDefaultAccentPolicy()
+        {
+            // Simple, safe defaults. You’ll tune per genre later.
+            return new GrooveAccentPolicy
+            {
+                RoleStrengthVelocity = new Dictionary<string, Dictionary<OnsetStrength, VelocityRule>>
+                {
+                    [GrooveRoles.Kick] = new()
+                    {
+                        [OnsetStrength.Downbeat] = new VelocityRule { Min = 90, Max = 120, Typical = 105, AccentBias = 0 },
+                        [OnsetStrength.Strong] = new VelocityRule { Min = 85, Max = 115, Typical = 100, AccentBias = 0 },
+                        [OnsetStrength.Offbeat] = new VelocityRule { Min = 70, Max = 105, Typical = 85, AccentBias = -5 },
+                    },
+                    [GrooveRoles.Snare] = new()
+                    {
+                        [OnsetStrength.Backbeat] = new VelocityRule { Min = 95, Max = 127, Typical = 112, AccentBias = 5 },
+                        [OnsetStrength.Ghost] = new VelocityRule { Min = 20, Max = 50, Typical = 35, AccentBias = 0 },
+                    },
+                    [GrooveRoles.Hat] = new()
+                    {
+                        [OnsetStrength.Strong] = new VelocityRule { Min = 55, Max = 85, Typical = 70, AccentBias = 0 },
+                        [OnsetStrength.Offbeat] = new VelocityRule { Min = 45, Max = 75, Typical = 60, AccentBias = -3 },
+                    },
+                    [GrooveRoles.Comp] = new()
+                    {
+                        [OnsetStrength.Strong] = new VelocityRule { Min = 60, Max = 95, Typical = 78, AccentBias = 0 },
+                        [OnsetStrength.Offbeat] = new VelocityRule { Min = 55, Max = 90, Typical = 72, AccentBias = -2 },
+                        [OnsetStrength.Pickup] = new VelocityRule { Min = 58, Max = 92, Typical = 74, AccentBias = 0 },
+                    },
+                    [GrooveRoles.Bass] = new()
+                    {
+                        [OnsetStrength.Downbeat] = new VelocityRule { Min = 70, Max = 110, Typical = 90, AccentBias = 0 },
+                        [OnsetStrength.Strong] = new VelocityRule { Min = 65, Max = 105, Typical = 85, AccentBias = -2 },
+                        [OnsetStrength.Offbeat] = new VelocityRule { Min = 55, Max = 95, Typical = 75, AccentBias = -5 },
+                    }
+                }
+            };
+        }
+
+        private static GrooveOrchestrationPolicy BuildDefaultOrchestrationPolicy()
+        {
+            // Lightweight “role present” defaults by section type.
+            return new GrooveOrchestrationPolicy
+            {
+                DefaultsBySectionType = new List<SectionRolePresenceDefaults>
+                {
+                    new SectionRolePresenceDefaults
+                    {
+                        SectionType = "Intro",
+                        RolePresent = new Dictionary<string, bool>
+                        {
+                            [GrooveRoles.DrumKit] = true,
+                            [GrooveRoles.Bass] = true,
+                            [GrooveRoles.Comp] = true,
+                            [GrooveRoles.Pads] = false
+                        }
+                    },
+                    new SectionRolePresenceDefaults
+                    {
+                        SectionType = "Verse",
+                        RolePresent = new Dictionary<string, bool>
+                        {
+                            [GrooveRoles.DrumKit] = true,
+                            [GrooveRoles.Bass] = true,
+                            [GrooveRoles.Comp] = true,
+                            [GrooveRoles.Pads] = true
+                        }
+                    },
+                    new SectionRolePresenceDefaults
+                    {
+                        SectionType = "Chorus",
+                        RolePresent = new Dictionary<string, bool>
+                        {
+                            [GrooveRoles.DrumKit] = true,
+                            [GrooveRoles.Bass] = true,
+                            [GrooveRoles.Comp] = true,
+                            [GrooveRoles.Pads] = true
+                        },
+                        RoleRegisterLiftSemitones = new Dictionary<string, int>
+                        {
+                            [GrooveRoles.Comp] = 0,
+                            [GrooveRoles.Pads] = 0
+                        },
+                        RoleDensityMultiplier = new Dictionary<string, double>
+                        {
+                            [GrooveRoles.Comp] = 1.1,
+                            [GrooveRoles.Pads] = 1.1
+                        }
+                    },
+                    new SectionRolePresenceDefaults
+                    {
+                        SectionType = "Bridge",
+                        RolePresent = new Dictionary<string, bool>
+                        {
+                            [GrooveRoles.DrumKit] = true,
+                            [GrooveRoles.Bass] = true,
+                            [GrooveRoles.Comp] = true,
+                            [GrooveRoles.Pads] = true
+                        }
+                    },
+                    new SectionRolePresenceDefaults
+                    {
+                        SectionType = "Outro",
+                        RolePresent = new Dictionary<string, bool>
+                        {
+                            [GrooveRoles.DrumKit] = true,
+                            [GrooveRoles.Bass] = true,
+                            [GrooveRoles.Comp] = true,
+                            [GrooveRoles.Pads] = false
+                        }
+                    }
+                }
+            };
+        }
+
+        private static List<GrooveProtectionLayer> BuildProtectionHierarchyLayers(int hierarchyDepth)
+        {
+            // Base protections (PopRock backbeat + anchors).
+            // Child/grandchild layers are placeholders now; you’ll refine later.
+            var layers = new List<GrooveProtectionLayer>();
+
+            for (int i = 0; i < hierarchyDepth; i++)
+            {
+                var layer = new GrooveProtectionLayer
+                {
+                    LayerId = i switch
+                    {
+                        0 => "Base",
+                        1 => "PopRockRefine",
+                        _ => "PopRockBasicRefine"
+                    },
+                    IsAdditiveOnly = true,
+                    RoleProtections = new Dictionary<string, RoleProtectionSet>()
+                };
+
+                // Only base layer defines must-hit anchors.
+                if (i == 0)
+                {
+                    layer.RoleProtections[GrooveRoles.Kick] = new RoleProtectionSet
+                    {
+                        MustHitOnsets = new List<decimal> { 1m, 3m },
+                        NeverRemoveOnsets = new List<decimal> { 1m },
+                    };
+                    layer.RoleProtections[GrooveRoles.Snare] = new RoleProtectionSet
+                    {
+                        MustHitOnsets = new List<decimal> { 2m, 4m },
+                        NeverRemoveOnsets = new List<decimal> { 2m, 4m }
+                    };
+                    layer.RoleProtections[GrooveRoles.Hat] = new RoleProtectionSet
+                    {
+                        ProtectedOnsets = new List<decimal> { 1m, 2m, 3m, 4m }
+                    };
+                }
+
+                layers.Add(layer);
+            }
+
+            return layers;
+        }
+
+        private static GrooveVariationCatalog BuildPopRockBasicVariationCatalog(
+            GroovePresetIdentity identity,
+            int hierarchyDepth)
+        {
+            var catalog = new GrooveVariationCatalog
+            {
+                Identity = identity,
+                KnownTags = new List<string>
+                {
+                    "Core",
+                    "Drive",
+                    "Fill",
+                    "Pickup",
+                    "Drop",
+                    "GhostSnare",
+                    "OpenHat"
+                }
+            };
+
+            // Candidate groups MUST include actual candidates; otherwise enabling tags does nothing.
+            var baseGroups = new List<GrooveCandidateGroup>
+            {
+                new GrooveCandidateGroup
+                {
+                    GroupId = "Drive_Hats16",
+                    GroupTags = new List<string> { "Drive" },
+                    MaxAddsPerBar = 4,
+                    BaseProbabilityBias = 1.0,
+                    Candidates = new List<GrooveOnsetCandidate>
+                    {
+                        // Add 16th-like pushes by inserting between existing 8ths (you already allow decimal beats).
+                        new GrooveOnsetCandidate { Role = GrooveRoles.Hat, OnsetBeat = 1.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
+                        new GrooveOnsetCandidate { Role = GrooveRoles.Hat, OnsetBeat = 2.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
+                        new GrooveOnsetCandidate { Role = GrooveRoles.Hat, OnsetBeat = 3.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
+                        new GrooveOnsetCandidate { Role = GrooveRoles.Hat, OnsetBeat = 4.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
+                    }
+                },
+                new GrooveCandidateGroup
+                {
+                    GroupId = "Pickups",
+                    GroupTags = new List<string> { "Pickup" },
+                    MaxAddsPerBar = 2,
+                    BaseProbabilityBias = 0.6,
+                    Candidates = new List<GrooveOnsetCandidate>
+                    {
+                        new GrooveOnsetCandidate { Role = GrooveRoles.Snare, OnsetBeat = 4.75m, Strength = OnsetStrength.Pickup, MaxAddsPerBar = 1, ProbabilityBias = 0.35, Tags = new List<string>{ "Pickup", "Fill" } },
+                        new GrooveOnsetCandidate { Role = GrooveRoles.Kick,  OnsetBeat = 4.75m, Strength = OnsetStrength.Pickup, MaxAddsPerBar = 1, ProbabilityBias = 0.35, Tags = new List<string>{ "Pickup", "Fill" } },
+                    }
+                },
+                new GrooveCandidateGroup
+                {
+                    GroupId = "GhostSnare",
+                    GroupTags = new List<string> { "GhostSnare" },
+                    MaxAddsPerBar = 2,
+                    BaseProbabilityBias = 0.5,
+                    Candidates = new List<GrooveOnsetCandidate>
+                    {
+                        new GrooveOnsetCandidate { Role = GrooveRoles.Snare, OnsetBeat = 1.5m, Strength = OnsetStrength.Ghost, MaxAddsPerBar = 1, ProbabilityBias = 0.25, Tags = new List<string>{ "GhostSnare" } },
+                        new GrooveOnsetCandidate { Role = GrooveRoles.Snare, OnsetBeat = 3.5m, Strength = OnsetStrength.Ghost, MaxAddsPerBar = 1, ProbabilityBias = 0.25, Tags = new List<string>{ "GhostSnare" } },
+                    }
+                },
+                new GrooveCandidateGroup
+                {
+                    GroupId = "OpenHat",
+                    GroupTags = new List<string> { "OpenHat", "Fill" },
+                    MaxAddsPerBar = 1,
+                    BaseProbabilityBias = 0.35,
+                    Candidates = new List<GrooveOnsetCandidate>
+                    {
+                        new GrooveOnsetCandidate { Role = GrooveRoles.Hat, OnsetBeat = 4.5m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.3, Tags = new List<string>{ "OpenHat", "Fill" } },
+                    }
+                }
+            };
+
+            var layers = new List<GrooveVariationLayer>();
+            for (int i = 0; i < hierarchyDepth; i++)
+            {
+                layers.Add(new GrooveVariationLayer
+                {
+                    LayerId = i switch
+                    {
+                        0 => "BaseCandidates",
+                        1 => "PopRockRefineCandidates",
+                        _ => "PopRockBasicRefineCandidates"
+                    },
+                    IsAdditiveOnly = true,
+                    CandidateGroups = baseGroups
+                });
+            }
+
+            catalog.HierarchyLayers = layers;
+            return catalog;
+        }
+
+        private static IReadOnlyList<SegmentGrooveProfile> BuildSegmentProfilesForTestSong(
+            IReadOnlyList<SectionSpec> sections,
+            double verseCompDensity01,
+            double chorusCompDensity01,
+            double verseDrumDensity01,
+            double chorusDrumDensity01,
+            double verseBassDensity01,
+            double chorusBassDensity01)
+        {
+            var result = new List<SegmentGrooveProfile>();
+
+            int barCursor = 1;
+            for (int i = 0; i < sections.Count; i++)
+            {
+                var s = sections[i];
+
+                // Default tag enables by section type (later: rules/user/seed-driven).
+                var enabledTags = GetDefaultEnabledVariationTagsForSection(s.SectionType);
+
+                // Density targets (these are targets, not hard caps)
+                var (drums, comp, bass) = s.SectionType.Equals("Chorus", StringComparison.OrdinalIgnoreCase)
+                    ? (chorusDrumDensity01, chorusCompDensity01, chorusBassDensity01)
+                    : (verseDrumDensity01, verseCompDensity01, verseBassDensity01);
+
+                // Basic “max events per bar” defaults: set non-zero so your later systems don’t read “disabled”.
+                int maxDrumEvents = 32;
+                int maxCompEvents = 12;
+                int maxBassEvents = 8;
+                int maxHatEvents = 16;
+
+                result.Add(new SegmentGrooveProfile
+                {
+                    SegmentId = $"{s.SectionType}_{i}",
+                    SectionIndex = i,
+                    PhraseIndex = null,
+                    StartBar = barCursor,
+                    EndBar = barCursor + s.Bars - 1,
+
+                    EnabledVariationTags = enabledTags,
+                    EnabledProtectionTags = new List<string>(),
+
+                    DensityTargets = new List<RoleDensityTarget>
+                    {
+                        new RoleDensityTarget { Role = GrooveRoles.DrumKit, Density01 = drums, MaxEventsPerBar = maxDrumEvents },
+                        new RoleDensityTarget { Role = GrooveRoles.Comp,   Density01 = comp,  MaxEventsPerBar = maxCompEvents },
+                        new RoleDensityTarget { Role = GrooveRoles.Bass,   Density01 = bass,  MaxEventsPerBar = maxBassEvents },
+                        new RoleDensityTarget { Role = GrooveRoles.Hat,    Density01 = drums, MaxEventsPerBar = maxHatEvents },
+                    },
+
+                    OverrideFeel = null,
+                    OverrideSwingAmount01 = null
+                });
+
+                barCursor += s.Bars;
+            }
+
+            return result;
+        }
+
+        private static List<string> GetDefaultEnabledVariationTagsForSection(string sectionType)
+        {
+            // Keep simple now. This is just “what tags are allowed”.
+            return sectionType.ToLowerInvariant() switch
+            {
+                "intro" => new List<string> { "Core" },
+                "verse" => new List<string> { "Core", "GhostSnare" },
+                "chorus" => new List<string> { "Core", "Drive", "OpenHat" },
+                "bridge" => new List<string> { "Core", "Fill", "Pickup" },
+                "outro" => new List<string> { "Core", "Drop" },
+                _ => new List<string> { "Core" }
+            };
+        }
+
+        // Local helper type so inputs stay in one place in the main method
+        private sealed record SectionSpec(string SectionType, int Bars, int BeatsPerBar);
+    }
+}
