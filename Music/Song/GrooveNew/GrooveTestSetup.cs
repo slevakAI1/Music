@@ -1,7 +1,6 @@
 ﻿using Music.Generator;
-using Music.GrooveModel;
 
-namespace Music.Grooves
+namespace Music.Generator
 {
     public static class GrooveSetupFactory
     {
@@ -139,10 +138,10 @@ namespace Music.Grooves
             };
         }
 
-        private static Music.GrooveModel.GrooveInstanceLayer BuildPopRockBasicAnchorLayer()
+        private static GrooveInstanceLayer BuildPopRockBasicAnchorLayer()
         {
             // Your current PopRockBasic anchors.
-            return new Music.GrooveModel.GrooveInstanceLayer
+            return new GrooveInstanceLayer
             {
                 KickOnsets = new List<decimal> { 1m, 3m },
                 SnareOnsets = new List<decimal> { 2m, 4m },

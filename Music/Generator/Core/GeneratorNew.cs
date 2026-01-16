@@ -1,8 +1,7 @@
-// AI: purpose=Generate PartTracks using Harmony, Groove, Section+Bar timing; deterministic via seed.
-// AI: invariants=Harmony->Groove->Bar timing must align; BarTrack is read-only and must NOT be rebuilt here.
-// AI: deps=HarmonyValidator, MotifPlacementPlanner, MusicConstants.TicksPerQuarterNote.
+// AI: purpose=Generate PartTrack using for Drums only, Section+Bar timing;
+// AI: invariants=BarTrack is read-only and must NOT be rebuilt here.
+// AI: deps=MusicConstants.TicksPerQuarterNote.
 // AI: perf=Single-run generation; avoid allocations in inner loops; use seed for deterministic results.
-// TODO? confirm behavior when groove/pads onsets null vs empty; current code treats both as skip.
 
 using Music.MyMidi;
 
@@ -14,29 +13,12 @@ namespace Music.Generator
         // AI: behavior=Runs HarmonyValidator with default options (StrictDiatonicChordTones=true) to catch F# minor crashes.
         public static PartTrack Generate(SongContext songContext)
         {
-            // validate songcontext is not null
             ValidateSongContext(songContext);
             ValidateSectionTrack(songContext.SectionTrack);
-            ValidateHarmonyTrack(songContext.HarmonyTrack);
             ValidateTimeSignatureTrack(songContext.Song.TimeSignatureTrack);
-            //ValidateGrooveTrack(songContext.GrooveTrack);   // THESE ARE EVENTS HOW DO THEY RELATE TO NEW STRUCTURE? DO WE NEED TO VALIDATE ONSETS/SourcePresetName?
+            //ValidateGrooveTrack(songContext.GroovePresetDefinition);   TO DO 
 
-            // Validate harmony events for musical correctness before generation
-            var validationResult = HarmonyValidator.ValidateTrack(
-                songContext.HarmonyTrack,
-                new HarmonyValidationOptions
-                {
-                    ApplyFixes = false,
-                    StrictDiatonicChordTones = false,
-                    ClampInvalidBassToRoot = false,
-                    AllowUnknownQuality = false
-                });
 
-            if (!validationResult.IsValid)
-            {
-                var errorMessage = "Harmony validation failed:\n" + string.Join("\n", validationResult.Errors);
-                throw new InvalidOperationException(errorMessage);
-            }
 
             // Get total bars from section track
             int totalBars = songContext.SectionTrack.TotalBars;

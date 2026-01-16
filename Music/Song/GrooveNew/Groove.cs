@@ -1,4 +1,4 @@
-﻿namespace Music.GrooveModel
+﻿namespace Music.Generator
 {
     // =========================
     // 1) Subdivision grid + swing/shuffle feel
@@ -385,22 +385,5 @@
         public GrooveInstanceLayer AnchorLayer { get; set; } = new();         // Your existing anchor onsets.
         public GrooveProtectionPolicy ProtectionPolicy { get; set; } = new(); // Global protections + feel/constraints/etc.
         public GrooveVariationCatalog VariationCatalog { get; set; } = new(); // Candidates grouped by tags.
-    }
-
-    // =========================
-    // Your existing concept placeholder (matches your current code shape)
-    // =========================
-
-    /// <summary>
-    /// Existing onset layer: onsets in 1-based quarter-note beat units.
-    /// </summary>
-    public sealed class GrooveInstanceLayer
-    {
-        public List<decimal> KickOnsets { get; set; } = new(); // Kick onsets.
-        public List<decimal> SnareOnsets { get; set; } = new(); // Snare onsets.
-        public List<decimal> HatOnsets { get; set; } = new(); // Hat onsets.
-        public List<decimal> BassOnsets { get; set; } = new(); // Bass onsets.
-        public List<decimal> CompOnsets { get; set; } = new(); // Comp onsets.
-        public List<decimal> PadsOnsets { get; set; } = new(); // Pads onsets.
     }
 }

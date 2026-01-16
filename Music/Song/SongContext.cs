@@ -1,6 +1,5 @@
 ﻿using MusicGen.Lyrics;
 using Music.Song.Material;
-using Music.GrooveModel;
 
 namespace Music.Generator
 {
@@ -28,6 +27,7 @@ namespace Music.Generator
 
         // THIS IS THE NEW GROOVE STRUCTURE
         public GroovePresetDefinition GroovePresetDefinition { get; set; } = new();
+        public IReadOnlyList<SegmentGrooveProfile> SegmentGrooveProfiles { get; set; } = Array.Empty<SegmentGrooveProfile>();
 
 
 

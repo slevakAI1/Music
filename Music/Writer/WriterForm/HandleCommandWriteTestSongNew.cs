@@ -19,17 +19,26 @@ namespace Music.Writer
             try
             {
                 // Generate all song tracks 
-                var result = Generator.Generator.Generate(songContext);
-                songContext.Song.PartTracks.Add(result.BassTrack);
-                songContext.Song.PartTracks.Add(result.GuitarTrack);
-                songContext.Song.PartTracks.Add(result.KeysTrack);
-                songContext.Song.PartTracks.Add(result.DrumTrack);
+                var groovePreset = GrooveSetupFactory.BuildPopRockBasicGrooveForTestSong(
+                    songContext.SectionTrack,
+                    out var segmentProfiles);
+                songContext.GroovePresetDefinition = groovePreset;
+                songContext.SegmentGrooveProfiles = segmentProfiles; // ✅ Store it
+
+
+                var result = Generator.GeneratorNew.Generate(songContext);
+
+                songContext.Song.PartTracks.Add(result);
+
+                //songContext.Song.PartTracks.Add(result.GuitarTrack);
+                //songContext.Song.PartTracks.Add(result.KeysTrack);
+                //songContext.Song.PartTracks.Add(result.DrumTrack);
 
                 // Update Grid with song tracks
-                SongGridManager.AddNewPartTrack(result.BassTrack, dgSong);
-                SongGridManager.AddNewPartTrack(result.GuitarTrack, dgSong);
-                SongGridManager.AddNewPartTrack(result.KeysTrack, dgSong);
-                SongGridManager.AddNewPartTrack(result.DrumTrack, dgSong);
+                //SongGridManager.AddNewPartTrack(result.BassTrack, dgSong);
+                //SongGridManager.AddNewPartTrack(result.GuitarTrack, dgSong);
+                //SongGridManager.AddNewPartTrack(result.KeysTrack, dgSong);
+                SongGridManager.AddNewPartTrack(result, dgSong);
                 ShowSuccess(4);
             }
             catch (Exception ex)
