@@ -226,7 +226,7 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 1: Scaffold DrumGeneratorNew with Minimal Types
+### Story 1: Scaffold DrumGeneratorNew with Minimal Types (COMPLETED)
 **As a** developer  
 **I want** a minimal generator class that can emit drum notes  
 **So that** I have audible feedback immediately
@@ -235,6 +235,7 @@ Settings are applied in this order. Earlier settings establish constraints; late
 - [ ] Create `DrumTrackGeneratorNew` static class in `Music.Generator` namespace (update existing stub)
 - [ ] Create `DrumOnset` record (role, beat, velocity, tickPosition) - minimal fields for MVP
 - [ ] Create `DrumRole` enum (Kick, Snare, Hat) for role identification
+- [ ] Create the rest of the roles and definitions for entire midi drum kit
 - [ ] Implement main `Generate` method signature matching existing pattern
 - [ ] Method returns `PartTrack` with at least placeholder structure
 
