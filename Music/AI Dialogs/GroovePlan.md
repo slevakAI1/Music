@@ -265,22 +265,26 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 3: Implement MIDI Event Emission (MVP)
+### Story 3: Implement MIDI Event Emission (MVP) (COMPLETED)
 **As a** generator  
 **I want** DrumOnsets converted to PartTrackEvents  
 **So that** the output produces audible drums
 
 **Acceptance Criteria:**
-- [ ] Map DrumRole → MIDI note number (Kick=36, Snare=38, Hat=42)
-- [ ] Convert beat position to absolute tick using `BarTrack.GetAbsoluteTicksOfBarBeat`
-- [ ] Create `PartTrackEvent` NoteOn for each onset with velocity
-- [ ] Create corresponding NoteOff events (short duration, e.g., 60 ticks)
-- [ ] Sort events by absolute tick
-- [ ] Return complete `PartTrack` with `MidiProgramNumber` from parameter
+- [x] Map DrumRole → MIDI note number (Kick=36, Snare=38, Hat=42)
+- [x] Convert beat position to absolute tick using `BarTrack.ToTick` (bar+beat)
+- [x] Create `PartTrackEvent` NoteOn for each onset with velocity
+- [x] Create corresponding NoteOff events (short duration represented via `NoteDurationTicks`, e.g., 60 ticks)
+- [x] Sort events by absolute tick
+- [x] Return complete `PartTrack` with `MidiProgramNumber` from parameter
 
 **Settings Handled:**
 - Role-to-MIDI mapping (hardcoded for MVP)
 - Beat-to-tick conversion via BarTrack
+
+**Implementation notes:**
+- `Music/Generator/Drums/DrumTrackGeneratorNew.cs` implements anchor extraction, `ExtractAnchorOnsets`, and `ConvertOnsetsToMidiEvents`.
+- `DrumOnset` now includes `BarNumber`; `ConvertOnsetsToMidiEvents` uses `BarTrack.ToTick` and `PartTrackEvent` constructor with `NoteDurationTicks`.
 
 ---
 
@@ -292,9 +296,9 @@ Settings are applied in this order. Earlier settings establish constraints; late
 **Acceptance Criteria:**
 - [ ] Wire `DrumTrackGeneratorNew.Generate` into `GeneratorNew.Generate`
 - [ ] Pass required parameters: harmonyTrack, grooveTrack, barTrack, sectionTrack, totalBars
-- [ ] Verify using `CreateTestGrooveD1` which sets `SourcePresetName = "PopRockBasic"`
-- [ ] Confirm audible drum output (kick on 1/3, snare on 2/4, hats on eighths)
-- [ ] Validate PartTrack contains expected note count
+- [ ] Verify using `CreateTestGrooveD1` which sets `SourcePresetName = "PopRockBasic"`  (user manual test with existing UI)
+- [ ] Confirm audible drum output (kick on 1/3, snare on 2/4, hats on eighths)   (user manual test with existing UI)
+- [ ] Validate PartTrack contains expected note count  (user manual test with existing UI)
 
 **MVP Complete**: After Story 4, drums are audible using anchor patterns.
 
