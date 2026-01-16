@@ -407,41 +407,66 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 8: Implement Protection Hierarchy Merger
+### Story 8: Implement Protection Hierarchy Merger (COMPLETED)
 **As a** generator  
 **I want** to merge protection layers respecting IsAdditiveOnly  
 **So that** refined protections layer on base protections
 
 **Acceptance Criteria:**
-- [ ] Iterate `GrooveProtectionPolicy.HierarchyLayers` in order
-- [ ] For each layer, check `AppliesWhenTagsAll` against enabled tags
-- [ ] If `IsAdditiveOnly=true`, union onsets; else replace
-- [ ] Merge `MustHitOnsets`, `ProtectedOnsets`, `NeverRemoveOnsets`, `NeverAddOnsets`
-- [ ] Return merged `RoleProtectionSet` per role
+- [x] Iterate `GrooveProtectionPolicy.HierarchyLayers` in order
+- [x] For each layer, check `AppliesWhenTagsAll` against enabled tags
+- [x] If `IsAdditiveOnly=true`, union onsets; else replace
+- [x] Merge `MustHitOnsets`, `ProtectedOnsets`, `NeverRemoveOnsets`, `NeverAddOnsets`
+- [x] Return merged `RoleProtectionSet` per role
 
 **Settings Handled:**
 - `GrooveProtectionPolicy.HierarchyLayers`
 - `GrooveProtectionLayer.LayerId/AppliesWhenTagsAll/IsAdditiveOnly`
 - `RoleProtectionSet.*`
 
+**Implementation notes:**
+- `Music/Generator/Drums/ProtectionPolicyMerger.cs` implements hierarchical layer merging.
+- `MergeProtectionLayers` method processes layers [0..n] in order (base → refined).
+- `LayerApplies` checks if all `AppliesWhenTagsAll` tags are present in `enabledTags`.
+- `MergeAdditive` unions onset lists when `IsAdditiveOnly=true`.
+- `MergeReplace` replaces entire protection set when `IsAdditiveOnly=false`.
+- `UnionOnsets` prevents duplicate onsets in merged lists.
+- `CloneProtectionSet` creates deep copies to avoid shared references.
+- Integrated into `DrumTrackGeneratorNew.Generate` at line 82 via `MergeProtectionLayersPerBar`.
+- Per-bar merging uses `EnabledProtectionTags` from `SegmentGrooveProfile`.
+
 ---
 
-### Story 9: Apply Must-Hit and Protection Rules
+### Story 9: Apply Must-Hit and Protection Rules (COMPLETED)
 **As a** generator  
 **I want** MustHitOnsets always included and NeverRemove protected  
 **So that** essential groove anchors are preserved
 
 **Acceptance Criteria:**
-- [ ] Ensure all `MustHitOnsets` are in the onset list
-- [ ] Mark `NeverRemoveOnsets` as protected (cannot be pruned)
-- [ ] Filter variation candidates against `NeverAddOnsets`
-- [ ] `ProtectedOnsets` are discouraged but not forbidden to remove
+- [x] Ensure all `MustHitOnsets` are in the onset list
+- [x] Mark `NeverRemoveOnsets` as protected (cannot be pruned)
+- [x] Filter variation candidates against `NeverAddOnsets`
+- [x] `ProtectedOnsets` are discouraged but not forbidden to remove
 
 **Settings Handled:**
 - `RoleProtectionSet.MustHitOnsets`
 - `RoleProtectionSet.NeverRemoveOnsets`
 - `RoleProtectionSet.NeverAddOnsets`
 - `RoleProtectionSet.ProtectedOnsets`
+
+**Implementation notes:**
+- `Music/Generator/Drums/DrumTrackGeneratorNew.cs` lines 222-304 implement `EnforceProtections` method.
+- `DrumOnset` record extended with `IsMustHit`, `IsNeverRemove`, `IsProtected` flags (lines 33-35).
+- Protection enforcement pipeline:
+  1. Groups onsets by bar for efficient processing.
+  2. Iterates each bar's merged protections by role.
+  3. **NeverAddOnsets**: Removes matching onsets from pool (line 249).
+  4. **NeverRemoveOnsets**: Sets `IsNeverRemove=true` flag on matching onsets (line 256).
+  5. **ProtectedOnsets**: Sets `IsProtected=true` flag on matching onsets (line 259).
+  6. **MustHitOnsets**: Adds missing onsets with default velocity=100; sets all three flags appropriately (lines 263-279).
+- Deduplication by bar+role+beat ensures no duplicate onsets (lines 294-301).
+- Integrated into `DrumTrackGeneratorNew.Generate` at line 91 after role presence filtering.
+- **Manual testing**: Verify protection flags affect future variation/pruning logic (Stories 10-17).
 
 ---
 
