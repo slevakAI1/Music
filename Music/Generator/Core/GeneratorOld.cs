@@ -9,7 +9,7 @@ using Music.Song.Material;
 
 namespace Music.Generator
 {
-    public static class Generator
+    public static class GeneratorOld
     {
         // AI: Generate: validates harmony track before generation; fast-fail on invalid data prevents silent errors.
         // AI: behavior=Runs HarmonyValidator with default options (StrictDiatonicChordTones=true) to catch F# minor crashes.

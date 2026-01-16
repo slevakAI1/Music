@@ -19,7 +19,7 @@ namespace Music.Writer
             try
             {
                 // Generate all song tracks 
-                var result = Generator.Generator.Generate(songContext);
+                var result = Generator.GeneratorOld.Generate(songContext);
                 songContext.Song.PartTracks.Add(result.BassTrack);
                 songContext.Song.PartTracks.Add(result.GuitarTrack);
                 songContext.Song.PartTracks.Add(result.KeysTrack);
