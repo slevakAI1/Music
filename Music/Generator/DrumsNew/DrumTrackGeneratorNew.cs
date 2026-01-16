@@ -22,12 +22,18 @@ namespace Music.Generator
 
     // AI: DrumOnset captures a single drum hit; minimal fields for MVP. Strength field added in Story 18 (velocity shaping).
     // AI: invariants=Beat is 1-based within bar; BarNumber is 1-based; Velocity 1-127; TickPosition computed from BarTrack.
+    // AI: Story 9 adds protection flags: IsMustHit, IsNeverRemove, IsProtected for enforcement logic.
     public sealed record DrumOnset(
         DrumRole Role,
         int BarNumber,
         decimal Beat,
         int Velocity,
-        long TickPosition);
+        long TickPosition)
+    {
+        public bool IsMustHit { get; set; }
+        public bool IsNeverRemove { get; set; }
+        public bool IsProtected { get; set; }
+    }
 
     // AI: DrumBarContext provides per-bar context for Story 5; section, phrase position, segment profile for downstream logic.
     // AI: invariants=BarNumber is 1-based; BarWithinSection is 0-based; BarsUntilSectionEnd is >= 0.
@@ -57,6 +63,7 @@ namespace Music.Generator
         /// Story 5: adds per-bar context building for section/phrase awareness.
         /// Story 6: adds role presence check (orchestration policy).
         /// Story 8: adds protection hierarchy merger.
+        /// Story 9: adds protection enforcement (must-hits, never-remove, never-add).
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
@@ -73,7 +80,7 @@ namespace Music.Generator
             // Story 5: Build per-bar context (section, phrase position, segment profile)
             var barContexts = BuildBarContexts(sectionTrack, segmentProfiles.ToList(), totalBars);
 
-            // Story 8: Merge protection hierarchy layers (will be used in Story 9 for protection enforcement)
+            // Story 8: Merge protection hierarchy layers
             var mergedProtections = MergeProtectionLayersPerBar(barContexts, groovePresetDefinition.ProtectionPolicy);
 
             // Story 2: Extract anchor patterns from GroovePreset per bar
@@ -82,8 +89,11 @@ namespace Music.Generator
             // Story 6: Filter onsets by role presence (orchestration policy)
             var filteredOnsets = ApplyRolePresenceFilter(allOnsets, barContexts, groovePresetDefinition.ProtectionPolicy.OrchestrationPolicy);
 
+            // Story 9: Enforce protections (add must-hits, mark protected, remove never-adds)
+            var enforcedOnsets = EnforceProtections(filteredOnsets, mergedProtections);
+
             // Story 3: Convert onsets to MIDI events
-            ConvertOnsetsToMidiEvents(filteredOnsets, barTrack, notes);
+            ConvertOnsetsToMidiEvents(enforcedOnsets, barTrack, notes);
 
             return new PartTrack(notes) { MidiProgramNumber = midiProgramNumber };
         }
@@ -209,6 +219,90 @@ namespace Music.Generator
             }
 
             return result;
+        }
+
+        // AI: EnforceProtections applies merged protections to onset pool (Story 9).
+        // AI: Ensures MustHitOnsets present, marks NeverRemove/Protected flags, filters NeverAddOnsets.
+        // AI: Returns deduplicated onset list with protection flags set.
+        private static List<DrumOnset> EnforceProtections(
+            List<DrumOnset> onsets,
+            Dictionary<int, Dictionary<string, RoleProtectionSet>> mergedProtectionsPerBar)
+        {
+            var result = new List<DrumOnset>();
+
+            // Group existing onsets by bar
+            var onsetsByBar = onsets.GroupBy(o => o.BarNumber).ToDictionary(g => g.Key, g => g.ToList());
+
+            // Process each bar that has protections
+            foreach (var (bar, protectionsByRole) in mergedProtectionsPerBar)
+            {
+                var barOnsets = onsetsByBar.TryGetValue(bar, out var existing) ? new List<DrumOnset>(existing) : new List<DrumOnset>();
+
+                // Process each role's protections
+                foreach (var (roleName, protectionSet) in protectionsByRole)
+                {
+                    // Parse role name to DrumRole enum
+                    if (!Enum.TryParse<DrumRole>(roleName, ignoreCase: true, out var drumRole))
+                        continue;
+
+                    // Remove onsets in NeverAddOnsets
+                    if (protectionSet.NeverAddOnsets != null && protectionSet.NeverAddOnsets.Count > 0)
+                    {
+                        barOnsets.RemoveAll(o => o.Role == drumRole && protectionSet.NeverAddOnsets.Contains(o.Beat));
+                    }
+
+                    // Mark existing onsets that are protected or never-remove
+                    foreach (var onset in barOnsets.Where(o => o.Role == drumRole))
+                    {
+                        if (protectionSet.NeverRemoveOnsets != null && protectionSet.NeverRemoveOnsets.Contains(onset.Beat))
+                            onset.IsNeverRemove = true;
+
+                        if (protectionSet.ProtectedOnsets != null && protectionSet.ProtectedOnsets.Contains(onset.Beat))
+                            onset.IsProtected = true;
+                    }
+
+                    // Add missing MustHitOnsets
+                    if (protectionSet.MustHitOnsets != null)
+                    {
+                        foreach (var mustBeat in protectionSet.MustHitOnsets)
+                        {
+                            bool exists = barOnsets.Any(o => o.Role == drumRole && o.Beat == mustBeat);
+                            if (!exists)
+                            {
+                                var newOnset = new DrumOnset(drumRole, bar, mustBeat, Velocity: 100, TickPosition: 0)
+                                {
+                                    IsMustHit = true,
+                                    IsNeverRemove = protectionSet.NeverRemoveOnsets?.Contains(mustBeat) ?? false,
+                                    IsProtected = protectionSet.ProtectedOnsets?.Contains(mustBeat) ?? false
+                                };
+                                barOnsets.Add(newOnset);
+                            }
+                        }
+                    }
+                }
+
+                result.AddRange(barOnsets);
+            }
+
+            // Add onsets from bars without protections
+            var barsWithProtections = new HashSet<int>(mergedProtectionsPerBar.Keys);
+            foreach (var (bar, barOnsets) in onsetsByBar)
+            {
+                if (!barsWithProtections.Contains(bar))
+                    result.AddRange(barOnsets);
+            }
+
+            // Deduplicate by bar + role + beat
+            var deduped = new List<DrumOnset>();
+            var seen = new HashSet<string>();
+            foreach (var onset in result.OrderBy(o => o.BarNumber).ThenBy(o => o.Beat))
+            {
+                string key = $"{onset.BarNumber}|{onset.Role}|{onset.Beat}";
+                if (seen.Add(key))
+                    deduped.Add(onset);
+            }
+
+            return deduped;
         }
 
         // AI: ApplyRolePresenceFilter removes onsets for roles disabled by orchestration policy per section; Story 6 implementation.

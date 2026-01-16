@@ -100,7 +100,7 @@ namespace Music.Generator
                     harmonyPolicy,
                     padsProgramNumber),
 
-                DrumTrack = DrumTrackGenerator.Generate(
+                DrumTrack = DrumTrackGeneratorOld.Generate(
                     songContext.HarmonyTrack,
                     songContext.GrooveTrack,
                     songContext.BarTrack,

@@ -8,7 +8,7 @@ using Music.Song.Material;
 
 namespace Music.Generator
 {
-    internal static class DrumTrackGenerator
+    internal static class DrumTrackGeneratorOld
     {
         /// <summary>
         /// Generates drum track: kick, snare, hi-hat, ride with deterministic variations and fills.
