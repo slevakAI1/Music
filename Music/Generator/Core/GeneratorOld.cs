@@ -62,55 +62,7 @@ namespace Music.Generator
             int padsProgramNumber = GetProgramNumberForRole(songContext.Voices, "Pads", defaultProgram: 4);
             int drumProgramNumber = GetProgramNumberForRole(songContext.Voices, "DrumKit", defaultProgram: 255);
 
-            return new GeneratorResult
-            {
-                BassTrack = BassTrackGenerator.Generate(
-                    songContext.HarmonyTrack,
-                    songContext.GrooveTrack,
-                    songContext.BarTrack,
-                    songContext.SectionTrack,
-                    motifPlan,
-                    motifPresence,
-                    totalBars,
-                    settings,
-                    harmonyPolicy,
-                    bassProgramNumber),
-
-                GuitarTrack = GuitarTrackGenerator.Generate(
-                    songContext.HarmonyTrack,
-                    songContext.GrooveTrack,
-                    songContext.BarTrack,
-                    songContext.SectionTrack,
-                    motifPlan,
-                    motifPresence,
-                    totalBars,
-                    settings,
-                    harmonyPolicy,
-                    compProgramNumber),
-
-                KeysTrack = KeysTrackGenerator.Generate(
-                    songContext.HarmonyTrack,
-                    songContext.GrooveTrack,
-                    songContext.BarTrack,
-                    songContext.SectionTrack,
-                    motifPlan,
-                    motifPresence,
-                    totalBars,
-                    settings,
-                    harmonyPolicy,
-                    padsProgramNumber),
-
-                DrumTrack = DrumTrackGeneratorOld.Generate(
-                    songContext.HarmonyTrack,
-                    songContext.GrooveTrack,
-                    songContext.BarTrack,
-                    songContext.SectionTrack,
-                    motifPlan,
-                    motifPresence,
-                    totalBars,
-                    settings,
-                    drumProgramNumber)
-            };
+            return null;
         }
 
         // AI: returns SourcePresetName of first groove event or "Default"; used as primary groove key
@@ -173,10 +125,10 @@ namespace Music.Generator
         // AI: GeneratorResult: required PartTracks returned; consumers expect these program numbers and ordering.
         public sealed class GeneratorResult
         {
-            public required PartTrack BassTrack { get; init; }
-            public required PartTrack GuitarTrack { get; init; }
-            public required PartTrack KeysTrack { get; init; }
-            public required PartTrack DrumTrack { get; init; }
+            public  PartTrack BassTrack { get; init; }
+            public  PartTrack GuitarTrack { get; init; }
+            public  PartTrack KeysTrack { get; init; }
+            public  PartTrack DrumTrack { get; init; }
         }
 
         #region Validation
