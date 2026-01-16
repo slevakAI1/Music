@@ -185,6 +185,7 @@ namespace Music.Generator
 
         // AI: ApplyRolePresenceFilter removes onsets for roles disabled by orchestration policy per section; Story 6 implementation.
         // AI: deps=GrooveOrchestrationPolicy.DefaultsBySectionType; returns filtered onset list with only present roles.
+        // AI: note=checks specific role names (ClosedHat, OpenHat, Kick, Snare) and DrumKit master switch.
         private static List<DrumOnset> ApplyRolePresenceFilter(
             List<DrumOnset> onsets,
             List<DrumBarContext> barContexts,
@@ -217,12 +218,12 @@ namespace Music.Generator
                 {
                     string roleName = onset.Role.ToString();
 
-                    // Check individual role first (Kick, Snare, Hat, etc.)
+                    // Check specific role name (ClosedHat, OpenHat, Kick, Snare, etc.)
                     if (sectionDefaults.RolePresent.TryGetValue(roleName, out bool rolePresent))
                     {
                         isRolePresent = rolePresent;
                     }
-                    // Also check DrumKit (master switch for all drums)
+                    // Check DrumKit (master switch for all drums)
                     else if (sectionDefaults.RolePresent.TryGetValue("DrumKit", out bool drumKitPresent))
                     {
                         isRolePresent = drumKitPresent;

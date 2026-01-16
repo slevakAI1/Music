@@ -56,15 +56,16 @@
     /// </summary>
     public static class GrooveRoles
     {
-        public const string Kick = "Kick";       // Drum lane: kick
-        public const string Snare = "Snare";     // Drum lane: snare
-        public const string Hat = "Hat";         // Drum lane: hats/ride
-        public const string DrumKit = "DrumKit"; // Optional combined lane
-        public const string Bass = "Bass";       // Bass role
-        public const string Comp = "Comp";       // Comping role (guitar/keys comp fragments)
-        public const string Pads = "Pads";       // Pads / sustained harmony
-        public const string Keys = "Keys";       // Keys role (if separate from Pads)
-        public const string Lead = "Lead";       // Future lead/vocal
+        public const string Kick = "Kick";           // Drum lane: kick
+        public const string Snare = "Snare";         // Drum lane: snare
+        public const string ClosedHat = "ClosedHat"; // Drum lane: closed hi-hat
+        public const string OpenHat = "OpenHat";     // Drum lane: open hi-hat
+        public const string DrumKit = "DrumKit";     // Optional combined lane
+        public const string Bass = "Bass";           // Bass role
+        public const string Comp = "Comp";           // Comping role (guitar/keys comp fragments)
+        public const string Pads = "Pads";           // Pads / sustained harmony
+        public const string Keys = "Keys";           // Keys role (if separate from Pads)
+        public const string Lead = "Lead";           // Future lead/vocal
     }
 
     // =========================

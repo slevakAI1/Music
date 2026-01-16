@@ -322,10 +322,15 @@ namespace Music.Generator
                         [OnsetStrength.Backbeat] = new VelocityRule { Min = 95, Max = 127, Typical = 112, AccentBias = 5 },
                         [OnsetStrength.Ghost] = new VelocityRule { Min = 20, Max = 50, Typical = 35, AccentBias = 0 },
                     },
-                    [GrooveRoles.Hat] = new()
+                    [GrooveRoles.ClosedHat] = new()
                     {
                         [OnsetStrength.Strong] = new VelocityRule { Min = 55, Max = 85, Typical = 70, AccentBias = 0 },
                         [OnsetStrength.Offbeat] = new VelocityRule { Min = 45, Max = 75, Typical = 60, AccentBias = -3 },
+                    },
+                    [GrooveRoles.OpenHat] = new()
+                    {
+                        [OnsetStrength.Strong] = new VelocityRule { Min = 60, Max = 90, Typical = 75, AccentBias = 0 },
+                        [OnsetStrength.Offbeat] = new VelocityRule { Min = 50, Max = 80, Typical = 65, AccentBias = -3 },
                     },
                     [GrooveRoles.Comp] = new()
                     {
@@ -369,7 +374,8 @@ namespace Music.Generator
                             [GrooveRoles.DrumKit] = true,
                             [GrooveRoles.Bass] = true,
                             [GrooveRoles.Comp] = true,
-                            [GrooveRoles.Pads] = true
+                            [GrooveRoles.Pads] = true,
+                            [GrooveRoles.OpenHat] = true
                         }
                     },
                     new SectionRolePresenceDefaults
@@ -452,9 +458,13 @@ namespace Music.Generator
                         MustHitOnsets = new List<decimal> { 2m, 4m },
                         NeverRemoveOnsets = new List<decimal> { 2m, 4m }
                     };
-                    layer.RoleProtections[GrooveRoles.Hat] = new RoleProtectionSet
+                    layer.RoleProtections[GrooveRoles.ClosedHat] = new RoleProtectionSet
                     {
                         ProtectedOnsets = new List<decimal> { 1m, 2m, 3m, 4m }
+                    };
+                    layer.RoleProtections[GrooveRoles.OpenHat] = new RoleProtectionSet
+                    {
+                        ProtectedOnsets = new List<decimal>()
                     };
                 }
 
@@ -495,10 +505,10 @@ namespace Music.Generator
                     Candidates = new List<GrooveOnsetCandidate>
                     {
                         // Add 16th-like pushes by inserting between existing 8ths (you already allow decimal beats).
-                        new GrooveOnsetCandidate { Role = GrooveRoles.Hat, OnsetBeat = 1.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
-                        new GrooveOnsetCandidate { Role = GrooveRoles.Hat, OnsetBeat = 2.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
-                        new GrooveOnsetCandidate { Role = GrooveRoles.Hat, OnsetBeat = 3.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
-                        new GrooveOnsetCandidate { Role = GrooveRoles.Hat, OnsetBeat = 4.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
+                        new GrooveOnsetCandidate { Role = GrooveRoles.ClosedHat, OnsetBeat = 1.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
+                        new GrooveOnsetCandidate { Role = GrooveRoles.ClosedHat, OnsetBeat = 2.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
+                        new GrooveOnsetCandidate { Role = GrooveRoles.ClosedHat, OnsetBeat = 3.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
+                        new GrooveOnsetCandidate { Role = GrooveRoles.ClosedHat, OnsetBeat = 4.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
                     }
                 },
                 new GrooveCandidateGroup
@@ -533,7 +543,7 @@ namespace Music.Generator
                     BaseProbabilityBias = 0.35,
                     Candidates = new List<GrooveOnsetCandidate>
                     {
-                        new GrooveOnsetCandidate { Role = GrooveRoles.Hat, OnsetBeat = 4.5m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.3, Tags = new List<string>{ "OpenHat", "Fill" } },
+                        new GrooveOnsetCandidate { Role = GrooveRoles.OpenHat, OnsetBeat = 4.5m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.3, Tags = new List<string>{ "OpenHat", "Fill" } },
                     }
                 }
             };
@@ -604,7 +614,7 @@ namespace Music.Generator
                         new RoleDensityTarget { Role = GrooveRoles.DrumKit, Density01 = drums, MaxEventsPerBar = maxDrumEvents },
                         new RoleDensityTarget { Role = GrooveRoles.Comp,   Density01 = comp,  MaxEventsPerBar = maxCompEvents },
                         new RoleDensityTarget { Role = GrooveRoles.Bass,   Density01 = bass,  MaxEventsPerBar = maxBassEvents },
-                        new RoleDensityTarget { Role = GrooveRoles.Hat,    Density01 = drums, MaxEventsPerBar = maxHatEvents },
+                        new RoleDensityTarget { Role = GrooveRoles.ClosedHat, Density01 = drums, MaxEventsPerBar = maxHatEvents },
                     },
 
                     OverrideFeel = null,
