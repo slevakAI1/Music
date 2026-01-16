@@ -357,6 +357,10 @@
         public int? StartBar { get; set; }              // Optional explicit bar window start.
         public int? EndBar { get; set; }                // Optional explicit bar window end (inclusive or exclusive by convention later).
 
+        // AI: GroovePresetName links segment to a preset in GroovePresetLibrary; null = use default/primary preset.
+        // AI: change=Enables mid-song preset switching (e.g., PopRock bar 1-19, Reggae bar 20-27, PopRock bar 28+).
+        public string? GroovePresetName { get; set; }   // e.g., "PopRockBasic", "ReggaeOneDrop".
+
         // Enabled tags for candidate groups (variation) for this segment.
         public List<string> EnabledVariationTags { get; set; } = new(); // e.g., enable "Pickup" in pre-chorus.
 
@@ -393,6 +397,67 @@
         // AI: compat=Migration stub from GrooveTrack.GetActiveGroovePreset; returns self (single preset applies to all bars).
         // AI: change=Multi-preset support requires bar-range mapping; currently assumes one preset per song.
         public GroovePresetDefinition GetActiveGroovePreset(int bar) => this;
+    }
+
+    // =========================
+    // GroovePresetLibrary: holds multiple presets by name for mid-song switching
+    // =========================
+
+    /// <summary>
+    /// Container for multiple groove presets keyed by name. Enables mid-song preset switching
+    /// where SegmentGrooveProfile.GroovePresetName selects the active preset for a bar range.
+    /// </summary>
+    // AI: purpose=Holds preset dictionary for mid-song switching; generator resolves segment.GroovePresetName here.
+    // AI: usage=Add presets via Add(); lookup via TryGetPreset(); DefaultPresetName for fallback.
+    public sealed class GroovePresetLibrary
+    {
+        public Dictionary<string, GroovePresetDefinition> Presets { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+        // AI: DefaultPresetName used when segment.GroovePresetName is null or not found in Presets.
+        public string? DefaultPresetName { get; set; }
+
+        public void Add(GroovePresetDefinition preset)
+        {
+            ArgumentNullException.ThrowIfNull(preset);
+            var name = preset.Identity?.Name ?? throw new ArgumentException("Preset must have Identity.Name", nameof(preset));
+            Presets[name] = preset;
+        }
+
+        public bool TryGetPreset(string? name, out GroovePresetDefinition? preset)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                // Fall back to default preset
+                if (!string.IsNullOrEmpty(DefaultPresetName) && Presets.TryGetValue(DefaultPresetName, out preset))
+                    return true;
+
+                preset = null;
+                return false;
+            }
+
+            return Presets.TryGetValue(name, out preset);
+        }
+
+        // AI: GetPresetForBar resolves preset for a bar using segment profiles; returns default if no match.
+        public GroovePresetDefinition? GetPresetForBar(int bar, IReadOnlyList<SegmentGrooveProfile> segmentProfiles)
+        {
+            // Find segment covering this bar
+            foreach (var segment in segmentProfiles)
+            {
+                bool inRange = true;
+                if (segment.StartBar.HasValue && bar < segment.StartBar.Value)
+                    inRange = false;
+                if (segment.EndBar.HasValue && bar > segment.EndBar.Value)
+                    inRange = false;
+
+                if (inRange && TryGetPreset(segment.GroovePresetName, out var preset))
+                    return preset;
+            }
+
+            // Fall back to default
+            TryGetPreset(DefaultPresetName, out var defaultPreset);
+            return defaultPreset;
+        }
     }
 
     // TO DO this was in old groove code. used by this new code. needs to be decoupled from old code.
