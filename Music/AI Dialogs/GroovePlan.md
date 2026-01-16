@@ -246,18 +246,18 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 2: Implement Anchor Pattern Extraction
+### Story 2: Implement Anchor Pattern Extraction (COMPLETED)
 **As a** generator  
 **I want** to extract onset positions from a GroovePresetDefinition's AnchorLayer  
 **So that** I have the base groove pattern to emit
 
 **Acceptance Criteria:**
-- [ ] Resolve `GroovePresetDefinition` from `GrooveTrack.GetActiveGroovePreset(bar)`
-- [ ] Read `GrooveInstanceLayer.KickOnsets` for Kick role
-- [ ] Read `GrooveInstanceLayer.SnareOnsets` for Snare role
-- [ ] Read `GrooveInstanceLayer.HatOnsets` for Hat role
-- [ ] Return `List<DrumOnset>` with beat positions and default velocity (100)
-- [ ] Handle preset lookup using `SourcePresetName` from `CreateTestGrooveD1` ("PopRockBasic")
+- [x] Resolve `GroovePresetDefinition` from `GrooveTrack.GetActiveGroovePreset(bar)`
+- [x] Read `GrooveInstanceLayer.KickOnsets` for Kick role
+- [x] Read `GrooveInstanceLayer.SnareOnsets` for Snare role
+- [x] Read `GrooveInstanceLayer.HatOnsets` for Hat role
+- [x] Return `List<DrumOnset>` with beat positions and default velocity (100)
+- [x] Handle preset lookup using `SourcePresetName` from `CreateTestGrooveD1` ("PopRockBasic")
 
 **Settings Handled:**
 - `GroovePresetDefinition.AnchorLayer`
