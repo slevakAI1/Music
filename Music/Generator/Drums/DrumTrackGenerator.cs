@@ -72,7 +72,7 @@ namespace Music.Generator
                 bool hasLeadMotif = motifPresence?.HasLeadMotif(absoluteSectionIndex, barIndexWithinSection) ?? false;
                 double duckingMultiplier = hasLeadMotif ? 0.7 : 1.0; // Thin optional hits by 30% when lead motif active
 
-                // Create deterministic per-bar RNG so fill decisions remain deterministic when knobs change.
+                // Create deterministic per-bar Rng so fill decisions remain deterministic when knobs change.
                 var barRng = RandomHelpersOld.CreateLocalRng(settings.Seed, $"{grooveEvent.SourcePresetName ?? "groove"}_{sectionType}", bar, 0m);
 
                 // Phrase-end pull biases optional fill chance (with null tension query, bias is 0.0); this must not override transition fills.

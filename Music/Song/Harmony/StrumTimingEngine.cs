@@ -49,7 +49,7 @@ namespace Music.Generator
             if (voicing.Count == 1)
                 return new List<int> { 0 };
 
-            // Create deterministic RNG for this chord onset
+            // Create deterministic Rng for this chord onset
             var rng = RandomHelpersOld.CreateLocalRng(baseSeed, role, bar, onsetBeat);
 
             // Strategy: distribute offsets across 0 to maxSpreadTicks

@@ -1,7 +1,8 @@
+// AI: THIS FILE IS DEPRECATED. Use Rng in Music.Generator.Core.Randomization instead. This class kept for backwards compatibility.
 // AI: purpose=Controlled pitch selection per instrument; returns MIDI notes that respect key and chord constraints.
 // AI: invariants=All returned pitch classes must be in the provided key scale; bass pcs MUST be root or fifth; guitar strong-beat pcs MUST be chord tones.
 // AI: deps=RandomHelpers (rng, pick, scale helpers), PitchClassUtils, RandomizationSettings.Seed controls determinism.
-// AI: perf=hotpath per note; avoid allocations; uses local per-call RNG for determinism.
+// AI: perf=hotpath per note; avoid allocations; uses local per-call Rng for determinism.
 // TODO? confirm PickMidiNearRange handles octave wrapping and chooses nearest octave of target pc.
 
 using System.Diagnostics;

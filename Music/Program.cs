@@ -18,6 +18,9 @@ namespace Music
             // AI: EnsureLoaded: pre-load singletons (WordParser) at startup to avoid first-use delays.
             WordParser.EnsureLoaded();
 
+            // Initialize RNG manager (once per app)
+            Rng.Initialize();
+
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();

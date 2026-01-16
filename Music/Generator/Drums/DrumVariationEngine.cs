@@ -1,5 +1,5 @@
 // AI: purpose=Deterministic drum variation engine for Story 6.1; transforms static groove templates into living drum performances.
-// AI: invariants=All variation choices deterministic for (seed, grooveName, sectionType, barIndex); RNG only for tie-breaking valid options.
+// AI: invariants=All variation choices deterministic for (seed, grooveName, sectionType, barIndex); Rng only for tie-breaking valid options.
 // AI: deps=Uses RandomHelpers for seeding, GrooveEvent for template, MusicConstants.eSectionType for section context.
 // AI: perf=Called once per bar during generation; keep candidate generation lightweight.
 
@@ -72,8 +72,8 @@ namespace Music.Generator
                 }
             }
 
-            // Bar-level deterministic RNG for consistent bar-wide choices
-            // FIX: include sectionType in RNG seed for full determinism over (seed, grooveName, sectionType, barIndex)
+            // Bar-level deterministic Rng for consistent bar-wide choices
+            // FIX: include sectionType in Rng seed for full determinism over (seed, grooveName, sectionType, barIndex)
             string sectionKey = sectionType.ToString();
             var barRng = RandomHelpersOld.CreateLocalRng(seed, $"{grooveEvent.SourcePresetName ?? "groove"}_{sectionKey}", barIndex, 0m);
 

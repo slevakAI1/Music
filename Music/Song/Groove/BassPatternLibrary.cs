@@ -1,5 +1,5 @@
 // AI: purpose=Static library of reusable bass patterns keyed by groove preset name and section type.
-// AI: invariants=Pattern selection is deterministic by (groovePreset, sectionType, barIndex); no external RNG.
+// AI: invariants=Pattern selection is deterministic by (groovePreset, sectionType, barIndex); no external Rng.
 // AI: deps=Used by Generator.GenerateBassTrack; patterns must align with GroovePresets BassOnsets structure.
 // AI: change=When adding patterns, ensure semitone offsets and slot indices are musically valid for bass range.
 

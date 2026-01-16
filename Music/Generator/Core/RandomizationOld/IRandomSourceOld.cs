@@ -1,4 +1,5 @@
-// AI: purpose=Pluggable RNG interface to allow deterministic seeds and replaceable generators for music logic.
+// AI: THIS FILE IS DEPRECATED. Use Rng in Music.Generator.Core.Randomization instead. This class kept for backwards compatibility.
+// AI: purpose=Pluggable Rng interface to allow deterministic seeds and replaceable generators for music logic.
 // AI: invariants=Deterministic for same seed; implementations must preserve inclusive/exclusive semantics; do not mutate global state.
 // AI: deps=Used by music generation for probabilistic choices; no I/O; contract changes require updating callers/tests.
 // AI: perf=Called frequently in generation; implementations should be low-allocation and fast.

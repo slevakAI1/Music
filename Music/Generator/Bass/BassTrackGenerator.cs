@@ -142,7 +142,7 @@ namespace Music.Generator
                 // Render pattern into bass hits
                 var patternHits = bassPattern.Render(rootMidi, onsetSlots.Count);
 
-                // Story 7.3: Create deterministic RNG for busy probability checks
+                // Story 7.3: Create deterministic Rng for busy probability checks
                 var barRng = RandomHelpersOld.CreateLocalRng(settings.Seed, $"bass_{groovePreset.Name}_{sectionType}", bar, 0m);
 
                 // Process each pattern hit and check for chord change opportunities

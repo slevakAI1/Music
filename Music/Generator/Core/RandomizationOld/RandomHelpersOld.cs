@@ -1,4 +1,5 @@
-// AI: purpose=Deterministic per-decision RNG & helpers for pitch selection; callers expect reproducible choices.
+// AI: THIS FILE IS DEPRECATED. Use Rng in Music.Generator.Core.Randomization instead. This class kept for backwards compatibility.
+// AI: purpose=Deterministic per-decision Rng & helpers for pitch selection; callers expect reproducible choices.
 // AI: invariants=StableSeed/CreateLocalRng determinism; PickMidiNearRange must pick a MIDI with target pc when possible.
 // AI: deps=PitchClassUtils, HarmonyPitchContext shapes, RandomizationSettings.Seed; used heavily by PitchRandomizer.
 // AI: perf=Hotpath per-note; avoid adding allocations or changing fallback determinism.

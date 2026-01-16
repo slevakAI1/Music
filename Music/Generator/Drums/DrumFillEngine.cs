@@ -228,7 +228,7 @@ namespace Music.Generator
             // Get style characteristics
             var style = GetFillStyle(grooveName);
 
-            // Deterministic RNG for this fill
+            // Deterministic Rng for this fill
             var fillRng = RandomHelpersOld.CreateLocalRng(seed, $"fill_{grooveName}", sectionIndex, bar);
 
             // Determine fill complexity based on section type and allow Stage 7 to scale it.

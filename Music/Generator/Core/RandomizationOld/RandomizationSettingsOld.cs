@@ -1,3 +1,4 @@
+// AI: THIS FILE IS DEPRECATED. Use Rng in Music.Generator.Core.Randomization instead. This class kept for backwards compatibility.
 // AI: purpose=Config for controlled randomness used by PitchRandomizer/RandomHelpers; affects generated MIDI output deterministically.
 // AI: invariants=weights/probabilities expected in [0,1]; callers assume immutability and stable Seed behavior.
 // AI: deps=consumed by PitchRandomizer and RandomHelpers; renaming or altering fields breaks determinism and tests.

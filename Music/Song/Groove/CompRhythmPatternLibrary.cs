@@ -1,5 +1,5 @@
 // AI: purpose=Static library of comp rhythm patterns keyed by groove preset name and section type.
-// AI: invariants=Pattern selection is deterministic by (grooveName, sectionType, barIndex); RNG only for tie-break.
+// AI: invariants=Pattern selection is deterministic by (grooveName, sectionType, barIndex); Rng only for tie-break.
 // AI: deps=Used by Generator.GenerateGuitarTrack; patterns must align with GroovePresets CompOnsets structure.
 // AI: change=When adding patterns, ensure IncludedOnsetIndices are valid for the target groove's CompOnsets count.
 

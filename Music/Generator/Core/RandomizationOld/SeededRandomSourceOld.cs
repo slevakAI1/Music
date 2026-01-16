@@ -1,7 +1,8 @@
-// AI: purpose=Deterministic IRandomSource wrapper over System.Random used for per-decision reproducible RNG.
+// AI: THIS FILE IS DEPRECATED. Use Rng in Music.Generator.Core.Randomization instead. This class kept for backwards compatibility.
+// AI: purpose=Deterministic IRandomSource wrapper over System.Random used for per-decision reproducible Rng.
 // AI: invariants=Same seed + same sequence of calls => identical outputs; callers expect determinism for tests.
-// AI: deps=Relies on System.Random implementation; changing RNG implementation or seed semantics breaks determinism.
-// AI: thread-safety=Not thread-safe; intended for single-threaded or per-decision instances (one RNG per context).
+// AI: deps=Relies on System.Random implementation; changing Rng implementation or seed semantics breaks determinism.
+// AI: thread-safety=Not thread-safe; intended for single-threaded or per-decision instances (one Rng per context).
 // AI: behavior=NextInt returns minInclusive when minInclusive>=maxExclusive as a deliberate fallback; preserve it.
 
 namespace Music.Generator

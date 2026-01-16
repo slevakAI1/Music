@@ -42,7 +42,7 @@ internal static class DrumTensionHooksIntegrationTests
     //    bool neutralShouldFill = rngNeutral.NextDouble() < neutralExtra;
     //    bool tensionShouldFill = rngTension.NextDouble() < tensionExtra;
 
-    //    // With identical RNG state, adding positive probability cannot make shouldFill less likely.
+    //    // With identical Rng state, adding positive probability cannot make shouldFill less likely.
     //    if (neutralShouldFill && !tensionShouldFill)
     //        throw new Exception("Tension fill bias should not reduce fill triggering");
     //}
