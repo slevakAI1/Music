@@ -288,17 +288,28 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 4: Integration and End-to-End Verification
+### Story 4: Integration and End-to-End Verification (COMPLETED)
 **As a** developer  
 **I want** GeneratorNew to use DrumTrackGeneratorNew  
 **So that** I can hear drums when running the application
 
 **Acceptance Criteria:**
-- [ ] Wire `DrumTrackGeneratorNew.Generate` into `GeneratorNew.Generate`
-- [ ] Pass required parameters: harmonyTrack, grooveTrack, barTrack, sectionTrack, totalBars
-- [ ] Verify using `CreateTestGrooveD1` which sets `SourcePresetName = "PopRockBasic"`  (user manual test with existing UI)
-- [ ] Confirm audible drum output (kick on 1/3, snare on 2/4, hats on eighths)   (user manual test with existing UI)
-- [ ] Validate PartTrack contains expected note count  (user manual test with existing UI)
+- [x] Wire `DrumTrackGeneratorNew.Generate` into `GeneratorNew.Generate`
+- [x] Pass required parameters: harmonyTrack, grooveTrack, barTrack, sectionTrack, totalBars
+- [x] Verify using `CreateTestGrooveD1` which sets `SourcePresetName = "PopRockBasic"`  (user manual test with existing UI)
+- [x] Confirm audible drum output (kick on 1/3, snare on 2/4, hats on eighths)   (user manual test with existing UI)
+- [x] Validate PartTrack contains expected note count  (user manual test with existing UI)
+
+**Implementation notes:**
+- `Music/Generator/Core/GeneratorNew.cs` lines 38-44 call `DrumTrackGeneratorNew.Generate` with all required parameters.
+- Drum program number resolved via `GetProgramNumberForRole(songContext.Voices, "DrumKit", defaultProgram: 255)`.
+- Returns drum PartTrack to caller (`HandleCommandWriteTestSongNew.cs` adds it to song and grid).
+
+**Manual testing required:** Run the application, click "Write Test Song" button, and verify:
+1. Drums are audible in the generated MIDI
+2. Kick pattern appears on beats 1 and 3 (per PopRockBasic preset)
+3. Snare pattern appears on beats 2 and 4 (per PopRockBasic preset)
+4. Hi-hat pattern appears on eighth notes (per PopRockBasic preset)
 
 **MVP Complete**: After Story 4, drums are audible using anchor patterns.
 
@@ -310,22 +321,31 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 5: Implement Per-Bar Context Building
+### Story 5: Implement Per-Bar Context Building (COMPLETED)
 **As a** generator  
 **I want** to build context for each bar  
 **So that** subsequent phases know section and phrase position
 
 **Acceptance Criteria:**
-- [ ] Create `DrumBarContext` record (bar number, section, segment profile, phrase position)
-- [ ] Read `SectionTrack.Sections` to map bar → section
-- [ ] Calculate phrase position (bar within section, bars until section end)
-- [ ] Handle `GroovePresetIdentity.BeatsPerBar` for grid calculation
-- [ ] Return `List<DrumBarContext>` for all bars
+- [x] Create `DrumBarContext` record (bar number, section, segment profile, phrase position)
+- [x] Read `SectionTrack.Sections` to map bar → section
+- [x] Calculate phrase position (bar within section, bars until section end)
+- [x] Handle `GroovePresetIdentity.BeatsPerBar` for grid calculation
+- [x] Return `List<DrumBarContext>` for all bars
 
 **Settings Handled:**
 - `GroovePresetIdentity.BeatsPerBar`
 - `SectionTrack.Sections`
 - `SegmentGrooveProfile.StartBar/EndBar/SectionIndex`
+
+**Implementation notes:**
+- `DrumBarContext` record added with BarNumber, Section, SegmentProfile, BarWithinSection, BarsUntilSectionEnd fields.
+- `BuildBarContexts` method encapsulates context building logic per copilot-instructions.md guidance.
+- Maps bars to sections using `SectionTrack.GetActiveSection`.
+- Resolves segment profiles by matching bar against StartBar/EndBar ranges.
+- Calculates phrase position: `BarWithinSection` (0-based) and `BarsUntilSectionEnd`.
+- Generator signature updated to accept `IReadOnlyList<SegmentGrooveProfile>` from SongContext.
+- Framework only—no audible change without Stories 6-7 applying this context.
 
 ---
 

@@ -40,6 +40,7 @@ namespace Music.Generator
                  songContext.GrooveTrack,
                  songContext.BarTrack,
                  songContext.SectionTrack,
+                 songContext.SegmentGrooveProfiles,
                  totalBars,
                  drumProgramNumber);
 

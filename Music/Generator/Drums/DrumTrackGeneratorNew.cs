@@ -29,6 +29,15 @@ namespace Music.Generator
         int Velocity,
         long TickPosition);
 
+    // AI: DrumBarContext provides per-bar context for Story 5; section, phrase position, segment profile for downstream logic.
+    // AI: invariants=BarNumber is 1-based; BarWithinSection is 0-based; BarsUntilSectionEnd is >= 0.
+    public sealed record DrumBarContext(
+        int BarNumber,
+        Section? Section,
+        SegmentGrooveProfile? SegmentProfile,
+        int BarWithinSection,
+        int BarsUntilSectionEnd);
+
     internal static class DrumTrackGeneratorNew
     {
         // AI: MIDI drum note numbers (General MIDI standard); extend mapping as roles are added.
@@ -45,16 +54,21 @@ namespace Music.Generator
         /// <summary>
         /// Generates drum track from groove preset anchor patterns.
         /// MVP: extracts anchor onsets and emits MIDI events with default velocity.
+        /// Story 5: adds per-bar context building for section/phrase awareness.
         /// </summary>
         public static PartTrack Generate(
             HarmonyTrack harmonyTrack,
             GrooveTrack grooveTrack,
             BarTrack barTrack,
             SectionTrack sectionTrack,
+            IReadOnlyList<SegmentGrooveProfile> segmentProfiles,
             int totalBars,
             int midiProgramNumber)
         {
             var notes = new List<PartTrackEvent>();
+
+            // Story 5: Build per-bar context (section, phrase position, segment profile)
+            var barContexts = BuildBarContexts(sectionTrack, segmentProfiles.ToList(), totalBars);
 
             // Story 2: Extract anchor patterns from GroovePreset per bar
             var allOnsets = ExtractAnchorOnsets(grooveTrack, totalBars);
@@ -107,6 +121,61 @@ namespace Music.Generator
             }
 
             return allOnsets;
+        }
+
+        // AI: BuildBarContexts builds per-bar context for Story 5; maps bar → section, calculates phrase position, resolves segment profile.
+        // AI: deps=SectionTrack.GetActiveSection; SegmentGrooveProfiles list from song context.
+        private static List<DrumBarContext> BuildBarContexts(
+            SectionTrack sectionTrack,
+            List<SegmentGrooveProfile> segmentProfiles,
+            int totalBars)
+        {
+            var contexts = new List<DrumBarContext>(totalBars);
+
+            for (int bar = 1; bar <= totalBars; bar++)
+            {
+                // Map bar to section
+                sectionTrack.GetActiveSection(bar, out var section);
+
+                // Calculate phrase position within section
+                int barWithinSection = 0;
+                int barsUntilSectionEnd = 0;
+
+                if (section != null)
+                {
+                    barWithinSection = bar - section.StartBar;
+                    int sectionEndBar = section.StartBar + section.BarCount - 1;
+                    barsUntilSectionEnd = sectionEndBar - bar;
+                }
+
+                // Resolve segment profile for this bar
+                SegmentGrooveProfile? segmentProfile = null;
+                foreach (var profile in segmentProfiles)
+                {
+                    bool inRange = true;
+
+                    if (profile.StartBar.HasValue && bar < profile.StartBar.Value)
+                        inRange = false;
+
+                    if (profile.EndBar.HasValue && bar > profile.EndBar.Value)
+                        inRange = false;
+
+                    if (inRange)
+                    {
+                        segmentProfile = profile;
+                        break; // Use first matching profile
+                    }
+                }
+
+                contexts.Add(new DrumBarContext(
+                    BarNumber: bar,
+                    Section: section,
+                    SegmentProfile: segmentProfile,
+                    BarWithinSection: barWithinSection,
+                    BarsUntilSectionEnd: barsUntilSectionEnd));
+            }
+
+            return contexts;
         }
 
         // AI: ConvertOnsetsToMidiEvents converts DrumOnset list to PartTrackEvent notes using BarTrack for tick conversion.
