@@ -35,7 +35,7 @@ namespace Music.Generator
 
         // ========== DRUM SETTINGS (Story 6.5 hooks for Stage 7) ==========
         // Expose a single object that Stage 7 can set to control drum behavior without changing engine code.
-        public DrumRoleParameters DrumParameters { get; init; } = new DrumRoleParameters();
+        //public DrumRoleParameters DrumParameters { get; init; } = new DrumRoleParameters();
 
         // AI: Default returns a minimal-randomness settings instance; callers expect stable defaults.
         public static RandomizationSettingsOld Default => new();

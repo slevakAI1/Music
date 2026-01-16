@@ -13,6 +13,7 @@
     <Compile Remove="Archives\MusicXml\**" />
     <Compile Remove="Files\OutputSamples\**" />
     <Compile Remove="Future Ideas\**" />
+    <Compile Remove="Generator\DrumsOld\**" />
     <Compile Remove="Generator\Energy\**" />
     <Compile Remove="Patches\**" />
     <Compile Remove="Tests\**" />
@@ -20,6 +21,7 @@
     <EmbeddedResource Remove="Archives\MusicXml\**" />
     <EmbeddedResource Remove="Files\OutputSamples\**" />
     <EmbeddedResource Remove="Future Ideas\**" />
+    <EmbeddedResource Remove="Generator\DrumsOld\**" />
     <EmbeddedResource Remove="Generator\Energy\**" />
     <EmbeddedResource Remove="Patches\**" />
     <EmbeddedResource Remove="Tests\**" />
@@ -27,6 +29,7 @@
     <None Remove="Archives\MusicXml\**" />
     <None Remove="Files\OutputSamples\**" />
     <None Remove="Future Ideas\**" />
+    <None Remove="Generator\DrumsOld\**" />
     <None Remove="Generator\Energy\**" />
     <None Remove="Patches\**" />
     <None Remove="Tests\**" />
