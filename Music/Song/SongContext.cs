@@ -1,5 +1,6 @@
 ﻿using MusicGen.Lyrics;
 using Music.Song.Material;
+using Music.GrooveModel;
 
 namespace Music.Generator
 {
@@ -16,8 +17,22 @@ namespace Music.Generator
         // AI: BarTrack pre-initialized to avoid null checks; contains measure tick mapping used during generation.
         public BarTrack BarTrack { get; set; } = new();
 
+
+        //======================================================================================
+
+
+
         // AI: GrooveTrack pre-initialized; holds groove events applied during generation. Consumers must normalize lists.
+        // THIS IS THE OLD GROOVE STRUCTURE
         public GrooveTrack GrooveTrack { get; set; } = new();
+
+        // THIS IS THE NEW GROOVE STRUCTURE
+        public GroovePresetDefinition GroovePresetDefinition { get; set; } = new();
+
+
+
+        //======================================================================================
+
 
         // AI: HarmonyTrack persisted with design; may be empty. Used to build HarmonyPitchContext for generators.
         public HarmonyTrack HarmonyTrack { get; set; } = new();

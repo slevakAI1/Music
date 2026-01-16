@@ -333,7 +333,8 @@ namespace Music.Writer
 
                     // THIS IS WORKING NOW!
                 case "Write Test Song":
-                    HandleCommandWriteTestSong.HandleWriteTestSong(_songContext, dgSong);
+                   // HandleCommandWriteTestSong.HandleWriteTestSong(_songContext, dgSong);
+                    HandleCommandWriteTestSongNew.HandleWriteTestSong(_songContext, dgSong);
                     break;
 
                 // Other cases will be added here later.
