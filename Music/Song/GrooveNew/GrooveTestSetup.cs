@@ -1,4 +1,6 @@
-﻿using Music.GrooveModel;
+﻿using System;
+using System.Collections.Generic;
+using Music.GrooveModel;
 
 namespace Music.Grooves
 {
@@ -629,12 +631,12 @@ namespace Music.Grooves
             // Keep simple now. This is just “what tags are allowed”.
             return sectionType.ToLowerInvariant() switch
             {
-                "intro" => new List<string> { "Core" },
-                "verse" => new List<string> { "Core", "GhostSnare" },
+                "intro"  => new List<string> { "Core" },
+                "verse"  => new List<string> { "Core", "GhostSnare" },
                 "chorus" => new List<string> { "Core", "Drive", "OpenHat" },
                 "bridge" => new List<string> { "Core", "Fill", "Pickup" },
-                "outro" => new List<string> { "Core", "Drop" },
-                _ => new List<string> { "Core" }
+                "outro"  => new List<string> { "Core", "Drop" },
+                _        => new List<string> { "Core" }
             };
         }
 
