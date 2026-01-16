@@ -376,20 +376,28 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 7: Add Segment Groove Profile Support
+### Story 7: Add Segment Groove Profile Support (COMPLETED)
 **As a** generator  
 **I want** to resolve segment profiles for bars  
 **So that** segment-specific overrides can be applied later
 
 **Acceptance Criteria:**
-- [ ] Read `SegmentGrooveProfiles` from song context
-- [ ] Map bar → segment profile by `StartBar`/`EndBar` range
-- [ ] Store segment profile in `DrumBarContext`
-- [ ] Handle bars with no explicit segment (use defaults)
+- [x] Read `SegmentGrooveProfiles` from song context
+- [x] Map bar → segment profile by `StartBar`/`EndBar` range
+- [x] Store segment profile in `DrumBarContext`
+- [x] Handle bars with no explicit segment (use defaults)
 
 **Settings Handled:**
 - `SegmentGrooveProfile.StartBar/EndBar`
 - `SegmentGrooveProfile.SectionIndex`
+
+**Implementation notes:**
+- **Implemented as part of Story 5** - `BuildBarContexts` already resolves segment profiles.
+- Matches bars against `StartBar`/`EndBar` ranges and stores result in `DrumBarContext.SegmentProfile`.
+- Returns null for bars without explicit segment (callers handle defaults).
+- Framework only—segment data is captured but not yet applied to generation.
+- **Future stories will consume this data**: Story 20 (Feel/Swing overrides), Story 22 (Merge policy), variations/density (when implemented).
+- **Manual testing**: Segment profiles are built by `GrooveSetupFactory.BuildSegmentProfilesForTestSong` and passed through `SongContext.SegmentGrooveProfiles`.
 
 ---
 
