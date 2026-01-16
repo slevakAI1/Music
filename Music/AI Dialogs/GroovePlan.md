@@ -214,36 +214,105 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ### Epic: Groove-Driven Drum Generation
 
+> **PRIORITY STRATEGY**: Stories are organized into phases. **Phase 1 (MVP)** delivers audible 
+> drum output using anchor patterns from `CreateTestGrooveD1` as early as possible. 
+> Subsequent phases add refinement features. All original settings coverage is preserved.
+
 ---
 
-### Story 1: Scaffold DrumGeneratorNew Class Structure
+## Phase 1: MVP - Audible Anchor Output (Stories 1-4)
+
+*Goal: Generate audible drum notes from anchor patterns. After Phase 1, you can hear drums.*
+
+---
+
+### Story 1: Scaffold DrumGeneratorNew with Minimal Types
 **As a** developer  
-**I want** a well-organized generator class with clear phase methods  
-**So that** each pipeline phase is testable and maintainable
+**I want** a minimal generator class that can emit drum notes  
+**So that** I have audible feedback immediately
 
 **Acceptance Criteria:**
-- [ ] Create `DrumGeneratorNew` static class in `Music.Generator` namespace
-- [ ] Define phase method stubs: `Initialize`, `GenerateAnchors`, `SelectVariations`, `EnforceConstraints`, `ShapeVelocity`, `AdjustTiming`, `EmitEvents`
-- [ ] Create `DrumBarContext` record to hold per-bar state (bar number, section, segment profile, phrase position)
-- [ ] Create `DrumOnset` record (role, beat, strength, velocity, tickPosition)
-- [ ] Update `GeneratorNew.Generate` to call `DrumGeneratorNew.Generate`
+- [ ] Create `DrumTrackGeneratorNew` static class in `Music.Generator` namespace (update existing stub)
+- [ ] Create `DrumOnset` record (role, beat, velocity, tickPosition) - minimal fields for MVP
+- [ ] Create `DrumRole` enum (Kick, Snare, Hat) for role identification
+- [ ] Implement main `Generate` method signature matching existing pattern
+- [ ] Method returns `PartTrack` with at least placeholder structure
 
 **Tasks:**
-1. Create DrumGeneratorNew.cs with class structure
-2. Define DrumBarContext and DrumOnset types
-3. Implement main Generate method that orchestrates phases
-4. Wire into GeneratorNew
+1. Update DrumTrackGeneratorNew.cs with minimal implementation
+2. Define DrumOnset and DrumRole types
+3. Implement Generate method that returns empty PartTrack initially
 
 ---
 
-### Story 2: Implement Initialization Phase
+### Story 2: Implement Anchor Pattern Extraction
 **As a** generator  
-**I want** to build per-bar context from SongContext  
-**So that** each bar knows its section, segment profile, and phrase position
+**I want** to extract onset positions from a GroovePresetDefinition's AnchorLayer  
+**So that** I have the base groove pattern to emit
 
 **Acceptance Criteria:**
+- [ ] Resolve `GroovePresetDefinition` from `GrooveTrack.GetActiveGroovePreset(bar)`
+- [ ] Read `GrooveInstanceLayer.KickOnsets` for Kick role
+- [ ] Read `GrooveInstanceLayer.SnareOnsets` for Snare role
+- [ ] Read `GrooveInstanceLayer.HatOnsets` for Hat role
+- [ ] Return `List<DrumOnset>` with beat positions and default velocity (100)
+- [ ] Handle preset lookup using `SourcePresetName` from `CreateTestGrooveD1` ("PopRockBasic")
+
+**Settings Handled:**
+- `GroovePresetDefinition.AnchorLayer`
+- `GrooveInstanceLayer.KickOnsets/SnareOnsets/HatOnsets`
+
+---
+
+### Story 3: Implement MIDI Event Emission (MVP)
+**As a** generator  
+**I want** DrumOnsets converted to PartTrackEvents  
+**So that** the output produces audible drums
+
+**Acceptance Criteria:**
+- [ ] Map DrumRole → MIDI note number (Kick=36, Snare=38, Hat=42)
+- [ ] Convert beat position to absolute tick using `BarTrack.GetAbsoluteTicksOfBarBeat`
+- [ ] Create `PartTrackEvent` NoteOn for each onset with velocity
+- [ ] Create corresponding NoteOff events (short duration, e.g., 60 ticks)
+- [ ] Sort events by absolute tick
+- [ ] Return complete `PartTrack` with `MidiProgramNumber` from parameter
+
+**Settings Handled:**
+- Role-to-MIDI mapping (hardcoded for MVP)
+- Beat-to-tick conversion via BarTrack
+
+---
+
+### Story 4: Integration and End-to-End Verification
+**As a** developer  
+**I want** GeneratorNew to use DrumTrackGeneratorNew  
+**So that** I can hear drums when running the application
+
+**Acceptance Criteria:**
+- [ ] Wire `DrumTrackGeneratorNew.Generate` into `GeneratorNew.Generate`
+- [ ] Pass required parameters: harmonyTrack, grooveTrack, barTrack, sectionTrack, totalBars
+- [ ] Verify using `CreateTestGrooveD1` which sets `SourcePresetName = "PopRockBasic"`
+- [ ] Confirm audible drum output (kick on 1/3, snare on 2/4, hats on eighths)
+- [ ] Validate PartTrack contains expected note count
+
+**MVP Complete**: After Story 4, drums are audible using anchor patterns.
+
+---
+
+## Phase 2: Core Context & Structure (Stories 5-7)
+
+*Goal: Add per-bar context, section awareness, and role presence checks.*
+
+---
+
+### Story 5: Implement Per-Bar Context Building
+**As a** generator  
+**I want** to build context for each bar  
+**So that** subsequent phases know section and phrase position
+
+**Acceptance Criteria:**
+- [ ] Create `DrumBarContext` record (bar number, section, segment profile, phrase position)
 - [ ] Read `SectionTrack.Sections` to map bar → section
-- [ ] Read `SegmentGrooveProfiles` to map bar → segment profile
 - [ ] Calculate phrase position (bar within section, bars until section end)
 - [ ] Handle `GroovePresetIdentity.BeatsPerBar` for grid calculation
 - [ ] Return `List<DrumBarContext>` for all bars
@@ -255,7 +324,7 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 3: Implement Role Presence Check
+### Story 6: Implement Role Presence Check
 **As a** generator  
 **I want** to skip roles that are disabled for a section type  
 **So that** orchestration policy controls which instruments play
@@ -272,25 +341,30 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 4: Implement Anchor Generation Phase
+### Story 7: Add Segment Groove Profile Support
 **As a** generator  
-**I want** to copy base onsets from AnchorLayer  
-**So that** each bar starts with the core groove pattern
+**I want** to resolve segment profiles for bars  
+**So that** segment-specific overrides can be applied later
 
 **Acceptance Criteria:**
-- [ ] Copy `GrooveInstanceLayer.KickOnsets` for Kick role
-- [ ] Copy `GrooveInstanceLayer.SnareOnsets` for Snare role
-- [ ] Copy `GrooveInstanceLayer.HatOnsets` for Hat role
-- [ ] Normalize onset beats to bar-relative (1-based within bar)
-- [ ] Return `List<DrumOnset>` per role
+- [ ] Read `SegmentGrooveProfiles` from song context
+- [ ] Map bar → segment profile by `StartBar`/`EndBar` range
+- [ ] Store segment profile in `DrumBarContext`
+- [ ] Handle bars with no explicit segment (use defaults)
 
 **Settings Handled:**
-- `GroovePresetDefinition.AnchorLayer`
-- `GrooveInstanceLayer.KickOnsets/SnareOnsets/HatOnsets`
+- `SegmentGrooveProfile.StartBar/EndBar`
+- `SegmentGrooveProfile.SectionIndex`
 
 ---
 
-### Story 5: Implement Protection Hierarchy Merger
+## Phase 3: Protection System (Stories 8-9)
+
+*Goal: Implement protection rules that constrain what can be modified.*
+
+---
+
+### Story 8: Implement Protection Hierarchy Merger
 **As a** generator  
 **I want** to merge protection layers respecting IsAdditiveOnly  
 **So that** refined protections layer on base protections
@@ -309,7 +383,7 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 6: Apply Must-Hit and Protection Rules
+### Story 9: Apply Must-Hit and Protection Rules
 **As a** generator  
 **I want** MustHitOnsets always included and NeverRemove protected  
 **So that** essential groove anchors are preserved
@@ -328,7 +402,13 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 7: Implement Subdivision Grid Filter
+## Phase 4: Subdivision & Rhythm Vocabulary (Stories 10-12)
+
+*Goal: Filter onsets by grid and rhythm rules.*
+
+---
+
+### Story 10: Implement Subdivision Grid Filter
 **As a** generator  
 **I want** to filter onsets by allowed subdivision grid  
 **So that** only valid beat positions are used
@@ -347,7 +427,7 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 8: Implement Syncopation and Anticipation Filter
+### Story 11: Implement Syncopation and Anticipation Filter
 **As a** generator  
 **I want** to filter candidates by syncopation/anticipation rules  
 **So that** rhythm vocabulary is respected
@@ -364,7 +444,7 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 9: Implement Phrase Hook Policy
+### Story 12: Implement Phrase Hook Policy
 **As a** generator  
 **I want** fills enabled only in designated windows  
 **So that** phrase structure is respected
@@ -388,7 +468,13 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 10: Implement Variation Catalog Merger
+## Phase 5: Variation System (Stories 13-17)
+
+*Goal: Add variation candidates, filtering, and selection.*
+
+---
+
+### Story 13: Implement Variation Catalog Merger
 **As a** generator  
 **I want** to merge variation layers respecting IsAdditiveOnly  
 **So that** refined variations layer on base candidates
@@ -406,7 +492,7 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 11: Implement Variation Tag Filter
+### Story 14: Implement Variation Tag Filter
 **As a** generator  
 **I want** candidates filtered by segment's enabled tags  
 **So that** only appropriate variations are considered
@@ -424,7 +510,7 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 12: Implement Probability-Weighted Selection
+### Story 15: Implement Probability-Weighted Selection
 **As a** generator  
 **I want** candidates selected by weighted probability  
 **So that** variation is deterministic but configurable
@@ -441,7 +527,7 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 13: Implement Density Target Selection
+### Story 16: Implement Density Target Selection
 **As a** generator  
 **I want** variation count driven by density targets  
 **So that** sections have appropriate activity levels
@@ -460,7 +546,7 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 14: Implement MaxHits Caps Enforcement
+### Story 17: Implement MaxHits Caps Enforcement
 **As a** generator  
 **I want** density caps strictly enforced  
 **So that** bars don't become overcrowded
@@ -482,7 +568,13 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 15: Implement Onset Strength Classification
+## Phase 6: Velocity Shaping (Stories 18-19)
+
+*Goal: Shape dynamics based on onset strength and role.*
+
+---
+
+### Story 18: Implement Onset Strength Classification
 **As a** generator  
 **I want** each onset classified by strength  
 **So that** velocity shaping is applied correctly
@@ -502,7 +594,7 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 16: Implement Velocity Shaping
+### Story 19: Implement Velocity Shaping
 **As a** generator  
 **I want** velocity determined by role and strength  
 **So that** dynamics reflect the groove feel
@@ -522,7 +614,13 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 17: Implement Feel/Swing Timing
+## Phase 7: Timing & Feel (Stories 20-21)
+
+*Goal: Apply swing, shuffle, and micro-timing adjustments.*
+
+---
+
+### Story 20: Implement Feel/Swing Timing
 **As a** generator  
 **I want** swing/shuffle feel applied to timing  
 **So that** the groove has the right pocket
@@ -544,7 +642,7 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 18: Implement Role Timing Bias
+### Story 21: Implement Role Timing Bias
 **As a** generator  
 **I want** per-role micro-timing applied  
 **So that** instruments have distinct pocket feel
@@ -566,27 +664,13 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 19: Implement MIDI Event Emission
-**As a** generator  
-**I want** DrumOnsets converted to PartTrackEvents  
-**So that** the output is a valid PartTrack
+## Phase 8: Override & Merge Policy (Story 22)
 
-**Acceptance Criteria:**
-- [ ] Map role → MIDI note number (Kick=36, Snare=38, Hat=42, etc.)
-- [ ] Convert beat position to absolute tick (using BarTrack)
-- [ ] Create `PartTrackEvent.CreateNoteOn` for each onset
-- [ ] Set velocity from shaped value
-- [ ] Create corresponding `PartTrackEvent.CreateNoteOff`
-- [ ] Add `PartTrackEvent.CreateProgramChange` for drums (channel 10)
-- [ ] Sort events by absolute tick
-- [ ] Return complete `PartTrack`
-
-**Settings Handled:**
-- All timing and velocity from previous phases
+*Goal: Implement segment override merge rules.*
 
 ---
 
-### Story 20: Implement Merge Policy Enforcement
+### Story 22: Implement Merge Policy Enforcement
 **As a** generator  
 **I want** segment overrides governed by merge policy  
 **So that** override behavior is predictable
@@ -606,21 +690,13 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 21: Integration and Wiring
-**As a** developer  
-**I want** GeneratorNew to use the new drum generator  
-**So that** the system is fully connected
+## Phase 9: Testing & Validation (Story 23)
 
-**Acceptance Criteria:**
-- [ ] Update `GeneratorNew.Generate` to call `DrumGeneratorNew.Generate`
-- [ ] Pass `SongContext` with `GroovePresetDefinition` and `SegmentGrooveProfiles`
-- [ ] Return generated `PartTrack` for drums
-- [ ] Remove/comment old drum generation code
-- [ ] Verify end-to-end with test song
+*Goal: Comprehensive test coverage for all phases.*
 
 ---
 
-### Story 22: Unit Tests for Core Phases
+### Story 23: Unit Tests for Core Phases
 **As a** developer  
 **I want** unit tests for each phase  
 **So that** behavior is verified and regressions caught
@@ -640,59 +716,137 @@ Settings are applied in this order. Earlier settings establish constraints; late
 ## 5. Story Dependencies
 
 ```
-Story 1 (Scaffold)
-    ├── Story 2 (Initialization)
-    │   └── Story 3 (Role Presence)
-    ├── Story 4 (Anchors)
-    │   └── Story 5 (Protection Merge)
-    │       └── Story 6 (Apply Protection)
-    ├── Story 7 (Subdivision Filter)
-    │   └── Story 8 (Syncopation Filter)
-    │       └── Story 9 (Phrase Hooks)
-    ├── Story 10 (Variation Merge)
-    │   └── Story 11 (Tag Filter)
-    │       └── Story 12 (Probability Selection)
-    │           └── Story 13 (Density Selection)
-    │               └── Story 14 (MaxHits Caps)
-    ├── Story 15 (Strength Classification)
-    │   └── Story 16 (Velocity Shaping)
-    ├── Story 17 (Feel/Swing)
-    │   └── Story 18 (Role Timing)
-    └── Story 19 (MIDI Emission)
-        └── Story 20 (Merge Policy)
-            └── Story 21 (Integration)
-                └── Story 22 (Tests)
+PHASE 1: MVP - AUDIBLE OUTPUT (Stories 1-4)
+────────────────────────────────────────────
+Story 1 (Scaffold & Types)
+    └── Story 2 (Anchor Extraction)
+        └── Story 3 (MIDI Emission MVP)
+            └── Story 4 (Integration & Verify)
+                │
+                ▼ AUDIBLE DRUMS WORKING
+
+PHASE 2: CORE CONTEXT (Stories 5-7)
+────────────────────────────────────────────
+Story 5 (Per-Bar Context)
+    ├── Story 6 (Role Presence)
+    └── Story 7 (Segment Profile Support)
+
+PHASE 3: PROTECTION (Stories 8-9)
+────────────────────────────────────────────
+Story 8 (Protection Merge)
+    └── Story 9 (Apply Protection Rules)
+
+PHASE 4: SUBDIVISION & RHYTHM (Stories 10-12)
+────────────────────────────────────────────
+Story 10 (Subdivision Grid Filter)
+    └── Story 11 (Syncopation/Anticipation Filter)
+        └── Story 12 (Phrase Hook Policy)
+
+PHASE 5: VARIATION (Stories 13-17)
+────────────────────────────────────────────
+Story 13 (Variation Catalog Merge)
+    └── Story 14 (Tag Filter)
+        └── Story 15 (Probability Selection)
+            └── Story 16 (Density Target)
+                └── Story 17 (MaxHits Caps)
+
+PHASE 6: VELOCITY (Stories 18-19)
+────────────────────────────────────────────
+Story 18 (Strength Classification)
+    └── Story 19 (Velocity Shaping)
+
+PHASE 7: TIMING (Stories 20-21)
+────────────────────────────────────────────
+Story 20 (Feel/Swing)
+    └── Story 21 (Role Timing Bias)
+
+PHASE 8: MERGE POLICY (Story 22)
+────────────────────────────────────────────
+Story 22 (Merge Policy Enforcement)
+
+PHASE 9: TESTING (Story 23)
+────────────────────────────────────────────
+Story 23 (Unit Tests)
 ```
+
+**Key Insight**: Phase 1 completes at Story 4 with audible drums. All subsequent phases 
+add refinement features incrementally. Each phase after 1 can be tested against audible output.
 
 ---
 
 ## 6. Estimated Effort
 
-| Story | Complexity | Points |
-|-------|------------|--------|
-| 1. Scaffold | Medium | 3 |
-| 2. Initialization | Medium | 3 |
-| 3. Role Presence | Small | 1 |
-| 4. Anchors | Small | 2 |
-| 5. Protection Merge | Medium | 3 |
-| 6. Apply Protection | Medium | 3 |
-| 7. Subdivision Filter | Medium | 3 |
-| 8. Syncopation Filter | Small | 2 |
-| 9. Phrase Hooks | Medium | 5 |
-| 10. Variation Merge | Medium | 3 |
-| 11. Tag Filter | Small | 2 |
-| 12. Probability Selection | Medium | 3 |
-| 13. Density Selection | Medium | 3 |
-| 14. MaxHits Caps | Medium | 3 |
-| 15. Strength Classification | Small | 2 |
-| 16. Velocity Shaping | Medium | 3 |
-| 17. Feel/Swing | Medium | 5 |
-| 18. Role Timing | Small | 2 |
-| 19. MIDI Emission | Medium | 3 |
-| 20. Merge Policy | Medium | 3 |
-| 21. Integration | Small | 2 |
-| 22. Tests | Large | 8 |
-| **Total** | | **67** |
+### Phase 1: MVP - Audible Output
+| Story | Description | Complexity | Points |
+|-------|-------------|------------|--------|
+| 1 | Scaffold & Types | Small | 2 |
+| 2 | Anchor Extraction | Small | 2 |
+| 3 | MIDI Emission MVP | Medium | 3 |
+| 4 | Integration & Verify | Small | 2 |
+| **Phase 1 Total** | | | **9** |
+
+*After Phase 1: Drums are audible using anchor patterns*
+
+### Phase 2: Core Context
+| Story | Description | Complexity | Points |
+|-------|-------------|------------|--------|
+| 5 | Per-Bar Context | Medium | 3 |
+| 6 | Role Presence | Small | 1 |
+| 7 | Segment Profile Support | Small | 2 |
+| **Phase 2 Total** | | | **6** |
+
+### Phase 3: Protection
+| Story | Description | Complexity | Points |
+|-------|-------------|------------|--------|
+| 8 | Protection Merge | Medium | 3 |
+| 9 | Apply Protection Rules | Medium | 3 |
+| **Phase 3 Total** | | | **6** |
+
+### Phase 4: Subdivision & Rhythm
+| Story | Description | Complexity | Points |
+|-------|-------------|------------|--------|
+| 10 | Subdivision Grid Filter | Medium | 3 |
+| 11 | Syncopation/Anticipation Filter | Small | 2 |
+| 12 | Phrase Hook Policy | Medium | 5 |
+| **Phase 4 Total** | | | **10** |
+
+### Phase 5: Variation
+| Story | Description | Complexity | Points |
+|-------|-------------|------------|--------|
+| 13 | Variation Catalog Merge | Medium | 3 |
+| 14 | Tag Filter | Small | 2 |
+| 15 | Probability Selection | Medium | 3 |
+| 16 | Density Target | Medium | 3 |
+| 17 | MaxHits Caps | Medium | 3 |
+| **Phase 5 Total** | | | **14** |
+
+### Phase 6: Velocity
+| Story | Description | Complexity | Points |
+|-------|-------------|------------|--------|
+| 18 | Strength Classification | Small | 2 |
+| 19 | Velocity Shaping | Medium | 3 |
+| **Phase 6 Total** | | | **5** |
+
+### Phase 7: Timing
+| Story | Description | Complexity | Points |
+|-------|-------------|------------|--------|
+| 20 | Feel/Swing | Medium | 5 |
+| 21 | Role Timing Bias | Small | 2 |
+| **Phase 7 Total** | | | **7** |
+
+### Phase 8: Merge Policy
+| Story | Description | Complexity | Points |
+|-------|-------------|------------|--------|
+| 22 | Merge Policy Enforcement | Medium | 3 |
+| **Phase 8 Total** | | | **3** |
+
+### Phase 9: Testing
+| Story | Description | Complexity | Points |
+|-------|-------------|------------|--------|
+| 23 | Unit Tests | Large | 8 |
+| **Phase 9 Total** | | | **8** |
+
+| **Grand Total** | | | **68** |
 
 ---
 
