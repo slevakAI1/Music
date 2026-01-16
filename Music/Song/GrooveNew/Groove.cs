@@ -386,18 +386,25 @@
         public GrooveInstanceLayer AnchorLayer { get; set; } = new();         // Your existing anchor onsets.
         public GrooveProtectionPolicy ProtectionPolicy { get; set; } = new(); // Global protections + feel/constraints/etc.
         public GrooveVariationCatalog VariationCatalog { get; set; } = new(); // Candidates grouped by tags.
+
+        // AI: compat=Placeholder for GrooveTrack.Events migration; returns empty list (single preset, no multi-bar events yet).
+        public List<object> Events { get; } = new();
+
+        // AI: compat=Migration stub from GrooveTrack.GetActiveGroovePreset; returns self (single preset applies to all bars).
+        // AI: change=Multi-preset support requires bar-range mapping; currently assumes one preset per song.
+        public GroovePresetDefinition GetActiveGroovePreset(int bar) => this;
     }
 
     // TO DO this was in old groove code. used by this new code. needs to be decoupled from old code.
 
-    //public sealed class GrooveInstanceLayer
-    //{
-    //    // AI: Onset values are domain units (e.g., beats or fractional bar offsets); callers should normalize/sort when needed.
-    //    public List<decimal> KickOnsets { get; set; } = new();
-    //    public List<decimal> SnareOnsets { get; set; } = new();
-    //    public List<decimal> HatOnsets { get; set; } = new();
-    //    public List<decimal> BassOnsets { get; set; } = new();
-    //    public List<decimal> CompOnsets { get; set; } = new();
-    //    public List<decimal> PadsOnsets { get; set; } = new();
-    //}
+    public sealed class GrooveInstanceLayer
+    {
+        // AI: Onset values are domain units (e.g., beats or fractional bar offsets); callers should normalize/sort when needed.
+        public List<decimal> KickOnsets { get; set; } = new();
+        public List<decimal> SnareOnsets { get; set; } = new();
+        public List<decimal> HatOnsets { get; set; } = new();
+        public List<decimal> BassOnsets { get; set; } = new();
+        public List<decimal> CompOnsets { get; set; } = new();
+        public List<decimal> PadsOnsets { get; set; } = new();
+    }
 }

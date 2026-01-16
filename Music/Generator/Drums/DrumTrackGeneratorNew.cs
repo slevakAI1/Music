@@ -66,7 +66,6 @@ namespace Music.Generator
         /// Story 9: adds protection enforcement (must-hits, never-remove, never-add).
         /// </summary>
         public static PartTrack Generate(
-            GrooveTrack grooveTrack,
             BarTrack barTrack,
             SectionTrack sectionTrack,
             IReadOnlyList<SegmentGrooveProfile> segmentProfiles,
@@ -83,7 +82,7 @@ namespace Music.Generator
             var mergedProtections = MergeProtectionLayersPerBar(barContexts, groovePresetDefinition.ProtectionPolicy);
 
             // Story 2: Extract anchor patterns from GroovePreset per bar
-            var allOnsets = ExtractAnchorOnsets(grooveTrack, totalBars);
+            var allOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars);
 
             // Story 6: Filter onsets by role presence (orchestration policy)
             var filteredOnsets = ApplyRolePresenceFilter(allOnsets, barContexts, groovePresetDefinition.ProtectionPolicy.OrchestrationPolicy);
@@ -98,13 +97,13 @@ namespace Music.Generator
         }
 
         // AI: ExtractAnchorOnsets reads kick/snare/hat patterns from GroovePreset anchor layer per bar; returns DrumOnset list with beat positions and default velocity.
-        private static List<DrumOnset> ExtractAnchorOnsets(GrooveTrack grooveTrack, int totalBars)
+        private static List<DrumOnset> ExtractAnchorOnsets(GroovePresetDefinition groovePresetDefinition, int totalBars)
         {
             var allOnsets = new List<DrumOnset>();
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
-                var groovePreset = grooveTrack.GetActiveGroovePreset(bar);
+                var groovePreset = groovePresetDefinition.GetActiveGroovePreset(bar);
                 var anchorLayer = groovePreset.AnchorLayer;
 
                 foreach (var beat in anchorLayer.KickOnsets)

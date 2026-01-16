@@ -193,21 +193,21 @@ namespace Music.Writer
             // If the fixed Groove row was double-clicked, open the Groove editor and write back to the local _songContext
             if (e.RowIndex == SongGridManager.FIXED_ROW_GROOVE)
             {
-                if (_songContext == null)
-                    _songContext = new SongContext();
+                //if (_songContext == null)
+                //    _songContext = new SongContext();
 
-                var initialGroove = _songContext.GrooveTrack;
+                //var initialGroove = _songContext.GrooveTrack;
 
 
-                // TO DO - Groove endbar is always a 1 - doesnt seem to be used
+                //// TO DO - Groove endbar is always a 1 - doesnt seem to be used
 
-                using var dlg = new Music.Designer.GrooveEditorForm(_songContext.BarTrack, initialGroove);
-                if (dlg.ShowDialog(this) == DialogResult.OK)
-                {
-                    _songContext.GrooveTrack = dlg.ResultTrack;
-                }
+                //using var dlg = new Music.Designer.GrooveEditorForm(_songContext.BarTrack, initialGroove);
+                //if (dlg.ShowDialog(this) == DialogResult.OK)
+                //{
+                //    _songContext.GrooveTrack = dlg.ResultTrack;
+                //}
 
-                return;
+                //return;
             }
 
             // If the fixed Time Signature row was double-clicked, open the Time Signature editor and write back to the local _songContext

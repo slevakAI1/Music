@@ -21,13 +21,12 @@ namespace Music.Generator
             // Get total bars from section track
             int totalBars = songContext.SectionTrack.TotalBars;
 
-            var grooveName = GetPrimaryGrooveName(songContext.GrooveTrack);
+            var grooveName = GetPrimaryGrooveName(songContext.GroovePresetDefinition);
 
             // Resolve MIDI program numbers from VoiceSet
             int drumProgramNumber = GetProgramNumberForRole(songContext.Voices, "DrumKit", defaultProgram: 255);
 
             var drumTrack = DrumTrackGeneratorNew.Generate(
-                 songContext.GrooveTrack,
                  songContext.BarTrack,
                  songContext.SectionTrack,
                  songContext.SegmentGrooveProfiles,
@@ -38,14 +37,14 @@ namespace Music.Generator
             return drumTrack;
         }
 
-        // AI: returns SourcePresetName of first groove event or "Default"; used as primary groove key
-        private static string GetPrimaryGrooveName(GrooveTrack grooveTrack)
+        // AI: returns Identity.Name of groove preset or "Default"; used as primary groove key
+        private static string GetPrimaryGrooveName(GroovePresetDefinition groovePresetDefinition)
         {
-            var firstGroove = grooveTrack.Events.FirstOrDefault();
-            return firstGroove?.SourcePresetName ?? "Default";
+            return groovePresetDefinition?.Identity?.Name ?? "Default";
         }
 
         #region Validation
+
 
         // AI: Validation methods throw ArgumentException when required tracks are missing; callers rely on exceptions for invalid song contexts.
 

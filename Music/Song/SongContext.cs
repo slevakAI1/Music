@@ -20,11 +20,6 @@ namespace Music.Generator
         //======================================================================================
 
 
-
-        // AI: GrooveTrack pre-initialized; holds groove events applied during generation. Consumers must normalize lists.
-        // THIS IS THE OLD GROOVE STRUCTURE
-        public GrooveTrack GrooveTrack { get; set; } = new();
-
         // THIS IS THE NEW GROOVE STRUCTURE
         public GroovePresetDefinition GroovePresetDefinition { get; set; } = new();
         public IReadOnlyList<SegmentGrooveProfile> SegmentGrooveProfiles { get; set; } = Array.Empty<SegmentGrooveProfile>();

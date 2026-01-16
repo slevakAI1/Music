@@ -42,9 +42,6 @@ namespace Music.Generator
             // AI: note=BarTrack must be built before GrooveTrack since GrooveEvent constructor requires non-null BarTrack.
             songContext.BarTrack.RebuildFromTimingTrack(songContext.Song.TimeSignatureTrack, songContext.SectionTrack.TotalBars);
 
-            // 7) Groove track: set one event at bar 1 beat one for PopRockBasic preset
-            songContext.GrooveTrack = GrooveTrackTestData.CreateTestGrooveD1(songContext.BarTrack);
-
             // 8) Material bank: populate with test motifs for Stage 9+ testing
             // AI: note=Adds all 4 hardcoded test motifs from MotifLibrary; motifs stored as PartTracks with MaterialLocal domain.
             PopulateTestMotifs(songContext.MaterialBank);

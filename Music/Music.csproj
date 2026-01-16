@@ -17,6 +17,7 @@
     <Compile Remove="Generator\Energy\**" />
     <Compile Remove="Generator\Guitar\**" />
     <Compile Remove="Patches\**" />
+    <Compile Remove="Song\GrooveOld\**" />
     <Compile Remove="Tests\**" />
     <EmbeddedResource Remove="Archives\**" />
     <EmbeddedResource Remove="Files\OutputSamples\**" />
@@ -26,6 +27,7 @@
     <EmbeddedResource Remove="Generator\Energy\**" />
     <EmbeddedResource Remove="Generator\Guitar\**" />
     <EmbeddedResource Remove="Patches\**" />
+    <EmbeddedResource Remove="Song\GrooveOld\**" />
     <EmbeddedResource Remove="Tests\**" />
     <None Remove="Archives\**" />
     <None Remove="Files\OutputSamples\**" />
@@ -35,6 +37,7 @@
     <None Remove="Generator\Energy\**" />
     <None Remove="Generator\Guitar\**" />
     <None Remove="Patches\**" />
+    <None Remove="Song\GrooveOld\**" />
     <None Remove="Tests\**" />
   </ItemGroup>
 
