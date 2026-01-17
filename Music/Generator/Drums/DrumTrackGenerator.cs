@@ -76,23 +76,94 @@ namespace Music.Generator
             // Story G1: Use shared BarContextBuilder instead of local BuildBarContexts
             var barContexts = BarContextBuilder.Build(sectionTrack, segmentProfiles, totalBars);
 
-            // Story 8: Merge protection hierarchy layers
-            var mergedProtections = MergeProtectionLayersPerBar(barContexts, groovePresetDefinition.ProtectionPolicy);
+            // Story 8: Merge protection hierarchy layers per-bar using shared ProtectionPolicyMerger
+            var mergedProtections = new Dictionary<int, Dictionary<string, RoleProtectionSet>>();
+            foreach (var barCtx in barContexts)
+            {
+                var enabledTags = barCtx.SegmentProfile?.EnabledProtectionTags ?? new List<string>();
+                var merged = ProtectionPolicyMerger.MergeProtectionLayers(groovePresetDefinition.ProtectionPolicy, enabledTags);
+                mergedProtections[barCtx.BarNumber] = merged;
+            }
 
-            // Story 12: Apply phrase hook policy (protect anchors near phrase/section ends)
-            mergedProtections = ApplyPhraseHookPolicyToProtections(mergedProtections, barContexts, groovePresetDefinition.ProtectionPolicy.PhraseHookPolicy, groovePresetDefinition.Identity.BeatsPerBar);
+            // Story 12: Apply phrase hook policy (protect anchors near phrase/section ends) using shared PhraseHookWindowResolver
+            var phraseHookPolicy = groovePresetDefinition.ProtectionPolicy?.PhraseHookPolicy;
+            if (phraseHookPolicy != null)
+            {
+                foreach (var ctx in barContexts)
+                {
+                    if (!mergedProtections.TryGetValue(ctx.BarNumber, out var protectionsByRole))
+                    {
+                        protectionsByRole = new Dictionary<string, RoleProtectionSet>(StringComparer.OrdinalIgnoreCase);
+                        mergedProtections[ctx.BarNumber] = protectionsByRole;
+                    }
 
-            // Story 2: Extract anchor patterns from GroovePreset per bar
+                    var windowInfo = PhraseHookWindowResolver.Resolve(ctx, phraseHookPolicy);
+                    if (!windowInfo.InPhraseEndWindow)
+                        continue;
+
+                    if (phraseHookPolicy.ProtectDownbeatOnPhraseEnd)
+                    {
+                        foreach (var roleName in protectionsByRole.Keys.ToList())
+                        {
+                            var set = protectionsByRole[roleName] ?? new RoleProtectionSet();
+                            if (!set.NeverRemoveOnsets.Contains(1m))
+                                set.NeverRemoveOnsets.Add(1m);
+                            protectionsByRole[roleName] = set;
+                        }
+                    }
+
+                    if (phraseHookPolicy.ProtectBackbeatOnPhraseEnd)
+                    {
+                        var backbeats = new List<decimal>();
+                        if (groovePresetDefinition.Identity.BeatsPerBar >= 2) backbeats.Add(2m);
+                        if (groovePresetDefinition.Identity.BeatsPerBar >= 4) backbeats.Add(4m);
+
+                        foreach (var roleName in protectionsByRole.Keys.ToList())
+                        {
+                            var set = protectionsByRole[roleName] ?? new RoleProtectionSet();
+                            foreach (var b in backbeats)
+                                if (!set.NeverRemoveOnsets.Contains(b))
+                                    set.NeverRemoveOnsets.Add(b);
+                            protectionsByRole[roleName] = set;
+                        }
+                    }
+                }
+            }
+
+            // Story 2: Extract anchor patterns from GroovePreset per bar (drum-specific)
             var allOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars);
 
             // Story 10 / Story G2: Filter onsets by allowed subdivision grid using shared OnsetGrid
-            allOnsets = ApplySubdivisionFilter(allOnsets, groovePresetDefinition.ProtectionPolicy.SubdivisionPolicy, groovePresetDefinition.Identity.BeatsPerBar);
+            var subdivisionPolicy = groovePresetDefinition.ProtectionPolicy?.SubdivisionPolicy;
+            if (subdivisionPolicy != null)
+            {
+                var grid = OnsetGridBuilder.Build(groovePresetDefinition.Identity.BeatsPerBar, subdivisionPolicy.AllowedSubdivisions);
+                allOnsets = allOnsets.Where(o => grid.IsAllowed(o.Beat)).ToList();
+            }
 
             // Story 11 / Story G3: Filter onsets by syncopation/anticipation rules using shared RhythmVocabularyFilter
-            allOnsets = ApplySyncopationAnticipationFilter(allOnsets, groovePresetDefinition.ProtectionPolicy.RoleConstraintPolicy, groovePresetDefinition.Identity.BeatsPerBar);
+            allOnsets = RhythmVocabularyFilter.Filter(
+                allOnsets,
+                getRoleName: onset => onset.Role.ToString(),
+                getBeat: onset => onset.Beat,
+                beatsPerBar: groovePresetDefinition.Identity.BeatsPerBar,
+                roleConstraintPolicy: groovePresetDefinition.ProtectionPolicy?.RoleConstraintPolicy);
 
-            // Story 6: Filter onsets by role presence (orchestration policy)
-            var filteredOnsets = ApplyRolePresenceFilter(allOnsets, barContexts, groovePresetDefinition.ProtectionPolicy.OrchestrationPolicy);
+            // Story 6: Filter onsets by role presence (orchestration policy) using shared RolePresenceGate
+            var barContextDict = barContexts?.ToDictionary(ctx => ctx.BarNumber) ?? new Dictionary<int, BarContext>();
+            var filteredOnsets = new List<DrumOnset>();
+            foreach (var onset in allOnsets)
+            {
+                if (!barContextDict.TryGetValue(onset.BarNumber, out var barCtx))
+                {
+                    filteredOnsets.Add(onset);
+                    continue;
+                }
+
+                string sectionType = barCtx.Section?.SectionType.ToString() ?? string.Empty;
+                if (RolePresenceGate.IsRolePresent(sectionType, onset.Role.ToString(), groovePresetDefinition.ProtectionPolicy?.OrchestrationPolicy))
+                    filteredOnsets.Add(onset);
+            }
 
             // Story G6: Use generic ProtectionApplier to enforce protections on DrumOnset events.
             var enforcedOnsets = ProtectionApplier.Apply(
