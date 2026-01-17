@@ -36,9 +36,9 @@ public class Story12PhraseHookPolicyTests
             }
         };
 
-        var barContexts = new List<DrumBarContext>
+        var barContexts = new List<BarContext>
         {
-            new DrumBarContext(1, null, null, 0, 3)
+            new BarContext(1, null, null, 0, 3)
         };
 
         var result = InvokeApplyPhraseHookPolicy(mergedProtections, barContexts, null, 4);
@@ -51,7 +51,7 @@ public class Story12PhraseHookPolicyTests
     public void ApplyPhraseHookPolicy_EmptyProtections_ReturnsEmpty()
     {
         var mergedProtections = new Dictionary<int, Dictionary<string, RoleProtectionSet>>();
-        var barContexts = new List<DrumBarContext>();
+        var barContexts = new List<BarContext>();
 
         var policy = new GroovePhraseHookPolicy
         {
@@ -78,9 +78,9 @@ public class Story12PhraseHookPolicyTests
             }
         };
 
-        var barContexts = new List<DrumBarContext>
+        var barContexts = new List<BarContext>
         {
-            new DrumBarContext(4, CreateSection(), null, 3, 0) // Last bar of section
+            new BarContext(4, CreateSection(), null, 3, 0) // Last bar of section
         };
 
         var policy = new GroovePhraseHookPolicy
@@ -109,9 +109,9 @@ public class Story12PhraseHookPolicyTests
             }
         };
 
-        var barContexts = new List<DrumBarContext>
+        var barContexts = new List<BarContext>
         {
-            new DrumBarContext(4, CreateSection(), null, 3, 0)
+            new BarContext(4, CreateSection(), null, 3, 0)
         };
 
         var policy = new GroovePhraseHookPolicy
@@ -140,9 +140,9 @@ public class Story12PhraseHookPolicyTests
             }
         };
 
-        var barContexts = new List<DrumBarContext>
+        var barContexts = new List<BarContext>
         {
-            new DrumBarContext(4, CreateSection(), null, 3, 0)
+            new BarContext(4, CreateSection(), null, 3, 0)
         };
 
         var policy = new GroovePhraseHookPolicy
@@ -171,9 +171,9 @@ public class Story12PhraseHookPolicyTests
             }
         };
 
-        var barContexts = new List<DrumBarContext>
+        var barContexts = new List<BarContext>
         {
-            new DrumBarContext(4, CreateSection(), null, 3, 0)
+            new BarContext(4, CreateSection(), null, 3, 0)
         };
 
         var policy = new GroovePhraseHookPolicy
@@ -199,12 +199,12 @@ public class Story12PhraseHookPolicyTests
             [4] = new Dictionary<string, RoleProtectionSet> { ["Kick"] = new RoleProtectionSet() }
         };
 
-        var barContexts = new List<DrumBarContext>
+        var barContexts = new List<BarContext>
         {
-            new DrumBarContext(1, CreateSection(), null, 0, 3), // 3 bars until end - not in window
-            new DrumBarContext(2, CreateSection(), null, 1, 2), // 2 bars until end - not in window
-            new DrumBarContext(3, CreateSection(), null, 2, 1), // 1 bar until end - not in window
-            new DrumBarContext(4, CreateSection(), null, 3, 0)  // 0 bars until end - IN WINDOW
+            new BarContext(1, CreateSection(), null, 0, 3), // 3 bars until end - not in window
+            new BarContext(2, CreateSection(), null, 1, 2), // 2 bars until end - not in window
+            new BarContext(3, CreateSection(), null, 2, 1), // 1 bar until end - not in window
+            new BarContext(4, CreateSection(), null, 3, 0)  // 0 bars until end - IN WINDOW
         };
 
         var policy = new GroovePhraseHookPolicy
@@ -233,12 +233,12 @@ public class Story12PhraseHookPolicyTests
             [4] = new Dictionary<string, RoleProtectionSet> { ["Kick"] = new RoleProtectionSet() }
         };
 
-        var barContexts = new List<DrumBarContext>
+        var barContexts = new List<BarContext>
         {
-            new DrumBarContext(1, CreateSection(), null, 0, 3),
-            new DrumBarContext(2, CreateSection(), null, 1, 2),
-            new DrumBarContext(3, CreateSection(), null, 2, 1), // IN WINDOW
-            new DrumBarContext(4, CreateSection(), null, 3, 0)  // IN WINDOW
+            new BarContext(1, CreateSection(), null, 0, 3),
+            new BarContext(2, CreateSection(), null, 1, 2),
+            new BarContext(3, CreateSection(), null, 2, 1), // IN WINDOW
+            new BarContext(4, CreateSection(), null, 3, 0)  // IN WINDOW
         };
 
         var policy = new GroovePhraseHookPolicy
@@ -267,9 +267,9 @@ public class Story12PhraseHookPolicyTests
             }
         };
 
-        var barContexts = new List<DrumBarContext>
+        var barContexts = new List<BarContext>
         {
-            new DrumBarContext(4, CreateSection(), null, 3, 0)
+            new BarContext(4, CreateSection(), null, 3, 0)
         };
 
         var policy = new GroovePhraseHookPolicy
@@ -295,9 +295,9 @@ public class Story12PhraseHookPolicyTests
             }
         };
 
-        var barContexts = new List<DrumBarContext>
+        var barContexts = new List<BarContext>
         {
-            new DrumBarContext(3, CreateSection(), null, 2, 0)
+            new BarContext(3, CreateSection(), null, 2, 0)
         };
 
         var policy = new GroovePhraseHookPolicy
@@ -326,9 +326,9 @@ public class Story12PhraseHookPolicyTests
             }
         };
 
-        var barContexts = new List<DrumBarContext>
+        var barContexts = new List<BarContext>
         {
-            new DrumBarContext(4, CreateSection(), null, 3, 0)
+            new BarContext(4, CreateSection(), null, 3, 0)
         };
 
         var policy = new GroovePhraseHookPolicy
@@ -360,9 +360,9 @@ public class Story12PhraseHookPolicyTests
             }
         };
 
-        var barContexts = new List<DrumBarContext>
+        var barContexts = new List<BarContext>
         {
-            new DrumBarContext(4, CreateSection(), null, 3, 0)
+            new BarContext(4, CreateSection(), null, 3, 0)
         };
 
         var policy = new GroovePhraseHookPolicy
@@ -391,9 +391,9 @@ public class Story12PhraseHookPolicyTests
             }
         };
 
-        var barContexts = new List<DrumBarContext>
+        var barContexts = new List<BarContext>
         {
-            new DrumBarContext(4, CreateSection(), null, 3, 0)
+            new BarContext(4, CreateSection(), null, 3, 0)
         };
 
         var policy = new GroovePhraseHookPolicy
@@ -414,9 +414,9 @@ public class Story12PhraseHookPolicyTests
     {
         var mergedProtections = new Dictionary<int, Dictionary<string, RoleProtectionSet>>();
 
-        var barContexts = new List<DrumBarContext>
+        var barContexts = new List<BarContext>
         {
-            new DrumBarContext(4, CreateSection(), null, 3, 0)
+            new BarContext(4, CreateSection(), null, 3, 0)
         };
 
         var policy = new GroovePhraseHookPolicy
@@ -443,9 +443,9 @@ public class Story12PhraseHookPolicyTests
             }
         };
 
-        var barContexts = new List<DrumBarContext>
+        var barContexts = new List<BarContext>
         {
-            new DrumBarContext(4, CreateSection(), null, 3, 0)
+            new BarContext(4, CreateSection(), null, 3, 0)
         };
 
         var policy = new GroovePhraseHookPolicy
@@ -476,9 +476,9 @@ public class Story12PhraseHookPolicyTests
             }
         };
 
-        var barContexts = new List<DrumBarContext>
+        var barContexts = new List<BarContext>
         {
-            new DrumBarContext(1, null, null, 0, -1) // No section
+            new BarContext(1, null, null, 0, -1) // No section
         };
 
         var policy = new GroovePhraseHookPolicy
@@ -504,9 +504,9 @@ public class Story12PhraseHookPolicyTests
             }
         };
 
-        var barContexts = new List<DrumBarContext>
+        var barContexts = new List<BarContext>
         {
-            new DrumBarContext(4, CreateSection(), null, 3, 0)
+            new BarContext(4, CreateSection(), null, 3, 0)
         };
 
         var policy = new GroovePhraseHookPolicy
@@ -532,9 +532,9 @@ public class Story12PhraseHookPolicyTests
             }
         };
 
-        var barContexts = new List<DrumBarContext>
+        var barContexts = new List<BarContext>
         {
-            new DrumBarContext(4, CreateSection(), null, 3, 0)
+            new BarContext(4, CreateSection(), null, 3, 0)
         };
 
         var policy = new GroovePhraseHookPolicy
@@ -553,7 +553,7 @@ public class Story12PhraseHookPolicyTests
     // Helper methods
     private Dictionary<int, Dictionary<string, RoleProtectionSet>> InvokeApplyPhraseHookPolicy(
         Dictionary<int, Dictionary<string, RoleProtectionSet>> mergedProtectionsPerBar,
-        List<DrumBarContext> barContexts,
+        IReadOnlyList<BarContext> barContexts,
         GroovePhraseHookPolicy? phraseHookPolicy,
         int beatsPerBar)
     {

@@ -35,14 +35,8 @@ namespace Music.Generator
         public bool IsProtected { get; set; }
     }
 
-    // AI: DrumBarContext provides per-bar context for Story 5; section, phrase position, segment profile for downstream logic.
-    // AI: invariants=BarNumber is 1-based; BarWithinSection is 0-based; BarsUntilSectionEnd is >= 0.
-    public sealed record DrumBarContext(
-        int BarNumber,
-        Section? Section,
-        SegmentGrooveProfile? SegmentProfile,
-        int BarWithinSection,
-        int BarsUntilSectionEnd);
+    // AI: DrumBarContext removed in Story G1; replaced by shared Music.Generator.BarContext.
+    // AI: change=Use BarContext from Music.Generator namespace for cross-generator bar context.
 
     public static class DrumTrackGeneratorNew
     {
@@ -79,7 +73,8 @@ namespace Music.Generator
             var notes = new List<PartTrackEvent>();
 
             // Story 5: Build per-bar context (section, phrase position, segment profile)
-            var barContexts = BuildBarContexts(sectionTrack, segmentProfiles.ToList(), totalBars);
+            // Story G1: Use shared BarContextBuilder instead of local BuildBarContexts
+            var barContexts = BarContextBuilder.Build(sectionTrack, segmentProfiles, totalBars);
 
             // Story 8: Merge protection hierarchy layers
             var mergedProtections = MergeProtectionLayersPerBar(barContexts, groovePresetDefinition.ProtectionPolicy);
@@ -298,65 +293,13 @@ namespace Music.Generator
             return filtered;
         }
 
-        // AI: BuildBarContexts builds per-bar context for Story 5; maps bar → section, calculates phrase position, resolves segment profile.
-        // AI: deps=SectionTrack.GetActiveSection; SegmentGrooveProfiles list from song context.
-        private static List<DrumBarContext> BuildBarContexts(
-            SectionTrack sectionTrack,
-            List<SegmentGrooveProfile> segmentProfiles,
-            int totalBars)
-        {
-            var contexts = new List<DrumBarContext>(totalBars);
-
-            for (int bar = 1; bar <= totalBars; bar++)
-            {
-                // Map bar to section
-                sectionTrack.GetActiveSection(bar, out var section);
-
-                // Calculate phrase position within section
-                int barWithinSection = 0;
-                int barsUntilSectionEnd = 0;
-
-                if (section != null)
-                {
-                    barWithinSection = bar - section.StartBar;
-                    int sectionEndBar = section.StartBar + section.BarCount - 1;
-                    barsUntilSectionEnd = sectionEndBar - bar;
-                }
-
-                // Resolve segment profile for this bar
-                SegmentGrooveProfile? segmentProfile = null;
-                foreach (var profile in segmentProfiles)
-                {
-                    bool inRange = true;
-
-                    if (profile.StartBar.HasValue && bar < profile.StartBar.Value)
-                        inRange = false;
-
-                    if (profile.EndBar.HasValue && bar > profile.EndBar.Value)
-                        inRange = false;
-
-                    if (inRange)
-                    {
-                        segmentProfile = profile;
-                        break; // Use first matching profile
-                    }
-                }
-
-                contexts.Add(new DrumBarContext(
-                    BarNumber: bar,
-                    Section: section,
-                    SegmentProfile: segmentProfile,
-                    BarWithinSection: barWithinSection,
-                    BarsUntilSectionEnd: barsUntilSectionEnd));
-            }
-
-            return contexts;
-        }
+        // AI: BuildBarContexts removed in Story G1; replaced by shared BarContextBuilder.Build().
+        // AI: change=Use BarContextBuilder.Build(sectionTrack, segmentProfiles, totalBars) for cross-generator compatibility.
 
         // AI: MergeProtectionLayersPerBar merges protection hierarchy for each bar using enabled tags from segment profile.
         // AI: deps=ProtectionPolicyMerger.MergeProtectionLayers; returns dictionary of bar → role → merged protections.
         private static Dictionary<int, Dictionary<string, RoleProtectionSet>> MergeProtectionLayersPerBar(
-            List<DrumBarContext> barContexts,
+            IReadOnlyList<BarContext> barContexts,
             GrooveProtectionPolicy protectionPolicy)
         {
             var result = new Dictionary<int, Dictionary<string, RoleProtectionSet>>();
@@ -381,7 +324,7 @@ namespace Music.Generator
         // AI: invariants=does not create new roles; only augments NeverRemoveOnsets when protection flags require it.
         private static Dictionary<int, Dictionary<string, RoleProtectionSet>> ApplyPhraseHookPolicyToProtections(
             Dictionary<int, Dictionary<string, RoleProtectionSet>> mergedProtectionsPerBar,
-            List<DrumBarContext> barContexts,
+            IReadOnlyList<BarContext> barContexts,
             GroovePhraseHookPolicy? phraseHookPolicy,
             int beatsPerBar)
         {
@@ -528,7 +471,7 @@ namespace Music.Generator
         // AI: note=checks specific role names (ClosedHat, OpenHat, Kick, Snare) and DrumKit master switch.
         private static List<DrumOnset> ApplyRolePresenceFilter(
             List<DrumOnset> onsets,
-            List<DrumBarContext> barContexts,
+            IReadOnlyList<BarContext> barContexts,
             GrooveOrchestrationPolicy orchestrationPolicy)
         {
             var filtered = new List<DrumOnset>();
