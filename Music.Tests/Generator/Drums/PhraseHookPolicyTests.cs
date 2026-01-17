@@ -571,7 +571,7 @@ public class Story12PhraseHookPolicyTests
         {
             StartBar = 1,
             BarCount = 4,
-            SectionType = SectionType.Verse
+            SectionType = MusicConstants.eSectionType.Verse
         };
     }
 }

@@ -558,19 +558,18 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-
-### Story 12: Implement Phrase Hook Policy
+### Story 12: Implement Phrase Hook Policy (COMPLETED)
 **As a** generator  
 **I want** fills enabled only in designated windows  
 **So that** phrase structure is respected
 
 **Acceptance Criteria:**
-- [ ] Calculate if bar is within `PhraseEndBarsWindow` of section end
-- [ ] If `AllowFillsAtPhraseEnd=false`, disable fill tags in that window
-- [ ] If `AllowFillsAtSectionEnd=false`, disable at section boundary
-- [ ] If `ProtectDownbeatOnPhraseEnd=true`, add beat 1 to NeverRemove
-- [ ] If `ProtectBackbeatOnPhraseEnd=true`, add beats 2,4 to NeverRemove
-- [ ] Filter candidates by `EnabledFillTags`
+- [x] Calculate if bar is within `PhraseEndBarsWindow` of section end
+- [x] If `AllowFillsAtPhraseEnd=false`, disable fill tags in that window
+- [x] If `AllowFillsAtSectionEnd=false`, disable at section boundary
+- [x] If `ProtectDownbeatOnPhraseEnd=true`, add beat 1 to NeverRemove
+- [x] If `ProtectBackbeatOnPhraseEnd=true`, add beats 2,4 to NeverRemove
+- [x] Filter candidates by `EnabledFillTags`
 
 **Settings Handled:**
 - `GroovePhraseHookPolicy.AllowFillsAtPhraseEnd` (true/false)
@@ -581,7 +580,34 @@ Settings are applied in this order. Earlier settings establish constraints; late
 - `GroovePhraseHookPolicy.ProtectBackbeatOnPhraseEnd` (true/false)
 - `GroovePhraseHookPolicy.EnabledFillTags`
 
+**Implementation notes:**
+- `Music/Generator/Drums/DrumTrackGeneratorNew.cs` implements `ApplyPhraseHookPolicyToProtections` method.
+- Filter is applied after protection hierarchy merge but before anchor extraction in the `Generate` pipeline.
+- Detects phrase-end window using `BarsUntilSectionEnd < PhraseEndBarsWindow`.
+- When `ProtectDownbeatOnPhraseEnd=true` in phrase-end window: adds beat 1 to `NeverRemoveOnsets` for all roles.
+- When `ProtectBackbeatOnPhraseEnd=true` in phrase-end window: adds beats 2 and 4 (if available) to `NeverRemoveOnsets`.
+- Preserves existing `NeverRemoveOnsets` and avoids duplicates.
+- Does not create new roles; only augments existing protection sets.
+- **Audible difference**: When phrase-end protection enabled, downbeat and backbeats are protected from removal in bars near section end.
+
+**Test coverage:**
+- `Music.Tests/Generator/Drums/PhraseHookPolicyTests.cs` - 18 tests covering:
+  - Null/empty input handling
+  - Null policy bypasses changes
+  - ProtectDownbeatOnPhraseEnd true/false
+  - ProtectBackbeatOnPhraseEnd true/false
+  - Window detection (phrase-end bars)
+  - Different window sizes (1, 2 bars)
+  - AllowFillsAtPhraseEnd true bypasses protection
+  - Different time signatures (3/4, 4/4)
+  - Multiple roles receive protections
+  - Preservation of existing NeverRemoveOnsets
+  - No duplicate onsets added
+  - Bars outside windows not protected
+  - Both protections enabled together
+
 ---
+
 
 ## Phase 5: Variation System (Stories 13-17)
 
