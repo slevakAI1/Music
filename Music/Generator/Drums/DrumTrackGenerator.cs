@@ -76,59 +76,15 @@ namespace Music.Generator
             // Story G1: Use shared BarContextBuilder instead of local BuildBarContexts
             var barContexts = BarContextBuilder.Build(sectionTrack, segmentProfiles, totalBars);
 
-            // Story 8: Merge protection hierarchy layers per-bar using shared ProtectionPolicyMerger
-            var mergedProtections = new Dictionary<int, Dictionary<string, RoleProtectionSet>>();
-            foreach (var barCtx in barContexts)
-            {
-                var enabledTags = barCtx.SegmentProfile?.EnabledProtectionTags ?? new List<string>();
-                var merged = ProtectionPolicyMerger.MergeProtectionLayers(groovePresetDefinition.ProtectionPolicy, enabledTags);
-                mergedProtections[barCtx.BarNumber] = merged;
-            }
+            // Story 8: Merge protection hierarchy layers per-bar using shared ProtectionPerBarBuilder
+            var mergedProtections = ProtectionPerBarBuilder.Build(barContexts, groovePresetDefinition.ProtectionPolicy);
 
-            // Story 12: Apply phrase hook policy (protect anchors near phrase/section ends) using shared PhraseHookWindowResolver
-            var phraseHookPolicy = groovePresetDefinition.ProtectionPolicy?.PhraseHookPolicy;
-            if (phraseHookPolicy != null)
-            {
-                foreach (var ctx in barContexts)
-                {
-                    if (!mergedProtections.TryGetValue(ctx.BarNumber, out var protectionsByRole))
-                    {
-                        protectionsByRole = new Dictionary<string, RoleProtectionSet>(StringComparer.OrdinalIgnoreCase);
-                        mergedProtections[ctx.BarNumber] = protectionsByRole;
-                    }
-
-                    var windowInfo = PhraseHookWindowResolver.Resolve(ctx, phraseHookPolicy);
-                    if (!windowInfo.InPhraseEndWindow)
-                        continue;
-
-                    if (phraseHookPolicy.ProtectDownbeatOnPhraseEnd)
-                    {
-                        foreach (var roleName in protectionsByRole.Keys.ToList())
-                        {
-                            var set = protectionsByRole[roleName] ?? new RoleProtectionSet();
-                            if (!set.NeverRemoveOnsets.Contains(1m))
-                                set.NeverRemoveOnsets.Add(1m);
-                            protectionsByRole[roleName] = set;
-                        }
-                    }
-
-                    if (phraseHookPolicy.ProtectBackbeatOnPhraseEnd)
-                    {
-                        var backbeats = new List<decimal>();
-                        if (groovePresetDefinition.Identity.BeatsPerBar >= 2) backbeats.Add(2m);
-                        if (groovePresetDefinition.Identity.BeatsPerBar >= 4) backbeats.Add(4m);
-
-                        foreach (var roleName in protectionsByRole.Keys.ToList())
-                        {
-                            var set = protectionsByRole[roleName] ?? new RoleProtectionSet();
-                            foreach (var b in backbeats)
-                                if (!set.NeverRemoveOnsets.Contains(b))
-                                    set.NeverRemoveOnsets.Add(b);
-                            protectionsByRole[roleName] = set;
-                        }
-                    }
-                }
-            }
+            // Story 12: Apply phrase hook policy (protect anchors near phrase/section ends) using shared PhraseHookProtectionAugmenter
+            PhraseHookProtectionAugmenter.Augment(
+                mergedProtections,
+                barContexts,
+                groovePresetDefinition.ProtectionPolicy?.PhraseHookPolicy,
+                groovePresetDefinition.Identity.BeatsPerBar);
 
             // Story 2: Extract anchor patterns from GroovePreset per bar (drum-specific)
             var allOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars);
