@@ -94,8 +94,28 @@ namespace Music.Generator
             // Story 6: Filter onsets by role presence (orchestration policy)
             var filteredOnsets = ApplyRolePresenceFilter(allOnsets, barContexts, groovePresetDefinition.ProtectionPolicy.OrchestrationPolicy);
 
-            // Story 9: Enforce protections (add must-hits, mark protected, remove never-adds)
-            var enforcedOnsets = EnforceProtections(filteredOnsets, mergedProtections);
+            // Story G6: Use generic ProtectionApplier to enforce protections on DrumOnset events.
+            var enforcedOnsets = ProtectionApplier.Apply(
+                filteredOnsets,
+                mergedProtections,
+                getBar: o => o.BarNumber,
+                getRoleName: o => o.Role.ToString(),
+                getBeat: o => o.Beat,
+                // setFlags: mutate DrumOnset flags and return it
+                setFlags: (o, isMustHit, isNeverRemove, isProtected) =>
+                {
+                    o.IsMustHit = isMustHit || o.IsMustHit;
+                    o.IsNeverRemove = isNeverRemove || o.IsNeverRemove;
+                    o.IsProtected = isProtected || o.IsProtected;
+                    return o;
+                },
+                // createEvent: create a new DrumOnset for missing MustHit onsets
+                createEvent: (bar, roleName, beat) =>
+                {
+                    if (!Enum.TryParse<DrumRole>(roleName, ignoreCase: true, out var parsedRole))
+                        parsedRole = DrumRole.Kick; // fallback though role names should match
+                    return new DrumOnset(parsedRole, bar, beat, Velocity: 100, TickPosition: 0);
+                });
 
             // Story 3: Convert onsets to MIDI events
             ConvertOnsetsToMidiEvents(enforcedOnsets, barTrack, notes);

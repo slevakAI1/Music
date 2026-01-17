@@ -154,9 +154,9 @@ Move groove-related logic out of `DrumTrackGeneratorNew` into reusable, generato
 
 ---
 
-## Phase 6: Make Protection Application Less Drum-Specific (recommended)
+## Phase 6: Make Protection Application Less Drum-Specific (recommended)   (COMPLETED)
 
-### Story G6: Create generic `ProtectionApplier` (events with role+beat)
+### Story G6: Create generic `ProtectionApplier` (events with role+beat)   (COMPLETED)
 **As a** developer  
 **I want** protection enforcement to be role-agnostic  
 **So that** other generators can reuse must-hit/never-add/never-remove logic
@@ -181,7 +181,7 @@ Move groove-related logic out of `DrumTrackGeneratorNew` into reusable, generato
 
 ## Phase 7: Consolidate Drum Generator into a Thin Orchestrator
 
-### Story G7: Simplify `DrumTrackGeneratorNew` to “compose services”
+### Story G7: Simplify `DrumTrackGenerator` to “compose services”
 **As a** developer  
 **I want** DrumTrackGeneratorNew to be a thin pipeline orchestrator  
 **So that** groove logic doesn’t creep back into drum code
