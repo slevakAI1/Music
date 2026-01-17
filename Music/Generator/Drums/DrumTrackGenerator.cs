@@ -235,15 +235,9 @@ namespace Music.Generator
                     mergedProtectionsPerBar[ctx.BarNumber] = protectionsByRole;
                 }
 
-                bool inPhraseEndWindow = phraseHookPolicy.AllowFillsAtPhraseEnd == false
-                    && phraseHookPolicy.PhraseEndBarsWindow > 0
-                    && ctx.BarsUntilSectionEnd >= 0
-                    && ctx.BarsUntilSectionEnd < phraseHookPolicy.PhraseEndBarsWindow;
-
-                bool inSectionEndWindow = phraseHookPolicy.AllowFillsAtSectionEnd == false
-                    && phraseHookPolicy.SectionEndBarsWindow > 0
-                    && ctx.BarsUntilSectionEnd >= 0
-                    && ctx.BarsUntilSectionEnd < phraseHookPolicy.SectionEndBarsWindow;
+                // Story G5: use shared PhraseHookWindowResolver to compute phrase/section-end windows.
+                var windowInfo = PhraseHookWindowResolver.Resolve(ctx, phraseHookPolicy);
+                bool inPhraseEndWindow = windowInfo.InPhraseEndWindow;
 
                 if (inPhraseEndWindow)
                 {

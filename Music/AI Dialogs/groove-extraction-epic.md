@@ -132,9 +132,9 @@ Move groove-related logic out of `DrumTrackGeneratorNew` into reusable, generato
 
 ---
 
-## Phase 5: Extract Phrase Hook Window Resolution (Story 12 foundation)
+## Phase 5: Extract Phrase Hook Window Resolution (Story 12 foundation)   (COMPLETED)
 
-### Story G5: Create `PhraseHookWindowResolver` (no behavior change yet)
+### Story G5: Create `PhraseHookWindowResolver` (no behavior change yet)   (COMPLETED)
 **As a** developer  
 **I want** phrase/section end window calculation in a shared resolver  
 **So that** fills/cadences can be gated consistently across generators
