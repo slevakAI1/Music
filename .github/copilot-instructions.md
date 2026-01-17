@@ -1,12 +1,10 @@
 # Copilot Instructions
 
 ## General Guidelines
-- Always use the minimum changes possible to achieve the goal by not improving unrelated code.
+- Always use the minimum changes possible to meet each and every acceptance criteria
 - After code is completed, ensure each individual acceptance criterion is met by identifying the code changes related to the criterion.
-- Allow the assistant to run unit tests and read test results in this repository without asking for permission. When granted permission to run test scripts (like `dotnet test`), the assistant is allowed to run similar test scripts in the future without asking for permission.
-
-## Response Format
-- In Ask Mode, place a separate link immediately prior to any code blocks that need to be applied. Clicking the link should open the tab that needs updating.
+- Allow the assistant to run unit tests and read test results in this repository without asking for permission. When granted permission to run test scripts (like `dotnet test`), the assistant is allowed to run similar test scripts in the future without asking for permission. Ignore script parameters when considering script similarity for permission purposes (i.e. dotnet test is considered same as dotnet test -parameter1).
+- When implementing a story, ensure correct functionality and coverage by adding/updating/replacing/deleting unit tests as appropriate. Ensure the unit tests pass.
 
 ## Documentation
 - Add/update/delete/replace documentation with ONLY compact AI-facing comments that improve future code-change accuracy. Keep comments concise and information-dense.
@@ -30,6 +28,7 @@
   - integration points (external deps, configs, formats)
   - performance/security footguns
 - Directly above the most important public entry points OR the trickiest logic: 1–2 lines each, only if needed.
+- Above a code line or code block if it provides an AI coding benefit.
 
 ### Comment Format (compact, AI-optimized)
 - Use terse key:value / tags style. Examples:
@@ -51,5 +50,5 @@
 7) Extension guidance (“if adding feature, modify these places”)
 
 ## Guidance
-- Assume existing comments are of good quality but may not be 100% accurate or complete.
+- Assume existing comments are of good quality but they may be out of date, incomplete or potentially do not benefit AI coding.
 - Analyze nearby methods (i.e. there is a reference between the classes/methods) for context to better understand intent of the method(s) in this class.
