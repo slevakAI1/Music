@@ -91,10 +91,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include=".github\copilot-instructions.md" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="Song\Voices\Voices.Notion.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
