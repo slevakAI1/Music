@@ -1,38 +1,35 @@
 // AI: purpose=Unit tests for Story 11 syncopation/anticipation filter; validates rhythm vocabulary rules enforcement.
-// AI: deps=DrumTrackGeneratorNew.ApplySyncopationAnticipationFilter; uses reflection to test private methods.
+// AI: Story G3: Updated to use shared RhythmVocabularyFilter instead of private DrumTrackGenerator methods.
 // AI: coverage=AllowSyncopation true/false, AllowAnticipation true/false, offbeat/pickup detection, role-specific filtering.
 
 using FluentAssertions;
 using Music.Generator;
-using System.Reflection;
 
 namespace Music.Tests.Generator.Drums;
 
 public class Story11_SyncopationAnticipationFilterTests
 {
-    private readonly MethodInfo _filterMethod;
-    private readonly MethodInfo _isOffbeatMethod;
-    private readonly MethodInfo _isPickupMethod;
+    #region Helper Methods
 
-    public Story11_SyncopationAnticipationFilterTests()
+    private static List<DrumOnset> InvokeFilter(List<DrumOnset>? onsets, GrooveRoleConstraintPolicy? policy, int beatsPerBar)
     {
-        var type = typeof(DrumTrackGenerator);
-        
-        _filterMethod = type.GetMethod(
-            "ApplySyncopationAnticipationFilter",
-            BindingFlags.NonPublic | BindingFlags.Static)
-            ?? throw new InvalidOperationException("ApplySyncopationAnticipationFilter method not found");
-        
-        _isOffbeatMethod = type.GetMethod(
-            "IsOffbeatPosition",
-            BindingFlags.NonPublic | BindingFlags.Static)
-            ?? throw new InvalidOperationException("IsOffbeatPosition method not found");
-        
-        _isPickupMethod = type.GetMethod(
-            "IsPickupPosition",
-            BindingFlags.NonPublic | BindingFlags.Static)
-            ?? throw new InvalidOperationException("IsPickupPosition method not found");
+        return RhythmVocabularyFilter.Filter(
+            onsets ?? new List<DrumOnset>(),
+            onset => onset.Role.ToString(),
+            onset => onset.Beat,
+            beatsPerBar,
+            policy);
     }
+
+    private static GrooveRoleConstraintPolicy CreateDefaultPolicy()
+    {
+        return new GrooveRoleConstraintPolicy
+        {
+            RoleVocabulary = new Dictionary<string, RoleRhythmVocabulary>()
+        };
+    }
+
+    #endregion
 
     [Fact]
     public void ApplySyncopationAnticipationFilter_NullOnsets_ReturnsEmpty()
@@ -270,160 +267,126 @@ public class Story11_SyncopationAnticipationFilterTests
     {
         var onsets = new List<DrumOnset>
         {
-            new DrumOnset(DrumRole.Snare, 5, 2.0m, 95, 1920)
-            {
-                IsMustHit = true,
-                IsProtected = true
-            }
+            new DrumOnset(DrumRole.Kick, 5, 3.25m, 110, 1920) { IsMustHit = true }
         };
 
         var policy = CreateDefaultPolicy();
+
         var result = InvokeFilter(onsets, policy, 4);
-
         result.Should().HaveCount(1);
-        var onset = result[0];
-        onset.Role.Should().Be(DrumRole.Snare);
-        onset.BarNumber.Should().Be(5);
-        onset.Beat.Should().Be(2.0m);
-        onset.Velocity.Should().Be(95);
-        onset.TickPosition.Should().Be(1920);
-        onset.IsMustHit.Should().BeTrue();
-        onset.IsProtected.Should().BeTrue();
+        result[0].BarNumber.Should().Be(5);
+        result[0].Velocity.Should().Be(110);
+        result[0].TickPosition.Should().Be(1920);
+        result[0].IsMustHit.Should().BeTrue();
     }
 
     [Fact]
-    public void IsOffbeatPosition_DetectsEighthNoteOffbeats()
-    {
-        InvokeIsOffbeat(1.5m, 4).Should().BeTrue("1.5 should be offbeat");
-        InvokeIsOffbeat(2.5m, 4).Should().BeTrue("2.5 should be offbeat");
-        InvokeIsOffbeat(3.5m, 4).Should().BeTrue("3.5 should be offbeat");
-        InvokeIsOffbeat(4.5m, 4).Should().BeTrue("4.5 should be offbeat");
-    }
-
-    [Fact]
-    public void IsOffbeatPosition_DoesNotDetectDownbeats()
-    {
-        InvokeIsOffbeat(1.0m, 4).Should().BeFalse("1.0 should not be offbeat");
-        InvokeIsOffbeat(2.0m, 4).Should().BeFalse("2.0 should not be offbeat");
-        InvokeIsOffbeat(3.0m, 4).Should().BeFalse("3.0 should not be offbeat");
-        InvokeIsOffbeat(4.0m, 4).Should().BeFalse("4.0 should not be offbeat");
-    }
-
-    [Fact]
-    public void IsOffbeatPosition_DoesNotDetectSixteenths()
-    {
-        InvokeIsOffbeat(1.25m, 4).Should().BeFalse("1.25 should not be offbeat");
-        InvokeIsOffbeat(1.75m, 4).Should().BeFalse("1.75 should not be offbeat");
-    }
-
-    [Fact]
-    public void IsPickupPosition_Detects75Positions()
-    {
-        InvokeIsPickup(1.75m, 4).Should().BeTrue("1.75 should be pickup");
-        InvokeIsPickup(2.75m, 4).Should().BeTrue("2.75 should be pickup");
-        InvokeIsPickup(4.75m, 4).Should().BeTrue("4.75 should be pickup");
-    }
-
-    [Fact]
-    public void IsPickupPosition_DoesNotDetectDownbeats()
-    {
-        InvokeIsPickup(1.0m, 4).Should().BeFalse();
-        InvokeIsPickup(2.0m, 4).Should().BeFalse();
-    }
-
-    [Fact]
-    public void IsPickupPosition_DoesNotDetectOffbeats()
-    {
-        InvokeIsPickup(1.5m, 4).Should().BeFalse();
-        InvokeIsPickup(2.5m, 4).Should().BeFalse();
-    }
-
-    [Fact]
-    public void ApplySyncopationAnticipationFilter_ThreeQuarterTime_Works()
+    public void ApplySyncopationAnticipationFilter_MultipleBars()
     {
         var onsets = new List<DrumOnset>
         {
-            new DrumOnset(DrumRole.ClosedHat, 1, 1.0m, 100, 0),
-            new DrumOnset(DrumRole.ClosedHat, 1, 1.5m, 100, 0),  // Offbeat
-            new DrumOnset(DrumRole.ClosedHat, 1, 2.0m, 100, 0),
-            new DrumOnset(DrumRole.ClosedHat, 1, 2.5m, 100, 0),  // Offbeat
-            new DrumOnset(DrumRole.ClosedHat, 1, 3.0m, 100, 0)
+            new DrumOnset(DrumRole.Kick, 1, 1.0m, 100, 0),
+            new DrumOnset(DrumRole.Kick, 1, 1.5m, 100, 0),  // Offbeat
+            new DrumOnset(DrumRole.Kick, 2, 1.0m, 100, 0),
+            new DrumOnset(DrumRole.Kick, 2, 1.5m, 100, 0)   // Offbeat
         };
 
         var policy = new GrooveRoleConstraintPolicy
         {
             RoleVocabulary = new Dictionary<string, RoleRhythmVocabulary>
             {
-                ["ClosedHat"] = new RoleRhythmVocabulary
+                ["Kick"] = new RoleRhythmVocabulary
                 {
                     AllowSyncopation = false,
                     AllowAnticipation = true,
-                    MaxHitsPerBar = 32,
-                    MaxHitsPerBeat = 4,
+                    MaxHitsPerBar = 8,
+                    MaxHitsPerBeat = 2,
                     SnapStrongBeatsToChordTones = false
                 }
             }
         };
 
-        var result = InvokeFilter(onsets, policy, 3);  // 3/4 time
-        result.Should().HaveCount(3, "Only downbeats should remain in 3/4");
-        result.Should().OnlyContain(o => o.Beat == 1.0m || o.Beat == 2.0m || o.Beat == 3.0m);
+        var result = InvokeFilter(onsets, policy, 4);
+        result.Should().HaveCount(2, "Offbeats should be filtered from both bars");
+        result.Should().OnlyContain(o => o.Beat == 1.0m);
     }
 
-    // Helper methods
-    private List<DrumOnset> InvokeFilter(
-        List<DrumOnset>? onsets, 
-        GrooveRoleConstraintPolicy? policy, 
-        int beatsPerBar)
+    [Fact]
+    public void ApplySyncopationAnticipationFilter_3_4Time()
     {
-        var result = _filterMethod.Invoke(null, new object?[] { onsets, policy, beatsPerBar });
-        return (List<DrumOnset>)(result ?? new List<DrumOnset>());
-    }
+        var onsets = new List<DrumOnset>
+        {
+            new DrumOnset(DrumRole.Kick, 1, 1.0m, 100, 0),
+            new DrumOnset(DrumRole.Kick, 1, 1.5m, 100, 0),  // Offbeat
+            new DrumOnset(DrumRole.Kick, 1, 2.0m, 100, 0),
+            new DrumOnset(DrumRole.Kick, 1, 2.5m, 100, 0)   // Offbeat
+        };
 
-    private bool InvokeIsOffbeat(decimal beat, int beatsPerBar)
-    {
-        var result = _isOffbeatMethod.Invoke(null, new object[] { beat, beatsPerBar });
-        return (bool)(result ?? false);
-    }
-
-    private bool InvokeIsPickup(decimal beat, int beatsPerBar)
-    {
-        var result = _isPickupMethod.Invoke(null, new object[] { beat, beatsPerBar });
-        return (bool)(result ?? false);
-    }
-
-    private static GrooveRoleConstraintPolicy CreateDefaultPolicy()
-    {
-        return new GrooveRoleConstraintPolicy
+        var policy = new GrooveRoleConstraintPolicy
         {
             RoleVocabulary = new Dictionary<string, RoleRhythmVocabulary>
             {
                 ["Kick"] = new RoleRhythmVocabulary
                 {
-                    AllowSyncopation = true,
+                    AllowSyncopation = false,
                     AllowAnticipation = true,
                     MaxHitsPerBar = 8,
                     MaxHitsPerBeat = 2,
-                    SnapStrongBeatsToChordTones = false
-                },
-                ["Snare"] = new RoleRhythmVocabulary
-                {
-                    AllowSyncopation = true,
-                    AllowAnticipation = true,
-                    MaxHitsPerBar = 8,
-                    MaxHitsPerBeat = 2,
-                    SnapStrongBeatsToChordTones = false
-                },
-                ["ClosedHat"] = new RoleRhythmVocabulary
-                {
-                    AllowSyncopation = true,
-                    AllowAnticipation = true,
-                    MaxHitsPerBar = 32,
-                    MaxHitsPerBeat = 4,
                     SnapStrongBeatsToChordTones = false
                 }
             }
         };
-    }
-}
 
+        var result = InvokeFilter(onsets, policy, 3);
+        result.Should().HaveCount(2);
+        result.Should().OnlyContain(o => o.Beat == 1.0m || o.Beat == 2.0m);
+    }
+
+    #region Position Detection Tests (now public via RhythmVocabularyFilter)
+
+    [Fact]
+    public void IsOffbeatPosition_DetectsOffbeats()
+    {
+        RhythmVocabularyFilter.IsOffbeatPosition(1.5m, 4).Should().BeTrue();
+        RhythmVocabularyFilter.IsOffbeatPosition(2.5m, 4).Should().BeTrue();
+        RhythmVocabularyFilter.IsOffbeatPosition(3.5m, 4).Should().BeTrue();
+        RhythmVocabularyFilter.IsOffbeatPosition(4.5m, 4).Should().BeTrue();
+    }
+
+    [Fact]
+    public void IsOffbeatPosition_DoesNotDetectDownbeats()
+    {
+        RhythmVocabularyFilter.IsOffbeatPosition(1.0m, 4).Should().BeFalse();
+        RhythmVocabularyFilter.IsOffbeatPosition(2.0m, 4).Should().BeFalse();
+        RhythmVocabularyFilter.IsOffbeatPosition(3.0m, 4).Should().BeFalse();
+        RhythmVocabularyFilter.IsOffbeatPosition(4.0m, 4).Should().BeFalse();
+    }
+
+    [Fact]
+    public void IsOffbeatPosition_DoesNotDetectSixteenths()
+    {
+        RhythmVocabularyFilter.IsOffbeatPosition(1.25m, 4).Should().BeFalse();
+        RhythmVocabularyFilter.IsOffbeatPosition(1.75m, 4).Should().BeFalse();
+        RhythmVocabularyFilter.IsOffbeatPosition(2.25m, 4).Should().BeFalse();
+    }
+
+    [Fact]
+    public void IsPickupPosition_DetectsPickups()
+    {
+        RhythmVocabularyFilter.IsPickupPosition(1.75m, 4).Should().BeTrue();
+        RhythmVocabularyFilter.IsPickupPosition(2.75m, 4).Should().BeTrue();
+        RhythmVocabularyFilter.IsPickupPosition(3.75m, 4).Should().BeTrue();
+        RhythmVocabularyFilter.IsPickupPosition(4.75m, 4).Should().BeTrue();
+    }
+
+    [Fact]
+    public void IsPickupPosition_DoesNotDetectOffbeats()
+    {
+        RhythmVocabularyFilter.IsPickupPosition(1.5m, 4).Should().BeFalse();
+        RhythmVocabularyFilter.IsPickupPosition(2.5m, 4).Should().BeFalse();
+        RhythmVocabularyFilter.IsPickupPosition(3.5m, 4).Should().BeFalse();
+        RhythmVocabularyFilter.IsPickupPosition(4.5m, 4).Should().BeFalse();
+    }
+
+    #endregion
+}

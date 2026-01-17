@@ -27,7 +27,7 @@ Move groove-related logic out of `DrumTrackGeneratorNew` into reusable, generato
 
 ---
 
-## Phase 0: Baseline Lock (must-do, quick)
+## Phase 0: Baseline Lock (must-do, quick)   (COMPLETED)
 
 ### Story G0: Freeze current drum output with a “golden test”
 **As a** developer  
@@ -68,7 +68,7 @@ Move groove-related logic out of `DrumTrackGeneratorNew` into reusable, generato
 
 ---
 
-## Phase 2: Extract Onset Grid / Subdivision Logic
+## Phase 2: Extract Onset Grid / Subdivision Logic     (COMPLETED)
 
 ### Story G2: Create `OnsetGrid` and `OnsetGridBuilder`
 **As a** developer  
@@ -91,7 +91,7 @@ Move groove-related logic out of `DrumTrackGeneratorNew` into reusable, generato
 
 ---
 
-## Phase 3: Extract Rhythm Vocabulary Classification (syncopation/anticipation)
+## Phase 3: Extract Rhythm Vocabulary Classification (syncopation/anticipation)      (COMPLETED)
 
 ### Story G3: Create `RhythmVocabularyFilter` (grid-aware or v1)
 **As a** developer  

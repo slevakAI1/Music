@@ -88,7 +88,7 @@ namespace Music.Generator
             // Story 10 / Story G2: Filter onsets by allowed subdivision grid using shared OnsetGrid
             allOnsets = ApplySubdivisionFilter(allOnsets, groovePresetDefinition.ProtectionPolicy.SubdivisionPolicy, groovePresetDefinition.Identity.BeatsPerBar);
 
-            // Story 11: Filter onsets by syncopation/anticipation rules (rhythm vocabulary)
+            // Story 11 / Story G3: Filter onsets by syncopation/anticipation rules using shared RhythmVocabularyFilter
             allOnsets = ApplySyncopationAnticipationFilter(allOnsets, groovePresetDefinition.ProtectionPolicy.RoleConstraintPolicy, groovePresetDefinition.Identity.BeatsPerBar);
 
             // Story 6: Filter onsets by role presence (orchestration policy)
@@ -148,8 +148,8 @@ namespace Music.Generator
         }
 
         // AI: ApplySyncopationAnticipationFilter filters onsets based on rhythm vocabulary rules per role.
+        // AI: Story G3: Refactored to use shared RhythmVocabularyFilter; kept as convenience wrapper for backwards compatibility.
         // AI: AllowSyncopation=false removes offbeat onsets (.5 positions); AllowAnticipation=false removes pickup onsets (.75, anticipations).
-        // AI: deps=RoleRhythmVocabulary from GrooveRoleConstraintPolicy; returns filtered onset list.
         private static List<DrumOnset> ApplySyncopationAnticipationFilter(
             List<DrumOnset> onsets,
             GrooveRoleConstraintPolicy? roleConstraintPolicy,
@@ -158,67 +158,13 @@ namespace Music.Generator
             if (onsets == null || onsets.Count == 0)
                 return new List<DrumOnset>();
 
-            if (roleConstraintPolicy == null || roleConstraintPolicy.RoleVocabulary == null)
-                return onsets;
-
-            var filtered = new List<DrumOnset>();
-
-            foreach (var onset in onsets)
-            {
-                // Look up role vocabulary for this role
-                string roleName = onset.Role.ToString();
-                if (!roleConstraintPolicy.RoleVocabulary.TryGetValue(roleName, out var vocab))
-                {
-                    // No vocabulary defined for this role, allow by default
-                    filtered.Add(onset);
-                    continue;
-                }
-
-                // Determine if this onset is offbeat or pickup
-                bool isOffbeat = IsOffbeatPosition(onset.Beat, beatsPerBar);
-                bool isPickup = IsPickupPosition(onset.Beat, beatsPerBar);
-
-                // Apply syncopation filter
-                if (isOffbeat && !vocab.AllowSyncopation)
-                    continue; // Filter out this offbeat onset
-
-                // Apply anticipation filter
-                if (isPickup && !vocab.AllowAnticipation)
-                    continue; // Filter out this pickup onset
-
-                filtered.Add(onset);
-            }
-
-            return filtered;
-        }
-
-        // AI: IsOffbeatPosition checks if beat is on offbeat (.5 positions between main beats).
-        // AI: Examples in 4/4: 1.5, 2.5, 3.5, 4.5 are offbeats.
-        private static bool IsOffbeatPosition(decimal beat, int beatsPerBar)
-        {
-            // Offbeats are at .5 positions (eighth note offbeats)
-            decimal fractionalPart = beat - Math.Floor(beat);
-            return Math.Abs(fractionalPart - 0.5m) < 0.01m;
-        }
-
-        // AI: IsPickupPosition checks if beat is pickup/anticipation (.75 or similar leading to strong beat).
-        // AI: Examples in 4/4: 4.75 (anticipates beat 1), 2.75, etc.
-        private static bool IsPickupPosition(decimal beat, int beatsPerBar)
-        {
-            // Pickups are typically at .75 positions (16th note anticipations)
-            // or last 16th before downbeat
-            decimal fractionalPart = beat - Math.Floor(beat);
-            
-            // .75 positions (e.g., 4.75)
-            if (Math.Abs(fractionalPart - 0.75m) < 0.01m)
-                return true;
-
-            // Also check if it's within last 16th of bar (anticipating beat 1)
-            decimal beatInBar = ((beat - 1) % beatsPerBar) + 1;
-            if (beatInBar > beatsPerBar - 0.25m)
-                return true;
-
-            return false;
+            // Story G3: Use shared RhythmVocabularyFilter for cross-generator consistency
+            return RhythmVocabularyFilter.Filter(
+                onsets,
+                getRoleName: onset => onset.Role.ToString(),
+                getBeat: onset => onset.Beat,
+                beatsPerBar: beatsPerBar,
+                roleConstraintPolicy: roleConstraintPolicy);
         }
 
         // AI: ApplySubdivisionFilter restricts onsets to positions allowed by the subdivision policy flags.
