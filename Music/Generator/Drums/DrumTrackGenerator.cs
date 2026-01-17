@@ -38,7 +38,7 @@ namespace Music.Generator
     // AI: DrumBarContext removed in Story G1; replaced by shared Music.Generator.BarContext.
     // AI: change=Use BarContext from Music.Generator namespace for cross-generator bar context.
 
-    public static class DrumTrackGeneratorNew
+    public static class DrumTrackGenerator
     {
         // AI: MIDI drum note numbers (General MIDI standard); extend mapping as roles are added.
         private const int KickMidiNote = 36;

@@ -16,7 +16,7 @@ public class Story11_SyncopationAnticipationFilterTests
 
     public Story11_SyncopationAnticipationFilterTests()
     {
-        var type = typeof(DrumTrackGeneratorNew);
+        var type = typeof(DrumTrackGenerator);
         
         _filterMethod = type.GetMethod(
             "ApplySyncopationAnticipationFilter",

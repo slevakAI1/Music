@@ -14,7 +14,7 @@ public class Story12PhraseHookPolicyTests
 
     public Story12PhraseHookPolicyTests()
     {
-        var type = typeof(DrumTrackGeneratorNew);
+        var type = typeof(DrumTrackGenerator);
         
         _applyPhraseHookPolicyMethod = type.GetMethod(
             "ApplyPhraseHookPolicyToProtections",

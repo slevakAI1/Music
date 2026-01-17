@@ -15,7 +15,7 @@ public class Story10_SubdivisionGridFilterTests
     public Story10_SubdivisionGridFilterTests()
     {
         // Use reflection to access private ApplySubdivisionFilter method for testing
-        _applySubdivisionFilterMethod = typeof(DrumTrackGeneratorNew)
+        _applySubdivisionFilterMethod = typeof(DrumTrackGenerator)
             .GetMethod("ApplySubdivisionFilter", BindingFlags.NonPublic | BindingFlags.Static)
             ?? throw new InvalidOperationException("ApplySubdivisionFilter method not found");
     }

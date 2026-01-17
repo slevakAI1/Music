@@ -26,7 +26,7 @@ namespace Music.Generator
             // Resolve MIDI program numbers from VoiceSet
             int drumProgramNumber = GetProgramNumberForRole(songContext.Voices, "DrumKit", defaultProgram: 255);
 
-            var drumTrack = DrumTrackGeneratorNew.Generate(
+            var drumTrack = DrumTrackGenerator.Generate(
                  songContext.BarTrack,
                  songContext.SectionTrack,
                  songContext.SegmentGrooveProfiles,

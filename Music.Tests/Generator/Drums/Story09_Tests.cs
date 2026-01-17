@@ -33,7 +33,10 @@ namespace Music.Tests.Generator.Drums
                 ProtectionPolicy = new GrooveProtectionPolicy
                 {
                     Identity = new GroovePresetIdentity { BeatsPerBar = 4 },
-                    SubdivisionPolicy = new GrooveSubdivisionPolicy(),
+                    SubdivisionPolicy = new GrooveSubdivisionPolicy
+                    {
+                        AllowedSubdivisions = AllowedSubdivision.Quarter | AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth
+                    },
                     RoleConstraintPolicy = new GrooveRoleConstraintPolicy(),
                     PhraseHookPolicy = new GroovePhraseHookPolicy(),
                     TimingPolicy = new GrooveTimingPolicy(),
@@ -120,7 +123,7 @@ namespace Music.Tests.Generator.Drums
             };
 
             // Act
-            var result = DrumTrackGeneratorNew.Generate(
+            var result = DrumTrackGenerator.Generate(
                 barTrack,
                 sectionTrack,
                 segmentProfiles,
@@ -130,7 +133,7 @@ namespace Music.Tests.Generator.Drums
 
             // Assert: Verify kick at beat 3 was added (even though absent from anchors)
             var kickEvents = result.PartTrackNoteEvents
-                .Where(e => e.NoteNumber == DrumTrackGeneratorNew.GetMidiNoteNumber(DrumRole.Kick))
+                .Where(e => e.NoteNumber == DrumTrackGenerator.GetMidiNoteNumber(DrumRole.Kick))
                 .ToList();
 
             // Should have kick on beat 1 (bar 1), beat 3 (bar 1), beat 1 (bar 2), beat 3 (bar 2)
@@ -174,7 +177,7 @@ namespace Music.Tests.Generator.Drums
             };
 
             // Act
-            var result = DrumTrackGeneratorNew.Generate(
+            var result = DrumTrackGenerator.Generate(
                 barTrack,
                 sectionTrack,
                 segmentProfiles,
@@ -184,7 +187,7 @@ namespace Music.Tests.Generator.Drums
 
             // Assert: Verify kick at beat 1 exists (NeverRemove protection is enforced during generation)
             var kickEvents = result.PartTrackNoteEvents
-                .Where(e => e.NoteNumber == DrumTrackGeneratorNew.GetMidiNoteNumber(DrumRole.Kick))
+                .Where(e => e.NoteNumber == DrumTrackGenerator.GetMidiNoteNumber(DrumRole.Kick))
                 .ToList();
 
             var bar1Beat1Tick = barTrack.ToTick(barNumber: 1, onsetBeat: 1m);
@@ -227,7 +230,7 @@ namespace Music.Tests.Generator.Drums
             };
 
             // Act
-            var result = DrumTrackGeneratorNew.Generate(
+            var result = DrumTrackGenerator.Generate(
                 barTrack,
                 sectionTrack,
                 segmentProfiles,
@@ -237,7 +240,7 @@ namespace Music.Tests.Generator.Drums
 
             // Assert: Verify kick at beat 2 was removed
             var kickEvents = result.PartTrackNoteEvents
-                .Where(e => e.NoteNumber == DrumTrackGeneratorNew.GetMidiNoteNumber(DrumRole.Kick))
+                .Where(e => e.NoteNumber == DrumTrackGenerator.GetMidiNoteNumber(DrumRole.Kick))
                 .ToList();
 
             var bar1Beat2Tick = barTrack.ToTick(barNumber: 1, onsetBeat: 2m);
@@ -283,7 +286,7 @@ namespace Music.Tests.Generator.Drums
             };
 
             // Act
-            var result = DrumTrackGeneratorNew.Generate(
+            var result = DrumTrackGenerator.Generate(
                 barTrack,
                 sectionTrack,
                 segmentProfiles,
@@ -293,7 +296,7 @@ namespace Music.Tests.Generator.Drums
 
             // Assert: Verify protected hats are present (this is the baseline; future variations may prune them)
             var hatEvents = result.PartTrackNoteEvents
-                .Where(e => e.NoteNumber == DrumTrackGeneratorNew.GetMidiNoteNumber(DrumRole.ClosedHat))
+                .Where(e => e.NoteNumber == DrumTrackGenerator.GetMidiNoteNumber(DrumRole.ClosedHat))
                 .ToList();
 
             hatEvents.Should().HaveCountGreaterThanOrEqualTo(4,
@@ -342,7 +345,7 @@ namespace Music.Tests.Generator.Drums
             };
 
             // Act
-            var result = DrumTrackGeneratorNew.Generate(
+            var result = DrumTrackGenerator.Generate(
                 barTrack,
                 sectionTrack,
                 segmentProfiles,
@@ -352,7 +355,7 @@ namespace Music.Tests.Generator.Drums
 
             // Assert: Verify kick beat 2 was removed (NeverAdd), kick beats 1,3 present (MustHit)
             var kickEvents = result.PartTrackNoteEvents
-                .Where(e => e.NoteNumber == DrumTrackGeneratorNew.GetMidiNoteNumber(DrumRole.Kick))
+                .Where(e => e.NoteNumber == DrumTrackGenerator.GetMidiNoteNumber(DrumRole.Kick))
                 .ToList();
 
             var bar1Beat1Tick = barTrack.ToTick(barNumber: 1, onsetBeat: 1m);
@@ -365,7 +368,7 @@ namespace Music.Tests.Generator.Drums
 
             // Verify snare beats 2,4 present (MustHit + NeverRemove)
             var snareEvents = result.PartTrackNoteEvents
-                .Where(e => e.NoteNumber == DrumTrackGeneratorNew.GetMidiNoteNumber(DrumRole.Snare))
+                .Where(e => e.NoteNumber == DrumTrackGenerator.GetMidiNoteNumber(DrumRole.Snare))
                 .ToList();
 
             var bar1Beat2TickSnare = barTrack.ToTick(barNumber: 1, onsetBeat: 2m);
@@ -408,7 +411,7 @@ namespace Music.Tests.Generator.Drums
             };
 
             // Act
-            var result = DrumTrackGeneratorNew.Generate(
+            var result = DrumTrackGenerator.Generate(
                 barTrack,
                 sectionTrack,
                 segmentProfiles,
@@ -418,7 +421,7 @@ namespace Music.Tests.Generator.Drums
 
             // Assert: Verify all 4 kicks are present (MustHit applied because "Drive" tag enabled)
             var kickEvents = result.PartTrackNoteEvents
-                .Where(e => e.NoteNumber == DrumTrackGeneratorNew.GetMidiNoteNumber(DrumRole.Kick))
+                .Where(e => e.NoteNumber == DrumTrackGenerator.GetMidiNoteNumber(DrumRole.Kick))
                 .ToList();
 
             kickEvents.Should().HaveCount(4, "Drive protection layer adds MustHit for all 4 beats");
@@ -459,7 +462,7 @@ namespace Music.Tests.Generator.Drums
             };
 
             // Act
-            var result = DrumTrackGeneratorNew.Generate(
+            var result = DrumTrackGenerator.Generate(
                 barTrack,
                 sectionTrack,
                 segmentProfiles,
@@ -469,7 +472,7 @@ namespace Music.Tests.Generator.Drums
 
             // Assert: Verify only anchor kicks (beats 1,3) are present; Drive layer NOT applied
             var kickEvents = result.PartTrackNoteEvents
-                .Where(e => e.NoteNumber == DrumTrackGeneratorNew.GetMidiNoteNumber(DrumRole.Kick))
+                .Where(e => e.NoteNumber == DrumTrackGenerator.GetMidiNoteNumber(DrumRole.Kick))
                 .ToList();
 
             kickEvents.Should().HaveCount(2, "Drive protection layer not applied; only anchor onsets present");
@@ -495,7 +498,7 @@ namespace Music.Tests.Generator.Drums
             };
 
             // Act
-            var result = DrumTrackGeneratorNew.Generate(
+            var result = DrumTrackGenerator.Generate(
                 barTrack,
                 sectionTrack,
                 segmentProfiles,
@@ -508,7 +511,7 @@ namespace Music.Tests.Generator.Drums
             totalEvents.Should().BeGreaterThan(0, "anchor layer should produce onsets");
 
             var kickEvents = result.PartTrackNoteEvents
-                .Where(e => e.NoteNumber == DrumTrackGeneratorNew.GetMidiNoteNumber(DrumRole.Kick))
+                .Where(e => e.NoteNumber == DrumTrackGenerator.GetMidiNoteNumber(DrumRole.Kick))
                 .ToList();
             kickEvents.Should().HaveCount(2, "anchor layer has kick on beats 1,3");
         }

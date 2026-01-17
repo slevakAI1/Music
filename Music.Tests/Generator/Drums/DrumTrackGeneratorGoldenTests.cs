@@ -50,7 +50,7 @@ namespace Music.Tests.Generator.Drums
             var barTrack = CreateTestBarTrack();
 
             // Act: Generate drum track
-            var result = DrumTrackGeneratorNew.Generate(
+            var result = DrumTrackGenerator.Generate(
                 barTrack,
                 sectionTrack,
                 segmentProfiles,
