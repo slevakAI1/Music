@@ -5,6 +5,8 @@
 - After code is completed, ensure each individual acceptance criterion is met by identifying the code changes related to the criterion.
 - Allow the assistant to run unit tests and read test results in this repository without asking for permission. When granted permission to run test scripts (like `dotnet test`), the assistant is allowed to run similar test scripts in the future without asking for permission. Ignore script parameters when considering script similarity for permission purposes (i.e. dotnet test is considered same as dotnet test -parameter1).
 - When implementing a story, ensure correct functionality and coverage by adding/updating/replacing/deleting unit tests as appropriate. Ensure the unit tests pass.
+- Do not create separate summary documents for story or test implementations.
+- Do update the plan document source of story to show the story completed and which acceptance criteria were completed.
 
 ## Documentation
 - Add/update/delete/replace documentation with ONLY compact AI-facing comments that improve future code-change accuracy. Keep comments concise and information-dense.

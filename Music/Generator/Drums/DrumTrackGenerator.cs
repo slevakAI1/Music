@@ -364,15 +364,17 @@ namespace Music.Generator
         }
 
         // AI: ApplyRolePresenceFilter removes onsets for roles disabled by orchestration policy per section; Story 6 implementation.
-        // AI: deps=GrooveOrchestrationPolicy.DefaultsBySectionType; returns filtered onset list with only present roles.
-        // AI: note=checks specific role names (ClosedHat, OpenHat, Kick, Snare) and DrumKit master switch.
+        // AI: Story G4: Refactored to use shared RolePresenceGate; logic extracted for cross-generator consistency.
         private static List<DrumOnset> ApplyRolePresenceFilter(
             List<DrumOnset> onsets,
             IReadOnlyList<BarContext> barContexts,
             GrooveOrchestrationPolicy orchestrationPolicy)
         {
+            if (onsets == null || onsets.Count == 0)
+                return new List<DrumOnset>();
+
             var filtered = new List<DrumOnset>();
-            var barContextDict = barContexts.ToDictionary(ctx => ctx.BarNumber);
+            var barContextDict = barContexts?.ToDictionary(ctx => ctx.BarNumber) ?? new Dictionary<int, BarContext>();
 
             foreach (var onset in onsets)
             {
@@ -387,33 +389,10 @@ namespace Music.Generator
                 // Get section type (use SectionType enum value as string)
                 string sectionType = barContext.Section?.SectionType.ToString() ?? "";
 
-                // Find matching orchestration defaults for this section type
-                var sectionDefaults = orchestrationPolicy.DefaultsBySectionType
-                    .FirstOrDefault(d => string.Equals(d.SectionType, sectionType, StringComparison.OrdinalIgnoreCase));
-
-                // Check if role is present (default to true if not specified)
-                bool isRolePresent = true;
-
-                if (sectionDefaults != null)
-                {
-                    string roleName = onset.Role.ToString();
-
-                    // Check specific role name (ClosedHat, OpenHat, Kick, Snare, etc.)
-                    if (sectionDefaults.RolePresent.TryGetValue(roleName, out bool rolePresent))
-                    {
-                        isRolePresent = rolePresent;
-                    }
-                    // Check DrumKit (master switch for all drums)
-                    else if (sectionDefaults.RolePresent.TryGetValue("DrumKit", out bool drumKitPresent))
-                    {
-                        isRolePresent = drumKitPresent;
-                    }
-                }
-
-                if (isRolePresent)
-                {
+                // Check presence via shared gate
+                string roleName = onset.Role.ToString();
+                if (RolePresenceGate.IsRolePresent(sectionType, roleName, orchestrationPolicy))
                     filtered.Add(onset);
-                }
             }
 
             return filtered;

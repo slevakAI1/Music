@@ -114,9 +114,9 @@ Move groove-related logic out of `DrumTrackGeneratorNew` into reusable, generato
 
 ---
 
-## Phase 4: Extract Role Presence Gate
+## Phase 4: Extract Role Presence Gate   (COMPLETED)
 
-### Story G4: Create `RolePresenceGate`
+### Story G4: Create `RolePresenceGate`   (COMPLETED)
 **As a** developer  
 **I want** orchestration role presence checks in a shared helper  
 **So that** every generator uses identical role gating behavior
