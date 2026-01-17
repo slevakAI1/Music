@@ -65,6 +65,8 @@ namespace Music.Generator
         /// Story 8: adds protection hierarchy merger.
         /// Story 9: adds protection enforcement (must-hits, never-remove, never-add).
         /// Story 10: applies subdivision grid filter to onsets.
+        /// Story 11: applies syncopation/anticipation filter per role vocabulary.
+        /// Story 12: applies phrase hook policy (protect anchors in phrase-end windows).
         /// </summary>
         public static PartTrack Generate(
             BarTrack barTrack,
@@ -82,11 +84,17 @@ namespace Music.Generator
             // Story 8: Merge protection hierarchy layers
             var mergedProtections = MergeProtectionLayersPerBar(barContexts, groovePresetDefinition.ProtectionPolicy);
 
+            // Story 12: Apply phrase hook policy (protect anchors near phrase/section ends)
+            mergedProtections = ApplyPhraseHookPolicyToProtections(mergedProtections, barContexts, groovePresetDefinition.ProtectionPolicy.PhraseHookPolicy, groovePresetDefinition.Identity.BeatsPerBar);
+
             // Story 2: Extract anchor patterns from GroovePreset per bar
             var allOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars);
 
             // Story 10: Filter onsets by allowed subdivision grid (pre-anchor/variation filter step)
             allOnsets = ApplySubdivisionFilter(allOnsets, groovePresetDefinition.ProtectionPolicy.SubdivisionPolicy, groovePresetDefinition.Identity.BeatsPerBar);
+
+            // Story 11: Filter onsets by syncopation/anticipation rules (rhythm vocabulary)
+            allOnsets = ApplySyncopationAnticipationFilter(allOnsets, groovePresetDefinition.ProtectionPolicy.RoleConstraintPolicy, groovePresetDefinition.Identity.BeatsPerBar);
 
             // Story 6: Filter onsets by role presence (orchestration policy)
             var filteredOnsets = ApplyRolePresenceFilter(allOnsets, barContexts, groovePresetDefinition.ProtectionPolicy.OrchestrationPolicy);
@@ -142,6 +150,80 @@ namespace Music.Generator
             }
 
             return allOnsets;
+        }
+
+        // AI: ApplySyncopationAnticipationFilter filters onsets based on rhythm vocabulary rules per role.
+        // AI: AllowSyncopation=false removes offbeat onsets (.5 positions); AllowAnticipation=false removes pickup onsets (.75, anticipations).
+        // AI: deps=RoleRhythmVocabulary from GrooveRoleConstraintPolicy; returns filtered onset list.
+        private static List<DrumOnset> ApplySyncopationAnticipationFilter(
+            List<DrumOnset> onsets,
+            GrooveRoleConstraintPolicy? roleConstraintPolicy,
+            int beatsPerBar)
+        {
+            if (onsets == null || onsets.Count == 0)
+                return new List<DrumOnset>();
+
+            if (roleConstraintPolicy == null || roleConstraintPolicy.RoleVocabulary == null)
+                return onsets;
+
+            var filtered = new List<DrumOnset>();
+
+            foreach (var onset in onsets)
+            {
+                // Look up role vocabulary for this role
+                string roleName = onset.Role.ToString();
+                if (!roleConstraintPolicy.RoleVocabulary.TryGetValue(roleName, out var vocab))
+                {
+                    // No vocabulary defined for this role, allow by default
+                    filtered.Add(onset);
+                    continue;
+                }
+
+                // Determine if this onset is offbeat or pickup
+                bool isOffbeat = IsOffbeatPosition(onset.Beat, beatsPerBar);
+                bool isPickup = IsPickupPosition(onset.Beat, beatsPerBar);
+
+                // Apply syncopation filter
+                if (isOffbeat && !vocab.AllowSyncopation)
+                    continue; // Filter out this offbeat onset
+
+                // Apply anticipation filter
+                if (isPickup && !vocab.AllowAnticipation)
+                    continue; // Filter out this pickup onset
+
+                filtered.Add(onset);
+            }
+
+            return filtered;
+        }
+
+        // AI: IsOffbeatPosition checks if beat is on offbeat (.5 positions between main beats).
+        // AI: Examples in 4/4: 1.5, 2.5, 3.5, 4.5 are offbeats.
+        private static bool IsOffbeatPosition(decimal beat, int beatsPerBar)
+        {
+            // Offbeats are at .5 positions (eighth note offbeats)
+            decimal fractionalPart = beat - Math.Floor(beat);
+            return Math.Abs(fractionalPart - 0.5m) < 0.01m;
+        }
+
+        // AI: IsPickupPosition checks if beat is pickup/anticipation (.75 or similar leading to strong beat).
+        // AI: Examples in 4/4: 4.75 (anticipates beat 1), 2.75, etc.
+        private static bool IsPickupPosition(decimal beat, int beatsPerBar)
+        {
+            // Pickups are typically at .75 positions (16th note anticipations)
+            // or last 16th before downbeat
+            decimal fractionalPart = beat - Math.Floor(beat);
+            
+            // .75 positions (e.g., 4.75)
+            if (Math.Abs(fractionalPart - 0.75m) < 0.01m)
+                return true;
+
+            // Also check if it's within last 16th of bar (anticipating beat 1)
+            decimal beatInBar = ((beat - 1) % beatsPerBar) + 1;
+            if (beatInBar > beatsPerBar - 0.25m)
+                return true;
+
+            return false;
         }
 
         // AI: ApplySubdivisionFilter restricts onsets to positions allowed by the subdivision policy flags.
@@ -293,6 +375,68 @@ namespace Music.Generator
             }
 
             return result;
+        }
+
+        // AI: ApplyPhraseHookPolicyToProtections adds NeverRemove beats to protect anchors in phrase/section-end windows.
+        // AI: invariants=does not create new roles; only augments NeverRemoveOnsets when protection flags require it.
+        private static Dictionary<int, Dictionary<string, RoleProtectionSet>> ApplyPhraseHookPolicyToProtections(
+            Dictionary<int, Dictionary<string, RoleProtectionSet>> mergedProtectionsPerBar,
+            List<DrumBarContext> barContexts,
+            GroovePhraseHookPolicy? phraseHookPolicy,
+            int beatsPerBar)
+        {
+            if (phraseHookPolicy == null) return mergedProtectionsPerBar;
+
+            foreach (var ctx in barContexts)
+            {
+                if (!mergedProtectionsPerBar.TryGetValue(ctx.BarNumber, out var protectionsByRole))
+                {
+                    protectionsByRole = new Dictionary<string, RoleProtectionSet>(StringComparer.OrdinalIgnoreCase);
+                    mergedProtectionsPerBar[ctx.BarNumber] = protectionsByRole;
+                }
+
+                bool inPhraseEndWindow = phraseHookPolicy.AllowFillsAtPhraseEnd == false
+                    && phraseHookPolicy.PhraseEndBarsWindow > 0
+                    && ctx.BarsUntilSectionEnd >= 0
+                    && ctx.BarsUntilSectionEnd < phraseHookPolicy.PhraseEndBarsWindow;
+
+                bool inSectionEndWindow = phraseHookPolicy.AllowFillsAtSectionEnd == false
+                    && phraseHookPolicy.SectionEndBarsWindow > 0
+                    && ctx.BarsUntilSectionEnd >= 0
+                    && ctx.BarsUntilSectionEnd < phraseHookPolicy.SectionEndBarsWindow;
+
+                if (inPhraseEndWindow)
+                {
+                    if (phraseHookPolicy.ProtectDownbeatOnPhraseEnd)
+                    {
+                        foreach (var roleName in protectionsByRole.Keys.ToList())
+                        {
+                            var set = protectionsByRole[roleName] ?? new RoleProtectionSet();
+                            if (!set.NeverRemoveOnsets.Contains(1m))
+                                set.NeverRemoveOnsets.Add(1m);
+                            protectionsByRole[roleName] = set;
+                        }
+                    }
+
+                    if (phraseHookPolicy.ProtectBackbeatOnPhraseEnd)
+                    {
+                        var backbeats = new List<decimal>();
+                        if (beatsPerBar >= 2) backbeats.Add(2m);
+                        if (beatsPerBar >= 4) backbeats.Add(4m);
+
+                        foreach (var roleName in protectionsByRole.Keys.ToList())
+                        {
+                            var set = protectionsByRole[roleName] ?? new RoleProtectionSet();
+                            foreach (var b in backbeats)
+                                if (!set.NeverRemoveOnsets.Contains(b))
+                                    set.NeverRemoveOnsets.Add(b);
+                            protectionsByRole[roleName] = set;
+                        }
+                    }
+                }
+            }
+
+            return mergedProtectionsPerBar;
         }
 
         // AI: EnforceProtections applies merged protections to onset pool (Story 9).

@@ -8,11 +8,11 @@ using System.Reflection;
 
 namespace Music.Tests.Generator.Drums;
 
-public class Story10SubdivisionGridFilterTests
+public class Story10_SubdivisionGridFilterTests
 {
     private readonly MethodInfo _applySubdivisionFilterMethod;
 
-    public Story10SubdivisionGridFilterTests()
+    public Story10_SubdivisionGridFilterTests()
     {
         // Use reflection to access private ApplySubdivisionFilter method for testing
         _applySubdivisionFilterMethod = typeof(DrumTrackGeneratorNew)

@@ -516,22 +516,48 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-### Story 11: Implement Syncopation and Anticipation Filter
+### Story 11: Implement Syncopation and Anticipation Filter (COMPLETED)
 **As a** generator  
 **I want** to filter candidates by syncopation/anticipation rules  
 **So that** rhythm vocabulary is respected
 
 **Acceptance Criteria:**
-- [ ] If `AllowSyncopation=false`, filter onsets with `Strength=Offbeat`
-- [ ] If `AllowAnticipation=false`, filter onsets with `Strength=Pickup`
-- [ ] Apply per-role from `RoleRhythmVocabulary`
-- [ ] Handle both true/false cases correctly
+- [x] If `AllowSyncopation=false`, filter onsets with `Strength=Offbeat`
+- [x] If `AllowAnticipation=false`, filter onsets with `Strength=Pickup`
+- [x] Apply per-role from `RoleRhythmVocabulary`
+- [x] Handle both true/false cases correctly
 
 **Settings Handled:**
 - `RoleRhythmVocabulary.AllowSyncopation` (true/false)
 - `RoleRhythmVocabulary.AllowAnticipation` (true/false)
 
+**Implementation notes:**
+- `Music/Generator/Drums/DrumTrackGeneratorNew.cs` implements `ApplySyncopationAnticipationFilter` method.
+- Filter is applied after `ApplySubdivisionFilter` in the `Generate` pipeline (before role presence filtering).
+- Classifies onsets as offbeat (.5 positions) or pickup (.75 positions, anticipations).
+- `IsOffbeatPosition` detects eighth note offbeats (1.5, 2.5, 3.5, 4.5).
+- `IsPickupPosition` detects .75 anticipations and last 16th of bar.
+- Per-role filtering: looks up `RoleRhythmVocabulary` for each role and applies rules.
+- Missing vocabulary entries default to allow (no filtering).
+- **Audible difference**: If AllowSyncopation=false for a role, offbeat onsets are removed; if AllowAnticipation=false, pickup onsets are removed.
+
+**Test coverage:**
+- `Music.Tests/Generator/Drums/SyncopationAnticipationFilterTests.cs` - 18 tests covering:
+  - Null/empty input handling
+  - Null policy bypasses filter
+  - No vocabulary entry allows onsets
+  - AllowSyncopation true/false cases
+  - AllowAnticipation true/false cases
+  - Both false filters both types
+  - Different roles have different rules
+  - Onset properties preserved
+  - Offbeat position detection (1.5, 2.5, 3.5, 4.5)
+  - Pickup position detection (.75 positions)
+  - Non-offbeat/non-pickup positions not filtered
+  - Different time signatures (3/4)
+
 ---
+
 
 ### Story 12: Implement Phrase Hook Policy
 **As a** generator  

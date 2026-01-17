@@ -8,7 +8,7 @@ using Music.MyMidi;
 
 namespace Music.Tests.Generator.Drums
 {
-    public class Story9Tests
+    public class Story09_Tests
     {
         #region Test Data Builders
 
