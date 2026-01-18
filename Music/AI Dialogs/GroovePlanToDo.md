@@ -112,7 +112,7 @@
 
 ---
 
-### Story B2 — Implement Candidate Filtering (Group + Candidate Tags)
+### Story B2 — Implement Candidate Filtering (Group + Candidate Tags) (COMPLETED)
 **As a** generator  
 **I want** candidates filtered by active tags and phrase/fill windows  
 **So that** only appropriate variations are considered per segment/bar
