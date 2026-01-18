@@ -31,7 +31,7 @@
 
 # EPIC: Groove Core Completion (Drummer-Ready)
 
-## Phase A — Prep: Stable Groove Interfaces + Deterministic RNG Streams
+## Phase A — Prep: Stable Groove Interfaces + Deterministic RNG Streams   (COMPLETED)
 
 ### Story A1 — Define Groove Output Contracts (Drummer-Ready) (COMPLETED)
 **As a** developer  
@@ -93,7 +93,7 @@
 
 ## Phase B — Variation Engine (Works with catalog today, supports operator engine later)
 
-### Story B1 — Implement Variation Layer Merge (Catalog Merge)
+### Story B1 — Implement Variation Layer Merge (Catalog Merge) (COMPLETED)
 **As a** generator  
 **I want** variation layers merged with tag-gated additive/replace logic  
 **So that** candidates can be composed cleanly across style/base/refinement layers
