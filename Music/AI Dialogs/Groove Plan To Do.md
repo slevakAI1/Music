@@ -35,21 +35,29 @@ and acceptance criteria must be confirmed (by unit test(s) if possible) and chec
 
 ## Phase A — Prep: Stable Groove Interfaces + Deterministic RNG Streams
 
-### Story A1 — Define Groove Output Contracts (Drummer-Ready)
+### Story A1 — Define Groove Output Contracts (Drummer-Ready) (COMPLETED)
 **As a** developer  
 **I want** stable groove output types  
 **So that** drums (and later other roles) can consume groove decisions consistently
 
 **Acceptance Criteria:**
-- [ ] Create `GrooveBarContext` (or reuse/rename existing `DrumBarContext`) as an instrument-agnostic context model.
-- [ ] Create `GrooveOnset` record with fields at minimum: `Role`, `BarNumber`, `Beat`, `Strength?`, `Velocity?`, `TimingOffsetTicks?`, `Provenance?`, protection flags.
-- [ ] Create `GrooveBarPlan` containing:
-  - [ ] `BaseOnsets` (anchors)
-  - [ ] `SelectedVariationOnsets` (adds)
-  - [ ] `FinalOnsets` (after constraints)
-  - [ ] Optional `Diagnostics` reference (null when disabled)
-- [ ] Ensure existing drum generator can be refit to emit/consume `GrooveOnset` without changing audible output (Phase 1–4 behavior stays identical).
-- [ ] No new behavior changes beyond type plumbing.
+- [x] Create `GrooveBarContext` (or reuse/rename existing `DrumBarContext`) as an instrument-agnostic context model.
+- [x] Create `GrooveOnset` record with fields at minimum: `Role`, `BarNumber`, `Beat`, `Strength?`, `Velocity?`, `TimingOffsetTicks?`, `Provenance?`, protection flags.
+- [x] Create `GrooveBarPlan` containing:
+  - [x] `BaseOnsets` (anchors)
+  - [x] `SelectedVariationOnsets` (adds)
+  - [x] `FinalOnsets` (after constraints)
+  - [x] Optional `Diagnostics` reference (null when disabled)
+- [x] Ensure existing drum generator can be refit to emit/consume `GrooveOnset` without changing audible output (Phase 1–4 behavior stays identical).
+- [x] No new behavior changes beyond type plumbing.
+
+**Implementation Notes:**
+- Created `GrooveBarContext` in `Music/Generator/Groove/GrooveBarContext.cs` as an instrument-agnostic context with conversion methods from/to existing `BarContext`
+- Created `GrooveOnset` in `Music/Generator/Groove/GrooveOnset.cs` with all required fields: `Role` (string), `BarNumber`, `Beat`, `Strength?`, `Velocity?`, `TimingOffsetTicks?`, `Provenance?`, and protection flags (`IsMustHit`, `IsNeverRemove`, `IsProtected`)
+- Created `GrooveBarPlan` in `Music/Generator/Groove/GrooveBarPlan.cs` with `BaseOnsets`, `SelectedVariationOnsets`, `FinalOnsets`, optional `Diagnostics`, and `BarNumber`
+- All types are immutable records for deterministic behavior
+- Created comprehensive unit tests in `Music.Tests/Generator/Groove/GrooveOutputContractsTests.cs` - all 15 tests passing
+- Backward compatibility: existing `DrumOnset` and drum generator remain unchanged; new types are ready for future groove system integration
 
 ---
 
