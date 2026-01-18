@@ -61,7 +61,7 @@ and acceptance criteria must be confirmed (by unit test(s) if possible) and chec
 
 ---
 
-### Story A2 — Formalize Deterministic RNG Stream Policy
+### Story A2 — Formalize Deterministic RNG Stream Policy (COMPLETED)
 **As a** developer  
 **I want** a deterministic RNG stream contract per “random use case”  
 **So that** future drummer policies can add randomness without breaking reproducibility

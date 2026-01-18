@@ -10,10 +10,30 @@ namespace Music.Generator
 {
     /// <summary>
     /// Purpose enum identifies distinct Rng sequences for different generation contexts.
+    /// Story A2: Extended with groove-specific purposes for per-stream-key RNG instances.
     /// </summary>
     public enum RandomPurpose
     {
-        DrumGenerator
+        DrumGenerator,
+
+        // ===== Groove System Stream Keys (Story A2) =====
+        // Each GrooveRngStreamKey gets its own RandomPurpose for independent sequences
+
+        GrooveVariationGroupPick,
+        GrooveCandidatePick,
+        GrooveTieBreak,
+        GroovePrunePick,
+        GrooveDensityPick,
+        GrooveVelocityJitter,
+        GrooveGhostVelocityPick,
+        GrooveTimingJitter,
+        GrooveSwingJitter,
+        GrooveFillPick,
+        GrooveAccentPick,
+        GrooveGhostNotePick,
+        GrooveOrnamentPick,
+        GrooveCymbalPick,
+        GrooveDynamicsPick
     }
 
     // AI: public API=Initialize(seed), static NextInt(purpose[,min,max]), NextDouble(purpose); prefer static methods.
@@ -37,6 +57,7 @@ namespace Music.Generator
 
         /// <summary>
         /// Initializes the Rng dictionary with derived seeds for each Purpose. Call once at app start.
+        /// Story A2: Extended with groove-specific RNG instances for per-stream-key determinism.
         /// </summary>
         /// <param name="seed">Master seed for deriving per-Purpose seeds; default 12345.</param>
         public static void Initialize(int seed = 12345)
@@ -45,7 +66,24 @@ namespace Music.Generator
             
             _instances = new Dictionary<RandomPurpose, Rng>
             {
-                [RandomPurpose.DrumGenerator] = new Rng(masterRng.Next())
+                [RandomPurpose.DrumGenerator] = new Rng(masterRng.Next()),
+
+                // Groove system stream keys (Story A2) - each gets independent seed
+                [RandomPurpose.GrooveVariationGroupPick] = new Rng(masterRng.Next()),
+                [RandomPurpose.GrooveCandidatePick] = new Rng(masterRng.Next()),
+                [RandomPurpose.GrooveTieBreak] = new Rng(masterRng.Next()),
+                [RandomPurpose.GroovePrunePick] = new Rng(masterRng.Next()),
+                [RandomPurpose.GrooveDensityPick] = new Rng(masterRng.Next()),
+                [RandomPurpose.GrooveVelocityJitter] = new Rng(masterRng.Next()),
+                [RandomPurpose.GrooveGhostVelocityPick] = new Rng(masterRng.Next()),
+                [RandomPurpose.GrooveTimingJitter] = new Rng(masterRng.Next()),
+                [RandomPurpose.GrooveSwingJitter] = new Rng(masterRng.Next()),
+                [RandomPurpose.GrooveFillPick] = new Rng(masterRng.Next()),
+                [RandomPurpose.GrooveAccentPick] = new Rng(masterRng.Next()),
+                [RandomPurpose.GrooveGhostNotePick] = new Rng(masterRng.Next()),
+                [RandomPurpose.GrooveOrnamentPick] = new Rng(masterRng.Next()),
+                [RandomPurpose.GrooveCymbalPick] = new Rng(masterRng.Next()),
+                [RandomPurpose.GrooveDynamicsPick] = new Rng(masterRng.Next())
             };
         }
 
