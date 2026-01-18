@@ -142,7 +142,7 @@
 
 ---
 
-### Story B4 — Add “Operator Candidate Source” Hook (Reserved)
+### Story B4 — Add “Operator Candidate Source” Hook (COMPLETED)
 **As a** developer  
 **I want** a second candidate source interface  
 **So that** future operator-based drummer logic can supply candidates without changing the engine
