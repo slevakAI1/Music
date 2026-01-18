@@ -52,6 +52,7 @@
     <None Remove="AI Dialogs\Backlog.md" />
     <None Remove="AI Dialogs\Disconnect_Energy.md" />
     <None Remove="AI Dialogs\DrumFillStyleResearch.md" />
+    <None Remove="AI Dialogs\GroovePlan.md" />
     <None Remove="AI Dialogs\HarmonyPolicy.md" />
     <None Remove="AI Dialogs\MeasureTrackerPlan.md" />
     <None Remove="AI Dialogs\musical_energy_compilation.md" />
