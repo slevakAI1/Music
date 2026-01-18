@@ -5,6 +5,7 @@
 **When story unit tests are completed and passing, the story must be marked completed in this document
 and acceptance criteria must be confirmed (by unit test(s) if possible) and checked off.**
 **Use Rng() class for randomness**
+**All classes created by these stories should be groove-specific, not part-specific.**
 
 ---
 
