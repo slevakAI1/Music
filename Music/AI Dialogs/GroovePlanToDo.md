@@ -156,7 +156,7 @@
 
 ---
 
-## Phase C — Density & Caps (Selection count + hard guardrails)
+## Phase C — Density & Caps (Selection count + hard guardrails) (COMPLETED)
 
 ### Story C1 — Implement Density Target Computation (Role + Section + Policy)
 **As a** generator  
@@ -172,7 +172,7 @@
 
 ---
 
-### Story C2 — Select Until Target Reached (With Pool Exhaustion Safety)
+### Story C2 — Select Until Target Reached (With Pool Exhaustion Safety) (COMPLETED)
 **As a** generator  
 **I want** to select candidates until target count is reached  
 **So that** density controls how many additions happen
