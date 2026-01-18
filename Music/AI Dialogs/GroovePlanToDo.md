@@ -2,8 +2,6 @@
 **Scope:** Finish the *groove system* (selection + constraints + velocity + timing + overrides + diagnostics + tests) with **hooks ready** for a future “Pop Rock Human Drummer” epic.  
 **Non-goals in this plan:** implementing a specific drummer style, building a large candidate library, or adding heavy data curation.
 **All classes will use Music.Generator namespace and will be placed in the Generator/Groove subfolder**
-**When story unit tests are completed and passing, the story must be marked completed in this document
-and acceptance criteria must be confirmed (by unit test(s) if possible) and checked off.**
 **Use Rng() class for randomness**
 **All classes created by these stories should be groove-specific, not part-specific.**
 
@@ -74,7 +72,7 @@ and acceptance criteria must be confirmed (by unit test(s) if possible) and chec
 
 ---
 
-### Story A3 — Add Drummer Policy Hook (No Behavior Yet)
+### Story A3 — Add Drummer Policy Hook (No Behavior Yet) (COMPLETED)
 **As a** developer  
 **I want** optional external policy overrides  
 **So that** a future “human drummer model” can drive groove without refactors
