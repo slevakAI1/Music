@@ -1,9 +1,7 @@
 // AI: purpose=Define groove onset with all metadata required for complete groove pipeline from Story A1.
 // AI: invariants=Beat is 1-based within bar; BarNumber is 1-based; Velocity 1-127 when set; Role is instrument-agnostic string.
-// AI: deps=OnsetStrength from Groove.cs for strength classification; MaterialProvenance for provenance tracking.
-// AI: change=Story A1 defines stable output contract for groove system; replaces drum-specific DrumOnset in future stories.
-
-using Music.Song.Material;
+// AI: deps=OnsetStrength from Groove.cs for strength classification; GrooveOnsetProvenance for provenance tracking (Story G2).
+// AI: change=Story C3 updated to use GrooveOnsetProvenance instead of MaterialProvenance for groove-specific tracking.
 
 namespace Music.Generator
 {
@@ -55,7 +53,7 @@ namespace Music.Generator
         /// Origin tracking: where this onset came from (anchor, variation, etc.).
         /// Nullable: populated by Story G2 provenance system if diagnostics enabled.
         /// </summary>
-        public MaterialProvenance? Provenance { get; init; }
+        public GrooveOnsetProvenance? Provenance { get; init; }
 
         /// <summary>
         /// Must-hit onset: always included in final output, never removed by constraints.

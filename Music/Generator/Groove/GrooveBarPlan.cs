@@ -32,11 +32,11 @@ namespace Music.Generator
         public required IReadOnlyList<GrooveOnset> FinalOnsets { get; init; }
 
         /// <summary>
-        /// Optional diagnostics reference for decision tracing.
+        /// Optional diagnostics text for decision tracing.
         /// Null when diagnostics disabled (Story G1).
-        /// Reserved for future use; not implemented in Story A1.
+        /// Contains human-readable explanation of decisions made during generation.
         /// </summary>
-        public object? Diagnostics { get; init; }
+        public string? Diagnostics { get; init; }
 
         /// <summary>
         /// Bar number this plan applies to (1-based).

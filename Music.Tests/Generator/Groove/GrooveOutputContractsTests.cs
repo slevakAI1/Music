@@ -288,7 +288,7 @@ namespace Music.Generator.Tests
         public void GrooveBarPlan_SupportsOptionalDiagnostics()
         {
             // Arrange
-            var diagnostics = new { Message = "Test diagnostic data" };
+            var diagnostics = "Test diagnostic data";
 
             // Act
             var plan = new GrooveBarPlan
@@ -302,7 +302,7 @@ namespace Music.Generator.Tests
 
             // Assert
             Assert.NotNull(plan.Diagnostics);
-            Assert.Equal("Test diagnostic data", ((dynamic)plan.Diagnostics!).Message);
+            Assert.Equal("Test diagnostic data", plan.Diagnostics);
         }
 
         [Fact]
