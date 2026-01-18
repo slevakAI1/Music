@@ -126,7 +126,7 @@
 
 ---
 
-### Story B3 — Implement Weighted Candidate Selection (Deterministic)
+### Story B3 — Implement Weighted Candidate Selection (Deterministic) (COMPLETED)
 **As a** generator  
 **I want** weighted selection for variation candidates  
 **So that** variation is configurable but reproducible
