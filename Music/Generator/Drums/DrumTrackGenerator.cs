@@ -73,7 +73,6 @@ namespace Music.Generator
             var notes = new List<PartTrackEvent>();
 
             // Story 5: Build per-bar context (section, phrase position, segment profile)
-            // Story G1: Use shared BarContextBuilder instead of local BuildBarContexts
             var barContexts = BarContextBuilder.Build(sectionTrack, segmentProfiles, totalBars);
 
             // Story 8: Merge protection hierarchy layers per-bar using shared ProtectionPerBarBuilder
@@ -89,7 +88,7 @@ namespace Music.Generator
             // Story 2: Extract anchor patterns from GroovePreset per bar (drum-specific)
             var allOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars);
 
-            // Story 10 / Story G2: Filter onsets by allowed subdivision grid using shared OnsetGrid
+            // Story 10: Filter onsets by allowed subdivision grid using shared OnsetGrid
             var subdivisionPolicy = groovePresetDefinition.ProtectionPolicy?.SubdivisionPolicy;
             if (subdivisionPolicy != null)
             {
@@ -97,7 +96,7 @@ namespace Music.Generator
                 allOnsets = allOnsets.Where(o => grid.IsAllowed(o.Beat)).ToList();
             }
 
-            // Story 11 / Story G3: Filter onsets by syncopation/anticipation rules using shared RhythmVocabularyFilter
+            // Story 11 : Filter onsets by syncopation/anticipation rules using shared RhythmVocabularyFilter
             allOnsets = RhythmVocabularyFilter.Filter(
                 allOnsets,
                 getRoleName: onset => onset.Role.ToString(),
@@ -121,7 +120,7 @@ namespace Music.Generator
                     filteredOnsets.Add(onset);
             }
 
-            // Story G6: Use generic ProtectionApplier to enforce protections on DrumOnset events.
+            // Use generic ProtectionApplier to enforce protections on DrumOnset events.
             var enforcedOnsets = ProtectionApplier.Apply(
                 filteredOnsets,
                 mergedProtections,

@@ -470,7 +470,7 @@ Settings are applied in this order. Earlier settings establish constraints; late
 
 ---
 
-## Phase 4: Subdivision & Rhythm Vocabulary (Stories 10-12)
+## Phase 4: Subdivision & Rhythm Vocabulary (Stories 10-12) (COMPLETED)
 
 *Goal: Filter onsets by grid and rhythm rules.*
 
@@ -612,6 +612,8 @@ Settings are applied in this order. Earlier settings establish constraints; late
 ## Phase 5: Variation System (Stories 13-17)
 
 *Goal: Add variation candidates, filtering, and selection.*
+
+*Hard Rule - Each random number sequence needed must obtain an rng from class RNG() for it's use case
 
 ---
 

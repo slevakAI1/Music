@@ -1,0 +1,397 @@
+﻿# Groove System Completion Plan (Revised Agile Stories)
+**Scope:** Finish the *groove system* (selection + constraints + velocity + timing + overrides + diagnostics + tests) with **hooks ready** for a future “Pop Rock Human Drummer” epic.  
+**Non-goals in this plan:** implementing a specific drummer style, building a large candidate library, or adding heavy data curation.
+**All classes will use Music.Generator namespace and will be placed in the Generator/Groove subfolder**
+**When story unit tests are completed and passing, the story must be marked completed in this document
+and acceptance criteria must be confirmed (by unit test(s) if possible) and checked off.**
+**Use Rng() class for randomness**
+
+---
+
+## Guiding Principles (kept explicit in story AC)
+- Deterministic: same inputs + seeds => same output.
+- Modular: groove system remains mostly instrument-agnostic; drum generator consumes its outputs.
+- Explainable: every selection/prune decision can be traced (opt-in, zero behavior impact).
+- Drummer-ready: the system accepts “policy outputs” (operator enablement, density/texture overrides, performance biases) without refactors.
+
+---
+
+## Definition of “Groove System Done” (for this milestone)
+- Produces per-bar per-role **final onset list** with:
+  - anchors + selected variations
+  - constraint enforcement (caps/grid/vocabulary)
+  - onset strength classification
+  - per-onset velocity
+  - per-onset timing offsets (feel + role microtiming)
+- Supports segment overrides with merge policies.
+- Exposes a **stable hook interface** for a future DrummerPolicy / OperatorEngine.
+- Has tests that lock determinism + verify every enum/boolean handler.
+- Has diagnostics/tracing to explain decisions.
+
+---
+
+# EPIC: Groove Core Completion (Drummer-Ready)
+
+## Phase A — Prep: Stable Groove Interfaces + Deterministic RNG Streams
+
+### Story A1 — Define Groove Output Contracts (Drummer-Ready)
+**As a** developer  
+**I want** stable groove output types  
+**So that** drums (and later other roles) can consume groove decisions consistently
+
+**Acceptance Criteria:**
+- [ ] Create `GrooveBarContext` (or reuse/rename existing `DrumBarContext`) as an instrument-agnostic context model.
+- [ ] Create `GrooveOnset` record with fields at minimum: `Role`, `BarNumber`, `Beat`, `Strength?`, `Velocity?`, `TimingOffsetTicks?`, `Provenance?`, protection flags.
+- [ ] Create `GrooveBarPlan` containing:
+  - [ ] `BaseOnsets` (anchors)
+  - [ ] `SelectedVariationOnsets` (adds)
+  - [ ] `FinalOnsets` (after constraints)
+  - [ ] Optional `Diagnostics` reference (null when disabled)
+- [ ] Ensure existing drum generator can be refit to emit/consume `GrooveOnset` without changing audible output (Phase 1–4 behavior stays identical).
+- [ ] No new behavior changes beyond type plumbing.
+
+---
+
+### Story A2 — Formalize Deterministic RNG Stream Policy
+**As a** developer  
+**I want** a deterministic RNG stream contract per “random use case”  
+**So that** future drummer policies can add randomness without breaking reproducibility
+
+**Acceptance Criteria:**
+- [ ] Define a canonical list of RNG stream keys (examples: `VariationGroupPick`, `CandidatePick`, `TieBreak`, `PrunePick`, `VelocityJitter`, `TimingJitter`).
+- [ ] Implement a helper: `RngFor(bar, role, streamKey)` (or equivalent) that derives stable seeds.
+- [ ] Replace any ad-hoc RNG usage in groove code paths with `RNG()` instances sourced via this helper.
+- [ ] Add a unit test: same song inputs => identical RNG draw sequences per stream key.
+
+---
+
+### Story A3 — Add Drummer Policy Hook (No Behavior Yet)
+**As a** developer  
+**I want** optional external policy overrides  
+**So that** a future “human drummer model” can drive groove without refactors
+
+**Acceptance Criteria:**
+- [ ] Define `IGroovePolicyProvider` (or similar) with method `GetPolicy(barContext, role) -> GroovePolicyDecision`.
+- [ ] `GroovePolicyDecision` supports optional overrides:
+  - [ ] `EnabledVariationTagsOverride`
+  - [ ] `Density01Override`
+  - [ ] `MaxEventsPerBarOverride`
+  - [ ] `RoleTimingFeelOverride`, `RoleTimingBiasTicksOverride`
+  - [ ] `VelocityBiasOverride` (simple additive or multiplier)
+  - [ ] `OperatorAllowList` (reserved for later; unused now)
+- [ ] Default provider returns “no overrides” and produces identical output to current system.
+- [ ] Unit test: enabling the hook with default provider does not change output.
+
+---
+
+## Phase B — Variation Engine (Works with catalog today, supports operator engine later)
+
+### Story B1 — Implement Variation Layer Merge (Catalog Merge)
+**As a** generator  
+**I want** variation layers merged with tag-gated additive/replace logic  
+**So that** candidates can be composed cleanly across style/base/refinement layers
+
+**Acceptance Criteria:**
+- [ ] Iterate `GrooveVariationCatalog.HierarchyLayers` in order.
+- [ ] Apply `AppliesWhenTagsAll` against bar’s enabled tags.
+- [ ] If `IsAdditiveOnly=true`, union candidate groups (dedupe by stable id).
+- [ ] If `IsAdditiveOnly=false`, replace the working set entirely.
+- [ ] Preserve deterministic ordering in the merged result (stable sort by layer order + group id).
+- [ ] Unit tests for:
+  - [ ] additive union behavior
+  - [ ] replace behavior
+  - [ ] tag-gated apply/skip
+  - [ ] deterministic ordering
+
+---
+
+### Story B2 — Implement Candidate Filtering (Group + Candidate Tags)
+**As a** generator  
+**I want** candidates filtered by active tags and phrase/fill windows  
+**So that** only appropriate variations are considered per segment/bar
+
+**Acceptance Criteria:**
+- [ ] Resolve enabled tags from: segment profile, phrase hook policy, and optional `GroovePolicyDecision.EnabledVariationTagsOverride`.
+- [ ] Filter `GrooveCandidateGroup` when any `GroupTags` intersects enabled tags.
+- [ ] Filter `GrooveOnsetCandidate` when `Tags` specified and intersects enabled tags.
+- [ ] Treat empty/null `GroupTags` and empty/null `Candidate.Tags` as “match all”.
+- [ ] Add a deterministic unit test that verifies filtering outcomes across multiple bars with different segment tags.
+
+---
+
+### Story B3 — Implement Weighted Candidate Selection (Deterministic)
+**As a** generator  
+**I want** weighted selection for variation candidates  
+**So that** variation is configurable but reproducible
+
+**Acceptance Criteria:**
+- [ ] Compute weight per candidate: `ProbabilityBias * Group.BaseProbabilityBias`.
+- [ ] Use `RngFor(bar, role, VariationPick)` for all selection randomness.
+- [ ] Implement deterministic tie-breaking (weight desc, then stable id).
+- [ ] Unit tests:
+  - [ ] same seed => identical selections
+  - [ ] different seed => different selections when multiple valid options exist
+  - [ ] zero/negative weights handled safely (treated as 0, or filtered out)
+
+---
+
+### Story B4 — Add “Operator Candidate Source” Hook (Reserved)
+**As a** developer  
+**I want** a second candidate source interface  
+**So that** future operator-based drummer logic can supply candidates without changing the engine
+
+**Acceptance Criteria:**
+- [ ] Define `IGrooveCandidateSource` returning candidate groups for `(barContext, role)`.
+- [ ] Default implementation adapts existing `GrooveVariationCatalog` into this interface.
+- [ ] Engine consumes `IGrooveCandidateSource` instead of directly reading the catalog.
+- [ ] No behavior change with the default adapter.
+- [ ] Add one unit test ensuring adapter output equals prior merged catalog output.
+
+---
+
+## Phase C — Density & Caps (Selection count + hard guardrails)
+
+### Story C1 — Implement Density Target Computation (Role + Section + Policy)
+**As a** generator  
+**I want** a consistent target-count calculation  
+**So that** busyness is controlled predictably
+
+**Acceptance Criteria:**
+- [ ] Read `RoleDensityTarget.Density01` and `RoleDensityTarget.MaxEventsPerBar`.
+- [ ] Apply `SectionRolePresenceDefaults.RoleDensityMultiplier[role]`.
+- [ ] Apply `GroovePolicyDecision.Density01Override` and/or `MaxEventsPerBarOverride` when provided.
+- [ ] Compute `TargetCount = round(Density01 * MaxEventsPerBar)` with clamping to `[0..MaxEventsPerBar]`.
+- [ ] Unit tests for rounding/clamping and multiplier impact.
+
+---
+
+### Story C2 — Select Until Target Reached (With Pool Exhaustion Safety)
+**As a** generator  
+**I want** to select candidates until target count is reached  
+**So that** density controls how many additions happen
+
+**Acceptance Criteria:**
+- [ ] Select candidates in weighted order with deterministic RNG.
+- [ ] Stop when target reached or candidate pool exhausted.
+- [ ] Do not exceed `MaxEventsPerBar` from density target (even if pool large).
+- [ ] Preserve protected/must-hit anchors; selection only adds.
+- [ ] Unit test: small pool + high density => selects all without error.
+
+---
+
+### Story C3 — Enforce Hard Caps (Per Bar / Per Beat / Per Role)
+**As a** generator  
+**I want** strict cap enforcement  
+**So that** output never turns into mush
+
+**Acceptance Criteria:**
+- [ ] Enforce `RoleRhythmVocabulary.MaxHitsPerBar`.
+- [ ] Enforce `RoleRhythmVocabulary.MaxHitsPerBeat`.
+- [ ] Enforce `GrooveRoleConstraintPolicy.RoleMaxDensityPerBar[role]`.
+- [ ] Enforce per-candidate `GrooveOnsetCandidate.MaxAddsPerBar`.
+- [ ] Enforce per-group `GrooveCandidateGroup.MaxAddsPerBar`.
+- [ ] Prune by deterministic policy:
+  - [ ] Never prune `IsMustHit` or `IsNeverRemove`.
+  - [ ] Prefer pruning non-protected, lowest-scored additions first.
+  - [ ] Use `RngFor(bar, role, PrunePick)` only when ties remain after stable sorting.
+- [ ] Unit tests cover each cap independently + combined caps.
+
+---
+
+## Phase D — Onset Strength + Velocity (Human realism hooks, still deterministic)
+
+### Story D1 — Implement Onset Strength Classification (All Meters)
+**As a** generator  
+**I want** consistent onset strength classification  
+**So that** velocity and timing policies can reference musical meaning
+
+**Acceptance Criteria:**
+- [ ] Classify `Downbeat` (beat 1 of bar).
+- [ ] Classify `Backbeat` for common meters:
+  - [ ] 4/4: beats 2 and 4
+  - [ ] 3/4: beat 2 (configurable fallback) and/or style default
+  - [ ] Other meters: define deterministic defaults (documented in code comments).
+- [ ] Classify `Strong` (e.g., beat 3 in 4/4) where applicable.
+- [ ] Classify `Offbeat` (.5 positions on eighth grid).
+- [ ] Classify `Pickup` (.75, anticipations) consistent with your existing detection.
+- [ ] Support explicit `GrooveOnsetCandidate.Strength` overriding computed strength when present.
+- [ ] Unit tests for 4/4 and 3/4 at minimum, including triplet grids.
+
+---
+
+### Story D2 — Implement Velocity Shaping (Role x Strength)
+**As a** generator  
+**I want** velocities shaped by role and strength  
+**So that** the groove has musical dynamics
+
+**Acceptance Criteria:**
+- [ ] Look up `GrooveAccentPolicy.RoleStrengthVelocity[role][strength]`.
+- [ ] Use `VelocityRule.Typical` + `VelocityRule.AccentBias`.
+- [ ] Clamp within `VelocityRule.Min/Max`.
+- [ ] For `Ghost`, use `GrooveAccentPolicy.RoleGhostVelocity[role]` when defined.
+- [ ] Apply `GroovePolicyDecision.VelocityBiasOverride` if provided.
+- [ ] Unit tests verify:
+  - [ ] lookups work
+  - [ ] missing lookups fall back to sensible defaults
+  - [ ] clamping works
+  - [ ] policy override affects output deterministically
+
+---
+
+## Phase E — Timing & Feel (Pocket hooks for drummer model)
+
+### Story E1 — Implement Feel Timing (Straight/Swing/Shuffle/Triplet)
+**As a** generator  
+**I want** feel timing applied deterministically  
+**So that** groove pocket is correct per style/segment
+
+**Acceptance Criteria:**
+- [ ] Read feel from `SegmentGrooveProfile.OverrideFeel` or fallback to `GrooveSubdivisionPolicy.Feel`.
+- [ ] Read swing amount from `OverrideSwingAmount01` or fallback to `SwingAmount01`.
+- [ ] Implement behaviors:
+  - [ ] `Straight`: no shift
+  - [ ] `Swing`: shift offbeats later proportional to swing amount
+  - [ ] `Shuffle`: map eighth offbeats toward triplet feel
+  - [ ] `TripletFeel`: quantize eligible subdivisions to triplet grid (bounded)
+- [ ] Ensure timing adjustments respect `AllowedSubdivisions` (no illegal slot creation).
+- [ ] Unit tests for each feel mode with swing at 0, 0.5, 1.0.
+
+---
+
+### Story E2 — Implement Role Timing Feel + Bias + Clamp
+**As a** generator  
+**I want** per-role microtiming applied with clamping  
+**So that** each role can sit ahead/behind and still stay safe
+
+**Acceptance Criteria:**
+- [ ] Read `GrooveTimingPolicy.RoleTimingFeel[role]`.
+- [ ] Convert feel to base tick offset:
+  - [ ] Ahead: negative
+  - [ ] OnTop: zero
+  - [ ] Behind: positive
+  - [ ] LaidBack: larger positive
+- [ ] Add `GrooveTimingPolicy.RoleTimingBiasTicks[role]`.
+- [ ] Apply `GroovePolicyDecision.RoleTimingFeelOverride` / `RoleTimingBiasTicksOverride` when provided.
+- [ ] Clamp by `GrooveTimingPolicy.MaxAbsTimingBiasTicks`.
+- [ ] Unit tests verify clamping and override precedence.
+
+---
+
+## Phase F — Override Merge Policy (Segment overrides without surprises)
+
+### Story F1 — Implement Override Merge Policy Enforcement
+**As a** developer  
+**I want** override merge behavior governed by policy  
+**So that** segment overrides behave predictably
+
+**Acceptance Criteria:**
+- [ ] Implement `OverrideReplacesLists` for:
+  - [ ] variation tags
+  - [ ] protection tags
+  - [ ] any per-segment list-based overrides used by groove
+- [ ] Implement `OverrideCanRemoveProtectedOnsets`:
+  - [ ] If false, protected never removed even under override
+  - [ ] If true, allow removal logic (only where your pipeline supports removal)
+- [ ] Implement `OverrideCanRelaxConstraints`:
+  - [ ] If true, segment caps can increase MaxHits/MaxEvents, otherwise base caps apply
+- [ ] Implement `OverrideCanChangeFeel`:
+  - [ ] If false, ignore segment feel/swing overrides
+- [ ] Unit tests cover all four booleans in both states with a small matrix.
+
+---
+
+## Phase G — Diagnostics & Explainability (required to evolve toward human level)
+
+### Story G1 — Add Groove Decision Trace (Opt-in, No Behavior Change)
+**As a** developer  
+**I want** an explain trace of groove decisions  
+**So that** debugging and future drummer tuning is practical
+
+**Acceptance Criteria:**
+- [ ] Add an opt-in diagnostics flag (config or parameter).
+- [ ] When enabled, capture per bar + role:
+  - [ ] enabled tags (after phrase/segment/policy)
+  - [ ] candidate groups count, candidate count
+  - [ ] filters applied and why (tag mismatch, never-add, grid invalid, etc.)
+  - [ ] density target inputs and computed target count
+  - [ ] selected candidates with weights/scores and RNG stream used
+  - [ ] prune events and reasons (cap violated, tie-break, protected preserved)
+  - [ ] final onset list summary
+- [ ] When disabled, diagnostics collection is zero-cost-ish and produces identical output.
+- [ ] Unit test: diagnostics on/off does not change generated notes.
+
+---
+
+### Story G2 — Add “Provenance” to Onsets
+**As a** developer  
+**I want** each onset to remember where it came from  
+**So that** later systems (drummer model, ducking, analysis) can reason about it
+
+**Acceptance Criteria:**
+- [ ] Add `Provenance` fields to `GrooveOnset`:
+  - [ ] `Source = Anchor | Variation`
+  - [ ] `GroupId`, `CandidateId` (nullable)
+  - [ ] `TagsSnapshot` (optional)
+- [ ] Ensure provenance does not affect sorting or output determinism.
+- [ ] Unit test: provenance fields are stable for identical runs.
+
+---
+
+## Phase H — Test Suite & Regression Locks (finish the groove system confidently)
+
+### Story H1 — Full Groove Phase Unit Tests (Core)
+**As a** developer  
+**I want** unit tests for each groove phase  
+**So that** behavior is verified and regressions are caught
+
+**Acceptance Criteria:**
+- [ ] Test: variation merge respects additive/replace/tag gating.
+- [ ] Test: candidate filtering by enabled tags and empty-tag semantics.
+- [ ] Test: deterministic weighted selection with stable tie-breaks.
+- [ ] Test: density computation with multipliers and overrides.
+- [ ] Test: caps enforcement (per bar, per beat, per role, per group, per candidate).
+- [ ] Test: onset strength classification for 4/4 and 3/4.
+- [ ] Test: velocity shaping lookups + clamp + ghost velocity.
+- [ ] Test: feel timing for all `GrooveFeel` values + swing amounts.
+- [ ] Test: role timing feel + bias + clamp + overrides.
+- [ ] Test: merge policy booleans matrix.
+- [ ] Test: diagnostics on/off produces identical events.
+
+---
+
+### Story H2 — End-to-End Groove Regression Snapshot (Golden Test)
+**As a** developer  
+**I want** a golden-file style regression test for a known groove preset  
+**So that** improvements don’t accidentally break determinism or musical guardrails
+
+**Acceptance Criteria:**
+- [ ] Create a deterministic test song fixture (existing `CreateTestGrooveD1` is fine).
+- [ ] Generate groove output and serialize a compact snapshot:
+  - [ ] per bar/role: beats, velocities, timing offsets
+- [ ] Assert snapshot matches expected output exactly.
+- [ ] Provide a controlled way to intentionally update the snapshot when behavior changes by design.
+
+---
+
+# NEXT EPIC (Not part of Groove Completion): Pop Rock Human Drummer Model
+**Goal:** Implement a Pop/Rock drummer policy provider and operator candidate source using the hooks added above.
+
+**Entry Criteria (must be true after this file’s plan is done):**
+- Groove system accepts `IGroovePolicyProvider` overrides.
+- Groove system accepts `IGrooveCandidateSource` (catalog adapter exists).
+- Diagnostics/provenance exist to measure and tune drummer behaviors.
+- Deterministic RNG stream policy exists and is used everywhere.
+
+---
+
+## Story Path Summary (from now to “Groove System Done”)
+1. A1 → A2 → A3  
+2. B1 → B2 → B3 → B4  
+3. C1 → C2 → C3  
+4. D1 → D2  
+5. E1 → E2  
+6. F1  
+7. G1 → G2  
+8. H1 → H2  
+
+---
