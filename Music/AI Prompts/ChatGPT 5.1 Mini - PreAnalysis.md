@@ -75,7 +75,6 @@ Stories follow this structure:
 - Performance optimization techniques
 
 ## Output Format
-
 Use clear markdown with headers for each section. Be concise but thorough. Focus on **understanding the problem**, not solving it.
 Output the response as markdown text in folder Music/AIPlans
 

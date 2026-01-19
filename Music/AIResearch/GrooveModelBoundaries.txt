@@ -1,0 +1,118 @@
+Groove module boundary (what should live here)
+
+If the groove module’s job is: given meter + subdivision grid + segment tags + policies + seed ⇒ emit a per-bar/per-role list of abstract onsets with “performance hints” (strength, suggested velocity, suggested timing offset, provenance, diagnostics), then everything from Phase D → H can stay in the groove module as long as it never touches instrument-specific concerns (note lengths, articulations, sticking/limb constraints, MIDI channel/patch mapping, register/range, voicings, polyphony rules, etc.).
+
+A clean rule:
+
+Groove module = “when” + “how hard” + “how early/late” + “why (provenance/trace)”
+
+Part note generator = “what note(s)” + “how long” + “how it’s played on that instrument” + “how it maps to MIDI/audio”
+
+Story-by-story sanity check (Phase D → H)
+Phase D — Onset Strength + Velocity
+
+D1 — Onset Strength Classification (All Meters) ✅ Groove module
+
+Purely rhythmic semantics derived from meter + subdivision grid + beat position + epsilon.
+
+No instrument knowledge required.
+
+Keeping it in groove is correct and future-proof.
+
+D2 — Velocity Shaping (Role x Strength) ✅ Groove module (with one small caveat)
+
+It’s still groove if treated as suggested intensity for an onset, driven by role + strength + policy overrides, not by instrument samples/articulation.
+
+The caveat: your current AC uses MIDI 1..127. That’s not “instrument-specific,” but it is “rendering-domain-specific.”
+
+Best future-proof tweak (recommended): keep velocity shaping in groove, but store it as either:
+
+Velocity01 (0..1) and optionally SuggestedMidiVelocity as a convenience, or
+
+SuggestedVelocity with an explicit contract: “MIDI-like scalar, not final rendering.”
+
+Then the part generator can do the final mapping/clamping if it ever needs different curves per instrument.
+
+Bottom line: don’t move D2 out unless you later make velocity depend on drum-kit piece physics, instrument articulation, or sample layer logic.
+
+Phase E — Timing & Feel
+
+E1 — Feel Timing (Straight/Swing/Shuffle/Triplet) ✅ Groove module
+
+This is the definition of groove: grid interpretation + feel shift rules.
+
+As long as it outputs “timing offsets / adjusted slot positions” and respects AllowedSubdivisions, it’s groove-level.
+
+Keep it agnostic: it should not decide durations or note overlaps.
+
+E2 — Role Timing Feel + Bias + Clamp ✅ Groove module
+
+Still groove: per-role pocket (ahead/behind) is exactly what you want the drummer model to override later.
+
+Important boundary: role timing here should remain small offsets relative to the grid, not “human drummer limb simulation.” Limb/sticking constraints belong in the drummer model / part generator.
+
+Phase F — Override Merge Policy
+
+F1 — Override Merge Policy Enforcement ✅ Groove module
+
+This is purely about how groove configuration is merged (segment overrides vs base).
+
+No instrument coupling. Keep it in groove.
+
+Phase G — Diagnostics & Explainability
+
+G1 — Groove Decision Trace ✅ Groove module
+
+Trace belongs where the decisions happen.
+
+Keep it explicitly “no behavior impact.”
+
+G2 — Provenance on Onsets ✅ Groove module
+
+Provenance is metadata on groove outputs.
+
+Very useful later for ducking, analysis, and drummer tuning. Keep it here.
+
+Phase H — Tests & Regression Locks
+
+H1 — Full Groove Phase Unit Tests ✅ Groove module
+
+These tests should only assert groove outputs (onsets/strength/velocity/timing/provenance), not instrument notes.
+
+H2 — End-to-End Groove Regression Snapshot ✅ Groove module
+
+A golden snapshot of groove outputs is exactly what you want to prevent refactors later.
+
+Just keep it strictly at the groove output level (beats/slots + suggested velocity + timing offsets), not MIDI note numbers.
+
+The only real “refactor risk” I see
+
+It’s not that any of these stories belong in the part note generator. It’s that a couple of them can accidentally drift into instrument-land if you’re not strict:
+
+Velocity shaping (D2) can drift into “drum-piece realism” (snare vs hat vs kick curves, sample layers, articulations).
+
+Fix: define groove velocity as generic intensity and let the drummer model / part generator optionally remap it per instrument.
+
+Timing (E1/E2) can drift into “playability constraints” (two hands, sticking, pedal rules, flam/drag patterns).
+
+Fix: groove timing stays as suggested offsets; drummer model decides if/how those offsets become realistic drum performance gestures.
+
+If you hold those two lines, you will not need to rip code out of the groove module later.
+
+Concrete “keep it groove” contract (so you don’t refactor later)
+
+Make GrooveOnset explicitly carry hints, not final rendered truth:
+
+Beat / slot identity (grid-aligned)
+
+Strength (semantic)
+
+SuggestedVelocity (preferably 0..1 or “MIDI-like but abstract”)
+
+SuggestedTimingOffsetTicks (small, clamped)
+
+Provenance + Diagnostics
+
+Then the human drummer model (policy provider / operator source) can override those hints, and the percussion note generator can turn them into actual MIDI notes (which piece? what duration? flams? rolls? choke? etc.).
+
+That’s the clean separation you’re sanity-checking for—and your Phase D–H stories are compatible with it.
