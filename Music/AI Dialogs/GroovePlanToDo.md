@@ -278,6 +278,128 @@
   - [ ] clamping works
   - [ ] policy override affects output deterministically
 
+** Clarifying questions and answers for D2:
+
+8. VelocityBiasOverride semantics: is it strictly additive (int to add) or can it be multiplicative? Which interpretation should we implement for Story D2?
+Implement both, in a fixed, deterministic way: treat VelocityBiasOverride as (Multiplier, Additive) where multiplier is a double (default 1.0) and additive is an int (default 0). If your current GroovePolicyDecision only has one field, interpret it as additive for now unless it’s already modeled as a multiplier somewhere. Practically: Multiplier then Additive (see Q9).
+
+9. Override application order: should the policy override apply before or after AccentBias is added?
+Apply override after the strength lookup has been resolved into a base value. Order:
+
+base = Typical + AccentBias (from the resolved rule for role+strength)
+
+biased = round(base * Multiplier) + Additive
+
+clamp (see Q13)
+
+This makes override a true “final policy bias” and keeps the accent model internally consistent.
+
+10. Ghost handling precedence: if RoleGhostVelocity[role] exists AND RoleStrengthVelocity[role] contains an entry for OnsetStrength.Ghost, which should be used?
+RoleGhostVelocity[role] wins. Treat it as an explicit “ghost override” because it’s role-specialized and unambiguous.
+
+So precedence for Ghost strength is:
+
+If RoleGhostVelocity[role] exists → use it as the Typical velocity (with AccentBias treated as 0 unless you intentionally want ghost accents, which is usually wrong).
+
+Else if RoleStrengthVelocity[role][Ghost] exists → use that rule.
+
+Else fall back (see Q11).
+
+They are not mutually exclusive; the ghost dictionary is the override.
+
+11. Fallback defaults: when lookup fails (role missing or strength missing), what exact default should be used?
+Do not throw. Use deterministic, layered fallback:
+
+Fallback resolution order
+
+If RoleStrengthVelocity contains the role but not the strength:
+
+Try OnsetStrength.Offbeat for that role (it’s the safest “neutral” proxy).
+
+If Offbeat missing, take the first available strength entry for that role using a fixed priority order:
+Downbeat > Backbeat > Strong > Pickup > Offbeat (first one that exists).
+
+If role missing entirely: use a global default VelocityRule:
+
+Typical = 80, AccentBias = 0, Min = 1, Max = 127.
+
+For Ghost specifically, if no ghost rule exists, map Ghost → Offbeat under the same fallback rules above.
+
+12. Data types & rounding: are bias and AccentBias integers only? If fractional/multiplicative bias is supported later, how should rounding be handled?
+For Story D2, keep the stored rule values as ints (Typical, AccentBias, Min, Max). Allow policy override multiplier as double.
+
+Rounding rule (deterministic):
+
+After multiplication, round to nearest int, midpoint away from zero.
+
+Then apply additive int.
+
+So: biasedInt = (int)Math.Round(base * multiplier, MidpointRounding.AwayFromZero) + add;
+
+13. Min/Max enforcement scope: clamp to rule Min/Max OR also global MIDI 1..127?
+Both. Deterministic clamp order:
+
+Normalize the configured rule bounds into the legal MIDI domain (see Q17).
+
+Clamp velocity to [ruleMin..ruleMax].
+
+Clamp again to [1..127] (this second clamp becomes redundant if ruleMin/ruleMax were normalized, but it’s fine and defensive).
+
+14. Diagnostics: what minimal diagnostic fields are required per-onset for velocity shaping (rule used, pre-clamp value, override applied)?
+Minimal per-onset fields that are worth locking tests against:
+
+Role
+
+Strength (computed or overridden strength)
+
+RuleSource (e.g., RoleStrength, RoleGhost, FallbackRoleOffbeat, FallbackRoleFirst, FallbackGlobal)
+
+Typical
+
+AccentBias
+
+BaseVelocity (= Typical + AccentBias, or ghost typical)
+
+PolicyMultiplier (default 1.0)
+
+PolicyAdditive (default 0)
+
+PreClampVelocity
+
+RuleMin, RuleMax
+
+FinalVelocity
+
+That’s enough to explain every number without bloating the trace.
+
+15. Interaction with existing onset velocity: if an onset already has a velocity set (from anchors), should velocity shaping override it always, or only for variation-added onsets?
+Do not blindly override existing velocities. Use this rule:
+
+If GrooveOnset.Velocity is already set → leave it unchanged.
+
+If it’s null/unspecified → apply velocity shaping.
+
+This preserves anchor intent and avoids “surprising” changes when anchors were authored with explicit dynamics. If you later want global reshaping, make it an explicit opt-in policy flag (not part of Story D2).
+
+16. Concurrency / mutation: is it acceptable to update the Velocity in place, or should a new immutable output record be produced?
+Produce a new immutable output record (copy-with). Your groove output contracts are immutable records; keep that consistent:
+
+FinalOnsets = oldOnsets.Select(o => o with { Velocity = computed }).ToList();
+
+No in-place mutation of shared lists—cleaner determinism, fewer bugs, and thread-safe by default.
+
+17. If Min or Max are out of MIDI range, should they be normalized to [1..127] or treated as configuration error?
+Normalize (clamp) them to [1..127] at runtime and surface a diagnostic/validation issue (non-throwing). Treat it as a configuration mistake, but don’t break generation.
+
+Deterministic normalization rules:
+
+ruleMin = Clamp(ruleMin, 1, 127)
+
+ruleMax = Clamp(ruleMax, 1, 127)
+
+If after clamp ruleMin > ruleMax, swap them (or set both to the clamped typical—pick one and keep it consistent; I recommend swap for simplest determinism + least surprise).
+
+
 ---
 
 ## Phase E — Timing & Feel (Pocket hooks for drummer model)
