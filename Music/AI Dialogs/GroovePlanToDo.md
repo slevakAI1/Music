@@ -207,22 +207,40 @@
 
 ## Phase D — Onset Strength + Velocity (Human realism hooks, still deterministic)
 
-### Story D1 — Implement Onset Strength Classification (All Meters)
+### Story D1 — Implement Onset Strength Classification (All Meters) (COMPLETED)
 **As a** generator  
 **I want** consistent onset strength classification  
 **So that** velocity and timing policies can reference musical meaning
 
 **Acceptance Criteria:**
-- [ ] Classify `Downbeat` (beat 1 of bar).
-- [ ] Classify `Backbeat` for common meters:
-  - [ ] 4/4: beats 2 and 4
-  - [ ] 3/4: beat 2 (configurable fallback) and/or style default
-  - [ ] Other meters: define deterministic defaults (documented in code comments).
-- [ ] Classify `Strong` (e.g., beat 3 in 4/4) where applicable.
-- [ ] Classify `Offbeat` (.5 positions on eighth grid).
-- [ ] Classify `Pickup` (.75, anticipations) consistent with your existing detection.
-- [ ] Support explicit `GrooveOnsetCandidate.Strength` overriding computed strength when present.
-- [ ] Unit tests for 4/4 and 3/4 at minimum, including triplet grids.
+- [x] Classify `Downbeat` (beat 1 of bar).
+- [x] Classify `Backbeat` for common meters:
+  - [x] 4/4: beats 2 and 4
+  - [x] 3/4: beat 2 (configurable fallback) and/or style default
+  - [x] Other meters: define deterministic defaults (documented in code comments).
+- [x] Classify `Strong` (e.g., beat 3 in 4/4) where applicable.
+- [x] Classify `Offbeat` (.5 positions on eighth grid).
+- [x] Classify `Pickup` (.75, anticipations) consistent with your existing detection.
+- [x] Support explicit `GrooveOnsetCandidate.Strength` overriding computed strength when present.
+- [x] Unit tests for 4/4 and 3/4 at minimum, including triplet grids.
+
+**Implementation Notes:**
+- Created `OnsetStrengthClassifier` in `Music/Generator/Groove/OnsetStrengthClassifier.cs` with deterministic classification rules.
+- Implemented meter-specific rules for common meters (4/4, 3/4, 2/4, 6/8, 5/4, 7/4) with documented defaults.
+- Fallback rules for unusual meters: even beats for backbeat, odd beats beyond downbeat for strong.
+- Uses epsilon tolerance (0.002 beats) consistent with existing grid filters.
+- Explicit candidate strength always overrides computed classification.
+- Comprehensive test suite: 57 tests covering all meters, edge cases, triplet grids, and determinism.
+- All tests passing.
+
+**Meter-Specific Rules Documented in Code:**
+- **4/4:** Backbeats on 2 & 4, Strong on 3
+- **3/4:** Backbeat on 2, Strong on 3
+- **2/4:** Backbeat on 2, no additional strong beats
+- **6/8:** Backbeats on 2 & 4 (compound feel), Strong on 3 & 5
+- **5/4:** Backbeats on 2 & 4 (asymmetric), Strong on 3
+- **7/4:** Backbeats on 3 & 5 (asymmetric), Strong on 2, 4, 6
+- **Other:** Even beats = backbeat, odd beats beyond downbeat = strong
 
 ---
 
