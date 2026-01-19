@@ -32,7 +32,8 @@ namespace Music.Generator.Tests
             string role = "Kick";
             var streamKey = GrooveRngStreamKey.CandidatePick;
 
-            // Act - get same stream twice and draw from both
+            // Act - Initialize and draw first sequence
+            Rng.Initialize(42);
             var purpose1 = GrooveRngHelper.RngFor(barNumber, role, streamKey);
             var seq1 = new[] {
                 Rng.NextInt(purpose1, 0, 100),
@@ -40,7 +41,7 @@ namespace Music.Generator.Tests
                 Rng.NextInt(purpose1, 0, 100)
             };
 
-            // Reset RNG to same seed for second sequence
+            // Reset RNG to same seed and draw second sequence
             Rng.Initialize(42);
             var purpose2 = GrooveRngHelper.RngFor(barNumber, role, streamKey);
             var seq2 = new[] {
@@ -49,7 +50,7 @@ namespace Music.Generator.Tests
                 Rng.NextInt(purpose2, 0, 100)
             };
 
-            // Assert - sequences must be identical when RNG reset
+            // Assert - sequences must be identical when RNG reset to same seed
             Assert.Equal(seq1[0], seq2[0]);
             Assert.Equal(seq1[1], seq2[1]);
             Assert.Equal(seq1[2], seq2[2]);
