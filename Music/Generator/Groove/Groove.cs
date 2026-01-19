@@ -1,4 +1,4 @@
-﻿namespace Music.Generator
+namespace Music.Generator
 {
     // =========================
     // 1) Subdivision grid + swing/shuffle feel

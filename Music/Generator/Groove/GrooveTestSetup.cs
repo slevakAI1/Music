@@ -1,4 +1,4 @@
-﻿using Music.Generator;
+using Music.Generator;
 
 namespace Music.Generator
 {
