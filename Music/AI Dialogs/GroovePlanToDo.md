@@ -261,7 +261,7 @@
 
 ---
 
-### Story D2 — Implement Velocity Shaping (Role x Strength)
+### Story D2 — Implement Velocity Shaping (Role x Strength) (COMPLETED)
 **As a** generator  
 **I want** velocities shaped by role and strength  
 **So that** the groove has musical dynamics
