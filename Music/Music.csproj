@@ -49,18 +49,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="AI Dialogs\Backlog.md" />
-    <None Remove="AI Dialogs\Disconnect_Energy.md" />
-    <None Remove="AI Dialogs\DrumFillStyleResearch.md" />
-    <None Remove="AI Dialogs\GroovePlan.md" />
-    <None Remove="AI Dialogs\HarmonyPolicy.md" />
-    <None Remove="AI Dialogs\MeasureTrackerPlan.md" />
-    <None Remove="AI Dialogs\musical_energy_compilation.md" />
-    <None Remove="AI Dialogs\PlanV1.md" />
-    <None Remove="AI Dialogs\Story6.3-Implementation-Summary.md" />
-    <None Remove="AI Dialogs\Story9TestsSummary.md" />
-    <None Remove="AI Dialogs\Story_7_5_8_Usage_Guide.md" />
-    <None Remove="AI Dialogs\Story_9_1_Implementation_Summary.md" />
+    <None Remove="AI Prompts\Backlog.md" />
+    <None Remove="AI Prompts\Disconnect_Energy.md" />
+    <None Remove="AI Prompts\DrumFillStyleResearch.md" />
+    <None Remove="AI Prompts\GroovePlan.md" />
+    <None Remove="AI Prompts\HarmonyPolicy.md" />
+    <None Remove="AI Prompts\MeasureTrackerPlan.md" />
+    <None Remove="AI Prompts\musical_energy_compilation.md" />
+    <None Remove="AI Prompts\PlanV1.md" />
+    <None Remove="AI Prompts\Story6.3-Implementation-Summary.md" />
+    <None Remove="AI Prompts\Story9TestsSummary.md" />
+    <None Remove="AI Prompts\Story_7_5_8_Usage_Guide.md" />
+    <None Remove="AI Prompts\Story_9_1_Implementation_Summary.md" />
   </ItemGroup>
 
   <ItemGroup>
@@ -89,6 +89,7 @@
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
+    <Folder Include="AIResearch\" />
   </ItemGroup>
 
   <ItemGroup>
