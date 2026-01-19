@@ -99,9 +99,9 @@ public static class VelocityShaper
         // For Ghost resolved via RoleGhostVelocity, AccentBias is treated as 0 (already baked into Typical)
         int baseVelocity = rule.Typical + rule.AccentBias;
 
-        // Apply policy override (multiplier then additive)
-        // Current GroovePolicyDecision only has int? VelocityBiasOverride, treated as additive
-        double multiplier = 1.0; // Reserved for future VelocityMultiplierOverride
+        // Apply policy override (multiplier then additive) per Story D2 Q8-Q9
+        // Order: biased = round(base * multiplier, AwayFromZero) + additive
+        double multiplier = policyDecision?.VelocityMultiplierOverride ?? 1.0;
         int additive = policyDecision?.VelocityBiasOverride ?? 0;
 
         int biasedVelocity = (int)Math.Round(baseVelocity * multiplier, MidpointRounding.AwayFromZero) + additive;
@@ -131,7 +131,7 @@ public static class VelocityShaper
 
         int baseVelocity = rule.Typical + rule.AccentBias;
 
-        double multiplier = 1.0;
+        double multiplier = policyDecision?.VelocityMultiplierOverride ?? 1.0;
         int additive = policyDecision?.VelocityBiasOverride ?? 0;
 
         int preClampVelocity = (int)Math.Round(baseVelocity * multiplier, MidpointRounding.AwayFromZero) + additive;

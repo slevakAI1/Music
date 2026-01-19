@@ -48,12 +48,18 @@ namespace Music.Generator
         public int? RoleTimingBiasTicksOverride { get; init; }
 
         /// <summary>
-        /// Override velocity bias (simple additive or multiplier, interpretation TBD in Story D2).
-        /// When null, uses base velocity shaping from GrooveAccentPolicy.
-        /// Reserved for drummer model to adjust dynamics per phrase/bar.
-        /// Positive values increase velocity, negative values decrease.
+        /// Override velocity additive bias (applied after multiplier, per Story D2).
+        /// When null (default 0), no additive adjustment. Positive values increase velocity, negative decrease.
+        /// Order: base = Typical + AccentBias → biased = round(base * Multiplier) + Additive → clamp.
         /// </summary>
         public int? VelocityBiasOverride { get; init; }
+
+        /// <summary>
+        /// Override velocity multiplier (applied before additive, per Story D2 Q8).
+        /// When null (default 1.0), no multiplier adjustment. Values &gt;1.0 boost, &lt;1.0 reduce.
+        /// Order: base = Typical + AccentBias → biased = round(base * Multiplier) + Additive → clamp.
+        /// </summary>
+        public double? VelocityMultiplierOverride { get; init; }
 
         /// <summary>
         /// Reserved for future operator-based drummer logic.
@@ -78,6 +84,7 @@ namespace Music.Generator
             RoleTimingFeelOverride is not null ||
             RoleTimingBiasTicksOverride is not null ||
             VelocityBiasOverride is not null ||
+            VelocityMultiplierOverride is not null ||
             OperatorAllowList is not null;
     }
 }

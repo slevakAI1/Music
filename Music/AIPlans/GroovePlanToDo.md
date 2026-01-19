@@ -267,16 +267,26 @@
 **So that** the groove has musical dynamics
 
 **Acceptance Criteria:**
-- [ ] Look up `GrooveAccentPolicy.RoleStrengthVelocity[role][strength]`.
-- [ ] Use `VelocityRule.Typical` + `VelocityRule.AccentBias`.
-- [ ] Clamp within `VelocityRule.Min/Max`.
-- [ ] For `Ghost`, use `GrooveAccentPolicy.RoleGhostVelocity[role]` when defined.
-- [ ] Apply `GroovePolicyDecision.VelocityBiasOverride` if provided.
-- [ ] Unit tests verify:
-  - [ ] lookups work
-  - [ ] missing lookups fall back to sensible defaults
-  - [ ] clamping works
-  - [ ] policy override affects output deterministically
+- [x] Look up `GrooveAccentPolicy.RoleStrengthVelocity[role][strength]`.
+- [x] Use `VelocityRule.Typical` + `VelocityRule.AccentBias`.
+- [x] Clamp within `VelocityRule.Min/Max`.
+- [x] For `Ghost`, use `GrooveAccentPolicy.RoleGhostVelocity[role]` when defined.
+- [x] Apply `GroovePolicyDecision.VelocityBiasOverride` if provided.
+- [x] Apply `GroovePolicyDecision.VelocityMultiplierOverride` if provided (per Q8).
+- [x] Unit tests verify:
+  - [x] lookups work
+  - [x] missing lookups fall back to sensible defaults
+  - [x] clamping works
+  - [x] policy override affects output deterministically
+  - [x] multiplier and additive override order correct (per Q9)
+
+**Implementation Summary:**
+- `VelocityShaper` class in `Music/Generator/Groove/VelocityShaper.cs`
+- `GroovePolicyDecision` updated with `VelocityMultiplierOverride` field
+- Fallback chain: RoleGhostVelocity → RoleStrengthVelocity → Offbeat → first available → global default
+- Order: base = Typical + AccentBias → biased = round(base × Multiplier) + Additive → clamp
+- Diagnostics via `ComputeVelocityWithDiagnostics` with full `VelocityShapingDiagnostics` record
+- **Test Results**: 41 tests, 100% passing
 
 ## Story D2 — Clarifying Questions + Answers
 

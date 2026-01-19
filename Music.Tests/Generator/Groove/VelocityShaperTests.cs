@@ -321,6 +321,96 @@ public class VelocityShaperTests
     }
 
     // ========================================================================
+    // AC5b: Apply VelocityMultiplierOverride from policy decision (Story D2 Q8)
+    // ========================================================================
+
+    [Fact]
+    public void ComputeVelocity_MultiplierOverride_AppliesMultiplierGreaterThanOne()
+    {
+        var policy = CreateTestAccentPolicy();
+        var policyDecision = new GroovePolicyDecision { VelocityMultiplierOverride = 1.2 };
+
+        // Kick Downbeat: Typical=105, AccentBias=0, base=105, then *1.2 = 126
+        var velocity = VelocityShaper.ComputeVelocity("Kick", OnsetStrength.Downbeat, policy, policyDecision);
+
+        Assert.Equal(120, velocity); // round(105 * 1.2) = 126, clamped to rule Max=120
+    }
+
+    [Fact]
+    public void ComputeVelocity_MultiplierOverride_AppliesMultiplierLessThanOne()
+    {
+        var policy = CreateTestAccentPolicy();
+        var policyDecision = new GroovePolicyDecision { VelocityMultiplierOverride = 0.8 };
+
+        // Kick Downbeat: Typical=105, AccentBias=0, base=105, then *0.8 = 84
+        var (velocity, diag) = VelocityShaper.ComputeVelocityWithDiagnostics(
+            "Kick", OnsetStrength.Downbeat, policy, policyDecision);
+
+        Assert.Equal(0.8, diag.PolicyMultiplier);
+        Assert.Equal(84, diag.PreClampVelocity); // round(105 * 0.8) = 84
+        Assert.Equal(90, velocity); // Clamped to rule Min=90
+    }
+
+    [Fact]
+    public void ComputeVelocity_MultiplierAndAdditive_AppliesInCorrectOrder()
+    {
+        var policy = CreateTestAccentPolicy();
+        // Per Q9: biased = round(base * multiplier) + additive
+        var policyDecision = new GroovePolicyDecision 
+        { 
+            VelocityMultiplierOverride = 1.1, 
+            VelocityBiasOverride = 5 
+        };
+
+        // Kick Downbeat: base=105, round(105 * 1.1) = 116, then +5 = 121
+        // But clamped to rule Max=120
+        var (velocity, diag) = VelocityShaper.ComputeVelocityWithDiagnostics(
+            "Kick", OnsetStrength.Downbeat, policy, policyDecision);
+
+        Assert.Equal(1.1, diag.PolicyMultiplier);
+        Assert.Equal(5, diag.PolicyAdditive);
+        Assert.Equal(121, diag.PreClampVelocity); // round(105 * 1.1) + 5 = 116 + 5 = 121
+        Assert.Equal(120, velocity); // Clamped to rule Max=120
+    }
+
+    [Fact]
+    public void ComputeVelocity_MultiplierOverride_RoundsAwayFromZero()
+    {
+        var policy = new GrooveAccentPolicy
+        {
+            RoleStrengthVelocity = new Dictionary<string, Dictionary<OnsetStrength, VelocityRule>>
+            {
+                ["Test"] = new()
+                {
+                    [OnsetStrength.Downbeat] = new VelocityRule 
+                    { 
+                        Min = 1, Max = 127, Typical = 100, AccentBias = 0 
+                    }
+                }
+            }
+        };
+        // 100 * 0.995 = 99.5, should round to 100 (away from zero)
+        var policyDecision = new GroovePolicyDecision { VelocityMultiplierOverride = 0.995 };
+
+        var velocity = VelocityShaper.ComputeVelocity("Test", OnsetStrength.Downbeat, policy, policyDecision);
+
+        Assert.Equal(100, velocity); // 99.5 rounds to 100 (AwayFromZero)
+    }
+
+    [Fact]
+    public void ComputeVelocity_MultiplierOverride_NullUsesDefaultOne()
+    {
+        var policy = CreateTestAccentPolicy();
+        var policyDecision = new GroovePolicyDecision { VelocityMultiplierOverride = null, VelocityBiasOverride = 5 };
+
+        var (velocity, diag) = VelocityShaper.ComputeVelocityWithDiagnostics(
+            "Kick", OnsetStrength.Downbeat, policy, policyDecision);
+
+        Assert.Equal(1.0, diag.PolicyMultiplier); // Default multiplier
+        Assert.Equal(110, velocity); // 105 * 1.0 + 5 = 110
+    }
+
+    // ========================================================================
     // AC6: Fallback to sensible defaults when lookups fail
     // ========================================================================
 
