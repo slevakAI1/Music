@@ -20,16 +20,19 @@ public class OnsetStrengthClassifierTests
     [InlineData(5)] // 5/4
     [InlineData(6)] // 6/8
     [InlineData(7)] // 7/4
+    [InlineData(12)] // 12/8
     public void Classify_Beat1_ReturnsDownbeat_AllMeters(int beatsPerBar)
     {
-        var result = OnsetStrengthClassifier.Classify(1.0m, beatsPerBar);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(1.0m, beatsPerBar, grid);
         Assert.Equal(OnsetStrength.Downbeat, result);
     }
 
     [Fact]
     public void Classify_Beat1WithinEpsilon_ReturnsDownbeat()
     {
-        var result = OnsetStrengthClassifier.Classify(1.0009m, 4);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(1.0009m, 4, grid);
         Assert.Equal(OnsetStrength.Downbeat, result);
     }
 
@@ -40,14 +43,16 @@ public class OnsetStrengthClassifierTests
     [Fact]
     public void Classify_Beat2In4_4_ReturnsBackbeat()
     {
-        var result = OnsetStrengthClassifier.Classify(2.0m, 4);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(2.0m, 4, grid);
         Assert.Equal(OnsetStrength.Backbeat, result);
     }
 
     [Fact]
     public void Classify_Beat4In4_4_ReturnsBackbeat()
     {
-        var result = OnsetStrengthClassifier.Classify(4.0m, 4);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(4.0m, 4, grid);
         Assert.Equal(OnsetStrength.Backbeat, result);
     }
 
@@ -58,7 +63,8 @@ public class OnsetStrengthClassifierTests
     [Fact]
     public void Classify_Beat2In3_4_ReturnsBackbeat()
     {
-        var result = OnsetStrengthClassifier.Classify(2.0m, 3);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(2.0m, 3, grid);
         Assert.Equal(OnsetStrength.Backbeat, result);
     }
 
@@ -69,16 +75,17 @@ public class OnsetStrengthClassifierTests
     [Fact]
     public void Classify_Beat2In2_4_ReturnsBackbeat()
     {
-        var result = OnsetStrengthClassifier.Classify(2.0m, 2);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(2.0m, 2, grid);
         Assert.Equal(OnsetStrength.Backbeat, result);
     }
 
-    [Theory]
-    [InlineData(2)] // 6/8 beat 2
-    [InlineData(4)] // 6/8 beat 4
-    public void Classify_Beats2And4In6_8_ReturnsBackbeat(int beat)
+    [Fact]
+    public void Classify_Beat4In6_8_ReturnsBackbeat()
     {
-        var result = OnsetStrengthClassifier.Classify(beat, 6);
+        // 6/8 updated to compound meter: backbeat is beat 4 (second big pulse)
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(4.0m, 6, grid);
         Assert.Equal(OnsetStrength.Backbeat, result);
     }
 
@@ -87,7 +94,8 @@ public class OnsetStrengthClassifierTests
     [InlineData(4)] // 5/4 beat 4
     public void Classify_Beats2And4In5_4_ReturnsBackbeat(int beat)
     {
-        var result = OnsetStrengthClassifier.Classify(beat, 5);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(beat, 5, grid);
         Assert.Equal(OnsetStrength.Backbeat, result);
     }
 
@@ -96,7 +104,8 @@ public class OnsetStrengthClassifierTests
     [InlineData(5)] // 7/4 beat 5
     public void Classify_Beats3And5In7_4_ReturnsBackbeat(int beat)
     {
-        var result = OnsetStrengthClassifier.Classify(beat, 7);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(beat, 7, grid);
         Assert.Equal(OnsetStrength.Backbeat, result);
     }
 
@@ -107,30 +116,34 @@ public class OnsetStrengthClassifierTests
     [Fact]
     public void Classify_Beat3In4_4_ReturnsStrong()
     {
-        var result = OnsetStrengthClassifier.Classify(3.0m, 4);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(3.0m, 4, grid);
         Assert.Equal(OnsetStrength.Strong, result);
     }
 
     [Fact]
     public void Classify_Beat3In3_4_ReturnsStrong()
     {
-        var result = OnsetStrengthClassifier.Classify(3.0m, 3);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(3.0m, 3, grid);
         Assert.Equal(OnsetStrength.Strong, result);
     }
 
     [Theory]
     [InlineData(3)] // 6/8 beat 3
-    [InlineData(5)] // 6/8 beat 5
-    public void Classify_Beats3And5In6_8_ReturnsStrong(int beat)
+    [InlineData(6)] // 6/8 beat 6 (updated from 5 per new spec)
+    public void Classify_Beats3And6In6_8_ReturnsStrong(int beat)
     {
-        var result = OnsetStrengthClassifier.Classify(beat, 6);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(beat, 6, grid);
         Assert.Equal(OnsetStrength.Strong, result);
     }
 
     [Fact]
     public void Classify_Beat3In5_4_ReturnsStrong()
     {
-        var result = OnsetStrengthClassifier.Classify(3.0m, 5);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(3.0m, 5, grid);
         Assert.Equal(OnsetStrength.Strong, result);
     }
 
@@ -145,7 +158,8 @@ public class OnsetStrengthClassifierTests
     [InlineData(4.5)]
     public void Classify_HalfBeatPositions_ReturnsOffbeat_4_4(double beat)
     {
-        var result = OnsetStrengthClassifier.Classify((decimal)beat, 4);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify((decimal)beat, 4, grid);
         Assert.Equal(OnsetStrength.Offbeat, result);
     }
 
@@ -154,14 +168,16 @@ public class OnsetStrengthClassifierTests
     [InlineData(2.5)]
     public void Classify_HalfBeatPositions_ReturnsOffbeat_3_4(double beat)
     {
-        var result = OnsetStrengthClassifier.Classify((decimal)beat, 3);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify((decimal)beat, 3, grid);
         Assert.Equal(OnsetStrength.Offbeat, result);
     }
 
     [Fact]
     public void Classify_OffbeatWithinEpsilon_ReturnsOffbeat()
     {
-        var result = OnsetStrengthClassifier.Classify(1.5009m, 4);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(1.5009m, 4, grid);
         Assert.Equal(OnsetStrength.Offbeat, result);
     }
 
@@ -176,7 +192,8 @@ public class OnsetStrengthClassifierTests
     [InlineData(4.75)]
     public void Classify_PickupPositions_ReturnsPickup_4_4(double beat)
     {
-        var result = OnsetStrengthClassifier.Classify((decimal)beat, 4);
+        var grid = AllowedSubdivision.Sixteenth; // Sixteenth grid for .75 positions
+        var result = OnsetStrengthClassifier.Classify((decimal)beat, 4, grid);
         Assert.Equal(OnsetStrength.Pickup, result);
     }
 
@@ -185,21 +202,24 @@ public class OnsetStrengthClassifierTests
     [InlineData(2.75)]
     public void Classify_PickupPositions_ReturnsPickup_3_4(double beat)
     {
-        var result = OnsetStrengthClassifier.Classify((decimal)beat, 3);
+        var grid = AllowedSubdivision.Sixteenth; // Sixteenth grid for .75 positions
+        var result = OnsetStrengthClassifier.Classify((decimal)beat, 3, grid);
         Assert.Equal(OnsetStrength.Pickup, result);
     }
 
     [Fact]
     public void Classify_LastSixteenthOfBar_ReturnsPickup()
     {
-        var result = OnsetStrengthClassifier.Classify(4.75m, 4);
+        var grid = AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(4.75m, 4, grid);
         Assert.Equal(OnsetStrength.Pickup, result);
     }
 
     [Fact]
     public void Classify_PickupWithinEpsilon_ReturnsPickup()
     {
-        var result = OnsetStrengthClassifier.Classify(4.7509m, 4);
+        var grid = AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(4.7509m, 4, grid);
         Assert.Equal(OnsetStrength.Pickup, result);
     }
 
@@ -211,7 +231,8 @@ public class OnsetStrengthClassifierTests
     public void Classify_ExplicitStrengthProvided_ReturnsExplicitStrength()
     {
         // Beat 1 would normally be Downbeat, but override to Ghost
-        var result = OnsetStrengthClassifier.Classify(1.0m, 4, OnsetStrength.Ghost);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(1.0m, 4, grid, OnsetStrength.Ghost);
         Assert.Equal(OnsetStrength.Ghost, result);
     }
 
@@ -219,14 +240,16 @@ public class OnsetStrengthClassifierTests
     public void Classify_ExplicitBackbeatOverride_ReturnsBackbeat()
     {
         // Beat 1.5 would normally be Offbeat, but override to Backbeat
-        var result = OnsetStrengthClassifier.Classify(1.5m, 4, OnsetStrength.Backbeat);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(1.5m, 4, grid, OnsetStrength.Backbeat);
         Assert.Equal(OnsetStrength.Backbeat, result);
     }
 
     [Fact]
     public void Classify_NoExplicitStrength_ComputesFromPosition()
     {
-        var result = OnsetStrengthClassifier.Classify(2.0m, 4, null);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(2.0m, 4, grid, null);
         Assert.Equal(OnsetStrength.Backbeat, result);
     }
 
@@ -241,8 +264,9 @@ public class OnsetStrengthClassifierTests
     [InlineData(2.666667)] // Eighth triplet position 2
     public void Classify_TripletPositions_ReturnsDeterministicResult_4_4(double beat)
     {
-        // Triplet positions don't match .5 or .75 exactly, so should classify as Strong or fallback
-        var result = OnsetStrengthClassifier.Classify((decimal)beat, 4);
+        // Triplet positions with eighth grid should return Strong (not matching .5 or .75)
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify((decimal)beat, 4, grid);
         Assert.NotEqual(OnsetStrength.Offbeat, result);
         Assert.NotEqual(OnsetStrength.Pickup, result);
     }
@@ -252,7 +276,8 @@ public class OnsetStrengthClassifierTests
     [InlineData(1.833333)] // Sixteenth triplet
     public void Classify_SixteenthTripletPositions_ReturnsDeterministicResult(double beat)
     {
-        var result = OnsetStrengthClassifier.Classify((decimal)beat, 4);
+        var grid = AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify((decimal)beat, 4, grid);
         // Should not be classified as offbeat or pickup
         Assert.True(result == OnsetStrength.Strong || result == OnsetStrength.Downbeat || 
                     result == OnsetStrength.Backbeat);
@@ -265,8 +290,9 @@ public class OnsetStrengthClassifierTests
     [Fact]
     public void Classify_SameInputs_ProducesSameOutput()
     {
-        var result1 = OnsetStrengthClassifier.Classify(2.5m, 4);
-        var result2 = OnsetStrengthClassifier.Classify(2.5m, 4);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result1 = OnsetStrengthClassifier.Classify(2.5m, 4, grid);
+        var result2 = OnsetStrengthClassifier.Classify(2.5m, 4, grid);
         Assert.Equal(result1, result2);
     }
 
@@ -274,6 +300,7 @@ public class OnsetStrengthClassifierTests
     public void Classify_AllCommonBeatsIn4_4_Deterministic()
     {
         // Test all quarter and eighth positions for determinism
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
         var beats = new[] { 1.0m, 1.5m, 2.0m, 2.5m, 3.0m, 3.5m, 4.0m, 4.5m };
         var expected = new[]
         {
@@ -289,7 +316,7 @@ public class OnsetStrengthClassifierTests
 
         for (int i = 0; i < beats.Length; i++)
         {
-            var result = OnsetStrengthClassifier.Classify(beats[i], 4);
+            var result = OnsetStrengthClassifier.Classify(beats[i], 4, grid);
             Assert.Equal(expected[i], result);
         }
     }
@@ -297,6 +324,7 @@ public class OnsetStrengthClassifierTests
     [Fact]
     public void Classify_AllCommonBeatsIn3_4_Deterministic()
     {
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
         var beats = new[] { 1.0m, 1.5m, 2.0m, 2.5m, 3.0m, 3.5m };
         var expected = new[]
         {
@@ -310,7 +338,7 @@ public class OnsetStrengthClassifierTests
 
         for (int i = 0; i < beats.Length; i++)
         {
-            var result = OnsetStrengthClassifier.Classify(beats[i], 3);
+            var result = OnsetStrengthClassifier.Classify(beats[i], 3, grid);
             Assert.Equal(expected[i], result);
         }
     }
@@ -322,14 +350,16 @@ public class OnsetStrengthClassifierTests
     [Fact]
     public void Classify_ExactIntegerBeat_NoFloatingPointIssues()
     {
-        var result = OnsetStrengthClassifier.Classify(2m, 4);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(2m, 4, grid);
         Assert.Equal(OnsetStrength.Backbeat, result);
     }
 
     [Fact]
     public void Classify_VerySmallEpsilonOffset_CorrectlyClassified()
     {
-        var result = OnsetStrengthClassifier.Classify(1.0001m, 4);
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(1.0001m, 4, grid);
         Assert.Equal(OnsetStrength.Downbeat, result);
     }
 
@@ -339,7 +369,8 @@ public class OnsetStrengthClassifierTests
     [InlineData(2.25)] // Sixteenth position
     public void Classify_SixteenthPositions_NotOffbeatOrPickup(double beat)
     {
-        var result = OnsetStrengthClassifier.Classify((decimal)beat, 4);
+        var grid = AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify((decimal)beat, 4, grid);
         Assert.NotEqual(OnsetStrength.Offbeat, result);
         Assert.NotEqual(OnsetStrength.Pickup, result);
     }
@@ -354,16 +385,115 @@ public class OnsetStrengthClassifierTests
     [InlineData(13)] // 13/8
     public void Classify_UnusualMeters_UseDeterministicFallback(int beatsPerBar)
     {
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        
         // Beat 1 should always be downbeat
-        var result1 = OnsetStrengthClassifier.Classify(1.0m, beatsPerBar);
+        var result1 = OnsetStrengthClassifier.Classify(1.0m, beatsPerBar, grid);
         Assert.Equal(OnsetStrength.Downbeat, result1);
 
         // Offbeats should still be detected
-        var result2 = OnsetStrengthClassifier.Classify(1.5m, beatsPerBar);
+        var result2 = OnsetStrengthClassifier.Classify(1.5m, beatsPerBar, grid);
         Assert.Equal(OnsetStrength.Offbeat, result2);
 
-        // Pickups should still be detected
-        var result3 = OnsetStrengthClassifier.Classify(1.75m, beatsPerBar);
+        // Pickups should still be detected with sixteenth grid
+        var gridWithSixteenth = AllowedSubdivision.Sixteenth;
+        var result3 = OnsetStrengthClassifier.Classify(1.75m, beatsPerBar, gridWithSixteenth);
         Assert.Equal(OnsetStrength.Pickup, result3);
     }
+
+    // ========================================================================
+    // New tests for triplet grid detection (AC 5 + AC 7 from new story)
+    // ========================================================================
+
+    [Fact]
+    public void Classify_TripletGridOffbeat_ReturnsOffbeat()
+    {
+        // Middle triplet (1/3 position) with triplet grid should be offbeat
+        var grid = AllowedSubdivision.EighthTriplet;
+        var result = OnsetStrengthClassifier.Classify(1.333333m, 4, grid);
+        Assert.Equal(OnsetStrength.Offbeat, result);
+    }
+
+    [Fact]
+    public void Classify_TripletGridPickup_ReturnsPickup()
+    {
+        // Last triplet (2/3 position) with triplet grid should be pickup
+        var grid = AllowedSubdivision.EighthTriplet;
+        var result = OnsetStrengthClassifier.Classify(1.666667m, 4, grid);
+        Assert.Equal(OnsetStrength.Pickup, result);
+    }
+
+    [Fact]
+    public void Classify_TripletOffbeatMultipleBars_Deterministic()
+    {
+        var grid = AllowedSubdivision.EighthTriplet;
+        var beats = new[] { 1.333333m, 2.333333m, 3.333333m };
+        
+        foreach (var beat in beats)
+        {
+            var result = OnsetStrengthClassifier.Classify(beat, 4, grid);
+            Assert.Equal(OnsetStrength.Offbeat, result);
+        }
+    }
+
+    [Fact]
+    public void Classify_TripletPickupMultipleBars_Deterministic()
+    {
+        var grid = AllowedSubdivision.EighthTriplet;
+        var beats = new[] { 1.666667m, 2.666667m, 3.666667m };
+        
+        foreach (var beat in beats)
+        {
+            var result = OnsetStrengthClassifier.Classify(beat, 4, grid);
+            Assert.Equal(OnsetStrength.Pickup, result);
+        }
+    }
+
+    // ========================================================================
+    // New tests for 12/8 meter (AC 2.3 from new story)
+    // ========================================================================
+
+    [Fact]
+    public void Classify_12_8_Beat1_ReturnsDownbeat()
+    {
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(1.0m, 12, grid);
+        Assert.Equal(OnsetStrength.Downbeat, result);
+    }
+
+    [Fact]
+    public void Classify_12_8_Beat7_ReturnsBackbeat()
+    {
+        // 12/8: backbeat is beat 7 (midpoint pulse in compound meter)
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(7.0m, 12, grid);
+        Assert.Equal(OnsetStrength.Backbeat, result);
+    }
+
+    [Theory]
+    [InlineData(4)]  // 12/8 beat 4
+    [InlineData(10)] // 12/8 beat 10
+    public void Classify_12_8_Beats4And10_ReturnsStrong(int beat)
+    {
+        // 12/8: strong beats are 4 and 10 (middle of each pulse group)
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        var result = OnsetStrengthClassifier.Classify(beat, 12, grid);
+        Assert.Equal(OnsetStrength.Strong, result);
+    }
+
+    [Fact]
+    public void Classify_12_8_OffbeatsAndPickups_WorkAsExpected()
+    {
+        var grid = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth;
+        
+        // Offbeat at .5 positions
+        var offbeat = OnsetStrengthClassifier.Classify(1.5m, 12, grid);
+        Assert.Equal(OnsetStrength.Offbeat, offbeat);
+        
+        // Pickup at .75 positions (requires sixteenth grid)
+        var gridWithSixteenth = AllowedSubdivision.Sixteenth;
+        var pickup = OnsetStrengthClassifier.Classify(1.75m, 12, gridWithSixteenth);
+        Assert.Equal(OnsetStrength.Pickup, pickup);
+    }
 }
+

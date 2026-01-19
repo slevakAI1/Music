@@ -1,4 +1,4 @@
-﻿# Groove System Completion Plan (Revised Agile Stories)
+# Groove System Completion Plan (Revised Agile Stories)
 **Scope:** Finish the *groove system* (selection + constraints + velocity + timing + overrides + diagnostics + tests) with **hooks ready** for a future “Pop Rock Human Drummer” epic.  
 **Non-goals in this plan:** implementing a specific drummer style, building a large candidate library, or adding heavy data curation.
 **All classes will use Music.Generator namespace and will be placed in the Generator/Groove subfolder**
@@ -213,34 +213,51 @@
 **So that** velocity and timing policies can reference musical meaning
 
 **Acceptance Criteria:**
-- [x] Classify `Downbeat` (beat 1 of bar).
-- [x] Classify `Backbeat` for common meters:
-  - [x] 4/4: beats 2 and 4
-  - [x] 3/4: beat 2 (configurable fallback) and/or style default
-  - [x] Other meters: define deterministic defaults (documented in code comments).
-- [x] Classify `Strong` (e.g., beat 3 in 4/4) where applicable.
-- [x] Classify `Offbeat` (.5 positions on eighth grid).
-- [x] Classify `Pickup` (.75, anticipations) consistent with your existing detection.
-- [x] Support explicit `GrooveOnsetCandidate.Strength` overriding computed strength when present.
-- [x] Unit tests for 4/4 and 3/4 at minimum, including triplet grids.
+- [x] Classify `Downbeat` (beat 1 of bar) for all meters.
+- [x] Classify `Backbeat` using meter defaults table (2/4, 3/4, 4/4, 5/4, 6/8, 7/4, 12/8).
+- [x] Classify `Strong` using meter defaults table for required meters.
+- [x] For "other meters", apply deterministic fallback rule (even/odd number rules).
+- [x] Classify `Offbeat` relative to **active subdivision grid**:
+  - [x] Eighth grid: integer + 0.5
+  - [x] Triplet grid: integer + 1/3 (middle triplet)
+- [x] Classify `Pickup` as the **last subdivision before stronger beat**, relative to active grid:
+  - [x] Sixteenth grid: integer + 0.75
+  - [x] Triplet grid: integer + 2/3
+  - [x] Bar-end anticipation supported
+- [x] Use epsilon tolerance `0.002` beats for all comparisons.
+- [x] Support explicit `GrooveOnsetCandidate.Strength` overriding computed strength unconditionally.
+- [x] Updated all unit tests to include grid parameter (66 tests, 100% passing)
+- [x] Added triplet grid-specific tests (1.333, 1.666 handling)
+- [x] Added 12/8 meter tests
+- [x] Verified determinism with grid parameter
 
-**Implementation Notes:**
-- Created `OnsetStrengthClassifier` in `Music/Generator/Groove/OnsetStrengthClassifier.cs` with deterministic classification rules.
-- Implemented meter-specific rules for common meters (4/4, 3/4, 2/4, 6/8, 5/4, 7/4) with documented defaults.
-- Fallback rules for unusual meters: even beats for backbeat, odd beats beyond downbeat for strong.
-- Uses epsilon tolerance (0.002 beats) consistent with existing grid filters.
-- Explicit candidate strength always overrides computed classification.
-- Comprehensive test suite: 57 tests covering all meters, edge cases, triplet grids, and determinism.
-- All tests passing.
+**Implementation Summary:**
+- **BREAKING CHANGE**: Classifier signature now requires `AllowedSubdivision` parameter for grid-aware detection
+- Fully compliant with new Story D1 specification:
+  - Grid-aware offbeat/pickup detection (triplet and straight grids)
+  - 12/8 meter support (backbeat=7, strong=4,10)
+  - Refined fallback rules (even/odd meter formulas documented)
+  - Classification precedence: Pickup → Downbeat → Backbeat → Strong → Offbeat → fallback
+- All extension methods updated to include grid parameter
+- Code comments document all meter-specific rules and fallback formulas
+- **Test Results**: 66 tests, 100% passing, 4.6s build time
+- See `Music/AI Dialogs/StoryD1_Complete.md` for full implementation report
 
-**Meter-Specific Rules Documented in Code:**
-- **4/4:** Backbeats on 2 & 4, Strong on 3
+**Meter-Specific Rules Implemented:**
+- **2/4:** Backbeat on 2, no strong beats
 - **3/4:** Backbeat on 2, Strong on 3
-- **2/4:** Backbeat on 2, no additional strong beats
-- **6/8:** Backbeats on 2 & 4 (compound feel), Strong on 3 & 5
-- **5/4:** Backbeats on 2 & 4 (asymmetric), Strong on 3
-- **7/4:** Backbeats on 3 & 5 (asymmetric), Strong on 2, 4, 6
-- **Other:** Even beats = backbeat, odd beats beyond downbeat = strong
+- **4/4:** Backbeats on 2 & 4, Strong on 3
+- **5/4:** Backbeats on 2 & 4, Strong on 3
+- **6/8:** Backbeat on 4 (updated), Strong on 3 & 6 (updated)
+- **7/4:** Backbeats on 3 & 5, Strong on 2, 4, 6
+- **12/8:** Backbeat on 7 (NEW), Strong on 4 & 10 (NEW)
+- **Other:** Deterministic fallback: even=(N/2+1), odd=Ceil(N/2+0.5)
+
+**Configuration Note**:
+- 3/4 backbeat configuration belongs in `GrooveAccentPolicy` per specification
+- Current: hardcoded (future: configurable via policy)
+
+**Ready for Story D2 (Velocity Shaping)**
 
 ---
 

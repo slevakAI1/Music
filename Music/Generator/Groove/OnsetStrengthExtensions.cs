@@ -10,13 +10,19 @@ public static class OnsetStrengthExtensions
     /// Classifies a GrooveOnset and returns a new onset with the strength field populated.
     /// Respects existing strength value if already set.
     /// </summary>
-    public static GrooveOnset WithClassifiedStrength(this GrooveOnset onset, int beatsPerBar)
+    /// <param name="onset">The onset to classify</param>
+    /// <param name="beatsPerBar">Meter numerator</param>
+    /// <param name="allowedSubdivisions">Active subdivision grid for grid-relative detection</param>
+    public static GrooveOnset WithClassifiedStrength(
+        this GrooveOnset onset, 
+        int beatsPerBar,
+        AllowedSubdivision allowedSubdivisions)
     {
         // If strength already set, preserve it
         if (onset.Strength.HasValue)
             return onset;
 
-        var classified = OnsetStrengthClassifier.Classify(onset.Beat, beatsPerBar);
+        var classified = OnsetStrengthClassifier.Classify(onset.Beat, beatsPerBar, allowedSubdivisions);
         
         return onset with { Strength = classified };
     }
@@ -25,17 +31,33 @@ public static class OnsetStrengthExtensions
     /// Classifies a GrooveOnsetCandidate's strength based on its position.
     /// The candidate's explicit Strength field takes precedence over computed classification.
     /// </summary>
-    public static OnsetStrength GetEffectiveStrength(this GrooveOnsetCandidate candidate, int beatsPerBar)
+    /// <param name="candidate">The candidate to classify</param>
+    /// <param name="beatsPerBar">Meter numerator</param>
+    /// <param name="allowedSubdivisions">Active subdivision grid for grid-relative detection</param>
+    public static OnsetStrength GetEffectiveStrength(
+        this GrooveOnsetCandidate candidate, 
+        int beatsPerBar,
+        AllowedSubdivision allowedSubdivisions)
     {
-        return OnsetStrengthClassifier.Classify(candidate.OnsetBeat, beatsPerBar, candidate.Strength);
+        return OnsetStrengthClassifier.Classify(
+            candidate.OnsetBeat, 
+            beatsPerBar, 
+            allowedSubdivisions,
+            candidate.Strength);
     }
 
     /// <summary>
     /// Batch classifies all onsets in a list, preserving existing strength values.
     /// </summary>
-    public static List<GrooveOnset> ClassifyStrengths(this IEnumerable<GrooveOnset> onsets, int beatsPerBar)
+    /// <param name="onsets">Onsets to classify</param>
+    /// <param name="beatsPerBar">Meter numerator</param>
+    /// <param name="allowedSubdivisions">Active subdivision grid for grid-relative detection</param>
+    public static List<GrooveOnset> ClassifyStrengths(
+        this IEnumerable<GrooveOnset> onsets, 
+        int beatsPerBar,
+        AllowedSubdivision allowedSubdivisions)
     {
-        return onsets.Select(o => o.WithClassifiedStrength(beatsPerBar)).ToList();
+        return onsets.Select(o => o.WithClassifiedStrength(beatsPerBar, allowedSubdivisions)).ToList();
     }
 }
 
@@ -48,17 +70,22 @@ public static class OnsetStrengthUsageExamples
     /// <summary>
     /// Example: Classify anchors extracted from GrooveInstanceLayer
     /// </summary>
+    /// <param name="anchor">The anchor layer containing base onsets</param>
+    /// <param name="barNumber">Bar number in the song</param>
+    /// <param name="beatsPerBar">Meter numerator</param>
+    /// <param name="allowedSubdivisions">Active subdivision grid</param>
     public static List<GrooveOnset> ClassifyAnchorOnsets(
         GrooveInstanceLayer anchor,
         int barNumber,
-        int beatsPerBar)
+        int beatsPerBar,
+        AllowedSubdivision allowedSubdivisions)
     {
         var onsets = new List<GrooveOnset>();
 
         // Extract kick anchors and classify
         foreach (var beat in anchor.KickOnsets)
         {
-            var strength = OnsetStrengthClassifier.Classify(beat, beatsPerBar);
+            var strength = OnsetStrengthClassifier.Classify(beat, beatsPerBar, allowedSubdivisions);
             onsets.Add(new GrooveOnset
             {
                 Role = GrooveRoles.Kick,
@@ -77,7 +104,7 @@ public static class OnsetStrengthUsageExamples
         // Extract snare anchors and classify
         foreach (var beat in anchor.SnareOnsets)
         {
-            var strength = OnsetStrengthClassifier.Classify(beat, beatsPerBar);
+            var strength = OnsetStrengthClassifier.Classify(beat, beatsPerBar, allowedSubdivisions);
             onsets.Add(new GrooveOnset
             {
                 Role = GrooveRoles.Snare,
@@ -99,14 +126,19 @@ public static class OnsetStrengthUsageExamples
     /// <summary>
     /// Example: Classify variation candidates, respecting explicit strength overrides
     /// </summary>
+    /// <param name="candidate">The candidate to classify</param>
+    /// <param name="beatsPerBar">Meter numerator</param>
+    /// <param name="allowedSubdivisions">Active subdivision grid</param>
     public static OnsetStrength GetCandidateStrength(
         GrooveOnsetCandidate candidate,
-        int beatsPerBar)
+        int beatsPerBar,
+        AllowedSubdivision allowedSubdivisions)
     {
         // Classifier automatically respects candidate.Strength if set
         return OnsetStrengthClassifier.Classify(
             candidate.OnsetBeat,
             beatsPerBar,
+            allowedSubdivisions,
             candidate.Strength
         );
     }
@@ -114,15 +146,20 @@ public static class OnsetStrengthUsageExamples
     /// <summary>
     /// Example: Filter candidates by strength (e.g., only allow ghost notes in specific bars)
     /// </summary>
+    /// <param name="candidates">Candidates to filter</param>
+    /// <param name="beatsPerBar">Meter numerator</param>
+    /// <param name="allowedSubdivisions">Active subdivision grid</param>
+    /// <param name="allowedStrengths">Allowed strength values</param>
     public static List<GrooveOnsetCandidate> FilterCandidatesByStrength(
         List<GrooveOnsetCandidate> candidates,
         int beatsPerBar,
+        AllowedSubdivision allowedSubdivisions,
         params OnsetStrength[] allowedStrengths)
     {
         var allowedSet = new HashSet<OnsetStrength>(allowedStrengths);
         
         return candidates
-            .Where(c => allowedSet.Contains(c.GetEffectiveStrength(beatsPerBar)))
+            .Where(c => allowedSet.Contains(c.GetEffectiveStrength(beatsPerBar, allowedSubdivisions)))
             .ToList();
     }
 
@@ -130,14 +167,18 @@ public static class OnsetStrengthUsageExamples
     /// Example: Prepare onsets for velocity shaping (Story D2)
     /// All onsets must have classified strength before velocity shaping.
     /// </summary>
+    /// <param name="onsets">Onsets to prepare</param>
+    /// <param name="beatsPerBar">Meter numerator</param>
+    /// <param name="allowedSubdivisions">Active subdivision grid</param>
     public static List<GrooveOnset> PrepareOnsetsForVelocityShaping(
         List<GrooveOnset> onsets,
-        int beatsPerBar)
+        int beatsPerBar,
+        AllowedSubdivision allowedSubdivisions)
     {
         return onsets
             .Select(o => o.Strength.HasValue 
                 ? o 
-                : o with { Strength = OnsetStrengthClassifier.Classify(o.Beat, beatsPerBar) })
+                : o with { Strength = OnsetStrengthClassifier.Classify(o.Beat, beatsPerBar, allowedSubdivisions) })
             .ToList();
     }
 }
