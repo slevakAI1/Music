@@ -412,7 +412,7 @@ Deterministic normalization rules:
 
 ## Phase E — Timing & Feel (Pocket hooks for drummer model)
 
-### Story E1 — Implement Feel Timing (Straight/Swing/Shuffle/Triplet)
+### Story E1 — Implement Feel Timing (Straight/Swing/Shuffle/Triplet)  (COMPLETED)
 **As a** generator  
 **I want** feel timing applied deterministically  
 **So that** groove pocket is correct per style/segment

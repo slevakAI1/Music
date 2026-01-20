@@ -1,18 +1,12 @@
 
 
-NOTE:  Choose Ask / ChatGPT 5.1 Mini for this prompt
-
-==================================================================================================
-
 #solution 
-#file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\GroovePlanToDo.md' 
-#file:'C:\Users\sleva\source\repos\Music\Music\AICompleted\GroovePlanCompletedStories.md'  
-#file:'C:\Users\sleva\source\repos\Music\Music\Generator\Groove\Groove.cs' 
-#file:'C:\Users\sleva\source\repos\Music\Music\Generator\Groove\GrooveTestSetup.cs'  
+#file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\CurrentEpic_Groove.md'
+#file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\ProjectArchitecture.md' 
 
 # Pre-Analysis Request for Agile Story Implementation
 
-I need you to analyze an agile story from our Groove System plan and provide **context and questions only** — no technical implementation suggestions.
+I need you to analyze an agile story from the current epic and provide **context and questions only** — no technical implementation suggestions.
 
 ## Story Format
 Stories follow this structure:
@@ -75,12 +69,11 @@ Stories follow this structure:
 - Performance optimization techniques
 
 ## Output Format
-Use clear markdown with headers for each section. Be concise but thorough. Focus on **understanding the problem**, not solving it.
-Output the response as markdown text in folder Music/AIPlans
+Use clear markdown with headers for each section. Be concise but thorough. 
+Write complete response to file PreAnalysis_<Story number>.md in Music/AIPlans folder. 
+Limit response in chat pane to 4 bullets only summarizing what was done.
 
 ---
 
-**Now analyze this story:**
-
-[Paste the story text from GroovePlanToDo.md here]
-
+Focus on **understanding the problem**, not solving it.
+Now analyze this story: E2
