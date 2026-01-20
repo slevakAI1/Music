@@ -1,7 +1,7 @@
-// AI: purpose=Enforce hard caps on groove onsets with policy-aware protection (Story C3, F1).
+// AI: purpose=Enforce hard caps on groove onsets with policy-aware protection (Story C3, F1, G1).
 // AI: invariants=IsMustHit/IsNeverRemove never pruned; IsProtected respects OverrideCanRemoveProtectedOnsets policy.
-// AI: deps=GrooveOverrideMergePolicy, OverrideMergePolicyEnforcer for removal decisions.
-// AI: change=Story F1: OverrideCanRemoveProtectedOnsets controls whether IsProtected onsets can be pruned.
+// AI: deps=GrooveOverrideMergePolicy, OverrideMergePolicyEnforcer, GrooveDiagnosticsCollector for decision tracing.
+// AI: change=Story G1: Uses structured GrooveDiagnosticsCollector instead of string diagnostics.
 
 using System;
 using System.Collections.Generic;
@@ -16,6 +16,7 @@ namespace Music.Generator
     /// <remarks>
     /// Story C3: Enforce Hard Caps (Per Bar / Per Beat / Per Role).
     /// Story F1: OverrideCanRemoveProtectedOnsets policy controls IsProtected onset pruning.
+    /// Story G1: Supports structured diagnostics via GrooveDiagnosticsCollector.
     /// 
     /// Enforcement order: Candidate caps -> Group caps -> Role density -> MaxHitsPerBar -> MaxHitsPerBeat
     /// 
@@ -32,6 +33,7 @@ namespace Music.Generator
     {
         /// <summary>
         /// Enforces all hard caps on a groove bar plan, pruning excess onsets deterministically.
+        /// Story G1: Supports optional structured diagnostics collection.
         /// </summary>
         /// <param name="barPlan">The bar plan with selected onsets to enforce caps on.</param>
         /// <param name="preset">The groove preset definition containing constraint policies.</param>
@@ -61,14 +63,21 @@ namespace Music.Generator
                 ? barPlan.FinalOnsets.ToList()
                 : barPlan.BaseOnsets.Concat(barPlan.SelectedVariationOnsets).ToList();
 
-            var diagnostics = diagnosticsEnabled ? new List<string>() : null;
+            // Story G1: Create collector for each role when diagnostics enabled
+            var roleCollectors = new Dictionary<string, GrooveDiagnosticsCollector>();
 
             // Group onsets by role for per-role enforcement
             var onsetsByRole = workingOnsets.GroupBy(o => o.Role).ToDictionary(g => g.Key, g => g.ToList());
 
             foreach (var (role, roleOnsets) in onsetsByRole)
             {
-                diagnostics?.Add($"Enforcing caps for role '{role}', bar {barPlan.BarNumber}, initial count: {roleOnsets.Count}");
+                // Story G1: Create collector for this role
+                GrooveDiagnosticsCollector? collector = null;
+                if (diagnosticsEnabled)
+                {
+                    collector = new GrooveDiagnosticsCollector(barPlan.BarNumber, role);
+                    roleCollectors[role] = collector;
+                }
 
                 // Enforce caps in order: candidate -> group -> role -> per-beat
                 var prunedOnsets = EnforceRoleCaps(
@@ -80,20 +89,33 @@ namespace Music.Generator
                     barPlan.BarNumber,
                     rngSeed,
                     effectivePolicy,
-                    diagnostics);
+                    collector);
 
                 onsetsByRole[role] = prunedOnsets;
+
+                // Story G1: Record final counts
+                collector?.RecordOnsetCounts(
+                    baseCount: barPlan.BaseOnsets.Count(o => o.Role == role),
+                    variationCount: barPlan.SelectedVariationOnsets.Count(o => o.Role == role),
+                    finalCount: prunedOnsets.Count);
             }
 
             // Flatten back to single list
             var finalOnsets = onsetsByRole.Values.SelectMany(o => o).OrderBy(o => o.Beat).ToList();
 
-            // TODO: Story G1 full integration - convert string diagnostics to structured GrooveBarDiagnostics
-            // For now, structured diagnostics are not populated by GrooveCapsEnforcer
+            // Story G1: Build diagnostics from first role collector (or null if disabled)
+            // Note: Full multi-role diagnostics would require a different GrooveBarPlan structure
+            GrooveBarDiagnostics? diagnostics = null;
+            if (diagnosticsEnabled && roleCollectors.Count > 0)
+            {
+                var firstCollector = roleCollectors.Values.First();
+                diagnostics = firstCollector.Build();
+            }
+
             return barPlan with
             {
                 FinalOnsets = finalOnsets,
-                Diagnostics = null
+                Diagnostics = diagnostics
             };
         }
 
@@ -106,25 +128,25 @@ namespace Music.Generator
             int barNumber,
             int rngSeed,
             GrooveOverrideMergePolicy mergePolicy,
-            List<string>? diagnostics)
+            GrooveDiagnosticsCollector? collector)
         {
             var workingOnsets = roleOnsets.ToList();
 
 
             // 1. Enforce per-candidate MaxAddsPerBar
-            workingOnsets = EnforceCandidateCaps(workingOnsets, variationCatalog, mergePolicy, diagnostics);
+            workingOnsets = EnforceCandidateCaps(workingOnsets, variationCatalog, mergePolicy, collector);
 
             // 2. Enforce per-group MaxAddsPerBar
-            workingOnsets = EnforceGroupCaps(workingOnsets, variationCatalog, mergePolicy, diagnostics);
+            workingOnsets = EnforceGroupCaps(workingOnsets, variationCatalog, mergePolicy, collector);
 
             // 3. Enforce RoleMaxDensityPerBar (global role cap)
-            workingOnsets = EnforceRoleMaxDensityPerBar(workingOnsets, role, preset, mergePolicy, diagnostics);
+            workingOnsets = EnforceRoleMaxDensityPerBar(workingOnsets, role, preset, mergePolicy, collector);
 
             // 4. Enforce RoleRhythmVocabulary.MaxHitsPerBar
-            workingOnsets = EnforceMaxHitsPerBar(workingOnsets, role, preset, mergePolicy, diagnostics);
+            workingOnsets = EnforceMaxHitsPerBar(workingOnsets, role, preset, mergePolicy, collector);
 
             // 5. Enforce RoleRhythmVocabulary.MaxHitsPerBeat
-            workingOnsets = EnforceMaxHitsPerBeat(workingOnsets, role, preset, barNumber, rngSeed, mergePolicy, diagnostics);
+            workingOnsets = EnforceMaxHitsPerBeat(workingOnsets, role, preset, barNumber, rngSeed, mergePolicy, collector);
 
             return workingOnsets;
         }
@@ -133,7 +155,7 @@ namespace Music.Generator
             List<GrooveOnset> onsets,
             GrooveVariationCatalog? catalog,
             GrooveOverrideMergePolicy mergePolicy,
-            List<string>? diagnostics)
+            GrooveDiagnosticsCollector? collector)
         {
             if (catalog == null)
                 return onsets;
@@ -179,7 +201,11 @@ namespace Music.Generator
                     // Use policy-aware removal check (Story F1)
                     if (currentCount >= maxAllowed && OverrideMergePolicyEnforcer.CanRemoveOnset(onset, mergePolicy))
                     {
-                        diagnostics?.Add($"  Pruned onset at beat {onset.Beat} (candidate cap: {maxAllowed})");
+                        // Story G1: Record prune decision
+                        collector?.RecordPrune(
+                            GrooveDiagnosticsCollector.MakeOnsetId(onset),
+                            $"candidate cap exceeded ({maxAllowed})",
+                            onset.IsMustHit || onset.IsNeverRemove || onset.IsProtected);
                         continue;
                     }
 
@@ -196,7 +222,7 @@ namespace Music.Generator
             List<GrooveOnset> onsets,
             GrooveVariationCatalog? catalog,
             GrooveOverrideMergePolicy mergePolicy,
-            List<string>? diagnostics)
+            GrooveDiagnosticsCollector? collector)
         {
             if (catalog == null)
                 return onsets;
@@ -239,7 +265,11 @@ namespace Music.Generator
                     // Use policy-aware removal check (Story F1)
                     if (currentCount >= maxAllowed && OverrideMergePolicyEnforcer.CanRemoveOnset(onset, mergePolicy))
                     {
-                        diagnostics?.Add($"  Pruned onset at beat {onset.Beat} from group '{groupId}' (group cap: {maxAllowed})");
+                        // Story G1: Record prune decision
+                        collector?.RecordPrune(
+                            GrooveDiagnosticsCollector.MakeOnsetId(onset),
+                            $"group cap exceeded ({groupId}: {maxAllowed})",
+                            onset.IsMustHit || onset.IsNeverRemove || onset.IsProtected);
                         continue;
                     }
 
@@ -248,6 +278,7 @@ namespace Music.Generator
 
                 result.Add(onset);
             }
+
 
             // Restore original order
             return result.OrderBy(o => o.Beat).ToList();
@@ -258,7 +289,7 @@ namespace Music.Generator
             string role,
             GroovePresetDefinition preset,
             GrooveOverrideMergePolicy mergePolicy,
-            List<string>? diagnostics)
+            GrooveDiagnosticsCollector? collector)
         {
             var roleConstraints = preset.ProtectionPolicy?.RoleConstraintPolicy?.RoleMaxDensityPerBar;
             if (roleConstraints == null || !roleConstraints.TryGetValue(role, out int maxDensity))
@@ -267,9 +298,7 @@ namespace Music.Generator
             if (onsets.Count <= maxDensity)
                 return onsets;
 
-            diagnostics?.Add($"  Enforcing RoleMaxDensityPerBar: {maxDensity} (current: {onsets.Count})");
-
-            return PruneToCount(onsets, maxDensity, preset.VariationCatalog, mergePolicy, diagnostics);
+            return PruneToCount(onsets, maxDensity, preset.VariationCatalog, mergePolicy, collector, "role density cap");
         }
 
         private List<GrooveOnset> EnforceMaxHitsPerBar(
@@ -277,7 +306,7 @@ namespace Music.Generator
             string role,
             GroovePresetDefinition preset,
             GrooveOverrideMergePolicy mergePolicy,
-            List<string>? diagnostics)
+            GrooveDiagnosticsCollector? collector)
         {
             var vocab = preset.ProtectionPolicy?.RoleConstraintPolicy?.RoleVocabulary;
             if (vocab == null || !vocab.TryGetValue(role, out var roleVocab))
@@ -287,9 +316,7 @@ namespace Music.Generator
             if (onsets.Count <= maxHits)
                 return onsets;
 
-            diagnostics?.Add($"  Enforcing MaxHitsPerBar: {maxHits} (current: {onsets.Count})");
-
-            return PruneToCount(onsets, maxHits, preset.VariationCatalog, mergePolicy, diagnostics);
+            return PruneToCount(onsets, maxHits, preset.VariationCatalog, mergePolicy, collector, "max hits per bar");
         }
 
         private List<GrooveOnset> EnforceMaxHitsPerBeat(
@@ -299,7 +326,7 @@ namespace Music.Generator
             int barNumber,
             int rngSeed,
             GrooveOverrideMergePolicy mergePolicy,
-            List<string>? diagnostics)
+            GrooveDiagnosticsCollector? collector)
         {
             var vocab = preset.ProtectionPolicy?.RoleConstraintPolicy?.RoleVocabulary;
             if (vocab == null || !vocab.TryGetValue(role, out var roleVocab))
@@ -323,7 +350,6 @@ namespace Music.Generator
                 }
 
                 int beatNumber = bucket.Key;
-                diagnostics?.Add($"  Beat {beatNumber} has {beatOnsets.Count} onsets, max allowed: {maxHitsPerBeat}");
 
                 // Separate non-removable from prunable using policy (Story F1)
                 var nonRemovable = beatOnsets.Where(o => !OverrideMergePolicyEnforcer.CanRemoveOnset(o, mergePolicy)).ToList();
@@ -332,7 +358,6 @@ namespace Music.Generator
                 // If non-removable already exceed limit, keep all non-removable (configuration error)
                 if (nonRemovable.Count >= maxHitsPerBeat)
                 {
-                    diagnostics?.Add($"  Warning: Beat {beatNumber} non-removable onsets ({nonRemovable.Count}) exceed limit");
                     result.AddRange(nonRemovable);
                     continue;
                 }
@@ -354,6 +379,7 @@ namespace Music.Generator
                 var toKeep = scored.Take(prunableToKeep).ToList();
 
                 // If we have ties at the boundary, use RNG
+                bool usedTieBreak = false;
                 if (toKeep.Count == prunableToKeep && scored.Count > prunableToKeep)
                 {
                     var boundaryScore = toKeep.Last().Score;
@@ -367,16 +393,27 @@ namespace Music.Generator
                             .Where(x => x.Score > boundaryScore || shuffled.Take(1).Contains(x))
                             .Take(prunableToKeep)
                             .ToList();
-
-                        diagnostics?.Add($"  Used RNG tie-break at beat {beatNumber}");
+                        usedTieBreak = true;
                     }
                 }
 
                 result.AddRange(nonRemovable);
                 result.AddRange(toKeep.Select(x => x.Onset));
 
-                int pruned = beatOnsets.Count - nonRemovable.Count - toKeep.Count;
-                diagnostics?.Add($"  Pruned {pruned} onsets from beat {beatNumber}");
+                // Story G1: Record prune decisions for removed onsets
+                int prunedCount = beatOnsets.Count - nonRemovable.Count - toKeep.Count;
+                if (collector != null && prunedCount > 0)
+                {
+                    var keptBeats = new HashSet<decimal>(toKeep.Select(x => x.Onset.Beat));
+                    foreach (var prunable_onset in prunable.Where(o => !keptBeats.Contains(o.Beat)))
+                    {
+                        string reason = usedTieBreak ? "per-beat cap (tie-break)" : "per-beat cap exceeded";
+                        collector.RecordPrune(
+                            GrooveDiagnosticsCollector.MakeOnsetId(prunable_onset),
+                            reason,
+                            prunable_onset.IsMustHit || prunable_onset.IsNeverRemove || prunable_onset.IsProtected);
+                    }
+                }
             }
 
             return result.OrderBy(o => o.Beat).ToList();
@@ -387,7 +424,8 @@ namespace Music.Generator
             int targetCount,
             GrooveVariationCatalog? catalog,
             GrooveOverrideMergePolicy mergePolicy,
-            List<string>? diagnostics)
+            GrooveDiagnosticsCollector? collector,
+            string pruneReason)
         {
             if (onsets.Count <= targetCount)
                 return onsets;
@@ -399,7 +437,6 @@ namespace Music.Generator
             // If non-removable count already exceeds target, keep all non-removable (configuration error)
             if (nonRemovable.Count >= targetCount)
             {
-                diagnostics?.Add($"  Warning: Non-removable onsets ({nonRemovable.Count}) exceed target ({targetCount})");
                 return nonRemovable;
             }
 
@@ -424,9 +461,19 @@ namespace Music.Generator
                 .ToList();
 
             var keptPrunable = scored.Take(prunableToKeep).Select(x => x.Onset).ToList();
-            var pruned = prunable.Count - keptPrunable.Count;
 
-            diagnostics?.Add($"  Pruned {pruned} onsets to reach target count {targetCount}");
+            // Story G1: Record prune decisions for removed onsets
+            if (collector != null)
+            {
+                var keptBeats = new HashSet<decimal>(keptPrunable.Select(o => o.Beat));
+                foreach (var prunedOnset in prunable.Where(o => !keptBeats.Contains(o.Beat)))
+                {
+                    collector.RecordPrune(
+                        GrooveDiagnosticsCollector.MakeOnsetId(prunedOnset),
+                        pruneReason,
+                        prunedOnset.IsMustHit || prunedOnset.IsNeverRemove || prunedOnset.IsProtected);
+                }
+            }
 
             return nonRemovable.Concat(keptPrunable).OrderBy(o => o.Beat).ToList();
         }

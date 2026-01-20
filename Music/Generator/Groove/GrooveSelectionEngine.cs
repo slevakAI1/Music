@@ -1,32 +1,36 @@
 // AI: purpose=Select groove candidates until target count reached with pool exhaustion safety (Story C2).
 // AI: invariants=Deterministic; same seed => same selections; never exceeds target; respects anchors and caps.
-// AI: deps=GrooveWeightedCandidateSelector, GrooveRngHelper for RNG; GrooveOnset for anchors.
-// AI: change=Story C2 acceptance criteria: select until target reached or pool exhausted with safety.
+// AI: deps=GrooveWeightedCandidateSelector, GrooveRngHelper for RNG; GrooveOnset for anchors; GrooveDiagnosticsCollector for G1.
+// AI: change=Story G1: Added optional diagnostics collection via GrooveDiagnosticsCollector.
 
 namespace Music.Generator
 {
     /// <summary>
     /// Selection engine for groove candidates with target count and pool exhaustion safety.
     /// Story C2: Implements safe candidate selection with anchor preservation and cap enforcement.
+    /// Story G1: Supports optional diagnostics collection.
     /// </summary>
     public static class GrooveSelectionEngine
     {
         /// <summary>
         /// Selects candidates until target count is reached or pool is exhausted.
         /// Story C2: Deterministic selection with RNG, respects anchors and per-group/per-candidate caps.
+        /// Story G1: Optional diagnostics collection for decision tracing.
         /// </summary>
         /// <param name="barContext">Bar context for RNG seed derivation.</param>
         /// <param name="role">Role name for selection.</param>
         /// <param name="groups">Candidate groups to select from (should be merged and filtered by caller).</param>
         /// <param name="targetCount">Target number of candidates to select.</param>
         /// <param name="existingAnchors">Existing anchors for this role (to avoid duplicates).</param>
+        /// <param name="diagnostics">Optional diagnostics collector for decision tracing (Story G1).</param>
         /// <returns>List of selected candidates in selection order.</returns>
         public static IReadOnlyList<GrooveOnsetCandidate> SelectUntilTargetReached(
             GrooveBarContext barContext,
             string role,
             IReadOnlyList<GrooveCandidateGroup> groups,
             int targetCount,
-            IReadOnlyList<GrooveOnset> existingAnchors)
+            IReadOnlyList<GrooveOnset> existingAnchors,
+            GrooveDiagnosticsCollector? diagnostics = null)
         {
             ArgumentNullException.ThrowIfNull(barContext);
             ArgumentException.ThrowIfNullOrWhiteSpace(role);
@@ -46,7 +50,10 @@ namespace Music.Generator
                     .Select(a => a.Beat));
 
             // Build working pool: candidates that don't conflict with anchors
-            var workingPool = BuildWorkingPool(groups, anchorBeats);
+            var workingPool = BuildWorkingPool(groups, anchorBeats, diagnostics);
+
+            // Story G1: Record candidate pool statistics
+            diagnostics?.RecordCandidatePool(groups.Count, workingPool.Count);
 
             if (workingPool.Count == 0)
             {
@@ -93,6 +100,14 @@ namespace Music.Generator
                 var picked = selectedCandidates[0];
                 selected.Add(picked.Candidate);
 
+                // Story G1: Record selection decision
+                if (diagnostics != null)
+                {
+                    double weight = picked.Candidate.ProbabilityBias * picked.Group.BaseProbabilityBias;
+                    string candidateId = GrooveDiagnosticsCollector.MakeCandidateId(picked.Group.GroupId, picked.Candidate.OnsetBeat);
+                    diagnostics.RecordSelection(candidateId, weight, RandomPurpose.GrooveCandidatePick);
+                }
+
                 // Update allowances
                 UpdateAllowances(picked, groupAllowances, candidateAllowances);
 
@@ -107,10 +122,12 @@ namespace Music.Generator
 
         /// <summary>
         /// Builds the working pool of candidates excluding those that conflict with anchors.
+        /// Story G1: Records filter decisions for excluded candidates.
         /// </summary>
         private static List<(GrooveOnsetCandidate Candidate, GrooveCandidateGroup Group)> BuildWorkingPool(
             IReadOnlyList<GrooveCandidateGroup> groups,
-            HashSet<decimal> anchorBeats)
+            HashSet<decimal> anchorBeats,
+            GrooveDiagnosticsCollector? diagnostics = null)
         {
             var pool = new List<(GrooveOnsetCandidate, GrooveCandidateGroup)>();
 
@@ -119,7 +136,16 @@ namespace Music.Generator
                 foreach (var candidate in group.Candidates)
                 {
                     // Story C2: Exclude candidates that conflict with anchors (same beat)
-                    if (!anchorBeats.Contains(candidate.OnsetBeat))
+                    if (anchorBeats.Contains(candidate.OnsetBeat))
+                    {
+                        // Story G1: Record filter decision
+                        if (diagnostics != null)
+                        {
+                            string candidateId = GrooveDiagnosticsCollector.MakeCandidateId(group.GroupId, candidate.OnsetBeat);
+                            diagnostics.RecordFilter(candidateId, "anchor conflict");
+                        }
+                    }
+                    else
                     {
                         pool.Add((candidate, group));
                     }
