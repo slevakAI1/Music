@@ -51,6 +51,7 @@
   <ItemGroup>
     <None Remove="AI Prompts\Backlog.md" />
     <None Remove="AI Prompts\Chat GPT 5.2 Thinking - Answer clarifying questions.md" />
+    <None Remove="AI Prompts\Chat GPT 5.2 Thinking - Clarify Analysis.md" />
     <None Remove="AI Prompts\ChatGPT 5.1 Mini - PreAnalysis.md" />
     <None Remove="AI Prompts\ChatGPT 5.1 Mini Agent - PreAnalysis.md" />
     <None Remove="AI Prompts\Disconnect_Energy.md" />
@@ -70,6 +71,8 @@
     <None Remove="AICompleted\PreAnalysis_E2.md" />
     <None Remove="AICompleted\PreAnalysis_E2_Clarified.md" />
     <None Remove="AICompleted\PreAnalysis_Groove_E1.md" />
+    <None Remove="AICompleted\PreAnalysis_SC1.md" />
+    <None Remove="AICompleted\PreAnalysis_SC1_Clarified.md" />
     <None Remove="AICompleted\StoryD1_Complete.md" />
     <None Remove="AICompleted\StoryD1_UpdateSummary.md" />
     <None Remove="AICompleted\Story_7_5_8_Usage_Guide.md" />
