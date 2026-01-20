@@ -70,6 +70,8 @@
     <None Remove="AICompleted\MeasureTrackerPlan.md" />
     <None Remove="AICompleted\PreAnalysis_E2.md" />
     <None Remove="AICompleted\PreAnalysis_E2_Clarified.md" />
+    <None Remove="AICompleted\PreAnalysis_F1.md" />
+    <None Remove="AICompleted\PreAnalysis_F1_Clarified.md" />
     <None Remove="AICompleted\PreAnalysis_Groove_E1.md" />
     <None Remove="AICompleted\PreAnalysis_SC1.md" />
     <None Remove="AICompleted\PreAnalysis_SC1_Clarified.md" />
