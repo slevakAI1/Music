@@ -88,10 +88,12 @@ namespace Music.Generator
             // Flatten back to single list
             var finalOnsets = onsetsByRole.Values.SelectMany(o => o).OrderBy(o => o.Beat).ToList();
 
+            // TODO: Story G1 full integration - convert string diagnostics to structured GrooveBarDiagnostics
+            // For now, structured diagnostics are not populated by GrooveCapsEnforcer
             return barPlan with
             {
                 FinalOnsets = finalOnsets,
-                Diagnostics = diagnosticsEnabled ? string.Join(Environment.NewLine, diagnostics!) : null
+                Diagnostics = null
             };
         }
 

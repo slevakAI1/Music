@@ -60,6 +60,7 @@
     <None Remove="AI Prompts\HarmonyPolicy.md" />
     <None Remove="AI Prompts\MeasureTrackerPlan.md" />
     <None Remove="AI Prompts\musical_energy_compilation.md" />
+    <None Remove="AI Prompts\Opus 4.5 - Implement Story.md" />
     <None Remove="AI Prompts\PlanV1.md" />
     <None Remove="AI Prompts\Story6.3-Implementation-Summary.md" />
     <None Remove="AI Prompts\Story9TestsSummary.md" />
@@ -107,6 +108,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="AI Prompts\" />
     <Folder Include="AICompleted\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />

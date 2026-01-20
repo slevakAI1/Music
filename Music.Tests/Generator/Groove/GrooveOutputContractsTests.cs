@@ -287,8 +287,30 @@ namespace Music.Generator.Tests
         [Fact]
         public void GrooveBarPlan_SupportsOptionalDiagnostics()
         {
-            // Arrange
-            var diagnostics = "Test diagnostic data";
+            // Arrange - Story G1: Diagnostics is now GrooveBarDiagnostics? (structured)
+            var diagnostics = new GrooveBarDiagnostics
+            {
+                BarNumber = 1,
+                Role = "Kick",
+                EnabledTags = [],
+                CandidateGroupCount = 0,
+                TotalCandidateCount = 0,
+                FiltersApplied = [],
+                DensityTarget = new DensityTargetDiagnostics
+                {
+                    Density01 = 0.0,
+                    MaxEventsPerBar = 0,
+                    TargetCount = 0
+                },
+                SelectedCandidates = [],
+                PruneEvents = [],
+                FinalOnsetSummary = new OnsetListSummary
+                {
+                    BaseCount = 0,
+                    VariationCount = 0,
+                    FinalCount = 0
+                }
+            };
 
             // Act
             var plan = new GrooveBarPlan
@@ -302,7 +324,8 @@ namespace Music.Generator.Tests
 
             // Assert
             Assert.NotNull(plan.Diagnostics);
-            Assert.Equal("Test diagnostic data", plan.Diagnostics);
+            Assert.Equal(1, plan.Diagnostics.BarNumber);
+            Assert.Equal("Kick", plan.Diagnostics.Role);
         }
 
         [Fact]

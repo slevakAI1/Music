@@ -1,7 +1,7 @@
 // AI: purpose=Captures groove plan for a single bar across all pipeline phases from Story A1.
 // AI: invariants=BaseOnsets from anchors; SelectedVariationOnsets from variation selection; FinalOnsets post-constraints.
-// AI: deps=GrooveOnset for onset representation; optional diagnostics reference for explainability (Story G1).
-// AI: change=Story A1 defines stable container for per-bar groove decisions; supports pipeline phases 2-4.
+// AI: deps=GrooveOnset for onset representation; GrooveBarDiagnostics for optional decision tracing (Story G1).
+// AI: change=Story G1 changed Diagnostics type from string? to GrooveBarDiagnostics? for structured tracing.
 
 namespace Music.Generator
 {
@@ -32,11 +32,11 @@ namespace Music.Generator
         public required IReadOnlyList<GrooveOnset> FinalOnsets { get; init; }
 
         /// <summary>
-        /// Optional diagnostics text for decision tracing.
+        /// Optional structured diagnostics for decision tracing.
         /// Null when diagnostics disabled (Story G1).
-        /// Contains human-readable explanation of decisions made during generation.
+        /// When enabled, captures per-bar/per-role groove decisions: tags, candidates, filters, selections, prunes.
         /// </summary>
-        public string? Diagnostics { get; init; }
+        public GrooveBarDiagnostics? Diagnostics { get; init; }
 
         /// <summary>
         /// Bar number this plan applies to (1-based).
