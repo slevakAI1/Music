@@ -52,6 +52,7 @@
     <None Remove="AI Prompts\Backlog.md" />
     <None Remove="AI Prompts\Chat GPT 5.2 Thinking - Answer clarifying questions.md" />
     <None Remove="AI Prompts\ChatGPT 5.1 Mini - PreAnalysis.md" />
+    <None Remove="AI Prompts\ChatGPT 5.1 Mini Agent - PreAnalysis.md" />
     <None Remove="AI Prompts\Disconnect_Energy.md" />
     <None Remove="AI Prompts\DrumFillStyleResearch.md" />
     <None Remove="AI Prompts\GroovePlan.md" />
@@ -66,6 +67,8 @@
     <None Remove="AICompleted\Disconnect_Energy.md" />
     <None Remove="AICompleted\GroovePlanCompletedStories.md" />
     <None Remove="AICompleted\MeasureTrackerPlan.md" />
+    <None Remove="AICompleted\PreAnalysis_E2.md" />
+    <None Remove="AICompleted\PreAnalysis_E2_Clarified.md" />
     <None Remove="AICompleted\PreAnalysis_Groove_E1.md" />
     <None Remove="AICompleted\StoryD1_Complete.md" />
     <None Remove="AICompleted\StoryD1_UpdateSummary.md" />
