@@ -451,10 +451,7 @@ Deterministic normalization rules:
 
 ## Phase Special Special Case — Implement Part Track Bar Coverage Analysis - was prevously deferred
 
-## Story SC1 — Track per-part bar coverage (progress) independently of song length
-
-Status: DEFERRED
-Reason: The finer details of note generation and generator policies (when to prefer filling `Empty` vs augmenting `HasContent`, how to treat non-contiguous fills, and the semantics of a `Locked` state) are not yet settled. This story depends on later work (comping, bass patterns, variation, motif placement) and is postponed to avoid premature coupling.
+## Story SC1 — Track per-part bar coverage (progress) independently of song length (COMPLETED)
 
 Intent: support incremental/manual workflows where parts are filled non-uniformly and non-contiguously; generation needs to know what is empty vs already has content.
 
@@ -478,6 +475,7 @@ Notes for future implementation:
 - Consider adding a `GenerationPolicy` parameter to generators to control whether they respect coverage or always generate full parts.
 
 ---
+
 ## Phase F — Override Merge Policy (Segment overrides without surprises)
 
 ### Story F1 — Implement Override Merge Policy Enforcement
