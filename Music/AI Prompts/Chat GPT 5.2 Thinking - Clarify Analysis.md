@@ -1,6 +1,6 @@
 
 
-Goal: Update PreAnalysis_F1.md with answers to clarifying questions in order to resolve ambiguities and ensure a clear understanding of the requirements. 
+Goal: Update PreAnalysis_G1.md with answers to clarifying questions in order to resolve ambiguities and ensure a clear understanding of the requirements. 
 
 
 Information Sources: 

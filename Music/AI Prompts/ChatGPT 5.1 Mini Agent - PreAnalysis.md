@@ -1,8 +1,10 @@
 
 
-#solution 
-#file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\CurrentEpic_Groove.md'
-#file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\ProjectArchitecture.md' 
+#solution
+
+#file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\CurrentEpic.md'
+
+#file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\ProjectArchitecture.md'
 
 # Pre-Analysis Request for Agile Story Implementation
 
