@@ -330,6 +330,7 @@ public sealed record GrooveOnset
 | `OnsetGrid.cs` / `OnsetGridBuilder.cs` | Valid beat positions from subdivision policy |
 | `OnsetStrengthClassifier.cs` | Classify onset strength |
 | `VelocityShaper.cs` | Compute velocity per onset (role x strength) |
+| `FeelTimingEngine.cs` | Apply feel timing (Straight/Swing/Shuffle/Triplet) to eligible eighth offbeats |
 | `ProtectionPerBarBuilder.cs` | Merge protection layers per bar |
 | `ProtectionApplier.cs` | Apply must-hit/never-add/never-remove rules |
 | `RolePresenceGate.cs` | Check if role is present in section |
@@ -630,6 +631,8 @@ The groove system is being rebuilt story by story. Current state:
 - Syncopation/anticipation filtering implemented
 - Role presence gating implemented
 - Phrase hook protection implemented
+ - Feel timing (Story E1) implemented: `FeelTimingEngine` applies Straight/Swing/Shuffle/Triplet timing
+   shifts to eligible eighth offbeats and is covered by unit tests (`FeelTimingEngineTests`).
 
 ### Material/Motif System
 
