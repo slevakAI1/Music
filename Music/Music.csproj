@@ -61,6 +61,7 @@
     <None Remove="AI Prompts\Story9TestsSummary.md" />
     <None Remove="AI Prompts\Story_7_5_8_Usage_Guide.md" />
     <None Remove="AI Prompts\Story_9_1_Implementation_Summary.md" />
+    <None Remove="AIPlans\CompletedWork_CurrentState.md" />
   </ItemGroup>
 
   <ItemGroup>
