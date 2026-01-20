@@ -232,7 +232,9 @@ Pipeline steps (in order):
 6. **Filter by syncopation/anticipation** — `RhythmVocabularyFilter.Filter(...)`
 7. **Filter by role presence** — `RolePresenceGate.IsRolePresent(...)`
 8. **Apply protections** — `ProtectionApplier.Apply(...)` (must-hit, never-add, never-remove)
-9. **Convert to MIDI events** — Create `PartTrackEvent` from `DrumOnset`
+9. **Apply feel timing** — `FeelTimingEngine.ApplyFeelTiming(...)` (global feel shifts eligible eighth offbeats)
+10. **Apply role micro-timing** — `RoleTimingEngine.ApplyRoleTiming(...)` (per-role feel+bias added on top of E1; final clamp applied)
+11. **Convert to MIDI events** — Create `PartTrackEvent` from `GrooveOnset`
 
 ---
 
@@ -265,12 +267,18 @@ public sealed class GrooveProtectionPolicy
     public GrooveSubdivisionPolicy SubdivisionPolicy { get; set; }     // Grid + feel
     public GrooveRoleConstraintPolicy RoleConstraintPolicy { get; set; } // Vocab constraints
     public GroovePhraseHookPolicy PhraseHookPolicy { get; set; }       // Fill windows/cadence
-    public GrooveTimingPolicy TimingPolicy { get; set; }               // Micro-timing
+    public GrooveTimingPolicy TimingPolicy { get; set; }               // Micro-timing (per-role feel & bias)
     public GrooveAccentPolicy AccentPolicy { get; set; }               // Velocity shaping
     public GrooveOrchestrationPolicy OrchestrationPolicy { get; set; } // Role presence defaults
     public List<GrooveProtectionLayer> HierarchyLayers { get; set; }   // Layered protections
 }
 ```
+
+Note: The `GrooveTimingPolicy` is consumed by the Role Timing Engine (Story E2). Key behavior:
+- `TimingFeel` maps to fixed base tick offsets: Ahead=-10, OnTop=0, Behind=+10, LaidBack=+20.
+- `RoleTimingBiasTicks[role]` is added to the base feel offset per role.
+- `GroovePolicyDecision` may provide field-level overrides per bar/role: `RoleTimingFeelOverride` and `RoleTimingBiasTicksOverride`.
+- Combined offset is added to any existing E1 feel timing and the final result is clamped to `[-MaxAbsTimingBiasTicks..+MaxAbsTimingBiasTicks]`.
 
 #### SegmentGrooveProfile (Per-Section Overrides)
 
@@ -331,6 +339,7 @@ public sealed record GrooveOnset
 | `OnsetStrengthClassifier.cs` | Classify onset strength |
 | `VelocityShaper.cs` | Compute velocity per onset (role x strength) |
 | `FeelTimingEngine.cs` | Apply feel timing (Straight/Swing/Shuffle/Triplet) to eligible eighth offbeats |
+| `RoleTimingEngine.cs` | Apply per-role micro-timing (TimingFeel -> ticks + RoleTimingBiasTicks) and clamp to `MaxAbsTimingBiasTicks` |
 | `ProtectionPerBarBuilder.cs` | Merge protection layers per bar |
 | `ProtectionApplier.cs` | Apply must-hit/never-add/never-remove rules |
 | `RolePresenceGate.cs` | Check if role is present in section |
