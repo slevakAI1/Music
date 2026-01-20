@@ -1,7 +1,7 @@
-// AI: purpose=Compute density target count for groove candidate selection (Story C1).
+// AI: purpose=Compute density target count for groove candidate selection (Story C1, F1).
 // AI: invariants=Deterministic; same inputs => same output; no RNG; clamps to [0..MaxEvents].
-// AI: deps=GrooveBarContext, RoleDensityTarget, GrooveOrchestrationPolicy, GroovePolicyDecision.
-// AI: change=Story C1 acceptance criteria: consistent target-count calculation with multipliers and overrides.
+// AI: deps=GrooveBarContext, RoleDensityTarget, GrooveOrchestrationPolicy, GroovePolicyDecision, GrooveOverrideMergePolicy.
+// AI: change=Story F1: OverrideCanRelaxConstraints controls whether segment can increase caps beyond base.
 
 namespace Music.Generator
 {
@@ -18,25 +18,29 @@ namespace Music.Generator
     /// <summary>
     /// Computes density target count for groove candidate selection.
     /// Story C1: Implements role + section + policy-based density calculation.
+    /// Story F1: OverrideCanRelaxConstraints controls whether segment can increase caps.
     /// </summary>
     public static class GrooveDensityCalculator
     {
         /// <summary>
         /// Computes the target count of candidates to select for a role in a bar.
         /// Story C1: TargetCount = round(Density01 * MaxEventsPerBar) clamped to [0..MaxEventsPerBar].
+        /// Story F1: When OverrideCanRelaxConstraints=false, maxEvents cannot exceed base policy caps.
         /// </summary>
         /// <param name="barContext">Bar context with segment profile.</param>
         /// <param name="role">Role name (e.g., "Kick", "Snare").</param>
-        /// <param name="roleConstraintPolicy">Optional role constraint policy for fallback max events.</param>
+        /// <param name="roleConstraintPolicy">Optional role constraint policy for base caps.</param>
         /// <param name="orchestrationPolicy">Optional orchestration policy for section multipliers.</param>
         /// <param name="policyDecision">Optional policy decision with overrides.</param>
+        /// <param name="mergePolicy">Optional merge policy controlling cap relaxation.</param>
         /// <returns>Density result with target count and provenance information.</returns>
         public static GrooveDensityResult ComputeDensityTarget(
             GrooveBarContext barContext,
             string role,
             GrooveRoleConstraintPolicy? roleConstraintPolicy = null,
             GrooveOrchestrationPolicy? orchestrationPolicy = null,
-            GroovePolicyDecision? policyDecision = null)
+            GroovePolicyDecision? policyDecision = null,
+            GrooveOverrideMergePolicy? mergePolicy = null)
         {
             ArgumentNullException.ThrowIfNull(barContext);
             ArgumentException.ThrowIfNullOrWhiteSpace(role);
@@ -60,6 +64,7 @@ namespace Music.Generator
             int maxEventsEffective;
             bool densityOverridden = false;
             bool maxEventsOverridden = false;
+            bool capsRelaxed = false;
 
             if (policyDecision?.Density01Override is not null)
             {
@@ -73,8 +78,16 @@ namespace Music.Generator
 
             if (policyDecision?.MaxEventsPerBarOverride is not null)
             {
-                maxEventsEffective = Math.Max(0, policyDecision.MaxEventsPerBarOverride.Value);
+                int requestedMax = Math.Max(0, policyDecision.MaxEventsPerBarOverride.Value);
+                
+                // Story F1: Apply OverrideCanRelaxConstraints policy
+                maxEventsEffective = OverrideMergePolicyEnforcer.ResolveEffectiveMaxHitsPerBar(
+                    maxEventsBase,
+                    requestedMax,
+                    mergePolicy ?? new GrooveOverrideMergePolicy());
+                    
                 maxEventsOverridden = true;
+                capsRelaxed = mergePolicy?.OverrideCanRelaxConstraints == true && requestedMax > maxEventsBase;
             }
             else
             {
@@ -95,6 +108,7 @@ namespace Music.Generator
                 multiplier,
                 densityOverridden,
                 maxEventsOverridden,
+                capsRelaxed,
                 densityEffective,
                 maxEventsEffective,
                 targetCount);
@@ -174,6 +188,7 @@ namespace Music.Generator
             return 1.0;
         }
 
+
         /// <summary>
         /// Clamps density value to [0.0, 1.0] range.
         /// </summary>
@@ -191,6 +206,7 @@ namespace Music.Generator
             double multiplier,
             bool densityOverridden,
             bool maxEventsOverridden,
+            bool capsRelaxed,
             double densityEffective,
             int maxEventsEffective,
             int targetCount)
@@ -214,6 +230,10 @@ namespace Music.Generator
             if (maxEventsOverridden)
             {
                 parts.Add($"maxEventsOverride={maxEventsEffective}");
+                if (capsRelaxed)
+                {
+                    parts.Add("(relaxed)");
+                }
             }
             else
             {
