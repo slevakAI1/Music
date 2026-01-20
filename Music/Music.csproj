@@ -73,11 +73,14 @@
     <None Remove="AICompleted\PreAnalysis_E2_Clarified.md" />
     <None Remove="AICompleted\PreAnalysis_F1.md" />
     <None Remove="AICompleted\PreAnalysis_F1_Clarified.md" />
+    <None Remove="AICompleted\PreAnalysis_G1.md" />
+    <None Remove="AICompleted\PreAnalysis_G1_Clarified.md" />
     <None Remove="AICompleted\PreAnalysis_Groove_E1.md" />
     <None Remove="AICompleted\PreAnalysis_SC1.md" />
     <None Remove="AICompleted\PreAnalysis_SC1_Clarified.md" />
     <None Remove="AICompleted\StoryD1_Complete.md" />
     <None Remove="AICompleted\StoryD1_UpdateSummary.md" />
+    <None Remove="AICompleted\StoryG1_Complete.md" />
     <None Remove="AICompleted\Story_7_5_8_Usage_Guide.md" />
     <None Remove="AICompleted\Story_9_1_Implementation_Summary.md" />
     <None Remove="AIPlans\CompletedWork_CurrentState.md" />

@@ -501,7 +501,7 @@ Notes for future implementation:
 
 ## Phase G — Diagnostics & Explainability (required to evolve toward human level)
 
-### Story G1 — Add Groove Decision Trace (Opt-in, No Behavior Change)
+### Story G1 — Add Groove Decision Trace (Opt-in, No Behavior Change)   (COMPLETED)
 **As a** developer  
 **I want** an explain trace of groove decisions  
 **So that** debugging and future drummer tuning is practical
