@@ -731,6 +731,7 @@ Location: `Music.Tests/TestFixtures/`
 |------|---------|
 | `GrooveSnapshotHelper.cs` | Story H1/H2: Snapshot serialization for golden tests |
 
+
 ```csharp
 // Usage for golden tests (H2)
 var snapshot = GrooveSnapshotHelper.CreateSnapshot(plan, "Kick");
@@ -774,6 +775,8 @@ bool equal = GrooveSnapshotHelper.SnapshotsEqual(expected, actual);
 | `Generator/Core/` | Entrypoint, RNG, overlap helpers |
 | `Generator/Drums/` | Drum track generator |
 | `Generator/Groove/` | Groove system (policies, selection, protection) |
+| `Generator/Agents/` | Shared agent infrastructure: contracts, memory, and operator primitives for instrument agents |
+
 | `Song/` | Data model (Section, Harmony, Tempo, Timing, PartTrack, Bar, Voices, Lyrics) |
 | `Song/Material/` | Material/motif system |
 | `Converters/` | PartTrack ↔ MIDI conversion |
@@ -849,3 +852,43 @@ var midiDoc = ConvertPartTracksToMidiSongDocument_For_Play_And_Export.Convert(
     songContext.Song.TimeSignatureTrack);
 new MidiIoService().ExportToFile("output.mid", midiDoc);
 ```
+
+
+---
+
+## 15) Agent Infrastructure (Stories 1.1-1.2)
+
+Location: `Generator/Agents/Common/`
+
+Purpose: Shared contracts and base types for all instrument agents (Drums, Guitar, Keys, Bass, Vocals).
+
+Files added in Story 1.1:
+
+```
+Generator/Agents/Common/
+  ├── IMusicalOperator.cs          (generic operator interface)
+  ├── AgentContext.cs             (shared, immutable context record)
+  ├── IAgentMemory.cs             (memory interface for anti-repetition)
+  ├── OperatorFamily.cs           (stable operator classification enum)
+  └── FillShape.cs                (fill metadata structure for memory)
+```
+
+Files added in Story 1.2:
+
+```
+Generator/Agents/Common/
+  ├── AgentMemory.cs              (concrete IAgentMemory implementation)
+  └── DecayCurve.cs               (enum for repetition penalty decay)
+```
+
+Notes:
+- `AgentContext` is a record to ensure immutability and determinism.
+- `IMusicalOperator<TCandidate>` is generic; instrument agents implement specialized versions.
+- `OperatorFamily` enum values are stable and must not be reordered.
+- `IAgentMemory` provides decision recording and lookups used by selection engine.
+- `AgentMemory` uses circular buffer for last-N-bars tracking with configurable window size.
+- `GetRepetitionPenalty()` supports Linear and Exponential decay curves.
+- All collections use sorted order for deterministic iteration.
+
+
+
