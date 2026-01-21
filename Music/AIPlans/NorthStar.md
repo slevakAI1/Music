@@ -11,7 +11,7 @@ Build a deterministic, user-controllable music generator that produces **origina
 ### Success Means
 
 - **Originality:** outputs are non-derivative at the song level (melody, motifs, arrangement, groove, phrasing), not just shuffled templates.
-- **Stickiness:** songs create memorable hooks and satisfying tension/release so a high percentage of listeners can recall the main idea after listening.
+- **Stickiness:** songs create memorable hooks/motif and satisfying tension/release so a high percentage of listeners can recall the main idea after listening.
 - **Human realism:** timing, dynamics, articulation, and instrument behavior sound like expert players, not quantized MIDI.
 - **Songwriter-level structure:** clear section identity, repetition with purposeful variation, effective builds/drops, and strong cadences.
 - **Control + automation range:** the system supports both:
