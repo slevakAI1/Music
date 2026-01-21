@@ -536,7 +536,7 @@ Notes for future implementation:
 
 ---
 
-## Phase H — Test Suite & Regression Locks (finish the groove system confidently)
+## Phase H — Test Suite & Regression Locks (finish the groove system confidently) (COMPLETED)
 
 ### Story H1 — Full Groove Phase Unit Tests (Core)
 **As a** developer  
@@ -558,7 +558,7 @@ Notes for future implementation:
 
 ---
 
-### Story H2 — End-to-End Groove Regression Snapshot (Golden Test)
+### Story H2 — End-to-End Groove Regression Snapshot (Golden Test)   (COMPLETED)
 **As a** developer  
 **I want** a golden-file style regression test for a known groove preset  
 **So that** improvements don’t accidentally break determinism or musical guardrails
