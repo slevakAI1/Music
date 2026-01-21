@@ -111,7 +111,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="AI Prompts\" />
     <Folder Include="AICompleted\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
