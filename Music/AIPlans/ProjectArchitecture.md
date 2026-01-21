@@ -167,6 +167,32 @@ public class PartTrackEvent
 }
 ```
 
+#### PartTrackBarCoverageAnalyzer (Story SC1)
+
+Location: `Generator/Groove/PartTrackBarCoverageAnalyzer.cs`
+
+Utility for analyzing which bars have content vs are empty (supports incremental/non-contiguous fill workflows):
+
+```csharp
+public enum BarFillState
+{
+    Empty,       // No events intersect this bar
+    HasContent,  // At least one event intersects this bar
+    Locked       // Optional: user-set "do not modify" flag (future)
+}
+
+public static class PartTrackBarCoverageAnalyzer
+{
+    // Returns Dictionary<int, BarFillState> mapping bar numbers to fill state
+    public static IReadOnlyDictionary<int, BarFillState> Analyze(
+        PartTrack partTrack,
+        BarTrack barTrack,
+        int totalBars);
+}
+```
+
+**Story SC1:** Pure, side-effect-free utility. Bar intersection rule: note belongs to bar if its `[startTick, endTick)` overlaps the bar's `[StartTick, EndTick)`.
+
 ### BarTrack (Timing Ruler)
 
 Location: `Song/Bar/BarTrack.cs`
@@ -331,6 +357,78 @@ public sealed record GrooveOnset
 }
 ```
 
+#### GrooveBarPlan (Per-Bar Plan)
+
+Location: `Generator/Groove/GrooveBarPlan.cs`
+
+```csharp
+public sealed record GrooveBarPlan
+{
+    public required IReadOnlyList<GrooveOnset> BaseOnsets { get; init; }              // Anchors
+    public required IReadOnlyList<GrooveOnset> SelectedVariationOnsets { get; init; } // Selected variations
+    public required IReadOnlyList<GrooveOnset> FinalOnsets { get; init; }             // After constraints
+    public GrooveBarDiagnostics? Diagnostics { get; init; }                           // Story G1: Structured diagnostics
+    public required int BarNumber { get; init; }
+}
+```
+
+**Story G1 Update:** `Diagnostics` changed from `string?` to `GrooveBarDiagnostics?` for structured decision tracing.
+
+#### GrooveBarDiagnostics (Decision Trace - Story G1)
+
+Location: `Generator/Groove/GrooveBarDiagnostics.cs`
+
+Structured diagnostics for opt-in decision tracing. When disabled, remains null (zero-cost).
+
+```csharp
+public sealed record GrooveBarDiagnostics
+{
+    public required int BarNumber { get; init; }
+    public required string Role { get; init; }
+    public required IReadOnlyList<string> EnabledTags { get; init; }
+    public required int CandidateGroupCount { get; init; }
+    public required int TotalCandidateCount { get; init; }
+    public required IReadOnlyList<FilterDecision> FiltersApplied { get; init; }
+    public required DensityTargetDiagnostics DensityTarget { get; init; }
+    public required IReadOnlyList<SelectionDecision> SelectedCandidates { get; init; }
+    public required IReadOnlyList<PruneDecision> PruneEvents { get; init; }
+    public required OnsetListSummary FinalOnsetSummary { get; init; }
+}
+
+// Supporting records
+public sealed record FilterDecision(string CandidateId, string Reason);
+public sealed record SelectionDecision(string CandidateId, double Weight, string RngStreamUsed);
+public sealed record PruneDecision(string OnsetId, string Reason, bool WasProtected);
+public sealed record DensityTargetDiagnostics { /* density computation inputs */ };
+public sealed record OnsetListSummary { /* onset counts at pipeline stages */ };
+```
+
+**Story G1:** Diagnostics collection is opt-in via `GrooveDiagnosticsCollector` helper class. Records:
+- Enabled tags after phrase/segment/policy resolution
+- Candidate pool statistics
+- Filter decisions with reasons
+- Selection decisions with weights and RNG streams
+- Prune events with protection status
+- Final onset counts
+
+#### GrooveOverrideMergePolicy (Story F1)
+
+Location: `Generator/Groove/Groove.cs`
+
+Controls how segment overrides interact with base policies:
+
+```csharp
+public sealed class GrooveOverrideMergePolicy
+{
+    public bool OverrideReplacesLists { get; set; }           // Replace vs union/append for lists
+    public bool OverrideCanRemoveProtectedOnsets { get; set; } // Allow removing protected items
+    public bool OverrideCanRelaxConstraints { get; set; }     // Allow increasing caps
+    public bool OverrideCanChangeFeel { get; set; }           // Allow changing swing/feel
+}
+```
+
+**Story F1:** Enforced by `OverrideMergePolicyEnforcer.CanRemoveOnset()` to ensure predictable override behavior.
+
 ### Groove Infrastructure Files
 
 | File | Purpose |
@@ -347,8 +445,13 @@ public sealed record GrooveOnset
 | `PhraseHookProtectionAugmenter.cs` | Protect anchors near phrase/section ends |
 | `BarContext.cs` / `BarContextBuilder.cs` | Per-bar context (section, phrase position) |
 | `GrooveBarContext.cs` | Type alias for BarContext in groove system |
-| `GrooveBarPlan.cs` | Per-bar plan (base onsets, variation, final) |
-| `GrooveSelectionEngine.cs` | Select candidates until target reached |
+| `GrooveBarPlan.cs` | Per-bar plan (base onsets, variation, final, diagnostics) |
+| `GrooveBarDiagnostics.cs` | Structured diagnostics records (Story G1) |
+| `GrooveDiagnosticsCollector.cs` | Helper for collecting diagnostic data during pipeline (Story G1) |
+| `GrooveSelectionEngine.cs` | Select candidates until target reached; supports diagnostics collection |
+| `GrooveCapsEnforcer.cs` | Enforce hard caps with diagnostics; respects merge policy (Stories C3, F1, G1) |
+| `OverrideMergePolicyEnforcer.cs` | Enforce override merge policy rules (Story F1) |
+| `PartTrackBarCoverageAnalyzer.cs` | Analyze per-bar fill state (Story SC1) |
 | `GrooveTestSetup.cs` | Build PopRockBasic preset for testing |
 
 ---
@@ -633,15 +736,19 @@ Uses MSTest. Contains integration and contract tests for groove system.
 ### Groove System (Active Development)
 
 The groove system is being rebuilt story by story. Current state:
-- Anchor patterns → MIDI events working
-- Protection hierarchy implemented
-- Velocity shaping implemented
-- Subdivision filtering implemented
-- Syncopation/anticipation filtering implemented
-- Role presence gating implemented
-- Phrase hook protection implemented
- - Feel timing (Story E1) implemented: `FeelTimingEngine` applies Straight/Swing/Shuffle/Triplet timing
-   shifts to eligible eighth offbeats and is covered by unit tests (`FeelTimingEngineTests`).
+- **Stories A1-A3 (COMPLETED):** Stable output types (GrooveOnset, GrooveBarContext, GrooveBarPlan), deterministic RNG streams, drummer policy hooks
+- **Stories B1-B4 (COMPLETED):** Variation layer merge, candidate filtering, weighted selection, operator candidate source hook
+- **Stories C1-C3 (COMPLETED):** Density target computation, selection until target, hard caps enforcement
+- **Stories D1-D2 (COMPLETED):** Onset strength classification (all meters + grid-aware), velocity shaping (role × strength)
+- **Story E1 (COMPLETED):** Feel timing (Straight/Swing/Shuffle/Triplet) with `FeelTimingEngine`
+- **Story SC1 (COMPLETED):** Part track bar coverage analysis with `PartTrackBarCoverageAnalyzer`
+- **Story F1 (COMPLETED):** Override merge policy enforcement with `GrooveOverrideMergePolicy`
+- **Story G1 (COMPLETED):** Groove decision trace with structured `GrooveBarDiagnostics` (opt-in, zero-cost when disabled)
+
+**Remaining work:**
+- Story E2: Role timing feel + bias + clamp
+- Story G2: Add provenance to onsets
+- Stories H1-H2: Full test suite + golden regression tests
 
 ### Material/Motif System
 
