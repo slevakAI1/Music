@@ -92,6 +92,14 @@
     <None Remove="AIPlans\CompletedWork_CurrentState.md" />
     <None Remove="AIPlans\PreAnalysis_E2.md" />
     <None Remove="AIPlans\PreAnalysis_E2_Clarified.md" />
+    <None Remove="AIResearch\ComponentRelationshipsAndDevelopmentPath.md" />
+    <None Remove="AIResearch\ConvertAudioSampleTunesToMidi.txt" />
+    <None Remove="AIResearch\DrumFillStyleResearch.md" />
+    <None Remove="AIResearch\GrooveModelBoundaries.txt" />
+    <None Remove="AIResearch\groove_human_drummer_session_notes.md" />
+    <None Remove="AIResearch\HarmonyPolicy.md" />
+    <None Remove="AIResearch\musical_energy_compilation.md" />
+    <None Remove="AIResearch\Usage.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -119,6 +127,7 @@
   <ItemGroup>
     <Folder Include="AI Prompts\" />
     <Folder Include="AICompleted\" />
+    <Folder Include="AIResearch\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />

@@ -856,9 +856,11 @@ new MidiIoService().ExportToFile("output.mid", midiDoc);
 
 
 
+
+
 ---
 
-## 15) Agent Infrastructure (Stories 1.1-1.3)
+## 15) Agent Infrastructure (Stories 1.1-1.4)
 
 Location: `Generator/Agents/Common/`
 
@@ -890,6 +892,14 @@ Generator/Agents/Common/
   └── OperatorSelectionEngine.cs  (selection engine with scoring and density/cap limits)
 ```
 
+Files added in Story 1.4:
+
+```
+Generator/Agents/Common/
+  ├── StyleConfiguration.cs        (FeelRules, GridRules, StyleConfiguration records)
+  └── StyleConfigurationLibrary.cs (registry with PopRock, Jazz, Metal presets)
+```
+
 Notes:
 - `AgentContext` is a record to ensure immutability and determinism.
 - `IMusicalOperator<TCandidate>` is generic; instrument agents implement specialized versions.
@@ -902,6 +912,13 @@ Notes:
 - Score formula: `finalScore = baseScore * styleWeight * (1.0 - repetitionPenalty)`.
 - Deterministic tie-breaking: score desc → operatorId asc → candidateId asc.
 - Respects density targets (stop when reached) and hard caps (never exceed).
+- `StyleConfiguration` separates genre behavior from operator logic (immutable record).
+- `StyleConfigurationLibrary.GetStyle(styleId)` provides case-insensitive lookup.
+- Predefined styles: PopRock (straight/16th), Jazz (swing/triplets), Metal (dense/16th).
+- Missing operator weights default to 0.5; missing role caps default to int.MaxValue.
+
+
+
 
 
 
