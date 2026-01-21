@@ -854,9 +854,11 @@ new MidiIoService().ExportToFile("output.mid", midiDoc);
 ```
 
 
+
+
 ---
 
-## 15) Agent Infrastructure (Stories 1.1-1.2)
+## 15) Agent Infrastructure (Stories 1.1-1.3)
 
 Location: `Generator/Agents/Common/`
 
@@ -881,6 +883,13 @@ Generator/Agents/Common/
   └── DecayCurve.cs               (enum for repetition penalty decay)
 ```
 
+Files added in Story 1.3:
+
+```
+Generator/Agents/Common/
+  └── OperatorSelectionEngine.cs  (selection engine with scoring and density/cap limits)
+```
+
 Notes:
 - `AgentContext` is a record to ensure immutability and determinism.
 - `IMusicalOperator<TCandidate>` is generic; instrument agents implement specialized versions.
@@ -889,6 +898,13 @@ Notes:
 - `AgentMemory` uses circular buffer for last-N-bars tracking with configurable window size.
 - `GetRepetitionPenalty()` supports Linear and Exponential decay curves.
 - All collections use sorted order for deterministic iteration.
+- `OperatorSelectionEngine<TCandidate>` selects candidates using weighted scoring.
+- Score formula: `finalScore = baseScore * styleWeight * (1.0 - repetitionPenalty)`.
+- Deterministic tie-breaking: score desc → operatorId asc → candidateId asc.
+- Respects density targets (stop when reached) and hard caps (never exceed).
+
+
+
 
 
 
