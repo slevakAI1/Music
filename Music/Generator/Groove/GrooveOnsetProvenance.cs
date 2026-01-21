@@ -48,5 +48,55 @@ namespace Music.Generator
         /// Useful for understanding why a candidate was chosen.
         /// </summary>
         public IReadOnlyList<string>? TagsSnapshot { get; init; }
+
+        /// <summary>
+        /// Creates provenance for an anchor-layer onset.
+        /// Story G2: Anchors have Source=Anchor with null GroupId/CandidateId.
+        /// </summary>
+        /// <returns>Provenance record for an anchor onset.</returns>
+        public static GrooveOnsetProvenance ForAnchor()
+        {
+            return new GrooveOnsetProvenance
+            {
+                Source = GrooveOnsetSource.Anchor,
+                GroupId = null,
+                CandidateId = null,
+                TagsSnapshot = null
+            };
+        }
+
+        /// <summary>
+        /// Creates provenance for a variation-selected onset.
+        /// Story G2: Variations have Source=Variation with GroupId and CandidateId populated.
+        /// </summary>
+        /// <param name="groupId">Group ID from GrooveCandidateGroup.GroupId.</param>
+        /// <param name="candidateId">Candidate ID (format: "{groupId}:{beat:F2}").</param>
+        /// <param name="enabledTags">Enabled tags at selection time (null if unavailable).</param>
+        /// <returns>Provenance record for a variation onset.</returns>
+        public static GrooveOnsetProvenance ForVariation(
+            string groupId,
+            string candidateId,
+            IReadOnlyList<string>? enabledTags = null)
+        {
+            return new GrooveOnsetProvenance
+            {
+                Source = GrooveOnsetSource.Variation,
+                GroupId = groupId,
+                CandidateId = candidateId,
+                TagsSnapshot = enabledTags
+            };
+        }
+
+        /// <summary>
+        /// Creates a stable candidate ID from group ID and beat position.
+        /// Uses same format as GrooveDiagnosticsCollector.MakeCandidateId for consistency.
+        /// </summary>
+        /// <param name="groupId">Group identifier.</param>
+        /// <param name="beat">Beat position of the candidate.</param>
+        /// <returns>Stable candidate identifier string.</returns>
+        public static string MakeCandidateId(string groupId, decimal beat)
+        {
+            return $"{groupId}:{beat:F2}";
+        }
     }
 }

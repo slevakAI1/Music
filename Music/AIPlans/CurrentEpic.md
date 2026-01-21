@@ -521,7 +521,7 @@ Notes for future implementation:
 
 ---
 
-### Story G2 — Add “Provenance” to Onsets
+### Story G2 — Add “Provenance” to Onsets (COMPLETED)
 **As a** developer  
 **I want** each onset to remember where it came from  
 **So that** later systems (drummer model, ducking, analysis) can reason about it
