@@ -68,6 +68,7 @@
     <None Remove="AI Prompts\Story_7_5_8_Usage_Guide.md" />
     <None Remove="AI Prompts\Story_9_1_Implementation_Summary.md" />
     <None Remove="AICompleted\Disconnect_Energy.md" />
+    <None Remove="AICompleted\Epic_Groove.md" />
     <None Remove="AICompleted\GroovePlanCompletedStories.md" />
     <None Remove="AICompleted\MeasureTrackerPlan.md" />
     <None Remove="AICompleted\PreAnalysis_E2.md" />
