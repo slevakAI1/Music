@@ -2,9 +2,15 @@
 // AI: invariants=All outputs deterministic by seed; placement respects orchestration/register constraints; collision-free within register bands.
 // AI: deps=Consumes SectionTrack, MaterialBank; produces MotifPlacementPlan for renderer.
 
-using Music.Generator;
 
-namespace Music.Song.Material;
+// AI: purpose=Deterministic motif placement planner; selects WHICH motifs appear WHERE.
+// AI: invariants=All outputs deterministic by seed; placement respects orchestration/register constraints; collision-free within register bands.
+// AI: deps=Consumes SectionTrack, MaterialBank; produces MotifPlacementPlan for renderer.
+
+using Music.Generator;
+using Music.Song.Material;
+
+namespace Music.Generator.Material;
 
 /// <summary>
 /// Deterministically places motifs in song structure based on section types, tension, and orchestration.

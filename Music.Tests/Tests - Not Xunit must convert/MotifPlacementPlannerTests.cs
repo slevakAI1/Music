@@ -2,6 +2,7 @@
 // AI: invariants=All tests deterministic; placement respects orchestration/register constraints; common forms produce sensible output.
 
 using Music.Generator;
+using Music.Generator.Material;
 using Music.MyMidi;
 
 namespace Music.Song.Material.Tests;

@@ -1,7 +1,9 @@
 // AI: purpose=Query structure for checking motif activity at (section, bar, role); used by generators for ducking/replacement decisions.
 // AI: Story 9.3=Minimal implementation to support motif presence checks; density estimate for ducking magnitude.
 
-namespace Music.Song.Material;
+using Music.Song.Material;
+
+namespace Music.Generator.Material;
 
 /// <summary>
 /// Query structure for checking if motifs are active at specific song positions.

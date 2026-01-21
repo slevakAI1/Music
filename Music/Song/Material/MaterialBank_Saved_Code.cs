@@ -1,3 +1,4 @@
+using Music.Generator.Material;
 using Music.Song.Material;
 
 namespace Music.Generator
