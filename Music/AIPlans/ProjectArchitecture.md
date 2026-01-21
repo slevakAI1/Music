@@ -548,6 +548,10 @@ public sealed class MaterialBank
 5. **MotifPresenceMap** — Query if motif active at (section, bar, role)
 6. **MotifRenderer** — Renders motif spec + placement to PartTrack (currently commented out / WIP)
 
+Generator/Material/                     # Processing & generation
+  ├── MotifPlacementPlanner.cs          # Story 9.1 (planning)
+  ├── MotifPresenceMap.cs               # Story 9.3 (coordination)
+  └── MotifRenderer.cs                  # Story 9.2 (rendering)
 ---
 
 ## 7) RNG System
