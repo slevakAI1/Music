@@ -78,4 +78,4 @@ Limit response in chat pane to 4 bullets only summarizing what was done.
 ---
 
 Focus on **understanding the problem**, not solving it.
-Now analyze this story: SC1
+Now analyze this story: H1

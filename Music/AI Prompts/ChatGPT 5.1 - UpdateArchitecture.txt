@@ -2,7 +2,5 @@
 
 #solution #file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\CurrentEpic.md' 
 
-Goal: Ensure changes made for stories SC1, F1 and G1 are 
-reflected in #file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\ProjectArchitecture.md' . 
+Goal: 
 
-Make updates as needed only for this purpose.

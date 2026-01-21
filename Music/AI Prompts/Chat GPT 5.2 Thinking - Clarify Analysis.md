@@ -8,7 +8,7 @@
 
 #file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\NorthStar.md'
 
-Goal: Update PreAnalysis_G2.md with answers to clarifying questions in order to resolve ambiguities and ensure a clear understanding of the requirements. 
+Goal: Update PreAnalysis_H1.md with answers to clarifying questions in order to resolve ambiguities and ensure a clear understanding of the requirements. 
 
 
 Information Sources: 

@@ -686,7 +686,54 @@ public static class GrooveRoles
 
 Location: `Music.Tests/`
 
-Uses MSTest. Contains integration and contract tests for groove system.
+Uses **xUnit** test framework. Contains unit and integration tests for groove system.
+
+**Test packages:** `xunit`, `FluentAssertions`, `NSubstitute`, `AutoFixture.AutoNSubstitute`
+
+**Test conventions:**
+- Constructor-based RNG initialization: `Rng.Initialize(42);`
+- Method naming: `<Component>_<Condition>_<ExpectedResult>`
+- Use `#region` blocks to organize test categories
+
+### Groove System Tests (Story H1)
+
+| File | Purpose |
+|------|---------|
+| `GrooveOutputContractsTests.cs` | Story A1: Stable groove output types |
+| `GrooveRngStreamPolicyTests.cs` | Story A2: Deterministic RNG streams |
+| `GroovePolicyHookTests.cs` | Story A3: Policy provider hooks |
+| `VariationLayerMergeTests.cs` | Story B1: Layer merge (additive/replace) |
+| `CandidateFilterTests.cs` | Story B2: Tag-based filtering |
+| `WeightedCandidateSelectionTests.cs` | Story B3: Weighted selection + tie-breaks |
+| `GrooveCandidateSourceTests.cs` | Story B4: Candidate source adapter |
+| `DensityTargetComputationTests.cs` | Story C1: Density calculation |
+| `CapEnforcementTests.cs` | Story C3: Hard caps + pruning |
+| `OnsetStrengthClassifierTests.cs` | Story D1: Onset strength (66 tests) |
+| `VelocityShaperTests.cs` | Story D2: Velocity shaping (41 tests) |
+| `FeelTimingEngineTests.cs` | Story E1: Feel timing |
+| `RoleTimingEngineTests.cs` | Story E2: Role micro-timing |
+| `OverrideMergePolicyMatrixTests.cs` | Story F1/H1: Override policy matrix (18 tests) |
+| `GrooveBarDiagnosticsTests.cs` | Story G1: Structured diagnostics |
+| `GrooveOnsetProvenanceTests.cs` | Story G2: Onset provenance |
+| `PartTrackBarCoverageAnalyzerTests.cs` | Story SC1: Bar coverage analysis |
+| `GroovePhaseIntegrationTests.cs` | Story H1: Narrow integration tests (8 tests) |
+| `GrooveCrossComponentTests.cs` | Story H1: Cross-component verification (8 tests) |
+
+### Test Fixtures
+
+Location: `Music.Tests/TestFixtures/`
+
+| File | Purpose |
+|------|---------|
+| `GrooveSnapshotHelper.cs` | Story H1/H2: Snapshot serialization for golden tests |
+
+```csharp
+// Usage for golden tests (H2)
+var snapshot = GrooveSnapshotHelper.CreateSnapshot(plan, "Kick");
+string json = GrooveSnapshotHelper.SerializeSnapshot(snapshot);
+var restored = GrooveSnapshotHelper.DeserializeSnapshot(json);
+bool equal = GrooveSnapshotHelper.SnapshotsEqual(expected, actual);
+```
 
 ---
 
@@ -743,13 +790,15 @@ The groove system is being rebuilt story by story. Current state:
 - **Stories C1-C3 (COMPLETED):** Density target computation, selection until target, hard caps enforcement
 - **Stories D1-D2 (COMPLETED):** Onset strength classification (all meters + grid-aware), velocity shaping (role × strength)
 - **Story E1 (COMPLETED):** Feel timing (Straight/Swing/Shuffle/Triplet) with `FeelTimingEngine`
+- **Story E2 (COMPLETED):** Role timing feel + bias + clamp with `RoleTimingEngine`
 - **Story SC1 (COMPLETED):** Part track bar coverage analysis with `PartTrackBarCoverageAnalyzer`
 - **Story F1 (COMPLETED):** Override merge policy enforcement with `GrooveOverrideMergePolicy`
 - **Story G1 (COMPLETED):** Groove decision trace with structured `GrooveBarDiagnostics` (opt-in, zero-cost when disabled)
+- **Story G2 (COMPLETED):** Onset provenance with `GrooveOnsetProvenance`
+- **Story H1 (COMPLETED):** Full groove phase unit tests with override policy matrix, integration tests, and snapshot helpers
 
-                **Remaining work:**
-                - Story E2: Role timing feel + bias + clamp
-                - Stories H1-H2: Full test suite + golden regression tests
+**Remaining work:**
+- Story H2: End-to-end groove regression snapshot (golden test)
 
 ### Material/Motif System
 
