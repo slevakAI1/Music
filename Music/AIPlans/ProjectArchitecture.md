@@ -448,6 +448,8 @@ public sealed class GrooveOverrideMergePolicy
 | `GrooveBarPlan.cs` | Per-bar plan (base onsets, variation, final, diagnostics) |
 | `GrooveBarDiagnostics.cs` | Structured diagnostics records (Story G1) |
 | `GrooveDiagnosticsCollector.cs` | Helper for collecting diagnostic data during pipeline (Story G1) |
+| `GrooveOnsetProvenance.cs` | Provenance record for `GrooveOnset` (Story G2) |
+| `GrooveOnsetFactory.cs` | Helper to construct `GrooveOnset` with provenance (Story G2) |
 | `GrooveSelectionEngine.cs` | Select candidates until target reached; supports diagnostics collection |
 | `GrooveCapsEnforcer.cs` | Enforce hard caps with diagnostics; respects merge policy (Stories C3, F1, G1) |
 | `OverrideMergePolicyEnforcer.cs` | Enforce override merge policy rules (Story F1) |
@@ -745,10 +747,9 @@ The groove system is being rebuilt story by story. Current state:
 - **Story F1 (COMPLETED):** Override merge policy enforcement with `GrooveOverrideMergePolicy`
 - **Story G1 (COMPLETED):** Groove decision trace with structured `GrooveBarDiagnostics` (opt-in, zero-cost when disabled)
 
-**Remaining work:**
-- Story E2: Role timing feel + bias + clamp
-- Story G2: Add provenance to onsets
-- Stories H1-H2: Full test suite + golden regression tests
+                **Remaining work:**
+                - Story E2: Role timing feel + bias + clamp
+                - Stories H1-H2: Full test suite + golden regression tests
 
 ### Material/Motif System
 
