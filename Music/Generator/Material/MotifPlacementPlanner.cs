@@ -7,7 +7,6 @@
 // AI: invariants=All outputs deterministic by seed; placement respects orchestration/register constraints; collision-free within register bands.
 // AI: deps=Consumes SectionTrack, MaterialBank; produces MotifPlacementPlan for renderer.
 
-using Music.Generator;
 using Music.Song.Material;
 
 namespace Music.Generator.Material;
