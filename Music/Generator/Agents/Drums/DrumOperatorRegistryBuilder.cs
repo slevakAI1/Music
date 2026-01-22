@@ -1,11 +1,12 @@
 // AI: purpose=Builder for DrumOperatorRegistry; registers all drum operators for discovery and filtering.
 // AI: invariants=RegisterAll() must be called before any operators can be used; operators registered in deterministic order.
-// AI: deps=DrumOperatorRegistry, all operator implementations across MicroAddition/SubdivisionTransform/PhrasePunctuation families.
-// AI: change=Story 2.4 stub; Story 3.1 adds MicroAddition; Story 3.2 adds SubdivisionTransform; Story 3.3 adds PhrasePunctuation; Story 3.6 completes with all families.
+// AI: deps=DrumOperatorRegistry, all operator implementations across MicroAddition/SubdivisionTransform/PhrasePunctuation/PatternSubstitution families.
+// AI: change=Story 2.4 stub; Story 3.1 adds MicroAddition; Story 3.2 adds SubdivisionTransform; Story 3.3 adds PhrasePunctuation; Story 3.4 adds PatternSubstitution; Story 3.6 completes with all families.
 
 using Music.Generator.Agents.Drums.Operators.MicroAddition;
 using Music.Generator.Agents.Drums.Operators.SubdivisionTransform;
 using Music.Generator.Agents.Drums.Operators.PhrasePunctuation;
+using Music.Generator.Agents.Drums.Operators.PatternSubstitution;
 
 namespace Music.Generator.Agents.Drums
 {
@@ -15,7 +16,8 @@ namespace Music.Generator.Agents.Drums
     /// Story 3.1: Registers MicroAddition operators (7 operators).
     /// Story 3.2: Registers SubdivisionTransform operators (5 operators).
     /// Story 3.3: Registers PhrasePunctuation operators (7 operators).
-    /// Story 3.6: Completes registration with PatternSubstitution and StyleIdiom operators (full 28 operators).
+    /// Story 3.4: Registers PatternSubstitution operators (4 operators).
+    /// Story 3.6: Completes registration with StyleIdiom operators (full 28 operators).
     /// </summary>
     /// <remarks>
     /// Operators are registered in a deterministic order for reproducibility:
@@ -60,8 +62,8 @@ namespace Music.Generator.Agents.Drums
             // Story 3.3: PhrasePunctuation operators (7)
             RegisterPhrasePunctuationOperators(registry);
 
-            // Story 3.4: PatternSubstitution operators (4) - TODO
-            // RegisterPatternSubstitutionOperators(registry);
+            // Story 3.4: PatternSubstitution operators (4)
+            RegisterPatternSubstitutionOperators(registry);
 
             // Story 3.5: StyleIdiom operators (5) - TODO
             // RegisterStyleIdiomOperators(registry);
@@ -110,7 +112,18 @@ namespace Music.Generator.Agents.Drums
             registry.RegisterOperator(new DropFillOperator());
         }
 
-        // TODO Story 3.4: Add RegisterPatternSubstitutionOperators
+        /// <summary>
+        /// Registers PatternSubstitution family operators (groove swaps, feel changes).
+        /// Story 3.4: 4 operators.
+        /// </summary>
+        private static void RegisterPatternSubstitutionOperators(DrumOperatorRegistry registry)
+        {
+            registry.RegisterOperator(new BackbeatVariantOperator());
+            registry.RegisterOperator(new KickPatternVariantOperator());
+            registry.RegisterOperator(new HalfTimeFeelOperator());
+            registry.RegisterOperator(new DoubleTimeFeelOperator());
+        }
+
         // TODO Story 3.5: Add RegisterStyleIdiomOperators
     }
 }

@@ -3,8 +3,6 @@
 
 #file:'C:\Users\sleva\source\repos\Music\Music\AI\Plans\CurrentEpic_HumanDrummer.md'
 
-#file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\ProjectArchitecture.md' 
-
 # Pre-Analysis Request for Agile Story Implementation
 
 I need you to analyze an agile story from the current epic and provide **context and questions only** — no technical implementation suggestions.

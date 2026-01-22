@@ -1190,7 +1190,7 @@ Notes:
 
 ---
 
-## 18) Drum Operators (Stories 3.1-3.3)
+## 18) Drum Operators (Stories 3.1-3.4)
 
 Location: `Generator/Agents/Drums/Operators/`
 
@@ -1296,7 +1296,7 @@ Tom mapping:
 - DropFill descending: Tom1 → Tom2 → FloorTom
 - Fallback to Snare if no toms available
 
-### Operator Registry (Story 3.3 partial, Story 3.6 complete)
+### Operator Registry (Story 3.4 partial, Story 3.6 complete)
 
 Location: `Generator/Agents/Drums/DrumOperatorRegistry.cs`, `DrumOperatorRegistryBuilder.cs`
 
@@ -1304,9 +1304,9 @@ Location: `Generator/Agents/Drums/DrumOperatorRegistry.cs`, `DrumOperatorRegistr
 - Story 3.1: 7 MicroAddition operators
 - Story 3.2: 5 SubdivisionTransform operators
 - Story 3.3: 7 PhrasePunctuation operators
-- Story 3.4: 4 PatternSubstitution operators (TODO)
+- Story 3.4: 4 PatternSubstitution operators
 - Story 3.5: 5 StyleIdiom operators (TODO)
-- **Total (current):** 19 operators registered
+- **Total (current):** 23 operators registered
 - **Total (final in 3.6):** 28 operators
 
 Registry methods:
@@ -1318,6 +1318,45 @@ Registry methods:
 - `GetEnabledOperators(style)` - filtered by StyleConfiguration
 - `GetEnabledOperators(allowList)` - filtered by policy allow list
 
+### PatternSubstitution Operators (Story 3.4)
+
+Location: `Generator/Agents/Drums/Operators/PatternSubstitution/`
+
+| Operator | Purpose | Energy Threshold | Special Constraints |
+|----------|---------|------------------|---------------------|
+| `BackbeatVariantOperator` | Snare articulation variants (flam, rimshot, sidestick) | >= 0.3 | Snare in ActiveRoles, section-aware articulation selection |
+| `KickPatternVariantOperator` | Kick pattern swaps (four-on-floor, syncopated, half-time) | >= 0.3 | Kick in ActiveRoles, section-aware pattern selection |
+| `HalfTimeFeelOperator` | Half-time feel (snare on 3 only, sparse kicks) | 0.2-0.6 | Snare in ActiveRoles, Bridge/Verse/Intro/Outro sections |
+| `DoubleTimeFeelOperator` | Double-time feel (8th note kick density) | >= 0.6 | Kick in ActiveRoles, Chorus/Solo/Outro sections |
+
+Key behaviors:
+- Pattern substitution operators replace entire patterns, not additive like MicroAddition
+- Lower base scores (0.45-0.5) encourage sparing use compared to other families
+- Section-aware: different patterns for verse vs chorus vs bridge
+- Energy-gated: half-time at low energy, double-time at high energy
+- **Mutual exclusion:** HalfTimeFeel and DoubleTimeFeel are mutually exclusive via energy thresholds
+- Suppress during fill windows (fills handle their own patterns)
+- All suppress during `IsFillWindow = true`
+- Score boost at section boundaries (pattern change marks section identity)
+
+Articulation selection for BackbeatVariant:
+- Verse: SideStick (lighter feel)
+- Chorus: Rimshot (power and cut)
+- Bridge: Flam (texture) or SideStick (low energy)
+- Solo: Rimshot (cutting through)
+- Intro/Outro: SideStick (subtlety)
+
+Kick pattern variants:
+- FourOnFloor: Kick on every beat (Chorus with high energy)
+- Syncopated: Beat 1, offbeat at 2.5, beat 4 (Verse with moderate energy)
+- HalfTime: Sparse kicks on beat 1 only or beats 1 and 3 (Bridge)
+
+Feel operators coordination:
+- HalfTimeFeelOperator: Generates snare on beat 3 + sparse kick pattern
+- DoubleTimeFeelOperator: Generates 8th note kick density + standard backbeats
+
+
+
 ### Test Coverage
 
 | Test File | Purpose |
@@ -1325,6 +1364,7 @@ Registry methods:
 | `MicroAdditionOperatorTests.cs` | Story 3.1: 7 operators, determinism, energy gating |
 | `SubdivisionTransformOperatorTests.cs` | Story 3.2: 5 operators, pattern verification, odd meters |
 | `PhrasePunctuationOperatorTests.cs` | Story 3.3: 7 operators, fill windows, density scaling, time-signature adaptation |
+| `PatternSubstitutionOperatorTests.cs` | Story 3.4: 4 operators, section/energy gating, articulation variants, mutual exclusion, odd meters |
 
 
 
