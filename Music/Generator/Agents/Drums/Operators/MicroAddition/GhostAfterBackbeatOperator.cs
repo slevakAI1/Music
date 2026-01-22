@@ -66,8 +66,9 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                 // Ghost at 0.25 beats after backbeat (e.g., 2.25 after beat 2)
                 decimal ghostBeat = backbeat + 0.25m;
 
-                // Skip if ghost would land after the bar ends
-                if (ghostBeat > drummerContext.BeatsPerBar)
+                // Skip if ghost would land beyond valid 16th grid positions
+                // (BeatsPerBar + 0.75 is the last valid 16th position)
+                if (ghostBeat > drummerContext.BeatsPerBar + 0.75m)
                     continue;
 
                 int velocityHint = GenerateVelocityHint(

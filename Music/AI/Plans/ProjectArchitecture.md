@@ -1190,7 +1190,7 @@ Notes:
 
 ---
 
-## 18) Drum Operators (Stories 3.1-3.2)
+## 18) Drum Operators (Stories 3.1-3.3)
 
 Location: `Generator/Agents/Drums/Operators/`
 
@@ -1248,6 +1248,9 @@ Location: `Generator/Agents/Drums/Operators/SubdivisionTransform/`
 | `PartialLiftOperator` | 8ths first half, 16ths second half | >= 0.5 | HatSubdivision == Eighth, BeatsPerBar >= 4 |
 | `OpenHatAccentOperator` | Open hat on 1&, 3& | >= 0.5 | OpenHat in ActiveRoles |
 
+
+
+
 Key behaviors:
 - Generate full-bar patterns (not individual notes)
 - Check `HatSubdivision` and `CurrentHatMode` for applicability
@@ -1260,12 +1263,70 @@ Pattern positions for 4/4:
 - 16th pattern: 1.0, 1.25, 1.5, 1.75, ..., 4.75 (16 positions)
 - PartialLift: 8ths on beats 1-2, 16ths on beats 3-4 (12 positions)
 
+### PhrasePunctuation Operators (Story 3.3)
+
+Location: `Generator/Agents/Drums/Operators/PhrasePunctuation/`
+
+| Operator | Purpose | Energy Threshold | Special Constraints |
+|----------|---------|------------------|---------------------|
+| `CrashOnOneOperator` | Crash cymbal on beat 1 at section start | Any | IsAtSectionBoundary + PhrasePosition < 0.1, Crash in ActiveRoles |
+| `TurnaroundFillShortOperator` | 2-beat fill on last 2 beats (3-4 in 4/4) | >= 0.3 | IsFillWindow, Snare in ActiveRoles, generates 4-8 hits |
+| `TurnaroundFillFullOperator` | Full-bar fill at section end | >= 0.4 | IsFillWindow + BarsUntilSectionEnd <= 1, generates 8-16 hits |
+| `SetupHitOperator` | Kick/snare on 4& leading to next section | >= 0.3 | IsFillWindow or IsAtSectionBoundary, adds snare if energy >= 0.6 |
+| `StopTimeOperator` | Sparse accents (kick on 1, snare on 3) | 0.4-0.7 | IsFillWindow, creates "dropout" via absence of dense candidates |
+| `BuildFillOperator` | Ascending tom fill (low to high) | >= 0.5 | IsFillWindow, requires at least one tom, generates 6-12 hits |
+| `DropFillOperator` | Descending tom fill (high to low) | >= 0.4 | IsFillWindow, requires at least one tom, generates 6-12 hits |
+
+Key behaviors:
+- All require `IsFillWindow = true` (except CrashOnOne which requires IsAtSectionBoundary)
+- Fill density scales with energy level (higher energy = more hits)
+- Time-signature adaptive (fills adjust to last 2 beats of bar, whatever the meter)
+- BuildFill/DropFill use ascending/descending tom patterns with velocity crescendo/decrescendo
+- StopTimeOperator is unique: generates minimal candidates to create "negative space"
+- Deterministic pattern selection via HashCode.Combine with operator-specific tags
+- FillRole classification: Setup, FillStart, FillBody, FillEnd for memory tracking
+
+Fill density mapping:
+- Energy 0.0-0.3: sparse (4-6 hits per 2-beat fill)
+- Energy 0.3-0.6: moderate (6-10 hits)
+- Energy 0.6-1.0: dense (10-16 hits)
+
+Tom mapping:
+- BuildFill ascending: FloorTom → Tom2 → Tom1
+- DropFill descending: Tom1 → Tom2 → FloorTom
+- Fallback to Snare if no toms available
+
+### Operator Registry (Story 3.3 partial, Story 3.6 complete)
+
+Location: `Generator/Agents/Drums/DrumOperatorRegistry.cs`, `DrumOperatorRegistryBuilder.cs`
+
+**DrumOperatorRegistryBuilder** provides deterministic operator registration:
+- Story 3.1: 7 MicroAddition operators
+- Story 3.2: 5 SubdivisionTransform operators
+- Story 3.3: 7 PhrasePunctuation operators
+- Story 3.4: 4 PatternSubstitution operators (TODO)
+- Story 3.5: 5 StyleIdiom operators (TODO)
+- **Total (current):** 19 operators registered
+- **Total (final in 3.6):** 28 operators
+
+Registry methods:
+- `BuildComplete()` - creates and freezes a registry with all operators
+- `RegisterAllOperators(registry)` - populates a registry (testable)
+- `GetAllOperators()` - deterministic order (registration order)
+- `GetOperatorsByFamily(family)` - filtered by OperatorFamily
+- `GetOperatorById(operatorId)` - lookup by ID
+- `GetEnabledOperators(style)` - filtered by StyleConfiguration
+- `GetEnabledOperators(allowList)` - filtered by policy allow list
+
 ### Test Coverage
 
 | Test File | Purpose |
 |-----------|---------|
 | `MicroAdditionOperatorTests.cs` | Story 3.1: 7 operators, determinism, energy gating |
 | `SubdivisionTransformOperatorTests.cs` | Story 3.2: 5 operators, pattern verification, odd meters |
+| `PhrasePunctuationOperatorTests.cs` | Story 3.3: 7 operators, fill windows, density scaling, time-signature adaptation |
+
+
 
 
 

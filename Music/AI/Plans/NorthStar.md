@@ -146,7 +146,7 @@ See `History.md` for detailed implementation notes on each completed stage.
 ---
 
 
-NOTE - STAGE 11 IS FURTHER REFINED IN A SEPARATE DOCUMENT NOT LISTED HERE. THIS IS CLOSE.
+NOTE - STAGE 11 IS FURTHER REFINED IN A SEPARATE DOCUMENT - CurrentEpic_HumanDrummer.md
 
 ## Stage 11 — Human Drummer Agent (Pop/Rock)
 
