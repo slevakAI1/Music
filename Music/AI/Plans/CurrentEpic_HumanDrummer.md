@@ -206,7 +206,7 @@
 
 ---
 
-### Story 2.3 — Implement Drummer Policy Provider
+### Story 2.3 — Implement Drummer Policy Provider (COMPLETED)
 
 **As a** groove system  
 **I want** drummer agent to implement `IGroovePolicyProvider`  

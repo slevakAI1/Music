@@ -2,7 +2,7 @@
 
 #solution
 
-#file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\CurrentEpic.md'
+#file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\CurrentEpic_HumanDrummer.md'
 
 #file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\ProjectArchitecture.md'
 
@@ -78,4 +78,4 @@ Limit response in chat pane to 4 bullets only summarizing what was done.
 ---
 
 Focus on **understanding the problem**, not solving it.
-Now analyze this story: 2.2
+Now analyze this story: 2.3

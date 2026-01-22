@@ -135,7 +135,6 @@
 
   <ItemGroup>
     <Folder Include="AI\Prompts\" />
-    <Folder Include="AI\Completed\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />

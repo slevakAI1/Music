@@ -981,6 +981,128 @@ Notes:
 - `DrumCandidate.GenerateCandidateId()` helper creates stable IDs.
 - `DrumCandidate.CreateMinimal()` helper for testing.
 
+---
+
+## 17) Drummer Policy Provider (Story 2.3)
+
+Location: `Generator/Agents/Drums/DrummerPolicyProvider.cs`
+
+Purpose: Implements `IGroovePolicyProvider` to drive groove system behavior from drummer context, style configuration, and memory state.
+
+### Key Types
+
+```csharp
+// DrummerPolicyProvider - main policy provider
+public sealed class DrummerPolicyProvider : IGroovePolicyProvider
+{
+    public DrummerPolicyProvider(
+        StyleConfiguration styleConfig,
+        IAgentMemory? memory = null,
+        DrummerPolicySettings? settings = null);
+    
+    public GroovePolicyDecision? GetPolicy(GrooveBarContext barContext, string role);
+}
+
+// DrummerPolicySettings - configurable behavior
+public sealed record DrummerPolicySettings
+{
+    public double EnergyDensityScale { get; init; } = 0.2;      // Energy's effect on density (±20%)
+    public int FillWindowBars { get; init; } = 2;               // Bars from section end = fill window
+    public bool AllowConsecutiveFills { get; init; } = false;
+    public int MinBarsBetweenFills { get; init; } = 4;
+}
+
+// FillOperatorIds - known fill operator identifiers
+public static class FillOperatorIds
+{
+    public const string TurnaroundFillShort = "TurnaroundFillShort";
+    public const string TurnaroundFillFull = "TurnaroundFillFull";
+    public const string BuildFill = "BuildFill";
+    public const string DropFill = "DropFill";
+    public const string SetupHit = "SetupHit";
+    public const string StopTime = "StopTime";
+    public const string CrashOnOne = "CrashOnOne";
+    public static readonly IReadOnlySet<string> All = { ... };
+}
+```
+
+### Behavior
+
+**Density Override Computation:**
+- Base density from section type: Intro=0.4, Verse=0.5, Chorus=0.8, Solo=0.7, Bridge=0.4, Outro=0.5
+- Energy modifier applied: Chorus +0.2, Solo +0.1, Bridge/Intro/Outro -0.1
+- Result clamped to [0.0, 1.0]
+
+**Max Events Override:**
+- Uses `StyleConfiguration.GetRoleCap(role)` from style (e.g., PopRock Kick=8, Snare=6, ClosedHat=16)
+- Returns null if cap is int.MaxValue (no limit)
+
+**Operator Allow List:**
+- Respects `StyleConfiguration.AllowedOperatorIds` (empty = all allowed)
+- Gates fill operators based on fill window + memory state
+- Fill operators allowed when: `BarsUntilSectionEnd <= FillWindowBars` AND no recent fill in memory
+
+**Timing Feel Override:**
+- PopRock snare gets `TimingFeel.Behind` (laid-back feel)
+- Other roles return null (use default)
+
+**Velocity Bias Override:**
+- Section-based: Chorus +10, Solo +5, Bridge -10, Intro/Outro -5, Verse 0
+- Returns null if bias is 0
+
+**Variation Tags Override:**
+- Fill window: adds "Fill", "TurnAround"
+- Section start (BarWithinSection=0): adds "SectionStart", "Crash"
+- Near section end (BarsUntilSectionEnd<=2): adds "Buildup", "SectionEnd"
+
+### Precedence Rules
+
+Policy override precedence: **immediate context > memory > style config**
+
+1. Immediate context wins (e.g., IsFillWindow status)
+2. Memory takes second priority (anti-repetition)
+3. Style config provides defaults when no overrides
+
+### Determinism
+
+- Same inputs → same `GroovePolicyDecision` (pure function)
+- No RNG calls (determinism from inputs only)
+- Read-only memory access (no mutations)
+
+### Memory Integration
+
+- Fill gating checks `IAgentMemory.GetLastFillShape()`
+- Consecutive fills blocked if `barsSinceLastFill < MinBarsBetweenFills`
+- Memory is optional (null = no memory influence)
+
+### Error Handling
+
+- `ArgumentNullException` for null barContext or role
+- Unknown roles return `GroovePolicyDecision.NoOverrides` (safe fallback)
+- No exceptions for missing style config fields (uses defaults)
+
+### Test Coverage
+
+Tests in `Music.Tests/Generator/Agents/Drums/DrummerPolicyProviderTests.cs`:
+- Construction validation
+- GetPolicy basic validation (null checks, unknown roles)
+- Determinism (same inputs → same outputs)
+- Density overrides (section-based, clamped to [0.0, 1.0])
+- Max events caps (respects style RoleCaps)
+- Fill window gating (variation tags, operator allow list)
+- Memory integration (recent fills block new fills)
+- Timing feel overrides (PopRock snare = Behind)
+- Velocity bias overrides (section-based)
+- All drum roles coverage
+
+Notes:
+- DrummerPolicyProvider is **stateless** and **thread-safe**
+- Policy decisions are computed per-bar, per-role
+- Integration with DrummerCandidateSource happens in Story 2.4
+- Operator weights remain in StyleConfiguration; policy only gates eligibility
+
+
+
 
 
 
