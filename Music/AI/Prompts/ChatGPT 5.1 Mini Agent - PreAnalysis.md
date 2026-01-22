@@ -1,4 +1,6 @@
-#solution #file:'C:\Users\sleva\source\repos\Music\Music\AI\Plans\CurrentEpic_HumanDrummer.md' #file:'C:\Users\sleva\source\repos\Music\Music\AI\Plans\ProjectArchitecture.md'
+#solution 
+#file:'C:\Users\sleva\source\repos\Music\Music\AI\Plans\CurrentEpic_HumanDrummer.md' 
+#file:'C:\Users\sleva\source\repos\Music\Music\AI\Plans\ProjectArchitecture.md'
 
 # Pre-Analysis Request for Agile Story Implementation
 
@@ -66,7 +68,7 @@ Stories follow this structure:
 
 ## Output Format
 Use clear markdown with headers for each section. Be concise but thorough. 
-Write complete response to file PreAnalysis_<Story number>.md in Music/AIPlans folder. 
+Write complete response to file PreAnalysis_<Story number>.md in root folder AI/Plans.
 Limit response in chat pane to 4 bullets only summarizing what was done.
 
 ---
