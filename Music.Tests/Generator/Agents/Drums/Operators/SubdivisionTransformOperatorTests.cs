@@ -14,6 +14,7 @@ namespace Music.Generator.Agents.Drums.Operators.Tests
     /// Story 3.2: Tests for SubdivisionTransform operators.
     /// Verifies pattern generation, context filtering, subdivision checks, and determinism.
     /// </summary>
+    [Collection("RngDependentTests")]
     public class SubdivisionTransformOperatorTests
     {
         public SubdivisionTransformOperatorTests()

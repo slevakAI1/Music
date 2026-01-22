@@ -12,6 +12,7 @@ namespace Music.Generator.Agents.Common.Tests
     /// Story 1.2: Tests for AgentMemory anti-repetition system.
     /// Verifies operator tracking, repetition penalties, decay curves, and determinism.
     /// </summary>
+    [Collection("RngDependentTests")]
     public class AgentMemoryTests
     {
         public AgentMemoryTests()

@@ -13,6 +13,7 @@ namespace Music.Generator.Agents.Drums.Tests
     /// Story 2.5: Tests for DrummerMemory drummer-specific anti-repetition system.
     /// Verifies fill tracking, section-based anti-repetition, crash patterns, hat mode history, and ghost frequency.
     /// </summary>
+    [Collection("RngDependentTests")]
     public class DrummerMemoryTests
     {
         public DrummerMemoryTests()

@@ -13,6 +13,7 @@ namespace Music.Generator.Agents.Drums.Tests
     /// Story 2.2: Tests for DrumCandidate, FillRole, and DrumArticulation types.
     /// Verifies creation, validation, scoring, and helper methods.
     /// </summary>
+    [Collection("RngDependentTests")]
     public class DrumCandidateTests
     {
         public DrumCandidateTests()

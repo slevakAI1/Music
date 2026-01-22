@@ -10,6 +10,11 @@ namespace Music.Generator.Tests
     /// Story B3: Tests for weighted candidate selection.
     /// Verifies determinism, weight computation, tie-breaking, and edge cases.
     /// </summary>
+    /// <remarks>
+    /// This class is in the RngDependentTests collection to run sequentially because
+    /// tests verify determinism by re-initializing global RNG state.
+    /// </remarks>
+    [Collection("RngDependentTests")]
     public class WeightedCandidateSelectionTests
     {
         public WeightedCandidateSelectionTests()

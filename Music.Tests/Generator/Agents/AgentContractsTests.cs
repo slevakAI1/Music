@@ -12,6 +12,7 @@ namespace Music.Generator.Agents.Common.Tests
     /// Story 1.1: Tests for common agent contracts.
     /// Verifies OperatorFamily, FillShape, AgentContext, IAgentMemory, and IMusicalOperator.
     /// </summary>
+    [Collection("RngDependentTests")]
     public class AgentContractsTests
     {
         public AgentContractsTests()

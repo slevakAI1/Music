@@ -12,6 +12,11 @@ namespace Music.Tests.Generator.Groove;
 /// These tests exercise 2-3 components together to verify correct interactions.
 /// Scope: Single bar + single role maximum.
 /// </summary>
+/// <remarks>
+/// This class is in the RngDependentTests collection to run sequentially because
+/// tests depend on global RNG state.
+/// </remarks>
+[Collection("RngDependentTests")]
 public class GroovePhaseIntegrationTests
 {
     public GroovePhaseIntegrationTests()

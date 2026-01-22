@@ -14,6 +14,7 @@ namespace Music.Generator.Agents.Drums.Operators.Tests
     /// Story 3.1: Tests for MicroAddition operators.
     /// Verifies candidate generation, context filtering, velocity ranges, and determinism.
     /// </summary>
+    [Collection("RngDependentTests")]
     public class MicroAdditionOperatorTests
     {
         public MicroAdditionOperatorTests()

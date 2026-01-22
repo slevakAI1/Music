@@ -10,6 +10,11 @@ namespace Music.Generator.Tests
     /// Story A2: Tests for deterministic RNG stream policy.
     /// Verifies same inputs => identical RNG sequences per stream key.
     /// </summary>
+    /// <remarks>
+    /// This class is in the RngDependentTests collection to run sequentially because
+    /// tests verify determinism by re-initializing global RNG state.
+    /// </remarks>
+    [Collection("RngDependentTests")]
     public class GrooveRngStreamPolicyTests
     {
         #region Setup/Teardown

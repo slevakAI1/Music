@@ -12,6 +12,11 @@ namespace Music.Generator.Agents.Common.Tests
     /// Story 1.3: Tests for OperatorSelectionEngine.
     /// Verifies selection algorithm, determinism, density targets, hard caps, and tie-breaking.
     /// </summary>
+    /// <remarks>
+    /// This class is in the RngDependentTests collection to run sequentially because
+    /// tests verify determinism by re-initializing global RNG state.
+    /// </remarks>
+    [Collection("RngDependentTests")]
     public class OperatorSelectionEngineTests
     {
         public OperatorSelectionEngineTests()

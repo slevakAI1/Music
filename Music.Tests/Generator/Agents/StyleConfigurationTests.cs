@@ -12,6 +12,7 @@ namespace Music.Generator.Agents.Common.Tests
     /// Story 1.4: Tests for StyleConfiguration and StyleConfigurationLibrary.
     /// Verifies configuration loading, default values, and style lookup.
     /// </summary>
+    [Collection("RngDependentTests")]
     public class StyleConfigurationTests
     {
         public StyleConfigurationTests()

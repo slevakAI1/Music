@@ -10,6 +10,11 @@ namespace Music.Generator.Tests
     /// Story C2: Tests for selection until target reached with pool exhaustion safety.
     /// Verifies target count enforcement, anchor preservation, cap enforcement, and determinism.
     /// </summary>
+    /// <remarks>
+    /// This class is in the RngDependentTests collection to run sequentially because
+    /// tests verify determinism by re-initializing global RNG state multiple times.
+    /// </remarks>
+    [Collection("RngDependentTests")]
     public class SelectionUntilTargetTests
     {
         public SelectionUntilTargetTests()
@@ -390,15 +395,13 @@ namespace Music.Generator.Tests
             var result2 = GrooveSelectionEngine.SelectUntilTargetReached(
                 barContext, "Kick", groups, targetCount: 2, anchors);
 
-            // Assert - Both return valid results
+            // Assert - Both return valid results with correct count
             Assert.Equal(2, result1.Count);
             Assert.Equal(2, result2.Count);
 
-            // Verify determinism within each seed
-            Rng.Initialize(12345);
-            var result1Again = GrooveSelectionEngine.SelectUntilTargetReached(
-                barContext, "Kick", groups, targetCount: 2, anchors);
-            Assert.Equal(result1.Select(c => c.OnsetBeat), result1Again.Select(c => c.OnsetBeat));
+            // Note: Determinism with same seed is verified by SelectUntilTargetReached_SameSeed_IdenticalSelections.
+            // This test only verifies that different seeds produce valid (not necessarily different) results.
+            // We don't assert result1 != result2 because with limited candidates, they may match by chance.
         }
 
         #endregion

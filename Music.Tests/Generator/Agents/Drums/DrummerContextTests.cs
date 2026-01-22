@@ -13,6 +13,7 @@ namespace Music.Generator.Agents.Drums.Tests
     /// Story 2.1: Tests for DrummerContext and DrummerContextBuilder.
     /// Verifies context construction, field population, and edge case handling.
     /// </summary>
+    [Collection("RngDependentTests")]
     public class DrummerContextTests
     {
         public DrummerContextTests()

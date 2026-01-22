@@ -13,6 +13,11 @@ namespace Music.Song.Material.Tests;
 /// Story 9.2: Tests for MotifRenderer.
 /// Verifies rendering produces valid, deterministic output respecting all constraints.
 /// </summary>
+/// <remarks>
+/// This class is in the RngDependentTests collection to run sequentially because
+/// tests depend on global RNG state.
+/// </remarks>
+[Collection("RngDependentTests")]
 public class MotifRendererTests
 {
     public MotifRendererTests()

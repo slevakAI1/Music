@@ -14,6 +14,7 @@ namespace Music.Generator.Agents.Drums.Operators.Tests
     /// Story 3.4: Tests for PatternSubstitution operators.
     /// Verifies pattern generation, section/energy gating, articulation variants, and determinism.
     /// </summary>
+    [Collection("RngDependentTests")]
     public class PatternSubstitutionOperatorTests
     {
         public PatternSubstitutionOperatorTests()

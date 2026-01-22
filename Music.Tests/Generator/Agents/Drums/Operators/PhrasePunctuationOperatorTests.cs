@@ -14,6 +14,7 @@ namespace Music.Generator.Agents.Drums.Operators.Tests
     /// Story 3.3: Tests for PhrasePunctuation operators.
     /// Verifies fill/crash generation, context gating, density scaling, and determinism.
     /// </summary>
+    [Collection("RngDependentTests")]
     public class PhrasePunctuationOperatorTests
     {
         public PhrasePunctuationOperatorTests()

@@ -14,6 +14,7 @@ namespace Music.Generator.Agents.Drums.Tests
     /// Story 2.3: Tests for DrummerPolicyProvider.
     /// Verifies policy decision computation, determinism, and override behavior.
     /// </summary>
+    [Collection("RngDependentTests")]
     public class DrummerPolicyProviderTests
     {
         public DrummerPolicyProviderTests()

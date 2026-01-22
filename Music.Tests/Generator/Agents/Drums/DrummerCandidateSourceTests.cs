@@ -15,6 +15,7 @@ namespace Music.Generator.Agents.Drums.Tests
     /// Story 2.4: Tests for DrummerCandidateSource.
     /// Verifies candidate generation, mapping, grouping, and physicality filtering.
     /// </summary>
+    [Collection("RngDependentTests")]
     public class DrummerCandidateSourceTests
     {
         public DrummerCandidateSourceTests()
