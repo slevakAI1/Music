@@ -131,7 +131,7 @@
 
   <ItemGroup>
     <Folder Include="AI Prompts\" />
-    <Folder Include="AICompleted\" />
+    <Folder Include="AIDialog\" />
     <Folder Include="AIResearch\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
