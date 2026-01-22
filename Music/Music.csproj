@@ -51,6 +51,7 @@
   <ItemGroup>
     <None Remove="AI\Completed\PreAnalysis_2.3.md" />
     <None Remove="AI\Completed\PreAnalysis_2.4.md" />
+    <None Remove="AI\Completed\PreAnalysis_2.5.md" />
     <None Remove="AI\Prompts\AgentEpic.md" />
     <None Remove="AI\Prompts\Backlog.md" />
     <None Remove="AI\Prompts\Chat GPT 5.2 Thinking - Answer clarifying questions.md" />

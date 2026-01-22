@@ -723,6 +723,20 @@ Uses **xUnit** test framework. Contains unit and integration tests for groove sy
 | `GroovePhaseIntegrationTests.cs` | Story H1: Narrow integration tests (8 tests) |
 | `GrooveCrossComponentTests.cs` | Story H1: Cross-component verification (8 tests) |
 
+### Agent System Tests
+
+| File | Purpose |
+|------|---------|
+| `AgentContractsTests.cs` | Story 1.1: Common agent contracts (IMusicalOperator, AgentContext) |
+| `AgentMemoryTests.cs` | Story 1.2: Base agent memory anti-repetition |
+| `StyleConfigurationTests.cs` | Story 1.4: Style configuration model |
+| `OperatorSelectionEngineTests.cs` | Story 1.3: Weighted operator selection |
+| `DrummerContextTests.cs` | Story 2.1: Drummer-specific context |
+| `DrumCandidateTests.cs` | Story 2.2: Drum candidate type |
+| `DrummerPolicyProviderTests.cs` | Story 2.3: Drummer policy provider |
+| `DrummerCandidateSourceTests.cs` | Story 2.4: Drummer candidate source |
+| `DrummerMemoryTests.cs` | Story 2.5: Drummer memory (fills, crashes, hats, ghosts - 48 tests) |
+
 ### Test Fixtures
 
 Location: `Music.Tests/TestFixtures/`
@@ -817,6 +831,7 @@ The drummer agent implements human-like drumming using the groove system hooks.
 - **Story 2.2 (COMPLETED):** DrumCandidate record with role, position, strength, hints, articulation, fill role, and score
 - **Story 2.3 (COMPLETED):** DrummerPolicyProvider implementing IGroovePolicyProvider
 - **Story 2.4 (COMPLETED):** DrummerCandidateSource implementing IGrooveCandidateSource with operator registry, mapping, grouping, and physicality filter stubs
+- **Story 2.5 (COMPLETED):** DrummerMemory extending AgentMemory with fill tracking, crash patterns, hat mode history, ghost frequency
 
 **Key Types:**
 
@@ -826,6 +841,8 @@ The drummer agent implements human-like drumming using the groove system hooks.
 | `DrumOperatorRegistry` | Registry for operator discovery and filtering by family/style |
 | `DrumCandidateMapper` | Maps DrumCandidate → GrooveOnsetCandidate with tag-based hints |
 | `DrummerCandidateSource` | IGrooveCandidateSource implementation gathering operator candidates |
+| `DrummerMemory` | Drummer-specific memory extending AgentMemory (fills, crashes, hats, ghosts) |
+| `HatModeHistoryEntry` | Record tracking hat mode changes (bar, mode, subdivision) |
 | `PhysicalityFilter` | Stub filter for playability validation (full implementation Story 4.3) |
 | `PhysicalityRules` | Configuration for hit caps, limb rules, strictness levels |
 
@@ -859,15 +876,15 @@ DrummerCandidateSource.GetCandidateGroups(barContext, role)
 | `Generator/Agents/Drums/DrumCandidateMapper.cs` | DrumCandidate → GrooveOnsetCandidate mapper |
 | `Generator/Agents/Drums/DrummerCandidateSource.cs` | IGrooveCandidateSource implementation |
 | `Generator/Agents/Drums/DrummerContext.cs` | Drum-specific context |
+| `Generator/Agents/Drums/DrummerMemory.cs` | Drummer-specific memory (fills, crashes, hats, ghosts) |
 | `Generator/Agents/Drums/DrummerPolicyProvider.cs` | IGroovePolicyProvider implementation |
 | `Generator/Agents/Drums/Physicality/PhysicalityFilter.cs` | Playability filter stub |
 | `Generator/Agents/Drums/Physicality/PhysicalityRules.cs` | Physicality configuration |
 
 **Remaining Drummer Agent Work:**
-- Story 2.5: DrummerMemory (fill shape tracking)
 - Stories 3.1-3.6: Drum operators (28 total)
 - Stories 4.1-4.4: Full physicality constraints (limb model, sticking rules)
-- Stories 5.1-5.3: Pop Rock style configuration
+- Stories 5.1-5.4: Pop Rock style configuration
 
 ### Material/Motif System
 

@@ -2,7 +2,7 @@
 // AI: invariants=Deterministic: same sequence of records = same state; uses sorted collections for stable iteration.
 // AI: deps=IAgentMemory, FillShape, DecayCurve, MusicConstants.eSectionType.
 // AI: perf=Circular buffer O(1) insert; usage lookup O(windowSize); sorted keys for determinism.
-// AI: change=Extend with additional tracking if agent needs emerge; keep interface stable.
+// AI: change=Extend with DrummerMemory for instrument-specific tracking; keep interface stable.
 
 using Music;
 
@@ -13,7 +13,7 @@ namespace Music.Generator.Agents.Common
     /// Uses circular buffer for efficient last-N-bars tracking.
     /// Human musicians don't repeat the exact same pattern 8 times—this creates variation.
     /// </summary>
-    public sealed class AgentMemory : IAgentMemory
+    public class AgentMemory : IAgentMemory
     {
         private readonly int _windowSize;
         private readonly DecayCurve _decayCurve;

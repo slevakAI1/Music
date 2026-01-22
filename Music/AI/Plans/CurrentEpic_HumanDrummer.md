@@ -256,7 +256,7 @@
 
 ---
 
-### Story 2.5 — Implement Drummer Memory
+### Story 2.5 — Implement Drummer Memory (COMPLETED)
 
 **As a** drummer agent  
 **I want** drummer-specific memory extending base memory  
