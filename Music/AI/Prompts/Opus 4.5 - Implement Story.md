@@ -1,6 +1,8 @@
 
 #solution
+
 #file:'C:\Users\sleva\source\repos\Music\Music\AI\Plans\CurrentEpic_HumanDrummer.md'
+
 #file:'C:\Users\sleva\source\repos\Music\Music\AI\Plans\ProjectArchitecture.md'
 
 Goal: To implement Story 2.4 from the Current Epic #file:'C:\Users\sleva\source\repos\Music\Music\AI\Plans\CurrentEpic_HumanDrummer.md'.

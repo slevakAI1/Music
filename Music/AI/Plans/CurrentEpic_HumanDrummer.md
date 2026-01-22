@@ -232,7 +232,7 @@
 
 ---
 
-### Story 2.4 — Implement Drummer Candidate Source
+### Story 2.4 — Implement Drummer Candidate Source (COMPLETED)
 
 **As a** groove system  
 **I want** drummer agent to implement `IGrooveCandidateSource`  

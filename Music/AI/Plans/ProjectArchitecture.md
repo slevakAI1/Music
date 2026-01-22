@@ -807,6 +807,68 @@ The groove system is being rebuilt story by story. Current state:
 **Remaining work:**
 - Story H2: End-to-end groove regression snapshot (golden test)
 
+### Human Drummer Agent (Active Development)
+
+The drummer agent implements human-like drumming using the groove system hooks.
+
+**Completed Stories:**
+- **Story 1.1-1.4 (COMPLETED):** Common agent infrastructure (IMusicalOperator, AgentContext, IAgentMemory, OperatorFamily, AgentMemory, OperatorSelectionEngine, StyleConfiguration)
+- **Story 2.1 (COMPLETED):** DrummerContext extending AgentContext with drum-specific fields (HatMode, HatSubdivision, IsFillWindow, BackbeatBeats)
+- **Story 2.2 (COMPLETED):** DrumCandidate record with role, position, strength, hints, articulation, fill role, and score
+- **Story 2.3 (COMPLETED):** DrummerPolicyProvider implementing IGroovePolicyProvider
+- **Story 2.4 (COMPLETED):** DrummerCandidateSource implementing IGrooveCandidateSource with operator registry, mapping, grouping, and physicality filter stubs
+
+**Key Types:**
+
+| Type | Purpose |
+|------|---------|
+| `IDrumOperator` | Drum-specific operator interface extending IMusicalOperator<DrumCandidate> |
+| `DrumOperatorRegistry` | Registry for operator discovery and filtering by family/style |
+| `DrumCandidateMapper` | Maps DrumCandidate → GrooveOnsetCandidate with tag-based hints |
+| `DrummerCandidateSource` | IGrooveCandidateSource implementation gathering operator candidates |
+| `PhysicalityFilter` | Stub filter for playability validation (full implementation Story 4.3) |
+| `PhysicalityRules` | Configuration for hit caps, limb rules, strictness levels |
+
+**Architecture Pattern:**
+
+```
+DrummerCandidateSource.GetCandidateGroups(barContext, role)
+  │
+  ├─ Build DrummerContext from GrooveBarContext
+  ├─ Get enabled operators (style + policy filtering)
+  ├─ For each operator:
+  │    ├─ CanApply() pre-filter check
+  │    └─ GenerateCandidates() → List<DrumCandidate>
+  ├─ Map DrumCandidate → GrooveOnsetCandidate (preserves hints as tags)
+  ├─ Group by OperatorFamily → GrooveCandidateGroup[]
+  └─ PhysicalityFilter.Filter() → pruned groups
+```
+
+**Files:**
+
+| File | Purpose |
+|------|---------|
+| `Generator/Agents/Common/IMusicalOperator.cs` | Generic operator interface |
+| `Generator/Agents/Common/AgentContext.cs` | Base context for all agents |
+| `Generator/Agents/Common/OperatorFamily.cs` | Operator classification enum |
+| `Generator/Agents/Common/AgentMemory.cs` | Anti-repetition memory |
+| `Generator/Agents/Common/StyleConfiguration.cs` | Style weights and caps |
+| `Generator/Agents/Drums/IDrumOperator.cs` | Drum-specific operator interface |
+| `Generator/Agents/Drums/DrumOperatorRegistry.cs` | Operator registry and discovery |
+| `Generator/Agents/Drums/DrumCandidate.cs` | Drum event candidate record |
+| `Generator/Agents/Drums/DrumCandidateMapper.cs` | DrumCandidate → GrooveOnsetCandidate mapper |
+| `Generator/Agents/Drums/DrummerCandidateSource.cs` | IGrooveCandidateSource implementation |
+| `Generator/Agents/Drums/DrummerContext.cs` | Drum-specific context |
+| `Generator/Agents/Drums/DrummerPolicyProvider.cs` | IGroovePolicyProvider implementation |
+| `Generator/Agents/Drums/Physicality/PhysicalityFilter.cs` | Playability filter stub |
+| `Generator/Agents/Drums/Physicality/PhysicalityRules.cs` | Physicality configuration |
+
+**Remaining Drummer Agent Work:**
+- Story 2.5: DrummerMemory (fill shape tracking)
+- Stories 3.1-3.6: Drum operators (28 total)
+- Stories 4.1-4.4: Full physicality constraints (limb model, sticking rules)
+- Stories 5.1-5.3: Pop Rock style configuration
+
 ### Material/Motif System
 
 - Data definitions complete (MotifSpec, MotifPlacement, MaterialBank)
