@@ -106,12 +106,14 @@
     <None Remove="AI\Plans\PreAnalysis_E2_Clarified.md" />
     <None Remove="AI\Research\ComponentRelationshipsAndDevelopmentPath.md" />
     <None Remove="AI\Research\ConvertAudioSampleTunesToMidi.txt" />
+    <None Remove="AI\Research\Drum Articulation Sounds Research - IMPORTANT.txt" />
     <None Remove="AI\Research\DrumFillStyleResearch.md" />
     <None Remove="AI\Research\GrooveModelBoundaries.txt" />
     <None Remove="AI\Research\groove_human_drummer_session_notes.md" />
     <None Remove="AI\Research\HarmonyPolicy.md" />
     <None Remove="AI\Research\musical_energy_compilation.md" />
     <None Remove="AI\Research\Usage.txt" />
+    <None Remove="AI\Research\VSTs for Drum articulations.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -139,6 +141,7 @@
   <ItemGroup>
     <Folder Include="AI\Completed\" />
     <Folder Include="AI\Prompts\" />
+    <Folder Include="AI\Research\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
