@@ -1,13 +1,17 @@
 
 #solution
-#file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\CurrentEpic.md'
+#file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\CurrentEpic_HumanDrummer.md'
 #file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\ProjectArchitecture.md'
 
-(1) Implement Story 2.1 from #file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\CurrentEpic.md'
-Use #file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\PreAnalysis_H1_Clarified.md'
- to guide your implementation.
+Goal: To implement Story 2.2 from the Current Epic #file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\CurrentEpic_HumanDrummer.md'.
 
-(2) Ensure changes made for the story are reflected in #file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\ProjectArchitecture.md' . 
+Steps to achieve the goal:
+
+(1) Review the details and acceptance criteria outlined in #file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\PreAnalysis_2.2.md' to understand the basic requirements for Story 2.2.
+(2) Compute answers to the Clarifying Questions in #file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\PreAnalysis_2.2.md' and update this document with answers to be placed under each existing question (example: Question 1, newline, Answer 1 newline, ....).
+(3) Implement Story 2.2 from #file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\CurrentEpic_HumanDrummer.md'.
+Use #file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\PreAnalysis_2.2.md' to guide your implementation.
+(4) Update #file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\ProjectArchitecture.md' to reflect the changes. Only include project architecure content.
 
 WHAT NOT TO DO:
     - Do not update nor attempt to update #file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\CurrentEpic.md'. The user will handle that.

@@ -179,7 +179,7 @@
 
 ---
 
-### Story 2.2 — Define Drum Candidate Type
+### Story 2.2 — Define Drum Candidate Type (COMPLETED)
 
 **As a** drummer agent  
 **I want** drum-specific candidate type  

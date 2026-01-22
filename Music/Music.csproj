@@ -76,6 +76,7 @@
     <None Remove="AICompleted\MeasureTrackerPlan.md" />
     <None Remove="AICompleted\Plan9.2.md" />
     <None Remove="AICompleted\PreAnalysis_2.1.md" />
+    <None Remove="AICompleted\PreAnalysis_2.2.md" />
     <None Remove="AICompleted\PreAnalysis_E2.md" />
     <None Remove="AICompleted\PreAnalysis_E2_Clarified.md" />
     <None Remove="AICompleted\PreAnalysis_F1.md" />
@@ -97,6 +98,7 @@
     <None Remove="AICompleted\Story_9_1_Implementation_Summary.md" />
     <None Remove="AIPlans\CompletedWork_CurrentState.md" />
     <None Remove="AIPlans\CurrentEpic.md" />
+    <None Remove="AIPlans\PreAnalysis_2.2.md" />
     <None Remove="AIPlans\PreAnalysis_E2.md" />
     <None Remove="AIPlans\PreAnalysis_E2_Clarified.md" />
     <None Remove="AIResearch\ComponentRelationshipsAndDevelopmentPath.md" />
@@ -134,7 +136,6 @@
   <ItemGroup>
     <Folder Include="AI Prompts\" />
     <Folder Include="AICompleted\" />
-    <Folder Include="AIResearch\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
