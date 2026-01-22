@@ -154,7 +154,7 @@
 
 ---
 
-### Story 2.1 — Define Drummer-Specific Context
+### Story 2.1 — Define Drummer-Specific Context (COMPLETED)
 
 **As a** drummer agent  
 **I want** drum-specific context extending the common agent context  

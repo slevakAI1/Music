@@ -1,0 +1,267 @@
+// AI: purpose=Builds DrummerContext from GrooveBarContext, policy, and runtime state; pure builder for determinism.
+// AI: invariants=Builder is stateless; same inputs produce identical DrummerContext; bars/beats 1-based.
+// AI: deps=GrooveBarContext, GroovePolicyDecision, GrooveProtectionPolicy, PhraseHookWindowResolver, GrooveRoles.
+// AI: change=Story 2.1; extend with additional input sources as drummer operators require.
+
+using Music.Generator.Agents.Common;
+
+namespace Music.Generator.Agents.Drums
+{
+    /// <summary>
+    /// Input configuration for building DrummerContext.
+    /// Groups required inputs to avoid large parameter lists.
+    /// </summary>
+    public sealed record DrummerContextBuildInput
+    {
+        /// <summary>Per-bar groove context (section, phrase position).</summary>
+        public required GrooveBarContext BarContext { get; init; }
+
+        /// <summary>Optional policy decision with overrides for this bar.</summary>
+        public GroovePolicyDecision? PolicyDecision { get; init; }
+
+        /// <summary>Protection policy containing phrase hook settings and orchestration.</summary>
+        public GrooveProtectionPolicy? ProtectionPolicy { get; init; }
+
+        /// <summary>Seed for deterministic generation.</summary>
+        public int Seed { get; init; } = 42;
+
+        /// <summary>Energy level for this bar (0.0-1.0).</summary>
+        public double EnergyLevel { get; init; } = 0.5;
+
+        /// <summary>Tension level for this bar (0.0-1.0).</summary>
+        public double TensionLevel { get; init; } = 0.0;
+
+        /// <summary>Motif presence score for this bar (0.0-1.0).</summary>
+        public double MotifPresenceScore { get; init; } = 0.0;
+
+        /// <summary>Beats per bar (time signature numerator).</summary>
+        public int BeatsPerBar { get; init; } = 4;
+
+        /// <summary>Optional override for active roles; null uses orchestration policy defaults.</summary>
+        public IReadOnlySet<string>? ActiveRolesOverride { get; init; }
+
+        /// <summary>Last kick beat position from previous bar (1-based, fractional). Null if unknown.</summary>
+        public decimal? LastKickBeat { get; init; }
+
+        /// <summary>Last snare beat position from previous bar (1-based, fractional). Null if unknown.</summary>
+        public decimal? LastSnareBeat { get; init; }
+
+        /// <summary>Optional override for hat mode; null uses default based on energy.</summary>
+        public HatMode? HatModeOverride { get; init; }
+
+        /// <summary>Optional override for hat subdivision; null uses default based on energy.</summary>
+        public HatSubdivision? HatSubdivisionOverride { get; init; }
+    }
+
+    /// <summary>
+    /// Builds DrummerContext from GrooveBarContext and related inputs.
+    /// Stateless builder ensuring deterministic output for same inputs.
+    /// Story 2.1: DrummerContextBuilder builds from GrooveBarContext + policies.
+    /// </summary>
+    public static class DrummerContextBuilder
+    {
+        /// <summary>
+        /// Default drum roles enabled when no orchestration policy is present.
+        /// </summary>
+        private static readonly IReadOnlySet<string> DefaultActiveRoles = new HashSet<string>
+        {
+            GrooveRoles.Kick,
+            GrooveRoles.Snare,
+            GrooveRoles.ClosedHat
+        };
+
+        /// <summary>
+        /// All possible drum roles for validation.
+        /// </summary>
+        private static readonly IReadOnlySet<string> AllDrumRoles = new HashSet<string>
+        {
+            GrooveRoles.Kick,
+            GrooveRoles.Snare,
+            GrooveRoles.ClosedHat,
+            GrooveRoles.OpenHat,
+            "Crash",
+            "Ride",
+            "Tom1",
+            "Tom2",
+            "FloorTom"
+        };
+
+        /// <summary>
+        /// Builds a DrummerContext from the provided input configuration.
+        /// </summary>
+        /// <param name="input">Input configuration containing all required data.</param>
+        /// <returns>Immutable DrummerContext for operator decisions.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when input or input.BarContext is null.</exception>
+        public static DrummerContext Build(DrummerContextBuildInput input)
+        {
+            ArgumentNullException.ThrowIfNull(input);
+            ArgumentNullException.ThrowIfNull(input.BarContext);
+
+            var barContext = input.BarContext;
+
+            // Resolve section type from BarContext
+            var sectionType = barContext.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+
+            // Compute phrase position (0.0 = start, 1.0 = end)
+            double phrasePosition = ComputePhrasePosition(barContext);
+
+            // Determine active roles from orchestration policy or defaults
+            var activeRoles = ResolveActiveRoles(input, sectionType);
+
+            // Compute backbeat beats for the time signature
+            var backbeatBeats = ComputeBackbeatBeats(input.BeatsPerBar);
+
+            // Resolve fill window using PhraseHookWindowResolver
+            var hookPolicy = input.ProtectionPolicy?.PhraseHookPolicy;
+            var windowInfo = PhraseHookWindowResolver.Resolve(barContext.ToBarContext(), hookPolicy);
+
+            // Determine if at section boundary (first or last bar)
+            bool isAtSectionBoundary = barContext.BarWithinSection == 0 || barContext.BarsUntilSectionEnd == 0;
+
+            // Determine hat mode and subdivision based on energy and overrides
+            var hatMode = ResolveHatMode(input);
+            var hatSubdivision = ResolveHatSubdivision(input);
+
+            // Build RNG stream key
+            string rngStreamKey = $"Drummer_Bar{barContext.BarNumber}";
+
+            return new DrummerContext
+            {
+                // Base AgentContext fields
+                BarNumber = barContext.BarNumber,
+                Beat = 1.0m,
+                SectionType = sectionType,
+                PhrasePosition = phrasePosition,
+                BarsUntilSectionEnd = barContext.BarsUntilSectionEnd,
+                EnergyLevel = input.EnergyLevel,
+                TensionLevel = input.TensionLevel,
+                MotifPresenceScore = input.MotifPresenceScore,
+                Seed = input.Seed,
+                RngStreamKey = rngStreamKey,
+
+                // Drummer-specific fields
+                ActiveRoles = activeRoles,
+                LastKickBeat = input.LastKickBeat,
+                LastSnareBeat = input.LastSnareBeat,
+                CurrentHatMode = hatMode,
+                HatSubdivision = hatSubdivision,
+                IsFillWindow = windowInfo.InPhraseEndWindow || windowInfo.InSectionEndWindow,
+                IsAtSectionBoundary = isAtSectionBoundary,
+                BackbeatBeats = backbeatBeats,
+                BeatsPerBar = input.BeatsPerBar
+            };
+        }
+
+        /// <summary>
+        /// Computes phrase position (0.0 at phrase start, 1.0 at phrase end).
+        /// Uses bar position within section as proxy for phrase position.
+        /// </summary>
+        private static double ComputePhrasePosition(GrooveBarContext barContext)
+        {
+            if (barContext.Section == null)
+                return 0.0;
+
+            int totalBars = barContext.Section.BarCount;
+            if (totalBars <= 1)
+                return 0.0;
+
+            // BarWithinSection is 0-based; compute position as fraction of section
+            return (double)barContext.BarWithinSection / (totalBars - 1);
+        }
+
+        /// <summary>
+        /// Resolves active roles from orchestration policy or defaults.
+        /// </summary>
+        private static IReadOnlySet<string> ResolveActiveRoles(DrummerContextBuildInput input, MusicConstants.eSectionType sectionType)
+        {
+            // Use explicit override if provided
+            if (input.ActiveRolesOverride != null)
+                return ValidateRoles(input.ActiveRolesOverride);
+
+            // Try orchestration policy
+            var orchestration = input.ProtectionPolicy?.OrchestrationPolicy;
+            if (orchestration?.DefaultsBySectionType != null)
+            {
+                var sectionTypeName = sectionType.ToString();
+                var sectionDefaults = orchestration.DefaultsBySectionType
+                    .FirstOrDefault(d => d.SectionType.Equals(sectionTypeName, StringComparison.OrdinalIgnoreCase));
+
+                if (sectionDefaults?.RolePresent != null)
+                {
+                    var enabledRoles = sectionDefaults.RolePresent
+                        .Where(kvp => kvp.Value && AllDrumRoles.Contains(kvp.Key))
+                        .Select(kvp => kvp.Key)
+                        .ToHashSet();
+
+                    if (enabledRoles.Count > 0)
+                        return enabledRoles;
+                }
+            }
+
+            // Fall back to defaults
+            return DefaultActiveRoles;
+        }
+
+        /// <summary>
+        /// Validates that provided roles are in the allowed set.
+        /// </summary>
+        private static IReadOnlySet<string> ValidateRoles(IReadOnlySet<string> roles)
+        {
+            var validated = roles.Where(r => AllDrumRoles.Contains(r)).ToHashSet();
+            return validated.Count > 0 ? validated : DefaultActiveRoles;
+        }
+
+        /// <summary>
+        /// Computes backbeat beats for a given time signature numerator.
+        /// </summary>
+        private static IReadOnlyList<int> ComputeBackbeatBeats(int beatsPerBar)
+        {
+            return beatsPerBar switch
+            {
+                2 => new List<int> { 2 },           // 2/4: backbeat on 2
+                3 => new List<int> { 2 },           // 3/4: backbeat on 2 (waltz)
+                4 => new List<int> { 2, 4 },        // 4/4: backbeats on 2 and 4
+                5 => new List<int> { 3, 5 },        // 5/4: beats 3 and 5 (3+2 grouping)
+                6 => new List<int> { 4 },           // 6/8: backbeat on 4 (compound duple)
+                7 => new List<int> { 3, 5, 7 },     // 7/8: beats 3, 5, 7 (2+2+3 grouping)
+                _ => beatsPerBar >= 4               // Default: even beats
+                    ? Enumerable.Range(1, beatsPerBar).Where(b => b % 2 == 0).ToList()
+                    : new List<int> { beatsPerBar > 1 ? 2 : 1 }
+            };
+        }
+
+        /// <summary>
+        /// Resolves hat mode based on override or energy-based defaults.
+        /// </summary>
+        private static HatMode ResolveHatMode(DrummerContextBuildInput input)
+        {
+            // Use explicit override if provided
+            if (input.HatModeOverride.HasValue)
+                return input.HatModeOverride.Value;
+
+            // Energy-based defaults: higher energy may use ride
+            if (input.EnergyLevel >= 0.8)
+                return HatMode.Ride;
+
+            return HatMode.Closed;
+        }
+
+        /// <summary>
+        /// Resolves hat subdivision based on override or energy-based defaults.
+        /// </summary>
+        private static HatSubdivision ResolveHatSubdivision(DrummerContextBuildInput input)
+        {
+            // Use explicit override if provided
+            if (input.HatSubdivisionOverride.HasValue)
+                return input.HatSubdivisionOverride.Value;
+
+            // Energy-based defaults: higher energy uses denser subdivision
+            if (input.EnergyLevel >= 0.7)
+                return HatSubdivision.Sixteenth;
+            if (input.EnergyLevel >= 0.3)
+                return HatSubdivision.Eighth;
+
+            return HatSubdivision.None;
+        }
+    }
+}
