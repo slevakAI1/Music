@@ -284,7 +284,7 @@
 
 ---
 
-### Story 3.1 — Micro-Addition Operators (Ghost Notes & Embellishments)
+### Story 3.1 — Micro-Addition Operators (Ghost Notes & Embellishments) (COMPLETED)
 
 **As a** drummer agent  
 **I want** operators that add subtle single hits  
