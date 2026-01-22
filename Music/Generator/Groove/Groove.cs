@@ -50,23 +50,33 @@ namespace Music.Generator
     // 9) Groove identity tags + compatibility hints
     // =========================
 
+
     /// <summary>
     /// Stable role identifiers used by groove policies, candidates, and profiles.
     /// Keep as string for extensibility; later you can wrap as enum if desired.
     /// </summary>
     public static class GrooveRoles
     {
+        // Drum roles
         public const string Kick = "Kick";           // Drum lane: kick
         public const string Snare = "Snare";         // Drum lane: snare
         public const string ClosedHat = "ClosedHat"; // Drum lane: closed hi-hat
         public const string OpenHat = "OpenHat";     // Drum lane: open hi-hat
+        public const string Crash = "Crash";         // Drum lane: crash cymbal
+        public const string Ride = "Ride";           // Drum lane: ride cymbal
+        public const string Tom1 = "Tom1";           // Drum lane: high tom
+        public const string Tom2 = "Tom2";           // Drum lane: mid tom
+        public const string FloorTom = "FloorTom";   // Drum lane: floor tom
         public const string DrumKit = "DrumKit";     // Optional combined lane
+
+        // Instrument roles
         public const string Bass = "Bass";           // Bass role
         public const string Comp = "Comp";           // Comping role (guitar/keys comp fragments)
         public const string Pads = "Pads";           // Pads / sustained harmony
         public const string Keys = "Keys";           // Keys role (if separate from Pads)
         public const string Lead = "Lead";           // Future lead/vocal
     }
+
 
     // =========================
     // GroovePresetIdentity (includes #9 + basic meter linkage)

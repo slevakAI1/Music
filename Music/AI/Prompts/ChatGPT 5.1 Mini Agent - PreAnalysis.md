@@ -1,6 +1,9 @@
-#solution 
-#file:'C:\Users\sleva\source\repos\Music\Music\AI\Plans\CurrentEpic_HumanDrummer.md' 
-#file:'C:\Users\sleva\source\repos\Music\Music\AI\Plans\ProjectArchitecture.md'
+
+#solution
+
+#file:'C:\Users\sleva\source\repos\Music\Music\AI\Plans\CurrentEpic_HumanDrummer.md'
+
+#file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\ProjectArchitecture.md' 
 
 # Pre-Analysis Request for Agile Story Implementation
 
