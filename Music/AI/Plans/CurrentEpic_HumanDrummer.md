@@ -318,7 +318,7 @@
 
 ---
 
-### Story 3.2 — Subdivision Transform Operators (Timekeeping Changes)
+### Story 3.2 — Subdivision Transform Operators (Timekeeping Changes)  (COMPLETED)
 
 **As a** drummer agent  
 **I want** operators that change the timekeeping texture  
