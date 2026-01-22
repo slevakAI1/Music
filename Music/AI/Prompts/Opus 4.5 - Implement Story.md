@@ -3,7 +3,7 @@
 
 #file:'C:\Users\sleva\source\repos\Music\Music\AI\Plans\CurrentEpic_HumanDrummer.md'
 
-#file:'C:\Users\sleva\source\repos\Music\Music\AI\Plans\ProjectArchitecture.md'
+#file:'C:\Users\sleva\source\repos\Music\Music\AIPlans\ProjectArchitecture.md' 
 
 Goal: To implement Story 2.5 from the Current Epic CurrentEpic_HumanDrummer.md.
 
