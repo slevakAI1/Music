@@ -260,6 +260,9 @@ Pipeline steps (in order):
 8. **Apply protections** — `ProtectionApplier.Apply(...)` (must-hit, never-add, never-remove)
 9. **Apply feel timing** — `FeelTimingEngine.ApplyFeelTiming(...)` (global feel shifts eligible eighth offbeats)
 10. **Apply role micro-timing** — `RoleTimingEngine.ApplyRoleTiming(...)` (per-role feel+bias added on top of E1; final clamp applied)
+11. **Operator Candidates Generation** — `DrumOperatorRegistry` and operator implementations (MicroAddition, SubdivisionTransform, PhrasePunctuation, PatternSubstitution, StyleIdiom) generate `DrumCandidate` instances.
+12. **Physicality Filter** — `PhysicalityFilter` removes impossible/sticking-violating candidates before selection.
+13. **Operator Selection** — `OperatorSelectionEngine` scores and selects final candidates respecting density targets and style weights.
 11. **Convert to MIDI events** — Create `PartTrackEvent` from `GrooveOnset`
 
 ---
