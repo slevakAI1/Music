@@ -69,16 +69,46 @@ Notes: Criteria 2–6 are related (eligibility, gating, generation, scoring). It
 - Generated candidate density exceeds role caps — downstream cap enforcement should prune; ensure operators don't assume unlimited capacity.
 
 ## 7) Clarifying Questions
+
 1. What are the canonical `HatSubdivision` enum values and their ordering? Is it Eighth < Sixteenth < None? Are triplet or other subdivisions relevant?
+
+   **Answer:** The enum in `DrummerContext.cs` defines: `None`, `Eighth`, `Sixteenth`. No triplet subdivisions are currently defined. Ordering for density purposes: None < Eighth < Sixteenth.
+
 2. "Generates full bar's worth of changed hat pattern" — should operators always create a candidate per allowed grid position across the bar, or only the minimal changed onsets (e.g., only added 16th on intermediate positions)?
+
+   **Answer:** These operators should generate full-bar replacement patterns (all hat/ride positions for the new subdivision). This follows the "pattern substitution" family model where the selection engine chooses between the full original pattern or the full transformed pattern. HatLift generates all 16th positions, HatDrop generates all 8th positions, etc.
+
 3. How should `PartialLiftOperator` be interpreted precisely (beats 2-4 or last half of bar)? Is the exact pattern parametric or fixed?
+
+   **Answer:** PartialLift should be fixed for initial implementation: 16ths only on beats 3-4 (last half of bar in 4/4). This creates a natural energy build within the bar. The first half remains at current subdivision, last half lifts to 16ths.
+
 4. What numeric thresholds define "higher" vs "lower" energy for gating (explicit cut points or relative scaling)?
+
+   **Answer:** Based on existing operators: energy >= 0.6 is "high" for lift operations; energy <= 0.4 is "low" for drop operations. Mid-range (0.4-0.6) allows either based on context. These thresholds match patterns in MicroAddition operators.
+
 5. Should subdivision operators replace existing hat anchors (pattern substitution) or simply add candidates that compete with anchors? Which precedence is desired?
+
+   **Answer:** Subdivision operators add candidates that compete with anchors in the selection engine. The selection engine chooses based on scores, style weights, and density targets. Operators don't replace; they provide alternatives. Protection system ensures must-hit anchors survive.
+
 6. How should scoring reflect "section transition relevance"? Is there a provided quantitative input (bars until section end/start) or should operators inspect `BarWithinSection` / `BarsUntilSectionEnd`?
+
+   **Answer:** Operators should use `DrummerContext.BarsUntilSectionEnd` and `DrummerContext.IsAtSectionBoundary`. Score boost (+10-20%) when BarsUntilSectionEnd <= 2 for lift/drop changes, as these mark section transitions. Also boost when IsAtSectionBoundary is true.
+
 7. Are there stylistic constraints per `StyleId` (e.g., PopRock disallows `RideSwap` except in bridges)? If so, where are they declared?
+
+   **Answer:** Style constraints are declared in `StyleConfiguration.AllowedOperatorIds`. If empty, all operators are allowed. The `DrummerPolicyProvider` gates operators via the policy's `OperatorAllowListOverride`. For PopRock, all five subdivision operators are allowed; style weights in StyleConfigurationLibrary control frequency.
+
 8. Determinism: which RNG stream(s) should operators use for internal variation (naming convention from Appendix C)?
+
+   **Answer:** Use the deterministic hash approach from existing operators: `HashCode.Combine(barNumber, beat, seed, operatorId)`. This avoids RNG stream dependency and ensures same inputs → same outputs. No RNG calls needed for current operator logic.
+
 9. Unit test expectations: are there canonical reference patterns for 4/4 PopRock (expected 8th vs 16th hat patterns) to assert against?
+
+   **Answer:** 8th pattern: beats 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5 (8 positions). 16th pattern: beats 1, 1.25, 1.5, 1.75, ..., 4.75 (16 positions). Tests should verify these position counts and grid alignment.
+
 10. Compatibility with Physicality/Protection: if a hat/ride event conflicts with a must-hit onset (rare), should the subdivision operator avoid creating that candidate or let later filters prune it?
+
+    **Answer:** Let later filters (PhysicalityFilter) handle conflicts. Operators generate all valid candidates; filtering is a downstream concern. This follows the established pattern in DrummerCandidateSource which applies PhysicalityFilter after candidate generation.
 
 ## 8) Test Scenario Ideas (unit test name suggestions)
 - `HatLift_WhenHatSubdivisionIsEighthAndEnergyHigh_GeneratesSixteenthPatternForFullBar`

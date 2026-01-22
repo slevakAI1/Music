@@ -739,6 +739,8 @@ Uses **xUnit** test framework. Contains unit and integration tests for groove sy
 | `DrummerPolicyProviderTests.cs` | Story 2.3: Drummer policy provider |
 | `DrummerCandidateSourceTests.cs` | Story 2.4: Drummer candidate source |
 | `DrummerMemoryTests.cs` | Story 2.5: Drummer memory (fills, crashes, hats, ghosts - 48 tests) |
+| `MicroAdditionOperatorTests.cs` | Story 3.1: MicroAddition operators (7 operators) |
+| `SubdivisionTransformOperatorTests.cs` | Story 3.2: SubdivisionTransform operators (5 operators, 35+ tests) |
 
 ### Test Fixtures
 
@@ -881,11 +883,14 @@ DrummerCandidateSource.GetCandidateGroups(barContext, role)
 | `Generator/Agents/Drums/DrummerContext.cs` | Drum-specific context |
 | `Generator/Agents/Drums/DrummerMemory.cs` | Drummer-specific memory (fills, crashes, hats, ghosts) |
 | `Generator/Agents/Drums/DrummerPolicyProvider.cs` | IGroovePolicyProvider implementation |
+| `Generator/Agents/Drums/Operators/DrumOperatorBase.cs` | Abstract base for all drum operators |
+| `Generator/Agents/Drums/Operators/MicroAddition/*.cs` | Story 3.1: 7 micro-addition operators |
+| `Generator/Agents/Drums/Operators/SubdivisionTransform/*.cs` | Story 3.2: 5 subdivision transform operators |
 | `Generator/Agents/Drums/Physicality/PhysicalityFilter.cs` | Playability filter stub |
 | `Generator/Agents/Drums/Physicality/PhysicalityRules.cs` | Physicality configuration |
 
 **Remaining Drummer Agent Work:**
-- Stories 3.1-3.6: Drum operators (28 total)
+- Stories 3.3-3.6: Remaining drum operators (PhrasePunctuation, PatternSubstitution, StyleIdiom, Registry)
 - Stories 4.1-4.4: Full physicality constraints (limb model, sticking rules)
 - Stories 5.1-5.4: Pop Rock style configuration
 
@@ -1182,6 +1187,87 @@ Notes:
 - Policy decisions are computed per-bar, per-role
 - Integration with DrummerCandidateSource happens in Story 2.4
 - Operator weights remain in StyleConfiguration; policy only gates eligibility
+
+---
+
+## 18) Drum Operators (Stories 3.1-3.2)
+
+Location: `Generator/Agents/Drums/Operators/`
+
+Purpose: Musical "moves" that generate drum candidates. Each operator family addresses different aspects of drumming variation.
+
+### Operator Base Class
+
+Location: `Generator/Agents/Drums/Operators/DrumOperatorBase.cs`
+
+```csharp
+public abstract class DrumOperatorBase : IDrumOperator
+{
+    public abstract string OperatorId { get; }
+    public abstract OperatorFamily OperatorFamily { get; }
+    
+    protected virtual double MinEnergyThreshold => 0.0;
+    protected virtual double MaxEnergyThreshold => 1.0;
+    protected virtual string? RequiredRole => null;
+    protected virtual bool Requires16thGrid => false;
+    
+    protected DrumCandidate CreateCandidate(...);
+    protected static int GenerateVelocityHint(int min, int max, int barNumber, decimal beat, int seed);
+}
+```
+
+### MicroAddition Operators (Story 3.1)
+
+Location: `Generator/Agents/Drums/Operators/MicroAddition/`
+
+| Operator | Purpose | Energy Threshold | Required Role |
+|----------|---------|------------------|---------------|
+| `GhostBeforeBackbeatOperator` | Ghost snare at 1.75, 3.75 | >= 0.3 | Snare |
+| `GhostAfterBackbeatOperator` | Ghost snare at 2.25, 4.25 | >= 0.4 | Snare |
+| `KickPickupOperator` | Kick anticipation at 4.75 | >= 0.4 | Kick |
+| `KickDoubleOperator` | Extra kicks at 1.5, 3.5 (or 16th variants) | >= 0.4 | Kick |
+| `HatEmbellishmentOperator` | Sparse 16th hat notes | >= 0.45 | ClosedHat |
+| `GhostClusterOperator` | 2-3 ghost notes mini-fill | >= 0.5 | Snare |
+| `FloorTomPickupOperator` | Floor tom anticipation at 4.75 | >= 0.6 | FloorTom |
+
+Key behaviors:
+- All suppress during fill windows (`IsFillWindow = true`)
+- Velocity hints: ghosts 30-50, pickups 60-80
+- Scores scale with energy level
+- Deterministic via `HashCode.Combine(barNumber, beat, seed)`
+
+### SubdivisionTransform Operators (Story 3.2)
+
+Location: `Generator/Agents/Drums/Operators/SubdivisionTransform/`
+
+| Operator | Purpose | Energy | Precondition |
+|----------|---------|--------|--------------|
+| `HatLiftOperator` | 8ths → 16ths | >= 0.6 | HatSubdivision == Eighth |
+| `HatDropOperator` | 16ths → 8ths | <= 0.4 | HatSubdivision == Sixteenth |
+| `RideSwapOperator` | Hat → Ride cymbal | >= 0.4 | CurrentHatMode != Ride |
+| `PartialLiftOperator` | 8ths first half, 16ths second half | >= 0.5 | HatSubdivision == Eighth, BeatsPerBar >= 4 |
+| `OpenHatAccentOperator` | Open hat on 1&, 3& | >= 0.5 | OpenHat in ActiveRoles |
+
+Key behaviors:
+- Generate full-bar patterns (not individual notes)
+- Check `HatSubdivision` and `CurrentHatMode` for applicability
+- Score boost at section transitions (`BarsUntilSectionEnd <= 2`)
+- All suppress during fill windows
+- Respect odd meters (3/4, 5/4, 6/4)
+
+Pattern positions for 4/4:
+- 8th pattern: 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5 (8 positions)
+- 16th pattern: 1.0, 1.25, 1.5, 1.75, ..., 4.75 (16 positions)
+- PartialLift: 8ths on beats 1-2, 16ths on beats 3-4 (12 positions)
+
+### Test Coverage
+
+| Test File | Purpose |
+|-----------|---------|
+| `MicroAdditionOperatorTests.cs` | Story 3.1: 7 operators, determinism, energy gating |
+| `SubdivisionTransformOperatorTests.cs` | Story 3.2: 5 operators, pattern verification, odd meters |
+
+
 
 
 

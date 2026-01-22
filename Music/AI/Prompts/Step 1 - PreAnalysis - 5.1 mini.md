@@ -71,7 +71,7 @@ Stories follow this structure:
 
 ## Output Format
 Use clear markdown with headers for each section. Be concise but thorough. 
-Write complete response to file PreAnalysis_<Story number>.md in root folder AI/Plans.
+Write complete response to file PreAnalysis_<Story number>.md in folder C:\Users\sleva\source\repos\Music\Music\AI\Plans\.
 Limit response in chat pane to 4 bullets only summarizing what was done.
 
 ---

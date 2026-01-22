@@ -12,6 +12,7 @@
     <Compile Remove="Archives\**" />
     <Compile Remove="Files\OutputSamples\**" />
     <Compile Remove="Future Ideas\**" />
+    <Compile Remove="Generator\Agent\**" />
     <Compile Remove="Generator\Core\RandomizationOld\**" />
     <Compile Remove="Generator\DrumsOld\**" />
     <Compile Remove="Generator\Energy\**" />
@@ -22,6 +23,7 @@
     <EmbeddedResource Remove="Archives\**" />
     <EmbeddedResource Remove="Files\OutputSamples\**" />
     <EmbeddedResource Remove="Future Ideas\**" />
+    <EmbeddedResource Remove="Generator\Agent\**" />
     <EmbeddedResource Remove="Generator\Core\RandomizationOld\**" />
     <EmbeddedResource Remove="Generator\DrumsOld\**" />
     <EmbeddedResource Remove="Generator\Energy\**" />
@@ -32,6 +34,7 @@
     <None Remove="Archives\**" />
     <None Remove="Files\OutputSamples\**" />
     <None Remove="Future Ideas\**" />
+    <None Remove="Generator\Agent\**" />
     <None Remove="Generator\Core\RandomizationOld\**" />
     <None Remove="Generator\DrumsOld\**" />
     <None Remove="Generator\Energy\**" />
@@ -53,6 +56,7 @@
     <None Remove="AI\Completed\PreAnalysis_2.4.md" />
     <None Remove="AI\Completed\PreAnalysis_2.5.md" />
     <None Remove="AI\Completed\PreAnalysis_3.1.md" />
+    <None Remove="AI\Completed\PreAnalysis_3.2.md" />
     <None Remove="AI\Prompts\AgentEpic.md" />
     <None Remove="AI\Prompts\Backlog.md" />
     <None Remove="AI\Prompts\Chat GPT 5.2 Thinking - Answer clarifying questions.md" />
@@ -145,7 +149,6 @@
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
-    <Folder Include="Generator\Agent\" />
   </ItemGroup>
 
   <ItemGroup>
