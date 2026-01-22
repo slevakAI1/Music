@@ -145,6 +145,9 @@ See `History.md` for detailed implementation notes on each completed stage.
 
 ---
 
+
+NOTE - STAGE 11 IS FURTHER REFINED IN A SEPARATE DOCUMENT NOT LISTED HERE. THIS IS CLOSE.
+
 ## Stage 11 — Human Drummer Agent (Pop/Rock)
 
 **Why:** The groove system provides the framework; this stage implements a realistic drummer that makes musical decisions like a human.

@@ -40,7 +40,7 @@
 
 ---
 
-### Story 1.1 — Define Common Agent Contracts
+### Story 1.1 — Define Common Agent Contracts (COMPLETED)
 
 **As a** developer  
 **I want** shared interfaces and base types for all instrument agents  
@@ -75,7 +75,7 @@
 
 ---
 
-### Story 1.2 — Implement Agent Memory (Anti-Repetition)
+### Story 1.2 — Implement Agent Memory (Anti-Repetition) (COMPLETED)
 
 **As a** agent  
 **I want** memory of recent decisions  
@@ -98,7 +98,7 @@
 
 ---
 
-### Story 1.3 — Implement Operator Selection Engine
+### Story 1.3 — Implement Operator Selection Engine (COMPLETED)
 
 **As a** agent  
 **I want** weighted selection from operator candidates  
@@ -123,7 +123,7 @@
 
 ---
 
-### Story 1.4 — Implement Style Configuration Model
+### Story 1.4 — Implement Style Configuration Model (COMPLETED)
 
 **As a** developer  
 **I want** style configuration separate from operator logic  

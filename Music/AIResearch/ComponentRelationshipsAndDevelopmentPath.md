@@ -450,7 +450,9 @@ Minor updates only. The architecture is sound. Main work is:
 
 *************************    YOU ARE HERE    ************************* 
 
-3. Continue with **Stage 11, Stories 2.1-3.6** (Drummer Agent Core + Operators)
+3. Continue with Northstar **Stage 11 which is now replaced by Stories 2.1-3.6** of Epic_HumanDrummer.md (Drummer Agent Core + Operators)
+
+
 4. Then **Story 9.3** (Motif Integration) to connect systems
 
 This order provides:
