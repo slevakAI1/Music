@@ -282,9 +282,9 @@ See `History.md` for detailed implementation notes on each completed stage.
 ---
 
 
-NOTE - STAGE 11 IS FULLY DETAILED IN: `AI/Plans/CurrentEpic_HumanDrummer.md`
+NOTE - STAGE 10 IS FULLY DETAILED IN: `AI/Plans/CurrentEpic_HumanDrummer.md`
 
-## Stage 11 — Human Drummer Agent (Pop/Rock) (IN PROGRESS)
+## Stage 10 — Human Drummer Agent (Pop/Rock) (IN PROGRESS)
 
 **Why:** The groove system provides the framework; this stage implements a realistic drummer that makes musical decisions like a human.
 
@@ -350,7 +350,7 @@ A skilled drummer optimizes for:
 - 8.3: Golden regression snapshot
 
 ---
-## Stage 10 — Melody & lyric scaffolding (timing windows + singable melody MVP)
+## Stage 11 — Melody & lyric scaffolding (timing windows + singable melody MVP)
 
 **Why now:** Stage 9 provides instrumental motifs (hooks/riffs). Stage 10 adds vocal melody as a first-class feature, building on motif rendering infrastructure while adding lyric-aware timing constraints.
 
@@ -363,7 +363,7 @@ A skilled drummer optimizes for:
 
 ---
 
-### Story 10.1 — `LyricProsodyModel` (inputs and constraints; no real lyrics yet)
+### Story 11.1 — `LyricProsodyModel` (inputs and constraints; no real lyrics yet)
 
 **Intent:** Provide syllable timing/stress windows even if lyrics are placeholder. Establish the contract for future lyric integration.
 
@@ -393,7 +393,7 @@ A skilled drummer optimizes for:
 
 ---
 
-### Story 10.2 — Syllable windows → onset slot mapping
+### Story 11.2 — Syllable windows → onset slot mapping
 
 **Intent:** Map syllables onto groove onset slots deterministically, respecting prosody constraints.
 
@@ -424,7 +424,7 @@ A skilled drummer optimizes for:
 
 ---
 
-### Story 10.3 — Melody generator MVP (singable, chord-aware)
+### Story 11.3 — Melody generator MVP (singable, chord-aware)
 
 **Intent:** Generate pitch for each syllable event, creating a singable melody that respects harmony and phrase structure.
 
@@ -473,7 +473,7 @@ A skilled drummer optimizes for:
 
 ---
 
-### Story 10.4 — Vocal band protection (make room for melody)
+### Story 11.4 — Vocal band protection (make room for melody)
 
 **Intent:** When melody is active, accompaniment must avoid competing in the vocal register.
 
@@ -504,7 +504,7 @@ A skilled drummer optimizes for:
 
 ---
 
-### Story 10.5 — Melody variation across repeats (A/A')
+### Story 11.5 — Melody variation across repeats (A/A')
 
 **Intent:** Repeated sections (Verse 2, final Chorus) should have melodic variation while preserving identity.
 
@@ -541,7 +541,7 @@ A skilled drummer optimizes for:
 
 ---
 
-## Stage 12 — Human Guitarist Agent
+## Stage 11 — Human Guitarist Agent
 
 **Why:** Apply the same agent architecture to guitar, with fretboard-specific constraints and idioms.
 
@@ -552,7 +552,7 @@ A skilled drummer optimizes for:
 - **Register management:** avoid stepping on melody
 - **Idioms:** strumming, arpeggiation, palm mute, open vs closed voicings
 
-### Story 12.1 — Guitar Operator Framework
+### Story 11.1 — Guitar Operator Framework
 
 **Acceptance criteria:**
 - Create `IGuitarOperator` interface
@@ -564,7 +564,7 @@ A skilled drummer optimizes for:
   - **Hook support:** double vocal hook rhythm (simplified pitches)
   - **Fill licks:** phrase-end fills (only if vocal inactive)
 
-### Story 12.2 — Fretboard Feasibility Filter
+### Story 11.2 — Fretboard Feasibility Filter
 
 **Acceptance criteria:**
 - Fretboard model with string/fret constraints
@@ -572,14 +572,14 @@ A skilled drummer optimizes for:
 - Reject impossible voicings
 - Suggest alternatives when blocked
 
-### Story 12.3 — Guitar Memory and Style Adaptation
+### Story 11.3 — Guitar Memory and Style Adaptation
 
 **Acceptance criteria:**
 - Track recent voicing choices (avoid repetition)
 - Style profiles (acoustic folk vs electric rock vs jazz)
 - Energy-driven behavior switching
 
-### Story 12.4 — Guitar Performance Rendering
+### Story 11.4 — Guitar Performance Rendering
 
 **Acceptance criteria:**
 - Strum timing spread (direction feel)
@@ -589,7 +589,7 @@ A skilled drummer optimizes for:
 
 ---
 
-## Stage 13 — Human Keyboardist Agent
+## Stage 12 — Human Keyboardist Agent
 
 **Why:** Keys have unique hand span limits, voice-leading requirements, and pedal behavior.
 
@@ -600,7 +600,7 @@ A skilled drummer optimizes for:
 - **Pedal behavior:** sustain control, releases
 - **Split voicing:** left hand bass vs right hand chord
 
-### Story 13.1 — Keys Operator Framework
+### Story 12.1 — Keys Operator Framework
 
 **Acceptance criteria:**
 - Implement operator families:
@@ -610,21 +610,21 @@ A skilled drummer optimizes for:
   - **Arpeggiation:** broken chord patterns
   - **Texture changes:** pad widen, piano thin
 
-### Story 13.2 — Hand Span and Voice-Leading Filter
+### Story 12.2 — Hand Span and Voice-Leading Filter
 
 **Acceptance criteria:**
 - Hand span limits (octave + 2 for most players)
 - Voice-leading cost function (penalize large jumps)
 - Avoid muddy low clusters
 
-### Story 13.3 — Keys Memory and Role Coordination
+### Story 12.3 — Keys Memory and Role Coordination
 
 **Acceptance criteria:**
 - Track voicing register (avoid same register collision with comp)
 - Coordinate with left-hand bass when bass role absent
 - Section-aware behavior (verse sustain, chorus rhythmic)
 
-### Story 13.4 — Keys Performance Rendering
+### Story 12.4 — Keys Performance Rendering
 
 **Acceptance criteria:**
 - Slight asynchrony between hands
@@ -633,7 +633,7 @@ A skilled drummer optimizes for:
 
 ---
 
-## Stage 14 — Human Bassist Agent
+## Stage 13 — Human Bassist Agent
 
 **Why:** Bass locks with drums and provides harmonic foundation with its own idioms.
 
@@ -644,7 +644,7 @@ A skilled drummer optimizes for:
 - **Approach notes:** walk-ups, walk-downs, anticipations
 - **Style idioms:** fingerstyle, pick, slap (future)
 
-### Story 14.1 — Bass Operator Framework
+### Story 13.1 — Bass Operator Framework
 
 **Acceptance criteria:**
 - Implement operator families:
@@ -654,21 +654,21 @@ A skilled drummer optimizes for:
   - **Energy scaling:** root-only → add 5ths → add syncopation
   - **Kick lock:** match kick pattern accents
 
-### Story 14.2 — Bass Register and Collision Filter
+### Story 13.2 — Bass Register and Collision Filter
 
 **Acceptance criteria:**
 - Stay below bass ceiling (MIDI ~60)
 - Avoid collision with kick on same beats (unless intentional)
 - Cap syncopation under dense vocals
 
-### Story 14.3 — Bass Memory and Phrase Awareness
+### Story 13.3 — Bass Memory and Phrase Awareness
 
 **Acceptance criteria:**
 - Track approach note usage (don't overuse)
 - Phrase-end pickups (when groove has valid slot)
 - Section-aware behavior (verse simple, chorus fuller)
 
-### Story 14.4 — Bass Performance Rendering
+### Story 13.4 — Bass Performance Rendering
 
 **Acceptance criteria:**
 - Timing feel (slightly behind or on-grid by style)
@@ -677,7 +677,7 @@ A skilled drummer optimizes for:
 
 ---
 
-## Stage 15 — Human Vocalist/Lyricist Agent (Advanced)
+## Stage 14 — Human Vocalist/Lyricist Agent (Advanced)
 
 **Why:** Vocals are the hardest because they involve prosody, tessitura, breath, and lyric intelligibility.
 
@@ -688,7 +688,7 @@ A skilled drummer optimizes for:
 - **Prosody:** syllable stress ↔ rhythmic stress alignment
 - **Intelligibility:** consonant/vowel timing, avoid pileups at fast tempos
 
-### Story 15.1 — Vocal Operator Framework
+### Story 14.1 — Vocal Operator Framework
 
 **Acceptance criteria:**
 - Implement operator families:
@@ -698,7 +698,7 @@ A skilled drummer optimizes for:
   - **Rhythmic rewrites:** delay/anticipate phrase (preserve intelligibility)
   - **Phrase cadences:** rhyme-end shaping
 
-### Story 15.2 — Prosody and Singability Filter
+### Story 14.2 — Prosody and Singability Filter
 
 **Acceptance criteria:**
 - Tessitura limits by vocal type
@@ -707,14 +707,14 @@ A skilled drummer optimizes for:
 - Consonant pileup detection at fast tempos
 - Lyric intelligibility under busy accompaniment
 
-### Story 15.3 — Vocal Memory and Identity
+### Story 14.3 — Vocal Memory and Identity
 
 **Acceptance criteria:**
 - Track melodic motifs (chorus hook identity)
 - A/A' variation on repeated verses
 - Call-and-response awareness
 
-### Story 15.4 — Vocal Performance Rendering
+### Story 14.4 — Vocal Performance Rendering
 
 **Acceptance criteria:**
 - Microtiming for phrasing (ahead/behind by emphasis)
@@ -724,11 +724,11 @@ A skilled drummer optimizes for:
 
 ---
 
-## Stage 16 — Cross-Role Coordination ("Band Brain")
+## Stage 15 — Cross-Role Coordination ("Band Brain")
 
 **Why:** Individual agents sound good; a band sounds great when they listen to each other.
 
-### Story 16.1 — Spotlight Manager
+### Story 15.1 — Spotlight Manager
 
 **Acceptance criteria:**
 - Determine who "owns the spotlight" per section/phrase:
@@ -737,21 +737,21 @@ A skilled drummer optimizes for:
   - Drum fill → everyone else holds
 - Deterministic spotlight assignment by section type + energy + motif presence
 
-### Story 16.2 — Register Collision Avoidance
+### Story 15.2 — Register Collision Avoidance
 
 **Acceptance criteria:**
 - Cross-role register map per slot
 - Automatic voicing shifts to avoid mud
 - Priority order by role (vocal > lead > comp > bass)
 
-### Story 16.3 — Density Budget Enforcement
+### Story 15.3 — Density Budget Enforcement
 
 **Acceptance criteria:**
 - Global density budget per bar (energy-driven)
 - Per-role allocation
 - Deterministic thinning when budget exceeded
 
-### Story 16.4 — Groove Lock (Kick/Bass/Comp Coordination)
+### Story 15.4 — Groove Lock (Kick/Bass/Comp Coordination)
 
 **Acceptance criteria:**
 - Kick-bass alignment policy
@@ -760,7 +760,7 @@ A skilled drummer optimizes for:
 
 ---
 
-## Stage 17 — Harmonic Narrative
+## Stage 16 — Harmonic Narrative
 
 **Why:** Static chord progressions don't tell a story; tension-aware harmony choices create emotional arcs.
 
@@ -771,11 +771,11 @@ A skilled drummer optimizes for:
 - 17.4: Borrowed chords + chromaticism (policy-gated)
 - 17.5: Dominant pedal tension hook
 
-**Dependencies:** Stage 10 (phrase maps), Stage 7 (tension intent)
+**Dependencies:** Stage 11 (phrase maps), Stage 7 (tension intent)
 
 ---
 
-## Stage 18 — Performance Rendering (Full Humanization)
+## Stage 17 — Performance Rendering (Full Humanization)
 
 **Why:** Even with good decisions, quantized MIDI sounds fake.
 
@@ -787,7 +787,7 @@ A skilled drummer optimizes for:
 
 ---
 
-## Stage 19 — Sound/Render Pipeline + Export Quality
+## Stage 18 — Sound/Render Pipeline + Export Quality
 
 **Why:** More musical intelligence is only useful if export is reliable and debuggable.
 
@@ -799,7 +799,7 @@ A skilled drummer optimizes for:
 
 ---
 
-## Stage 20 — User Input Model + Constraints
+## Stage 19 — User Input Model + Constraints
 
 **Why:** As capability grows, the system needs a clear input schema for control and reproduction.
 
@@ -811,7 +811,7 @@ A skilled drummer optimizes for:
 
 ---
 
-## Stage 21 — Musical Evaluation Loop
+## Stage 20 — Musical Evaluation Loop
 
 **Why:** Automated checks enable iterative improvement without manual listening.
 
@@ -823,7 +823,7 @@ A skilled drummer optimizes for:
 
 ---
 
-## Stage 22 — Optional ML/AI Augmentation
+## Stage 21 — Optional ML/AI Augmentation
 
 **Why later:** Only once the classic pipeline is stable and explainable should AI be introduced.
 
@@ -916,12 +916,12 @@ Proposed organization:
 Generator/
   Groove/           # Agnostic rhythm engine (Stage G)
   Agents/
-    Drums/          # DrummerAgent (Stage 11)
-    Guitar/         # GuitarAgent (Stage 12)
-    Keys/           # KeysAgent (Stage 13)
-    Bass/           # BassAgent (Stage 14)
-    Vocal/          # VocalAgent (Stage 15)
-    Coordination/   # BandBrain (Stage 16)
+    Drums/          # DrummerAgent (Stage 10)
+    Guitar/         # GuitarAgent (Stage 11)
+    Keys/           # KeysAgent (Stage 12)
+    Bass/           # BassAgent (Stage 13)
+    Vocal/          # VocalAgent (Stage 14)
+    Coordination/   # BandBrain (Stage 15)
   Core/             # Shared generator infrastructure
 Song/
   Material/         # Motifs, fragments, MaterialBank
@@ -944,29 +944,29 @@ COMPLETED STAGES:
                       ↓
 [9: Motif Placement/Rendering] 🔄 (9.1-9.2 ✅, 9.3-9.4 pending)
                       ↓
-[11: Drums] 🔄 (Stages 1-3 ✅, Stages 4-8 pending)
+[10: Drums] 🔄 (Stages 1-3 ✅, Stages 4-8 pending)
                       ↓
-           [10: Melody Scaffolding]
+           [11: Melody Scaffolding]
                       ↓
     ┌───────────────────────────────────────┐
     ↓           ↓           ↓           ↓   ↓
-  [12:      [13:        [14:        [15:
+  [11:      [12:        [13:        [14:
   Guitar]   Keys]       Bass]       Vocal]
     └───────────────────────────────────────┘
                       ↓
-           [16: Cross-Role Coordination]
+           [15: Cross-Role Coordination]
                       ↓
-           [17: Harmonic Narrative]
+           [16: Harmonic Narrative]
                       ↓
-           [18: Performance Rendering]
+           [17: Performance Rendering]
                       ↓
-           [19: Export Quality]
+           [18: Export Quality]
                       ↓
-           [20: User Input Model]
+           [19: User Input Model]
                       ↓
-           [21: Evaluation Loop]
+           [20: Evaluation Loop]
                       ↓
-           [22: ML/AI Augmentation]
+           [21: ML/AI Augmentation]
 ```
 
 ---
@@ -1003,4 +1003,4 @@ COMPLETED STAGES:
 
 *This plan supersedes the original `NorthStarPlan.md` and incorporates insights from `groove_human_drummer_session_notes.md` and current codebase state.*
 
-*Last Updated:* Based on current codebase state (Stage G complete, Stage 11 Stages 1-3 complete)
+*Last Updated:* Based on current codebase state (Stage G complete, Stage 10 Stages 1-3 complete)
