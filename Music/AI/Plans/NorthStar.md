@@ -220,7 +220,7 @@ See `History.md` for detailed implementation notes on each completed stage.
 
 ---
 
-### Story 9.3 — Motif integration with accompaniment (call/response + ducking infrastructure)
+### Story 9.3 — Motif integration with accompaniment (call/response + ducking infrastructure) (COMPLETED)
 
 **Intent:** When a motif occurs, accompaniment should *make room* without destroying the groove. Build infrastructure for motif-aware coordination and integrate with DrummerAgent (Stage 10).
 
@@ -309,7 +309,7 @@ See `History.md` for detailed implementation notes on each completed stage.
 
 ---
 
-### Story 9.4 — Motif diagnostics
+### Story 9.4 — Motif diagnostics (PENDING COMPLETION OF STAGE 10)
 
 **Intent:** Make motif placement and rendering decisions visible for debugging and tuning.
 
@@ -339,7 +339,6 @@ See `History.md` for detailed implementation notes on each completed stage.
 **Dependencies:** Stage G (groove hooks) ✅, Stage 8 (motif data) ✅
 
 ---
-
 
 NOTE - STAGE 10 IS FULLY DETAILED IN: `AI/Plans/CurrentEpic_HumanDrummer.md`
 
