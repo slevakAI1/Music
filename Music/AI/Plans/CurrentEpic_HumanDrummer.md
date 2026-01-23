@@ -381,7 +381,7 @@
 
 ---
 
-### Story 3.4 — Pattern Substitution Operators (Groove Swaps)
+### Story 3.4 — Pattern Substitution Operators (Groove Swaps)  (COMPLETED)
 
 **As a** drummer agent  
 **I want** operators that swap entire groove patterns  

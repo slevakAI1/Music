@@ -58,6 +58,7 @@
     <None Remove="AI\Completed\PreAnalysis_3.1.md" />
     <None Remove="AI\Completed\PreAnalysis_3.2.md" />
     <None Remove="AI\Completed\PreAnalysis_3.3.md" />
+    <None Remove="AI\Completed\PreAnalysis_3.4.md" />
     <None Remove="AI\Prompts\AgentEpic.md" />
     <None Remove="AI\Prompts\Backlog.md" />
     <None Remove="AI\Prompts\Chat GPT 5.2 Thinking - Answer clarifying questions.md" />
