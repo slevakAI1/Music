@@ -409,7 +409,7 @@
 
 ---
 
-### Story 3.5 — Style Idiom Operators (Pop Rock Specifics)
+### Story 3.5 — Style Idiom Operators (Pop Rock Specifics)  (COMPLETED)
 
 **As a** drummer agent  
 **I want** genre-specific operators  
