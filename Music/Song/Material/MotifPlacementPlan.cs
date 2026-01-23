@@ -2,8 +2,6 @@
 // AI: invariants=Placements list is read-only; all placements reference valid motif IDs and section indices.
 // AI: deps=Story 9.1 output; consumed by Story 9.2 renderer and Story 9.3 accompaniment ducking.
 
-using Music.Generator;
-
 namespace Music.Song.Material;
 
 /// <summary>

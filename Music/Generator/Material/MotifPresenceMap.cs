@@ -3,7 +3,6 @@
 // AI: deps=Consumes MotifPlacementPlan and SectionTrack; queried by DrummerPolicyProvider and operators (Story 9.3).
 // AI: change=Story 9.3; extend density computation if MotifSpec gains density attribute.
 
-using Music.Generator;
 using Music.Song.Material;
 
 namespace Music.Generator.Material;

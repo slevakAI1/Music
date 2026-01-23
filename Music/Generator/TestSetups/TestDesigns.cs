@@ -3,8 +3,6 @@
 // AI: deps=Depends on SectionTests, HarmonyTests, TimingTests, TempoTests, GrooveTrackTestData, MotifLibrary, and BarTrack.RebuildFromTimingTrack.
 // AI: change=If you change defaults update all tests/fixtures and any code that asserts specific part names or TotalBars.
 
-using Music.Designer;
-using Music.Generator;
 using Music.Song.Material;
 
 namespace Music.Generator

@@ -3,10 +3,6 @@
 // AI: deps=GrooveOverrideMergePolicy, OverrideMergePolicyEnforcer, GrooveDiagnosticsCollector for decision tracing.
 // AI: change=Story G1: Uses structured GrooveDiagnosticsCollector instead of string diagnostics.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Music.Generator.Groove
 {
     /// <summary>

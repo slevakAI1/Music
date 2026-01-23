@@ -1,9 +1,6 @@
 // AI: purpose=Shared orchestration gate for role presence checks; used by generators to decide role on/off.
 // AI: invariants=Returns true when orchestrationPolicy is null or section defaults not found; non-throwing.
 
-using System;
-using System.Linq;
-
 namespace Music.Generator.Groove
 {
     public static class RolePresenceGate

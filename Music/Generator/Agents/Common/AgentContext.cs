@@ -3,7 +3,6 @@
 // AI: deps=MusicConstants.eSectionType for section classification; Rng system for RngStreamKey; MotifPresenceMap for ducking (Story 9.3).
 // AI: change=Extend via inheritance for instrument-specific contexts (DrummerContext, GuitarContext, etc.).
 
-using Music;
 using Music.Generator.Material;
 
 namespace Music.Generator.Agents.Common

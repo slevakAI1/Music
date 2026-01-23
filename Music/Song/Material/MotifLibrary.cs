@@ -2,8 +2,6 @@
 // AI: invariants=All motifs deterministic (same call → same output); non-derivative (archetype-level patterns only); valid structure
 // AI: deps=Uses MotifSpec, MaterialKind; ticks at 480 PPQN (MusicConstants.TicksPerQuarterNote)
 // AI: change=Stage 11+ may add procedural motif generation; these are MVP test fixtures
-using Music.Generator;
-
 namespace Music.Song.Material;
 
 /// <summary>

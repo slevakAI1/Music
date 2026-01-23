@@ -1,8 +1,6 @@
 // AI: purpose=Non-throwing validation for motif-specific constraints (parallel to PartTrackMaterialValidation)
 // AI: invariants=Returns empty list if valid; otherwise returns issue descriptions; deterministic
 // AI: deps=Validates MotifSpec fields against musical constraints; no external dependencies
-using Music.Generator;
-
 namespace Music.Song.Material;
 
 /// <summary>
