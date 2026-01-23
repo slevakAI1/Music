@@ -220,33 +220,92 @@ See `History.md` for detailed implementation notes on each completed stage.
 
 ---
 
-### Story 9.3 — Motif integration with accompaniment (call/response + ducking hooks)
+### Story 9.3 — Motif integration with accompaniment (call/response + ducking infrastructure)
 
-**Intent:** When a motif occurs, accompaniment should *make room* without destroying the groove.
+**Intent:** When a motif occurs, accompaniment should *make room* without destroying the groove. Build infrastructure for motif-aware coordination and integrate with DrummerAgent (Stage 10).
 
 **Acceptance criteria:**
-- Create `MotifPresenceMap` that can be queried per `(section, bar, slot)`:
-  - returns `bool IsMotifActive` and optional `MotifDensity` estimate
-- Wire minimal "ducking" into existing role generators:
-  - **Comp/Keys**: reduce density under motif windows
-    - skip some weak-beat onsets when motif is dense
-    - shorten sustain at motif onsets
-  - **Pads**: shorten sustain slightly at motif onsets (create breaths)
-  - **Drums**: reduce optional hats/ghosts slightly under dense motif windows
-    - style-safe: only affect optional events, never groove anchors
-- Ducking must be:
-  - deterministic
-  - bounded (never remove more than 30% of events)
-  - groove-protective (never remove downbeats/backbeats)
+
+**Part A: MotifPresenceMap (shared query service)**
+- Create `MotifPresenceMap` class in `Generator/Material/`:
+  - Constructor takes `MotifPlacementPlan` and `BarTrack`
+  - Query methods:
+    - `IsMotifActive(int barNumber, string? role = null) → bool` — any motif active in bar (optionally filtered by role)
+    - `GetMotifDensity(int barNumber, string? role = null) → double` — estimated density [0.0-1.0] from motif note density
+    - `GetActiveMotifs(int barNumber) → IReadOnlyList<MotifPlacement>` — which motifs are active
+  - Deterministic: same placement plan → same query results
+  - Register-aware: can filter by role when querying (e.g., "Lead", "Guitar")
+
+**Part B: DrummerAgent integration (NOW - Stage 10 active)**
+- Update `DrummerPolicyProvider` to accept optional `MotifPresenceMap`:
+  - When motif is active in current bar: reduce density target by 10-15%
+  - Add "MotifPresent" to EnabledVariationTagsOverride when motif active
+- Update relevant drum operators to query motif presence in `CanApply()` or `Score()`:
+  - **GhostClusterOperator**: reduce score by 50% when motif active (avoid clutter)
+  - **HatEmbellishmentOperator**: reduce score by 30% when motif active
+  - **GhostBeforeBackbeatOperator** / **GhostAfterBackbeatOperator**: reduce score by 20% when motif active
+  - Operators receive `MotifPresenceMap` via `DrummerContext` (extend context with optional field)
+- Ducking rules:
+  - **Never affect**: kick/snare anchors, backbeats, downbeats (groove-protective)
+  - **Affect only**: optional embellishments (ghosts, clusters, hat fills)
+  - **Bounded**: max 20% density reduction in any bar
 - Tests:
-  - Determinism: same motif presence → same ducking decisions
-  - Groove anchors preserved
-  - Density reduction stays within bounds
-  - Accompaniment still sounds musical (not over-thinned)
+  - Determinism: same motif placement → same ducking decisions
+  - Groove anchors preserved (kick/snare/backbeats unaffected)
+  - Density reduction stays within 20% bound
+  - Operators correctly query motif presence
+
+**Part C: Infrastructure hooks for future agents (Stages 11-13)**
+- Add `MotifPresenceMap?` field to `AgentContext` (base class for all agents):
+  - DrummerContext inherits this field
+  - GuitarContext / KeysContext / BassContext will inherit this field (future stages)
+- Document pattern in `ProjectArchitecture.md`:
+  - All instrument agents can query motif presence via context
+  - Policy providers should reduce density when motifs active
+  - Operators should adjust scores/eligibility based on motif presence
+  - Suggested reductions:
+    - Drums: 10-20% density reduction (only optional events)
+    - Comp/Keys: 20-30% density reduction (future Stage 12)
+    - Bass: minimal reduction, mainly register shifts (future Stage 13)
+
+**Part D: Testing**
+- Unit tests for `MotifPresenceMap`:
+  - Query correctness (IsMotifActive, GetMotifDensity)
+  - Role filtering (motif in "Lead" doesn't affect "Bass" queries)
+  - Edge cases (empty plan, no motifs in bar, multiple motifs)
+- Integration tests for DrummerAgent:
+  - Determinism: same motif placement + seed → identical drum track
+  - Groove protection: anchors never removed by ducking
+  - Density bounds: verify 20% max reduction
+  - Operator scoring: ghosts/embellishments score lower when motif present
+- Snapshot test:
+  - Generate drums with and without motif presence
+  - Verify reduced optional events (ghosts/clusters) when motif active
+  - Verify identical anchors in both cases
 
 **Notes:**
-- Ducking is a BIAS, not a hard rule
-- Integration should feel natural, not like "everything stops for the motif"
+- **Ducking is a BIAS, not a hard rule** — operators still generate candidates; selection engine applies bias
+- **Scope limited to DrummerAgent NOW** — Comp/Keys/Bass integration happens in their respective stages
+- **Infrastructure complete for future agents** — pattern is established and documented
+- **Integration feels natural** — accompaniment thins slightly, doesn't stop
+- **No new generator complexity** — uses existing operator/policy architecture
+
+**Dependencies:**
+- Stage 9 Stories 9.1-9.2 (motif placement and rendering) ✅
+- Stage 10 Stories 2.1-2.3 (DrummerContext, DrummerPolicyProvider) ✅
+- Stage 10 Story 3.1 (MicroAddition operators) ✅
+
+**Files to create:**
+- `Generator/Material/MotifPresenceMap.cs`
+- `Music.Tests/Generator/Material/MotifPresenceMapTests.cs`
+- `Music.Tests/Generator/Agents/Drums/DrummerMotifIntegrationTests.cs`
+
+**Files to modify:**
+- `Generator/Agents/Common/AgentContext.cs` (add optional `MotifPresenceMap?` field)
+- `Generator/Agents/Drums/DrummerContext.cs` (inherit MotifPresenceMap field)
+- `Generator/Agents/Drums/DrummerPolicyProvider.cs` (density reduction when motif active)
+- `Generator/Agents/Drums/Operators/MicroAddition/*.cs` (score reductions based on motif presence)
+- `Music/AI/Plans/ProjectArchitecture.md` (document motif coordination pattern)
 
 ---
 
