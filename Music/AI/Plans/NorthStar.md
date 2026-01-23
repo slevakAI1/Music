@@ -77,27 +77,28 @@ See `History.md` for detailed implementation notes on each completed stage.
 
 ---
 
-## Stage G — Groove System Completion (IN PROGRESS)
+## Stage G — Groove System Completion (COMPLETE)
 
-**Reference:** `GroovePlanToDo.md` for full story breakdown
+**Reference:** `Completed/Epic_Groove.md` for full implementation details
 
 **Goal:** Finish the groove system (selection + constraints + velocity + timing + overrides + diagnostics + tests) with hooks ready for human musician agent models.
 
-**Current Status:**
-- Phase A (Prep): ✅ Complete (A1, A2, A3)
-- Phase B (Variation Engine): ✅ Complete (B1, B2, B3, B4)
-- Phase C (Density & Caps): ✅ Complete (C1, C2, C3)
-- Phase D (Onset Strength + Velocity): ✅ Complete (D1, D2)
-- Phase E (Timing & Feel): 🔄 In Progress
-- Phase F (Override Merge Policy): ⏳ Pending
-- Phase G (Diagnostics): ⏳ Pending
-- Phase H (Test Suite): ⏳ Pending
+**All Phases Complete:**
+- Phase A (Prep): ✅ Complete (A1, A2, A3) — Output contracts, RNG streams, policy hooks
+- Phase B (Variation Engine): ✅ Complete (B1, B2, B3, B4) — Layer merge, filtering, weighted selection
+- Phase C (Density & Caps): ✅ Complete (C1, C2, C3) — Density targets, selection, hard caps
+- Phase D (Onset Strength + Velocity): ✅ Complete (D1, D2) — Strength classification, velocity shaping
+- Phase E (Timing & Feel): ✅ Complete (E1, E2) — Feel timing, role timing bias
+- Phase F (Override Merge Policy): ✅ Complete (F1) — Policy enforcement for segment overrides
+- Phase G (Diagnostics): ✅ Complete (G1, G2) — Decision trace, provenance tracking
+- Phase H (Test Suite): ✅ Complete (H1, H2) — Unit tests, golden regression test
 
-**Definition of Done:**
-- Produces per-bar per-role final onset list with anchors + variations + constraints + velocity + timing
-- Supports segment overrides with merge policies
-- Exposes stable hook interface for `IGroovePolicyProvider` / `IGrooveCandidateSource`
-- Has determinism-locked tests and diagnostics
+**Key Deliverables:**
+- `IGroovePolicyProvider` and `IGrooveCandidateSource` hooks ready for agent use
+- `FeelTimingEngine` with straight/swing/shuffle/triplet support
+- `OverrideMergePolicyEnforcer` for segment override control
+- `GrooveBarDiagnostics` for decision tracing
+- All tests passing (200+ groove-related tests)
 
 ---
 
@@ -116,17 +117,19 @@ See `History.md` for detailed implementation notes on each completed stage.
 
 ---
 
-## Stage 9 — Motif Placement and Rendering (PENDING)
+## Stage 9 — Motif Placement and Rendering (IN PROGRESS)
 
 **Goal:** Deterministically place motifs in appropriate sections, render them against harmony and groove, and integrate them with accompaniment.
 
-**Stories:**
-- 9.1: `MotifPlacementPlanner` (where motifs appear)
-- 9.2: `MotifRenderer` (notes from motif spec + harmony)
+**Completed Stories:**
+- 9.1: `MotifPlacementPlanner` (where motifs appear) ✅
+- 9.2: `MotifRenderer` (notes from motif spec + harmony) ✅ — 22 passing tests
+
+**Pending Stories:**
 - 9.3: Motif integration with accompaniment (call/response + ducking hooks)
 - 9.4: Motif diagnostics
 
-**Dependencies:** Stage G (groove hooks), Stage 8 (motif data)
+**Dependencies:** Stage G (groove hooks) ✅, Stage 8 (motif data) ✅
 
 ---
 
@@ -146,13 +149,13 @@ See `History.md` for detailed implementation notes on each completed stage.
 ---
 
 
-NOTE - STAGE 11 IS FURTHER REFINED IN A SEPARATE DOCUMENT - CurrentEpic_HumanDrummer.md
+NOTE - STAGE 11 IS FULLY DETAILED IN: `AI/Plans/CurrentEpic_HumanDrummer.md`
 
-## Stage 11 — Human Drummer Agent (Pop/Rock)
+## Stage 11 — Human Drummer Agent (Pop/Rock) (IN PROGRESS)
 
 **Why:** The groove system provides the framework; this stage implements a realistic drummer that makes musical decisions like a human.
 
-**Reference:** `AIResearch/groove_human_drummer_session_notes.md`
+**Reference:** `AI/Plans/CurrentEpic_HumanDrummer.md` for full story breakdown with acceptance criteria.
 
 ### Core Concept: `DrummerAgent` With Priorities
 
@@ -164,112 +167,54 @@ A skilled drummer optimizes for:
 5. **Variation** avoids repetition, but stays in style
 6. **Hands/feet constraints** avoid physically absurd patterns
 
-### Story 11.1 — Drummer Operator Framework
+### Progress Summary
 
-**Intent:** Define the operator interface and core operator families for drums.
+**Stage 1 — Shared Agent Infrastructure: ✅ COMPLETE**
+- 1.1: Common agent contracts (`IMusicalOperator`, `AgentContext`, `IAgentMemory`, `OperatorFamily`) ✅
+- 1.2: Agent memory with anti-repetition (`AgentMemory`, `FillShape`) ✅
+- 1.3: Operator selection engine (`OperatorSelectionEngine`) ✅
+- 1.4: Style configuration model (`StyleConfiguration`, `StyleConfigurationLibrary`) ✅
 
-**Acceptance criteria:**
-- Create `IDrumOperator` interface with:
-  - `OperatorId` (stable identifier)
-  - `OperatorType` (enum: MicroAddition, SubdivisionTransform, PhrasePunctuation, PatternSubstitution)
-  - `GenerateCandidates(DrummerContext) → IEnumerable<DrumCandidate>`
-  - `Score(candidate, context) → double`
-- Implement core operator families:
-  - **Micro-additions:** ghost-before-backbeat, ghost-after-backbeat, kick pickup, kick double, hat embellishment
-  - **Subdivision transforms:** hat lift (8ths→16ths), hat drop, ride swap, partial lift
-  - **Phrase punctuation:** crash on 1, turnaround fill, setup hit, stop-time/dropout
-  - **Pattern substitution:** backbeat variant, kick pattern variant, half-time/double-time toggle
-- Operators parameterized by style (Pop, Rock, Jazz, Metal, EDM)
-- All operators deterministic given context + seed
+**Stage 2 — Drummer Agent Core: ✅ COMPLETE**
+- 2.1: Drummer-specific context (`DrummerContext`, `DrummerContextBuilder`) ✅
+- 2.2: Drum candidate type (`DrumCandidate`, `DrumArticulation`, `FillRole`) ✅
+- 2.3: Drummer policy provider (`DrummerPolicyProvider` : `IGroovePolicyProvider`) ✅
+- 2.4: Drummer candidate source (`DrummerCandidateSource` : `IGrooveCandidateSource`) ✅
+- 2.5: Drummer memory (`DrummerMemory`) ✅
 
-### Story 11.2 — Physicality Constraints (Limb Feasibility)
+**Stage 3 — Drum Operators (28 Total): ✅ COMPLETE**
+- 3.1: MicroAddition operators (7): ghost notes, kick pickups, embellishments ✅
+- 3.2: SubdivisionTransform operators (5): hat lift/drop, ride swap, partial lift ✅
+- 3.3: PhrasePunctuation operators (7): crash on 1, fills, setup hits, stop-time ✅
+- 3.4: PatternSubstitution operators (4): backbeat variants, half/double-time ✅
+- 3.5: StyleIdiom operators (5): Pop Rock specific patterns ✅
+- 3.6: Operator registry and discovery (`DrumOperatorRegistry`) ✅
 
-**Intent:** Drums are physical; impossible patterns sound fake.
+**Stage 4 — Physicality Constraints: ⏳ PENDING**
+- 4.1: Limb model (which limb plays which role)
+- 4.2: Sticking rules (max consecutive same-hand, ghost density limits)
+- 4.3: Physicality filter (reject impossible patterns)
+- 4.4: Overcrowding prevention (density caps at physicality level)
 
-**Acceptance criteria:**
-- Create `DrumPhysicalityFilter` with rules:
-  - Limb feasibility (no impossible simultaneous hits)
-  - Sticking bias (limits on ghost density, fast alternations)
-  - No-overcrowd rules (caps per role, per beat)
-- Rules are style-aware (jazz allows more freedom; metal has double-kick constraints)
-- All filtering deterministic
-- Diagnostics: log rejected candidates with reason
+**Stage 5 — Pop Rock Style Configuration: ⏳ PENDING**
+- 5.1: Operator weights (high/medium/low by musical relevance)
+- 5.2: Density curves (section-aware targets)
+- 5.3: Physicality rules (Pop Rock specific constraints)
+- 5.4: Memory settings (anti-repetition tuning)
 
-### Story 11.3 — Drummer Memory and Anti-Repetition
+**Stage 6 — Performance Rendering: ⏳ PENDING**
+- 6.1: Velocity shaper (role × strength dynamics)
+- 6.2: Timing nuance (push/pull by role)
+- 6.3: Articulation mapping (MIDI note variations)
 
-**Intent:** Human drummers don't repeat the exact same bar 8 times.
+**Stage 7 — Diagnostics & Tuning: ⏳ PENDING**
+- 7.1: Drummer diagnostics collector (per-bar trace)
+- 7.2: Benchmark feature extraction (density, syncopation, punctuation)
 
-**Acceptance criteria:**
-- Create `DrummerMemory` tracking:
-  - Last N bars operator usage
-  - Last phrase fill "shape"
-  - Section signature choices (chorus hat-open on beat 1, etc.)
-- Anti-repetition policy:
-  - Bias against same operators in consecutive bars
-  - Vary fill placement/shape across repeated sections
-  - "Sometimes do nothing" policy for restraint
-- All deterministic with seed
-
-### Story 11.4 — Drummer Policy Provider
-
-**Intent:** Connect the drummer agent to the groove system via the policy hook.
-
-**Acceptance criteria:**
-- Implement `DrummerPolicyProvider : IGroovePolicyProvider`
-- Outputs `GroovePolicyDecision` with:
-  - `EnabledVariationTagsOverride` (style-filtered)
-  - `Density01Override` (energy-driven)
-  - `MaxEventsPerBarOverride` (cap enforcement)
-  - `OperatorAllowList` (which operators can fire this bar)
-- Integrate with Stage 7 intent query for energy/tension/phrase context
-- Unit tests verify determinism and musical sensibility
-
-### Story 11.5 — Drummer Candidate Source
-
-**Intent:** Replace static catalog with operator-generated candidates.
-
-**Acceptance criteria:**
-- Implement `DrummerCandidateSource : IGrooveCandidateSource`
-- Generates candidates via enabled operators
-- Scores and ranks candidates
-- Respects physicality filters
-- Integrates with groove selection engine (density targets, caps)
-- Unit tests: same context → same candidates
-
-### Story 11.6 — Drummer Performance Rendering
-
-**Intent:** Final velocity/timing/articulation for realistic drum output.
-
-**Acceptance criteria:**
-- Drummer-specific velocity shaping:
-  - Ghost velocity targets
-  - Accent patterns on phrase boundaries
-  - Fill crescendos
-- Drummer-specific timing:
-  - Push/pull by role (snare slightly behind, hats on top)
-  - Fill timing (rushed at climax, laid back in groove)
-- Articulation hints (for future audio rendering):
-  - Rimshot vs snare
-  - Open vs closed hat
-  - Crash vs ride
-- All deterministic
-
-### Story 11.7 — Drummer Diagnostics and Tuning
-
-**Intent:** Make drummer decisions visible for debugging and improvement.
-
-**Acceptance criteria:**
-- Per-bar trace showing:
-  - Operators considered/selected/rejected
-  - Physicality filter decisions
-  - Memory state
-  - Density targets vs actuals
-- Non-invasive (read-only)
-- Supports benchmark loop:
-  - Extract features from human tracks
-  - Run generator with matched context
-  - Compare with objective deltas
-  - Map gaps to operator/policy/constraint/performance buckets
+**Stage 8 — Integration & Testing: ⏳ PENDING**
+- 8.1: Wire drummer agent into generator (`DrummerAgent` facade)
+- 8.2: Unit tests (determinism, musical sensibility)
+- 8.3: Golden regression snapshot
 
 ---
 
@@ -667,20 +612,23 @@ Song/
 ## Summary: Stage Dependency Graph
 
 ```
-Completed: [1-2] → [3] → [4] → [5] → [6] → [7] → [8.0] → [M1]
-                                                            ↓
-Current:   [Stage G: Groove Completion] ←──────────────────┘
+COMPLETED STAGES:
+[1-2] → [3] → [4] → [5] → [6] → [7] → [8.0] → [M1]
+                                                  ↓
+[Stage G: Groove Completion] ✅ ←─────────────────┘
                       ↓
-           [8: Motif Data] (complete)
+[8: Motif Data] ✅
                       ↓
-           [9: Motif Placement/Rendering]
+[9: Motif Placement/Rendering] 🔄 (9.1-9.2 ✅, 9.3-9.4 pending)
+                      ↓
+[11: Drums] 🔄 (Stages 1-3 ✅, Stages 4-8 pending)
                       ↓
            [10: Melody Scaffolding]
                       ↓
     ┌───────────────────────────────────────┐
     ↓           ↓           ↓           ↓   ↓
-  [11:      [12:        [13:        [14:  [15:
-  Drums]    Guitar]     Keys]       Bass] Vocal]
+  [12:      [13:        [14:        [15:
+  Guitar]   Keys]       Bass]       Vocal]
     └───────────────────────────────────────┘
                       ↓
            [16: Cross-Role Coordination]
@@ -702,11 +650,34 @@ Current:   [Stage G: Groove Completion] ←────────────�
 
 ## Next Actions
 
-1. **Complete Stage G** (groove system) per `GroovePlanToDo.md`
-2. **Continue Stage 9** (motif placement) once Stage G hooks are stable
-3. **Begin Stage 11** (human drummer) as first full agent implementation
-4. **Apply learnings** from Stage 11 to Stages 12-15
+**Recommended Path Forward:**
+
+1. **Story 9.3** — Motif integration with accompaniment (ducking hooks)
+   - Enables drums and other instruments to query motif presence
+   - Small story, unlocks coordination between motifs and agents
+
+2. **Continue CurrentEpic Stage 4** — Physicality Constraints (Stories 4.1-4.4)
+   - Makes drum patterns physically realistic
+   - Required before style configuration makes sense
+
+3. **CurrentEpic Stage 5** — Pop Rock Style Configuration (Stories 5.1-5.4)
+   - Tunes operator weights and density curves for Pop Rock
+   - Completes the "musical intelligence" layer
+
+4. **CurrentEpic Stage 6** — Performance Rendering (Stories 6.1-6.3)
+   - Adds human-like velocity and timing nuance
+   - Makes output sound realistic
+
+5. **CurrentEpic Stages 7-8** — Diagnostics + Integration
+   - Completes drummer agent implementation
+   - Enables tuning and golden tests
+
+6. **Story 9.4** — Motif diagnostics (after drummer integration)
+
+**Rationale:** Story 9.3 first because it's small and enables motif-aware coordination in the drummer agent (crash on hook entries, ducking). Then complete the drummer epic sequentially.
 
 ---
 
 *This plan supersedes the original `NorthStarPlan.md` and incorporates insights from `groove_human_drummer_session_notes.md` and current codebase state.*
+
+*Last Updated:* Based on current codebase state (Stage G complete, Stage 11 Stages 1-3 complete)
