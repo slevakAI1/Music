@@ -467,7 +467,7 @@
 
 ---
 
-### Story 4.1 — Define Limb Model
+### Story 4.1 — Define Limb Model  (COMPLETED)
 
 **As a** drummer agent  
 **I want** a model of what a human drummer can physically play  

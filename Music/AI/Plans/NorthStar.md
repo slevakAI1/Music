@@ -381,8 +381,8 @@ A skilled drummer optimizes for:
 - 3.5: StyleIdiom operators (5): Pop Rock specific patterns ✅
 - 3.6: Operator registry and discovery (`DrumOperatorRegistry`) ✅
 
-**Stage 4 — Physicality Constraints: ⏳ PENDING**
-- 4.1: Limb model (which limb plays which role)
+**Stage 4 — Physicality Constraints: ⏳ IN PROGRESS**
+- 4.1: Limb model (which limb plays which role) ✅
 - 4.2: Sticking rules (max consecutive same-hand, ghost density limits)
 - 4.3: Physicality filter (reject impossible patterns)
 - 4.4: Overcrowding prevention (density caps at physicality level)
