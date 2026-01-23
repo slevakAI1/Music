@@ -1024,11 +1024,15 @@ var popRockOperators = registry.GetEnabledOperators(popRockStyle);
 | `Generator/Agents/Drums/Operators/PhrasePunctuation/*.cs` | Story 3.3: 7 phrase punctuation operators |
 | `Generator/Agents/Drums/Operators/PatternSubstitution/*.cs` | Story 3.4: 4 pattern substitution operators |
 | `Generator/Agents/Drums/Operators/StyleIdiom/*.cs` | Story 3.5: 5 PopRock style idiom operators |
+| `Generator/Agents/Drums/Physicality/LimbModel.cs` | Story 4.1: Limb enum and LimbModel class (role→limb mapping) |
+| `Generator/Agents/Drums/Physicality/LimbAssignment.cs` | Story 4.1: LimbAssignment record (bar, beat, role, limb) |
+| `Generator/Agents/Drums/Physicality/LimbConflictDetector.cs` | Story 4.1: LimbConflict record and LimbConflictDetector |
 | `Generator/Agents/Drums/Physicality/PhysicalityFilter.cs` | Playability filter stub |
 | `Generator/Agents/Drums/Physicality/PhysicalityRules.cs` | Physicality configuration |
 
 **Remaining Drummer Agent Work:**
-- Stories 4.1-4.4: Full physicality constraints (limb model, sticking rules)
+- Story 4.1 (COMPLETED): Limb model (enum, mapping, conflict detection)
+- Stories 4.2-4.4: Sticking rules, physicality filter integration
 - Stories 5.1-5.4: Pop Rock style configuration
 
 ### Material/Motif System
@@ -1503,6 +1507,129 @@ Feel operators coordination:
 | `SubdivisionTransformOperatorTests.cs` | Story 3.2: 5 operators, pattern verification, odd meters |
 | `PhrasePunctuationOperatorTests.cs` | Story 3.3: 7 operators, fill windows, density scaling, time-signature adaptation |
 | `PatternSubstitutionOperatorTests.cs` | Story 3.4: 4 operators, section/energy gating, articulation variants, mutual exclusion, odd meters |
+| `LimbModelTests.cs` | Story 4.1: Limb enum, LimbModel, LimbAssignment tests |
+| `LimbConflictDetectorTests.cs` | Story 4.1: Conflict detection, determinism, edge cases |
+
+---
+
+## 19) Physicality System (Story 4.1)
+
+Location: `Generator/Agents/Drums/Physicality/`
+
+Purpose: Models drummer physical capabilities to ensure generated patterns are playable.
+
+### Limb Enum
+
+```csharp
+public enum Limb
+{
+    RightHand = 0,  // Typically plays hi-hat, ride, crash
+    LeftHand = 1,   // Typically plays snare, toms
+    RightFoot = 2,  // Typically plays kick drum
+    LeftFoot = 3    // Typically operates hi-hat pedal
+}
+```
+
+### LimbModel
+
+Maps drum roles to the limb that plays them.
+
+```csharp
+public sealed class LimbModel
+{
+    // Returns the limb for a role, or null if unknown
+    public Limb? GetRequiredLimb(string role);
+    
+    // Read-only mapping
+    public IReadOnlyDictionary<string, Limb> RoleLimbMapping { get; }
+    
+    // Create new model with additional mapping
+    public LimbModel WithRoleMapping(string role, Limb limb);
+    
+    // Preset configurations
+    public static LimbModel Default { get; }      // Right-handed drummer
+    public static LimbModel LeftHanded { get; }   // Left-handed drummer
+}
+```
+
+**Default Mappings (right-handed):**
+
+| Role | Limb |
+|------|------|
+| ClosedHat, OpenHat, Ride, Crash | RightHand |
+| Snare, Tom1, Tom2, FloorTom | LeftHand |
+| Kick | RightFoot |
+
+### LimbAssignment
+
+Represents a limb's assignment to a drum event at a specific position.
+
+```csharp
+public readonly record struct LimbAssignment(
+    int BarNumber,    // 1-based
+    decimal Beat,     // 1-based, fractional (e.g., 1.5, 2.75)
+    string Role,      // e.g., "Snare", "Kick"
+    Limb Limb)        // Which limb plays this
+{
+    public static LimbAssignment? FromCandidate(DrumCandidate candidate, LimbModel limbModel);
+    public bool IsSamePosition(LimbAssignment other);
+    public bool ConflictsWith(LimbAssignment other);  // Same limb + same position
+}
+```
+
+### LimbConflictDetector
+
+Detects when the same limb is required for multiple simultaneous events.
+
+```csharp
+public sealed class LimbConflictDetector
+{
+    // Detect conflicts in limb assignments
+    public IReadOnlyList<LimbConflict> DetectConflicts(IReadOnlyList<LimbAssignment> assignments);
+    
+    // Detect conflicts directly from drum candidates
+    public IReadOnlyList<LimbConflict> DetectConflicts(
+        IReadOnlyList<DrumCandidate> candidates, LimbModel limbModel);
+    
+    // Fast existence check
+    public bool HasConflicts(IReadOnlyList<LimbAssignment> assignments);
+    
+    public static LimbConflictDetector Default { get; }
+}
+```
+
+### LimbConflict
+
+```csharp
+public readonly record struct LimbConflict(
+    Limb Limb,
+    int BarNumber,
+    decimal Beat,
+    IReadOnlyList<LimbAssignment> ConflictingAssignments)
+{
+    public int ConflictCount => ConflictingAssignments.Count;
+    public IEnumerable<string> ConflictingRoles => ConflictingAssignments.Select(a => a.Role);
+}
+```
+
+**Key Behaviors:**
+
+- Conflict = same limb required for 2+ events at exact same (BarNumber, Beat)
+- Different limbs at same position = allowed (e.g., snare + hat on backbeat)
+- Unknown roles (no limb mapping) are skipped, not treated as conflicts
+- Detection is deterministic: same input → same output (sorted by bar, beat, limb)
+- Story 4.3 will integrate conflict detection into `PhysicalityFilter`
+
+**Example Conflicts:**
+
+| Scenario | Conflict? |
+|----------|-----------|
+| Snare + Tom1 on bar 1, beat 2 | Yes (both LeftHand) |
+| Snare + Hat on bar 1, beat 2 | No (LeftHand + RightHand) |
+| OpenHat + ClosedHat on same beat | Yes (both RightHand) |
+| Kick + Snare on bar 1, beat 1 | No (RightFoot + LeftHand) |
+
+
 
 
 
