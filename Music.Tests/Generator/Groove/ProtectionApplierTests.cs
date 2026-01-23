@@ -2,6 +2,7 @@
 // AI: coverage=Tests must-hit addition, never-add filtering, never-remove/protected flag setting, deduplication, bar mapping.
 
 using Music.Generator;
+using Music.Generator.Groove;
 using Xunit;
 
 namespace Music.Tests.Generator.Groove

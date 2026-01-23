@@ -2,6 +2,7 @@
 // AI: deps=xunit for test framework; Music.Generator for types under test.
 // AI: change=Story B2 acceptance criteria: test tag resolution, group/candidate filtering, empty-tag semantics, determinism.
 
+using Music.Generator.Groove;
 using Xunit;
 
 namespace Music.Generator.Tests

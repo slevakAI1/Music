@@ -3,7 +3,7 @@
 // AI: deps=GrooveBarContext for bar context; GroovePolicyDecision for policy result.
 // AI: change=Story A3 acceptance criteria: stable hook interface for future drummer model without refactors.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Interface for external policy providers that can drive groove decisions.

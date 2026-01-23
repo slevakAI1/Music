@@ -3,6 +3,8 @@
 // AI: deps=IDrumOperator interface, DrummerContext, DrumCandidate; consumed by all MicroAddition/SubdivisionTransform operators.
 // AI: change=Story 3.1; extend with additional helper methods as operator patterns emerge.
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Drums.Operators
 {
     /// <summary>

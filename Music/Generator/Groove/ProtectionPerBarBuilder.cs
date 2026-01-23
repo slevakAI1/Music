@@ -2,7 +2,7 @@
 // AI: deps=ProtectionPolicyMerger, BarContext, SegmentGrooveProfile; generator-agnostic.
 // AI: invariants=Returns dictionary keyed by 1-based bar number; merges layers per enabled tags.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Builds per-bar merged protection dictionaries from protection policy and bar contexts.

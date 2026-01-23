@@ -3,7 +3,7 @@
 // AI: deps=IGroovePolicyProvider interface; GroovePolicyDecision for result.
 // AI: change=Story A3 acceptance criteria: default provider produces identical output to current system.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Default policy provider that returns no overrides.

@@ -5,6 +5,7 @@
 using Xunit;
 using Music.Generator.Agents.Common;
 using Music.Generator;
+using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Common.Tests
 {

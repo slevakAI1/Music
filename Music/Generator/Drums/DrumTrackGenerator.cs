@@ -2,6 +2,7 @@
 // AI: deps=GrooveTrack for preset lookup; BarTrack for tick conversion; returns PartTrack sorted by AbsoluteTimeTicks.
 // AI: change=Phase 1 MVP; subsequent stories add velocity shaping, timing, variations per GroovePlan.md.
 
+using Music.Generator.Groove;
 using Music.MyMidi;
 
 namespace Music.Generator

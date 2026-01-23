@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Default role presence for a section type; lightweight orchestration hint (e.g., Verse vs Chorus).
     // AI: invariants=SectionType is string (e.g., "Verse", "Chorus"); RolePresent gates role generation in section.

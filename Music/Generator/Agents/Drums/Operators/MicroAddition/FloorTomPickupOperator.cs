@@ -3,6 +3,8 @@
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
 // AI: change=Story 3.1; adjust energy threshold based on listening tests.
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Drums.Operators.MicroAddition
 {
     /// <summary>

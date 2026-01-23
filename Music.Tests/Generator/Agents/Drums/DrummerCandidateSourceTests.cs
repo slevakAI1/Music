@@ -8,6 +8,7 @@ using Music.Generator.Agents.Drums.Physicality;
 using Music.Generator.Agents.Common;
 using Music.Generator;
 using Music;
+using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Tests
 {

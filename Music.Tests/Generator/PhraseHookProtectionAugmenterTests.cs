@@ -3,6 +3,7 @@
 // AI: coverage=Null handling, downbeat protection, backbeat protection, multiple time signatures.
 
 using Music.Generator;
+using Music.Generator.Groove;
 using Xunit;
 
 namespace Music.Tests.Generator

@@ -3,7 +3,7 @@
 // AI: deps=GrooveOverrideMergePolicy, SegmentGrooveProfile, RoleDensityTarget.
 // AI: change=Story F1: controls list merge/replace, protected removal, cap relaxation, feel changes.
 
-namespace Music.Generator;
+namespace Music.Generator.Groove;
 
 /// <summary>
 /// Enforces override merge policy semantics for segment-level overrides.

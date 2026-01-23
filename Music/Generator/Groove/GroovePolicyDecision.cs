@@ -3,7 +3,7 @@
 // AI: deps=TimingFeel from Groove.cs for timing feel overrides.
 // AI: change=Story A3 acceptance criteria: drummer policy hook with no behavior change when defaults used.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Policy decision that can override groove behavior for a specific bar and role.

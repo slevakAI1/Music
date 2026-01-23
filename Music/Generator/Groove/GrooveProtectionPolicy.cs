@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Global groove protection policy with hierarchical layers; aggregates all #1-#8 policies + merge semantics.
     // AI: invariants=HierarchyLayers ordered [0]=base, [1+]=refinements; Identity links to preset; MergePolicy controls overrides.

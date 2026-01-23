@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Rhythm constraints and caps per role; aggregates RoleRhythmVocabulary + density/sustain caps.
     // AI: invariants=RoleVocabulary holds vocab constraints; RoleMaxDensityPerBar and RoleMaxSustainSlots are hard caps.

@@ -3,6 +3,8 @@
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
 // AI: change=Story 3.2; adjust beat positions (1&, 3&) or velocity based on listening tests.
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
 {
     /// <summary>

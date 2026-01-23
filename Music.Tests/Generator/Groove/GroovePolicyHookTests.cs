@@ -2,6 +2,7 @@
 // AI: deps=xunit for test framework; Music.Generator for types under test.
 // AI: change=Story A3 acceptance criteria: verify hook interface, default provider, and no behavior change.
 
+using Music.Generator.Groove;
 using Xunit;
 
 namespace Music.Generator.Tests

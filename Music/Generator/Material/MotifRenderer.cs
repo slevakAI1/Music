@@ -4,6 +4,7 @@
 // AI: change=Story 9.2 implementation; converts MaterialLocal motif specs to SongAbsolute rendered tracks.
 
 using Music.Generator;
+using Music.Generator.Groove;
 using Music.MyMidi;
 
 namespace Music.Song.Material;

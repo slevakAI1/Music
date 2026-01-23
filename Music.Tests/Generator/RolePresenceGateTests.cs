@@ -3,6 +3,7 @@
 // AI: coverage=Story G8 acceptance criteria: defaulting behavior, null policy handling, DrumKit fallback.
 
 using Music.Generator;
+using Music.Generator.Groove;
 using Xunit;
 
 namespace Music.Tests.Generator

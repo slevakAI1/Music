@@ -3,6 +3,7 @@
 // AI: deps=MusicConstants.TicksPerQuarterNote.
 // AI: perf=Single-run generation; avoid allocations in inner loops; use seed for deterministic results.
 
+using Music.Generator.Groove;
 using Music.MyMidi;
 
 namespace Music.Generator

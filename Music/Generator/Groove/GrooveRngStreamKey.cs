@@ -3,7 +3,7 @@
 // AI: deps=Used by GrooveRngHelper for deriving stable per-bar per-role RNG instances.
 // AI: change=Story A2 acceptance criteria: complete list covering all groove phases + future drummer hooks.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Canonical RNG stream keys for groove system.

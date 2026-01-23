@@ -3,7 +3,7 @@
 // AI: deps=IGrooveCandidateSource, GrooveVariationCatalog, GrooveVariationLayerMerger, GrooveCandidateFilter.
 // AI: change=Story B4 acceptance criteria: default implementation adapting existing catalog.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Default candidate source that adapts GrooveVariationCatalog using layer merger and filter.

@@ -1,4 +1,4 @@
-namespace Music.Generator;
+namespace Music.Generator.Groove;
 
 /// <summary>
 /// Extension methods for integrating OnsetStrengthClassifier with groove types.

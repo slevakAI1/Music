@@ -3,6 +3,8 @@
 // AI: deps=DrumCandidate, GrooveOnsetCandidate, FillRole, DrumArticulation; consumed by DrummerCandidateSource.
 // AI: change=Story 2.4; extend with additional hint mappings as operators evolve.
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Drums
 {
     /// <summary>

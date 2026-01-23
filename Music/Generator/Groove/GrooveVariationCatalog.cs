@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Catalog of optional rhythmic candidates for groove variation; grouped by tags with hierarchical layers.
     // AI: invariants=HierarchyLayers ordered [0]=base, [1+]=refinements; Identity links to preset; KnownTags for UI checklists.

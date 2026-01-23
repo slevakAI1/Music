@@ -3,6 +3,7 @@
 // AI: coverage=Story G3 acceptance criteria: IsAllowed, Filter<T>, position detection, role-specific rules.
 
 using Music.Generator;
+using Music.Generator.Groove;
 using Xunit;
 
 namespace Music.Tests.Generator

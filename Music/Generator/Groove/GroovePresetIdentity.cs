@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Identity + semantic tags for groove preset; defines name, meter, style, compatibility hints.
     // AI: invariants=Name MUST be unique in GroovePresetLibrary; BeatsPerBar MUST match song timing; Tags drive layer/candidate selection.

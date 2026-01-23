@@ -5,7 +5,7 @@
 
 using Music.MyMidi;
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: Static utility; all methods are pure; no instance state; thread-safe by design.
     public static class PartTrackBarCoverageAnalyzer

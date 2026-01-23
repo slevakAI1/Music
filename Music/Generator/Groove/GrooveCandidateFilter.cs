@@ -3,7 +3,7 @@
 // AI: deps=GrooveCandidateGroup, GrooveOnsetCandidate, SegmentGrooveProfile, GroovePhraseHookPolicy, GroovePolicyDecision.
 // AI: change=Story B2 acceptance criteria: resolve tags, filter groups/candidates by tag intersection.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Filters groove candidate groups and candidates by enabled tags.

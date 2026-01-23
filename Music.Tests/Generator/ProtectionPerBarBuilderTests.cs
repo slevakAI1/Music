@@ -3,6 +3,7 @@
 // AI: coverage=Null handling, empty contexts, segment tag merging.
 
 using Music.Generator;
+using Music.Generator.Groove;
 using Xunit;
 
 namespace Music.Tests.Generator

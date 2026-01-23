@@ -3,7 +3,7 @@
 // AI: deps=GrooveBarContext for bar context; GrooveCandidateGroup for return type.
 // AI: change=Story B4 acceptance criteria: abstraction layer for future operator-based drummer logic.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Interface for providing candidate groups to the groove engine.

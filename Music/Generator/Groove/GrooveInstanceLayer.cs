@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Instance layer holding onset lists per role; used for anchor onsets in GroovePresetDefinition.
     // AI: invariants=Onset values in domain units (beats or fractional bar offsets); callers normalize/sort when needed.

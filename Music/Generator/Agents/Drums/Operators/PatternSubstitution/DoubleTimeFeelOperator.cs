@@ -3,6 +3,8 @@
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
 // AI: change=Story 3.4; adjust energy threshold and pattern density based on style and listening tests.
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
 {
     /// <summary>

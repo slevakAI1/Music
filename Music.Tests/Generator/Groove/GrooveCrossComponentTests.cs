@@ -3,6 +3,7 @@
 // AI: deps=VelocityShaper, FeelTimingEngine, RoleTimingEngine, OnsetStrengthClassifier.
 
 using Music.Generator;
+using Music.Generator.Groove;
 using Music.Tests.TestFixtures;
 using Xunit;
 

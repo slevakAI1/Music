@@ -3,7 +3,7 @@
 // AI: deps=OnsetStrength from Groove.cs for strength classification; GrooveOnsetProvenance for provenance tracking (Story G2).
 // AI: change=Story C3 updated to use GrooveOnsetProvenance instead of MaterialProvenance for groove-specific tracking.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Represents a single onset (note event) in the groove system.

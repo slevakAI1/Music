@@ -2,7 +2,7 @@
 // AI: invariants=Pure function; returns same booleans as previous inline logic; no side-effects.
 // AI: deps=BarContext.BarsUntilSectionEnd; GroovePhraseHookPolicy fields; returns EnabledFillTags for consumers.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// DTO containing phrase/section-end window flags and enabled fill tags for a bar.

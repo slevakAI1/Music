@@ -3,7 +3,7 @@
 // AI: deps=GrooveWeightedCandidateSelector, GrooveRngHelper for RNG; GrooveOnset for anchors; GrooveDiagnosticsCollector for G1.
 // AI: change=Story G1: Added optional diagnostics collection via GrooveDiagnosticsCollector.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Selection engine for groove candidates with target count and pool exhaustion safety.

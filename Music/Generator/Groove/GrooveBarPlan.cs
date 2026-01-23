@@ -3,7 +3,7 @@
 // AI: deps=GrooveOnset for onset representation; GrooveBarDiagnostics for optional decision tracing (Story G1).
 // AI: change=Story G1 changed Diagnostics type from string? to GrooveBarDiagnostics? for structured tracing.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Represents the groove plan for a single bar.

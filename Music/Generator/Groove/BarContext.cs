@@ -3,7 +3,7 @@
 // AI: deps=Section from SectionTrack; SegmentGrooveProfile from song context; built by BarContextBuilder.
 // AI: change=Add fields only if needed by multiple generators; keep minimal to avoid coupling.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Provides per-bar context for generators: section position, phrase awareness, segment profile.

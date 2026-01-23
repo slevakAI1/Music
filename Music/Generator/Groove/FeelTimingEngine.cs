@@ -3,7 +3,7 @@
 // AI: deps=GrooveFeel, GrooveSubdivisionPolicy, SegmentGrooveProfile, AllowedSubdivision, MusicConstants.TicksPerQuarterNote, GrooveOverrideMergePolicy.
 // AI: change=Story F1: OverrideCanChangeFeel policy controls whether segment feel/swing overrides are applied.
 
-namespace Music.Generator;
+namespace Music.Generator.Groove;
 
 /// <summary>
 /// Applies groove feel timing (straight, swing, shuffle, triplet) to onset positions.

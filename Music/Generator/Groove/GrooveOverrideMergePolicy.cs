@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Defines how override layer merges with base policy; metadata-only (merging implementation separate).
     // AI: invariants=All flags default false for safety; OverrideReplacesLists=true means override replaces, else union.

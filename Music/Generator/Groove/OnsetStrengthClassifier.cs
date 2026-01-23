@@ -1,4 +1,4 @@
-namespace Music.Generator;
+namespace Music.Generator.Groove;
 
 /// <summary>
 /// Classifies onset positions into strength buckets for velocity and timing policies.

@@ -2,7 +2,7 @@
 // AI: deps=PhraseHookWindowResolver, BarContext, GroovePhraseHookPolicy; generator-agnostic.
 // AI: invariants=Mutates protection sets in-place; adds NeverRemove for downbeat (1) and backbeats (2, 4) when in phrase-end window.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Augments per-bar protection sets with phrase-end protection rules.

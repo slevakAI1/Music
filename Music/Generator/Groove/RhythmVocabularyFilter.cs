@@ -2,7 +2,7 @@
 // AI: deps=GrooveRoleConstraintPolicy, RoleRhythmVocabulary; used by drums, comp, melody, motifs.
 // AI: invariants=Deterministic position classification; v1 straight-grid heuristics (upgraded in Story 18/20).
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Filters events based on rhythm vocabulary rules (syncopation, anticipation).

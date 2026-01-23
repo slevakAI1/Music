@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Rules for fill/pull windows at phrase/section ends; controls where fills are allowed and how protected.
     // AI: invariants=AllowFills* gates fill candidates; *BarsWindow defines bar count from end; Protect* preserves anchors.

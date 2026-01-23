@@ -2,7 +2,7 @@
 // AI: invariants=Source required; GroupId/CandidateId nullable; does not affect output determinism.
 // AI: usage=Attached to GrooveOnset.Provenance for explainability and debugging.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Source type for a groove onset.

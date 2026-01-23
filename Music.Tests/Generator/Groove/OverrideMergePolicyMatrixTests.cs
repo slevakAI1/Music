@@ -3,6 +3,7 @@
 // AI: deps=OverrideMergePolicyEnforcer, GrooveOverrideMergePolicy, GrooveOnset, GrooveFeel.
 
 using Music.Generator;
+using Music.Generator.Groove;
 using Xunit;
 
 namespace Music.Tests.Generator.Groove;

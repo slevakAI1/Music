@@ -4,6 +4,7 @@
 // AI: change=Story 2.1; extend with additional input sources as drummer operators require.
 
 using Music.Generator.Agents.Common;
+using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums
 {

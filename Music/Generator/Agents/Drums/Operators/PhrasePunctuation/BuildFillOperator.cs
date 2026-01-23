@@ -3,6 +3,8 @@
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; uses Tom1, Tom2, FloorTom for ascending pattern.
 // AI: change=Story 3.3; adjust pattern and velocity curve based on listening tests.
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
 {
     /// <summary>

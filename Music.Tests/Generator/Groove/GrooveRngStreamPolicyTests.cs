@@ -2,6 +2,7 @@
 // AI: deps=xunit for test framework; Music.Generator for types under test.
 // AI: change=Story A2 acceptance criteria: verify determinism and RNG sequence independence.
 
+using Music.Generator.Groove;
 using Xunit;
 
 namespace Music.Generator.Tests

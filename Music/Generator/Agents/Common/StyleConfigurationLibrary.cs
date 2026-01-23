@@ -3,6 +3,8 @@
 // AI: deps=StyleConfiguration, FeelRules, GridRules, GrooveRoles for role constants.
 // AI: change=Add new styles as static properties; operator weights populated when operators exist (Phase 5).
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Common
 {
     /// <summary>

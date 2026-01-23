@@ -4,7 +4,7 @@
 using System;
 using System.Linq;
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     public static class RolePresenceGate
     {

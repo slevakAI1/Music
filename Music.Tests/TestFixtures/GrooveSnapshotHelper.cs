@@ -5,6 +5,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Music.Generator;
+using Music.Generator.Groove;
 
 namespace Music.Tests.TestFixtures;
 

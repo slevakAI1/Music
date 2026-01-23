@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Stable role identifiers for groove policies/candidates/profiles; string-based for extensibility.
     // AI: invariants=Role names MUST match across policies/candidates; case-sensitive; do not rename without migrating data.

@@ -3,7 +3,7 @@
 // AI: deps=GrooveTimingPolicy, TimingFeel, GroovePolicyDecision, GrooveOnset; E2 runs after E1 (additive semantics).
 // AI: change=TimingFeel maps to fixed ticks: Ahead=-10, OnTop=0, Behind=+10, LaidBack=+20; unknown roles default to OnTop/0 bias.
 
-namespace Music.Generator;
+namespace Music.Generator.Groove;
 
 /// <summary>
 /// Applies per-role micro-timing (feel/bias) on top of E1 feel timing.

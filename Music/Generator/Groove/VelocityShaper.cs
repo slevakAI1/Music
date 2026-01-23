@@ -3,7 +3,7 @@
 // AI: deps=GrooveAccentPolicy, VelocityRule, GroovePolicyDecision.VelocityBiasOverride, OnsetStrength.
 // AI: change=Ghost handling: RoleGhostVelocity takes precedence over RoleStrengthVelocity[Ghost].
 
-namespace Music.Generator;
+namespace Music.Generator.Groove;
 
 /// <summary>
 /// Computes velocity per onset using role x strength lookup from GrooveAccentPolicy.

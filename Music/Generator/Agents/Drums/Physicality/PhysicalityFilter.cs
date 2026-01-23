@@ -3,6 +3,8 @@
 // AI: deps=GrooveOnsetCandidate, DrumCandidateMapper.IsProtected; full implementation in Story 4.3.
 // AI: change=Story 2.4 stub; Story 4.3 adds LimbModel, StickingRules, overcrowding prevention.
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Drums.Physicality
 {
     /// <summary>

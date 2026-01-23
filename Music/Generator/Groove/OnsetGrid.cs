@@ -2,7 +2,7 @@
 // AI: deps=AllowedSubdivision from groove model; used by all generators (drums, comp, melody, motifs).
 // AI: invariants=Epsilon comparison for recurring fractions (1/3, 1/6); 1-based beat positions.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Represents an onset grid defining valid beat positions based on subdivision policy.

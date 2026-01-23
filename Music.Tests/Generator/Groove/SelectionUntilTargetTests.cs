@@ -2,6 +2,7 @@
 // AI: deps=xunit for test framework; Music.Generator for types under test.
 // AI: change=Story C2 acceptance criteria: test target enforcement, pool exhaustion, anchors, caps, determinism.
 
+using Music.Generator.Groove;
 using Xunit;
 
 namespace Music.Generator.Tests

@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Hierarchical layer of variation candidates; later layers refine earlier ones.
     // AI: invariants=AppliesWhenTagsAll gates layer activation; all tags MUST be enabled for layer to apply.

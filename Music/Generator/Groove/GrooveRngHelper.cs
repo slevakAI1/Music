@@ -3,7 +3,7 @@
 // AI: deps=Rng class for base RNG; GrooveRngStreamKey for stream key enum.
 // AI: change=Story A2 acceptance criteria: helper derives stable seeds for reproducible groove generation.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Helper for accessing deterministic RNG streams in groove system.

@@ -6,6 +6,7 @@ using Music.Generator;
 using Music.Generator.Agents.Common;
 using Music.Generator.Agents.Drums;
 using Music.Generator.Agents.Drums.Operators.MicroAddition;
+using Music.Generator.Groove;
 using Music.Generator.Material;
 using Music.Song.Material;
 using Xunit;

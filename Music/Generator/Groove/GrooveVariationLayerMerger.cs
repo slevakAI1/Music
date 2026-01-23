@@ -3,7 +3,7 @@
 // AI: deps=GrooveVariationCatalog, GrooveVariationLayer, GrooveCandidateGroup from Groove.cs.
 // AI: change=Story B1 acceptance criteria: iterate layers, apply tags, merge additive/replace, preserve ordering.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Merges variation layers from a GrooveVariationCatalog with tag-gated additive/replace logic.

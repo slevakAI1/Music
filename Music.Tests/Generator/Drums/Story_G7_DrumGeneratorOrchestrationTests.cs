@@ -4,6 +4,7 @@
 
 using FluentAssertions;
 using Music.Generator;
+using Music.Generator.Groove;
 using Music.MyMidi;
 
 namespace Music.Tests.Generator.Drums;

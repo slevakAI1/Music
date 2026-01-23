@@ -2,7 +2,7 @@
 // AI: deps=SectionTrack.GetActiveSection; segment profiles from song context; returns immutable list.
 // AI: change=Keep logic identical to DrumTrackGeneratorNew.BuildBarContexts for determinism (Story G1 requirement).
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Builds generator-agnostic bar contexts for all bars in song.

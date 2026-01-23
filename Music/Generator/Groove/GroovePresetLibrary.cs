@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Container for multiple groove presets by name; enables mid-song preset switching via SegmentGrooveProfile.
     // AI: invariants=Presets keyed by Identity.Name (case-insensitive); DefaultPresetName fallback when segment has no preset.

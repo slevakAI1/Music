@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Density targets per role for a segment; desired target for candidate selection (not a hard cap).
     // AI: invariants=Density01 in [0..1]; MaxEventsPerBar is segment-specific cap (<= global cap in RoleConstraintPolicy).

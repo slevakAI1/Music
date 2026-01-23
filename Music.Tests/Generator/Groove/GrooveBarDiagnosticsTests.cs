@@ -3,6 +3,7 @@
 // AI: change=Story G1 acceptance criteria: opt-in diagnostics; zero-cost when disabled; no behavior change.
 
 using Music.Generator;
+using Music.Generator.Groove;
 using Xunit;
 
 namespace Music.Tests.Generator.Groove;

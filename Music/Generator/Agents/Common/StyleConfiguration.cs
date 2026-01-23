@@ -3,6 +3,8 @@
 // AI: deps=GrooveFeel and AllowedSubdivision from Groove.cs; GrooveRoles for role constants.
 // AI: change=Add new styles by extending StyleConfigurationLibrary; weights/caps populated when operators exist.
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Common
 {
     /// <summary>

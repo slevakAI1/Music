@@ -2,7 +2,7 @@
 // AI: deps=AllowedSubdivision flags; returns immutable OnsetGrid.
 // AI: invariants=Quarter=1 div/beat, Eighth=2, Sixteenth=4, EighthTriplet=3, SixteenthTriplet=6.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Builder for constructing OnsetGrid instances from subdivision policies.

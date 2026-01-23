@@ -7,6 +7,7 @@ using Music.Generator.Agents.Drums;
 using Music.Generator.Agents.Drums.Operators.StyleIdiom;
 using Music.Generator;
 using Music;
+using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Operators.Tests
 {

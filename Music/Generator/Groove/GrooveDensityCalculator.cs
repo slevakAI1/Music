@@ -3,7 +3,7 @@
 // AI: deps=GrooveBarContext, RoleDensityTarget, GrooveOrchestrationPolicy, GroovePolicyDecision, GrooveOverrideMergePolicy.
 // AI: change=Story F1: OverrideCanRelaxConstraints controls whether segment can increase caps beyond base.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Result of density target computation with provenance for diagnostics.

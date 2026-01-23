@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Per-segment groove configuration; lightweight tag enabling/disabling + density targets for sections/phrases.
     // AI: invariants=GroovePresetName links to GroovePresetLibrary for mid-song switching; null=use default preset.

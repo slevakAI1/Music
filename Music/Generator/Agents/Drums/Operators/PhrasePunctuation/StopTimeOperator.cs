@@ -3,6 +3,8 @@
 // AI: deps=DrumOperatorBase, DrummerContext; downstream interprets fewer candidates as natural thinning.
 // AI: change=Story 3.3; this is a "negative space" operator that suppresses rather than generates.
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
 {
     /// <summary>

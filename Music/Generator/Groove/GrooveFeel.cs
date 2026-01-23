@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Rhythmic feel templates for subdivision interpretation (swing/shuffle); affects timing of subdivisions.
     // AI: invariants=Used by GrooveSubdivisionPolicy; Straight=no swing, others bias timing per SwingAmount01.

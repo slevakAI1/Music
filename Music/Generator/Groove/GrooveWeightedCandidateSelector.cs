@@ -3,7 +3,7 @@
 // AI: deps=GrooveCandidateGroup, GrooveOnsetCandidate, GrooveRngHelper for RNG access.
 // AI: change=Story B3 acceptance criteria: weighted selection using RngFor(bar, role, VariationPick).
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Weighted candidate record with computed weight and group context.

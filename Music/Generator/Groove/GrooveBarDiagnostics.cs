@@ -3,7 +3,7 @@
 // AI: deps=RandomPurpose for RNG stream names; GrooveOnset for onset references.
 // AI: change=Story G1 defines structured diagnostics; future stories may add serialization.
 
-namespace Music.Generator;
+namespace Music.Generator.Groove;
 
 /// <summary>
 /// Captures all decision-trace data for a single bar and role during groove generation.

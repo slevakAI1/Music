@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     public static class ProtectionApplier
     {

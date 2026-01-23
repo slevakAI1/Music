@@ -3,7 +3,7 @@
 // AI: deps=GrooveBarDiagnostics and sub-records; RandomPurpose for RNG stream names.
 // AI: change=Story G1 provides opt-in diagnostics collection without changing generation behavior.
 
-namespace Music.Generator;
+namespace Music.Generator.Groove;
 
 /// <summary>
 /// Collects groove decision data during pipeline execution.

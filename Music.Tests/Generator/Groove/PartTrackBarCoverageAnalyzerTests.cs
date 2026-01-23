@@ -2,6 +2,7 @@
 // AI: invariants=Tests are deterministic; no external dependencies; covers empty, locked, spanning, edge cases.
 
 using Music.Generator;
+using Music.Generator.Groove;
 using Music.MyMidi;
 using Xunit;
 

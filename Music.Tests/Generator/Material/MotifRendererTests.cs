@@ -6,6 +6,7 @@ using Xunit;
 using Music.Song.Material;
 using Music.Generator;
 using Music;
+using Music.Generator.Groove;
 
 namespace Music.Song.Material.Tests;
 

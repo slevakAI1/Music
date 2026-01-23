@@ -3,7 +3,7 @@
 // AI: deps=GrooveOnset, GrooveOnsetProvenance, GrooveOnsetCandidate, GrooveCandidateGroup.
 // AI: change=Story G2: Centralized onset creation ensures provenance is always populated correctly.
 
-namespace Music.Generator;
+namespace Music.Generator.Groove;
 
 /// <summary>
 /// Factory for creating GrooveOnset records with proper provenance tracking.

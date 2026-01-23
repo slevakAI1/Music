@@ -3,6 +3,8 @@
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
 // AI: change=Story 3.5; simplification intensity configurable in PopRockStyleConfiguration.
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
 {
     /// <summary>

@@ -2,6 +2,7 @@
 // AI: deps=xunit for test framework; Music.Generator for types under test.
 // AI: change=Story G2 acceptance criteria: verify provenance fields, stability, and preservation.
 
+using Music.Generator.Groove;
 using Xunit;
 
 namespace Music.Generator.Tests;

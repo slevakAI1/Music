@@ -2,7 +2,7 @@
 // AI: invariants=Alias only, no behavior change; GrooveBarContext and BarContext are identical types.
 // AI: change=Story A1 acceptance criteria allows reuse of existing BarContext as GrooveBarContext.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Groove-specific naming for bar context. This is a type alias for BarContext.

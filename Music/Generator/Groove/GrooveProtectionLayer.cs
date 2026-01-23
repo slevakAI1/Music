@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Single protection layer in hierarchy; multiple layers form base->refined protection chain.
     // AI: invariants=AppliesWhenTagsAll gates layer activation; all tags MUST be enabled for layer to apply.

@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     /// <summary>
     /// Enforces hard caps on groove onsets per bar, per beat, per role, per group, and per candidate.

@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Constraint knobs limiting rhythm generation for a role; caps hits, enables syncopation/anticipation.
     // AI: invariants=MaxHitsPerBar/Beat are hard caps; AllowSyncopation/Anticipation gate offbeat/pickup generation.

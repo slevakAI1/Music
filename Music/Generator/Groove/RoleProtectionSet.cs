@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Protection sets for a single role; defines must-hit/protected/never-remove/never-add onset constraints.
     // AI: invariants=Onsets in 1-based quarter-note units (e.g., 1.5, 2.0); MustHit cannot be removed by variation.

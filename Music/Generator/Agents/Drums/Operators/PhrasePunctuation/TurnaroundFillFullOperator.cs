@@ -3,6 +3,8 @@
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate, DrummerMemory for anti-repetition.
 // AI: change=Story 3.3; adjust hit density and pattern selection based on listening tests.
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
 {
     /// <summary>

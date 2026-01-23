@@ -2,7 +2,7 @@
 // AI: invariants=Layers are merged in order [0..n]; IsAdditiveOnly=true unions lists; false replaces.
 // AI: deps=GrooveProtectionPolicy, RoleProtectionSet from Groove.cs; used by DrumTrackGeneratorNew.
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: ProtectionPolicyMerger: Story 8 implementation; merges hierarchical protection layers respecting IsAdditiveOnly.
     internal static class ProtectionPolicyMerger

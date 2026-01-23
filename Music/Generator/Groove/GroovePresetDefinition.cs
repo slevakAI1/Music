@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Complete groove preset definition; ties identity + anchor onsets + protection policy + variation catalog.
     // AI: invariants=Identity.Name MUST be unique; AnchorLayer holds base onsets; ProtectionPolicy enforces constraints.

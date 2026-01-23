@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Velocity shaping per role based on onset strength buckets; maps role+strength to VelocityRule.
     // AI: invariants=RoleStrengthVelocity outer key=role, inner key=OnsetStrength; RoleGhostVelocity optional per-role ghost range.

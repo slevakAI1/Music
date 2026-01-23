@@ -3,6 +3,7 @@
 // AI: coverage=Story G2 acceptance criteria: each AllowedSubdivision flag, epsilon comparison, empty grid.
 
 using Music.Generator;
+using Music.Generator.Groove;
 using Xunit;
 
 namespace Music.Tests.Generator

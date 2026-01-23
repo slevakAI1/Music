@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Flags enum for legal rhythmic subdivision grids (quarter/eighth/sixteenth/triplets).
     // AI: invariants=Bitwise combinable; None=0 means no subdivisions allowed; used to constrain onset generation.

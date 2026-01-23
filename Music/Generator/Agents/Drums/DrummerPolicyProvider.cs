@@ -4,6 +4,7 @@
 // AI: change=Story 2.3, 9.3; extend with additional override logic as operators are implemented.
 
 using Music.Generator.Agents.Common;
+using Music.Generator.Groove;
 using Music.Generator.Material;
 
 namespace Music.Generator.Agents.Drums

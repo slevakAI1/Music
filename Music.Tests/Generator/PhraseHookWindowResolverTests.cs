@@ -3,6 +3,7 @@
 // AI: coverage=Story G8 acceptance criteria: null policy, window calculation, enabled fill tags.
 
 using Music.Generator;
+using Music.Generator.Groove;
 using Xunit;
 
 namespace Music.Tests.Generator

@@ -1,7 +1,7 @@
 // AI: purpose=Per-bar coverage state for PartTrack analysis; precedence: Locked > HasContent > Empty.
 // AI: deps=Used by PartTrackBarCoverageAnalyzer; consumers use for generation gating (fill-only-empty, respect-locked).
 
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: Enum values ordered by precedence for clarity; do not reorder without updating precedence logic.
     public enum BarFillState

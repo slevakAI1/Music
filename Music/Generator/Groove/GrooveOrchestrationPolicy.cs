@@ -1,4 +1,4 @@
-namespace Music.Generator
+namespace Music.Generator.Groove
 {
     // AI: purpose=Orchestration policy by section type; turns roles on/off and provides density/register hints per section.
     // AI: invariants=DefaultsBySectionType list holds SectionRolePresenceDefaults; lookup by SectionType string.

@@ -2,6 +2,7 @@
 // AI: deps=xunit for test framework; Music.Generator for types under test.
 // AI: change=Story A1 acceptance criteria: verify stable types, conversion methods, and immutability.
 
+using Music.Generator.Groove;
 using Xunit;
 
 namespace Music.Generator.Tests
