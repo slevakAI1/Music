@@ -1,9 +1,10 @@
 // AI: purpose=Shared context for all agent decisions; immutable record ensures determinism.
 // AI: invariants=BarNumber/Beat are 1-based; EnergyLevel/TensionLevel/MotifPresenceScore are 0.0-1.0.
-// AI: deps=MusicConstants.eSectionType for section classification; Rng system for RngStreamKey.
+// AI: deps=MusicConstants.eSectionType for section classification; Rng system for RngStreamKey; MotifPresenceMap for ducking (Story 9.3).
 // AI: change=Extend via inheritance for instrument-specific contexts (DrummerContext, GuitarContext, etc.).
 
 using Music;
+using Music.Generator.Material;
 
 namespace Music.Generator.Agents.Common
 {
@@ -72,13 +73,21 @@ namespace Music.Generator.Agents.Common
         public required string RngStreamKey { get; init; }
 
         /// <summary>
+        /// Optional reference to MotifPresenceMap for motif-aware ducking.
+        /// Story 9.3: When set, operators can query motif presence to reduce scores/density.
+        /// Null = no motif-aware behavior (backward compatible).
+        /// </summary>
+        public MotifPresenceMap? MotifPresenceMap { get; init; }
+
+        /// <summary>
         /// Creates a minimal context for testing purposes.
         /// All numeric values default to mid-range or zero.
         /// </summary>
         public static AgentContext CreateMinimal(
             int barNumber = 1,
             MusicConstants.eSectionType sectionType = MusicConstants.eSectionType.Verse,
-            int seed = 42)
+            int seed = 42,
+            MotifPresenceMap? motifPresenceMap = null)
         {
             return new AgentContext
             {
@@ -91,7 +100,8 @@ namespace Music.Generator.Agents.Common
                 TensionLevel = 0.0,
                 MotifPresenceScore = 0.0,
                 Seed = seed,
-                RngStreamKey = $"Test_{barNumber}"
+                RngStreamKey = $"Test_{barNumber}",
+                MotifPresenceMap = motifPresenceMap
             };
         }
     }

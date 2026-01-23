@@ -1,9 +1,10 @@
 // AI: purpose=Drummer policy provider implementing IGroovePolicyProvider; computes per-bar policy decisions from style + context + memory.
 // AI: invariants=Deterministic: same inputs → same GroovePolicyDecision; read-only access to memory; never mutates inputs.
-// AI: deps=IGroovePolicyProvider, GroovePolicyDecision, StyleConfiguration, IAgentMemory, DrummerContext.
-// AI: change=Story 2.3; extend with additional override logic as operators are implemented (Story 3.x).
+// AI: deps=IGroovePolicyProvider, GroovePolicyDecision, StyleConfiguration, IAgentMemory, DrummerContext, MotifPresenceMap (Story 9.3).
+// AI: change=Story 2.3, 9.3; extend with additional override logic as operators are implemented.
 
 using Music.Generator.Agents.Common;
+using Music.Generator.Material;
 
 namespace Music.Generator.Agents.Drums
 {
@@ -38,6 +39,7 @@ namespace Music.Generator.Agents.Drums
     /// Drummer agent policy provider that computes per-bar policy decisions.
     /// Implements IGroovePolicyProvider to drive groove system behavior from drummer context.
     /// Story 2.3: Implement Drummer Policy Provider.
+    /// Story 9.3: Motif-aware density reduction and variation tags.
     /// </summary>
     /// <remarks>
     /// Precedence order for overrides: immediate context > memory > style config.
@@ -48,6 +50,7 @@ namespace Music.Generator.Agents.Drums
         private readonly StyleConfiguration _styleConfig;
         private readonly IAgentMemory? _memory;
         private readonly DrummerPolicySettings _settings;
+        private readonly MotifPresenceMap? _motifPresenceMap;
 
         /// <summary>
         /// Creates a drummer policy provider with the specified configuration.
@@ -55,15 +58,18 @@ namespace Music.Generator.Agents.Drums
         /// <param name="styleConfig">Style configuration (PopRock, Jazz, etc.).</param>
         /// <param name="memory">Agent memory for anti-repetition (optional, null = no memory influence).</param>
         /// <param name="settings">Policy settings for density modifiers and lookback (optional, uses defaults).</param>
+        /// <param name="motifPresenceMap">Motif presence map for ducking (optional, null = no motif awareness). Story 9.3.</param>
         public DrummerPolicyProvider(
             StyleConfiguration styleConfig,
             IAgentMemory? memory = null,
-            DrummerPolicySettings? settings = null)
+            DrummerPolicySettings? settings = null,
+            MotifPresenceMap? motifPresenceMap = null)
         {
             ArgumentNullException.ThrowIfNull(styleConfig);
             _styleConfig = styleConfig;
             _memory = memory;
             _settings = settings ?? DrummerPolicySettings.Default;
+            _motifPresenceMap = motifPresenceMap;
         }
 
         /// <inheritdoc />
@@ -108,6 +114,7 @@ namespace Music.Generator.Agents.Drums
         /// <summary>
         /// Computes density override from energy level and section type.
         /// Uses style default density as base, then applies energy modifier.
+        /// Story 9.3: Applies motif-based density reduction when motif is active.
         /// </summary>
         private double ComputeDensityOverride(GrooveBarContext barContext)
         {
@@ -122,6 +129,19 @@ namespace Music.Generator.Agents.Drums
             // until DrummerContext is passed (integration with Story 2.4)
             double energyModifier = GetEnergyModifier(sectionType);
             double adjustedDensity = baseDensity + (energyModifier * _settings.EnergyDensityScale);
+
+            // Story 9.3: Apply motif-based density reduction (bounded)
+            if (_motifPresenceMap != null && _motifPresenceMap.IsMotifActive(barContext.BarNumber))
+            {
+                // Compute reduction based on motif density (0.5 for one motif, 1.0 for two or more)
+                double motifDensity = _motifPresenceMap.GetMotifDensity(barContext.BarNumber);
+                
+                // Scale the reduction by motif density: more motifs = more reduction, up to the configured max
+                double reductionFactor = _settings.MotifDensityReductionPercent * motifDensity / 0.5;
+                reductionFactor = Math.Min(reductionFactor, _settings.MaxMotifDensityReduction);
+                
+                adjustedDensity *= (1.0 - reductionFactor);
+            }
 
             // Clamp to valid range [0.0, 1.0]
             return Math.Clamp(adjustedDensity, 0.0, 1.0);
@@ -279,10 +299,17 @@ namespace Music.Generator.Agents.Drums
         /// <summary>
         /// Computes enabled variation tags based on context.
         /// Section boundaries enable punctuation tags; fills enable fill tags.
+        /// Story 9.3: Adds "MotifPresent" tag when a motif is active in the bar.
         /// </summary>
         private List<string>? ComputeVariationTagsOverride(GrooveBarContext barContext)
         {
             var tags = new List<string>();
+
+            // Story 9.3: Add MotifPresent tag when motif is active
+            if (_motifPresenceMap != null && _motifPresenceMap.IsMotifActive(barContext.BarNumber))
+            {
+                tags.Add("MotifPresent");
+            }
 
             // Enable fill tags when in fill window
             if (ShouldAllowFills(barContext))
@@ -327,6 +354,7 @@ namespace Music.Generator.Agents.Drums
 
     /// <summary>
     /// Configurable settings for DrummerPolicyProvider behavior.
+    /// Story 9.3: Added motif density reduction settings.
     /// </summary>
     public sealed record DrummerPolicySettings
     {
@@ -341,6 +369,18 @@ namespace Music.Generator.Agents.Drums
 
         /// <summary>Minimum bars between fills (default 4).</summary>
         public int MinBarsBetweenFills { get; init; } = 4;
+
+        /// <summary>
+        /// Density reduction percentage when a motif is active (default 0.15 = 15%).
+        /// Story 9.3: Reduces density target to make room for motifs.
+        /// </summary>
+        public double MotifDensityReductionPercent { get; init; } = 0.15;
+
+        /// <summary>
+        /// Maximum density reduction from motif presence (default 0.20 = 20%).
+        /// Story 9.3: Caps reduction to avoid over-thinning.
+        /// </summary>
+        public double MaxMotifDensityReduction { get; init; } = 0.20;
 
         /// <summary>Default settings instance.</summary>
         public static DrummerPolicySettings Default => new();

@@ -1,7 +1,7 @@
 // AI: purpose=MicroAddition operator adding sparse 16th hi-hat notes for rhythmic interest.
 // AI: invariants=VelocityHint in [40,60]; only applies when ClosedHat in ActiveRoles and 16th grid available.
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.1; adjust position selection and count based on listening tests.
+// AI: change=Story 3.1, 9.3; adjust position selection and count based on listening tests; reduces score when motif active.
 
 namespace Music.Generator.Agents.Drums.Operators.MicroAddition
 {
@@ -9,12 +9,18 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
     /// Generates sparse 16th note hi-hat embellishments for added rhythmic interest.
     /// Places 1-2 extra 16th hits in positions not covered by the base 8th pattern.
     /// Story 3.1: Micro-Addition Operators (Ghost Notes &amp; Embellishments).
+    /// Story 9.3: Reduces score by 30% when motif is active.
     /// </summary>
     public sealed class HatEmbellishmentOperator : DrumOperatorBase
     {
         private const int VelocityMin = 40;
         private const int VelocityMax = 60;
         private const double BaseScore = 0.5;
+
+        /// <summary>
+        /// Story 9.3: Score reduction when motif is active (30% = 0.3).
+        /// </summary>
+        private const double MotifScoreReduction = 0.3;
 
         // Candidate 16th positions that fall between 8ths (offbeats of offbeats)
         private static readonly decimal[] EmbellishmentPositions = [1.25m, 1.75m, 2.25m, 2.75m, 3.25m, 3.75m, 4.25m, 4.75m];
@@ -63,6 +69,9 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
             if (!CanApply(drummerContext))
                 yield break;
 
+            // Story 9.3: Get motif score multiplier (30% reduction when motif active)
+            double motifMultiplier = GetMotifScoreMultiplier(drummerContext, MotifScoreReduction);
+
             // Filter positions to those within the bar
             var validPositions = EmbellishmentPositions
                 .Where(p => p <= drummerContext.BeatsPerBar)
@@ -86,7 +95,8 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                     beat,
                     drummerContext.Seed);
 
-                double score = BaseScore * (0.5 + 0.5 * drummerContext.EnergyLevel);
+                // Story 9.3: Apply motif multiplier to reduce score when motif active
+                double score = BaseScore * (0.5 + 0.5 * drummerContext.EnergyLevel) * motifMultiplier;
 
                 yield return CreateCandidate(
                     role: GrooveRoles.ClosedHat,

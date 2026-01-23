@@ -1,7 +1,7 @@
 // AI: purpose=MicroAddition operator generating 2-3 ghost notes as a mini-fill cluster.
 // AI: invariants=VelocityHint in [30,50]; only applies when Snare in ActiveRoles, energy >= 0.5, not in fill window.
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.1; adjust cluster patterns and placement based on listening tests.
+// AI: change=Story 3.1, 9.3; adjust cluster patterns and placement based on listening tests; reduces score when motif active.
 
 namespace Music.Generator.Agents.Drums.Operators.MicroAddition
 {
@@ -9,12 +9,18 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
     /// Generates a cluster of 2-3 ghost notes as a mini-fill embellishment.
     /// Typically placed mid-bar (around beat 2.5-3) for subtle rhythmic interest.
     /// Story 3.1: Micro-Addition Operators (Ghost Notes &amp; Embellishments).
+    /// Story 9.3: Reduces score by 50% when motif is active (avoid clutter).
     /// </summary>
     public sealed class GhostClusterOperator : DrumOperatorBase
     {
         private const int VelocityMin = 30;
         private const int VelocityMax = 50;
         private const double BaseScore = 0.5;
+
+        /// <summary>
+        /// Story 9.3: Score reduction when motif is active (50% = 0.5).
+        /// </summary>
+        private const double MotifScoreReduction = 0.5;
 
         // Pre-defined cluster patterns (offsets from starting beat)
         private static readonly decimal[][] ClusterPatterns =
@@ -68,8 +74,12 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
             if (context is not DrummerContext drummerContext)
                 yield break;
 
+
             if (!CanApply(drummerContext))
                 yield break;
+
+            // Story 9.3: Get motif score multiplier (50% reduction when motif active)
+            double motifMultiplier = GetMotifScoreMultiplier(drummerContext, MotifScoreReduction);
 
             // Select cluster pattern and start position deterministically
             int hash = HashCode.Combine(drummerContext.BarNumber, drummerContext.Seed, "GhostCluster");
@@ -99,7 +109,8 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                     drummerContext.Seed);
 
                 // Score decreases for later notes in cluster (first note most important)
-                double score = BaseScore * (1.0 - (i * 0.1)) * (0.5 + 0.5 * drummerContext.EnergyLevel);
+                // Story 9.3: Apply motif multiplier to reduce score when motif active
+                double score = BaseScore * (1.0 - (i * 0.1)) * (0.5 + 0.5 * drummerContext.EnergyLevel) * motifMultiplier;
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,

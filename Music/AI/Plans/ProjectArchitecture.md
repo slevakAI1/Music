@@ -558,13 +558,58 @@ public sealed class MaterialBank
 2. **MotifPlacementPlanner** — Determines WHICH motifs WHERE (section type, role, variation intensity)
 3. **MotifPlacement** — Record: MotifId, AbsoluteSectionIndex, StartBarWithinSection, DurationBars, VariationIntensity
 4. **MotifPlacementPlan** — Collection of MotifPlacement records
-5. **MotifPresenceMap** — Query if motif active at (section, bar, role)
-6. **MotifRenderer** — Renders motif spec + placement to PartTrack (currently commented out / WIP)
+5. **MotifPresenceMap** — Query if motif active at (bar, role) for ducking/coordination (Story 9.3)
+6. **MotifRenderer** — Renders motif spec + placement to PartTrack (Story 9.2)
 
 Generator/Material/                     # Processing & generation
   ├── MotifPlacementPlanner.cs          # Story 9.1 (planning)
   ├── MotifPresenceMap.cs               # Story 9.3 (coordination)
   └── MotifRenderer.cs                  # Story 9.2 (rendering)
+
+### Motif Coordination Pattern (Story 9.3)
+
+**Purpose:** When motifs (hooks/melodies) are active, accompaniment makes room via "ducking" (density reduction and score biasing).
+
+**Key Components:**
+
+1. **MotifPresenceMap** — Queryable service built from `MotifPlacementPlan` + `SectionTrack`
+   - `IsMotifActive(barNumber, role?) → bool` — check if any motif active in bar
+   - `GetMotifDensity(barNumber, role?) → double` — density [0..1] (0.5 per motif, capped at 1.0)
+   - `GetActiveMotifs(barNumber) → IReadOnlyList<MotifPlacement>` — all active placements
+
+2. **AgentContext.MotifPresenceMap** — Optional field for motif-aware operators
+   - Inherited by `DrummerContext`, `GuitarContext`, `KeysContext`, `BassContext`
+   - Operators query via `context.MotifPresenceMap?.IsMotifActive(...)`
+
+3. **DrummerPolicyProvider Integration:**
+   - Accepts optional `MotifPresenceMap` in constructor
+   - When motif active: reduces density target by 10-15% (configurable, max 20%)
+   - Adds "MotifPresent" to `EnabledVariationTagsOverride`
+
+4. **Operator Score Reduction:**
+   - `GetMotifScoreMultiplier(context, reductionFactor)` helper in `DrumOperatorBase`
+   - Score reductions when motif active:
+     - GhostClusterOperator: 50%
+     - HatEmbellishmentOperator: 30%
+     - GhostBeforeBackbeatOperator / GhostAfterBackbeatOperator: 20%
+   - **Never affects:** Kick/snare anchors, backbeats, downbeats (groove-protective)
+
+**Ducking Rules:**
+- **Never remove:** groove anchors, must-hit onsets
+- **Affect only:** optional embellishments (ghosts, clusters, hat fills)
+- **Bounded:** max 20% density reduction per bar
+- **Deterministic:** same inputs → same ducking decisions
+
+**Suggested Reductions by Instrument (Future):**
+- Drums: 10-20% density reduction (optional events only)
+- Comp/Keys: 20-30% density reduction
+- Bass: minimal reduction, mainly register shifts
+
+**Configuration (DrummerPolicySettings):**
+```csharp
+public double MotifDensityReductionPercent { get; init; } = 0.15;  // 15% default
+public double MaxMotifDensityReduction { get; init; } = 0.20;      // 20% cap
+```
 ---
 
 ## 7) RNG System
@@ -748,6 +793,11 @@ Uses **xUnit** test framework. Contains unit and integration tests for groove sy
 | `DrumCandidateTests.cs` | Story 2.2: Drum candidate type |
 | `DrummerPolicyProviderTests.cs` | Story 2.3: Drummer policy provider |
 | `DrummerCandidateSourceTests.cs` | Story 2.4: Drummer candidate source |
+| `DrummerMemoryTests.cs` | Story 2.5: Drummer memory (fills, crashes, hats, ghosts - 48 tests) |
+| `MicroAdditionOperatorTests.cs` | Story 3.1: MicroAddition operators (7 operators) |
+| `SubdivisionTransformOperatorTests.cs` | Story 3.2: SubdivisionTransform operators (5 operators, 35+ tests) |
+| `MotifPresenceMapTests.cs` | Story 9.3: MotifPresenceMap queries (20 tests) |
+| `DrummerMotifIntegrationTests.cs` | Story 9.3: DrummerAgent motif integration (9 tests) |
 | `DrummerMemoryTests.cs` | Story 2.5: Drummer memory (fills, crashes, hats, ghosts - 48 tests) |
 | `MicroAdditionOperatorTests.cs` | Story 3.1: MicroAddition operators (7 operators) |
 | `SubdivisionTransformOperatorTests.cs` | Story 3.2: SubdivisionTransform operators (5 operators, 35+ tests) |

@@ -1,9 +1,10 @@
 // AI: purpose=Drummer-specific context extending AgentContext; immutable record for deterministic operator decisions.
 // AI: invariants=All fields immutable; bars/beats 1-based; ActiveRoles subset of GrooveRoles; BackbeatBeats valid for time signature.
-// AI: deps=AgentContext base type; GrooveRoles for role constants; consumed by DrummerOperators and DrummerPolicyProvider.
-// AI: change=Story 2.1; extend with additional drum-specific fields as operators require; keep immutable.
+// AI: deps=AgentContext base type; GrooveRoles for role constants; MotifPresenceMap (Story 9.3); consumed by DrummerOperators and DrummerPolicyProvider.
+// AI: change=Story 2.1, 9.3; extend with additional drum-specific fields as operators require; keep immutable.
 
 using Music.Generator.Agents.Common;
+using Music.Generator.Material;
 
 namespace Music.Generator.Agents.Drums
 {
@@ -41,6 +42,7 @@ namespace Music.Generator.Agents.Drums
     /// Drummer-specific context extending AgentContext with drum-relevant fields.
     /// Provides operators with information about active roles, recent hits, subdivision modes, and phrase positions.
     /// Story 2.1: Define Drummer-Specific Context.
+    /// Story 9.3: Inherits MotifPresenceMap from AgentContext for motif-aware ducking.
     /// </summary>
     public sealed record DrummerContext : AgentContext
     {
@@ -110,7 +112,8 @@ namespace Music.Generator.Agents.Drums
             MusicConstants.eSectionType sectionType = MusicConstants.eSectionType.Verse,
             int seed = 42,
             IReadOnlySet<string>? activeRoles = null,
-            IReadOnlyList<int>? backbeatBeats = null)
+            IReadOnlyList<int>? backbeatBeats = null,
+            MotifPresenceMap? motifPresenceMap = null)
         {
             return new DrummerContext
             {
@@ -125,6 +128,7 @@ namespace Music.Generator.Agents.Drums
                 MotifPresenceScore = 0.0,
                 Seed = seed,
                 RngStreamKey = $"Drummer_{barNumber}",
+                MotifPresenceMap = motifPresenceMap,
 
                 // Drummer-specific fields
                 ActiveRoles = activeRoles ?? new HashSet<string> { GrooveRoles.Kick, GrooveRoles.Snare, GrooveRoles.ClosedHat },

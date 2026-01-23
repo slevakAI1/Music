@@ -1,7 +1,7 @@
 // AI: purpose=MicroAddition operator generating ghost snare notes just before backbeats (1.75→2, 3.75→4).
 // AI: invariants=VelocityHint in [30,50]; only applies when Snare in ActiveRoles and energy >= 0.3.
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.1; adjust energy threshold or beat positions based on listening tests.
+// AI: change=Story 3.1, 9.3; adjust energy threshold or beat positions based on listening tests; reduces score when motif active.
 
 namespace Music.Generator.Agents.Drums.Operators.MicroAddition
 {
@@ -9,12 +9,18 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
     /// Generates ghost snare notes just before backbeats (beats 2 and 4 in 4/4).
     /// Places ghost notes at 1.75 and 3.75 to lead into the backbeat.
     /// Story 3.1: Micro-Addition Operators (Ghost Notes &amp; Embellishments).
+    /// Story 9.3: Reduces score by 20% when motif is active.
     /// </summary>
     public sealed class GhostBeforeBackbeatOperator : DrumOperatorBase
     {
         private const int VelocityMin = 30;
         private const int VelocityMax = 50;
         private const double BaseScore = 0.7;
+
+        /// <summary>
+        /// Story 9.3: Score reduction when motif is active (20% = 0.2).
+        /// </summary>
+        private const double MotifScoreReduction = 0.2;
 
         /// <inheritdoc/>
         public override string OperatorId => "DrumGhostBeforeBackbeat";
@@ -60,6 +66,9 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
             if (!CanApply(drummerContext))
                 yield break;
 
+            // Story 9.3: Get motif score multiplier (20% reduction when motif active)
+            double motifMultiplier = GetMotifScoreMultiplier(drummerContext, MotifScoreReduction);
+
             // Generate ghost note before each backbeat
             foreach (int backbeat in drummerContext.BackbeatBeats)
             {
@@ -78,7 +87,8 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                     drummerContext.Seed);
 
                 // Score increases with energy (more appropriate at higher energy)
-                double score = BaseScore * (0.5 + 0.5 * drummerContext.EnergyLevel);
+                // Story 9.3: Apply motif multiplier to reduce score when motif active
+                double score = BaseScore * (0.5 + 0.5 * drummerContext.EnergyLevel) * motifMultiplier;
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,
