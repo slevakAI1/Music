@@ -100,6 +100,16 @@ public sealed class SongContext
 }
 ```
 
+---
+
+## StyleIdiom Operators (Story 3.5) — Project Notes
+
+- StyleIdiom operators (PopRock-specific) are registered into the central `DrumOperatorRegistry` alongside other families.
+- Operators are discoverable globally; runtime filtering is performed by `DrumOperatorRegistry.GetEnabledOperators(style)` and by each operator's `CanApply`.
+- PopRock operators must consult `DrummerContext`, `StyleConfiguration.PopRock` and `DrummerMemory` for section-aware, deterministic behavior.
+- RNG streams for style-idiom variation should use dedicated `RandomPurpose` keys (e.g., `DrummerFillVariation`, `DrummerOperatorSelection`).
+- Registry builder adds StyleIdiom operators in deterministic order as part of `DrumOperatorRegistryBuilder.BuildComplete()`.
+
 ### Song (Runtime Output)
 
 Location: `Song/Song.cs`
@@ -886,11 +896,14 @@ DrummerCandidateSource.GetCandidateGroups(barContext, role)
 | `Generator/Agents/Drums/Operators/DrumOperatorBase.cs` | Abstract base for all drum operators |
 | `Generator/Agents/Drums/Operators/MicroAddition/*.cs` | Story 3.1: 7 micro-addition operators |
 | `Generator/Agents/Drums/Operators/SubdivisionTransform/*.cs` | Story 3.2: 5 subdivision transform operators |
+| `Generator/Agents/Drums/Operators/PhrasePunctuation/*.cs` | Story 3.3: 7 phrase punctuation operators |
+| `Generator/Agents/Drums/Operators/PatternSubstitution/*.cs` | Story 3.4: 4 pattern substitution operators |
+| `Generator/Agents/Drums/Operators/StyleIdiom/*.cs` | Story 3.5: 5 PopRock style idiom operators |
 | `Generator/Agents/Drums/Physicality/PhysicalityFilter.cs` | Playability filter stub |
 | `Generator/Agents/Drums/Physicality/PhysicalityRules.cs` | Physicality configuration |
 
 **Remaining Drummer Agent Work:**
-- Stories 3.3-3.6: Remaining drum operators (PhrasePunctuation, PatternSubstitution, StyleIdiom, Registry)
+- Story 3.6: Operator registry completion and discovery
 - Stories 4.1-4.4: Full physicality constraints (limb model, sticking rules)
 - Stories 5.1-5.4: Pop Rock style configuration
 
@@ -1298,6 +1311,7 @@ Tom mapping:
 
 ### Operator Registry (Story 3.4 partial, Story 3.6 complete)
 
+
 Location: `Generator/Agents/Drums/DrumOperatorRegistry.cs`, `DrumOperatorRegistryBuilder.cs`
 
 **DrumOperatorRegistryBuilder** provides deterministic operator registration:
@@ -1305,9 +1319,8 @@ Location: `Generator/Agents/Drums/DrumOperatorRegistry.cs`, `DrumOperatorRegistr
 - Story 3.2: 5 SubdivisionTransform operators
 - Story 3.3: 7 PhrasePunctuation operators
 - Story 3.4: 4 PatternSubstitution operators
-- Story 3.5: 5 StyleIdiom operators (TODO)
-- **Total (current):** 23 operators registered
-- **Total (final in 3.6):** 28 operators
+- Story 3.5: 5 StyleIdiom operators (PopRock-specific)
+- **Total:** 28 operators registered
 
 Registry methods:
 - `BuildComplete()` - creates and freezes a registry with all operators
@@ -1317,6 +1330,7 @@ Registry methods:
 - `GetOperatorById(operatorId)` - lookup by ID
 - `GetEnabledOperators(style)` - filtered by StyleConfiguration
 - `GetEnabledOperators(allowList)` - filtered by policy allow list
+
 
 ### PatternSubstitution Operators (Story 3.4)
 

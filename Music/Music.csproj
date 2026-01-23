@@ -146,7 +146,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="AI\Completed\" />
     <Folder Include="AI\Research\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />

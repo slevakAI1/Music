@@ -1,12 +1,13 @@
 // AI: purpose=Builder for DrumOperatorRegistry; registers all drum operators for discovery and filtering.
 // AI: invariants=RegisterAll() must be called before any operators can be used; operators registered in deterministic order.
-// AI: deps=DrumOperatorRegistry, all operator implementations across MicroAddition/SubdivisionTransform/PhrasePunctuation/PatternSubstitution families.
-// AI: change=Story 2.4 stub; Story 3.1 adds MicroAddition; Story 3.2 adds SubdivisionTransform; Story 3.3 adds PhrasePunctuation; Story 3.4 adds PatternSubstitution; Story 3.6 completes with all families.
+// AI: deps=DrumOperatorRegistry, all operator implementations across MicroAddition/SubdivisionTransform/PhrasePunctuation/PatternSubstitution/StyleIdiom families.
+// AI: change=Story 2.4 stub; Story 3.1 adds MicroAddition; Story 3.2 adds SubdivisionTransform; Story 3.3 adds PhrasePunctuation; Story 3.4 adds PatternSubstitution; Story 3.5 adds StyleIdiom; Story 3.6 completes with all families.
 
 using Music.Generator.Agents.Drums.Operators.MicroAddition;
 using Music.Generator.Agents.Drums.Operators.SubdivisionTransform;
 using Music.Generator.Agents.Drums.Operators.PhrasePunctuation;
 using Music.Generator.Agents.Drums.Operators.PatternSubstitution;
+using Music.Generator.Agents.Drums.Operators.StyleIdiom;
 
 namespace Music.Generator.Agents.Drums
 {
@@ -65,8 +66,8 @@ namespace Music.Generator.Agents.Drums
             // Story 3.4: PatternSubstitution operators (4)
             RegisterPatternSubstitutionOperators(registry);
 
-            // Story 3.5: StyleIdiom operators (5) - TODO
-            // RegisterStyleIdiomOperators(registry);
+            // Story 3.5: StyleIdiom operators (5)
+            RegisterStyleIdiomOperators(registry);
         }
 
         /// <summary>
@@ -124,6 +125,17 @@ namespace Music.Generator.Agents.Drums
             registry.RegisterOperator(new DoubleTimeFeelOperator());
         }
 
-        // TODO Story 3.5: Add RegisterStyleIdiomOperators
+        /// <summary>
+        /// Registers StyleIdiom family operators (genre-specific Pop Rock moves).
+        /// Story 3.5: 5 operators.
+        /// </summary>
+        private static void RegisterStyleIdiomOperators(DrumOperatorRegistry registry)
+        {
+            registry.RegisterOperator(new PopRockBackbeatPushOperator());
+            registry.RegisterOperator(new RockKickSyncopationOperator());
+            registry.RegisterOperator(new PopChorusCrashPatternOperator());
+            registry.RegisterOperator(new VerseSimplifyOperator());
+            registry.RegisterOperator(new BridgeBreakdownOperator());
+        }
     }
 }
