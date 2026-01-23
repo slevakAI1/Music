@@ -117,9 +117,157 @@ See `History.md` for detailed implementation notes on each completed stage.
 
 ---
 
-## Stage 9 — Motif Placement and Rendering (IN PROGRESS)
+## Stage 9 — Motif placement and rendering (where and how motifs appear)  (in progress)
+
+**Why now:** Stage 8 established motifs as material objects. Stage 9 makes them musically functional by placing them in the song structure and rendering them into actual note sequences.
 
 **Goal:** Deterministically place motifs in appropriate sections, render them against harmony and groove, and integrate them with accompaniment.
+
+---
+
+### Story 9.1 — `MotifPlacementPlanner` (where motifs appear)   (completed)
+
+**Intent:** Motifs should be intentional: chorus hook, intro answer, pre-chorus lift. Determine WHICH motifs appear WHERE in the song.
+
+**Acceptance criteria:**
+- Create `MotifPlacementPlanner` that outputs `MotifPlacementPlan`
+- Deterministically select and place motifs using inputs:
+  - song form (`SectionTrack`)
+  - section types and indices
+  - Stage 7 energy/tension/variation plans
+  - Stage 7 phrase map (when available, or fallback to inferred phrases)
+  - available motifs from `MaterialBank` (filtered by role/kind)
+  - seed for deterministic tie-breaking
+- MVP placement heuristics:
+  - **Chorus**: primary hook motif almost always (highest energy/tension moments)
+  - **Intro**: optional motif teaser if energy low and arrangement sparse
+  - **Pre-chorus**: motif fragment or rhythmic foreshadowing (build anticipation)
+  - **Bridge**: either new motif or transformed existing motif (contrast)
+  - **Verse**: optional riff if verse energy is mid-high
+- Provide deterministic collision checks:
+  - do not place motif when orchestration says role absent
+  - do not place motif if register reservation would be violated by required accompaniment
+  - avoid simultaneous dense motifs in same register band
+- Support motif repetition and variation:
+  - reference Stage 7 `SectionVariationPlan` for A/A'/B logic
+  - repeated sections reuse same motif with optional bounded variation
+- Output: `MotifPlacementPlan` containing:
+  - `List<MotifPlacement>` where each placement has:
+    - `MotifSpec` reference (or `MotifId`)
+    - `int AbsoluteSectionIndex`
+    - `int StartBarWithinSection`
+    - `int DurationBars`
+    - `double VariationIntensity` (for A/A' rendering differences)
+    - optional `TransformTags` (e.g., "OctaveUp", "Invert", "Syncopate")
+- Tests:
+  - Determinism: same inputs → same placement plan
+  - Placement respects orchestration constraints
+  - Placement respects register reservations
+  - Common forms produce sensible placement (Intro-V-C-V-C-Bridge-C-Outro)
+  - Different seeds produce different placement choices when valid options exist
+
+**Notes:**
+- Placement is INTENT only; actual notes come from Story 9.2 rendering
+- Placement must work with test motifs from Stage 8 Story 8.3
+
+---
+
+### Story 9.2 — `MotifRenderer` (notes from motif spec + harmony)  (COMPLETED)
+
+**Intent:** Convert placed motif specs into actual note events against song harmony and groove context.
+
+**Acceptance criteria:**
+- Create `MotifRenderer` that takes:
+  - `MotifSpec` (defines rhythm, contour, register, tone policy)
+  - `MotifPlacement` (where/when it appears, variation intensity, transform tags)
+  - `HarmonyContext` (per-slot harmony from harmony track)
+  - `OnsetGrid` (from groove preset)
+  - Stage 7/8 intent context (energy/tension/phrase position)
+  - seed for deterministic pitch selection
+- Render motif notes deterministically:
+  - **Rhythm**: apply `MotifSpec.RhythmShape` to groove onset grid
+    - align motif onsets with valid groove slots
+    - preserve rhythmic character of motif
+  - **Pitch**: realize pitches from contour and tone policy:
+    - strong beats prefer chord tones (bias from `TonePolicy.ChordToneBias`)
+    - weak beats allow diatonic passing tones if `TonePolicy.AllowPassingTones`
+    - apply contour intent (`Up`/`Down`/`Arch`/`Flat`/`ZigZag`)
+    - respect `RegisterIntent` (center + range)
+    - clamp to instrument range and avoid vocal band
+  - **Variation operators** (deterministic, bounded):
+    - driven by `MotifPlacement.VariationIntensity` and `TransformTags`
+    - octave displacement (±12 semitones, bounded by register)
+    - neighbor-tone ornaments (diatonic only)
+    - rhythmic displacement by one slot where safe (doesn't create overlap/collision)
+    - small contour-preserving pitch adjustments (±2 semitones)
+  - **Velocity**: apply Stage 7 energy/tension biases
+- Output: `PartTrack` in `SongAbsolute` domain (absolute song time)
+  - `Meta.Kind = RoleTrack`
+  - `Meta.IntendedRole` from `MotifSpec.IntendedRole`
+  - `Meta.Name` indicates motif source and variation
+- Tests:
+  - Determinism: same inputs → identical note sequence
+  - Rendered notes are in valid MIDI range
+  - Rendered notes respect harmony (chord tones vs passing tones)
+  - Rendered notes respect register constraints
+  - Variation operators stay within bounds
+  - No note overlaps
+  - Events sorted by `AbsoluteTimeTicks`
+
+**Notes:**
+- This is where MaterialLocal (motif template) becomes SongAbsolute (rendered track)
+- Renderer must use existing harmony and groove infrastructure (no new systems)
+
+---
+
+### Story 9.3 — Motif integration with accompaniment (call/response + ducking hooks)
+
+**Intent:** When a motif occurs, accompaniment should *make room* without destroying the groove.
+
+**Acceptance criteria:**
+- Create `MotifPresenceMap` that can be queried per `(section, bar, slot)`:
+  - returns `bool IsMotifActive` and optional `MotifDensity` estimate
+- Wire minimal "ducking" into existing role generators:
+  - **Comp/Keys**: reduce density under motif windows
+    - skip some weak-beat onsets when motif is dense
+    - shorten sustain at motif onsets
+  - **Pads**: shorten sustain slightly at motif onsets (create breaths)
+  - **Drums**: reduce optional hats/ghosts slightly under dense motif windows
+    - style-safe: only affect optional events, never groove anchors
+- Ducking must be:
+  - deterministic
+  - bounded (never remove more than 30% of events)
+  - groove-protective (never remove downbeats/backbeats)
+- Tests:
+  - Determinism: same motif presence → same ducking decisions
+  - Groove anchors preserved
+  - Density reduction stays within bounds
+  - Accompaniment still sounds musical (not over-thinned)
+
+**Notes:**
+- Ducking is a BIAS, not a hard rule
+- Integration should feel natural, not like "everything stops for the motif"
+
+---
+
+### Story 9.4 — Motif diagnostics
+
+**Intent:** Make motif placement and rendering decisions visible for debugging and tuning.
+
+**Acceptance criteria:**
+- Create `MotifDiagnostics` (parallel to energy/tension diagnostics)
+- Opt-in reports showing:
+  - motif placements by section (which motifs where)
+  - per-motif variation ops used (what transforms applied)
+  - collision/ducking decisions (what was thinned and why)
+  - register usage by motif vs accompaniment
+- Diagnostics must:
+  - not affect generation (read-only)
+  - be deterministic
+- Add test verifying diagnostics don't change generated output
+- Integrate with existing Stage 7 diagnostics where appropriate
+
+---
 
 **Completed Stories:**
 - 9.1: `MotifPlacementPlanner` (where motifs appear) ✅
@@ -130,21 +278,6 @@ See `History.md` for detailed implementation notes on each completed stage.
 - 9.4: Motif diagnostics
 
 **Dependencies:** Stage G (groove hooks) ✅, Stage 8 (motif data) ✅
-
----
-
-## Stage 10 — Melody & Lyric Scaffolding (PENDING)
-
-**Goal:** Build minimal melody engine with future lyric integration. Melodies are like motifs but with syllable timing constraints and vocal register/tessitura considerations.
-
-**Stories:**
-- 10.1: `LyricProsodyModel` (inputs and constraints; placeholder lyrics)
-- 10.2: Syllable windows → onset slot mapping
-- 10.3: Melody generator MVP (singable, chord-aware)
-- 10.4: Vocal band protection (make room for melody)
-- 10.5: Melody variation across repeats (A/A')
-
-**Dependencies:** Stage 9 (rendering infrastructure), Stage 7 (phrase maps)
 
 ---
 
@@ -215,6 +348,196 @@ A skilled drummer optimizes for:
 - 8.1: Wire drummer agent into generator (`DrummerAgent` facade)
 - 8.2: Unit tests (determinism, musical sensibility)
 - 8.3: Golden regression snapshot
+
+---
+## Stage 10 — Melody & lyric scaffolding (timing windows + singable melody MVP)
+
+**Why now:** Stage 9 provides instrumental motifs (hooks/riffs). Stage 10 adds vocal melody as a first-class feature, building on motif rendering infrastructure while adding lyric-aware timing constraints.
+
+**Goal:** Build minimal melody engine with future lyric integration in mind. Melodies are like motifs but with syllable timing constraints and vocal register/tessitura considerations.
+
+**Dependencies:**
+- Stage 8 material system (melody specs can reuse `MotifSpec` patterns)
+- Stage 9 rendering infrastructure (melody rendering parallels motif rendering)
+- Stage 7 phrase maps and tension (melody placement uses phrase positions)
+
+---
+
+### Story 10.1 — `LyricProsodyModel` (inputs and constraints; no real lyrics yet)
+
+**Intent:** Provide syllable timing/stress windows even if lyrics are placeholder. Establish the contract for future lyric integration.
+
+**Acceptance criteria:**
+- Add a model for phrase-level syllable planning:
+  - syllable count per phrase (deterministic default based on phrase length)
+  - stress pattern (simple: `Strong`/`Weak` or numeric stress levels 0-2)
+  - allowed melisma count (initially low; most syllables get one note)
+  - optional rest positions (intentional breaths/pauses)
+- Create `LyricProsodyModel` record:
+  - `int SyllableCount`
+  - `IReadOnlyList<SyllableStress> StressPattern` (Strong/Weak per syllable)
+  - `int MaxMelismaNotesPerSyllable` (default: 1-2)
+  - `IReadOnlySet<int> RestPositions` (syllable indices that are rests)
+- Deterministically generate a default prosody plan when the user provides none:
+  - derive syllable count from phrase length (e.g., 4-bar phrase → 8-12 syllables)
+  - stress pattern follows simple alternating or downbeat-emphasis pattern
+  - seed used for deterministic variation
+- Tests:
+  - Default prosody generation is deterministic
+  - Generated patterns are musically sensible (not too dense, not too sparse)
+  - Stress patterns align with typical phrase structures
+
+**Notes:**
+- This is a placeholder for real lyrics (Stage 14+)
+- Real lyric integration will replace defaults but use same interface
+
+---
+
+### Story 10.2 — Syllable windows → onset slot mapping
+
+**Intent:** Map syllables onto groove onset slots deterministically, respecting prosody constraints.
+
+**Acceptance criteria:**
+- Create `VocalTimingPlanner` that takes:
+  - `LyricProsodyModel` (syllable count, stress pattern)
+  - `OnsetGrid` (from groove)
+  - phrase length and position
+  - Stage 7 energy/tension context
+  - seed
+- Map syllables onto onset slots using deterministic rules:
+  - **stressed syllables** prefer stronger beats/slots (beat 1, beat 3, strong onsets)
+  - **unstressed syllables** can use weaker beats/offbeats
+  - avoid impossible densities (cap: max 2-3 syllables per bar typically)
+  - allow rests intentionally (respect `RestPositions` from prosody)
+  - melisma handling: when multiple notes per syllable, use adjacent slots
+- Output: `VocalTimingPlan` that can be queried by `(section, bar, slot)`:
+  - returns `SyllableEvent` with:
+    - `int SyllableIndex`
+    - `SyllableStress Stress`
+    - `bool IsMelismaStart` / `bool IsMelismaContinuation`
+    - `bool IsRest`
+- Tests:
+  - Determinism: same inputs → identical timing plan
+  - Stressed syllables land on strong beats
+  - Density stays within bounds (no overpacked bars)
+  - Rest positions respected
+
+---
+
+### Story 10.3 — Melody generator MVP (singable, chord-aware)
+
+**Intent:** Generate pitch for each syllable event, creating a singable melody that respects harmony and phrase structure.
+
+**Acceptance criteria:**
+- Create `MelodyRenderer` (parallel to `MotifRenderer` from Stage 9)
+- Takes:
+  - `VocalTimingPlan` (where syllables occur)
+  - `HarmonyContext` (harmony per slot)
+  - vocal register range and tessitura (comfortable singing range)
+  - Stage 7 phrase position and tension context
+  - seed for deterministic pitch selection
+- Generate pitch for each syllable event deterministically:
+  - **strong beats**: prefer chord tones (root, third, fifth)
+  - **weak beats**: allow diatonic passing/neighbor tones (policy-gated)
+  - **respect range and tessitura**: stay within comfortable vocal range
+    - typical ranges: soprano (C4-A5), alto (G3-E5), tenor (C3-A4), bass (E2-E4)
+    - keep most notes in middle tessitura (avoid extremes)
+  - **avoid large leaps** unless phrase position suggests emphasis (`Peak`)
+    - prefer stepwise motion and small leaps (≤ perfect 5th)
+    - larger leaps allowed at phrase starts or climaxes
+  - **phrase contour**: apply natural phrase arcs
+    - `Start`: establish starting pitch
+    - `Middle`: gradual motion
+    - `Peak`: highest note(s) of phrase
+    - `Cadence`: resolve downward toward stable tone
+  - **incorporate tension intent**:
+    - higher tension biases scale degrees away from tonic (2nd, 6th, 7th scale degrees)
+    - release moments return toward stable tones (1st, 3rd, 5th scale degrees)
+- Handle melisma:
+  - first note of melisma is primary pitch (aligned with harmony)
+  - continuation notes are neighbor tones or passing tones
+- Output: `PartTrack` in `SongAbsolute` domain
+  - `Meta.Kind = RoleTrack`
+  - `Meta.IntendedRole = "Vocal"` or `"Lead"`
+- Tests:
+  - Determinism: same inputs → identical melody
+  - All notes in valid vocal range
+  - Strong beats use chord tones
+  - Phrase contours are natural (no random jumps)
+  - Melisma handled correctly
+  - No overlaps
+
+**Notes:**
+- Melody rendering reuses harmony and phrase infrastructure from Stages 7-9
+- Melody is like a motif but with syllable timing constraints
+
+---
+
+### Story 10.4 — Vocal band protection (make room for melody)
+
+**Intent:** When melody is active, accompaniment must avoid competing in the vocal register.
+
+**Acceptance criteria:**
+- Define a `VocalBand` (MIDI note range) per vocal type:
+  - Soprano: C4-A5 (MIDI 60-81)
+  - Alto: G3-E5 (MIDI 55-76)
+  - Tenor: C3-A4 (MIDI 48-69)
+  - Bass: E2-E4 (MIDI 40-64)
+  - Default: C4-E5 (MIDI 60-76) for unspecified
+- When `VocalTimingPlan` indicates active syllables:
+  - **Pads/Keys**: avoid sustained notes in vocal band
+    - shift voicings down or up by octave
+    - reduce density of mid-register notes
+  - **Comp**: reduce density and/or shift inversion/register away from vocal band
+    - prefer lower inversions or higher inversions (avoid middle)
+  - **Drums**: optionally reduce busyness slightly (only optional events like hats/ghosts)
+    - style-safe: never remove groove anchors
+- Protection must be:
+  - deterministic
+  - bounded (don't completely remove accompaniment)
+  - groove-preserving
+- Tests:
+  - Determinism: same vocal timing → same protection decisions
+  - Accompaniment avoids vocal band when melody active
+  - Groove anchors preserved
+  - Register shifts stay within instrument ranges
+
+---
+
+### Story 10.5 — Melody variation across repeats (A/A')
+
+**Intent:** Repeated sections (Verse 2, final Chorus) should have melodic variation while preserving identity.
+
+**Acceptance criteria:**
+- Support controlled variation for repeated melody sections:
+  - reference Stage 7 `SectionVariationPlan` for A/A'/B logic
+  - Verse 2 melody = Verse 1 melody + bounded variation ops
+  - Final chorus can lift register or add melodic extensions
+- Variation operators (deterministic, bounded):
+  - octave displacement (±12 semitones, stay in vocal range)
+  - neighbor-tone ornaments (add passing tones on weak beats)
+  - rhythmic displacement by one slot where safe
+  - melodic extensions at phrase ends (add 1-2 notes before rest)
+  - register lift for climactic sections (shift up 2-4 semitones)
+- Variation intensity driven by:
+  - `SectionVariationPlan.VariationIntensity`
+  - section type and index
+  - energy/tension context
+  - seed for deterministic selection
+- Tests:
+  - Determinism: same inputs → identical varied melody
+  - Variations stay within vocal range
+  - Variations preserve melodic contour and character
+  - A' sections recognizable as variants of A
+
+**Notes:**
+- Melody variation parallels motif variation from Stage 9
+- Keep variations conservative for singability
+
+---
+
+
+
 
 ---
 
