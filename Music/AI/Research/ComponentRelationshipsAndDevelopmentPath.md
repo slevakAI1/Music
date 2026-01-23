@@ -446,12 +446,9 @@ Minor updates only. The architecture is sound. Main work is:
 
 1. Start with **Stage 11, Stories 1.1-1.4** (Shared Agent Infrastructure)  (COMPLETED)
 2. Complete **Story 9.2** (MotifRenderer) for quick audible wins   (COMPLETED)
-
-
-*************************    YOU ARE HERE    ************************* 
-
 3. Continue with Northstar **Stage 11 which is now replaced by Stories 2.1-3.6** of Epic_HumanDrummer.md (Drummer Agent Core + Operators)
 
+*************************    YOU ARE HERE    ************************* 
 
 4. Then **Story 9.3** (Motif Integration) to connect systems
 

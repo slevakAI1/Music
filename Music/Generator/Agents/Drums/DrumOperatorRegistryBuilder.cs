@@ -35,14 +35,45 @@ namespace Music.Generator.Agents.Drums
         /// Operators are registered in deterministic order for reproducibility.
         /// </summary>
         /// <returns>A frozen registry ready for use.</returns>
+        /// <exception cref="InvalidOperationException">If operator count != 28.</exception>
         public static DrumOperatorRegistry BuildComplete()
         {
             var registry = DrumOperatorRegistry.CreateEmpty();
 
             RegisterAllOperators(registry);
 
+            // Story 3.6: Validate total operator count (7+5+7+4+5=28)
+            const int ExpectedOperatorCount = 28;
+            if (registry.Count != ExpectedOperatorCount)
+            {
+                var message = BuildCountValidationMessage(registry, ExpectedOperatorCount);
+                throw new InvalidOperationException(message);
+            }
+
             registry.Freeze();
             return registry;
+        }
+
+        /// <summary>
+        /// Builds diagnostic message for operator count validation failure.
+        /// </summary>
+        private static string BuildCountValidationMessage(DrumOperatorRegistry registry, int expected)
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine($"Operator count validation failed. Expected {expected}, found {registry.Count}.");
+            sb.AppendLine("Registered operators by family:");
+
+            foreach (Common.OperatorFamily family in Enum.GetValues<Common.OperatorFamily>())
+            {
+                var ops = registry.GetOperatorsByFamily(family);
+                sb.AppendLine($"  {family}: {ops.Count} operators");
+                foreach (var op in ops)
+                {
+                    sb.AppendLine($"    - {op.OperatorId}");
+                }
+            }
+
+            return sb.ToString();
         }
 
         /// <summary>

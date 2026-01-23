@@ -847,6 +847,12 @@ The drummer agent implements human-like drumming using the groove system hooks.
 - **Story 2.3 (COMPLETED):** DrummerPolicyProvider implementing IGroovePolicyProvider
 - **Story 2.4 (COMPLETED):** DrummerCandidateSource implementing IGrooveCandidateSource with operator registry, mapping, grouping, and physicality filter stubs
 - **Story 2.5 (COMPLETED):** DrummerMemory extending AgentMemory with fill tracking, crash patterns, hat mode history, ghost frequency
+- **Story 3.1 (COMPLETED):** MicroAddition operators (7 operators: ghost notes, pickups, embellishments)
+- **Story 3.2 (COMPLETED):** SubdivisionTransform operators (5 operators: hat lift/drop, ride swap, partial lift, open hat accent)
+- **Story 3.3 (COMPLETED):** PhrasePunctuation operators (7 operators: fills, crashes, section boundaries)
+- **Story 3.4 (COMPLETED):** PatternSubstitution operators (4 operators: backbeat variants, kick patterns, half/double time)
+- **Story 3.5 (COMPLETED):** StyleIdiom operators (5 operators: PopRock-specific moves)
+- **Story 3.6 (COMPLETED):** DrumOperatorRegistry and DrumOperatorRegistryBuilder (28 operators total, discovery and filtering)
 
 **Key Types:**
 
@@ -876,6 +882,74 @@ DrummerCandidateSource.GetCandidateGroups(barContext, role)
   └─ PhysicalityFilter.Filter() → pruned groups
 ```
 
+### DrumOperatorRegistry (Story 3.6)
+
+Location: `Generator/Agents/Drums/DrumOperatorRegistry.cs`, `DrumOperatorRegistryBuilder.cs`
+
+Purpose: Centralized registry for discovering, filtering, and accessing all 28 drum operators across 5 families.
+
+**Registry Methods:**
+
+| Method | Purpose | Notes |
+|--------|---------|-------|
+| `RegisterOperator(IDrumOperator)` | Add operator to registry | Throws if duplicate ID or registry frozen |
+| `Freeze()` | Make registry immutable | Called after all operators registered |
+| `GetAllOperators()` | All operators in registration order | Deterministic iteration |
+| `GetOperatorsByFamily(OperatorFamily)` | Filter by family | Returns empty list for unknown families |
+| `GetOperatorById(string)` | Lookup by ID | Returns null if not found |
+| `GetEnabledOperators(StyleConfiguration)` | Filter by style allowed list | Empty AllowedOperatorIds = all allowed |
+| `GetEnabledOperators(IReadOnlyList<string>)` | Filter by policy allow list | Null/empty list = all allowed |
+| `Count` | Total registered operators | Should be 28 after BuildComplete() |
+
+**Builder Pattern:**
+
+```csharp
+// Create frozen registry with all 28 operators
+var registry = DrumOperatorRegistryBuilder.BuildComplete();
+
+// Registry enforces operator count validation
+// Throws InvalidOperationException if count != 28 with diagnostic message
+```
+
+**Registration Order (Deterministic):**
+
+1. MicroAddition (7 operators): GhostBeforeBackbeat, GhostAfterBackbeat, KickPickup, KickDouble, HatEmbellishment, GhostCluster, FloorTomPickup
+2. SubdivisionTransform (5 operators): HatLift, HatDrop, RideSwap, PartialLift, OpenHatAccent
+3. PhrasePunctuation (7 operators): CrashOnOne, TurnaroundFillShort, TurnaroundFillFull, SetupHit, StopTime, BuildFill, DropFill
+4. PatternSubstitution (4 operators): BackbeatVariant, KickPatternVariant, HalfTimeFeel, DoubleTimeFeel
+5. StyleIdiom (5 operators): PopRockBackbeatPush, RockKickSyncopation, PopChorusCrashPattern, VerseSimplify, BridgeBreakdown
+
+**Key Invariants:**
+
+- **Immutable after freeze:** No modifications allowed after `BuildComplete()`
+- **Unique operator IDs:** Duplicate IDs throw `InvalidOperationException`
+- **Operator count validation:** Must contain exactly 28 operators
+- **Deterministic ordering:** Same registration order every time (family by family)
+- **Thread-safe reads:** Immutability provides thread-safety as side effect
+
+**Operator ID Conventions:**
+
+- Most operators: `"Drum{OperatorName}"` (e.g., `"DrumGhostBeforeBackbeat"`)
+- Fill operators (PhrasePunctuation): No "Drum" prefix (e.g., `"CrashOnOne"`, `"TurnaroundFillShort"`)
+  - Fill IDs defined in `FillOperatorIds` constants class for policy filtering
+
+**Style Filtering:**
+
+```csharp
+// Get operators allowed for a specific style
+var popRockOperators = registry.GetEnabledOperators(popRockStyle);
+
+// Empty AllowedOperatorIds means all operators allowed
+// Maintains registration order in filtered results
+```
+
+**Integration:**
+
+- **DrummerCandidateSource** queries registry for enabled operators
+- **DrummerPolicyProvider** uses `FillOperatorIds` for fill window gating
+- **StyleConfiguration** specifies allowed operator IDs per genre
+- **Future stages:** Registry will be used by Stage 5 (Pop Rock configuration) to enable/disable operators
+
 **Files:**
 
 | File | Purpose |
@@ -886,7 +960,8 @@ DrummerCandidateSource.GetCandidateGroups(barContext, role)
 | `Generator/Agents/Common/AgentMemory.cs` | Anti-repetition memory |
 | `Generator/Agents/Common/StyleConfiguration.cs` | Style weights and caps |
 | `Generator/Agents/Drums/IDrumOperator.cs` | Drum-specific operator interface |
-| `Generator/Agents/Drums/DrumOperatorRegistry.cs` | Operator registry and discovery |
+| `Generator/Agents/Drums/DrumOperatorRegistry.cs` | Operator registry and discovery (Story 3.6) |
+| `Generator/Agents/Drums/DrumOperatorRegistryBuilder.cs` | Builds registry with all 28 operators (Story 3.6) |
 | `Generator/Agents/Drums/DrumCandidate.cs` | Drum event candidate record |
 | `Generator/Agents/Drums/DrumCandidateMapper.cs` | DrumCandidate → GrooveOnsetCandidate mapper |
 | `Generator/Agents/Drums/DrummerCandidateSource.cs` | IGrooveCandidateSource implementation |
@@ -903,7 +978,6 @@ DrummerCandidateSource.GetCandidateGroups(barContext, role)
 | `Generator/Agents/Drums/Physicality/PhysicalityRules.cs` | Physicality configuration |
 
 **Remaining Drummer Agent Work:**
-- Story 3.6: Operator registry completion and discovery
 - Stories 4.1-4.4: Full physicality constraints (limb model, sticking rules)
 - Stories 5.1-5.4: Pop Rock style configuration
 
