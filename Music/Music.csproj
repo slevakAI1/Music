@@ -66,6 +66,7 @@
     <None Remove="AI\Completed\PreAnalysis_3.5.md" />
     <None Remove="AI\Completed\PreAnalysis_3.6.md" />
     <None Remove="AI\Completed\PreAnalysis_4.1.md" />
+    <None Remove="AI\Completed\PreAnalysis_4.2.md" />
     <None Remove="AI\Completed\PreAnalysis_9.3.md" />
     <None Remove="AI\Prompts\AgentEpic.md" />
     <None Remove="AI\Prompts\Backlog.md" />

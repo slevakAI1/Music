@@ -6,6 +6,15 @@
 
 ---
 
+## Story 4.2 — Sticking Rules (Implemented)
+
+The sticking rules validation enforces hand/foot playability constraints before selection. Key behavior:
+- `StickingRules` class with defaults: `MaxConsecutiveSameHand=4`, `MaxGhostsPerBar=4`, `MinGapBetweenFastHits=TicksPerQuarterNote/4`.
+- Validation is per-call, pure and thread-safe. It counts `OnsetStrength.Ghost` per bar and inspects per-limb sequences to detect rapid same-limb hits.
+- Violations are returned as `StickingValidation` with detailed `StickingViolation` records (rule id, candidate ids, bar/beat, limb).
+- Policy: unknown role mappings are skipped; consecutive windows may span bar boundaries; `PhysicalityFilter` interprets violations according to strictness.
+
+
 ## 1) Solution Overview
 
 | Property | Value |
