@@ -1,7 +1,7 @@
 // AI: purpose=Configuration for physicality validation (limbs, sticking, density caps).
 // AI: invariants=Immutable record; all caps are optional (null = no limit); StrictnessLevel affects validation behavior.
 // AI: deps=LimbModel and StickingRules (Story 4.1, 4.2); consumed by PhysicalityFilter.
-// AI: change=Story 2.4 stub; Story 4.1-4.4 add full limb/sticking configuration.
+// AI: change=Story 4.3 adds LimbModel and StickingRules properties for full validation.
 
 namespace Music.Generator.Agents.Drums.Physicality
 {
@@ -10,20 +10,20 @@ namespace Music.Generator.Agents.Drums.Physicality
     /// </summary>
     public enum PhysicalityStrictness
     {
-        /// <summary>Strict: all rules enforced, no exceptions.</summary>
+        /// <summary>Strict: all rules enforced, violators removed.</summary>
         Strict = 0,
 
-        /// <summary>Normal: standard rules, some edge cases allowed.</summary>
+        /// <summary>Normal: minimal pruning to resolve conflicts (keep highest scored).</summary>
         Normal = 1,
 
-        /// <summary>Loose: relaxed rules for more creative freedom.</summary>
+        /// <summary>Loose: log violations but keep all candidates.</summary>
         Loose = 2
     }
 
     /// <summary>
     /// Configuration for physicality validation rules.
     /// Controls limb feasibility, sticking limits, and density caps.
-    /// Story 2.4: Stub configuration; Story 4.1-4.4 add full limb/sticking rules.
+    /// Story 4.3: Full limb/sticking configuration.
     /// </summary>
     public sealed record PhysicalityRules
     {
@@ -55,12 +55,21 @@ namespace Music.Generator.Agents.Drums.Physicality
 
         /// <summary>
         /// Strictness level for validation.
-        /// Affects how edge cases are handled.
+        /// Affects how violations are handled.
         /// </summary>
         public PhysicalityStrictness StrictnessLevel { get; init; } = PhysicalityStrictness.Normal;
 
-        // TODO: Story 4.1 - Add LimbModel configuration
-        // TODO: Story 4.2 - Add StickingRules configuration
+        /// <summary>
+        /// Limb model used for role→limb mapping in conflict detection.
+        /// Defaults to LimbModel.Default (right-handed drummer).
+        /// </summary>
+        public LimbModel LimbModel { get; init; } = LimbModel.Default;
+
+        /// <summary>
+        /// Sticking rules used to validate sequences per-limb.
+        /// Defaults to StickingRules with LimbModel.Default.
+        /// </summary>
+        public StickingRules StickingRules { get; init; } = new StickingRules(LimbModel.Default);
 
         /// <summary>
         /// Default physicality rules with standard limits.

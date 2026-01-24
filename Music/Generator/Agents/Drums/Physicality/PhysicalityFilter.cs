@@ -1,25 +1,24 @@
-// AI: purpose=Stub physicality filter for Story 2.4; validates drum candidates for playability constraints.
-// AI: invariants=Protected candidates never removed; deterministic filtering order; null-safe.
-// AI: deps=GrooveOnsetCandidate, DrumCandidateMapper.IsProtected; full implementation in Story 4.3.
-// AI: change=Story 2.4 stub; Story 4.3 adds LimbModel, StickingRules, overcrowding prevention.
+// AI: purpose=Physicality filter for Story 4.3; validates drum candidates for limb conflicts and sticking rules.
+// AI: invariants=Protected candidates never removed; deterministic pruning (score desc, operatorId asc, candidateId asc).
+// AI: deps=GrooveOnsetCandidate, DrumCandidateMapper, LimbConflictDetector, StickingRules, GrooveDiagnosticsCollector.
+// AI: change=Story 4.3 full implementation with limb conflicts, sticking validation, strictness modes.
 
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Physicality
 {
     /// <summary>
-    /// Stub physicality filter for drum candidate validation.
-    /// Story 2.4: Placeholder implementation; Story 4.3 provides full limb/sticking validation.
+    /// Physicality filter for drum candidate validation.
+    /// Story 4.3: Full implementation with limb/sticking validation.
     /// </summary>
     /// <remarks>
-    /// Current stub behavior:
-    /// - Passes all candidates through (no validation)
-    /// - Records filter diagnostics when collector is provided
+    /// Behavior by StrictnessLevel:
+    /// - Strict: remove all non-protected violating candidates
+    /// - Normal: minimal pruning (keep highest scored, remove others)
+    /// - Loose: log violations but keep all candidates
     /// 
-    /// Story 4.3 will add:
-    /// - LimbConflictDetector integration
-    /// - StickingRules validation
-    /// - Overcrowding prevention with deterministic pruning
+    /// Protected candidates (DrumCandidateMapper.ProtectedTag) are never removed.
+    /// Deterministic tie-break: Score desc → OperatorId asc → CandidateId asc.
     /// </remarks>
     public sealed class PhysicalityFilter
     {
@@ -42,11 +41,10 @@ namespace Music.Generator.Agents.Drums.Physicality
 
         /// <summary>
         /// Filters candidates by physicality constraints.
-        /// Stub implementation: passes all candidates through.
         /// </summary>
         /// <param name="candidates">Candidates to filter.</param>
-        /// <param name="barNumber">Bar number for diagnostics.</param>
-        /// <returns>Filtered candidates (currently same as input).</returns>
+        /// <param name="barNumber">Bar number for diagnostics and context.</param>
+        /// <returns>Filtered candidates (playable subset).</returns>
         public IReadOnlyList<GrooveOnsetCandidate> Filter(
             IReadOnlyList<GrooveOnsetCandidate> candidates,
             int barNumber)
@@ -56,16 +54,203 @@ namespace Music.Generator.Agents.Drums.Physicality
             if (candidates.Count == 0)
                 return candidates;
 
-            // Stub: Apply only basic overcrowding prevention if caps are set
-            if (_rules.MaxHitsPerBar.HasValue && candidates.Count > _rules.MaxHitsPerBar.Value)
+            // Build DrumCandidate representations for detectors
+            var drumCandidates = BuildDrumCandidates(candidates, barNumber);
+            var candidateById = BuildCandidateLookup(candidates);
+
+            // Track IDs to remove
+            var toRemoveIds = new HashSet<string>(StringComparer.Ordinal);
+
+            // 1) Apply overcrowding prevention first
+            var afterOvercrowding = ApplyOvercrowdingPrevention(candidates, barNumber);
+            if (afterOvercrowding.Count != candidates.Count)
             {
-                return ApplyOvercrowdingPrevention(candidates, barNumber);
+                // Rebuild for remaining
+                drumCandidates = BuildDrumCandidates(afterOvercrowding, barNumber);
+                candidateById = BuildCandidateLookup(afterOvercrowding);
+                candidates = afterOvercrowding;
             }
 
-            // TODO: Story 4.3 - Add limb conflict detection
-            // TODO: Story 4.3 - Add sticking rules validation
+            // 2) Detect and resolve limb conflicts
+            ResolveConflicts(drumCandidates, candidateById, toRemoveIds);
 
-            return candidates;
+            // 3) Validate sticking rules
+            ValidateSticking(drumCandidates, candidateById, toRemoveIds);
+
+            // Build final result
+            return BuildFilteredResult(candidates, toRemoveIds);
+        }
+
+        private List<DrumCandidate> BuildDrumCandidates(
+            IReadOnlyList<GrooveOnsetCandidate> candidates,
+            int barNumber)
+        {
+            var result = new List<DrumCandidate>();
+            foreach (var c in candidates)
+            {
+                string cid = DrumCandidateMapper.ExtractCandidateId(c) ?? $"gen_{Guid.NewGuid():N}";
+                string opId = DrumCandidateMapper.ExtractOperatorId(c) ?? "UnknownOp";
+
+                var dc = new DrumCandidate
+                {
+                    CandidateId = cid,
+                    OperatorId = opId,
+                    Role = c.Role,
+                    BarNumber = barNumber,
+                    Beat = c.OnsetBeat,
+                    Strength = c.Strength,
+                    VelocityHint = null,
+                    TimingHint = null,
+                    ArticulationHint = null,
+                    FillRole = ExtractFillRole(c),
+                    Score = c.ProbabilityBias
+                };
+                result.Add(dc);
+            }
+            return result;
+        }
+
+        private static Dictionary<string, GrooveOnsetCandidate> BuildCandidateLookup(
+            IReadOnlyList<GrooveOnsetCandidate> candidates)
+        {
+            var lookup = new Dictionary<string, GrooveOnsetCandidate>(StringComparer.Ordinal);
+            foreach (var c in candidates)
+            {
+                string cid = DrumCandidateMapper.ExtractCandidateId(c) ?? $"gen_{Guid.NewGuid():N}";
+                lookup.TryAdd(cid, c);
+            }
+            return lookup;
+        }
+
+        private static FillRole ExtractFillRole(GrooveOnsetCandidate c)
+        {
+            if (c.Tags == null) return FillRole.None;
+            if (c.Tags.Contains(nameof(FillRole.FillStart))) return FillRole.FillStart;
+            if (c.Tags.Contains(nameof(FillRole.FillBody))) return FillRole.FillBody;
+            if (c.Tags.Contains(nameof(FillRole.FillEnd))) return FillRole.FillEnd;
+            if (c.Tags.Contains(nameof(FillRole.Setup))) return FillRole.Setup;
+            return FillRole.None;
+        }
+
+        private void ResolveConflicts(
+            List<DrumCandidate> drumCandidates,
+            Dictionary<string, GrooveOnsetCandidate> candidateById,
+            HashSet<string> toRemoveIds)
+        {
+            var conflicts = LimbConflictDetector.Default.DetectConflicts(drumCandidates, _rules.LimbModel);
+
+            foreach (var conflict in conflicts)
+            {
+                var ids = conflict.ConflictingAssignments.Select(a => a.CandidateId).ToList();
+                ResolveViolation(ids, $"LimbConflict:{conflict.Limb}", drumCandidates, candidateById, toRemoveIds);
+            }
+        }
+
+        private void ValidateSticking(
+            List<DrumCandidate> drumCandidates,
+            Dictionary<string, GrooveOnsetCandidate> candidateById,
+            HashSet<string> toRemoveIds)
+        {
+            var validation = _rules.StickingRules?.ValidatePattern(drumCandidates);
+            if (validation == null || !validation.Violations.Any())
+                return;
+
+            foreach (var violation in validation.Violations)
+            {
+                var ids = violation.CandidateIds?.ToList() ?? new List<string>();
+                ResolveViolation(ids, $"Sticking:{violation.RuleId}", drumCandidates, candidateById, toRemoveIds);
+            }
+        }
+
+        private void ResolveViolation(
+            List<string> involvedIds,
+            string reason,
+            List<DrumCandidate> drumCandidates,
+            Dictionary<string, GrooveOnsetCandidate> candidateById,
+            HashSet<string> toRemoveIds)
+        {
+            if (involvedIds.Count == 0) return;
+
+            var protectedIds = involvedIds
+                .Where(id => candidateById.TryGetValue(id, out var gc) && DrumCandidateMapper.IsProtected(gc))
+                .ToHashSet(StringComparer.Ordinal);
+            var unprotectedIds = involvedIds.Except(protectedIds).ToList();
+
+            if (_rules.StrictnessLevel == PhysicalityStrictness.Loose)
+            {
+                // Log only
+                foreach (var id in involvedIds)
+                    _diagnosticsCollector?.RecordFilter(id, reason);
+                return;
+            }
+
+            if (_rules.StrictnessLevel == PhysicalityStrictness.Strict)
+            {
+                // Remove all unprotected
+                foreach (var id in unprotectedIds)
+                {
+                    toRemoveIds.Add(id);
+                    bool wasProtected = protectedIds.Contains(id);
+                    _diagnosticsCollector?.RecordPrune(id, reason, wasProtected);
+                }
+                return;
+            }
+
+            // Normal: minimal pruning - keep best, remove rest
+            if (protectedIds.Any())
+            {
+                // Protected exists, remove all unprotected
+                foreach (var id in unprotectedIds)
+                {
+                    toRemoveIds.Add(id);
+                    _diagnosticsCollector?.RecordPrune(id, reason, false);
+                }
+            }
+            else
+            {
+                // Keep highest scored, remove others
+                var ordered = OrderByScoreForPruning(unprotectedIds, drumCandidates);
+                foreach (var id in ordered.Skip(1))
+                {
+                    toRemoveIds.Add(id);
+                    _diagnosticsCollector?.RecordPrune(id, reason, false);
+                }
+            }
+        }
+
+        private static List<string> OrderByScoreForPruning(
+            IEnumerable<string> ids,
+            List<DrumCandidate> drumCandidates)
+        {
+            return ids
+                .Select(id =>
+                {
+                    var dc = drumCandidates.FirstOrDefault(c => c.CandidateId == id);
+                    return new { Id = id, Score = dc?.Score ?? 0.0, Op = dc?.OperatorId ?? "" };
+                })
+                .OrderByDescending(x => x.Score)
+                .ThenBy(x => x.Op, StringComparer.Ordinal)
+                .ThenBy(x => x.Id, StringComparer.Ordinal)
+                .Select(x => x.Id)
+                .ToList();
+        }
+
+        private IReadOnlyList<GrooveOnsetCandidate> BuildFilteredResult(
+            IReadOnlyList<GrooveOnsetCandidate> candidates,
+            HashSet<string> toRemoveIds)
+        {
+            var result = new List<GrooveOnsetCandidate>();
+            foreach (var c in candidates)
+            {
+                string id = DrumCandidateMapper.ExtractCandidateId(c) ?? "";
+                bool isProtected = DrumCandidateMapper.IsProtected(c);
+
+                if (toRemoveIds.Contains(id) && !isProtected)
+                    continue;
+
+                result.Add(c);
+            }
+            return result;
         }
 
         /// <summary>
@@ -76,53 +261,49 @@ namespace Music.Generator.Agents.Drums.Physicality
             IReadOnlyList<GrooveOnsetCandidate> candidates,
             int barNumber)
         {
-            int maxHits = _rules.MaxHitsPerBar ?? int.MaxValue;
+            int? maxHits = _rules.MaxHitsPerBar;
+            if (!maxHits.HasValue || candidates.Count <= maxHits.Value)
+                return candidates;
 
-            // Separate protected and unprotected candidates
             var protectedCandidates = new List<GrooveOnsetCandidate>();
             var unprotectedCandidates = new List<GrooveOnsetCandidate>();
 
             foreach (var candidate in candidates)
             {
                 if (DrumCandidateMapper.IsProtected(candidate))
-                {
                     protectedCandidates.Add(candidate);
-                }
                 else
-                {
                     unprotectedCandidates.Add(candidate);
-                }
             }
 
-            // If protected alone exceed cap, return all protected
-            if (protectedCandidates.Count >= maxHits)
+            if (protectedCandidates.Count >= maxHits.Value)
             {
+                foreach (var c in unprotectedCandidates)
+                {
+                    var id = DrumCandidateMapper.ExtractCandidateId(c) ?? "";
+                    _diagnosticsCollector?.RecordPrune(id, "Overcrowding:protectedExceeded", false);
+                }
                 return protectedCandidates;
             }
 
-            // Sort unprotected by score descending, then by tags for determinism
             var sorted = unprotectedCandidates
                 .OrderByDescending(c => c.ProbabilityBias)
-                .ThenBy(c => GetCandidateId(c) ?? "")
+                .ThenBy(c => DrumCandidateMapper.ExtractOperatorId(c) ?? "")
+                .ThenBy(c => DrumCandidateMapper.ExtractCandidateId(c) ?? "")
                 .ToList();
 
-            // Take top candidates up to remaining budget
-            int budget = maxHits - protectedCandidates.Count;
+            int budget = maxHits.Value - protectedCandidates.Count;
             var selected = sorted.Take(budget).ToList();
 
-            // Combine protected + selected unprotected
+            foreach (var c in sorted.Skip(budget))
+            {
+                var id = DrumCandidateMapper.ExtractCandidateId(c) ?? "";
+                _diagnosticsCollector?.RecordPrune(id, "Overcrowding:prunedLowestScored", false);
+            }
+
             var result = new List<GrooveOnsetCandidate>(protectedCandidates);
             result.AddRange(selected);
-
             return result;
-        }
-
-        /// <summary>
-        /// Extracts candidate ID for deterministic ordering.
-        /// </summary>
-        private static string? GetCandidateId(GrooveOnsetCandidate candidate)
-        {
-            return DrumCandidateMapper.ExtractCandidateId(candidate);
         }
 
         /// <summary>

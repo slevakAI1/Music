@@ -1,7 +1,7 @@
 // AI: purpose=Record capturing a limb's assignment to a drum event at a specific position.
 // AI: invariants=BarNumber>=1; Beat>=1.0; Limb is valid enum value; used as input to LimbConflictDetector.
 // AI: deps=Limb enum from LimbModel.cs; created from DrumCandidate via LimbModel.GetRequiredLimb.
-// AI: change=Story 4.1 defines record; consumed by LimbConflictDetector.DetectConflicts.
+// AI: change=Story 4.1 defines record; Story 4.3 adds CandidateId for conflict resolution.
 
 namespace Music.Generator.Agents.Drums.Physicality
 {
@@ -14,11 +14,13 @@ namespace Music.Generator.Agents.Drums.Physicality
     /// <param name="Beat">Beat position (1-based, decimal) within the bar. E.g., 1.0, 2.5, 3.75.</param>
     /// <param name="Role">Drum role for this hit (e.g., "Kick", "Snare", "ClosedHat").</param>
     /// <param name="Limb">Physical limb assigned to play this hit.</param>
+    /// <param name="CandidateId">Stable identifier of the candidate (for conflict resolution). Optional.</param>
     public readonly record struct LimbAssignment(
         int BarNumber,
         decimal Beat,
         string Role,
-        Limb Limb)
+        Limb Limb,
+        string CandidateId = "")
     {
         /// <summary>
         /// Creates a LimbAssignment from a DrumCandidate using the specified LimbModel.
@@ -40,7 +42,8 @@ namespace Music.Generator.Agents.Drums.Physicality
                 candidate.BarNumber,
                 candidate.Beat,
                 candidate.Role,
-                limb.Value);
+                limb.Value,
+                candidate.CandidateId);
         }
 
         /// <summary>

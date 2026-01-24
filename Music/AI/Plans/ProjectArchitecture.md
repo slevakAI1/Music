@@ -6,6 +6,21 @@
 
 ---
 
+## Story 4.3 — Physicality Filter (Implemented)
+
+The physicality filter validates drum candidates for playability before selection. Key behavior:
+- `PhysicalityFilter` class integrates `LimbConflictDetector` and `StickingRules` for full validation.
+- Input: `IReadOnlyList<GrooveOnsetCandidate>` + barNumber. Output: filtered list (playable subset).
+- Strictness modes (`PhysicalityStrictness`):
+  - `Strict`: remove all non-protected violating candidates
+  - `Normal`: minimal pruning (keep highest-scored, remove others with deterministic tie-break)
+  - `Loose`: log violations but keep all candidates
+- Deterministic tie-break for pruning: Score desc → OperatorId asc → CandidateId asc.
+- Protected candidates (`DrumCandidateMapper.ProtectedTag`) are never removed.
+- Diagnostics: uses `GrooveDiagnosticsCollector.RecordFilter()` and `RecordPrune()` for opt-in tracing.
+- `PhysicalityRules` now includes `LimbModel` and `StickingRules` properties for full configuration.
+- Integration: `DrummerCandidateSource` calls `PhysicalityFilter.Filter()` before grouping results.
+
 ## Story 4.2 — Sticking Rules (Implemented)
 
 The sticking rules validation enforces hand/foot playability constraints before selection. Key behavior:
@@ -13,6 +28,7 @@ The sticking rules validation enforces hand/foot playability constraints before 
 - Validation is per-call, pure and thread-safe. It counts `OnsetStrength.Ghost` per bar and inspects per-limb sequences to detect rapid same-limb hits.
 - Violations are returned as `StickingValidation` with detailed `StickingViolation` records (rule id, candidate ids, bar/beat, limb).
 - Policy: unknown role mappings are skipped; consecutive windows may span bar boundaries; `PhysicalityFilter` interprets violations according to strictness.
+- `LimbAssignment` includes `CandidateId` for conflict resolution tracking.
 
 
 ## 1) Solution Overview
@@ -805,11 +821,11 @@ Uses **xUnit** test framework. Contains unit and integration tests for groove sy
 | `DrummerMemoryTests.cs` | Story 2.5: Drummer memory (fills, crashes, hats, ghosts - 48 tests) |
 | `MicroAdditionOperatorTests.cs` | Story 3.1: MicroAddition operators (7 operators) |
 | `SubdivisionTransformOperatorTests.cs` | Story 3.2: SubdivisionTransform operators (5 operators, 35+ tests) |
+| `LimbModelTests.cs` | Story 4.1: Limb model and role→limb mapping |
+| `StickingRulesTests.cs` | Story 4.2: Sticking rules validation |
+| `PhysicalityFilterTests.cs` | Story 4.3: Physicality filter (limb conflicts, sticking, strictness modes) |
 | `MotifPresenceMapTests.cs` | Story 9.3: MotifPresenceMap queries (20 tests) |
 | `DrummerMotifIntegrationTests.cs` | Story 9.3: DrummerAgent motif integration (9 tests) |
-| `DrummerMemoryTests.cs` | Story 2.5: Drummer memory (fills, crashes, hats, ghosts - 48 tests) |
-| `MicroAdditionOperatorTests.cs` | Story 3.1: MicroAddition operators (7 operators) |
-| `SubdivisionTransformOperatorTests.cs` | Story 3.2: SubdivisionTransform operators (5 operators, 35+ tests) |
 
 ### Test Fixtures
 

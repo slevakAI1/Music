@@ -17,6 +17,52 @@ namespace Music.Generator.Agents.Drums.Physicality
             foreach (var c in candidates)            {                var limb = limbModel.GetRequiredLimb(c.Role);                if (!limb.HasValue)                    continue; // skip unknown roles per policy Answer 5
                 // Compute a sort key: bar * large + beat*1000 + timingHint (nullable)                // Beat is decimal (1-based). Multiply fractional by 1000 to preserve order.                int beatWhole = (int)Math.Floor(c.Beat);                int beatFrac = (int)((c.Beat - beatWhole) * 1000);                int timingHint = c.TimingHint ?? 0;                long key = ((long)c.BarNumber << 32) ^ ((long)beatWhole << 16) ^ (long)beatFrac ^ timingHint;                assignments.Add((c, limb.Value, key));            }
             // Group assignments per limb and sort by key (temporal order)            var byLimb = assignments                .OrderBy(a => a.SortKey)                .GroupBy(a => a.Limb)                .ToDictionary(g => g.Key, g => g.Select(a => a.Candidate).ToList());
-            foreach (var kv in byLimb)            {                var limb = kv.Key;                var list = kv.Value.OrderBy(c => c.BarNumber).ThenBy(c => c.Beat).ThenBy(c => c.TimingHint ?? 0).ToList();                // Check consecutive same-hand hits and min gap                int consecutive = 0;                long? lastTickApprox = null;                string? lastCandidateId = null;                foreach (var c in list)                {                    // Approximate tick distance using beat fractional * TPQN. Without BarTrack we approximate within bar.                    long approxTick = (long)((c.Beat - Math.Floor(c.Beat)) * MusicConstants.TicksPerQuarterNote) + ((c.TimingHint) ?? 0);
-                    if (lastTickApprox.HasValue)                    {                        long gap = Math.Abs(approxTick - lastTickApprox.Value);                        if (gap < MinGapBetweenFastHits)                        {                            consecutive++;                        }                        else                        {                            consecutive = 1; // reset chain                        }                    }                    else                    {                        consecutive = 1;                    }                    lastTickApprox = approxTick;                    lastCandidateId = c.CandidateId;                    if (consecutive > MaxConsecutiveSameHand)                    {                        validation.Violations.Add(new StickingViolation(                            "MaxConsecutiveSameHand",                            $"Limb {limb} exceeds max consecutive hits ({MaxConsecutiveSameHand}) at candidate {c.CandidateId}.",                            new List<string> { c.CandidateId },                            c.BarNumber,                            c.Beat,                            limb));                        // do not break; report all occurrences                    }                }            }
-            return validation;        }    }}
+            foreach (var kv in byLimb)            {                var limb = kv.Key;                var list = kv.Value.OrderBy(c => c.BarNumber).ThenBy(c => c.Beat).ThenBy(c => c.TimingHint ?? 0).ToList();                // Check consecutive same-hand hits and min gap
+                int consecutive = 0;
+                long? lastTickApprox = null;
+                string? lastCandidateId = null;
+                foreach (var c in list)
+                {
+                    // Approximate absolute tick using bar + beat.
+                    // Bar contributes (barNumber - 1) * 4 beats * TPQN (assuming 4/4).
+                    // Beat contributes (beat - 1.0) * TPQN + TimingHint.
+                    long barOffset = (long)(c.BarNumber - 1) * 4 * MusicConstants.TicksPerQuarterNote;
+                    long beatOffset = (long)((c.Beat - 1.0m) * MusicConstants.TicksPerQuarterNote);
+                    long approxTick = barOffset + beatOffset + (c.TimingHint ?? 0);
+
+                    if (lastTickApprox.HasValue)
+                    {
+                        long gap = Math.Abs(approxTick - lastTickApprox.Value);
+                        // Use <= to include hits at exactly the minimum gap as "fast" consecutive hits
+                        if (gap <= MinGapBetweenFastHits)
+                        {
+                            consecutive++;
+                        }
+                        else
+                        {
+                            consecutive = 1; // reset chain
+                        }
+                    }
+                    else
+                    {
+                        consecutive = 1;
+                    }
+                    lastTickApprox = approxTick;
+                    lastCandidateId = c.CandidateId;
+                    if (consecutive > MaxConsecutiveSameHand)
+                    {
+                        validation.Violations.Add(new StickingViolation(
+                            "MaxConsecutiveSameHand",
+                            $"Limb {limb} exceeds max consecutive hits ({MaxConsecutiveSameHand}) at candidate {c.CandidateId}.",
+                            new List<string> { c.CandidateId },
+                            c.BarNumber,
+                            c.Beat,
+                            limb));
+                        // do not break; report all occurrences
+                    }
+                }
+            }
+            return validation;
+        }
+    }
+}
