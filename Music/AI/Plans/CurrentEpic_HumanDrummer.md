@@ -713,6 +713,9 @@
 
 ### Story 6.3 — Implement Articulation Mapping
 
+IMPORTANT NOTE: This story requires VST voices that support these articulations.
+If the target VST does not support them, the mapping should gracefully fall back to standard notes.
+
 **As a** drummer agent  
 **I want** articulation hints mapped to MIDI  
 **So that** future audio rendering can use them
