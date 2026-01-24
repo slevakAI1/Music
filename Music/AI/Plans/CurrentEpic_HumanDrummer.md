@@ -562,11 +562,9 @@
 - Updates to `PhysicalityFilter.cs` and `PhysicalityRules.cs`
 
 
-TIME TO DISCUSS NEXT STEPS.. (1) - 5.3: Physicality rules (Pop Rock specific constraints) - why would there be physicality rules specific to pop rock?
-
 ## Stage 5 — Pop Rock Style Configuration
 
-**Goal:** Create complete Pop Rock configuration that drives all drummer decisions.
+**Goal:** Create complete Pop Rock style configuration (operator weights, density curves with role caps, memory settings) that drives all drummer decisions. Note: Physical constraints (limb model, sticking rules) are genre-agnostic and already defined in Stage 4.
 
 ---
 
@@ -612,38 +610,22 @@ TIME TO DISCUSS NEXT STEPS.. (1) - 5.3: Physicality rules (Pop Rock specific con
     - Outro: 0.5
   - [ ] Energy-based modifiers (+/- 20% based on energy level)
   - [ ] Role-specific density targets (Kick, Snare, Hat separate)
-- [ ] Unit tests: density targets computed correctly for each section
-
-**Files to Create:** (additions to existing)
-- Updates to `PopRockStyleConfiguration.cs`
-
----
-
-### Story 5.3 — Define Pop Rock Physicality Rules
-
-**As a** drummer agent  
-**I want** Pop Rock specific physicality constraints  
-**So that** patterns are realistic for the genre
-
-**Acceptance Criteria:**
-- [ ] Add to `PopRockStyleConfiguration`:
-  - [ ] Standard limb model (no double pedal)
-  - [ ] MaxGhostsPerBar: 4
-  - [ ] MaxConsecutiveSameHand: 4
-  - [ ] StrictnessLevel: Normal
-  - [ ] RoleCaps:
-    - Kick: 8 per bar
+  - [ ] Style-based RoleCaps (stylistic density limits, not physical limits):
+    - Kick: 8 per bar (Pop Rock taste, not physical limit)
     - Snare: 6 per bar
     - Hat: 16 per bar
     - Crash: 2 per bar
-- [ ] Unit tests: Pop Rock physicality rules applied correctly
+  - [ ] MaxGhostsPerBar: 4 (stylistic taste limit for Pop Rock)
+- [ ] Unit tests: density targets and role caps computed correctly for each section
 
 **Files to Create:** (additions to existing)
 - Updates to `PopRockStyleConfiguration.cs`
 
+**Note:** Physical constraints (LimbModel, StickingRules, StrictnessLevel) are genre-agnostic and configured in Stage 4's PhysicalityRules. The caps here are STYLE preferences, not physical limits.
+
 ---
 
-### Story 5.4 — Define Pop Rock Memory Settings
+### Story 5.3 — Define Pop Rock Memory Settings### Story 5.3 — Define Pop Rock Memory Settings
 
 **As a** drummer agent  
 **I want** Pop Rock specific memory settings  
@@ -1038,11 +1020,11 @@ STAGE 4: PHYSICALITY
 
 STAGE 5: POP ROCK CONFIG
 ────────────────────────────────
-3.6 + 4.4 → 5.1 (Weights) → 5.2 (Density) → 5.3 (Physicality) → 5.4 (Memory)
+3.6 + 4.4 → 5.1 (Weights) → 5.2 (Density + RoleCaps) → 5.3 (Memory)
 
 STAGE 6: PERFORMANCE
 ────────────────────────────────
-5.4 → 6.1 (Velocity) → 6.2 (Timing) → 6.3 (Articulation)
+5.3 → 6.1 (Velocity) → 6.2 (Timing) → 6.3 (Articulation)
 
 STAGE 7: DIAGNOSTICS
 ────────────────────────────────
@@ -1077,21 +1059,21 @@ The following stories are marked as speculative because they depend on earlier i
 | 2 - Drummer Core | 5 | Medium | 15 |
 | 3 - Operators | 6 | Large | 24 |
 | 4 - Physicality | 4 | Medium | 12 |
-| 5 - Pop Rock Config | 4 | Small | 8 |
+| 5 - Pop Rock Config | 3 | Small | 6 |
 | 6 - Performance | 3 | Medium | 9 |
 | 7 - Diagnostics | 2 | Medium | 6 |
 | 8 - Integration | 3 | Medium | 9 |
-| **Total** | **31** | | **95** |
+| **Total** | **30** | | **93** |
 
 ---
 
 ## Definition of Done (Epic Level)
 
-- [ ] All 31 stories completed and tested
+- [ ] All 30 stories completed and tested
 - [ ] 28 operators implemented and registered
-- [ ] Pop Rock style configuration complete
+- [ ] Pop Rock style configuration complete (weights, density curves with role caps, memory settings)
 - [ ] Drummer agent generates varied output for different seeds
-- [ ] Physicality constraints prevent impossible patterns
+- [ ] Physicality constraints prevent impossible patterns (genre-agnostic)
 - [ ] Memory system prevents robotic repetition
 - [ ] Diagnostics capture all decisions (opt-in)
 - [ ] Unit tests cover all components

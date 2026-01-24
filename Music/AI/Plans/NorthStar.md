@@ -387,15 +387,12 @@ A skilled drummer optimizes for:
 - 4.3: Physicality filter (reject impossible patterns) ✅
 - 4.4: Overcrowding prevention (density caps at physicality level) ✅
 
-
-TIME TO DISCUSS NEXT STEPS.. (1) - 5.3: Physicality rules (Pop Rock specific constraints) - why would there be physicality rules specific to pop rock?
-
-
 **Stage 5 — Pop Rock Style Configuration: ⏳ PENDING**
 - 5.1: Operator weights (high/medium/low by musical relevance)
-- 5.2: Density curves (section-aware targets)
-- 5.3: Physicality rules (Pop Rock specific constraints)
-- 5.4: Memory settings (anti-repetition tuning)
+- 5.2: Density curves + role caps (section-aware targets, style-based limits)
+- 5.3: Memory settings (anti-repetition tuning)
+
+**Note:** Physical constraints (limb model, sticking rules) are genre-agnostic and defined in Stage 4. Stage 5 configures style preferences only.
 
 **Stage 6 — Performance Rendering: ⏳ PENDING**
 - 6.1: Velocity shaper (role × strength dynamics)
