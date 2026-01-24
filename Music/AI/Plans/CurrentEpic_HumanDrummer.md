@@ -492,7 +492,7 @@
 
 ---
 
-### Story 4.2 — Implement Sticking Rules
+### Story 4.2 — Implement Sticking Rules  (COMPLETED)
 
 **As a** drummer agent  
 **I want** sticking rules enforced  
