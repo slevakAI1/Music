@@ -21,6 +21,41 @@ The physicality filter validates drum candidates for playability before selectio
 - `PhysicalityRules` now includes `LimbModel` and `StickingRules` properties for full configuration.
 - Integration: `DrummerCandidateSource` calls `PhysicalityFilter.Filter()` before grouping results.
 
+## Story 4.4 — Overcrowding Prevention (Implemented)
+
+Story 4.4 extends PhysicalityFilter with three levels of density caps to prevent overcrowded/muddy bars:
+
+**Caps Enforced (in order):**
+1. `MaxHitsPerRolePerBar` — per-role caps (e.g., Kick=8, Snare=6, Hat=16)
+2. `MaxHitsPerBeat` — per-beat cap (default: 3, allows kick+snare+hat on same beat)
+3. `MaxHitsPerBar` — total bar cap (default: 24 for 16th grid in 4/4)
+
+**PhysicalityRules Configuration:**
+```csharp
+public sealed record PhysicalityRules
+{
+    public int? MaxHitsPerBeat { get; init; } = 3;      // Null = no limit
+    public int? MaxHitsPerBar { get; init; } = 24;      // Null = no limit
+    public IReadOnlyDictionary<string, int>? MaxHitsPerRolePerBar { get; init; }
+    // ... other properties from Story 4.3
+}
+```
+
+**Behavior:**
+- Caps applied in order: Role → Beat → Bar (most specific to least specific)
+- Protected candidates (`DrumCandidateMapper.ProtectedTag`) are NEVER pruned
+- When protected alone exceed a cap, cap is allowed to exceed (preserves groove anchors)
+- Lowest-scored candidates pruned first with deterministic tie-break
+- Diagnostics recorded via `GrooveDiagnosticsCollector.RecordPrune()` with reasons:
+  - `"Overcrowding:MaxHitsPerRole:{role}"`
+  - `"Overcrowding:MaxHitsPerBeat"`
+  - `"Overcrowding:MaxHitsPerBar"`
+
+**Integration:**
+- Overcrowding prevention runs BEFORE limb conflict and sticking validation
+- This ensures conflict detection works on a reduced candidate set
+- Filter is called by `DrummerCandidateSource` during candidate generation
+
 ## Story 4.2 — Sticking Rules (Implemented)
 
 The sticking rules validation enforces hand/foot playability constraints before selection. Key behavior:
@@ -823,7 +858,7 @@ Uses **xUnit** test framework. Contains unit and integration tests for groove sy
 | `SubdivisionTransformOperatorTests.cs` | Story 3.2: SubdivisionTransform operators (5 operators, 35+ tests) |
 | `LimbModelTests.cs` | Story 4.1: Limb model and role→limb mapping |
 | `StickingRulesTests.cs` | Story 4.2: Sticking rules validation |
-| `PhysicalityFilterTests.cs` | Story 4.3: Physicality filter (limb conflicts, sticking, strictness modes) |
+| `PhysicalityFilterTests.cs` | Story 4.3/4.4: Physicality filter (limb conflicts, sticking, overcrowding - 29 tests) |
 | `MotifPresenceMapTests.cs` | Story 9.3: MotifPresenceMap queries (20 tests) |
 | `DrummerMotifIntegrationTests.cs` | Story 9.3: DrummerAgent motif integration (9 tests) |
 

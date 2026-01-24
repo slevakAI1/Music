@@ -461,7 +461,7 @@
 
 ---
 
-## Stage 4 — Physicality Constraints (Limb Feasibility)
+## Stage 4 — Physicality Constraints (Limb Feasibility)    (COMPLETED)
 
 **Goal:** Ensure generated patterns are physically playable by a human drummer.
 
@@ -515,7 +515,7 @@
 
 ---
 
-### Story 4.3 — Implement Physicality Filter
+### Story 4.3 — Implement Physicality Filter (COMPLETED)
 
 **As a** drummer agent  
 **I want** candidates filtered by physicality constraints  
@@ -541,7 +541,7 @@
 
 ---
 
-### Story 4.4 — Add Overcrowding Prevention
+### Story 4.4 — Add Overcrowding Prevention (COMPLETED)
 
 **As a** drummer agent  
 **I want** density caps enforced at physicality level  
@@ -561,7 +561,8 @@
 **Files to Create:** (additions to existing files)
 - Updates to `PhysicalityFilter.cs` and `PhysicalityRules.cs`
 
----
+
+TIME TO DISCUSS NEXT STEPS.. (1) - 5.3: Physicality rules (Pop Rock specific constraints) - why would there be physicality rules specific to pop rock?
 
 ## Stage 5 — Pop Rock Style Configuration
 

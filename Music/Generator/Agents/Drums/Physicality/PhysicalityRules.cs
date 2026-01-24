@@ -1,7 +1,7 @@
 // AI: purpose=Configuration for physicality validation (limbs, sticking, density caps).
 // AI: invariants=Immutable record; all caps are optional (null = no limit); StrictnessLevel affects validation behavior.
 // AI: deps=LimbModel and StickingRules (Story 4.1, 4.2); consumed by PhysicalityFilter.
-// AI: change=Story 4.3 adds LimbModel and StickingRules properties for full validation.
+// AI: change=Story 4.3 adds LimbModel and StickingRules. Story 4.4 documents overcrowding cap usage.
 
 namespace Music.Generator.Agents.Drums.Physicality
 {
