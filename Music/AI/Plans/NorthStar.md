@@ -387,12 +387,13 @@ A skilled drummer optimizes for:
 - 4.3: Physicality filter (reject impossible patterns) ✅
 - 4.4: Overcrowding prevention (density caps at physicality level) ✅
 
-**Stage 5 — Pop Rock Style Configuration: ⏳ PENDING**
-- 5.1: Operator weights (high/medium/low by musical relevance)
-- 5.2: Density curves + role caps (section-aware targets, style-based limits)
-- 5.3: Memory settings (anti-repetition tuning)
+**Stage 5 — Pop Rock Style Configuration: ✅ CONSOLIDATED**
+- Stories 5.1-5.3 removed as redundant
+- Functionality already exists in: Story 1.4 (`StyleConfiguration`, `StyleConfigurationLibrary.PopRock`) + Story 2.3 (`DrummerPolicyProvider` section-aware density + `DrummerPolicySettings`)
+- No separate `PopRockStyleConfiguration.cs` needed
+- Fine-tuning numeric values is ongoing iterative work, not discrete stories
 
-**Note:** Physical constraints (limb model, sticking rules) are genre-agnostic and defined in Stage 4. Stage 5 configures style preferences only.
+**Note:** Physical constraints (limb model, sticking rules) are genre-agnostic and defined in Stage 4.
 
 **Stage 6 — Performance Rendering: ⏳ PENDING**
 - 6.1: Velocity shaper (role × strength dynamics)
@@ -1003,7 +1004,7 @@ COMPLETED STAGES:
                       ↓
 [9: Motif Placement/Rendering] 🔄 (9.1-9.2 ✅, 9.3-9.4 pending)
                       ↓
-[10: Drums] 🔄 (Stages 1-3 ✅, Stages 4-8 pending)
+[10: Drums] 🔄 (Stages 1-4 ✅, Stage 5 consolidated, Stages 6-8 pending)
                       ↓
            [11: Melody Scaffolding]
                       ↓

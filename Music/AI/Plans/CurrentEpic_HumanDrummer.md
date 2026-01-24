@@ -562,88 +562,35 @@
 - Updates to `PhysicalityFilter.cs` and `PhysicalityRules.cs`
 
 
-## Stage 5 — Pop Rock Style Configuration
+## Stage 5 — Pop Rock Style Configuration (CONSOLIDATED — NO NEW STORIES)
 
-**Goal:** Create complete Pop Rock style configuration (operator weights, density curves with role caps, memory settings) that drives all drummer decisions. Note: Physical constraints (limb model, sticking rules) are genre-agnostic and already defined in Stage 4.
+**Status:** Stories 5.1-5.3 have been REMOVED as redundant. The required functionality already exists in earlier stages.
 
----
+**Rationale:** The following infrastructure already provides complete genre configuration:
 
-### Story 5.1 — Define Pop Rock Operator Weights
+| Requirement | Already Implemented In |
+|-------------|------------------------|
+| Operator weights | Story 1.4: `StyleConfiguration.OperatorWeights` + `StyleConfigurationLibrary.PopRock` |
+| Role caps | Story 1.4: `StyleConfiguration.RoleCaps` |
+| Feel/Grid rules | Story 1.4: `StyleConfiguration.FeelRules`, `GridRules` |
+| Section-aware density | Story 2.3: `DrummerPolicyProvider` computes density from section type (Intro=0.4, Verse=0.5, Chorus=0.8, etc.) |
+| Energy modifiers | Story 2.3: `DrummerPolicyProvider` applies energy-based density modifiers |
+| Memory settings | Story 2.3: `DrummerPolicySettings` (MinBarsBetweenFills, AllowConsecutiveFills, FillWindowBars) |
+| Allowed operators | Story 2.3: `DrummerPolicyProvider` gates operators via policy |
+| Groove timing/feel | Groove system: `GroovePresetDefinition`, `GrooveProtectionPolicy`, ~50 groove classes |
 
-**As a** drummer agent  
-**I want** Pop Rock specific operator weights  
-**So that** the style sounds authentic
+**Why This Matters:**
+- **No separate PopRockStyleConfiguration.cs file needed** — configuration is distributed across existing systems
+- **Adding new genres** only requires: new `StyleConfiguration` preset in `StyleConfigurationLibrary` + optional groove preset
+- **Tuning** is an iterative task (adjust existing values), not a story with acceptance criteria
 
-**Acceptance Criteria:**
-- [ ] Create `PopRockStyleConfiguration`:
-  - [ ] All 28 operators enabled with weights:
-    - High weight (0.8-1.0): GhostBeforeBackbeat, CrashOnOne, TurnaroundFillShort, PopRockBackbeatPush
-    - Medium weight (0.5-0.7): KickPickup, HatLift, RockKickSyncopation
-    - Low weight (0.2-0.4): DoubleTimeFeel, HalfTimeFeel, StopTime
-  - [ ] Section-aware weight modifiers:
-    - Verse: reduce busyness weights by 20%
-    - Chorus: increase crash and energy weights by 20%
-    - Bridge: enable breakdown operators
-- [ ] Store configuration in `StyleConfigurationLibrary`
-- [ ] Unit tests: weights load correctly
-
-**Files to Create:**
-- `Generator/Agents/Drums/Styles/PopRockStyleConfiguration.cs`
+**What Remains:** Fine-tuning the actual numeric values in `StyleConfigurationLibrary.PopRock` and `DrummerPolicySettings` through listening tests. This is ongoing tuning work, not a discrete story.
 
 ---
 
-### Story 5.2 — Define Pop Rock Density Curves
 
-**As a** drummer agent  
-**I want** section-aware density targets  
-**So that** energy arc is musically appropriate
+IMPORTANT NOTE: THIS STAGE REQUIRES VSTs THAT SUPPORT DETAILED ARTICULATIONS
 
-**Acceptance Criteria:**
-- [ ] Add to `PopRockStyleConfiguration`:
-  - [ ] Default densities by section type:
-    - Intro: 0.4
-    - Verse: 0.5
-    - PreChorus: 0.6
-    - Chorus: 0.8
-    - Bridge: 0.4
-    - Solo: 0.7
-    - Outro: 0.5
-  - [ ] Energy-based modifiers (+/- 20% based on energy level)
-  - [ ] Role-specific density targets (Kick, Snare, Hat separate)
-  - [ ] Style-based RoleCaps (stylistic density limits, not physical limits):
-    - Kick: 8 per bar (Pop Rock taste, not physical limit)
-    - Snare: 6 per bar
-    - Hat: 16 per bar
-    - Crash: 2 per bar
-  - [ ] MaxGhostsPerBar: 4 (stylistic taste limit for Pop Rock)
-- [ ] Unit tests: density targets and role caps computed correctly for each section
-
-**Files to Create:** (additions to existing)
-- Updates to `PopRockStyleConfiguration.cs`
-
-**Note:** Physical constraints (LimbModel, StickingRules, StrictnessLevel) are genre-agnostic and configured in Stage 4's PhysicalityRules. The caps here are STYLE preferences, not physical limits.
-
----
-
-### Story 5.3 — Define Pop Rock Memory Settings### Story 5.3 — Define Pop Rock Memory Settings
-
-**As a** drummer agent  
-**I want** Pop Rock specific memory settings  
-**So that** anti-repetition is appropriate for the genre
-
-**Acceptance Criteria:**
-- [ ] Add to `PopRockStyleConfiguration`:
-  - [ ] `MemoryBarsForOperators`: 4 (look back 4 bars for repetition)
-  - [ ] `MemoryBarsForFills`: 8 (look back 8 bars for fill variation)
-  - [ ] `RepetitionPenaltyDecay`: 0.5 (exponential decay)
-  - [ ] `AllowConsecutiveSameFill`: false
-  - [ ] `SectionSignatureStrength`: 0.7 (how much to maintain section consistency)
-- [ ] Unit tests: memory settings affect selection correctly
-
-**Files to Create:** (additions to existing)
-- Updates to `PopRockStyleConfiguration.cs`
-
----
 
 ## Stage 6 — Performance Rendering (Human Realism)
 
@@ -966,8 +913,6 @@ Generator/
         DrummerVelocityShaper.cs
         DrummerTimingShaper.cs
         DrumArticulationMapper.cs
-      Styles/
-        PopRockStyleConfiguration.cs
       Diagnostics/
         DrummerDiagnostics.cs
         DrummerDiagnosticsCollector.cs
@@ -1018,13 +963,13 @@ STAGE 4: PHYSICALITY
 ────────────────────────────────
 2.2 → 4.1 (Limb) → 4.2 (Sticking) → 4.3 (Filter) → 4.4 (Overcrowd)
 
-STAGE 5: POP ROCK CONFIG
+STAGE 5: POP ROCK CONFIG (CONSOLIDATED)
 ────────────────────────────────
-3.6 + 4.4 → 5.1 (Weights) → 5.2 (Density + RoleCaps) → 5.3 (Memory)
+[No new stories - functionality in Stories 1.4, 2.3, and groove system]
 
 STAGE 6: PERFORMANCE
 ────────────────────────────────
-5.3 → 6.1 (Velocity) → 6.2 (Timing) → 6.3 (Articulation)
+4.4 → 6.1 (Velocity) → 6.2 (Timing) → 6.3 (Articulation)
 
 STAGE 7: DIAGNOSTICS
 ────────────────────────────────
@@ -1043,7 +988,7 @@ The following stories are marked as speculative because they depend on earlier i
 
 1. **Story 7.2 (Benchmark Feature Extraction):** Preparatory only. Actual comparison against human tracks is a future epic (Stage 21 in NorthStar).
 
-2. **Stage 5 weights/densities:** Exact values will need tuning based on listening tests. Initial values are educated guesses.
+2. **Value tuning (ongoing):** Operator weights, density curves, and memory settings in `StyleConfigurationLibrary.PopRock` and `DrummerPolicySettings` will need tuning based on listening tests. This is iterative work, not discrete stories.
 
 3. **Articulation mapping (6.3):** Depends on available MIDI drum maps; may need adjustment for specific synths/samples.
 
@@ -1059,19 +1004,19 @@ The following stories are marked as speculative because they depend on earlier i
 | 2 - Drummer Core | 5 | Medium | 15 |
 | 3 - Operators | 6 | Large | 24 |
 | 4 - Physicality | 4 | Medium | 12 |
-| 5 - Pop Rock Config | 3 | Small | 6 |
+| 5 - Pop Rock Config | (consolidated) | — | 0 |
 | 6 - Performance | 3 | Medium | 9 |
 | 7 - Diagnostics | 2 | Medium | 6 |
 | 8 - Integration | 3 | Medium | 9 |
-| **Total** | **30** | | **93** |
+| **Total** | **27** | | **87** |
 
 ---
 
 ## Definition of Done (Epic Level)
 
-- [ ] All 30 stories completed and tested
+- [ ] All 27 stories completed and tested
 - [ ] 28 operators implemented and registered
-- [ ] Pop Rock style configuration complete (weights, density curves with role caps, memory settings)
+- [ ] Pop Rock style configuration via existing `StyleConfigurationLibrary.PopRock` + `DrummerPolicyProvider` (no separate PopRockStyleConfiguration.cs)
 - [ ] Drummer agent generates varied output for different seeds
 - [ ] Physicality constraints prevent impossible patterns (genre-agnostic)
 - [ ] Memory system prevents robotic repetition
