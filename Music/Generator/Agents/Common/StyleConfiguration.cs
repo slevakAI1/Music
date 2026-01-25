@@ -1,7 +1,7 @@
 // AI: purpose=Style configuration model separating genre behavior from operator logic.
 // AI: invariants=StyleConfiguration is immutable record; StyleId stable for lookup; defaults applied for missing values.
-// AI: deps=GrooveFeel and AllowedSubdivision from Groove.cs; GrooveRoles for role constants; DrummerVelocityHintSettings for velocity hints.
-// AI: change=Add new styles by extending StyleConfigurationLibrary; weights/caps populated when operators exist; Story 6.1 added DrummerVelocityHints.
+// AI: deps=GrooveFeel and AllowedSubdivision from Groove.cs; GrooveRoles for role constants; DrummerVelocityHintSettings, DrummerTimingHintSettings for performance hints.
+// AI: change=Add new styles by extending StyleConfigurationLibrary; Story 6.1 added DrummerVelocityHints; Story 6.2 added DrummerTimingHints.
 
 using Music.Generator.Agents.Drums.Performance;
 using Music.Generator.Groove;
@@ -107,6 +107,13 @@ namespace Music.Generator.Agents.Common
         /// </summary>
         public DrummerVelocityHintSettings? DrummerVelocityHints { get; init; }
 
+        /// <summary>
+        /// Optional drummer timing hint settings for this style.
+        /// When null, conservative defaults are used.
+        /// Story 6.2: Drummer timing nuance.
+        /// </summary>
+        public DrummerTimingHintSettings? DrummerTimingHints { get; init; }
+
         /// <summary>Default style weight when operator not in OperatorWeights (0.5).</summary>
         public const double DefaultOperatorWeight = 0.5;
 
@@ -162,6 +169,15 @@ namespace Music.Generator.Agents.Common
         public DrummerVelocityHintSettings GetDrummerVelocityHints()
         {
             return DrummerVelocityHints ?? DrummerVelocityHintSettings.ConservativeDefaults;
+        }
+
+        /// <summary>
+        /// Gets drummer timing hint settings, returning conservative defaults if not configured.
+        /// Story 6.2: Drummer timing nuance.
+        /// </summary>
+        public DrummerTimingHintSettings GetDrummerTimingHints()
+        {
+            return DrummerTimingHints ?? DrummerTimingHintSettings.ConservativeDefaults;
         }
     }
 }

@@ -1,7 +1,7 @@
 // AI: purpose=Registry of style configurations; provides GetStyle lookup and predefined styles.
 // AI: invariants=Styles are immutable; StyleId lookup is case-insensitive; unknown style returns null.
-// AI: deps=StyleConfiguration, FeelRules, GridRules, GrooveRoles for role constants, DrummerVelocityHintSettings for velocity hints.
-// AI: change=Add new styles as static properties; operator weights populated when operators exist (Phase 5); Story 6.1 added velocity hints.
+// AI: deps=StyleConfiguration, FeelRules, GridRules, GrooveRoles; DrummerVelocityHintSettings, DrummerTimingHintSettings for performance hints.
+// AI: change=Add new styles as static properties; Story 6.1 added velocity hints; Story 6.2 added timing hints.
 
 using Music.Generator.Agents.Drums.Performance;
 using Music.Generator.Groove;
@@ -97,7 +97,8 @@ namespace Music.Generator.Agents.Common
 
             FeelRules = FeelRules.Straight,
             GridRules = GridRules.SixteenthGrid,
-            DrummerVelocityHints = DrummerVelocityHintSettings.PopRockDefaults
+            DrummerVelocityHints = DrummerVelocityHintSettings.PopRockDefaults,
+            DrummerTimingHints = DrummerTimingHintSettings.PopRockDefaults
         };
 
         /// <summary>
@@ -141,7 +142,8 @@ namespace Music.Generator.Agents.Common
 
             FeelRules = FeelRules.Swing(0.6),
             GridRules = GridRules.EighthWithTriplets,
-            DrummerVelocityHints = DrummerVelocityHintSettings.JazzDefaults
+            DrummerVelocityHints = DrummerVelocityHintSettings.JazzDefaults,
+            DrummerTimingHints = DrummerTimingHintSettings.JazzDefaults
         };
 
         /// <summary>
@@ -189,7 +191,8 @@ namespace Music.Generator.Agents.Common
                                       AllowedSubdivision.Sixteenth |
                                       AllowedSubdivision.SixteenthTriplet  // For fills
             },
-            DrummerVelocityHints = DrummerVelocityHintSettings.MetalDefaults
+            DrummerVelocityHints = DrummerVelocityHintSettings.MetalDefaults,
+            DrummerTimingHints = DrummerTimingHintSettings.MetalDefaults
         };
 
         #endregion

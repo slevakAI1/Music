@@ -132,6 +132,70 @@ public sealed record DrummerVelocityHintSettings
 - Clamping and validation
 - Determinism verification
 
+## Story 6.2 — Drummer Timing Shaper (Implemented)
+
+The drummer timing shaper provides style-aware timing *hints* for drum candidates before the groove
+`RoleTimingEngine` computes final `GrooveOnset.TimingOffsetTicks`. It follows the same normalized-intent
+pattern established in Story 6.1 (velocity): the drummer layer classifies musical intent, the style maps
+intent → numeric tick offsets, and the shaper supplies deterministic, clamped hints.
+
+**Core Types (in `Generator/Agents/Drums/Performance/`):**
+
+| Type | Purpose |
+|------|---------|
+| `TimingIntent` | Enum of normalized timing intents (`OnTop`, `SlightlyAhead`, `SlightlyBehind`, `Rushed`, `LaidBack`) |
+| `DrummerTimingHintSettings` | Per-style mapping of intents to tick offsets, jitter, and role defaults |
+| `DrummerTimingShaper` | Static class that applies timing hints to `DrumCandidate` lists (hint-only) |
+| `TimingHintDiagnostics` | Diagnostics record for debugging timing decisions |
+
+**DrummerTimingHintSettings Configuration:**
+```csharp
+public sealed record DrummerTimingHintSettings
+{
+    public int SlightlyAheadTicks { get; init; } = -5;
+    public int SlightlyBehindTicks { get; init; } = 5;
+    public int RushedTicks { get; init; } = -10;
+    public int LaidBackTicks { get; init; } = 10;
+    public int MaxTimingJitter { get; init; } = 3; // deterministic humanization
+    public int MaxAdjustmentDelta { get; init; } = 5; // when existing hint present
+    public int MaxAbsoluteOffset { get; init; } = 20; // clamp range
+    public IReadOnlyDictionary<string, TimingIntent> RoleTimingIntentDefaults { get; init; }
+}
+```
+
+**Intent Classification:**
+- `FillRole.FillStart` → `SlightlyAhead`
+- `FillRole.FillBody` → `Rushed`
+- `FillRole.FillEnd` → `OnTop` (clean resolution)
+- Otherwise: role-based default from `RoleTimingIntentDefaults` (Snare → SlightlyBehind, Kick → OnTop, ClosedHat → OnTop)
+
+**Behavior:**
+- Runs BEFORE groove `RoleTimingEngine` (hint-only; does not write final offsets)
+- When `TimingHint` is null: provide style-based hint (mapped from `TimingIntent`)
+- When `TimingHint` exists: adjust minimally toward style target (±`MaxAdjustmentDelta`)
+- Apply deterministic jitter per-candidate (hash-based within ±`MaxTimingJitter`)
+- Apply subtle energy influence (±2 ticks) and clamp to `±MaxAbsoluteOffset`
+- Deterministic: same inputs → identical hints
+
+**Style Presets (in `StyleConfigurationLibrary`):**
+- `PopRock`: SlightlyAhead=-5, SlightlyBehind=+5, Rushed=-10, MaxTimingJitter=3
+- `Jazz`: SlightlyAhead=-3, SlightlyBehind=+8, Rushed=-6, MaxTimingJitter=4
+- `Metal`: SlightlyAhead=-5, SlightlyBehind=+2, Rushed=-12, MaxTimingJitter=2
+
+**Integration:**
+- `StyleConfiguration` extended with optional `DrummerTimingHints` field
+- `StyleConfiguration.GetDrummerTimingHints()` returns settings or conservative defaults
+- `DrummerTimingShaper` is called by `DrummerCandidateSource` after operator candidate generation
+- Does NOT write `GrooveOnset.TimingOffsetTicks` — `RoleTimingEngine` remains final authority
+
+**Test Coverage:** 48 tests in `DrummerTimingShaperTests.cs` covering:
+- Role-based intent classification (snare, kick, hats)
+- Fill timing progression (FillStart→FillBody→FillEnd)
+- Style mapping (PopRock/Jazz/Metal)
+- Minimal adjustment behavior when hints exist
+- Deterministic jitter and clamping
+
+
 
 ## 1) Solution Overview
 
