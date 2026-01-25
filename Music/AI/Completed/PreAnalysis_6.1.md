@@ -61,15 +61,33 @@ Notes: Criteria 5, 8 and 9 reference normalized intent names and mapping convent
 - Very short bars / odd meters where fill ramp spans fewer slots than expected.
 
 ## 7) Clarifying Questions
+
 1. What exact `StyleConfiguration` keys/names should be used for drummer dynamic targets (e.g., GhostRange, BackbeatTarget, FillRampBehavior)?
+   **Answer:** Create a new `DrummerVelocityHintSettings` record with properties: `GhostVelocityTarget` (int), `BackbeatVelocityTarget` (int), `CrashVelocityTarget` (int), `FillVelocityMin`/`FillVelocityMax` (int), and `FillRampDirection` (enum: Ascending, Descending, Flat). Add to `StyleConfiguration` as optional field.
+
 2. How should "adjust minimally" be quantified? (absolute tick/velocity delta, percentage, or capped offset?)
+   **Answer:** Use capped offset approach: when existing `VelocityHint` is present, adjust toward style target by at most ±10 velocity units (configurable via `MaxAdjustmentDelta` in settings). This preserves operator intent while nudging toward style.
+
 3. For fills: what is the canonical definition of "bar-local ramp" when fills cross bar boundaries or are shorter than a bar?
+   **Answer:** Ramp is computed per-bar using `FillRole` ordering: FillStart=low, FillBody=mid, FillEnd=high (for ascending) or reversed for descending. Single-hit fills get mid-range velocity. Cross-bar fills reset ramp per bar.
+
 4. If `VelocityHint` is already outside 1..127, should the shaper clamp it or treat as authoritative?
+   **Answer:** Clamp to [1..127] always. This is consistent with `VelocityShaper.ComputeVelocity()` which always clamps final values. Invalid hints should be normalized early.
+
 5. Are there existing unit-test fixtures (example style configs and candidate records) to reuse for determinism tests?
-6. Is thread-safety required for shared reads of `StyleConfiguration` or will the pipeline invoke this single-threaded? 
+   **Answer:** Yes. Use `StyleConfigurationLibrary.PopRock` and `DrumCandidate.CreateMinimal()` helpers. See `VelocityShaperTests.cs` and `DrummerPolicyProviderTests.cs` for patterns.
+
+6. Is thread-safety required for shared reads of `StyleConfiguration` or will the pipeline invoke this single-threaded?
+   **Answer:** `StyleConfiguration` is immutable record; reads are inherently thread-safe. Pipeline is currently single-threaded but immutability provides safety regardless.
+
 7. Is it acceptable to add new config fields to `StyleConfiguration` for ramp direction/amount, or must only existing keys be used?
+   **Answer:** Yes, acceptable. Add optional `DrummerVelocityHintSettings?` field to `StyleConfiguration`. Existing styles will have null (use defaults); new/updated styles can specify.
+
 8. Should we record diagnostics or telemetry when conservative defaults are used because style values are missing?
+   **Answer:** No for this story. Diagnostics are opt-in and Story 7.1 handles drummer diagnostics. Keep this story focused on hint computation only.
+
 9. Where should the `DrummerVelocityShaper` be registered in the pipeline (exact insertion point) and who is responsible for invoking it in the current codebase?
+   **Answer:** `DrummerCandidateSource.GetCandidateGroups()` should call `DrummerVelocityShaper.ApplyHints()` after operator candidate generation and before returning candidates. This runs BEFORE groove `VelocityShaper`.
 
 ## 8) Test Scenario Ideas
 - `DrummerVelocityShaper_NullHint_UsesStyleDefaultLowForGhosts()`

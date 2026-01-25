@@ -1,8 +1,9 @@
 // AI: purpose=Registry of style configurations; provides GetStyle lookup and predefined styles.
 // AI: invariants=Styles are immutable; StyleId lookup is case-insensitive; unknown style returns null.
-// AI: deps=StyleConfiguration, FeelRules, GridRules, GrooveRoles for role constants.
-// AI: change=Add new styles as static properties; operator weights populated when operators exist (Phase 5).
+// AI: deps=StyleConfiguration, FeelRules, GridRules, GrooveRoles for role constants, DrummerVelocityHintSettings for velocity hints.
+// AI: change=Add new styles as static properties; operator weights populated when operators exist (Phase 5); Story 6.1 added velocity hints.
 
+using Music.Generator.Agents.Drums.Performance;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Common
@@ -95,7 +96,8 @@ namespace Music.Generator.Agents.Common
             },
 
             FeelRules = FeelRules.Straight,
-            GridRules = GridRules.SixteenthGrid
+            GridRules = GridRules.SixteenthGrid,
+            DrummerVelocityHints = DrummerVelocityHintSettings.PopRockDefaults
         };
 
         /// <summary>
@@ -138,7 +140,8 @@ namespace Music.Generator.Agents.Common
             },
 
             FeelRules = FeelRules.Swing(0.6),
-            GridRules = GridRules.EighthWithTriplets
+            GridRules = GridRules.EighthWithTriplets,
+            DrummerVelocityHints = DrummerVelocityHintSettings.JazzDefaults
         };
 
         /// <summary>
@@ -185,7 +188,8 @@ namespace Music.Generator.Agents.Common
                                       AllowedSubdivision.Eighth |
                                       AllowedSubdivision.Sixteenth |
                                       AllowedSubdivision.SixteenthTriplet  // For fills
-            }
+            },
+            DrummerVelocityHints = DrummerVelocityHintSettings.MetalDefaults
         };
 
         #endregion

@@ -1,8 +1,9 @@
 // AI: purpose=Style configuration model separating genre behavior from operator logic.
 // AI: invariants=StyleConfiguration is immutable record; StyleId stable for lookup; defaults applied for missing values.
-// AI: deps=GrooveFeel and AllowedSubdivision from Groove.cs; GrooveRoles for role constants.
-// AI: change=Add new styles by extending StyleConfigurationLibrary; weights/caps populated when operators exist.
+// AI: deps=GrooveFeel and AllowedSubdivision from Groove.cs; GrooveRoles for role constants; DrummerVelocityHintSettings for velocity hints.
+// AI: change=Add new styles by extending StyleConfigurationLibrary; weights/caps populated when operators exist; Story 6.1 added DrummerVelocityHints.
 
+using Music.Generator.Agents.Drums.Performance;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Common
@@ -99,6 +100,13 @@ namespace Music.Generator.Agents.Common
         /// <summary>Grid/subdivision rules.</summary>
         public required GridRules GridRules { get; init; }
 
+        /// <summary>
+        /// Optional drummer velocity hint settings for this style.
+        /// When null, conservative defaults are used.
+        /// Story 6.1: Drummer velocity shaping.
+        /// </summary>
+        public DrummerVelocityHintSettings? DrummerVelocityHints { get; init; }
+
         /// <summary>Default style weight when operator not in OperatorWeights (0.5).</summary>
         public const double DefaultOperatorWeight = 0.5;
 
@@ -145,6 +153,15 @@ namespace Music.Generator.Agents.Common
                 return true;
 
             return AllowedOperatorIds.Contains(operatorId);
+        }
+
+        /// <summary>
+        /// Gets drummer velocity hint settings, returning conservative defaults if not configured.
+        /// Story 6.1: Drummer velocity shaping.
+        /// </summary>
+        public DrummerVelocityHintSettings GetDrummerVelocityHints()
+        {
+            return DrummerVelocityHints ?? DrummerVelocityHintSettings.ConservativeDefaults;
         }
     }
 }

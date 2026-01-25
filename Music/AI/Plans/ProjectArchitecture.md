@@ -65,6 +65,73 @@ The sticking rules validation enforces hand/foot playability constraints before 
 - Policy: unknown role mappings are skipped; consecutive windows may span bar boundaries; `PhysicalityFilter` interprets violations according to strictness.
 - `LimbAssignment` includes `CandidateId` for conflict resolution tracking.
 
+## Story 6.1 — Drummer Velocity Shaper (Implemented)
+
+The drummer velocity shaper provides style-aware velocity hints for drum candidates before the groove VelocityShaper applies final MIDI velocities. Key behavior:
+
+**Core Types (in `Generator/Agents/Drums/Performance/`):**
+
+| Type | Purpose |
+|------|---------|
+| `DynamicIntent` | Enum classifying normalized velocity intent (Low, MediumLow, Medium, StrongAccent, PeakAccent, FillRamp*) |
+| `FillRampDirection` | Enum for fill ramp direction (Ascending, Descending, Flat) |
+| `DrummerVelocityHintSettings` | Per-style velocity configuration record with target values and ramp settings |
+| `DrummerVelocityShaper` | Static class that applies velocity hints to DrumCandidate lists |
+| `VelocityHintDiagnostics` | Diagnostics record for debugging hint decisions |
+
+**DrummerVelocityHintSettings Configuration:**
+```csharp
+public sealed record DrummerVelocityHintSettings
+{
+    public int GhostVelocityTarget { get; init; } = 35;       // DynamicIntent.Low
+    public int MediumLowVelocityTarget { get; init; } = 60;   // Offbeats, pickups
+    public int MediumVelocityTarget { get; init; } = 80;      // Standard groove
+    public int BackbeatVelocityTarget { get; init; } = 100;   // Backbeats, downbeats
+    public int CrashVelocityTarget { get; init; } = 115;      // Crashes, peak accents
+    public int FillVelocityMin { get; init; } = 60;           // Fill ramp start (ascending)
+    public int FillVelocityMax { get; init; } = 110;          // Fill ramp end (ascending)
+    public FillRampDirection FillRampDirection { get; init; } = FillRampDirection.Ascending;
+    public int MaxAdjustmentDelta { get; init; } = 10;        // Max adjust when hint exists
+}
+```
+
+**Intent Classification:**
+- `OnsetStrength.Ghost` → `DynamicIntent.Low`
+- `OnsetStrength.Offbeat/Pickup` → `DynamicIntent.MediumLow`
+- `OnsetStrength.Strong` → `DynamicIntent.Medium`
+- `OnsetStrength.Downbeat/Backbeat` → `DynamicIntent.StrongAccent`
+- `Role == Crash` → `DynamicIntent.PeakAccent`
+- `FillRole.FillStart/FillBody/FillEnd` → `DynamicIntent.FillRamp*`
+
+**Behavior:**
+- Runs BEFORE groove `VelocityShaper` (hint-only, not final MIDI velocity)
+- When `VelocityHint` is null: provides style-based target
+- When `VelocityHint` exists: adjusts minimally toward target (max ±`MaxAdjustmentDelta`)
+- Energy-aware: ±5% velocity adjustment based on energy level (0.0-1.0)
+- Fill ramps: velocity progresses from min→max (ascending) or max→min (descending) based on FillRole
+- Always clamps final hint to [1..127]
+- Deterministic: same inputs → identical outputs
+
+**Style Presets (in `StyleConfigurationLibrary`):**
+- `PopRock`: Ghost=35, Backbeat=105, Crash=115, fills 65→110 ascending
+- `Jazz`: Ghost=30, Backbeat=90, Crash=105, fills 55→95 ascending (wider dynamic range, softer)
+- `Metal`: Ghost=45, Backbeat=115, Crash=125, fills 80→120 ascending (harder, compressed)
+
+**Integration:**
+- `StyleConfiguration` extended with optional `DrummerVelocityHints` field
+- `StyleConfiguration.GetDrummerVelocityHints()` returns settings or conservative defaults
+- Called by `DrummerCandidateSource` after operator candidate generation
+- Does NOT write `GrooveOnset.Velocity`—groove `VelocityShaper` remains final authority
+
+**Test Coverage:** 34 tests in `DrummerVelocityShaperTests.cs` covering:
+- Intent classification for all strength/role/fillRole combinations
+- Style-specific targets (PopRock, Jazz, Metal)
+- Minimal adjustment behavior
+- Energy-based adjustments
+- Fill ramp directions (ascending, descending, flat)
+- Clamping and validation
+- Determinism verification
+
 
 ## 1) Solution Overview
 

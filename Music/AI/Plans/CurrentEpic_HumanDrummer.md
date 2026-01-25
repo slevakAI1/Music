@@ -1,6 +1,6 @@
-# Epic: Human Drummer Agent (Pop Rock)
+# Epic: Human Drummer Agent
 
-**Scope:** Build a Pop/Rock drummer agent that generates drum tracks modeled after a skilled human drummer, using the completed groove system hooks.
+**Scope:** Build a drummer agent that generates drum tracks modeled after a skilled human drummer, using the completed groove system hooks.
 
 **Prerequisites:** Groove system completion (Stories A1-H2 complete). All hooks are ready: `IGroovePolicyProvider`, `IGrooveCandidateSource`, `GroovePolicyDecision`, deterministic RNG streams, diagnostics.
 
@@ -24,7 +24,7 @@
 
 - Generates drum tracks that vary meaningfully with different seeds
 - Implements at least 25 musical operators across 5 operator families
-- Pop Rock genre configuration drives operator selection and constraints
+- Pop Rock genre configuration which is totally independent of all drummer configuration drives operator selection and constraints. Pop Rock will just be the initial test genre.
 - Implements `IGroovePolicyProvider` and `IGrooveCandidateSource` from groove module
 - Physicality constraints prevent impossible patterns
 - Memory system prevents robotic repetition
@@ -148,7 +148,7 @@
 
 ---
 
-## Stage 2 — Drummer Agent Core (Pop Rock)  (COMPELTED)
+## Stage 2 — Drummer Agent Core  (COMPLETED)
 
 **Goal:** Implement the drummer agent framework with Pop Rock as the first genre.
 
@@ -588,17 +588,13 @@
 
 ---
 
-
-IMPORTANT NOTE: THIS STAGE REQUIRES VSTs THAT SUPPORT DETAILED ARTICULATIONS
-
-
 ## Stage 6 — Performance Rendering (Human Realism)
 
 **Goal:** Apply velocity and timing nuance for realistic drum output.
 
 ---
 
-### Story 6.1 — Implement Drummer Velocity Shaper
+### Story 6.1 — Implement Drummer Velocity Shaper (COMPLETED)
 
 **As a** drummer agent  
 **I want** drum-specific velocity shaping  
