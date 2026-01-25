@@ -590,7 +590,7 @@
 
 ## Stage 6 — Performance Rendering (Human Realism)
 
-**Goal:** Apply velocity and timing nuance for realistic drum output.
+**Goal:** Apply velocity and timing nuance for realistic drum output using normalized intents that are genre-agnostic at the drummer layer, with style configuration mapping intents to numeric values.
 
 ---
 
@@ -635,17 +635,54 @@
 **So that** pocket feels human
 
 **Acceptance Criteria:**
-- [ ] Create `DrummerTimingShaper`:
-  - [ ] Snare slightly behind (default +5 ticks) for laid-back feel
-  - [ ] Kick on-top or slightly ahead
-  - [ ] Hats consistent (low jitter)
-  - [ ] Fill notes: slight rush at climax, laid-back in groove
-- [ ] Respects groove system's timing pipeline (integrates, doesn't replace)
-- [ ] Configurable per style (Pop Rock: standard, Jazz: more behind, Metal: more ahead)
-- [ ] Unit tests: timing adjustments in expected ranges
+- [ ] Create `TimingIntent` enum (genre-agnostic at drummer layer):
+  - [ ] `OnTop` = no offset (0 ticks)
+  - [ ] `SlightlyAhead` = pushing feel (negative ticks)
+  - [ ] `SlightlyBehind` = laid-back feel (positive ticks)
+  - [ ] `Rushed` = aggressive push (more negative)
+  - [ ] `LaidBack` = deep pocket (more positive)
+- [ ] Create `DrummerTimingHintSettings` record (per-style numeric mapping):
+  - [ ] `SlightlyAheadTicks` (default: -5)
+  - [ ] `SlightlyBehindTicks` (default: +5)
+  - [ ] `RushedTicks` (default: -10)
+  - [ ] `LaidBackTicks` (default: +10)
+  - [ ] `MaxTimingJitter` (default: 3 ticks for humanization)
+  - [ ] `RoleTimingIntentDefaults` (Dictionary<role, TimingIntent>):
+    - [ ] Snare → SlightlyBehind (pocket feel, universal)
+    - [ ] Kick → OnTop (anchor, universal)
+    - [ ] ClosedHat → OnTop (consistent timekeeping)
+    - [ ] Fill candidates → context-dependent (rush toward climax)
+  - [ ] Static presets: `ConservativeDefaults`, per-style presets in `StyleConfigurationLibrary`
+- [ ] Extend `StyleConfiguration` with optional `DrummerTimingHints` field
+- [ ] Create `DrummerTimingShaper` (hint-only, not final timing):
+  - [ ] Input: `DrumCandidate` list + `StyleConfiguration` + context (fill position, energy)
+  - [ ] Output: updated `DrumCandidate.TimingHint` values (still nullable)
+  - [ ] Must NOT write final timing; groove `RoleTimingEngine` remains final authority
+  - [ ] Classify each candidate's timing intent from role + FillRole + context
+  - [ ] Map intent to tick offset via style settings
+  - [ ] When `TimingHint` already set: adjust minimally toward intent target
+  - [ ] When `TimingHint` is null: provide style-based hint
+  - [ ] Fill timing behavior:
+    - [ ] FillStart/FillBody: slight rush builds tension
+    - [ ] FillEnd: on-top for clean resolution
+  - [ ] Deterministic: same inputs → same hints
+- [ ] Unit tests:
+  - [ ] Timing hints respect style-provided targets
+  - [ ] Role-based intent classification correct
+  - [ ] Fill timing progression correct
+  - [ ] Determinism: same inputs → same hints
+  - [ ] Clamping within reasonable bounds
 
 **Files to Create:**
+- `Generator/Agents/Drums/Performance/TimingIntent.cs`
+- `Generator/Agents/Drums/Performance/DrummerTimingHintSettings.cs`
 - `Generator/Agents/Drums/Performance/DrummerTimingShaper.cs`
+
+**Notes:**
+- Follows Story 6.1 pattern: normalized intents at drummer layer, style maps to numeric values
+- Timing intents are genre-agnostic (snare slightly behind improves pocket in ALL genres)
+- Per-style presets tune the *magnitude* of offsets, not the *intent* mapping
+- Groove `RoleTimingEngine` remains the final authority for actual timing offsets
 
 ---
 

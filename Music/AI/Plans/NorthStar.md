@@ -397,9 +397,9 @@ A skilled drummer optimizes for:
 
 **Note:** Physical constraints (limb model, sticking rules) are genre-agnostic and defined in Stage 4.
 
-**Stage 6 — Performance Rendering: ⏳ PENDING**
-- 6.1: Velocity shaper (role × strength dynamics)
-- 6.2: Timing nuance (push/pull by role)
+**Stage 6 — Performance Rendering: ⏳ IN PROGRESS**
+- 6.1: Velocity shaper (normalized intents → style-mapped velocity hints) ✅
+- 6.2: Timing nuance (normalized intents → style-mapped timing hints)
 - 6.3: Articulation mapping (MIDI note variations)
 
 **Stage 7 — Diagnostics & Tuning: ⏳ PENDING**
