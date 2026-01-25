@@ -605,15 +605,27 @@ IMPORTANT NOTE: THIS STAGE REQUIRES VSTs THAT SUPPORT DETAILED ARTICULATIONS
 **So that** dynamics sound human
 
 **Acceptance Criteria:**
-- [ ] Create `DrummerVelocityShaper`:
-  - [ ] Uses operator-provided `VelocityHint` as starting point
-  - [ ] Applies accent patterns based on beat strength
-  - [ ] Ghost notes: 30-50 range
-  - [ ] Backbeats: 90-110 range
-  - [ ] Fills: crescendo from 70 to 110 typically
-  - [ ] Crash hits: 100-127 range
-- [ ] Respects groove system's velocity shaping pipeline (integrates, doesn't replace)
-- [ ] Unit tests: velocity shaping produces expected ranges
+- [ ] Create `DrummerVelocityShaper` (drummer-specific *hinting*, not a replacement shaper):
+  - [ ] Input: operator-provided `VelocityHint` (nullable) + context (role, onset strength, fill role, energy)
+  - [ ] Output: updated per-candidate `VelocityHint` only (still nullable)
+  - [ ] Must NOT write final MIDI velocities; final velocities remain owned by groove `VelocityShaper`
+  - [ ] Uses normalized dynamic intent (genre-agnostic at the drummer layer):
+    - [ ] Ghost = Low
+    - [ ] Backbeat = StrongAccent
+    - [ ] Crash = PeakAccent
+    - [ ] Fill = Ramp (bar-local ramp across fill hits; direction can be style-configured)
+  - [ ] Maps normalized intent to numeric velocity targets via style configuration:
+    - [ ] Numeric ranges/targets MUST come from `StyleConfiguration` (per-style), not hardcoded
+    - [ ] Defaults must be safe and conservative if style values missing
+  - [ ] When `VelocityHint` is already set by an operator, treat it as baseline and adjust minimally
+  - [ ] When `VelocityHint` is null, provide a conservative hint (do not invent extreme dynamics)
+- [ ] Integrates with groove velocity pipeline:
+  - [ ] `DrummerVelocityShaper` runs BEFORE groove `VelocityShaper`
+  - [ ] Groove `VelocityShaper` remains the single place that produces final `GrooveOnset.Velocity`
+  - [ ] All non-drum roles continue to use groove shaping unchanged
+- [ ] Unit tests:
+  - [ ] Velocity hinting respects style-provided targets (per-style) for each normalized intent
+  - [ ] Determinism: same inputs → same hints
 
 **Files to Create:**
 - `Generator/Agents/Drums/Performance/DrummerVelocityShaper.cs`

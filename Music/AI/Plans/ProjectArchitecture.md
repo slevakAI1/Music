@@ -508,7 +508,7 @@ public sealed class GrooveOverrideMergePolicy
 |------|---------|
 | `OnsetGrid.cs` / `OnsetGridBuilder.cs` | Valid beat positions from subdivision policy |
 | `OnsetStrengthClassifier.cs` | Classify onset strength |
-| `VelocityShaper.cs` | Compute velocity per onset (role x strength) |
+| `VelocityShaper.cs` | Compute final onset velocity per role x strength; should remain the single final velocity authority |
 | `FeelTimingEngine.cs` | Apply feel timing (Straight/Swing/Shuffle/Triplet) to eligible eighth offbeats |
 | `RoleTimingEngine.cs` | Apply per-role micro-timing (TimingFeel -> ticks + RoleTimingBiasTicks) and clamp to `MaxAbsTimingBiasTicks` |
 | `ProtectionPerBarBuilder.cs` | Merge protection layers per bar |
@@ -528,6 +528,9 @@ public sealed class GrooveOverrideMergePolicy
 | `OverrideMergePolicyEnforcer.cs` | Enforce override merge policy rules (Story F1) |
 | `PartTrackBarCoverageAnalyzer.cs` | Analyze per-bar fill state (Story SC1) |
 | `GrooveTestSetup.cs` | Build PopRockBasic preset for testing |
+
+Note (agent integration): instrument agents may provide per-candidate hint fields (e.g., drums `VelocityHint`) before groove shaping runs.
+The groove `VelocityShaper` must remain responsible for writing final `GrooveOnset.Velocity` to avoid per-agent duplication.
 
 ---
 

@@ -45,7 +45,9 @@ In blinded tests across target genres, the generator's songs achieve **listener 
 2. **Layered Architecture**
    - **Intent Layer:** Energy, tension, section arc, motif presence, "what the music needs now"
    - **Groove/Rhythm Layer:** Abstract event planning (when/where density increases, punctuation windows)
-   - **Instrument Agent Layer:** Concrete realization (which hits, pitches, articulations + how they're played)
+   - **Instrument Agent Layer:** Concrete realization (which hits, pitches, articulations) + normalized performance intent
+
+**Design rule:** agents output normalized intent (e.g., accent level, ramp shapes). Style config maps intent→numeric values.
 
 3. **Instrument-Specific Realities**
    - **Drums:** Limbs, kit pieces, density/texture, fills, crash language
