@@ -132,6 +132,7 @@
     <None Remove="AI\Research\musical_energy_compilation.md" />
     <None Remove="AI\Research\Usage.txt" />
     <None Remove="AI\Research\VSTs for Drum articulations.txt" />
+    <None Remove="AI\Usage.txt" />
   </ItemGroup>
 
   <ItemGroup>
