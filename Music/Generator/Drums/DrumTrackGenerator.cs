@@ -1,6 +1,6 @@
-// AI: purpose=Generate drum track using DrummerAgent (Story 10.8.1) or fallback to anchor-based generation.
-// AI: deps=DrummerAgent for operator-based generation; BarTrack for tick conversion; returns PartTrack sorted by AbsoluteTimeTicks.
-// AI: change=Story 10.8.1: integrated DrummerAgent; old anchor-based approach preserved as fallback.
+// AI: purpose=Generate drum track using GrooveBasedDrumGenerator pipeline (Story RF-4) or fallback to anchor-based generation.
+// AI: deps=GrooveBasedDrumGenerator for pipeline orchestration; DrummerAgent as data source; returns PartTrack sorted by AbsoluteTimeTicks.
+// AI: change=Story RF-4: uses GrooveBasedDrumGenerator pipeline with DrummerAgent; old anchor-based approach preserved as fallback.
 
 using Music.Generator.Agents.Common;
 using Music.Generator.Agents.Drums;
@@ -55,58 +55,35 @@ namespace Music.Generator
         private const int TomLowMidiNote = 45;
 
         /// <summary>
-        /// Generates drum track using DrummerAgent (Story 10.8.1).
-        /// Falls back to anchor-based generation if agent is not available.
+        /// Generates drum track using GrooveBasedDrumGenerator pipeline (Story RF-4).
+        /// Uses DrummerAgent as data source with PopRock style configuration.
         /// </summary>
         /// <param name="songContext">Song context containing all required data.</param>
         /// <returns>Generated drum PartTrack.</returns>
         /// <exception cref="ArgumentNullException">If songContext is null.</exception>
+        /// <remarks>
+        /// <para>Architecture (Story RF-4):</para>
+        /// <list type="bullet">
+        ///   <item>Creates DrummerAgent with PopRock style (data source)</item>
+        ///   <item>Creates GrooveBasedDrumGenerator (pipeline orchestrator)</item>
+        ///   <item>Generates via proper groove system with GrooveSelectionEngine</item>
+        ///   <item>Enforces density targets, operator caps, weighted selection</item>
+        /// </list>
+        /// </remarks>
         public static PartTrack Generate(SongContext songContext)
         {
             ArgumentNullException.ThrowIfNull(songContext);
 
-            // Story 10.8.1: Use DrummerAgent for operator-based generation
-            try
-            {
-                var drummerAgent = new DrummerAgent(
-                    StyleConfigurationLibrary.PopRock,
-                    DrummerAgentSettings.Default);
-
-                return drummerAgent.Generate(songContext);
-            }
-            catch (Exception ex)
-            {
-                // Fallback to anchor-based generation if DrummerAgent fails
-                Console.WriteLine($"DrummerAgent generation failed, falling back to anchor-based: {ex.Message}");
-                return GenerateLegacyAnchorBased(songContext);
-            }
-        }
-
-        /// <summary>
-        /// Legacy anchor-based generation (pre-Story 10.8.1).
-        /// Preserved as fallback for compatibility.
-        /// </summary>
-        private static PartTrack GenerateLegacyAnchorBased(SongContext songContext)
-        {
-            var barTrack = songContext.BarTrack;
-            var sectionTrack = songContext.SectionTrack;
-            var segmentProfiles = songContext.SegmentGrooveProfiles;
-            var groovePresetDefinition = songContext.GroovePresetDefinition;
-            int totalBars = sectionTrack.TotalBars;
-            int midiProgramNumber = GetDrumProgramNumber(songContext.Voices);
-
-            return GenerateLegacyAnchorBasedInternal(
-                barTrack,
-                sectionTrack,
-                segmentProfiles,
-                groovePresetDefinition,
-                totalBars,
-                midiProgramNumber);
+            // Story RF-4: Use GrooveBasedDrumGenerator pipeline with DrummerAgent as data source
+            var agent = new DrummerAgent(StyleConfigurationLibrary.PopRock);
+            var generator = new GrooveBasedDrumGenerator(agent, agent);
+            return generator.Generate(songContext);
         }
 
         /// <summary>
         /// Original Generate method signature preserved for backward compatibility.
-        /// Internally uses DrummerAgent.
+        /// Builds SongContext and uses GrooveBasedDrumGenerator pipeline.
+        /// Story RF-4: Updated to use new pipeline architecture.
         /// </summary>
         public static PartTrack Generate(
             BarTrack barTrack,
@@ -116,7 +93,7 @@ namespace Music.Generator
             int totalBars,
             int midiProgramNumber)
         {
-            // Build minimal SongContext for DrummerAgent
+            // Build minimal SongContext for pipeline
             var songContext = new SongContext
             {
                 BarTrack = barTrack,
@@ -125,7 +102,7 @@ namespace Music.Generator
                 GroovePresetDefinition = groovePresetDefinition
             };
 
-            // Use new entry point
+            // Use new pipeline entry point
             return Generate(songContext);
         }
 

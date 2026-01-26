@@ -1,19 +1,21 @@
-// AI: purpose=Unit tests for Story 8.1 DrummerAgent facade class.
+// AI: purpose=Unit tests for Story RF-5 DrummerAgent as data source (no Generate method).
 // AI: deps=xunit for test framework; Music.Generator.Agents.Drums for types under test.
-// AI: change=Story 8.1 acceptance criteria: construction, delegation, determinism, integration.
+// AI: change=Story RF-5: DrummerAgent is pure data source; tests verify interface delegation only.
 
 using Xunit;
 using Music.Generator;
 using Music.Generator.Agents.Drums;
 using Music.Generator.Agents.Common;
+using Music.Generator.Agents.Drums.Physicality;
 using Music.Generator.Groove;
 using Music;
 
 namespace Music.Generator.Agents.Drums.Tests
 {
     /// <summary>
-    /// Story 8.1: Tests for DrummerAgent facade class.
-    /// Verifies construction, delegation, determinism, and integration with Generator.
+    /// Story RF-5: Tests for DrummerAgent as data source.
+    /// Verifies construction and delegation to IGroovePolicyProvider + IGrooveCandidateSource.
+    /// DrummerAgent does NOT generate PartTracks directly - use GrooveBasedDrumGenerator pipeline.
     /// </summary>
     [Collection("RngDependentTests")]
     public class DrummerAgentTests
@@ -78,7 +80,7 @@ namespace Music.Generator.Agents.Drums.Tests
         #region IGroovePolicyProvider Delegation Tests
 
         [Fact]
-        public void GetPolicy_DelegatesToPolicyProvider()
+        public void GetPolicy_DelegatesToPolicyProvider_Correctly()
         {
             // Arrange
             var agent = CreateAgent();
@@ -89,6 +91,26 @@ namespace Music.Generator.Agents.Drums.Tests
 
             // Assert
             Assert.NotNull(policy);
+            Assert.NotNull(policy.Density01Override);
+        }
+
+        [Fact]
+        public void GetPolicy_DifferentContexts_ProduceDifferentPolicies()
+        {
+            // Arrange
+            var agent = CreateAgent();
+            var verseContext = CreateBarContext(barNumber: 1, MusicConstants.eSectionType.Verse);
+            var chorusContext = CreateBarContext(barNumber: 10, MusicConstants.eSectionType.Chorus);
+
+            // Act
+            var versePolicy = agent.GetPolicy(verseContext, GrooveRoles.Kick);
+            var chorusPolicy = agent.GetPolicy(chorusContext, GrooveRoles.Kick);
+
+            // Assert - Chorus should typically have higher density than Verse
+            Assert.NotNull(versePolicy);
+            Assert.NotNull(chorusPolicy);
+            Assert.True(chorusPolicy.Density01Override > versePolicy.Density01Override,
+                "Chorus density should be higher than verse density");
         }
 
         [Fact]
@@ -133,12 +155,30 @@ namespace Music.Generator.Agents.Drums.Tests
             Assert.Equal(policy1?.MaxEventsPerBarOverride, policy2?.MaxEventsPerBarOverride);
         }
 
+        [Fact]
+        public void GetPolicy_UsesSharedMemory_AcrossCalls()
+        {
+            // Arrange
+            var agent = CreateAgent();
+            var barContext1 = CreateBarContext(barNumber: 1);
+            var barContext2 = CreateBarContext(barNumber: 2);
+
+            // Act - Make multiple calls
+            var policy1 = agent.GetPolicy(barContext1, GrooveRoles.Kick);
+            var policy2 = agent.GetPolicy(barContext2, GrooveRoles.Kick);
+
+            // Assert - Memory should be shared and updated
+            Assert.NotNull(agent.Memory);
+            // Memory's CurrentBarNumber should reflect the last processed bar
+            Assert.True(agent.Memory.CurrentBarNumber >= 1, "Memory should track bar numbers");
+        }
+
         #endregion
 
         #region IGrooveCandidateSource Delegation Tests
 
         [Fact]
-        public void GetCandidateGroups_DelegatesToCandidateSource()
+        public void GetCandidateGroups_DelegatesToCandidateSource_Correctly()
         {
             // Arrange
             var agent = CreateAgent();
@@ -149,6 +189,40 @@ namespace Music.Generator.Agents.Drums.Tests
 
             // Assert
             Assert.NotNull(groups);
+            // Should have candidate groups from operators
+            Assert.True(groups.Count > 0, "Should have candidate groups");
+            // Verify candidates have valid properties
+            if (groups.Count > 0 && groups[0].Candidates.Count > 0)
+            {
+                var candidate = groups[0].Candidates[0];
+                Assert.NotNull(candidate.Role);
+                Assert.True(candidate.OnsetBeat > 0, "Onset beat should be positive");
+            }
+        }
+
+        [Fact]
+        public void GetCandidateGroups_DifferentRoles_ProduceDifferentCandidates()
+        {
+            // Arrange
+            var agent = CreateAgent();
+            var barContext = CreateBarContext(barNumber: 1);
+
+            // Act
+            var kickGroups = agent.GetCandidateGroups(barContext, GrooveRoles.Kick);
+            var snareGroups = agent.GetCandidateGroups(barContext, GrooveRoles.Snare);
+
+            // Assert
+            Assert.NotNull(kickGroups);
+            Assert.NotNull(snareGroups);
+            // Different roles should produce candidates for their respective roles
+            if (kickGroups.Count > 0 && kickGroups[0].Candidates.Count > 0)
+            {
+                Assert.Equal(GrooveRoles.Kick, kickGroups[0].Candidates[0].Role);
+            }
+            if (snareGroups.Count > 0 && snareGroups[0].Candidates.Count > 0)
+            {
+                Assert.Equal(GrooveRoles.Snare, snareGroups[0].Candidates[0].Role);
+            }
         }
 
         [Fact]
@@ -172,127 +246,31 @@ namespace Music.Generator.Agents.Drums.Tests
             Assert.Throws<ArgumentNullException>(() => agent.GetCandidateGroups(barContext, null!));
         }
 
-        #endregion
-
-        #region Generate Tests
-
         [Fact]
-        public void Generate_NullSongContext_Throws()
+        public void GetCandidateGroups_RespectsPhysicality_WhenConfigured()
         {
-            // Arrange
-            var agent = CreateAgent();
-
-            // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => agent.Generate(null!));
-        }
-
-        [Fact]
-        public void Generate_ValidSongContext_ReturnsPartTrack()
-        {
-            // Arrange
-            var agent = CreateAgent();
-            var songContext = CreateTestSongContext();
+            // Arrange - Create agent with physicality rules
+            var physicalityRules = new PhysicalityRules
+            {
+                MaxHitsPerBar = 8,
+                StrictnessLevel = PhysicalityStrictness.Normal
+            };
+            var settings = new DrummerAgentSettings
+            {
+                PhysicalityRules = physicalityRules
+            };
+            var agent = new DrummerAgent(StyleConfigurationLibrary.PopRock, settings);
+            var barContext = CreateBarContext(barNumber: 1);
 
             // Act
-            var track = agent.Generate(songContext);
+            var groups = agent.GetCandidateGroups(barContext, GrooveRoles.Kick);
 
             // Assert
-            Assert.NotNull(track);
-        }
-
-        [Fact]
-        public void Generate_ReturnsNonEmptyTrack()
-        {
-            // Arrange
-            var agent = CreateAgent();
-            var songContext = CreateTestSongContext();
-
-            // Act
-            var track = agent.Generate(songContext);
-
-            // Assert
-            Assert.True(track.PartTrackNoteEvents.Count > 0, "Track should contain notes");
-        }
-
-        [Fact]
-        public void Generate_EventsSortedByTime()
-        {
-            // Arrange
-            var agent = CreateAgent();
-            var songContext = CreateTestSongContext();
-
-            // Act
-            var track = agent.Generate(songContext);
-
-            // Assert
-            for (int i = 1; i < track.PartTrackNoteEvents.Count; i++)
-            {
-                Assert.True(
-                    track.PartTrackNoteEvents[i].AbsoluteTimeTicks >= track.PartTrackNoteEvents[i - 1].AbsoluteTimeTicks,
-                    "Events should be sorted by AbsoluteTimeTicks");
-            }
-        }
-
-        [Fact]
-        public void Generate_Deterministic_SameSeedSameOutput()
-        {
-            // Arrange
-            var songContext1 = CreateTestSongContext();
-            var songContext2 = CreateTestSongContext();
-
-            Rng.Initialize(42);
-            var agent1 = CreateAgent();
-            var track1 = agent1.Generate(songContext1);
-
-            Rng.Initialize(42);
-            var agent2 = CreateAgent();
-            var track2 = agent2.Generate(songContext2);
-
-            // Assert
-            Assert.Equal(track1.PartTrackNoteEvents.Count, track2.PartTrackNoteEvents.Count);
-
-            for (int i = 0; i < track1.PartTrackNoteEvents.Count; i++)
-            {
-                Assert.Equal(track1.PartTrackNoteEvents[i].AbsoluteTimeTicks, track2.PartTrackNoteEvents[i].AbsoluteTimeTicks);
-                Assert.Equal(track1.PartTrackNoteEvents[i].NoteNumber, track2.PartTrackNoteEvents[i].NoteNumber);
-                Assert.Equal(track1.PartTrackNoteEvents[i].NoteOnVelocity, track2.PartTrackNoteEvents[i].NoteOnVelocity);
-            }
-        }
-
-        [Fact]
-        public void Generate_DifferentSeeds_ProduceDifferentOutput()
-        {
-            // Arrange
-            var songContext1 = CreateTestSongContext();
-            var songContext2 = CreateTestSongContext();
-
-            Rng.Initialize(42);
-            var agent1 = CreateAgent();
-            var track1 = agent1.Generate(songContext1);
-
-            Rng.Initialize(999);
-            var agent2 = CreateAgent();
-            var track2 = agent2.Generate(songContext2);
-
-            // Assert - at least some difference should exist (not necessarily all notes differ)
-            // This is a sanity check; in practice with operators, variation should occur
-            bool anyDifference = track1.PartTrackNoteEvents.Count != track2.PartTrackNoteEvents.Count;
-            if (!anyDifference && track1.PartTrackNoteEvents.Count > 0)
-            {
-                for (int i = 0; i < Math.Min(track1.PartTrackNoteEvents.Count, track2.PartTrackNoteEvents.Count); i++)
-                {
-                    if (track1.PartTrackNoteEvents[i].AbsoluteTimeTicks != track2.PartTrackNoteEvents[i].AbsoluteTimeTicks ||
-                        track1.PartTrackNoteEvents[i].NoteNumber != track2.PartTrackNoteEvents[i].NoteNumber)
-                    {
-                        anyDifference = true;
-                        break;
-                    }
-                }
-            }
-
-            // Note: anchors are deterministic, so we expect at least anchors to be the same
-            // but operator candidates may differ. If no operators fire, outputs will be identical.
-            // This test is informational; we don't assert on anyDifference to avoid flakiness.
+            Assert.NotNull(groups);
+            // Count total candidates across all groups
+            int totalCandidates = groups.Sum(g => g.Candidates.Count);
+            // With physicality filtering, we shouldn't get candidates that violate rules
+            Assert.True(totalCandidates <= 20, "Physicality filter should limit candidate count");
         }
 
         #endregion
@@ -300,28 +278,28 @@ namespace Music.Generator.Agents.Drums.Tests
         #region Generator Integration Tests
 
         [Fact]
-        public void Generator_WithDrummerAgent_UsesDrummerAgent()
+        public void Generator_WithStyleConfiguration_UsesPipeline()
         {
             // Arrange
-            var agent = CreateAgent();
+            var style = StyleConfigurationLibrary.PopRock;
             var songContext = CreateTestSongContext();
 
             // Act
-            var track = Generator.Generate(songContext, agent);
+            var track = Generator.Generate(songContext, style);
 
             // Assert
             Assert.NotNull(track);
-            Assert.True(track.PartTrackNoteEvents.Count > 0);
+            Assert.True(track.PartTrackNoteEvents.Count > 0, "Should generate events via pipeline");
         }
 
         [Fact]
-        public void Generator_WithNullDrummerAgent_FallsBackToGrooveGenerator()
+        public void Generator_WithNullStyle_FallsBackToGrooveGenerator()
         {
             // Arrange
             var songContext = CreateTestSongContext();
 
             // Act
-            var track = Generator.Generate(songContext, drummerAgent: null);
+            var track = Generator.Generate(songContext, drummerStyle: null);
 
             // Assert
             Assert.NotNull(track);
@@ -350,16 +328,15 @@ namespace Music.Generator.Agents.Drums.Tests
         {
             // Arrange
             var agent = CreateAgent();
-            var songContext = CreateTestSongContext();
-
-            // Generate to populate memory
-            agent.Generate(songContext);
+            var barContext = CreateBarContext(barNumber: 5);
+            
+            // Call GetPolicy to populate memory
+            agent.GetPolicy(barContext, GrooveRoles.Kick);
 
             // Act
             agent.ResetMemory();
 
-            // Assert - memory should be cleared (hard to verify directly without exposing more)
-            // At minimum, CurrentBarNumber should be reset
+            // Assert - memory should be cleared
             Assert.Equal(0, agent.Memory.CurrentBarNumber);
         }
 
@@ -430,3 +407,4 @@ namespace Music.Generator.Agents.Drums.Tests
         #endregion
     }
 }
+

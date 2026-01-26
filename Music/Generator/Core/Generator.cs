@@ -1,9 +1,10 @@
 // AI: purpose=Generate PartTrack using for Drums only, Section+Bar timing;
 // AI: invariants=BarTrack is read-only and must NOT be rebuilt here.
-// AI: deps=MusicConstants.TicksPerQuarterNote; DrummerAgent for human-like drumming.
+// AI: deps=MusicConstants.TicksPerQuarterNote; GrooveBasedDrumGenerator pipeline for drum generation.
 // AI: perf=Single-run generation; avoid allocations in inner loops; use seed for deterministic results.
-// AI: change=Story 8.1 adds optional DrummerAgent parameter for operator-based generation with fallback to DrumTrackGenerator.
+// AI: change=Story RF-3 replaces DrummerAgent.Generate() with GrooveBasedDrumGenerator pipeline architecture.
 
+using Music.Generator.Agents.Common;
 using Music.Generator.Agents.Drums;
 using Music.Generator.Groove;
 using Music.MyMidi;
@@ -14,41 +15,53 @@ namespace Music.Generator
     {
         // AI: Generate: validates harmony track before generation; fast-fail on invalid data prevents silent errors.
         // AI: behavior=Runs HarmonyValidator with default options (StrictDiatonicChordTones=true) to catch F# minor crashes.
-        // AI: Story 8.1: Original signature preserved for backward compatibility; uses DrumTrackGenerator fallback.
+        // AI: Story RF-3: Original signature preserved for backward compatibility; uses DrumTrackGenerator fallback.
         public static PartTrack Generate(SongContext songContext)
         {
-            return Generate(songContext, drummerAgent: null);
+            return Generate(songContext, drummerStyle: null);
         }
 
         /// <summary>
-        /// Generates a drum track from the song context using the optional DrummerAgent.
-        /// Story 8.1: Wire Drummer Agent into Generator.
+        /// Generates a drum track from the song context using the optional drummer style configuration.
+        /// Story RF-3: Wire GrooveBasedDrumGenerator pipeline with DrummerAgent as data source.
         /// </summary>
         /// <param name="songContext">Song context with section, groove, and timing data.</param>
-        /// <param name="drummerAgent">Optional drummer agent for operator-based generation.
+        /// <param name="drummerStyle">Optional style configuration for operator-based drum generation.
         /// When null, falls back to groove-only DrumTrackGenerator.</param>
         /// <returns>Generated drum PartTrack.</returns>
         /// <remarks>
-        /// When drummerAgent is provided:
-        /// - Uses operator-based candidate generation with human-like variation
-        /// - Applies physicality constraints (limb conflicts, sticking rules)
-        /// - Uses memory for anti-repetition across sections
-        /// 
-        /// When drummerAgent is null:
-        /// - Falls back to existing DrumTrackGenerator (anchor patterns only)
-        /// - Maintains backward compatibility
+        /// <para>Architecture (Story RF-3):</para>
+        /// <list type="bullet">
+        ///   <item>When drummerStyle is provided: Creates DrummerAgent (data source) → passes to GrooveBasedDrumGenerator (pipeline) → uses GrooveSelectionEngine for weighted selection</item>
+        ///   <item>When drummerStyle is null: Falls back to existing DrumTrackGenerator (anchor patterns only)</item>
+        /// </list>
+        /// <para>Benefits of new architecture:</para>
+        /// <list type="bullet">
+        ///   <item>Enforces density targets from policy</item>
+        ///   <item>Respects operator caps and weights</item>
+        ///   <item>Uses GrooveSelectionEngine for proper weighted selection</item>
+        ///   <item>Supports operator-based generation with physicality constraints</item>
+        ///   <item>Memory system prevents robotic repetition</item>
+        /// </list>
         /// </remarks>
-        public static PartTrack Generate(SongContext songContext, DrummerAgent? drummerAgent)
+        public static PartTrack Generate(SongContext songContext, StyleConfiguration? drummerStyle)
         {
             ValidateSongContext(songContext);
             ValidateSectionTrack(songContext.SectionTrack);
             ValidateTimeSignatureTrack(songContext.Song.TimeSignatureTrack);
             ValidateGrooveTrack(songContext.GroovePresetDefinition);
 
-            // When drummer agent is provided, use operator-based generation
-            if (drummerAgent != null)
+            // When drummer style is provided, use operator-based generation with pipeline architecture
+            if (drummerStyle != null)
             {
-                return drummerAgent.Generate(songContext);
+                // Create DrummerAgent as data source (IGroovePolicyProvider + IGrooveCandidateSource)
+                var agent = new DrummerAgent(drummerStyle);
+
+                // Create pipeline orchestrator
+                var generator = new GrooveBasedDrumGenerator(agent, agent);
+
+                // Generate using proper groove system integration
+                return generator.Generate(songContext);
             }
 
             // Fallback to existing groove-only generation
