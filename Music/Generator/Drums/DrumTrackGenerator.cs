@@ -1,7 +1,9 @@
-// AI: purpose=Generate drum track from GroovePresetDefinition anchor patterns; MVP for Story 1 of GroovePlan.
-// AI: deps=GrooveTrack for preset lookup; BarTrack for tick conversion; returns PartTrack sorted by AbsoluteTimeTicks.
-// AI: change=Phase 1 MVP; subsequent stories add velocity shaping, timing, variations per GroovePlan.md.
+// AI: purpose=Generate drum track using DrummerAgent (Story 10.8.1) or fallback to anchor-based generation.
+// AI: deps=DrummerAgent for operator-based generation; BarTrack for tick conversion; returns PartTrack sorted by AbsoluteTimeTicks.
+// AI: change=Story 10.8.1: integrated DrummerAgent; old anchor-based approach preserved as fallback.
 
+using Music.Generator.Agents.Common;
+using Music.Generator.Agents.Drums;
 using Music.Generator.Groove;
 using Music.MyMidi;
 
@@ -53,7 +55,82 @@ namespace Music.Generator
         private const int TomLowMidiNote = 45;
 
         /// <summary>
-        /// Generates drum track from groove preset anchor patterns.
+        /// Generates drum track using DrummerAgent (Story 10.8.1).
+        /// Falls back to anchor-based generation if agent is not available.
+        /// </summary>
+        /// <param name="songContext">Song context containing all required data.</param>
+        /// <returns>Generated drum PartTrack.</returns>
+        /// <exception cref="ArgumentNullException">If songContext is null.</exception>
+        public static PartTrack Generate(SongContext songContext)
+        {
+            ArgumentNullException.ThrowIfNull(songContext);
+
+            // Story 10.8.1: Use DrummerAgent for operator-based generation
+            try
+            {
+                var drummerAgent = new DrummerAgent(
+                    StyleConfigurationLibrary.PopRock,
+                    DrummerAgentSettings.Default);
+
+                return drummerAgent.Generate(songContext);
+            }
+            catch (Exception ex)
+            {
+                // Fallback to anchor-based generation if DrummerAgent fails
+                Console.WriteLine($"DrummerAgent generation failed, falling back to anchor-based: {ex.Message}");
+                return GenerateLegacyAnchorBased(songContext);
+            }
+        }
+
+        /// <summary>
+        /// Legacy anchor-based generation (pre-Story 10.8.1).
+        /// Preserved as fallback for compatibility.
+        /// </summary>
+        private static PartTrack GenerateLegacyAnchorBased(SongContext songContext)
+        {
+            var barTrack = songContext.BarTrack;
+            var sectionTrack = songContext.SectionTrack;
+            var segmentProfiles = songContext.SegmentGrooveProfiles;
+            var groovePresetDefinition = songContext.GroovePresetDefinition;
+            int totalBars = sectionTrack.TotalBars;
+            int midiProgramNumber = GetDrumProgramNumber(songContext.Voices);
+
+            return GenerateLegacyAnchorBasedInternal(
+                barTrack,
+                sectionTrack,
+                segmentProfiles,
+                groovePresetDefinition,
+                totalBars,
+                midiProgramNumber);
+        }
+
+        /// <summary>
+        /// Original Generate method signature preserved for backward compatibility.
+        /// Internally uses DrummerAgent.
+        /// </summary>
+        public static PartTrack Generate(
+            BarTrack barTrack,
+            SectionTrack sectionTrack,
+            IReadOnlyList<SegmentGrooveProfile> segmentProfiles,
+            GroovePresetDefinition groovePresetDefinition,
+            int totalBars,
+            int midiProgramNumber)
+        {
+            // Build minimal SongContext for DrummerAgent
+            var songContext = new SongContext
+            {
+                BarTrack = barTrack,
+                SectionTrack = sectionTrack,
+                SegmentGrooveProfiles = segmentProfiles,
+                GroovePresetDefinition = groovePresetDefinition
+            };
+
+            // Use new entry point
+            return Generate(songContext);
+        }
+
+        /// <summary>
+        /// Legacy anchor-based generation implementation.
         /// MVP: extracts anchor onsets and emits MIDI events with default velocity.
         /// Story 5: adds per-bar context building for section/phrase awareness.
         /// Story 6: adds role presence check (orchestration policy).
@@ -63,7 +140,7 @@ namespace Music.Generator
         /// Story 11: applies syncopation/anticipation filter per role vocabulary.
         /// Story 12: applies phrase hook policy (protect anchors in phrase-end windows).
         /// </summary>
-        public static PartTrack Generate(
+        private static PartTrack GenerateLegacyAnchorBasedInternal(
             BarTrack barTrack,
             SectionTrack sectionTrack,
             IReadOnlyList<SegmentGrooveProfile> segmentProfiles,
@@ -232,5 +309,18 @@ namespace Music.Generator
             DrumRole.TomLow => TomLowMidiNote,
             _ => throw new ArgumentOutOfRangeException(nameof(role), $"Unknown drum role: {role}")
         };
+
+        // AI: GetDrumProgramNumber retrieves drum MIDI program from VoiceSet (defaults to 0 for standard GM drums).
+        private static int GetDrumProgramNumber(VoiceSet voiceSet)
+        {
+            // GM drums are on channel 10 (MIDI track 10) and typically use program 0
+            // Look for a voice with "Drum" in the name
+            var drumVoice = voiceSet.Voices.FirstOrDefault(v =>
+                v.VoiceName.Contains("Drum", StringComparison.OrdinalIgnoreCase) ||
+                v.GrooveRole == GrooveRoles.DrumKit);
+
+            // GM drums default to program 0 (Standard Kit)
+            return drumVoice != null ? 0 : 0;
+        }
     }
 }

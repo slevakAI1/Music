@@ -1477,7 +1477,7 @@ The data structures in 7.2a/7.2b are designed to support all these future analys
 
 ---
 
-### Story 10.8.1 — Wire Drummer Agent into Generator (COMPLETED)
+### Story 10.8.1 — Wire Drummer Agent into Generator (PENDING VERIFICATION OF BEST IMPLEMENTATION!)
 
 **As a** developer  
 **I want** drummer agent integrated into the generation pipeline  
@@ -1500,7 +1500,7 @@ The data structures in 7.2a/7.2b are designed to support all these future analys
 
 ---
 
-### Story 10.8.2 — Implement Drummer Unit Tests (Core)
+### Story 10.8.2 — Implement Drummer Unit Tests (Core)  (COMPLETED)
 
 **As a** developer  
 **I want** comprehensive unit tests  
