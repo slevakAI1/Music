@@ -72,8 +72,10 @@
     <None Remove="AI\Completed\PreAnalysis_6.1.md" />
     <None Remove="AI\Completed\PreAnalysis_6.2.md" />
     <None Remove="AI\Completed\PreAnalysis_6.3.md" />
+    <None Remove="AI\Completed\PreAnalysis_7.1.md" />
     <None Remove="AI\Completed\PreAnalysis_9.3.md" />
     <None Remove="AI\Completed\Story6.3_Complete.md" />
+    <None Remove="AI\Completed\Story7.2_DrumFeatureExtraction.md" />
     <None Remove="AI\Prompts\AgentEpic.md" />
     <None Remove="AI\Prompts\Backlog.md" />
     <None Remove="AI\Prompts\Chat GPT 5.2 Thinking - Answer clarifying questions.md" />
