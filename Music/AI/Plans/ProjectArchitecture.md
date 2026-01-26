@@ -195,6 +195,77 @@ public sealed record DrummerTimingHintSettings
 - Minimal adjustment behavior when hints exist
 - Deterministic jitter and clamping
 
+## Story 6.3 — Drummer Articulation Mapper (Implemented)
+
+The drummer articulation mapper translates `DrumArticulation` enum values to MIDI note numbers using GM2 (General MIDI Level 2) standard mappings. It provides graceful fallback to standard role notes when articulations are unavailable, ensuring playable MIDI output always.
+
+**Core Type (in `Generator/Agents/Drums/Performance/`):**
+
+| Type | Purpose |
+|------|---------|
+| `DrumArticulationMapper` | Static class mapping articulations to MIDI notes; supports GM2 standard + fallback |
+| `ArticulationMappingResult` | Result record containing MIDI note, articulation, role, fallback status, and metadata |
+
+**GM2 Standard Mappings:**
+
+| Articulation | Target Role | MIDI Note | GM2 Name |
+|-------------|-------------|-----------|----------|
+| `Rimshot` | Snare | 40 | Electric Snare (rimshot approximation) |
+| `SideStick` | Snare | 37 | Side Stick (cross stick) |
+| `OpenHat` | ClosedHat | 46 | Open Hi-Hat |
+| `Crash` | Crash | 49 | Crash Cymbal 1 |
+| `Ride` | Ride | 51 | Ride Cymbal 1 (bow) |
+| `RideBell` | Ride | 53 | Ride Bell |
+| `CrashChoke` | Crash | 49 | Crash Cymbal 1 (choke via duration) |
+| `Flam` | Any | Fallback | No specific GM2 note; timing-based |
+| `None` | Any | Role-specific | Standard note for role |
+
+**Standard Role Notes (GM2):**
+
+| Role | MIDI Note | GM2 Name |
+|------|-----------|----------|
+| Kick | 36 | Acoustic Bass Drum |
+| Snare | 38 | Acoustic Snare |
+| ClosedHat | 42 | Closed Hi-Hat |
+| OpenHat | 46 | Open Hi-Hat |
+| Crash | 49 | Crash Cymbal 1 |
+| Crash2 | 57 | Crash Cymbal 2 |
+| Ride | 51 | Ride Cymbal 1 |
+| Tom1 | 48 | Hi Mid Tom |
+| Tom2 | 47 | Low Mid Tom |
+| FloorTom | 41 | Low Floor Tom |
+| RideBell | 53 | Ride Bell |
+
+**Behavior:**
+- **Deterministic:** Same articulation + role → same MIDI note
+- **Null-safe:** Gracefully handles null/empty roles; returns safe fallback (snare note 38)
+- **Always playable:** Returns valid MIDI note [0..127] even for unknown articulations/roles
+- **Fallback hierarchy:** Articulation-specific note → standard role note → safe default (38)
+- **Metadata preservation:** Returns articulation metadata string for advanced renderers
+
+**Fallback Logic:**
+1. If articulation has specific GM2 mapping → use it (e.g., Rimshot → 40)
+2. Else if articulation is `None` or unmapped → use standard role note (e.g., Snare → 38)
+3. Else if role unknown → return snare (38) as universal safe fallback
+
+**Integration Points:**
+- Called by `DrumCandidateMapper` during candidate → onset conversion
+- Output used by MIDI converters (`Converters/`) for final MIDI export
+- Future integration: VST articulation selection, audio renderer hints
+
+**Test Coverage:** 38 tests in `DrumArticulationMapperTests.cs` covering:
+- GM2 mappings for all known articulations
+- Standard role mappings for all drum roles
+- Fallback behavior (unknown articulation, unknown role, null inputs)
+- Null safety (null/empty/whitespace roles)
+- Determinism (same inputs → same outputs)
+- MIDI note range validation (all outputs in [0..127])
+- Helper method correctness (`GetStandardNoteForRole`)
+- Integration scenarios (typical drum patterns, fills)
+
+
+
+
 
 
 ## 1) Solution Overview

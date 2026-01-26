@@ -64,16 +64,36 @@ Ambiguous/unclear ACs (highlighted):
 - Interaction with velocity/timing shapers: confirm articulation mapping does not inadvertently modify velocity/timing hints.
 
 ## 7) Clarifying Questions
+
 1. Which mapping standards must be supported out of the box (GM, GM2, custom sample-kit names)?
+**Answer:** Support GM2 (General MIDI Level 2) standard mappings as the baseline. GM2 provides the most comprehensive drum note mappings including articulations. Future extensions can add custom kit mappings via configuration.
+
 2. Should the mapper return a MIDI note number only, or also an articulation token (string) that renderers can interpret?
+**Answer:** Return both: (a) MIDI note number for immediate playback compatibility, and (b) optional articulation metadata string for advanced renderers. This dual approach ensures backward compatibility while enabling future enhancements.
+
 3. How many crash variants are required and how should a specific variant be selected (operator hint, style, seed)?
+**Answer:** Support 2 crash variants (Crash1, Crash2) mapped to GM2 notes 49 and 57. Selection is deterministic based on the role name suffix if provided by operators (e.g., "Crash" → Crash1, "Crash2" → Crash2), otherwise default to Crash1.
+
 4. When a VST/sampler exposes articulation by bank/program/CC rather than MIDI note, do we need a mapping abstraction or only note-level mapping for now?
+**Answer:** Note-level mapping only for Story 6.3. Bank/program/CC mappings are future enhancements. The articulation metadata string provides extensibility for such cases.
+
 5. Should `DrumArticulationMapper` be style-aware (consult `StyleConfiguration`) when selecting articulations?
+**Answer:** No style awareness in Story 6.3. Keep the mapper simple and deterministic based solely on articulation enum + role. Style influence happens earlier in operator selection, not in MIDI mapping.
+
 6. What exact fallback behavior is preferred when an articulation is unmapped: (a) return a neutral note, (b) return null and let converter choose, or (c) return a token indicating "unsupported"?
+**Answer:** (a) Return the standard MIDI note for the role (e.g., snare → 38, kick → 36) with articulation metadata indicating "fallback". This ensures playable MIDI output always.
+
 7. Are there any performance or allocation constraints on mapping calls (hot path concerns)?
+**Answer:** Minimal allocations. Use static readonly dictionaries for mappings. The mapper is called during candidate→onset conversion, not per-frame rendering, so performance is not critical but should still be efficient.
+
 8. Where should mapping tables live (code, config files, resource bundles) and who owns them (agent vs. converter subsystem)?
+**Answer:** Hardcoded in `DrumArticulationMapper` as static readonly dictionaries for Story 6.3. Future stories can externalize to config. Ownership is agent subsystem since it's part of the drummer performance layer.
+
 9. For unit tests, which canonical mapping table should tests assert against (GM2 defaults?), and where is that authoritative source?
+**Answer:** Tests assert against GM2 specification. Authoritative source is the hardcoded mapping tables in `DrumArticulationMapper` which document GM2 note numbers in comments.
+
 10. Should articulation mapping influence selection/scoring earlier in the pipeline (e.g., prefer articulations available in target kit), or only be applied at render-time?
+**Answer:** Render-time only for Story 6.3. Operators freely specify articulations; the mapper handles graceful fallback. Kit-aware operator scoring is a future enhancement.
 
 ## 8) Test Scenario Ideas
 - Unit tests:
