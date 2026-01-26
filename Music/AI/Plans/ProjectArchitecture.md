@@ -1513,6 +1513,112 @@ var popRockOperators = registry.GetEnabledOperators(popRockStyle);
 | `Generator/Agents/Drums/Physicality/PhysicalityFilter.cs` | Playability filter stub |
 | `Generator/Agents/Drums/Physicality/PhysicalityRules.cs` | Physicality configuration |
 
+---
+
+## Story 8.1 — Drummer Agent Integration (Implemented)
+
+The DrummerAgent facade unifies all drummer components (policy provider, candidate source, memory, registry) and integrates into Generator.cs. Key behavior:
+
+**DrummerAgent Class** (`Generator/Agents/Drums/DrummerAgent.cs`):
+- **Facade pattern:** Delegates to DrummerPolicyProvider and DrummerCandidateSource without containing generation logic
+- **Implements:** Both `IGroovePolicyProvider` and `IGrooveCandidateSource` for groove system integration
+- **Lifecycle:**
+  - Constructor takes `StyleConfiguration` + optional `DrummerAgentSettings`
+  - Creates `DrumOperatorRegistry` internally via `DrumOperatorRegistryBuilder.BuildComplete()`
+  - Creates `DrummerMemory` that persists for agent lifetime (song-level anti-repetition)
+  - Optional `PhysicalityFilter` if rules provided in settings
+- **Public API:**
+  - `Generate(SongContext) → PartTrack` — Main entry point for drum generation
+  - `GetPolicy(barContext, role)` — Delegates to DrummerPolicyProvider
+  - `GetCandidateGroups(barContext, role)` — Delegates to DrummerCandidateSource
+  - `ResetMemory()` — Clears memory for reusing agent with new song
+  - Properties: `StyleConfiguration`, `Registry`, `Memory` (for inspection/diagnostics)
+
+**DrummerAgentSettings** (`Generator/Agents/Drums/DrummerAgent.cs`):
+```csharp
+public sealed record DrummerAgentSettings
+{
+    public bool EnableDiagnostics { get; init; } = false;  // Opt-in diagnostics
+    public DrummerPolicySettings? PolicySettings { get; init; }
+    public DrummerCandidateSourceSettings? CandidateSourceSettings { get; init; }
+    public PhysicalityRules? PhysicalityRules { get; init; }
+}
+```
+
+**Generator.cs Integration** (`Generator/Core/Generator.cs`):
+- **New signature:** `Generator.Generate(SongContext, DrummerAgent?)` with optional agent parameter
+- **Backward compatibility:** Original `Generate(SongContext)` preserved, calls new signature with null agent
+- **Behavior:**
+  - When `drummerAgent != null`: Uses operator-based generation with human-like variation
+  - When `drummerAgent == null`: Falls back to `DrumTrackGenerator` (anchor patterns only)
+- **Validation:** Same validation as fallback (BarTrack, SectionTrack, GroovePresetDefinition required)
+
+**Generation Flow (when DrummerAgent provided):**
+```
+DrummerAgent.Generate(songContext)
+  │
+  ├─ Validate SongContext (throws ArgumentException if invalid)
+  ├─ Extract anchor onsets from GroovePresetDefinition.AnchorLayer
+  ├─ For each bar:
+  │    ├─ Build DrummerContext from BarContext
+  │    ├─ For each role (Kick, Snare, ClosedHat):
+  │    │    ├─ GetPolicy() → density/caps/enabled operators
+  │    │    └─ GetCandidateGroups() → operator-generated candidates
+  │    └─ Combine with anchors (anchors have priority)
+  └─ Convert DrumOnset → PartTrackEvent → sorted PartTrack
+```
+
+**Key Invariants:**
+- **Determinism:** Same seed + same context → identical output (anchors + operator candidates)
+- **Anchor preservation:** Anchors always present (kick on 1/3, snare on 2/4 for PopRock)
+- **No duplicate anchors:** Operator candidates cannot replace anchors (anchors have priority)
+- **Sorted output:** PartTrack events sorted by AbsoluteTimeTicks
+- **Memory persistence:** Memory persists across Generate() calls for song-level anti-repetition
+- **Delegation only:** DrummerAgent contains NO generation logic (pure facade)
+
+**Error Handling:**
+- `ArgumentNullException`: Null songContext or styleConfig
+- `ArgumentException`: Missing BarTrack, SectionTrack, or GroovePresetDefinition
+- Exceptions during generation propagate (fail fast, no silent fallback)
+
+**Testing** (`Music.Tests/Generator/Agents/Drums/DrummerAgentTests.cs`):
+- **Construction tests:** Valid/null config, registry/memory initialization
+- **Delegation tests:** Policy/candidate delegation correctness
+- **Determinism tests:** Same seed → same output, different seeds → different output
+- **Generate tests:** Validation, non-empty output, sorted events
+- **Integration tests:** Generator with agent, Generator without agent (fallback)
+- **Memory tests:** ResetMemory() clears memory state
+
+**Files:**
+- `Generator/Agents/Drums/DrummerAgent.cs` — Facade class (Story 8.1)
+- `Generator/Core/Generator.cs` — Updated with optional agent parameter (Story 8.1)
+- `Music.Tests/Generator/Agents/Drums/DrummerAgentTests.cs` — Unit tests (Story 8.1)
+
+**Usage Example:**
+```csharp
+// Create agent with PopRock style
+var agent = new DrummerAgent(StyleConfigurationLibrary.PopRock);
+
+// Generate drum track
+var drumTrack = Generator.Generate(songContext, agent);
+
+// Fallback (no agent)
+var fallbackTrack = Generator.Generate(songContext, drummerAgent: null);
+```
+
+**Remaining Drummer Agent Work:**
+- Story 4.1 (COMPLETED): Limb model (enum, mapping, conflict detection)
+- Stories 4.2-4.4: Sticking rules, physicality filter integration
+- Stories 5.1-5.4: Pop Rock style configuration
+
+**Notes:**
+- Diagnostics are per-bar in groove system, not agent-level (each bar creates its own GrooveDiagnosticsCollector)
+- PhysicalityFilter is optional; when null, no physicality constraints applied
+- DrumOperatorRegistry is frozen after BuildComplete() (immutable, thread-safe)
+- Different songs should use different DrummerAgent instances for proper memory isolation
+
+---
+
 **Remaining Drummer Agent Work:**
 - Story 4.1 (COMPLETED): Limb model (enum, mapping, conflict detection)
 - Stories 4.2-4.4: Sticking rules, physicality filter integration
