@@ -1,15 +1,96 @@
+# Task: Implement Story 10.8.2
 
+## Goal
 
-Goal: To implement Story 10.8.2 from the Current Epic CurrentEpic_HumanDrummer.md.
+Implement **Story 10.8.2** as defined in `CurrentEpic.md`, using `PreAnalysis_10.8.2.md` as the authoritative specification for requirements, constraints, and acceptance criteria.
 
-Steps to achieve the goal:
+---
 
-(1) Review the details and acceptance criteria outlined in PreAnalysis_10.8.2.md to understand the basic requirements for Story 10.8.2.
-(2) Compute answers to the Clarifying Questions in PreAnalysis_10.8.2.md and update this document with answers to be placed under each existing question (example: Question 1, newline, Answer 1 newline, ....).
-(3) Implement (code) Story 10.8.2 from CurrentEpic_HumanDrummer.md including unit tests.
-Use PreAnalysis_10.8.2.md to guide your implementation.
-(4) Run the entire test suite to ensure no existing functionality is broken.
-(5) Update ProjectArchitecture.md to reflect the changes. Only include project architecuture-related content.
+## Authoritative Inputs
 
-WHAT NOT TO DO:
-    - Do not update nor attempt to update CurrentEpic_HumanDrummer.md. The user will handle that.
+- **PreAnalysis_10.8.2.md**
+  - Defines all implementation rules, assumptions, constraints, and acceptance criteria.
+  - Acts as the single source of truth for behavior and scope.
+
+- **CurrentEpic.md**
+  - Provides story context and intent only.
+  - Must not be modified.
+
+---
+
+## Required Steps
+
+### 1. Review Pre-Analysis
+
+- Read the entire `PreAnalysis_10.8.2.md` document, including:
+  - Story description
+  - Requirements
+  - Constraints
+  - Acceptance criteria
+  - Assumptions and dependencies
+- Interpret and resolve behavior strictly according to what is specified.
+- Do not infer or introduce requirements beyond what is stated or implied by acceptance criteria.
+
+---
+
+### 2. Implement Story 10.8.2
+
+- Write production code that satisfies **all acceptance criteria** in `PreAnalysis_10.8.2.md`.
+- Follow existing project conventions unless explicitly overridden.
+- When multiple implementations are possible, make deterministic choices favoring:
+  - Simplicity
+  - Testability
+  - Alignment with acceptance criteria
+
+---
+
+### 3. Add or Update Unit Tests
+
+- Implement unit tests that:
+  - Explicitly validate each acceptance criterion
+  - Fail if the story is incomplete or incorrectly implemented
+- Ensure tests are:
+  - Isolated
+  - Deterministic
+  - Consistent with existing test patterns
+
+---
+
+### 4. Run Full Test Suite
+
+- Execute the entire test suite.
+- Fix any regressions or failures introduced by this change.
+- Do not disable, skip, or weaken existing tests.
+
+---
+
+### 5. Update Architecture Documentation
+
+- Update `ProjectArchitecture.md` **only if** the story introduces or modifies:
+  - Components
+  - Modules
+  - Data flow
+  - Responsibilities
+- Limit changes strictly to architecture-relevant content.
+- Do not include story descriptions, implementation notes, or rationale.
+
+---
+
+## Constraints / What Not To Do
+
+- Do not modify `CurrentEpic.md`.
+- Do not add new requirements beyond `PreAnalysis_10.8.2.md`.
+- Do not leave behavior ambiguous; select concrete, deterministic implementations.
+- Do not refactor unrelated code unless required to pass tests.
+- Do not add commentary, rationale, or meta-explanations to code or documentation.
+
+---
+
+## Completion Criteria
+
+The task is complete when:
+
+- All acceptance criteria in `PreAnalysis_10.8.2.md` are satisfied
+- All new and existing unit tests pass
+- `ProjectArchitecture.md` accurately reflects any architectural changes
+- No unauthorized files were modified
