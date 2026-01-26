@@ -1,6 +1,6 @@
 // AI: purpose=Story H1 cross-component tests verifying pipeline ordering and interactions.
 // AI: invariants=Deterministic; tests component boundaries; fast.
-// AI: deps=VelocityShaper, FeelTimingEngine, RoleTimingEngine, OnsetStrengthClassifier.
+// AI: deps=FeelTimingEngine, RoleTimingEngine, OnsetStrengthClassifier.
 
 using Music.Generator;
 using Music.Generator.Groove;
@@ -62,74 +62,6 @@ public class GrooveCrossComponentTests
         // Highest velocities kept
         Assert.Contains(result.FinalOnsets, o => o.Velocity == 100);
         Assert.Contains(result.FinalOnsets, o => o.Velocity == 95);
-    }
-
-    #endregion
-
-    #region Velocity and Timing Pipeline Order
-
-    [Fact]
-    public void VelocityAndTiming_BothApplied_IndependentlyCorrect()
-    {
-        // Arrange: verify velocity and timing are computed independently
-        var policy = CreateTimingPolicy();
-        var accentPolicy = CreateAccentPolicy();
-
-        var onset = new GrooveOnset
-        {
-            Role = "Kick",
-            BarNumber = 1,
-            Beat = 1.5m, // Offbeat
-            Strength = null, // Will be classified
-            Velocity = null,
-            TimingOffsetTicks = null
-        };
-
-        // Act: compute strength and velocity
-        var strength = OnsetStrengthClassifier.Classify(
-            onset.Beat,
-            beatsPerBar: 4,
-            AllowedSubdivision.Quarter | AllowedSubdivision.Eighth);
-
-        int velocity = VelocityShaper.ComputeVelocity("Kick", strength, accentPolicy, null);
-
-        // Apply role timing via the engine
-        var onsets = new List<GrooveOnset> { onset with { Strength = strength, Velocity = velocity } };
-        var afterTiming = RoleTimingEngine.ApplyRoleTiming(onsets, policy, null);
-        int timing = afterTiming[0].TimingOffsetTicks ?? 0;
-
-        // Assert: both computed correctly
-        Assert.Equal(OnsetStrength.Offbeat, strength);
-        Assert.Equal(85, velocity); // From accent policy
-        Assert.Equal(0, timing); // OnTop feel + 0 bias
-    }
-
-    [Fact]
-    public void VelocityAndTiming_OrderDoesNotAffectResult()
-    {
-        // Arrange
-        var policy = CreateTimingPolicy();
-        var accentPolicy = CreateAccentPolicy();
-        decimal beat = 2.0m;
-
-        // Act: compute timing first, then velocity
-        var strength1 = OnsetStrengthClassifier.Classify(beat, 4, AllowedSubdivision.Quarter | AllowedSubdivision.Eighth);
-        var onsets1 = new List<GrooveOnset> { CreateOnset(beat, 0) with { Strength = strength1 } };
-        var afterTiming1 = RoleTimingEngine.ApplyRoleTiming(onsets1, policy, null);
-        int timing1 = afterTiming1[0].TimingOffsetTicks ?? 0;
-        int velocity1 = VelocityShaper.ComputeVelocity("Kick", strength1, accentPolicy, null);
-
-        // Compute velocity first, then timing
-        var strength2 = OnsetStrengthClassifier.Classify(beat, 4, AllowedSubdivision.Quarter | AllowedSubdivision.Eighth);
-        int velocity2 = VelocityShaper.ComputeVelocity("Kick", strength2, accentPolicy, null);
-        var onsets2 = new List<GrooveOnset> { CreateOnset(beat, velocity2) with { Strength = strength2 } };
-        var afterTiming2 = RoleTimingEngine.ApplyRoleTiming(onsets2, policy, null);
-        int timing2 = afterTiming2[0].TimingOffsetTicks ?? 0;
-
-        // Assert: same results regardless of order
-        Assert.Equal(strength1, strength2);
-        Assert.Equal(velocity1, velocity2);
-        Assert.Equal(timing1, timing2);
     }
 
     #endregion
@@ -306,22 +238,6 @@ public class GrooveCrossComponentTests
             {
                 ["Kick"] = 0,
                 ["Snare"] = 5
-            }
-        };
-    }
-
-    private static GrooveAccentPolicy CreateAccentPolicy()
-    {
-        return new GrooveAccentPolicy
-        {
-            RoleStrengthVelocity = new Dictionary<string, Dictionary<OnsetStrength, VelocityRule>>
-            {
-                ["Kick"] = new Dictionary<OnsetStrength, VelocityRule>
-                {
-                    [OnsetStrength.Downbeat] = new VelocityRule { Typical = 100, AccentBias = 10, Min = 80, Max = 127 },
-                    [OnsetStrength.Offbeat] = new VelocityRule { Typical = 85, AccentBias = 0, Min = 60, Max = 110 },
-                    [OnsetStrength.Strong] = new VelocityRule { Typical = 95, AccentBias = 5, Min = 70, Max = 120 }
-                }
             }
         };
     }

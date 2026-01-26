@@ -215,9 +215,6 @@ namespace Music.Generator.Groove
                     }
                 },
 
-                // (#5) accents / dynamics
-                AccentPolicy = BuildDefaultAccentPolicy(),
-
                 // (#8) orchestration defaults by section type
                 OrchestrationPolicy = BuildDefaultOrchestrationPolicy(),
 
@@ -300,50 +297,6 @@ namespace Music.Generator.Groove
                 {
                     [GrooveRoles.Pads] = 2,
                     [GrooveRoles.Comp] = 2
-                }
-            };
-        }
-
-        private static GrooveAccentPolicy BuildDefaultAccentPolicy()
-        {
-            // Simple, safe defaults. You’ll tune per genre later.
-            return new GrooveAccentPolicy
-            {
-                RoleStrengthVelocity = new Dictionary<string, Dictionary<OnsetStrength, VelocityRule>>
-                {
-                    [GrooveRoles.Kick] = new()
-                    {
-                        [OnsetStrength.Downbeat] = new VelocityRule { Min = 90, Max = 120, Typical = 105, AccentBias = 0 },
-                        [OnsetStrength.Strong] = new VelocityRule { Min = 85, Max = 115, Typical = 100, AccentBias = 0 },
-                        [OnsetStrength.Offbeat] = new VelocityRule { Min = 70, Max = 105, Typical = 85, AccentBias = -5 },
-                    },
-                    [GrooveRoles.Snare] = new()
-                    {
-                        [OnsetStrength.Backbeat] = new VelocityRule { Min = 95, Max = 127, Typical = 112, AccentBias = 5 },
-                        [OnsetStrength.Ghost] = new VelocityRule { Min = 20, Max = 50, Typical = 35, AccentBias = 0 },
-                    },
-                    [GrooveRoles.ClosedHat] = new()
-                    {
-                        [OnsetStrength.Strong] = new VelocityRule { Min = 55, Max = 85, Typical = 70, AccentBias = 0 },
-                        [OnsetStrength.Offbeat] = new VelocityRule { Min = 45, Max = 75, Typical = 60, AccentBias = -3 },
-                    },
-                    [GrooveRoles.OpenHat] = new()
-                    {
-                        [OnsetStrength.Strong] = new VelocityRule { Min = 60, Max = 90, Typical = 75, AccentBias = 0 },
-                        [OnsetStrength.Offbeat] = new VelocityRule { Min = 50, Max = 80, Typical = 65, AccentBias = -3 },
-                    },
-                    [GrooveRoles.Comp] = new()
-                    {
-                        [OnsetStrength.Strong] = new VelocityRule { Min = 60, Max = 95, Typical = 78, AccentBias = 0 },
-                        [OnsetStrength.Offbeat] = new VelocityRule { Min = 55, Max = 90, Typical = 72, AccentBias = -2 },
-                        [OnsetStrength.Pickup] = new VelocityRule { Min = 58, Max = 92, Typical = 74, AccentBias = 0 },
-                    },
-                    [GrooveRoles.Bass] = new()
-                    {
-                        [OnsetStrength.Downbeat] = new VelocityRule { Min = 70, Max = 110, Typical = 90, AccentBias = 0 },
-                        [OnsetStrength.Strong] = new VelocityRule { Min = 65, Max = 105, Typical = 85, AccentBias = -2 },
-                        [OnsetStrength.Offbeat] = new VelocityRule { Min = 55, Max = 95, Typical = 75, AccentBias = -5 },
-                    }
                 }
             };
         }

@@ -1,7 +1,7 @@
 // AI: purpose=Maps DrumCandidate to GrooveOnsetCandidate for groove system integration.
-// AI: invariants=Deterministic: same input → same output; CandidateId preserved in Tags; null hints handled safely.
+// AI: invariants=Deterministic: same input → same output; VelocityHint/TimingHint flow directly to GrooveOnsetCandidate.
 // AI: deps=DrumCandidate, GrooveOnsetCandidate, FillRole, DrumArticulation; consumed by DrummerCandidateSource.
-// AI: change=Story 2.4; extend with additional hint mappings as operators evolve.
+// AI: change=VelocityHint/TimingHint now flow directly instead of via tags.
 
 using Music.Generator.Groove;
 
@@ -9,7 +9,8 @@ namespace Music.Generator.Agents.Drums
 {
     /// <summary>
     /// Maps DrumCandidate to GrooveOnsetCandidate for groove system consumption.
-    /// Preserves candidate identity and translates drum-specific hints to tags.
+    /// Preserves candidate identity and translates drum-specific hints.
+    /// VelocityHint and TimingHint flow directly to GrooveOnsetCandidate.
     /// Story 2.4: Implement Drummer Candidate Source.
     /// </summary>
     public static class DrumCandidateMapper
@@ -33,7 +34,7 @@ namespace Music.Generator.Agents.Drums
         /// Maps a DrumCandidate to a GrooveOnsetCandidate.
         /// </summary>
         /// <param name="candidate">Source drum candidate.</param>
-        /// <returns>Mapped groove onset candidate with tags from hints.</returns>
+        /// <returns>Mapped groove onset candidate with hints and tags.</returns>
         /// <exception cref="ArgumentNullException">If candidate is null.</exception>
         public static GrooveOnsetCandidate Map(DrumCandidate candidate)
         {
@@ -48,7 +49,9 @@ namespace Music.Generator.Agents.Drums
                 Strength = candidate.Strength,
                 ProbabilityBias = candidate.Score,
                 MaxAddsPerBar = 1, // Default; can be overridden by operator
-                Tags = tags
+                Tags = tags,
+                VelocityHint = candidate.VelocityHint,
+                TimingHint = candidate.TimingHint
             };
         }
 
@@ -105,17 +108,8 @@ namespace Music.Generator.Agents.Drums
                 tags.Add($"Strength:{candidate.Strength}");
             }
 
-            // Velocity hint tag (for downstream velocity shaping)
-            if (candidate.VelocityHint.HasValue)
-            {
-                tags.Add($"VelocityHint:{candidate.VelocityHint.Value}");
-            }
-
-            // Timing hint tag (for downstream timing shaping)
-            if (candidate.TimingHint.HasValue)
-            {
-                tags.Add($"TimingHint:{candidate.TimingHint.Value}");
-            }
+            // Note: VelocityHint and TimingHint now flow directly via GrooveOnsetCandidate properties,
+            // not via tags. Tags are kept for traceability/diagnostics only.
 
             return tags;
         }

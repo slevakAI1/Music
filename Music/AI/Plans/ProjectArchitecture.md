@@ -781,7 +781,6 @@ public sealed class GrooveProtectionPolicy
     public GrooveRoleConstraintPolicy RoleConstraintPolicy { get; set; } // Vocab constraints
     public GroovePhraseHookPolicy PhraseHookPolicy { get; set; }       // Fill windows/cadence
     public GrooveTimingPolicy TimingPolicy { get; set; }               // Micro-timing (per-role feel & bias)
-    public GrooveAccentPolicy AccentPolicy { get; set; }               // Velocity shaping
     public GrooveOrchestrationPolicy OrchestrationPolicy { get; set; } // Role presence defaults
     public List<GrooveProtectionLayer> HierarchyLayers { get; set; }   // Layered protections
 }
@@ -793,11 +792,15 @@ Note: The `GrooveTimingPolicy` is consumed by the Role Timing Engine (Story E2).
 - `GroovePolicyDecision` may provide field-level overrides per bar/role: `RoleTimingFeelOverride` and `RoleTimingBiasTicksOverride`.
 - Combined offset is added to any existing E1 feel timing and the final result is clamped to `[-MaxAbsTimingBiasTicks..+MaxAbsTimingBiasTicks]`.
 
+Note: Velocity shaping was removed from the groove system (Story 6.1). Velocity is now handled by instrument agents
+(e.g., `DrummerVelocityShaper`) which provide `VelocityHint` values that become the final `GrooveOnset.Velocity`.
+
 #### SegmentGrooveProfile (Per-Section Overrides)
 
 ```csharp
 public sealed class SegmentGrooveProfile
 {
+
     public string SegmentId { get; set; }
     public int? SectionIndex { get; set; }
     public int? StartBar { get; set; }
@@ -918,11 +921,11 @@ public sealed class GrooveOverrideMergePolicy
 
 ### Groove Infrastructure Files
 
+
 | File | Purpose |
 |------|---------|
 | `OnsetGrid.cs` / `OnsetGridBuilder.cs` | Valid beat positions from subdivision policy |
 | `OnsetStrengthClassifier.cs` | Classify onset strength |
-| `VelocityShaper.cs` | Compute final onset velocity per role x strength; should remain the single final velocity authority |
 | `FeelTimingEngine.cs` | Apply feel timing (Straight/Swing/Shuffle/Triplet) to eligible eighth offbeats |
 | `RoleTimingEngine.cs` | Apply per-role micro-timing (TimingFeel -> ticks + RoleTimingBiasTicks) and clamp to `MaxAbsTimingBiasTicks` |
 | `ProtectionPerBarBuilder.cs` | Merge protection layers per bar |
@@ -943,8 +946,8 @@ public sealed class GrooveOverrideMergePolicy
 | `PartTrackBarCoverageAnalyzer.cs` | Analyze per-bar fill state (Story SC1) |
 | `GrooveTestSetup.cs` | Build PopRockBasic preset for testing |
 
-Note (agent integration): instrument agents may provide per-candidate hint fields (e.g., drums `VelocityHint`) before groove shaping runs.
-The groove `VelocityShaper` must remain responsible for writing final `GrooveOnset.Velocity` to avoid per-agent duplication.
+Note (agent integration): Velocity is now handled by instrument agents (e.g., `DrummerVelocityShaper` provides hints).
+Agents set `VelocityHint` on candidates; final `GrooveOnset.Velocity` comes from these hints or defaults to 80.
 
 ---
 
@@ -957,6 +960,8 @@ Reusable musical fragments (motifs, riffs, hooks) with placement and rendering.
 Location: `Song/Material/`
 
 #### PartTrackMeta (Track Metadata)
+
+
 
 ```csharp
 public sealed record PartTrackMeta

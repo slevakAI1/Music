@@ -47,6 +47,7 @@ public static class GrooveOnsetFactory
     /// <summary>
     /// Creates a GrooveOnset from a variation candidate selection.
     /// Story G2: Sets Source=Variation with GroupId, CandidateId, and optional TagsSnapshot.
+    /// VelocityHint and TimingHint from candidate flow directly to GrooveOnset.
     /// </summary>
     /// <param name="candidate">The selected candidate.</param>
     /// <param name="group">The group containing the candidate.</param>
@@ -70,6 +71,8 @@ public static class GrooveOnsetFactory
             BarNumber = barNumber,
             Beat = candidate.OnsetBeat,
             Strength = candidate.Strength,
+            Velocity = candidate.VelocityHint,
+            TimingOffsetTicks = candidate.TimingHint,
             Provenance = GrooveOnsetProvenance.ForVariation(group.GroupId, candidateId, enabledTags)
         };
     }

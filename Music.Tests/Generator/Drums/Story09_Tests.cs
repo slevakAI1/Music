@@ -41,7 +41,6 @@ namespace Music.Tests.Generator.Drums
                     RoleConstraintPolicy = new GrooveRoleConstraintPolicy(),
                     PhraseHookPolicy = new GroovePhraseHookPolicy(),
                     TimingPolicy = new GrooveTimingPolicy(),
-                    AccentPolicy = new GrooveAccentPolicy(),
                     OrchestrationPolicy = new GrooveOrchestrationPolicy
                     {
                         DefaultsBySectionType = new List<SectionRolePresenceDefaults>

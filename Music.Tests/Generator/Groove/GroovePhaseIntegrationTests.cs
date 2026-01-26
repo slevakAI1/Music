@@ -84,22 +84,6 @@ public class GroovePhaseIntegrationTests
                         ["Snare"] = 5
                     }
                 },
-                AccentPolicy = new GrooveAccentPolicy
-                {
-                    RoleStrengthVelocity = new Dictionary<string, Dictionary<OnsetStrength, VelocityRule>>
-                    {
-                        ["Kick"] = new Dictionary<OnsetStrength, VelocityRule>
-                        {
-                            [OnsetStrength.Downbeat] = new VelocityRule { Typical = 100, AccentBias = 10, Min = 80, Max = 127 },
-                            [OnsetStrength.Offbeat] = new VelocityRule { Typical = 85, AccentBias = 0, Min = 60, Max = 110 }
-                        },
-                        ["Snare"] = new Dictionary<OnsetStrength, VelocityRule>
-                        {
-                            [OnsetStrength.Backbeat] = new VelocityRule { Typical = 110, AccentBias = 5, Min = 90, Max = 127 },
-                            [OnsetStrength.Offbeat] = new VelocityRule { Typical = 80, AccentBias = 0, Min = 50, Max = 100 }
-                        }
-                    }
-                },
                 MergePolicy = new GrooveOverrideMergePolicy()
             },
             VariationCatalog = new GrooveVariationCatalog
@@ -129,58 +113,6 @@ public class GroovePhaseIntegrationTests
             IsNeverRemove = false,
             IsProtected = false
         };
-    }
-
-    #endregion
-
-    #region Velocity + Strength Classification Integration
-
-    [Fact]
-    public void VelocityShaping_UsesClassifiedStrength_ForDownbeat()
-    {
-        // Arrange: onset on beat 1 (downbeat) without pre-set strength/velocity
-        var preset = CreateMinimalPreset();
-        var onset = CreateOnset("Kick", 1.0m);
-
-        // Act: classify strength then shape velocity
-        var classifiedStrength = OnsetStrengthClassifier.Classify(
-            onset.Beat,
-            preset.Identity.BeatsPerBar,
-            preset.ProtectionPolicy.SubdivisionPolicy.AllowedSubdivisions);
-
-        int velocity = VelocityShaper.ComputeVelocity(
-            role: onset.Role,
-            strength: classifiedStrength,
-            accentPolicy: preset.ProtectionPolicy.AccentPolicy,
-            policyDecision: null);
-
-        // Assert: beat 1 = Downbeat; Kick downbeat velocity = 100 + 10 = 110
-        Assert.Equal(OnsetStrength.Downbeat, classifiedStrength);
-        Assert.Equal(110, velocity);
-    }
-
-    [Fact]
-    public void VelocityShaping_UsesClassifiedStrength_ForOffbeat()
-    {
-        // Arrange: onset on beat 1.5 (eighth offbeat)
-        var preset = CreateMinimalPreset();
-        var onset = CreateOnset("Kick", 1.5m);
-
-        // Act
-        var classifiedStrength = OnsetStrengthClassifier.Classify(
-            onset.Beat,
-            preset.Identity.BeatsPerBar,
-            preset.ProtectionPolicy.SubdivisionPolicy.AllowedSubdivisions);
-
-        int velocity = VelocityShaper.ComputeVelocity(
-            role: onset.Role,
-            strength: classifiedStrength,
-            accentPolicy: preset.ProtectionPolicy.AccentPolicy,
-            policyDecision: null);
-
-        // Assert: beat 1.5 = Offbeat; Kick offbeat velocity = 85 + 0 = 85
-        Assert.Equal(OnsetStrength.Offbeat, classifiedStrength);
-        Assert.Equal(85, velocity);
     }
 
     #endregion
@@ -357,7 +289,7 @@ public class GroovePhaseIntegrationTests
 
     private List<GrooveOnset> ProcessOnsets(List<GrooveOnset> onsets, GroovePresetDefinition preset)
     {
-        // Simulate pipeline: classify strength → shape velocity → apply timing
+        // Simulate pipeline: classify strength → apply timing (velocity now comes from drummer hints)
         var result = new List<GrooveOnset>();
 
         foreach (var onset in onsets)
@@ -367,11 +299,8 @@ public class GroovePhaseIntegrationTests
                 preset.Identity.BeatsPerBar,
                 preset.ProtectionPolicy.SubdivisionPolicy.AllowedSubdivisions);
 
-            int velocity = VelocityShaper.ComputeVelocity(
-                role: onset.Role,
-                strength: strength,
-                accentPolicy: preset.ProtectionPolicy.AccentPolicy,
-                policyDecision: null);
+            // Use existing velocity or default to 80
+            int velocity = onset.Velocity ?? 80;
 
             result.Add(onset with
             {

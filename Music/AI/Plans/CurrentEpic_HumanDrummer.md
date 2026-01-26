@@ -716,7 +716,7 @@ If the target VST does not support them, the mapping should gracefully fall back
 
 ---
 
-### Story 7.1 — Implement Drummer Diagnostics Collector
+### Story 7.1 — Implement Drummer Diagnostics Collector (COMPLETED)
 
 **As a** developer  
 **I want** per-bar trace of drummer decisions  
