@@ -1,4 +1,4 @@
-# Music Generator — North Star Plan (Revised)
+# Music Generator — North Star Plan
 
 **Last Updated:** Based on current codebase state and human musician modeling research
 
