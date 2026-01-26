@@ -34,13 +34,13 @@
 
 ---
 
-## Stage 1 — Shared Agent Infrastructure (Reusable Foundation)
+## Stage 10.1 — Shared Agent Infrastructure (Reusable Foundation)
 
 **Goal:** Extract common patterns that all instrument agents (drums, guitar, keys, bass, vocal) will share.
 
 ---
 
-### Story 1.1 — Define Common Agent Contracts (COMPLETED)
+### Story 10.1.1 — Define Common Agent Contracts (COMPLETED)
 
 **As a** developer  
 **I want** shared interfaces and base types for all instrument agents  
@@ -75,7 +75,7 @@
 
 ---
 
-### Story 1.2 — Implement Agent Memory (Anti-Repetition) (COMPLETED)
+### Story 10.1.2 — Implement Agent Memory (Anti-Repetition) (COMPLETED)
 
 **As a** agent  
 **I want** memory of recent decisions  
@@ -98,7 +98,7 @@
 
 ---
 
-### Story 1.3 — Implement Operator Selection Engine (COMPLETED)
+### Story 10.1.3 — Implement Operator Selection Engine (COMPLETED)
 
 **As a** agent  
 **I want** weighted selection from operator candidates  
@@ -123,7 +123,7 @@
 
 ---
 
-### Story 1.4 — Implement Style Configuration Model (COMPLETED)
+### Story 10.1.4 — Implement Style Configuration Model (COMPLETED)
 
 **As a** developer  
 **I want** style configuration separate from operator logic  
@@ -148,13 +148,13 @@
 
 ---
 
-## Stage 2 — Drummer Agent Core  (COMPLETED)
+## Stage 10.2 — Drummer Agent Core  (COMPLETED)
 
 **Goal:** Implement the drummer agent framework with Pop Rock as the first genre.
 
 ---
 
-### Story 2.1 — Define Drummer-Specific Context (COMPLETED)
+### Story 10.2.1 — Define Drummer-Specific Context (COMPLETED)
 
 **As a** drummer agent  
 **I want** drum-specific context extending the common agent context  
@@ -179,7 +179,7 @@
 
 ---
 
-### Story 2.2 — Define Drum Candidate Type (COMPLETED)
+### Story 10.2.2 — Define Drum Candidate Type (COMPLETED)
 
 **As a** drummer agent  
 **I want** drum-specific candidate type  
@@ -206,7 +206,7 @@
 
 ---
 
-### Story 2.3 — Implement Drummer Policy Provider (COMPLETED)
+### Story 10.2.3 — Implement Drummer Policy Provider (COMPLETED)
 
 **As a** groove system  
 **I want** drummer agent to implement `IGroovePolicyProvider`  
@@ -232,7 +232,7 @@
 
 ---
 
-### Story 2.4 — Implement Drummer Candidate Source (COMPLETED)
+### Story 10.2.4 — Implement Drummer Candidate Source (COMPLETED)
 
 **As a** groove system  
 **I want** drummer agent to implement `IGrooveCandidateSource`  
@@ -256,7 +256,7 @@
 
 ---
 
-### Story 2.5 — Implement Drummer Memory (COMPLETED)
+### Story 10.2.5 — Implement Drummer Memory (COMPLETED)
 
 **As a** drummer agent  
 **I want** drummer-specific memory extending base memory  
@@ -278,13 +278,13 @@
 
 ---
 
-## Stage 3 — Drum Operators (25+ Musical Moves)
+## Stage 10.3 — Drum Operators (25+ Musical Moves)
 
 **Goal:** Implement operator families that generate drum candidates. Each operator is a "musical move" parameterized by context.
 
 ---
 
-### Story 3.1 — Micro-Addition Operators (Ghost Notes & Embellishments) (COMPLETED)
+### Story 10.3.1 — Micro-Addition Operators (Ghost Notes & Embellishments) (COMPLETED)
 
 **As a** drummer agent  
 **I want** operators that add subtle single hits  
@@ -318,7 +318,7 @@
 
 ---
 
-### Story 3.2 — Subdivision Transform Operators (Timekeeping Changes)  (COMPLETED)
+### Story 10.3.2 — Subdivision Transform Operators (Timekeeping Changes)  (COMPLETED)
 
 **As a** drummer agent  
 **I want** operators that change the timekeeping texture  
@@ -347,7 +347,7 @@
 
 ---
 
-### Story 3.3 — Phrase Punctuation Operators (Boundaries & Fills)
+### Story 10.3.3 — Phrase Punctuation Operators (Boundaries & Fills)
 
 **As a** drummer agent  
 **I want** operators that mark phrase and section boundaries  
@@ -381,7 +381,7 @@
 
 ---
 
-### Story 3.4 — Pattern Substitution Operators (Groove Swaps)  (COMPLETED)
+### Story 10.3.4 — Pattern Substitution Operators (Groove Swaps)  (COMPLETED)
 
 **As a** drummer agent  
 **I want** operators that swap entire groove patterns  
@@ -409,7 +409,7 @@
 
 ---
 
-### Story 3.5 — Style Idiom Operators (Pop Rock Specifics)  (COMPLETED)
+### Story 10.3.5 — Style Idiom Operators (Pop Rock Specifics)  (COMPLETED)
 
 **As a** drummer agent  
 **I want** genre-specific operators  
@@ -438,7 +438,7 @@
 
 ---
 
-### Story 3.6 — Operator Registry and Discovery
+### Story 10.3.6 — Operator Registry and Discovery
 
 **As a** drummer agent  
 **I want** a registry of all available operators  
@@ -461,13 +461,13 @@
 
 ---
 
-## Stage 4 — Physicality Constraints (Limb Feasibility)    (COMPLETED)
+## Stage 10.4 — Physicality Constraints (Limb Feasibility)    (COMPLETED)
 
 **Goal:** Ensure generated patterns are physically playable by a human drummer.
 
 ---
 
-### Story 4.1 — Define Limb Model  (COMPLETED)
+### Story 10.4.1 — Define Limb Model  (COMPLETED)
 
 **As a** drummer agent  
 **I want** a model of what a human drummer can physically play  
@@ -492,7 +492,7 @@
 
 ---
 
-### Story 4.2 — Implement Sticking Rules  (COMPLETED)
+### Story 10.4.2 — Implement Sticking Rules  (COMPLETED)
 
 **As a** drummer agent  
 **I want** sticking rules enforced  
@@ -515,7 +515,7 @@
 
 ---
 
-### Story 4.3 — Implement Physicality Filter (COMPLETED)
+### Story 10.4.3 — Implement Physicality Filter (COMPLETED)
 
 **As a** drummer agent  
 **I want** candidates filtered by physicality constraints  
@@ -541,7 +541,7 @@
 
 ---
 
-### Story 4.4 — Add Overcrowding Prevention (COMPLETED)
+### Story 10.4.4 — Add Overcrowding Prevention (COMPLETED)
 
 **As a** drummer agent  
 **I want** density caps enforced at physicality level  
@@ -562,7 +562,7 @@
 - Updates to `PhysicalityFilter.cs` and `PhysicalityRules.cs`
 
 
-## Stage 5 — Pop Rock Style Configuration (CONSOLIDATED — NO NEW STORIES)
+## Stage 10.5 — Pop Rock Style Configuration (CONSOLIDATED — NO NEW STORIES)
 
 **Status:** Stories 5.1-5.3 have been REMOVED as redundant. The required functionality already exists in earlier stages.
 
@@ -588,13 +588,13 @@
 
 ---
 
-## Stage 6 — Performance Rendering (Human Realism)
+## Stage 10.6 — Performance Rendering (Human Realism)
 
 **Goal:** Apply velocity and timing nuance for realistic drum output using normalized intents that are genre-agnostic at the drummer layer, with style configuration mapping intents to numeric values.
 
 ---
 
-### Story 6.1 — Implement Drummer Velocity Shaper (COMPLETED)
+### Story 10.6.1 — Implement Drummer Velocity Shaper (COMPLETED)
 
 **As a** drummer agent  
 **I want** drum-specific velocity shaping  
@@ -628,7 +628,7 @@
 
 ---
 
-### Story 6.2 — Implement Drummer Timing Nuance
+### Story 10.6.2 — Implement Drummer Timing Nuance
 
 **As a** drummer agent  
 **I want** drum-specific timing adjustments  
@@ -686,7 +686,7 @@
 
 ---
 
-### Story 6.3 — Implement Articulation Mapping
+### Story 10.6.3 — Implement Articulation Mapping
 
 IMPORTANT NOTE: This story requires VST voices that support these articulations.
 If the target VST does not support them, the mapping should gracefully fall back to standard notes.
@@ -710,13 +710,13 @@ If the target VST does not support them, the mapping should gracefully fall back
 
 ---
 
-## Stage 7 — Diagnostics & Tuning
+## Stage 10.7 — Diagnostics & Tuning
 
 **Goal:** Make drummer decisions visible for debugging and future improvement.
 
 ---
 
-### Story 7.1 — Implement Drummer Diagnostics Collector (COMPLETED)
+### Story 10.7.1 — Implement Drummer Diagnostics Collector (COMPLETED)
 
 **As a** developer  
 **I want** per-bar trace of drummer decisions  
@@ -744,7 +744,7 @@ If the target VST does not support them, the mapping should gracefully fall back
 
 ---
 
-# Story 7.2 — Comprehensive Drum Feature Extraction for Benchmark Analysis (COMPLETED)
+# Story 10.7.2 — Comprehensive Drum Feature Extraction for Benchmark Analysis (COMPLETED)
 
 **Epic:** Human Drummer Agent  
 **Stage:** 7 — Diagnostics & Tuning  
@@ -793,7 +793,7 @@ The original story focused on aggregate statistics (density curves, average sync
 
 ### Acceptance Criteria
 
-#### 7.2a.1 — Raw Event Extraction (`DrumTrackEventExtractor`)
+#### 10.7.2a.1 — Raw Event Extraction (`DrumTrackEventExtractor`)
 
 - [ ] Create `DrumMidiEvent` record:
   ```csharp
@@ -822,7 +822,7 @@ The original story focused on aggregate statistics (density curves, average sync
   - [ ] Group articulations to base role (e.g., 38 + 40 → "Snare")
   - [ ] Return unknown notes as "Unknown:{midiNote}"
 
-#### 7.2a.2 — Per-Bar Pattern Fingerprint (`BarPatternFingerprint`)
+#### 10.7.2a.2 — Per-Bar Pattern Fingerprint (`BarPatternFingerprint`)
 
 - [ ] Create `BarPatternFingerprint` record:
   ```csharp
@@ -858,7 +858,7 @@ The original story focused on aggregate statistics (density curves, average sync
   - [ ] SHA256 truncated to 16 hex chars for storage efficiency
   - [ ] Same pattern → same hash (deterministic)
 
-#### 7.2a.3 — Per-Role Beat-Position Matrix (`BeatPositionMatrix`)
+#### 10.7.2a.3 — Per-Role Beat-Position Matrix (`BeatPositionMatrix`)
 
 - [ ] Create `BeatPositionMatrix` record:
   ```csharp
@@ -880,7 +880,7 @@ The original story focused on aggregate statistics (density curves, average sync
   - [ ] Output: `BeatPositionMatrix` for that role
   - [ ] Enables rapid pattern comparison across bars
 
-#### 7.2a.4 — Onset Statistics Per Bar (`BarOnsetStats`)
+#### 10.7.2a.4 — Onset Statistics Per Bar (`BarOnsetStats`)
 
 - [ ] Create `BarOnsetStats` record:
   ```csharp
@@ -914,7 +914,7 @@ The original story focused on aggregate statistics (density curves, average sync
   - [ ] Input: `IReadOnlyList<DrumMidiEvent>` for a single bar, `beatsPerBar`
   - [ ] Output: `BarOnsetStats`
 
-#### 7.2a.5 — Track-Level Container (`DrumTrackFeatureData`)
+#### 10.7.2a.5 — Track-Level Container (`DrumTrackFeatureData`)
 
 - [ ] Create `DrumTrackFeatureData` record (main container):
   ```csharp
@@ -948,7 +948,7 @@ The original story focused on aggregate statistics (density curves, average sync
   - [ ] Input: `PartTrack` + `BarTrack` + optional genre/artist hints
   - [ ] Output: `DrumTrackFeatureData`
 
-#### 7.2a.6 — Serialization Support
+#### 10.7.2a.6 — Serialization Support
 
 - [ ] All records must be JSON serializable
 - [ ] Create `DrumFeatureDataSerializer` static class:
@@ -957,7 +957,7 @@ The original story focused on aggregate statistics (density curves, average sync
   - [ ] Compact format option (omit null fields)
 - [ ] Include version field in serialized output for schema evolution
 
-#### 7.2a.7 — Unit Tests
+#### 10.7.2a.7 — Unit Tests
 
 - [ ] Test MIDI note → role mapping for all GM2 drum notes
 - [ ] Test pattern fingerprint determinism (same events → same hash)
@@ -966,7 +966,7 @@ The original story focused on aggregate statistics (density curves, average sync
 - [ ] Test serialization round-trip
 - [ ] Test with empty track, single-bar track, multi-bar track
 
-### Files to Create (Story 7.2a)
+### Files to Create (Story 10.7.2a)
 
 ```
 Generator/Agents/Drums/Diagnostics/
@@ -992,7 +992,7 @@ Music.Tests/Generator/Agents/Drums/Diagnostics/
 
 ---
 
-## Story 7.2b — Pattern Detection and Cross-Instrument Analysis Data (COMPLETED)
+## Story 10.7.2b — Pattern Detection and Cross-Instrument Analysis Data (COMPLETED)
 
 **As a** developer  
 **I want** to capture pattern repetition, cross-instrument coordination, and structural markers  
@@ -1008,7 +1008,7 @@ Music.Tests/Generator/Agents/Drums/Diagnostics/
 
 ### Acceptance Criteria
 
-#### 7.2b.1 — Pattern Repetition Detection (`PatternRepetitionData`)
+#### 10.7.2b.1 — Pattern Repetition Detection (`PatternRepetitionData`)
 
 - [ ] Create `PatternRepetitionData` record:
   ```csharp
@@ -1045,7 +1045,7 @@ Music.Tests/Generator/Agents/Drums/Diagnostics/
   - [ ] Identify runs of 2+ consecutive identical patterns
   - [ ] Track all occurrences of each unique pattern
 
-#### 7.2b.2 — Pattern Similarity Analysis (`PatternSimilarityData`)
+#### 10.7.2b.2 — Pattern Similarity Analysis (`PatternSimilarityData`)
 
 - [ ] Create `PatternSimilarityData` record:
   ```csharp
@@ -1076,7 +1076,7 @@ Music.Tests/Generator/Agents/Drums/Diagnostics/
   - [ ] Threshold for "similar": >= 0.7 similarity
   - [ ] Group similar patterns into families
 
-#### 7.2b.3 — Cross-Role Coordination Data (`CrossRoleCoordinationData`)
+#### 10.7.2b.3 — Cross-Role Coordination Data (`CrossRoleCoordinationData`)
 
 - [ ] Create `CrossRoleCoordinationData` record:
   ```csharp
@@ -1108,7 +1108,7 @@ Music.Tests/Generator/Agents/Drums/Diagnostics/
   - [ ] Output: `CrossRoleCoordinationData`
   - [ ] Compute pairwise coordination for: Kick-Snare, Kick-Bass, Snare-Hat, Hat-Crash
 
-#### 7.2b.4 — Anchor Candidate Detection (`AnchorCandidateData`)
+#### 10.7.2b.4 — Anchor Candidate Detection (`AnchorCandidateData`)
 
 - [ ] Create `AnchorCandidateData` record:
   ```csharp
@@ -1145,7 +1145,7 @@ Music.Tests/Generator/Agents/Drums/Diagnostics/
   - [ ] Threshold for "consistent": >= 80% of bars have hit at position
   - [ ] Compare against provided reference anchor
 
-#### 7.2b.5 — Structural Marker Detection (`StructuralMarkerData`)
+#### 10.7.2b.5 — Structural Marker Detection (`StructuralMarkerData`)
 
 - [ ] Create `StructuralMarkerData` record:
   ```csharp
@@ -1192,7 +1192,7 @@ Music.Tests/Generator/Agents/Drums/Diagnostics/
   - [ ] Pattern change: similarity < 0.5 with previous bar
   - [ ] Fill heuristics: high density + tom presence + before crash
 
-#### 7.2b.6 — Multi-Bar Sequence Detection (`SequencePatternData`)
+#### 10.7.2b.6 — Multi-Bar Sequence Detection (`SequencePatternData`)
 
 - [ ] Create `SequencePatternData` record:
   ```csharp
@@ -1230,7 +1230,7 @@ Music.Tests/Generator/Agents/Drums/Diagnostics/
   - [ ] Detect 2-bar and 4-bar repeating sequences
   - [ ] Detect gradual evolution (similarity decreasing over bars)
 
-#### 7.2b.7 — Velocity Dynamics Data (`VelocityDynamicsData`)
+#### 10.7.2b.7 — Velocity Dynamics Data (`VelocityDynamicsData`)
 
 - [ ] Create `VelocityDynamicsData` record:
   ```csharp
@@ -1264,7 +1264,7 @@ Music.Tests/Generator/Agents/Drums/Diagnostics/
   - [ ] Identify accent positions (velocity > mean + 0.5*stdDev)
   - [ ] Identify ghost positions (snare velocity < mean - 0.5*stdDev)
 
-#### 7.2b.8 — Timing Feel Data (`TimingFeelData`)
+#### 10.7.2b.8 — Timing Feel Data (`TimingFeelData`)
 
 - [ ] Create `TimingFeelData` record:
   ```csharp
@@ -1298,7 +1298,7 @@ Music.Tests/Generator/Agents/Drums/Diagnostics/
   - [ ] Detect swing by measuring 8th note pair ratios
   - [ ] Compute per-role timing feel
 
-#### 7.2b.9 — Extended Feature Container (`DrumTrackExtendedFeatureData`)
+#### 10.7.2b.9 — Extended Feature Container (`DrumTrackExtendedFeatureData`)
 
 - [ ] Create `DrumTrackExtendedFeatureData` record (extends 7.2a container):
   ```csharp
@@ -1332,13 +1332,13 @@ Music.Tests/Generator/Agents/Drums/Diagnostics/
   - [ ] Input: `DrumTrackFeatureData` (from 7.2a) + reference anchor
   - [ ] Output: `DrumTrackExtendedFeatureData`
 
-#### 7.2b.10 — Serialization Support
+#### 10.7.2b.10 — Serialization Support
 
 - [ ] Extend `DrumFeatureDataSerializer` for extended data
 - [ ] Support saving base and extended data together or separately
 - [ ] Version field for schema evolution
 
-#### 7.2b.11 — Unit Tests
+#### 10.7.2b.11 — Unit Tests
 
 - [ ] Test pattern repetition detection with known repeating patterns
 - [ ] Test similarity calculation accuracy
@@ -1349,7 +1349,7 @@ Music.Tests/Generator/Agents/Drums/Diagnostics/
 - [ ] Test velocity and timing extraction
 - [ ] Test serialization round-trip
 
-### Files to Create (Story 7.2b)
+### Files to Create (Story 10.7.2b)
 
 ```
 Generator/Agents/Drums/Diagnostics/
@@ -1471,13 +1471,13 @@ The data structures in 7.2a/7.2b are designed to support all these future analys
 
 ---
 
-## Stage 8 — Integration & Testing (IN PROGRESS)
+## Stage 10.8 — Integration & Testing (IN PROGRESS)
 
 **Goal:** Wire everything together and verify end-to-end behavior.
 
 ---
 
-### Story 8.1 — Wire Drummer Agent into Generator (COMPLETED)
+### Story 10.8.1 — Wire Drummer Agent into Generator (COMPLETED)
 
 **As a** developer  
 **I want** drummer agent integrated into the generation pipeline  
@@ -1500,7 +1500,7 @@ The data structures in 7.2a/7.2b are designed to support all these future analys
 
 ---
 
-### Story 8.2 — Implement Drummer Unit Tests (Core)
+### Story 10.8.2 — Implement Drummer Unit Tests (Core)
 
 **As a** developer  
 **I want** comprehensive unit tests  
@@ -1526,7 +1526,7 @@ The data structures in 7.2a/7.2b are designed to support all these future analys
 
 ---
 
-### Story 8.3 — End-to-End Regression Snapshot (Golden Test)
+### Story 10.8.3 — End-to-End Regression Snapshot (Golden Test)
 
 **As a** developer  
 **I want** a golden-file regression test  
@@ -1589,7 +1589,7 @@ The data structures in 7.2a/7.2b are designed to support all these future analys
 ```
 Generator/
   Agents/
-    Common/                           # Stage 1 - Shared infrastructure
+    Common/                           # Stage 10.1 - Shared infrastructure
       IMusicalOperator.cs
       AgentContext.cs
       IAgentMemory.cs
@@ -1599,7 +1599,7 @@ Generator/
       StyleConfiguration.cs
       StyleConfigurationLibrary.cs
       FillShape.cs
-    Drums/                            # Stage 2-8 - Drummer agent
+    Drums/                            # Stage 10.2-10.8 - Drummer agent
       DrummerAgent.cs                 # Main facade
       DrummerContext.cs
       DrummerContextBuilder.cs
@@ -1689,41 +1689,41 @@ DrummerArticulationPick
 ## Appendix D: Story Dependencies
 
 ```
-STAGE 1: SHARED INFRASTRUCTURE
+STAGE 10.1: SHARED INFRASTRUCTURE
 ────────────────────────────────
-1.1 (Contracts) → 1.2 (Memory) → 1.3 (Selection) → 1.4 (Style Config)
+10.1 (Contracts) → 10.2 (Memory) → 10.3 (Selection) → 10.4 (Style Config)
 
-STAGE 2: DRUMMER CORE
+STAGE 10.2: DRUMMER CORE
 ────────────────────────────────
-1.1-1.4 → 2.1 (Context) → 2.2 (Candidate) → 2.3 (Policy) → 2.4 (Source) → 2.5 (Memory)
+10.1-10.4 → 10.2.1 (Context) → 10.2.2 (Candidate) → 10.2.3 (Policy) → 10.2.4 (Source) → 10.2.5 (Memory)
 
-STAGE 3: OPERATORS (can parallelize)
+STAGE 10.3: OPERATORS (can parallelize)
 ────────────────────────────────
-2.2 → 3.1 (Micro) ─┐
-2.2 → 3.2 (Subdiv) │
-2.2 → 3.3 (Phrase) ├→ 3.6 (Registry)
-2.2 → 3.4 (Pattern)│
-2.2 → 3.5 (Style) ─┘
+10.2.2 → 10.3.1 (Micro) ─┐
+10.2.2 → 10.3.2 (Subdiv) │
+10.2.2 → 10.3.3 (Phrase) ├→ 10.3.6 (Registry)
+10.2.2 → 10.3.4 (Pattern)│
+10.2.2 → 10.3.5 (Style) ─┘
 
-STAGE 4: PHYSICALITY
+STAGE 10.4: PHYSICALITY
 ────────────────────────────────
-2.2 → 4.1 (Limb) → 4.2 (Sticking) → 4.3 (Filter) → 4.4 (Overcrowd)
+10.2.2 → 10.4.1 (Limb) → 10.4.2 (Sticking) → 10.4.3 (Filter) → 10.4.4 (Overcrowd)
 
-STAGE 5: POP ROCK CONFIG (CONSOLIDATED)
+STAGE 10.5: POP ROCK CONFIG (CONSOLIDATED)
 ────────────────────────────────
-[No new stories - functionality in Stories 1.4, 2.3, and groove system]
+[No new stories - functionality in Stories 10.1.4, 10.2.3, and groove system]
 
-STAGE 6: PERFORMANCE
+STAGE 10.6: PERFORMANCE
 ────────────────────────────────
-4.4 → 6.1 (Velocity) → 6.2 (Timing) → 6.3 (Articulation)
+10.4.4 → 10.6.1 (Velocity) → 10.6.2 (Timing) → 10.6.3 (Articulation)
 
-STAGE 7: DIAGNOSTICS
+STAGE 10.7: DIAGNOSTICS
 ────────────────────────────────
-6.3 → 7.1 (Collector) → 7.2 (Benchmark) [SPECULATIVE - needs real tracks]
+10.6.3 → 10.7.1 (Collector) → 10.7.2 (Benchmark) [SPECULATIVE - needs real tracks]
 
-STAGE 8: INTEGRATION
+STAGE 10.8: INTEGRATION
 ────────────────────────────────
-6.3 → 8.1 (Wire) → 8.2 (Tests) → 8.3 (Golden)
+10.6.3 → 10.8.1 (Wire) → 10.8.2 (Tests) → 10.8.3 (Golden)
 ```
 
 ---
