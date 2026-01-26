@@ -397,17 +397,17 @@ A skilled drummer optimizes for:
 
 **Note:** Physical constraints (limb model, sticking rules) are genre-agnostic and defined in Stage 4.
 
-**Stage 6 — Performance Rendering: ⏳ IN PROGRESS**
+**Stage 6 — Performance Rendering: ✅ COMPLETE**
 - 6.1: Velocity shaper (normalized intents → style-mapped velocity hints) ✅
-- 6.2: Timing nuance (normalized intents → style-mapped timing hints)
-- 6.3: Articulation mapping (MIDI note variations)
+- 6.2: Timing nuance (normalized intents → style-mapped timing hints) ✅
+- 6.3: Articulation mapping (MIDI note variations) ✅
 
-**Stage 7 — Diagnostics & Tuning: ⏳ PENDING**
-- 7.1: Drummer diagnostics collector (per-bar trace)
-- 7.2: Benchmark feature extraction (density, syncopation, punctuation)
+**Stage 7 — Diagnostics & Tuning: ⏳ COMPLETE**
+- 7.1: Drummer diagnostics collector (per-bar trace) ✅
+- 7.2: Benchmark feature extraction (density, syncopation, punctuation) ✅
 
-**Stage 8 — Integration & Testing: ⏳ PENDING**
-- 8.1: Wire drummer agent into generator (`DrummerAgent` facade)
+**Stage 8 — Integration & Testing: ⏳ IN PROGRESS**
+- 8.1: Wire drummer agent into generator (`DrummerAgent` facade)  ✅
 - 8.2: Unit tests (determinism, musical sensibility)
 - 8.3: Golden regression snapshot
 

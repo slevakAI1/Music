@@ -1471,13 +1471,13 @@ The data structures in 7.2a/7.2b are designed to support all these future analys
 
 ---
 
-## Stage 8 — Integration & Testing
+## Stage 8 — Integration & Testing (IN PROGRESS)
 
 **Goal:** Wire everything together and verify end-to-end behavior.
 
 ---
 
-### Story 8.1 — Wire Drummer Agent into Generator
+### Story 8.1 — Wire Drummer Agent into Generator (COMPLETED)
 
 **As a** developer  
 **I want** drummer agent integrated into the generation pipeline  

@@ -126,7 +126,6 @@
     <None Remove="AI\Completed\Story_7_5_8_Usage_Guide.md" />
     <None Remove="AI\Completed\Story_9_1_Implementation_Summary.md" />
     <None Remove="AI\Plans\CompletedWork_CurrentState.md" />
-    <None Remove="AI\Plans\CurrentEpic.md" />
     <None Remove="AI\Plans\PreAnalysis_2.2.md" />
     <None Remove="AI\Plans\PreAnalysis_E2.md" />
     <None Remove="AI\Plans\PreAnalysis_E2_Clarified.md" />
