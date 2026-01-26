@@ -362,59 +362,57 @@ A skilled drummer optimizes for:
 
 ### Progress Summary
 
-**Stage 1 — Shared Agent Infrastructure: ✅ COMPLETE**
-- 1.1: Common agent contracts (`IMusicalOperator`, `AgentContext`, `IAgentMemory`, `OperatorFamily`) ✅
-- 1.2: Agent memory with anti-repetition (`AgentMemory`, `FillShape`) ✅
-- 1.3: Operator selection engine (`OperatorSelectionEngine`) ✅
-- 1.4: Style configuration model (`StyleConfiguration`, `StyleConfigurationLibrary`) ✅
+**Stage 10.1 — Shared Agent Infrastructure: ✅ COMPLETE**
+- 10.1.1: Common agent contracts (`IMusicalOperator`, `AgentContext`, `IAgentMemory`, `OperatorFamily`) ✅
+- 10.1.2: Agent memory with anti-repetition (`AgentMemory`, `FillShape`) ✅
+- 10.1.3: Operator selection engine (`OperatorSelectionEngine`) ✅
+- 10.1.4: Style configuration model (`StyleConfiguration`, `StyleConfigurationLibrary`) ✅
 
-**Stage 2 — Drummer Agent Core: ✅ COMPLETE**
-- 2.1: Drummer-specific context (`DrummerContext`, `DrummerContextBuilder`) ✅
-- 2.2: Drum candidate type (`DrumCandidate`, `DrumArticulation`, `FillRole`) ✅
-- 2.3: Drummer policy provider (`DrummerPolicyProvider` : `IGroovePolicyProvider`) ✅
-- 2.4: Drummer candidate source (`DrummerCandidateSource` : `IGrooveCandidateSource`) ✅
-- 2.5: Drummer memory (`DrummerMemory`) ✅
+**Stage 10.2 — Drummer Agent Core: ✅ COMPLETE**
+- 10.2.1: Drummer-specific context (`DrummerContext`, `DrummerContextBuilder`) ✅
+- 10.2.2: Drum candidate type (`DrumCandidate`, `DrumArticulation`, `FillRole`) ✅
+- 10.2.3: Drummer policy provider (`DrummerPolicyProvider` : `IGroovePolicyProvider`) ✅
+- 10.2.4: Drummer candidate source (`DrummerCandidateSource` : `IGrooveCandidateSource`) ✅
+- 10.2.5: Drummer memory (`DrummerMemory`) ✅
 
-**Stage 3 — Drum Operators (28 Total): ✅ COMPLETE**
-- 3.1: MicroAddition operators (7): ghost notes, kick pickups, embellishments ✅
-- 3.2: SubdivisionTransform operators (5): hat lift/drop, ride swap, partial lift ✅
-- 3.3: PhrasePunctuation operators (7): crash on 1, fills, setup hits, stop-time ✅
-- 3.4: PatternSubstitution operators (4): backbeat variants, half/double-time ✅
-- 3.5: StyleIdiom operators (5): Pop Rock specific patterns ✅
-- 3.6: Operator registry and discovery (`DrumOperatorRegistry`) ✅
+**Stage 10.3 — Drum Operators (28 Total): ✅ COMPLETE**
+- 10.3.1: MicroAddition operators (7): ghost notes, kick pickups, embellishments ✅
+- 10.3.2: SubdivisionTransform operators (5): hat lift/drop, ride swap, partial lift ✅
+- 10.3.3: PhrasePunctuation operators (7): crash on 1, fills, setup hits, stop-time ✅
+- 10.3.4: PatternSubstitution operators (4): backbeat variants, half/double-time ✅
+- 10.3.5: StyleIdiom operators (5): Pop Rock specific patterns ✅
+- 10.3.6: Operator registry and discovery (`DrumOperatorRegistry`) ✅
 
-**Stage 4 — Physicality Constraints: ✅ COMPLETE**
-- 4.1: Limb model (which limb plays which role) ✅
-- 4.2: Sticking rules (max consecutive same-hand, ghost density limits) ✅
-- 4.3: Physicality filter (reject impossible patterns) ✅
-- 4.4: Overcrowding prevention (density caps at physicality level) ✅
+**Stage 10.4 — Physicality Constraints: ✅ COMPLETE**
+- 10.4.1: Limb model (which limb plays which role) ✅
+- 10.4.2: Sticking rules (max consecutive same-hand, ghost density limits) ✅
+- 10.4.3: Physicality filter (reject impossible patterns) ✅
+- 10.4.4: Overcrowding prevention (density caps at physicality level) ✅
 
-**Stage 5 — Pop Rock Style Configuration: ✅ CONSOLIDATED**
+**Stage 10.5 — Pop Rock Style Configuration: ✅ CONSOLIDATED**
 - Stories 5.1-5.3 removed as redundant
-- Functionality already exists in: Story 1.4 (`StyleConfiguration`, `StyleConfigurationLibrary.PopRock`) + Story 2.3 (`DrummerPolicyProvider` section-aware density + `DrummerPolicySettings`)
+- Functionality already exists in: Story 10.1.4 (`StyleConfiguration`, `StyleConfigurationLibrary.PopRock`) + Story 10.2.3 (`DrummerPolicyProvider` section-aware density + `DrummerPolicySettings`)
 - No separate `PopRockStyleConfiguration.cs` needed
 - Fine-tuning numeric values is ongoing iterative work, not discrete stories
 
 **Note:** Physical constraints (limb model, sticking rules) are genre-agnostic and defined in Stage 4.
 
-**Stage 6 — Performance Rendering: ✅ COMPLETE**
-- 6.1: Velocity shaper (normalized intents → style-mapped velocity hints) ✅
-- 6.2: Timing nuance (normalized intents → style-mapped timing hints) ✅
-- 6.3: Articulation mapping (MIDI note variations) ✅
+**Stage 10.6 — Performance Rendering: ✅ COMPLETE**
+- 10.6.1: Velocity shaper (normalized intents → style-mapped velocity hints) ✅
+- 10.6.2: Timing nuance (normalized intents → style-mapped timing hints) ✅
+- 10.6.3: Articulation mapping (MIDI note variations) ✅
 
-**Stage 7 — Diagnostics & Tuning: ⏳ COMPLETE**
-- 7.1: Drummer diagnostics collector (per-bar trace) ✅
-- 7.2: Benchmark feature extraction (density, syncopation, punctuation) ✅
+**Stage 10.7 — Diagnostics & Tuning: ⏳ COMPLETE**
+ - 10.7.1: Drummer diagnostics collector (per-bar trace) ✅
+ - 10.7.2: Benchmark feature extraction (density, syncopation, punctuation) ✅
 
-**Stage 8 — Integration & Testing: ⏳ IN PROGRESS**
-- 8.1: Wire drummer agent into generator (`DrummerAgent` facade)  ✅
-- 8.2: Unit tests (determinism, musical sensibility)
-- 8.3: Golden regression snapshot
+**Stage 10.8 — Integration & Testing: ⏳ IN PROGRESS**
+ - 10.8.1: Wire drummer agent into generator (`DrummerAgent` facade)  ✅
+ - 10.8.2: Unit tests (determinism, musical sensibility)
+ - 10.8.3: Golden regression snapshot
 
 ---
 ## Stage 11 — Melody & lyric scaffolding (timing windows + singable melody MVP)
-
-**Why now:** Stage 9 provides instrumental motifs (hooks/riffs). Stage 10 adds vocal melody as a first-class feature, building on motif rendering infrastructure while adding lyric-aware timing constraints.
 
 **Goal:** Build minimal melody engine with future lyric integration in mind. Melodies are like motifs but with syllable timing constraints and vocal register/tessitura considerations.
 
