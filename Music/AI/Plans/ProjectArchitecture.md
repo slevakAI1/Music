@@ -263,7 +263,75 @@ The drummer articulation mapper translates `DrumArticulation` enum values to MID
 - Helper method correctness (`GetStandardNoteForRole`)
 - Integration scenarios (typical drum patterns, fills)
 
+## Story 7.1 — Drummer Diagnostics Collector (Implemented)
 
+The drummer diagnostics collector captures per-bar decision traces during drum generation, showing which operators were considered, selected, or rejected and why. It enables debugging, tuning, and validation of the drummer agent without affecting generation behavior.
+
+**Core Types (in `Generator/Agents/Drums/Diagnostics/`):**
+
+| Type | Purpose |
+|------|---------|
+| `DrummerDiagnostics` | Immutable record capturing all decision-trace data for a single bar and role |
+| `DrummerDiagnosticsCollector` | Mutable collector used during generation; builds immutable `DrummerDiagnostics` |
+| `OperatorTrace` | Records operator consideration/selection with scoring details |
+| `RejectionTrace` | Records rejection of operator/candidate with hierarchical reason |
+| `MemoryStateSnapshot` | Snapshot of agent memory state at capture time |
+| `FillShapeSnapshot` | Snapshot of fill shape from memory |
+| `DensityComparison` | Comparison of target vs actual density |
+| `PhysicalityViolation` | Records physicality constraint violations |
+
+**DrummerDiagnostics Structure:**
+```csharp
+public sealed record DrummerDiagnostics
+{
+    public required int BarNumber { get; init; }
+    public required string Role { get; init; }
+    public required IReadOnlyList<OperatorTrace> OperatorsConsidered { get; init; }
+    public required IReadOnlyList<OperatorTrace> OperatorsSelected { get; init; }
+    public required IReadOnlyList<RejectionTrace> OperatorsRejected { get; init; }
+    public required MemoryStateSnapshot MemoryState { get; init; }
+    public required DensityComparison DensityTargetVsActual { get; init; }
+    public required IReadOnlyList<PhysicalityViolation> PhysicalityViolationsFiltered { get; init; }
+}
+```
+
+**Behavior:**
+- **Opt-in:** Diagnostics collection is opt-in; when disabled, collector is null (zero-cost)
+- **Non-invasive:** Diagnostics never modify generation state or affect decision-making
+- **Determinism preserved:** Same seed + context → identical output whether diagnostics on or off
+- **Read-only:** Diagnostics collection uses read-only access to state
+- **Zero allocations when disabled:** Null collector pattern avoids overhead in production
+
+**Rejection Reason Format:**
+- Hierarchical format: `"System:Reason:Detail"` (e.g., `"PhysicalityFilter:LimbConflict:RightHand"`)
+- Allows parsing while remaining human-readable
+- Examples:
+  - `"PhysicalityFilter:LimbConflict:LeftHand:Snare+Tom1@1.5"`
+  - `"Memory:RecentUsage:DrumGhostBeforeBackbeat:2_bars_ago"`
+  - `"Overcrowding:MaxHitsPerBeat:beat_2"`
+
+**OperatorTrace Scoring Details:**
+- `BaseScore`: Original operator score (before style weight and memory penalty)
+- `StyleWeight`: Style configuration weight multiplier
+- `MemoryPenalty`: Memory-based repetition penalty (1.0 - penalty)
+- `FinalScore`: Score after all multipliers (baseScore × styleWeight × memoryPenalty)
+
+**Integration:**
+- Follows same opt-in pattern as `GrooveDiagnosticsCollector` (Story G1)
+- Complements groove diagnostics; can be queried together via (BarNumber, Role) key
+- Future stages (Story 7.2) will add serialization and benchmark feature extraction
+
+**Test Coverage:** 17 tests in `DrummerDiagnosticsTests.cs` covering:
+- Basic information capture (bar, role, operators)
+- Operator score capture (base, style weight, memory penalty, final)
+- Rejection reason capture with hierarchical format
+- Memory state snapshot (recent usage, fill shape)
+- Density comparison (target vs actual)
+- Physicality violation capture
+- Edge cases (no operators, no candidates, empty memory)
+- Multiple operators same family
+- Build idempotency
+- Default values
 
 
 
@@ -1064,6 +1132,7 @@ Uses **xUnit** test framework. Contains unit and integration tests for groove sy
 | `LimbModelTests.cs` | Story 4.1: Limb model and role→limb mapping |
 | `StickingRulesTests.cs` | Story 4.2: Sticking rules validation |
 | `PhysicalityFilterTests.cs` | Story 4.3/4.4: Physicality filter (limb conflicts, sticking, overcrowding - 29 tests) |
+| `DrummerDiagnosticsTests.cs` | Story 7.1: Drummer diagnostics collector (17 tests) |
 | `MotifPresenceMapTests.cs` | Story 9.3: MotifPresenceMap queries (20 tests) |
 | `DrummerMotifIntegrationTests.cs` | Story 9.3: DrummerAgent motif integration (9 tests) |
 
@@ -1893,6 +1962,70 @@ public readonly record struct LimbConflict(
 | Snare + Hat on bar 1, beat 2 | No (LeftHand + RightHand) |
 | OpenHat + ClosedHat on same beat | Yes (both RightHand) |
 | Kick + Snare on bar 1, beat 1 | No (RightFoot + LeftHand) |
+
+---
+
+## 20) Drummer Diagnostics (Story 7.1)
+
+Location: `Generator/Agents/Drums/Diagnostics/`
+
+Purpose: Captures per-bar decision traces during drum generation for debugging, tuning, and validation.
+
+### Files added in Story 7.1:
+
+```
+Generator/Agents/Drums/Diagnostics/
+  ├── DrummerDiagnostics.cs           (immutable diagnostics record)
+  └── DrummerDiagnosticsCollector.cs  (mutable collector for building diagnostics)
+```
+
+### DrummerDiagnostics Record Types
+
+| Type | Purpose |
+|------|---------|
+| `DrummerDiagnostics` | Main record capturing all decision-trace data for bar/role |
+| `OperatorTrace` | Records operator consideration/selection with scoring |
+| `RejectionTrace` | Records rejection with hierarchical reason |
+| `MemoryStateSnapshot` | Snapshot of agent memory at capture time |
+| `FillShapeSnapshot` | Snapshot of fill shape from memory |
+| `DensityComparison` | Target vs actual density comparison |
+| `PhysicalityViolation` | Records physicality constraint violations |
+
+### Key Behaviors
+
+- **Zero-cost when disabled:** Collector is null when diagnostics off (no allocations)
+- **Non-invasive:** Read-only access to state; no side effects on generation
+- **Determinism preserved:** Same output whether diagnostics enabled or not
+- **Integration with groove diagnostics:** Follows same opt-in pattern as `GrooveDiagnosticsCollector` (Story G1)
+
+### Usage Pattern
+
+```csharp
+// Create collector only when diagnostics enabled
+DrummerDiagnosticsCollector? collector = enableDiagnostics 
+    ? new DrummerDiagnosticsCollector(barNumber, role) 
+    : null;
+
+// Record decisions during generation (null-safe via ?.Invoke pattern)
+collector?.RecordOperatorConsidered("DrumGhostBeforeBackbeat", "MicroAddition", candidateCount: 2);
+collector?.RecordOperatorSelected("DrumGhostBeforeBackbeat", "MicroAddition", 2, 1, 0.75, 1.0, 0.9, 0.675);
+collector?.RecordPhysicalityViolation("candidate_id", "LimbConflict", "LimbConflict:LeftHand:Snare+Tom1");
+collector?.RecordMemoryState(memory);
+collector?.RecordDensityComparison(targetDensity: 0.6, actualDensity: 0.58, targetEventCount: 10, actualEventCount: 9);
+
+// Build immutable diagnostics record
+DrummerDiagnostics? diagnostics = collector?.Build();
+```
+
+### Rejection Reason Format
+
+Hierarchical format: `"System:Reason:Detail"`
+
+Examples:
+- `"PhysicalityFilter:LimbConflict:LeftHand:Snare+Tom1@1.5"`
+- `"Memory:RecentUsage:DrumGhostBeforeBackbeat"`
+- `"Overcrowding:MaxHitsPerBeat:beat_2"`
+- `"StickingViolation:MaxConsecutiveSameHand:LeftHand"`
 
 
 

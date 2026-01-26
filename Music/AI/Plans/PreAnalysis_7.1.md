@@ -191,32 +191,60 @@ public sealed record DrummerDiagnostics
 
 ### Scope & Granularity
 1. **What level of detail for scores?** Capture base score + style weight + memory penalty separately, or just final score?
+   **Answer:** Capture all components separately (base score, style weight, memory penalty, final score) for full transparency. This enables debugging weight tuning and memory penalty effects.
+
 2. **How much memory history?** Last 8 bars (default memory window) or configurable?
+   **Answer:** Use the actual memory window size from AgentMemory (default 8, configurable). Snapshot should capture what memory state actually contains at capture time.
+
 3. **Should we capture intermediate states?** (e.g., before/after physicality filter)
+   **Answer:** Yes, capture both pre-filter and post-filter candidate counts. This reveals how much physicality constraints prune vs selection engine.
+
 4. **What about sub-operator decisions?** (e.g., fill pattern selection within BuildFillOperator)
+   **Answer:** Not in Story 7.1 (scope creep). Operators can add operator-specific tags to candidates if they want traceability. Focus on operator-level decisions first.
 
 ### Rejection Reasons Format
 5. **Structured or string reasons?** Should rejection reasons be enums or free-form strings?
+   **Answer:** Use structured strings with consistent prefixes (e.g., "PhysicalityFilter:LimbConflict:RightHand"). This allows parsing while remaining readable. Consider enum for top-level rejection category.
+
 6. **Nested reasons?** (e.g., "PhysicalityFilter > LimbConflict > RightHand > Snare+Tom1")
+   **Answer:** Yes, use hierarchical format with consistent separator (e.g., colon). Pattern: "System:Reason:Detail". Example: "PhysicalityFilter:LimbConflict:RightHand:Snare+Tom1@1.5"
+
 7. **Should we capture *why* operators were considered?** (e.g., "high energy" triggered HatLiftOperator)
+   **Answer:** Not directly in Story 7.1. Operators can include context hints in their candidate metadata if useful. Focus on what happened, not why (that's in DrummerContext).
 
 ### Integration with Groove Diagnostics
 8. **What overlaps with GrooveBarDiagnostics?** Density target is in both—duplicate or reference?
+   **Answer:** Drummer diagnostics focuses on operator-level decisions. Reference groove diagnostics ID for correlation but maintain separate density tracking (target vs actual at drummer level may differ from groove level).
+
 9. **Should drummer diagnostics reference groove diagnostics?** Or keep separate?
+   **Answer:** Keep logically separate but enable correlation via (BarNumber, Role) key. DrummerDiagnostics and GrooveBarDiagnostics are complementary views of same bar.
+
 10. **Who owns the opt-in flag?** Global generation settings or per-system?
+   **Answer:** Single global flag (EnableDiagnostics) in generation settings/context. All diagnostic systems check same flag for consistency.
 
 ### Memory Management
 11. **Should diagnostics auto-serialize to disk?** Or keep in-memory until export?
+   **Answer:** Keep in-memory by default. Provide explicit export methods. Auto-serialize is future enhancement (Story 7.2 or later).
+
 12. **What's the memory budget?** How many bars of diagnostics is "too much"?
+   **Answer:** No hard limit in Story 7.1. Diagnostics should be disabled in production. For development/testing, 100-200 bars (typical song) is acceptable. Add memory warning if collection exceeds reasonable threshold.
+
 13. **Should we support streaming/append mode?** For very long generations
+   **Answer:** Not in Story 7.1. Keep implementation simple (List-based collection). Streaming is future optimization if needed.
 
 ### Test Data
 14. **How to verify "doesn't affect output"?** Golden test with/without diagnostics enabled?
+   **Answer:** Yes, use determinism tests: generate same song with diagnostics on/off, compare PartTrack events byte-for-byte. Use existing test infrastructure from Stage G/H.
+
 15. **Should test snapshots include diagnostics?** Or separate diagnostic snapshots?
+   **Answer:** Separate diagnostic snapshots. Output snapshots (PartTrack) and diagnostic snapshots serve different purposes. Keep them independent.
 
 ### Future Extensibility
 16. **Will other agents use same pattern?** Should `DrummerDiagnostics` be specialized or generalized?
+   **Answer:** DrummerDiagnostics is drummer-specific. Future agents (Guitar/Keys/Bass) will have their own *AgentDiagnostics types. Common patterns can be extracted to base types later if needed, but start specialized.
+
 17. **What about real-time diagnostics?** (e.g., callback per bar for live monitoring)
+   **Answer:** Not in Story 7.1. Current design is post-generation query. Real-time callbacks are future enhancement if UI needs it.
 
 ---
 
