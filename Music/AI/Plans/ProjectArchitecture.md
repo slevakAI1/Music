@@ -333,6 +333,150 @@ public sealed record DrummerDiagnostics
 - Build idempotency
 - Default values
 
+## Story 7.2a — Drum Feature Extraction (Implemented)
+
+Story 7.2a provides comprehensive drum track feature extraction from MIDI files for benchmark analysis. It enables data-driven tuning of groove anchors, style configuration, and operator settings by capturing raw events, per-bar patterns, and statistics.
+
+**Core Types (in `Generator/Agents/Drums/Diagnostics/`):**
+
+| Type | Purpose |
+|------|---------|
+| `DrumMidiEvent` | Raw MIDI drum event extracted from PartTrack |
+| `DrumRoleMapper` | Maps GM2 MIDI notes (35-81) to normalized role names |
+| `DrumTrackEventExtractor` | Extracts events from PartTrack + BarTrack |
+| `BarPatternFingerprint` | Per-bar pattern with role bitmasks and deterministic hash |
+| `BarPatternExtractor` | Extracts pattern fingerprints from events |
+| `BeatPositionMatrix` | Per-role × bar × position matrix for pattern comparison |
+| `BeatPositionSlot` | Single slot with velocity and timing offset |
+| `BeatPositionMatrixBuilder` | Builds matrices from events |
+| `BarOnsetStats` | Per-bar velocity/timing/density statistics |
+| `BarOnsetStatsExtractor` | Extracts statistics from events |
+| `DrumTrackFeatureData` | Top-level container for all feature data |
+| `DrumTrackFeatureDataBuilder` | Orchestrates extraction pipeline |
+| `DrumFeatureDataSerializer` | JSON serialization with versioning |
+
+**DrumMidiEvent Structure:**
+```csharp
+public sealed record DrumMidiEvent
+{
+    public required int BarNumber { get; init; }           // 1-based
+    public required decimal Beat { get; init; }            // 1-based fractional
+    public required string Role { get; init; }             // Normalized role name
+    public required int MidiNote { get; init; }            // Original GM2 note
+    public required int Velocity { get; init; }            // 1-127
+    public required int DurationTicks { get; init; }
+    public required long AbsoluteTimeTicks { get; init; }
+    public int? TimingOffsetTicks { get; init; }           // Deviation from grid
+}
+```
+
+**Pattern Fingerprinting:**
+- Quantizes events to 16th note grid (configurable resolution)
+- Creates role bitmasks where bit N = onset at grid position N
+- Generates deterministic SHA256 hash (truncated to 16 hex chars)
+- Same pattern → same hash for reliable pattern matching
+
+**Role Mapping (GM2 Standard):**
+- Primary roles: Kick (35,36), Snare (38,39,40), ClosedHat (42), OpenHat (46)
+- Cymbals: Crash (49,57), Ride (51,59), RideBell (53)
+- Toms: Tom1 (48,50), Tom2 (45,47), FloorTom (41,43)
+- Articulation variants grouped to base role (e.g., 38+40 → Snare)
+
+**Feature Data Container:**
+```csharp
+public sealed record DrumTrackFeatureData
+{
+    public required string TrackId { get; init; }
+    public string? GenreHint { get; init; }
+    public string? ArtistHint { get; init; }
+    public required int TotalBars { get; init; }
+    public required IReadOnlyList<DrumMidiEvent> Events { get; init; }
+    public required IReadOnlyList<BarPatternFingerprint> BarPatterns { get; init; }
+    public required IReadOnlyList<BarOnsetStats> BarStats { get; init; }
+    public required IReadOnlyDictionary<string, BeatPositionMatrix> RoleMatrices { get; init; }
+    public required IReadOnlySet<string> ActiveRoles { get; init; }
+}
+```
+
+**Serialization:**
+- JSON format with schema version field ("1.0")
+- Compact mode available for reduced file size
+- Uses internal DTOs for interface type handling (IReadOnlySet, IReadOnlyDictionary)
+- Async file I/O support (`SerializeToFileAsync`, `DeserializeFromFileAsync`)
+
+**Test Coverage:** 62 tests across three test files:
+- `DrumRoleMapperTests.cs`: GM2 mappings, role grouping, primary role detection
+- `BarPatternFingerprintTests.cs`: Hash determinism, bitmasks, similarity calculation
+- `DrumTrackFeatureDataTests.cs`: Builder, validation, serialization round-trip
+
+## Story 7.2b — Pattern Detection and Cross-Instrument Analysis (Implemented)
+
+Story 7.2b extends 7.2a with comprehensive pattern analysis, cross-role coordination, structural marker detection, and performance analysis for benchmark workflows.
+
+**Core Types (in `Generator/Agents/Drums/Diagnostics/`):**
+
+| Type | Purpose |
+|------|---------|
+| `PatternRepetitionData` | Pattern occurrence counts, consecutive runs, most common patterns |
+| `PatternRepetitionDetector` | Detects repeating patterns and consecutive runs |
+| `PatternSimilarityData` | Similar pattern pairs and pattern families |
+| `PatternSimilarityAnalyzer` | Jaccard similarity analysis and family clustering |
+| `CrossRoleCoordinationData` | Coincidence counts, lock scores between role pairs |
+| `CrossRoleCoordinationExtractor` | Extracts pairwise coordination from matrices |
+| `AnchorCandidateData` | Consistent positions, PopRock reference variance |
+| `AnchorCandidateExtractor` | Identifies anchor positions (>=80% consistency) |
+| `StructuralMarkerData` | Density anomalies, crashes, pattern changes, fills |
+| `StructuralMarkerDetector` | Detects fills, section changes, density outliers |
+| `SequencePatternData` | 2-bar and 4-bar repeating sequences, evolving patterns |
+| `SequencePatternDetector` | Multi-bar sequence detection |
+| `VelocityDynamicsData` | Per-role distributions, accent masks, ghost positions |
+| `VelocityDynamicsExtractor` | Velocity analysis and accent detection |
+| `TimingFeelData` | Swing ratio, ahead/behind score, timing consistency |
+| `TimingFeelExtractor` | Swing detection and timing feel analysis |
+| `DrumTrackExtendedFeatureData` | Top-level container combining 7.2a base + 7.2b analysis |
+| `DrumTrackExtendedFeatureDataBuilder` | Orchestrates all 7.2b extractors |
+| `DrumExtendedFeatureDataSerializer` | JSON serialization for extended data |
+
+**Extended Feature Data Container:**
+```csharp
+public sealed record DrumTrackExtendedFeatureData
+{
+    public required DrumTrackFeatureData BaseData { get; init; }
+    public required PatternRepetitionData PatternRepetition { get; init; }
+    public required PatternSimilarityData PatternSimilarity { get; init; }
+    public required SequencePatternData SequencePatterns { get; init; }
+    public required CrossRoleCoordinationData CrossRoleCoordination { get; init; }
+    public required AnchorCandidateData AnchorCandidates { get; init; }
+    public required StructuralMarkerData StructuralMarkers { get; init; }
+    public required VelocityDynamicsData VelocityDynamics { get; init; }
+    public required TimingFeelData TimingFeel { get; init; }
+}
+```
+
+**Key Analysis Capabilities:**
+
+| Analysis | Purpose | Key Metrics |
+|----------|---------|-------------|
+| Pattern Repetition | Find recurring patterns | UniquePatternCount, ConsecutiveRuns, MostCommonPatterns |
+| Pattern Similarity | Group similar patterns | SimilarPairs (Jaccard >= 0.7), PatternFamilies |
+| Cross-Role Coordination | Measure role interaction | CoincidenceCount, LockScores |
+| Anchor Detection | Find consistent positions | RoleAnchors (>=80% consistency), PopRockVariance |
+| Structural Markers | Identify fills/sections | HighDensityBars, CrashBars, PatternChanges, PotentialFills |
+| Velocity Dynamics | Analyze dynamics | AccentMasks, GhostPositions, per-role distributions |
+| Timing Feel | Detect groove feel | SwingRatio, AheadBehindScore, TimingConsistency |
+
+**PopRock Reference Anchor:**
+- Kick: positions 0, 8 (beats 1, 3)
+- Snare: positions 4, 12 (beats 2, 4)
+- ClosedHat: all 8th notes (0, 2, 4, 6, 8, 10, 12, 14)
+- Variance computed as Jaccard distance from detected anchors
+
+**Test Coverage:** 15 tests across four test files:
+- `PatternRepetitionTests.cs`: Repetition detection, consecutive runs
+- `CrossRoleCoordinationTests.cs`: Coincidence counts, key creation
+- `StructuralMarkerTests.cs`: Crashes, fills, anchor detection, sequences
+- `ExtendedFeatureDataTests.cs`: Builder, velocity, timing, serialization round-trip
+
 
 
 
