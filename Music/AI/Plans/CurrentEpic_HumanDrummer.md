@@ -744,7 +744,7 @@ If the target VST does not support them, the mapping should gracefully fall back
 
 ---
 
-# Story 7.2 — Comprehensive Drum Feature Extraction for Benchmark Analysis
+# Story 7.2 — Comprehensive Drum Feature Extraction for Benchmark Analysis (COMPLETED)
 
 **Epic:** Human Drummer Agent  
 **Stage:** 7 — Diagnostics & Tuning  
@@ -777,7 +777,7 @@ The original story focused on aggregate statistics (density curves, average sync
 
 ---
 
-## Story 7.2a — Raw Event Extraction and Per-Bar Pattern Capture
+## Story 7.2a — Raw Event Extraction and Per-Bar Pattern Capture (COMPLETED)
 
 **As a** developer  
 **I want** to extract raw events and per-bar patterns from MIDI drum tracks  
@@ -992,7 +992,7 @@ Music.Tests/Generator/Agents/Drums/Diagnostics/
 
 ---
 
-## Story 7.2b — Pattern Detection and Cross-Instrument Analysis Data
+## Story 7.2b — Pattern Detection and Cross-Instrument Analysis Data (COMPLETED)
 
 **As a** developer  
 **I want** to capture pattern repetition, cross-instrument coordination, and structural markers  
