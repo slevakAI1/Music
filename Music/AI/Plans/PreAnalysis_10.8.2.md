@@ -53,15 +53,95 @@ Notes: Grouped where helpful (operators/candidates, selection/memory/density, ph
 - Random tie-break scenarios where scores equal — verify deterministic tie-break rules produce consistent ordering.
 
 ## 7) Clarifying Questions
-1. Test framework and project: confirm we should use `xUnit` and place tests in `Music.Tests` (Epic references both in-project tests and `Music.Tests`).
-2. What precisely defines a "valid candidate" for an operator? (required fields, acceptable velocity/timing ranges, valid `Role` values)
-3. Selection-frequency assertions: should tests assert exact counts with repeated deterministic runs, or statistical/probabilistic expectations (and what thresholds)?
-4. Golden snapshot path and update workflow: should we use `Music.Tests/Generator/Agents/Drums/Snapshots/PopRock_Standard.json` as canonical location and document an update process?
-5. Physicality presets: are there canonical `PhysicalityRules` presets (Strict/Normal/Loose) to use in tests, or should tests construct minimal deterministic rules?
-6. Section density canonical values: what are the expected density targets for `PopRock` sections (Intro/Verse/Chorus/Bridge) to assert quantitative differences?
-7. RNG isolation: should each test call `Rng.Initialize(seed)` and fully avoid shared global RNG state, or is there a per-test RNG helper available?
-8. Test isolation/parallelism: should tests be runnable in parallel, or should they be marked to run sequentially due to shared global state (files, RNG, registries)?
-9. Scope: prefer unit-level tests (isolated operator + selection engine) or end-to-end pipeline tests that produce `PartTrack` output for golden comparisons? (both implied; prefer clarification.)
+
+### Question 1:
+Test framework and project: confirm we should use `xUnit` and place tests in `Music.Tests` (Epic references both in-project tests and `Music.Tests`).
+
+**Answer:**
+Yes, use xUnit framework and place all tests in the `Music.Tests` project. Create test files in `Music.Tests/Generator/Agents/Drums/` directory as specified in Story 10.8.2 acceptance criteria.
+
+---
+
+### Question 2:
+What precisely defines a "valid candidate" for an operator? (required fields, acceptable velocity/timing ranges, valid `Role` values)
+
+**Answer:**
+A valid `DrumCandidate` must have:
+- Non-null `CandidateId`, `OperatorId`, `Role`, `BarNumber`, `Beat`, `Strength`, `FillRole`, `Score`
+- `Role` must be from the set: Kick, Snare, ClosedHat, OpenHat, Crash, Ride, Tom1, Tom2, FloorTom
+- `VelocityHint` (nullable): if present, must be 0-127
+- `TimingHint` (nullable): if present, any integer tick offset is valid
+- `ArticulationHint` (nullable): if present, must be a valid `DrumArticulation` enum value
+- `Beat` must be within bar bounds (1-based, fractional, typically 1.0 to beatsPerBar+1.0)
+- `Score` must be 0.0-1.0
+
+---
+
+### Question 3:
+Selection-frequency assertions: should tests assert exact counts with repeated deterministic runs, or statistical/probabilistic expectations (and what thresholds)?
+
+**Answer:**
+Tests must assert **exact counts** using fixed deterministic seeds. The RNG system guarantees "same seed → identical output" per the determinism constraint. Run selection multiple times with the same seed and assert identical results each time. No statistical thresholds needed—test for perfect repeatability.
+
+---
+
+### Question 4:
+Golden snapshot path and update workflow: should we use `Music.Tests/Generator/Agents/Drums/Snapshots/PopRock_Standard.json` as canonical location and document an update process?
+
+**Answer:**
+Yes, use `Music.Tests/Generator/Agents/Drums/Snapshots/PopRock_Standard.json` as the canonical golden snapshot location (per Story 10.8.3 files to create). Update workflow: when behavior changes by design, regenerate the snapshot, manually review the diff, and commit the updated snapshot with a clear explanation of why output changed.
+
+---
+
+### Question 5:
+Physicality presets: are there canonical `PhysicalityRules` presets (Strict/Normal/Loose) to use in tests, or should tests construct minimal deterministic rules?
+
+**Answer:**
+Use canonical `PhysicalityRules` with `StrictnessLevel` enum values (Strict/Normal/Loose) when testing general physicality behavior. For targeted unit tests that verify specific constraints (e.g., limb conflicts, sticking rules), construct minimal deterministic `PhysicalityRules` instances with only the rules under test enabled to isolate behavior.
+
+---
+
+### Question 6:
+Section density canonical values: what are the expected density targets for `PopRock` sections (Intro/Verse/Chorus/Bridge) to assert quantitative differences?
+
+**Answer:**
+Per Story 10.2.3 and CurrentEpic Stage 10.5, canonical PopRock density targets are:
+- Intro: 0.4
+- Verse: 0.5
+- Chorus: 0.8
+- Bridge: (varies, typically 0.3-0.6 depending on context)
+
+Assert that chorus density (0.8) > verse density (0.5) in section-aware behavior tests.
+
+---
+
+### Question 7:
+RNG isolation: should each test call `Rng.Initialize(seed)` and fully avoid shared global RNG state, or is there a per-test RNG helper available?
+
+**Answer:**
+Each test must call `Rng.Initialize(seed)` in its constructor or test method setup with a fixed, unique seed per test. xUnit creates new test class instances per test, which provides isolation. There is no per-test RNG helper—use constructor-based initialization pattern as documented in ProjectArchitecture test conventions.
+
+---
+
+### Question 8:
+Test isolation/parallelism: should tests be runnable in parallel, or should they be marked to run sequentially due to shared global state (files, RNG, registries)?
+
+**Answer:**
+Tests should be designed to run in parallel. Each test must initialize its own fresh state (RNG seed, operator registry, memory, style configuration) to avoid shared global state conflicts. xUnit's default test instance-per-test model supports this. Do not use shared static state across tests. If a specific test absolutely requires sequential execution, mark it with `[Collection("Sequential")]` attribute, but prefer isolated parallel-safe tests.
+
+---
+
+### Question 9:
+Scope: prefer unit-level tests (isolated operator + selection engine) or end-to-end pipeline tests that produce `PartTrack` output for golden comparisons? (both implied; prefer clarification.)
+
+**Answer:**
+For Story 10.8.2, focus on **unit-level tests** that verify isolated components:
+- Individual operators generate valid candidates
+- Selection engine respects weights/caps/memory
+- Physicality filter removes violations
+- Determinism at component level
+
+End-to-end `PartTrack` output and golden file comparisons are covered by Story 10.8.3 (Golden Test). Story 10.8.2 provides the component-level foundation that 10.8.3 builds upon.
 
 ## 8) Test Scenario Ideas (suggested test names)
 - `Operators_AllOperatorsProduceValidCandidates` — verify each operator emits candidates meeting "valid candidate" criteria.
