@@ -60,7 +60,7 @@ namespace Music.Generator
         /// Story A2: Extended with groove-specific RNG instances for per-stream-key determinism.
         /// </summary>
         /// <param name="seed">Master seed for deriving per-Purpose seeds; default 12345.</param>
-        public static void Initialize(int seed = 93456)
+        public static void Initialize(int seed = 12345)
         {
             var masterRng = new Random(seed);
             

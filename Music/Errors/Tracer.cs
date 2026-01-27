@@ -37,26 +37,34 @@ namespace Music
             ArgumentNullException.ThrowIfNull(filename);
             ArgumentNullException.ThrowIfNull(text);
 
-            // Build path relative to project root: /Errors/{filename}
-            string relativePath = Path.Combine("Errors", filename);
+            try
+            {
+                // Build path relative to project root: /Errors/{filename}
+                string relativePath = Path.Combine("Errors", filename);
 
-            // Resolve using project helper (assume Windows environment and helper exists)
-            string fullPath = Helpers.ProjectPath(relativePath);
+                // Resolve using project helper (assume Windows environment and helper exists)
+                string fullPath = Helpers.ProjectPath(relativePath);
 
-            var dir = Path.GetDirectoryName(fullPath) ?? Path.GetDirectoryName(relativePath) ??
-                      Path.Combine(AppContext.BaseDirectory ?? Directory.GetCurrentDirectory());
+                var dir = Path.GetDirectoryName(fullPath) ?? Path.GetDirectoryName(relativePath) ??
+                          Path.Combine(AppContext.BaseDirectory ?? Directory.GetCurrentDirectory());
 
-            if (!Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
+                if (!Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
 
-            // Use Eastern Time (US) for timestamp (Windows timezone ID)
-            TimeZoneInfo estTz = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-            DateTimeOffset timestamp = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, estTz);
+                // Use Eastern Time (US) for timestamp (Windows timezone ID)
+                TimeZoneInfo estTz = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+                DateTimeOffset timestamp = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, estTz);
 
-            // Prepend an ISO-8601 timestamp in Eastern time for context
-            var entry = $"[{timestamp:O}] {text}{Environment.NewLine}";
+                // Prepend an ISO-8601 timestamp in Eastern time for context
+                var entry = $"[{timestamp:O}] {text}{Environment.NewLine}";
 
-            File.AppendAllText(fullPath, entry);
+                File.AppendAllText(fullPath, entry);
+            }
+            catch (Exception ex)
+            {
+                // If tracing fails, write to console as fallback
+                Console.WriteLine($"[TRACE FAILED: {ex.Message}] {text}");
+            }
         }
     }
 }

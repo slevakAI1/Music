@@ -59,6 +59,7 @@
     <None Remove="AI\Completed\Done_Story_10.8.1_Technical_Debt.md" />
     <None Remove="AI\Completed\Old_PreAnalysis_10.8.1.md" />
     <None Remove="AI\Completed\PreAnalysis_10.8.1.md" />
+    <None Remove="AI\Completed\PreAnalysis_10.8.1_new.md" />
     <None Remove="AI\Completed\PreAnalysis_10.8.2.md" />
     <None Remove="AI\Completed\PreAnalysis_2.3.md" />
     <None Remove="AI\Completed\PreAnalysis_2.4.md" />
@@ -83,6 +84,7 @@
     <None Remove="AI\Completed\Story6.3_Complete.md" />
     <None Remove="AI\Completed\Story7.2_DrumFeatureExtraction.md" />
     <None Remove="AI\Completed\Story_10.8.1_COMPLETE.md" />
+    <None Remove="AI\Completed\Story_10.8.1_Completion_Report.md" />
     <None Remove="AI\Completed\Story_10.8.2_COMPLETE.md" />
     <None Remove="AI\Completed\Story_10.8.2_Implementation_Summary.md" />
     <None Remove="AI\Completed\Story_8.1_Implementation_Complete_2026-01-26_101614.md" />
@@ -174,6 +176,7 @@
 
   <ItemGroup>
     <Folder Include="AI\AIDialog\" />
+    <Folder Include="AI\Completed\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
