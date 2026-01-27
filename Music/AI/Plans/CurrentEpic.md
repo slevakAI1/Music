@@ -1526,7 +1526,7 @@ The data structures in 7.2a/7.2b are designed to support all these future analys
 
 ---
 
-### Story 10.8.3 — End-to-End Regression Snapshot (Golden Test)
+### Story 10.8.3 — End-to-End Regression Snapshot (Golden Test) (Partially completed - there is a determinism issue blocking the main golden test - see existing analysis document of that for details)
 
 **As a** developer  
 **I want** a golden-file regression test  
