@@ -1,6 +1,6 @@
-# Pre-Analysis: Story 10.8.1 — Wire Drummer Agent into Generator
+# Pre-Analysis: Story 10.8.3 — Wire Drummer Agent into Generator
 
-**Story ID:** 10.8.1  
+**Story ID:** 10.8.3  
 **Status:** PENDING VERIFICATION OF BEST IMPLEMENTATION!  
 **Epic:** Human Drummer Agent (Stage 10.8 — Integration & Testing)
 
@@ -317,7 +317,7 @@ Assert.Equal(output1.PartTrackNoteEvents, output2.PartTrackNoteEvents);
   - `DrummerDeterminismTests.cs` ✅ (tests section behavior, fill windows, determinism)
   - `GrooveBasedDrumGeneratorTests.cs` ✅ (tests pipeline orchestrator)
 - **Status:** Tests exist and match refactored architecture (use GrooveBasedDrumGenerator pattern)
-- **New test file created:** `GeneratorIntegrationTests.cs` specifically for Story 10.8.1 AC8-10
+- **New test file created:** `GeneratorIntegrationTests.cs` specifically for Story 10.8.3 AC8-10
 
 ### ✅ COMPLETED - Manual Testing (AC #10)
 
@@ -392,7 +392,7 @@ Assert.Equal(output1.PartTrackNoteEvents, output2.PartTrackNoteEvents);
 
 ## Summary
 
-**This story is COMPLETE** — see detailed completion report in [`Story_10.8.1_Completion_Report.md`](Story_10.8.1_Completion_Report.md).
+**This story is COMPLETE** — see detailed completion report in [`Story_10.8.3_Completion_Report.md`](Story_10.8.3_Completion_Report.md).
 
 All acceptance criteria are met by the existing refactored architecture:
 
@@ -406,12 +406,12 @@ All acceptance criteria are met by the existing refactored architecture:
 1. ✅ Manual testing automated via existing test suite (`DrummerDeterminismTests.cs`, `GrooveBasedDrumGeneratorTests.cs`)
 2. ✅ Story 10.8.2 tests verified current (all tests match refactored architecture)
 3. ✅ AC #7 clarified (GrooveBasedDrumGenerator.Generate is correct entry point)
-4. **→ Mark Story 10.8.1 as COMPLETED in epic**
+4. **→ Mark Story 10.8.3 as COMPLETED in epic**
 5. **→ Remove "PENDING VERIFICATION OF BEST IMPLEMENTATION!" status from epic**
 6. **→ Update epic AC #7 wording** (see completion report for recommended text)
 
 ---
 
-**For detailed analysis, test coverage verification, and architecture clarifications, see:** [`Story_10.8.1_Completion_Report.md`](Story_10.8.1_Completion_Report.md)
+**For detailed analysis, test coverage verification, and architecture clarifications, see:** [`Story_10.8.3_Completion_Report.md`](Story_10.8.3_Completion_Report.md)
 
 

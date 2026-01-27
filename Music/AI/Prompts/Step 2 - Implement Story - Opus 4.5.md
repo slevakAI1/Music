@@ -1,14 +1,14 @@
-# Task: Implement Story 10.8.2
+# Task: Implement Story 10.8.3
 
 ## Goal
 
-Implement **Story 10.8.2** as defined in `CurrentEpic.md`, using `PreAnalysis_10.8.2.md` as the authoritative specification for requirements, constraints, and acceptance criteria.
+Implement **Story 10.8.3** as defined in `CurrentEpic.md`, using `PreAnalysis_10.8.3.md` as the authoritative specification for requirements, constraints, and acceptance criteria.
 
 ---
 
 ## Authoritative Inputs
 
-- **PreAnalysis_10.8.2.md**
+- **PreAnalysis_10.8.3.md**
   - Defines all implementation rules, assumptions, constraints, and acceptance criteria.
   - Acts as the single source of truth for behavior and scope.
 
@@ -22,7 +22,7 @@ Implement **Story 10.8.2** as defined in `CurrentEpic.md`, using `PreAnalysis_10
 
 ### 1. Review Pre-Analysis
 
-- Read the entire `PreAnalysis_10.8.2.md` document, including:
+- Read the entire `PreAnalysis_10.8.3.md` document, including:
   - Story description
   - Requirements
   - Constraints
@@ -33,9 +33,9 @@ Implement **Story 10.8.2** as defined in `CurrentEpic.md`, using `PreAnalysis_10
 
 ---
 
-### 2. Implement Story 10.8.2
+### 2. Implement Story 10.8.3
 
-- Write production code that satisfies **all acceptance criteria** in `PreAnalysis_10.8.2.md`.
+- Write production code that satisfies **all acceptance criteria** in `PreAnalysis_10.8.3.md`.
 - Follow existing project conventions unless explicitly overridden.
 - When multiple implementations are possible, make deterministic choices favoring:
   - Simplicity
@@ -79,7 +79,7 @@ Implement **Story 10.8.2** as defined in `CurrentEpic.md`, using `PreAnalysis_10
 ## Constraints / What Not To Do
 
 - Do not modify `CurrentEpic.md`.
-- Do not add new requirements beyond `PreAnalysis_10.8.2.md`.
+- Do not add new requirements beyond `PreAnalysis_10.8.3.md`.
 - Do not leave behavior ambiguous; select concrete, deterministic implementations.
 - Do not refactor unrelated code unless required to pass tests.
 - Do not add commentary, rationale, or meta-explanations to code or documentation.
@@ -90,7 +90,7 @@ Implement **Story 10.8.2** as defined in `CurrentEpic.md`, using `PreAnalysis_10
 
 The task is complete when:
 
-- All acceptance criteria in `PreAnalysis_10.8.2.md` are satisfied
+- All acceptance criteria in `PreAnalysis_10.8.3.md` are satisfied
 - All new and existing unit tests pass
 - `ProjectArchitecture.md` accurately reflects any architectural changes
 - No unauthorized files were modified

@@ -1,6 +1,6 @@
-# Task: Complete and Update Clarifying Questions for Story 10.8.2
+# Task: Complete and Update Clarifying Questions for Story 10.8.3
 
-You are given a pre-analysis document (`PreAnalysis_10.8.2.md`) that defines the scope, requirements, and acceptance criteria for Story 10.8.2.
+You are given a pre-analysis document (`PreAnalysis_10.8.3.md`) that defines the scope, requirements, and acceptance criteria for Story 10.8.3.
 
 Your job is to fully resolve the **Clarifying Questions** in that document so they can be used as authoritative guidance for later AI-driven code generation.
 
@@ -10,7 +10,7 @@ Your job is to fully resolve the **Clarifying Questions** in that document so th
 
 ### 1. Review the Document
 
-Read the entire `PreAnalysis_10.8.2.md` document carefully, including:
+Read the entire `PreAnalysis_10.8.3.md` document carefully, including:
 
 - Story description
 - Requirements
