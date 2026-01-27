@@ -62,6 +62,7 @@ namespace Music.Generator
         /// <param name="seed">Master seed for deriving per-Purpose seeds; default 12345.</param>
         public static void Initialize(int seed = 12345)
         {
+            Tracer.DebugTrace($"Rng.Initialize: seed={seed}");
             var masterRng = new Random(seed);
             
             _instances = new Dictionary<RandomPurpose, Rng>
@@ -88,6 +89,8 @@ namespace Music.Generator
         }
 
         private readonly Random _rng;
+        private static int _totalNextIntCalls = 0;
+        private static int _totalNextDoubleCalls = 0;
 
         // AI: ctor: private; only Initialize creates instances; seed derived from master Rng.
         private Rng(int seed)
@@ -98,13 +101,29 @@ namespace Music.Generator
         // AI: NextInt: returns [minInclusive, maxExclusive); if min>=max returns minInclusive (fallback).
         public int NextInt(int minInclusive, int maxExclusive)
         {
+            _totalNextIntCalls++;
             if (minInclusive >= maxExclusive)
                 return minInclusive;
             return _rng.Next(minInclusive, maxExclusive);
         }
 
         // AI: NextDouble: returns [0.0,1.0); preserve behavior.
-        public double NextDouble() => _rng.NextDouble();
+        public double NextDouble()
+        {
+            _totalNextDoubleCalls++;
+            return _rng.NextDouble();
+        }
+
+        public static void LogRngStats(string label)
+        {
+            Tracer.DebugTrace($"RNG Stats ({label}): NextInt called {_totalNextIntCalls} times, NextDouble called {_totalNextDoubleCalls} times");
+        }
+
+        public static void ResetRngStats()
+        {
+            _totalNextIntCalls = 0;
+            _totalNextDoubleCalls = 0;
+        }
 
         // AI: Static convenience methods for direct access without dictionary lookup.
         // AI: NextInt(purpose, min, max): looks up RNG by purpose and returns int in [min, max).
