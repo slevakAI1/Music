@@ -1,4 +1,4 @@
-﻿// AI: purpose=Singleton Rng manager; Initialize() seeds per-Purpose RNGs for deterministic sequences.
+// AI: purpose=Singleton Rng manager; Initialize() seeds per-Purpose RNGs for deterministic sequences.
 // AI: invariants=Same init seed -> identical sequences per Purpose; call Initialize before use else throws.
 // AI: deps=System.Random; Purpose seed derivation from master Rng; changing order breaks reproducibility.
 // AI: thread-safety=Not thread-safe; Initialize once at app start; concurrent Next* needs external sync.
@@ -60,7 +60,7 @@ namespace Music.Generator
         /// Story A2: Extended with groove-specific RNG instances for per-stream-key determinism.
         /// </summary>
         /// <param name="seed">Master seed for deriving per-Purpose seeds; default 12345.</param>
-        public static void Initialize(int seed = 12345)
+        public static void Initialize(int seed = 93456)
         {
             var masterRng = new Random(seed);
             

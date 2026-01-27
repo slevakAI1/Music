@@ -56,6 +56,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="AI\Completed\Done_Story_10.8.1_Technical_Debt.md" />
+    <None Remove="AI\Completed\Old_PreAnalysis_10.8.1.md" />
+    <None Remove="AI\Completed\PreAnalysis_10.8.1.md" />
     <None Remove="AI\Completed\PreAnalysis_10.8.2.md" />
     <None Remove="AI\Completed\PreAnalysis_2.3.md" />
     <None Remove="AI\Completed\PreAnalysis_2.4.md" />
@@ -76,6 +79,7 @@
     <None Remove="AI\Completed\PreAnalysis_7.1.md" />
     <None Remove="AI\Completed\PreAnalysis_8.1.md" />
     <None Remove="AI\Completed\PreAnalysis_9.3.md" />
+    <None Remove="AI\Completed\RefactorEpic.md" />
     <None Remove="AI\Completed\Story6.3_Complete.md" />
     <None Remove="AI\Completed\Story7.2_DrumFeatureExtraction.md" />
     <None Remove="AI\Completed\Story_10.8.1_COMPLETE.md" />
