@@ -51,6 +51,11 @@ namespace Music.Generator
             ValidateTimeSignatureTrack(songContext.Song.TimeSignatureTrack);
             ValidateGrooveTrack(songContext.GroovePresetDefinition);
 
+
+            //  TO DO - ---   drummer style is null so it's not even running agent here
+
+
+
             // When drummer style is provided, use operator-based generation with pipeline architecture
             if (drummerStyle != null)
             {

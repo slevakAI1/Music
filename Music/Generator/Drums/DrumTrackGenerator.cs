@@ -74,6 +74,10 @@ namespace Music.Generator
         {
             ArgumentNullException.ThrowIfNull(songContext);
 
+
+            //  OK ITS USING AGENT HERE
+
+
             // Story RF-4: Use GrooveBasedDrumGenerator pipeline with DrummerAgent as data source
             var agent = new DrummerAgent(StyleConfigurationLibrary.PopRock);
             var generator = new GrooveBasedDrumGenerator(agent, agent);
