@@ -7,7 +7,6 @@
 using Music.Generator.Agents.Common;
 using Music.Generator.Agents.Drums;
 using Music.Generator.Groove;
-using Music.MyMidi;
 
 namespace Music.Generator
 {
@@ -51,45 +50,15 @@ namespace Music.Generator
             ValidateTimeSignatureTrack(songContext.Song.TimeSignatureTrack);
             ValidateGrooveTrack(songContext.GroovePresetDefinition);
 
-
-            //  TO DO - ---   drummer style is null so it's not even running agent here
-
-
-
-            // When drummer style is provided, use operator-based generation with pipeline architecture
+            // When drummer style is provided, use custom style; otherwise use DrumTrackGenerator's default (PopRock)
             if (drummerStyle != null)
             {
-                // Create DrummerAgent as data source (IGroovePolicyProvider + IGrooveCandidateSource)
                 var agent = new DrummerAgent(drummerStyle);
-
-                // Create pipeline orchestrator
                 var generator = new GrooveBasedDrumGenerator(agent, agent);
-
-                // Generate using proper groove system integration
                 return generator.Generate(songContext);
             }
 
-            // Fallback to existing groove-only generation
-            int totalBars = songContext.SectionTrack.TotalBars;
-
-            // Resolve MIDI program numbers from VoiceSet
-            int drumProgramNumber = GetProgramNumberForRole(songContext.Voices, "DrumKit", defaultProgram: 255);
-
-            var drumTrack = DrumTrackGenerator.Generate(
-                 songContext.BarTrack,
-                 songContext.SectionTrack,
-                 songContext.SegmentGrooveProfiles,
-                 songContext.GroovePresetDefinition,
-                 totalBars,
-                 drumProgramNumber);
-
-            return drumTrack;
-        }
-
-        // AI: returns Identity.Name of groove preset or "Default"; used as primary groove key
-        private static string GetPrimaryGrooveName(GroovePresetDefinition groovePresetDefinition)
-        {
-            return groovePresetDefinition?.Identity?.Name ?? "Default";
+            return DrumTrackGenerator.Generate(songContext);
         }
 
         #region Validation
@@ -132,22 +101,5 @@ namespace Music.Generator
         }
 
         #endregion
-
-        // AI: resolves MIDI program by GrooveRole->VoiceName match (case-insensitive); returns defaultProgram on not found
-        private static int GetProgramNumberForRole(VoiceSet voices, String grooveRole, int defaultProgram)
-        {
-            // Find voice with matching groove role
-            var voice = voices.Voices.FirstOrDefault(v =>
-                string.Equals(v.GrooveRole, grooveRole, StringComparison.OrdinalIgnoreCase));
-
-            if (voice == null)
-                return defaultProgram;
-
-            // Look up MIDI program number from voice name
-            var midiVoice = MidiVoices.MidiVoiceList()
-                .FirstOrDefault(mv => string.Equals(mv.Name, voice.VoiceName, StringComparison.OrdinalIgnoreCase));
-
-            return midiVoice?.ProgramNumber ?? defaultProgram;
-        }
     }
 }
