@@ -1,5 +1,3 @@
-using Music.Generator;
-
 namespace Music.Generator.Groove
 {
     public static class GrooveSetupFactory

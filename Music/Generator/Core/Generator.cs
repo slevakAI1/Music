@@ -61,6 +61,24 @@ namespace Music.Generator
             return DrumTrackGenerator.Generate(songContext);
         }
 
+        // AI: purpose=Single-method groove preview for audition; generates groove from seed+genre, converts to playable PartTrack.
+        // AI: invariants=Deterministic: same seed+genre+barTrack always produces identical PartTrack; all events at same velocity.
+        // AI: deps=GrooveAnchorFactory.Generate for groove generation; GrooveInstanceLayer.ToPartTrack for MIDI conversion.
+        // AI: change=Story 2.2: Facade method combining groove generation + PartTrack conversion for quick audition workflow.
+        public static PartTrack GenerateGroovePreview(
+            int seed,
+            string genre,
+            BarTrack barTrack,
+            int totalBars,
+            int velocity = 100)
+        {
+            ArgumentNullException.ThrowIfNull(genre);
+            ArgumentNullException.ThrowIfNull(barTrack);
+
+            GrooveInstanceLayer groove = GrooveAnchorFactory.Generate(genre, seed);
+            return groove.ToPartTrack(barTrack, totalBars, velocity);
+        }
+
         #region Validation
 
 

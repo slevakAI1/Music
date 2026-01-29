@@ -74,7 +74,7 @@ The following classes ALREADY EXIST and should be reused (not recreated):
 
 ### Phase 1: Simplify Groove Generation (Reuse Existing)
 
-#### Story 1.1 — Add Query Methods to GrooveInstanceLayer
+#### Story 1.1 — Add Query Methods to GrooveInstanceLayer (COMPLETED)
 
 **As a** developer  
 **I want** helper methods on the existing `GrooveInstanceLayer`  
@@ -104,7 +104,7 @@ The following classes ALREADY EXIST and should be reused (not recreated):
 
 ---
 
-#### Story 1.2 — Extract Anchor Patterns to GrooveAnchorFactory
+#### Story 1.2 — Extract Anchor Patterns to GrooveAnchorFactory (COMPLETED)
 
 **As a** developer  
 **I want** a simple factory that returns anchor patterns by genre  
