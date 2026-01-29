@@ -16,9 +16,12 @@ namespace Music.Writer
             DataGridView dgSong,
             MidiPlaybackService midiPlaybackService)
         {
+            Tracer.DebugTrace("=== WriterFormEventHandlers.HandlePlayAsync START ===");
+
             // Check if there are any song tracks in the grid (excluding fixed rows)
             if (dgSong.Rows.Count <= SongGridManager.FIXED_ROWS_COUNT)
             {
+                Tracer.DebugTrace("HandlePlayAsync: No pitch events to play");
                 MessageBoxHelper.Show("No pitch events to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
@@ -30,9 +33,12 @@ namespace Music.Writer
 
             if (!hasTrackSelection)
             {
+                Tracer.DebugTrace("HandlePlayAsync: No track selected");
                 MessageBoxHelper.Show("Please select a pitch event to play.", "Play", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+
+            Tracer.DebugTrace($"HandlePlayAsync: Track selection validated, SelectedRows.Count={dgSong.SelectedRows.Count}");
 
             // Extract tempo track from fixed row
             var tempoRow = dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO];
@@ -125,12 +131,18 @@ namespace Music.Writer
             }
 
             // Consolidated conversion: songTracks -> midi document with tempo and time signature tracks
+            Tracer.DebugTrace($"HandlePlayAsync: Converting {songTracks.Count} tracks to MIDI document");
             var midiDoc = ConvertPartTracksToMidiSongDocument_For_Play_And_Export.Convert(
                 songTracks,
                 tempoTrack,
                 timeSignatureTrack);
 
+            Tracer.DebugTrace($"HandlePlayAsync: MIDI document created, Duration={midiDoc?.Duration.TotalMilliseconds ?? 0}ms");
+            Tracer.DebugTrace("HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync");
+
             await Player.PlayMidiFromSongTracksAsync(midiPlaybackService, midiDoc);
+
+            Tracer.DebugTrace("=== WriterFormEventHandlers.HandlePlayAsync END ===");
         }
 
         // AI: HandleExport: similar validation to Play then converts selected PartTracks to MidiSongDocument and writes file via service.

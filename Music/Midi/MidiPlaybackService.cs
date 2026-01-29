@@ -12,6 +12,8 @@ namespace Music.MyMidi
     {
         private OutputDevice? _outputDevice;
         private Playback? _playback;
+        private bool _isPaused = false;
+        private CancellationTokenSource? _cancellationTokenSource;
 
         public IEnumerable<string> EnumerateOutputDevices()
         {
@@ -31,17 +33,41 @@ namespace Music.MyMidi
         // AI: fix=Always get fresh output device to avoid using disposed device from previous Stop().
         public void Play(MidiSongDocument doc)
         {
+            Tracer.DebugTrace("MidiPlaybackService.Play: START");
+
             // Stop any existing playback first
+            Tracer.DebugTrace("MidiPlaybackService.Play: Calling Stop()");
             Stop();
 
+            // Create new cancellation token for this playback session
+            _cancellationTokenSource = new CancellationTokenSource();
+            Tracer.DebugTrace("MidiPlaybackService.Play: Created new CancellationTokenSource");
+
             // Always get a fresh output device (disposed by previous Stop)
+            Tracer.DebugTrace("MidiPlaybackService.Play: Getting fresh output device");
             _outputDevice = OutputDevice.GetAll().FirstOrDefault();
 
             if (_outputDevice == null)
+            {
+                Tracer.DebugTrace("MidiPlaybackService.Play: No output device available, returning");
                 return;
+            }
 
+            Tracer.DebugTrace($"MidiPlaybackService.Play: Device={_outputDevice.Name}");
+
+            Tracer.DebugTrace("MidiPlaybackService.Play: Creating playback from document");
             _playback = doc.Raw.GetPlayback(_outputDevice);
+
+            Tracer.DebugTrace("MidiPlaybackService.Play: Starting playback");
             _playback.Start();
+
+            Tracer.DebugTrace($"MidiPlaybackService.Play: END - IsPlaying={_playback?.IsRunning ?? false}");
+        }
+
+        // AI: GetCancellationToken: provides token for Task.Delay to allow cancellation when Stop is called.
+        public CancellationToken GetCancellationToken()
+        {
+            return _cancellationTokenSource?.Token ?? CancellationToken.None;
         }
 
         // AI: Pause stops playback but preserves _playback for Resume; sets _isPaused flag. Do not call Stop() if you plan to Resume().
@@ -69,8 +95,6 @@ namespace Music.MyMidi
 
         public bool IsPaused => _isPaused;
 
-        private bool _isPaused = false;
-
         /// <summary>
         /// Gets the current playback position in MIDI ticks. Returns 0 when not playing.
         /// </summary>
@@ -90,13 +114,41 @@ namespace Music.MyMidi
         // AI: Stop stops and disposes playback and output device, resetting internal state. After Stop(), Resume() will not work.
         public void Stop()
         {
-            _playback?.Stop();
-            _playback?.Dispose();
-            _playback = null;
+            Tracer.DebugTrace($"MidiPlaybackService.Stop: START - IsPlaying={_playback?.IsRunning ?? false}, IsPaused={_isPaused}");
+
+            // Cancel any pending Task.Delay to prevent orphaned continuations
+            if (_cancellationTokenSource != null)
+            {
+                Tracer.DebugTrace("MidiPlaybackService.Stop: Cancelling CancellationTokenSource");
+                _cancellationTokenSource.Cancel();
+                _cancellationTokenSource.Dispose();
+                _cancellationTokenSource = null;
+            }
+
+            if (_playback != null)
+            {
+                Tracer.DebugTrace("MidiPlaybackService.Stop: Stopping playback");
+                _playback.Stop();
+
+                Tracer.DebugTrace("MidiPlaybackService.Stop: Disposing playback");
+                _playback.Dispose();
+                _playback = null;
+            }
+            else
+            {
+                Tracer.DebugTrace("MidiPlaybackService.Stop: _playback is null, nothing to stop");
+            }
+
             _isPaused = false;
 
-            _outputDevice?.Dispose();
-            _outputDevice = null;
+            if (_outputDevice != null)
+            {
+                Tracer.DebugTrace("MidiPlaybackService.Stop: Disposing output device");
+                _outputDevice.Dispose();
+                _outputDevice = null;
+            }
+
+            Tracer.DebugTrace("MidiPlaybackService.Stop: END");
         }
     }
 }
