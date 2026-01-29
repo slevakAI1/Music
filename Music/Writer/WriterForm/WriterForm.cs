@@ -331,11 +331,14 @@ namespace Music.Writer
                     }
                     break;
 
-                    // THIS IS WORKING NOW!
-                case "Write Test Song":
-                   // HandleCommandWriteTestSong.HandleWriteTestSong(_songContext, dgSong);
+                case "Write Test Song": // THIS WAS TOO MUCH
                     HandleCommandWriteTestSongNew.HandleWriteTestSong(_songContext, dgSong);
                     break;
+
+                case "Groove Test": // Play groove instance as a test song
+                    HandleCommandGrooveTest.HandleGrooveTest(_songContext, dgSong);
+                    break;
+
 
                 // Other cases will be added here later.
 

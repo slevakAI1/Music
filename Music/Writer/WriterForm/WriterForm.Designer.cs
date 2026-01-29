@@ -22,6 +22,7 @@ namespace Music.Writer
             btnTestWordparser = new Button();
             btnExecute = new Button();
             gbSong = new GroupBox();
+            btnSaveWav = new Button();
             btnLoadDesign = new Button();
             btnSaveDesign = new Button();
             btnPause = new Button();
@@ -34,7 +35,6 @@ namespace Music.Writer
             btnClearAll = new Button();
             btnPlayTracks = new Button();
             dgSong = new DataGridView();
-            btnSaveWav = new Button();
             groupBox3.SuspendLayout();
             gbSong.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgSong).BeginInit();
@@ -43,7 +43,7 @@ namespace Music.Writer
             // cbCommand
             // 
             cbCommand.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbCommand.Items.AddRange(new object[] { "Repeat Note", "Write Test Song" });
+            cbCommand.Items.AddRange(new object[] { "Repeat Note", "Write Test Song", "Groove Test" });
             cbCommand.Location = new Point(13, 22);
             cbCommand.Name = "cbCommand";
             cbCommand.Size = new Size(250, 23);
@@ -120,6 +120,16 @@ namespace Music.Writer
             gbSong.TabIndex = 36;
             gbSong.TabStop = false;
             gbSong.Text = "Song";
+            // 
+            // btnSaveWav
+            // 
+            btnSaveWav.ForeColor = Color.FromArgb(0, 192, 0);
+            btnSaveWav.Location = new Point(994, 772);
+            btnSaveWav.Name = "btnSaveWav";
+            btnSaveWav.Size = new Size(85, 23);
+            btnSaveWav.TabIndex = 48;
+            btnSaveWav.Text = "Save Wav";
+            btnSaveWav.UseVisualStyleBackColor = true;
             // 
             // btnLoadDesign
             // 
@@ -253,16 +263,6 @@ namespace Music.Writer
             dgSong.Size = new Size(1864, 732);
             dgSong.TabIndex = 37;
             dgSong.CellDoubleClick += dgSong_CellDoubleClick;
-            // 
-            // btnSaveWav
-            // 
-            btnSaveWav.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSaveWav.Location = new Point(994, 772);
-            btnSaveWav.Name = "btnSaveWav";
-            btnSaveWav.Size = new Size(85, 23);
-            btnSaveWav.TabIndex = 48;
-            btnSaveWav.Text = "Save Wav";
-            btnSaveWav.UseVisualStyleBackColor = true;
             // 
             // WriterForm
             // 

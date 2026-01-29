@@ -72,7 +72,7 @@ The following classes ALREADY EXIST and should be reused (not recreated):
 
 ## Story Breakdown
 
-### Phase 1: Simplify Groove Generation (Reuse Existing)
+### Phase 1: Simplify Groove Generation (Reuse Existing)  (COMPLETED)
 
 #### Story 1.1 — Add Query Methods to GrooveInstanceLayer (COMPLETED)
 
@@ -137,7 +137,7 @@ The following classes ALREADY EXIST and should be reused (not recreated):
 
 ---
 
-#### Story 1.3 — Add Variation Logic to GrooveInstanceLayer
+#### Story 1.3 — Add Variation Logic to GrooveInstanceLayer  (COMPLETED)
 
 **As a** developer  
 **I want** seed-based variation applied to a `GrooveInstanceLayer`  
@@ -171,7 +171,7 @@ The following classes ALREADY EXIST and should be reused (not recreated):
 
 ---
 
-#### Story 1.4 — Create GrooveInstanceGenerator Facade Method
+#### Story 1.4 — Create GrooveInstanceGenerator Facade Method  (COMPLETED)
 
 **As a** developer  
 **I want** a single entry point: genre + seed → GrooveInstanceLayer  
@@ -197,9 +197,9 @@ The following classes ALREADY EXIST and should be reused (not recreated):
 
 ---
 
-### Phase 2: Groove to PartTrack Conversion
+### Phase 2: Groove to PartTrack Conversion (COMPLETED)
 
-#### Story 2.1 — Add ToPartTrack Method to GrooveInstanceLayer
+#### Story 2.1 — Add ToPartTrack Method to GrooveInstanceLayer  (COMPLETED)
 
 **As a** developer  
 **I want** to convert a GrooveInstanceLayer to a playable drum PartTrack  
@@ -230,7 +230,7 @@ The following classes ALREADY EXIST and should be reused (not recreated):
 
 ---
 
-#### Story 2.2 — Add GenerateGroovePreview to Generator.cs
+#### Story 2.2 — Add GenerateGroovePreview to Generator.cs (COMPLETED)
 
 **As a** developer  
 **I want** a single method to generate a groove preview from seed + genre  
