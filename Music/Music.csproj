@@ -57,10 +57,12 @@
 
   <ItemGroup>
     <None Remove="AI\Completed\Done_Story_10.8.1_Technical_Debt.md" />
+    <None Remove="AI\Completed\DrummerAgentEpic.md" />
     <None Remove="AI\Completed\Old_PreAnalysis_10.8.1.md" />
     <None Remove="AI\Completed\PreAnalysis_10.8.1.md" />
     <None Remove="AI\Completed\PreAnalysis_10.8.1_new.md" />
     <None Remove="AI\Completed\PreAnalysis_10.8.2.md" />
+    <None Remove="AI\Completed\PreAnalysis_10.8.3.md" />
     <None Remove="AI\Completed\PreAnalysis_2.3.md" />
     <None Remove="AI\Completed\PreAnalysis_2.4.md" />
     <None Remove="AI\Completed\PreAnalysis_2.5.md" />
@@ -87,6 +89,8 @@
     <None Remove="AI\Completed\Story_10.8.1_Completion_Report.md" />
     <None Remove="AI\Completed\Story_10.8.2_COMPLETE.md" />
     <None Remove="AI\Completed\Story_10.8.2_Implementation_Summary.md" />
+    <None Remove="AI\Completed\Story_10.8.3_Determinism_Investigation.md" />
+    <None Remove="AI\Completed\Story_10.8.3_Questions_Resolved.md" />
     <None Remove="AI\Completed\Story_8.1_Implementation_Complete_2026-01-26_101614.md" />
     <None Remove="AI\Prompts\AgentEpic.md" />
     <None Remove="AI\Prompts\Backlog.md" />
