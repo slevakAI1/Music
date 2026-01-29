@@ -3,6 +3,7 @@
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
 // AI: change=Story 3.5; crash pattern is a section signature (allowed repetition for consistency).
 
+
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Operators.StyleIdiom

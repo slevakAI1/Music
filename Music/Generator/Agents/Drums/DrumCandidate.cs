@@ -3,6 +3,7 @@
 // AI: deps=OnsetStrength from Groove.cs; FillRole and DrumArticulation enums; consumed by OperatorSelectionEngine and DrumCandidateMapper.
 // AI: change=Story 2.2; extend with additional hint fields as operators require; keep immutable record.
 
+
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums

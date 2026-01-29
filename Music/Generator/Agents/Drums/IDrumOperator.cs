@@ -5,6 +5,8 @@
 
 using Music.Generator.Agents.Common;
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Drums
 {
     /// <summary>

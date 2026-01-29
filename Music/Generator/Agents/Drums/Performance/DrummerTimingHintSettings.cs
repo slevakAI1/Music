@@ -3,6 +3,7 @@
 // AI: deps=TimingIntent enum; GrooveRoles for role constants; consumed by DrummerTimingShaper; stored in StyleConfiguration.
 // AI: change=Story 6.2; add additional settings as timing hinting requirements evolve.
 
+
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Performance

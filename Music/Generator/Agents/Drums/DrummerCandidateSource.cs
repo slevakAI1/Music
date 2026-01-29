@@ -5,6 +5,7 @@
 
 using Music.Generator.Agents.Common;
 using Music.Generator.Agents.Drums.Physicality;
+
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums
@@ -98,7 +99,7 @@ namespace Music.Generator.Agents.Drums
 
         /// <inheritdoc />
         public IReadOnlyList<DrumCandidateGroup> GetCandidateGroups(
-            GrooveBarContext barContext,
+            DrumBarContext barContext,
             string role)
         {
             ArgumentNullException.ThrowIfNull(barContext);
@@ -106,7 +107,7 @@ namespace Music.Generator.Agents.Drums
 
             _lastExecutionDiagnostics = new List<OperatorExecutionDiagnostic>();
 
-            // Build DrummerContext from GrooveBarContext
+            // Build DrummerContext from DrumBarContext
             var drummerContext = BuildDrummerContext(barContext, role);
 
             // Get enabled operators (style + policy filtering)
@@ -147,9 +148,9 @@ namespace Music.Generator.Agents.Drums
         public IReadOnlyList<OperatorExecutionDiagnostic>? LastExecutionDiagnostics => _lastExecutionDiagnostics;
 
         /// <summary>
-        /// Builds DrummerContext from GrooveBarContext.
+        /// Builds DrummerContext from DrumBarContext.
         /// </summary>
-        private DrummerContext BuildDrummerContext(GrooveBarContext barContext, string role)
+        private DrummerContext BuildDrummerContext(DrumBarContext barContext, string role)
         {
             var input = new DrummerContextBuildInput
             {
@@ -165,7 +166,7 @@ namespace Music.Generator.Agents.Drums
         /// <summary>
         /// Gets enabled operators based on style and policy.
         /// </summary>
-        private IReadOnlyList<IDrumOperator> GetEnabledOperators(GrooveBarContext barContext, string role)
+        private IReadOnlyList<IDrumOperator> GetEnabledOperators(DrumBarContext barContext, string role)
         {
             // Start with style-enabled operators
             var styleEnabled = _registry.GetEnabledOperators(_styleConfig);
@@ -400,7 +401,7 @@ namespace Music.Generator.Agents.Drums
         /// <summary>
         /// Gets seed from bar context or defaults.
         /// </summary>
-        private static int GetSeed(GrooveBarContext barContext)
+        private static int GetSeed(DrumBarContext barContext)
         {
             // Use bar number as component of seed for per-bar variation
             return 42 + barContext.BarNumber;
@@ -409,7 +410,7 @@ namespace Music.Generator.Agents.Drums
         /// <summary>
         /// Derives energy level from section type.
         /// </summary>
-        private static double GetEnergyLevel(GrooveBarContext barContext)
+        private static double GetEnergyLevel(DrumBarContext barContext)
         {
             var sectionType = barContext.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
             return sectionType switch

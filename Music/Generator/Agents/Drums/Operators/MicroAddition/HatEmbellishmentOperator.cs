@@ -3,6 +3,7 @@
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
 // AI: change=Story 3.1, 9.3; adjust position selection and count based on listening tests; reduces score when motif active.
 
+
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Operators.MicroAddition

@@ -6,6 +6,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Drums.Diagnostics;
 
 /// <summary>

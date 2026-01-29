@@ -19,13 +19,18 @@ namespace Music.Writer
         {
             try
             {
-                // Generate all song tracks 
-                var groovePreset = GrooveSetupFactory.BuildPopRockBasicGrooveForTestSong(
-                    songContext.SectionTrack,
-                    out var segmentProfiles);
+                // Generate all song tracks - GrooveSetupFactory deleted, use minimal preset
+                var groovePreset = new GroovePresetDefinition
+                {
+                    Identity = new GroovePresetIdentity
+                    {
+                        Name = "TestGroove",
+                        BeatsPerBar = 4,
+                        StyleFamily = "PopRock"
+                    },
+                    AnchorLayer = new GrooveInstanceLayer()
+                };
                 songContext.GroovePresetDefinition = groovePreset;
-                songContext.SegmentGrooveProfiles = segmentProfiles; // ✅ Store it
-
 
                 var result = Generator.Generator.Generate(songContext);
 

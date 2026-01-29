@@ -3,6 +3,8 @@
 // AI: deps=Consumed by DrummerVelocityShaper; maps from OnsetStrength/FillRole; style maps intent→numeric velocity.
 // AI: change=Story 6.1; extend with additional intents as needed; keep enum stable for determinism.
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Drums.Performance
 {
     /// <summary>

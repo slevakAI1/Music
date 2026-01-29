@@ -4,8 +4,9 @@
 // AI: change=Story 2.3, 9.3, 4.2; extend with additional override logic as operators are implemented.
 
 using Music.Generator.Agents.Common;
-using Music.Generator.Groove;
 using Music.Generator.Material;
+
+using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums
 {
@@ -75,7 +76,7 @@ namespace Music.Generator.Agents.Drums
         }
 
         /// <inheritdoc />
-        public DrumPolicyDecision? GetPolicy(GrooveBarContext barContext, string role)
+        public DrumPolicyDecision? GetPolicy(DrumBarContext barContext, string role)
         {
             ArgumentNullException.ThrowIfNull(barContext);
             ArgumentNullException.ThrowIfNull(role);
@@ -118,7 +119,7 @@ namespace Music.Generator.Agents.Drums
         /// Uses style default density as base, then applies energy modifier.
         /// Story 9.3: Applies motif-based density reduction when motif is active.
         /// </summary>
-        private double ComputeDensityOverride(GrooveBarContext barContext)
+        private double ComputeDensityOverride(DrumBarContext barContext)
         {
             // Get section type from bar context
             var sectionType = barContext.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
@@ -195,7 +196,7 @@ namespace Music.Generator.Agents.Drums
         /// Computes operator allow list based on context and memory.
         /// Fill operators are gated by IsFillWindow and memory state.
         /// </summary>
-        private List<string>? ComputeOperatorAllowList(GrooveBarContext barContext, string role)
+        private List<string>? ComputeOperatorAllowList(DrumBarContext barContext, string role)
         {
             // Get all allowed operators from style
             var allowedByStyle = _styleConfig.AllowedOperatorIds;
@@ -223,7 +224,7 @@ namespace Music.Generator.Agents.Drums
         /// Computes fill-gated operator list when style allows all.
         /// Returns null if fills are allowed; returns list excluding fills if not.
         /// </summary>
-        private List<string>? ComputeFillGatedOperatorList(GrooveBarContext barContext)
+        private List<string>? ComputeFillGatedOperatorList(DrumBarContext barContext)
         {
             if (ShouldAllowFills(barContext))
                 return null; // All operators allowed
@@ -240,7 +241,7 @@ namespace Music.Generator.Agents.Drums
         /// Determines whether fill operators should be allowed for this bar.
         /// Fills are allowed when: IsFillWindow AND memory doesn't disallow.
         /// </summary>
-        private bool ShouldAllowFills(GrooveBarContext barContext)
+        private bool ShouldAllowFills(DrumBarContext barContext)
         {
             // Check if in fill window (determined by PhraseHookWindowResolver upstream)
             // For now, use BarsUntilSectionEnd as proxy: fills allowed in last 1-2 bars
@@ -280,7 +281,7 @@ namespace Music.Generator.Agents.Drums
         /// Computes velocity bias override based on energy.
         /// Higher energy = positive bias (louder), lower energy = negative bias.
         /// </summary>
-        private int? ComputeVelocityBiasOverride(GrooveBarContext barContext)
+        private int? ComputeVelocityBiasOverride(DrumBarContext barContext)
         {
             var sectionType = barContext.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
 
@@ -303,7 +304,7 @@ namespace Music.Generator.Agents.Drums
         /// Section boundaries enable punctuation tags; fills enable fill tags.
         /// Story 9.3: Adds "MotifPresent" tag when a motif is active in the bar.
         /// </summary>
-        private List<string>? ComputeVariationTagsOverride(GrooveBarContext barContext)
+        private List<string>? ComputeVariationTagsOverride(DrumBarContext barContext)
         {
             var tags = new List<string>();
 

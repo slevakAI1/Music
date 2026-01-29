@@ -92,7 +92,7 @@ namespace Music.Generator
         public static PartTrack Generate(
             BarTrack barTrack,
             SectionTrack sectionTrack,
-            IReadOnlyList<SegmentGrooveProfile> segmentProfiles,
+            IReadOnlyList<object>? segmentProfiles,
             GroovePresetDefinition groovePresetDefinition,
             int totalBars,
             int midiProgramNumber)
@@ -102,110 +102,11 @@ namespace Music.Generator
             {
                 BarTrack = barTrack,
                 SectionTrack = sectionTrack,
-                SegmentGrooveProfiles = segmentProfiles,
                 GroovePresetDefinition = groovePresetDefinition
             };
 
             // Use new pipeline entry point
             return Generate(songContext);
-        }
-
-        /// <summary>
-        /// Legacy anchor-based generation implementation.
-        /// MVP: extracts anchor onsets and emits MIDI events with default velocity.
-        /// Story 5: adds per-bar context building for section/phrase awareness.
-        /// Story 6: adds role presence check (orchestration policy).
-        /// Story 8: adds protection hierarchy merger.
-        /// Story 9: adds protection enforcement (must-hits, never-remove, never-add).
-        /// Story 10: applies subdivision grid filter to onsets.
-        /// Story 11: applies syncopation/anticipation filter per role vocabulary.
-        /// Story 12: applies phrase hook policy (protect anchors in phrase-end windows).
-        /// </summary>
-        private static PartTrack GenerateLegacyAnchorBasedInternal(
-            BarTrack barTrack,
-            SectionTrack sectionTrack,
-            IReadOnlyList<SegmentGrooveProfile> segmentProfiles,
-            GroovePresetDefinition groovePresetDefinition,
-            int totalBars,
-            int midiProgramNumber)
-        {
-            var notes = new List<PartTrackEvent>();
-
-            // Story 5: Build per-bar context (section, phrase position, segment profile)
-            var barContexts = BarContextBuilder.Build(sectionTrack, segmentProfiles, totalBars);
-
-            // Story 8: Merge protection hierarchy layers per-bar using shared ProtectionPerBarBuilder
-            var mergedProtections = ProtectionPerBarBuilder.Build(barContexts, groovePresetDefinition.ProtectionPolicy);
-
-            // Story 12: Apply phrase hook policy (protect anchors near phrase/section ends) using shared PhraseHookProtectionAugmenter
-            PhraseHookProtectionAugmenter.Augment(
-                mergedProtections,
-                barContexts,
-                groovePresetDefinition.ProtectionPolicy?.PhraseHookPolicy,
-                groovePresetDefinition.Identity.BeatsPerBar);
-
-            // Story 2: Extract anchor patterns from GroovePreset per bar (drum-specific)
-            var allOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars);
-
-            // Story 10: Filter onsets by allowed subdivision grid using shared OnsetGrid
-            var subdivisionPolicy = groovePresetDefinition.ProtectionPolicy?.SubdivisionPolicy;
-            if (subdivisionPolicy != null)
-            {
-                var grid = OnsetGridBuilder.Build(groovePresetDefinition.Identity.BeatsPerBar, subdivisionPolicy.AllowedSubdivisions);
-                allOnsets = allOnsets.Where(o => grid.IsAllowed(o.Beat)).ToList();
-            }
-
-            // Story 11 : Filter onsets by syncopation/anticipation rules using shared RhythmVocabularyFilter
-            allOnsets = RhythmVocabularyFilter.Filter(
-                allOnsets,
-                getRoleName: onset => onset.Role.ToString(),
-                getBeat: onset => onset.Beat,
-                beatsPerBar: groovePresetDefinition.Identity.BeatsPerBar,
-                roleConstraintPolicy: groovePresetDefinition.ProtectionPolicy?.RoleConstraintPolicy);
-
-            // Story 6: Filter onsets by role presence (orchestration policy) using shared RolePresenceGate
-            var barContextDict = barContexts?.ToDictionary(ctx => ctx.BarNumber) ?? new Dictionary<int, BarContext>();
-            var filteredOnsets = new List<DrumOnset>();
-            foreach (var onset in allOnsets)
-            {
-                if (!barContextDict.TryGetValue(onset.BarNumber, out var barCtx))
-                {
-                    filteredOnsets.Add(onset);
-                    continue;
-                }
-
-                string sectionType = barCtx.Section?.SectionType.ToString() ?? string.Empty;
-                if (RolePresenceGate.IsRolePresent(sectionType, onset.Role.ToString(), groovePresetDefinition.ProtectionPolicy?.OrchestrationPolicy))
-                    filteredOnsets.Add(onset);
-            }
-
-            // Use generic ProtectionApplier to enforce protections on DrumOnset events.
-            var enforcedOnsets = ProtectionApplier.Apply(
-                filteredOnsets,
-                mergedProtections,
-                getBar: o => o.BarNumber,
-                getRoleName: o => o.Role.ToString(),
-                getBeat: o => o.Beat,
-                // setFlags: mutate DrumOnset flags and return it
-                setFlags: (o, isMustHit, isNeverRemove, isProtected) =>
-                {
-                    o.IsMustHit = isMustHit || o.IsMustHit;
-                    o.IsNeverRemove = isNeverRemove || o.IsNeverRemove;
-                    o.IsProtected = isProtected || o.IsProtected;
-                    return o;
-                },
-                // createEvent: create a new DrumOnset for missing MustHit onsets
-                createEvent: (bar, roleName, beat) =>
-                {
-                    if (!Enum.TryParse<DrumRole>(roleName, ignoreCase: true, out var parsedRole))
-                        parsedRole = DrumRole.Kick; // fallback though role names should match
-                    return new DrumOnset(parsedRole, bar, beat, Velocity: 100, TickPosition: 0);
-                });
-
-            // Story 3: Convert onsets to MIDI events
-            ConvertOnsetsToMidiEvents(enforcedOnsets, barTrack, notes);
-
-            return new PartTrack(notes) { MidiProgramNumber = midiProgramNumber };
         }
 
         // AI: ExtractAnchorOnsets reads kick/snare/hat patterns from GroovePreset anchor layer per bar; returns DrumOnset list with beat positions and default velocity.

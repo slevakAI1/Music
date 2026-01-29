@@ -1,7 +1,7 @@
 // AI: purpose=Define interface for drum policy providers to drive generation decisions (Story 4.2).
 // AI: invariants=Implementations must be deterministic for same bar context + role; null return treated as NoOverrides.
-// AI: deps=GrooveBarContext for bar context; DrumPolicyDecision for policy result.
-// AI: change=Story 4.2: moved from Groove namespace; Drum generator owns policy contracts.
+// AI: deps=DrumBarContext for bar context; DrumPolicyDecision for policy result.
+// AI: change=Story 5.2: Updated to use DrumBarContext (moved from Groove.DrumBarContext).
 
 using Music.Generator.Groove;
 
@@ -28,6 +28,6 @@ namespace Music.Generator.Agents.Drums
         /// This method may be called multiple times during generation if the system needs to 
         /// re-evaluate decisions. Implementations should return consistent results for the same inputs.
         /// </remarks>
-        DrumPolicyDecision? GetPolicy(GrooveBarContext barContext, string role);
+        DrumPolicyDecision? GetPolicy(DrumBarContext barContext, string role);
     }
 }

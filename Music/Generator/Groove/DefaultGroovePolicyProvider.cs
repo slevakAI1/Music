@@ -26,7 +26,7 @@ namespace Music.Generator.Groove
         /// <param name="barContext">Bar context (ignored - no overrides generated).</param>
         /// <param name="role">Role name (ignored - no overrides generated).</param>
         /// <returns>DrumPolicyDecision with no overrides set.</returns>
-        public DrumPolicyDecision? GetPolicy(GrooveBarContext barContext, string role)
+        public DrumPolicyDecision? GetPolicy(DrumBarContext barContext, string role)
         {
             // Story A3: Default provider returns "no overrides" to produce identical output
             return DrumPolicyDecision.NoOverrides;

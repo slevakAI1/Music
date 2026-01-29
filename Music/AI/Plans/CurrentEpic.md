@@ -287,7 +287,7 @@ The following classes ALREADY EXIST and should be reused (not recreated):
 
 ---
 
-### Phase 4: Move Part-Generation Code to Drum Generator
+### Phase 4: Move Part-Generation Code to Drum Generator  (COMPLETED)
 
 #### Story 4.1 — Move Candidate Types to Drum Generator (COMPLETED)
 
@@ -374,7 +374,7 @@ The following classes ALREADY EXIST and should be reused (not recreated):
 
 ### Phase 5: Delete Unused Groove Files
 
-#### Story 5.1 — Remove Velocity from Groove Types
+#### Story 5.1 — Remove Velocity from Groove Types   (COMPLETED)
 
 **As a** developer  
 **I want** velocity removed from Groove types  
@@ -391,7 +391,7 @@ The following classes ALREADY EXIST and should be reused (not recreated):
 
 ---
 
-#### Story 5.2 — Delete Section-Aware Groove Files
+#### Story 5.2 — Delete Section-Aware Groove Files   (COMPLETED)
 
 **As a** developer  
 **I want** to remove section-awareness from Groove  

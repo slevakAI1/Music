@@ -6,7 +6,6 @@
 using Music.Generator.Agents.Common;
 using Music.Generator.Agents.Drums.Diagnostics;
 using Music.Generator.Agents.Drums.Physicality;
-using Music.Generator.Groove;
 using Music.Generator.Material;
 using Music.MyMidi;
 
@@ -122,7 +121,7 @@ namespace Music.Generator.Agents.Drums
         #region IDrumPolicyProvider Implementation
 
         /// <inheritdoc />
-        public DrumPolicyDecision? GetPolicy(GrooveBarContext barContext, string role)
+        public DrumPolicyDecision? GetPolicy(DrumBarContext barContext, string role)
         {
             return _policyProvider.GetPolicy(barContext, role);
         }
@@ -133,7 +132,7 @@ namespace Music.Generator.Agents.Drums
 
         /// <inheritdoc />
         public IReadOnlyList<DrumCandidateGroup> GetCandidateGroups(
-            GrooveBarContext barContext,
+            DrumBarContext barContext,
             string role)
         {
             return _candidateSource.GetCandidateGroups(barContext, role);

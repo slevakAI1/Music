@@ -3,6 +3,7 @@
 // AI: deps=DrumWeightedCandidateSelector, GrooveRngHelper for RNG; GrooveOnset for anchors; GrooveDiagnosticsCollector for G1.
 // AI: change=Story G1: Added optional diagnostics collection via GrooveDiagnosticsCollector.
 
+
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums;
@@ -27,7 +28,7 @@ public static class DrumSelectionEngine
     /// <param name="diagnostics">Optional diagnostics collector for decision tracing (Story G1).</param>
     /// <returns>List of selected candidates in selection order.</returns>
     public static IReadOnlyList<DrumOnsetCandidate> SelectUntilTargetReached(
-        GrooveBarContext barContext,
+        DrumBarContext barContext,
         string role,
         IReadOnlyList<DrumCandidateGroup> groups,
         int targetCount,

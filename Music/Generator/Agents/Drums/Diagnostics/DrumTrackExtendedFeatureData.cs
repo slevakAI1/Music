@@ -3,6 +3,8 @@
 // AI: deps=Contains DrumTrackFeatureData (7.2a) + all analysis records from 7.2b.
 // AI: change=Story 7.2b; add new analysis sections as needed.
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Drums.Diagnostics;
 
 /// <summary>

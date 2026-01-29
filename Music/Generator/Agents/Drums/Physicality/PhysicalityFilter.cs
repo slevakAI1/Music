@@ -3,6 +3,7 @@
 // AI: deps=DrumOnsetCandidate, DrumCandidateMapper, LimbConflictDetector, StickingRules, GrooveDiagnosticsCollector.
 // AI: change=Story 4.4 adds full overcrowding prevention: MaxHitsPerBeat, MaxHitsPerBar, MaxHitsPerRolePerBar.
 
+
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Physicality

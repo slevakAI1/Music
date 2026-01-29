@@ -1,23 +1,18 @@
-// AI: purpose=Apply groove feel timing (straight/swing/shuffle/triplet) to onset positions (Story E1, F1).
+// AI: purpose=Apply groove feel timing (straight/swing/shuffle/triplet) to onset positions (Story E1).
 // AI: invariants=Deterministic output; only eighth offbeats (n+0.5) are eligible; Beat unchanged, only TimingOffsetTicks modified.
-// AI: deps=GrooveFeel, GrooveSubdivisionPolicy, SegmentGrooveProfile, AllowedSubdivision, MusicConstants.TicksPerQuarterNote, GrooveOverrideMergePolicy.
-// AI: change=Story F1: OverrideCanChangeFeel policy controls whether segment feel/swing overrides are applied.
+// AI: deps=GrooveFeel, AllowedSubdivision, MusicConstants.TicksPerQuarterNote.
+// AI: change=Story 5.3: Simplified, removed policy dependencies (moved to Drum Generator domain).
 
 namespace Music.Generator.Groove;
 
 /// <summary>
 /// Applies groove feel timing (straight, swing, shuffle, triplet) to onset positions.
 /// Story E1: Feel timing shifts eighth offbeats to create stylistically appropriate pocket.
-/// Story F1: OverrideCanChangeFeel policy controls whether segment feel/swing overrides are applied.
 /// </summary>
 /// <remarks>
 /// Eligibility: Only eighth offbeats (beat = integer + 0.5) are shifted.
 /// Downbeats, sixteenths, and triplet positions are never shifted by E1.
 /// Feel timing is additive: existing TimingOffsetTicks is preserved and feel offset is added.
-/// 
-/// Policy behavior (Story F1):
-/// - When OverrideCanChangeFeel=false: ignore segment overrides, use base policy values
-/// - When OverrideCanChangeFeel=true (or no policy provided): allow segment overrides
 /// </remarks>
 public static class FeelTimingEngine
 {
@@ -27,32 +22,27 @@ public static class FeelTimingEngine
     /// Applies feel timing to a list of onsets. Returns new immutable records with computed timing offsets.
     /// </summary>
     /// <param name="onsets">Source onsets to apply feel timing to</param>
-    /// <param name="subdivisionPolicy">Base subdivision policy with Feel and SwingAmount01</param>
-    /// <param name="segmentProfile">Optional segment profile with feel/swing overrides</param>
-    /// <param name="mergePolicy">Optional merge policy controlling whether feel overrides are allowed</param>
+    /// <param name="feel">The groove feel to apply</param>
+    /// <param name="swingAmount01">Swing amount (0.0 to 1.0), used only for Swing feel</param>
+    /// <param name="allowedSubdivisions">Allowed subdivisions flags</param>
     /// <returns>New onset list with TimingOffsetTicks computed for eligible onsets</returns>
     public static IReadOnlyList<GrooveOnset> ApplyFeelTiming(
         IReadOnlyList<GrooveOnset> onsets,
-        GrooveSubdivisionPolicy subdivisionPolicy,
-        SegmentGrooveProfile? segmentProfile = null,
-        GrooveOverrideMergePolicy? mergePolicy = null)
+        GrooveFeel feel = GrooveFeel.Straight,
+        double swingAmount01 = 0.0,
+        AllowedSubdivision allowedSubdivisions = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth)
     {
         ArgumentNullException.ThrowIfNull(onsets);
-        ArgumentNullException.ThrowIfNull(subdivisionPolicy);
 
         if (onsets.Count == 0)
             return onsets;
 
-        // Resolve effective feel and swing amount (respecting merge policy)
-        var effectiveFeel = ResolveEffectiveFeel(subdivisionPolicy, segmentProfile, mergePolicy);
-        var effectiveSwingAmount = ResolveEffectiveSwingAmount(subdivisionPolicy, segmentProfile, mergePolicy);
-
         // Straight feel: no shift applied
-        if (effectiveFeel == GrooveFeel.Straight)
+        if (feel == GrooveFeel.Straight)
             return onsets;
 
         // Check if Eighth subdivision is allowed - if not, no feel timing can be applied
-        bool eighthAllowed = subdivisionPolicy.AllowedSubdivisions.HasFlag(AllowedSubdivision.Eighth);
+        bool eighthAllowed = allowedSubdivisions.HasFlag(AllowedSubdivision.Eighth);
 
         var result = new List<GrooveOnset>(onsets.Count);
 
@@ -66,7 +56,7 @@ public static class FeelTimingEngine
             }
 
             // Compute feel offset based on feel type
-            int feelOffsetTicks = ComputeFeelOffsetTicks(effectiveFeel, effectiveSwingAmount);
+            int feelOffsetTicks = ComputeFeelOffsetTicks(feel, swingAmount01);
 
             // Apply additive timing: existing offset + feel offset
             int existingOffset = onset.TimingOffsetTicks ?? 0;
@@ -76,52 +66,6 @@ public static class FeelTimingEngine
         }
 
         return result;
-    }
-
-    /// <summary>
-    /// Resolves effective feel from segment override or policy fallback.
-    /// Story F1: When mergePolicy.OverrideCanChangeFeel=false, ignores segment override.
-    /// </summary>
-    /// <param name="subdivisionPolicy">Base subdivision policy with Feel.</param>
-    /// <param name="segmentProfile">Optional segment profile with feel override.</param>
-    /// <param name="mergePolicy">Optional merge policy (null = allow overrides).</param>
-    /// <returns>Effective feel to apply.</returns>
-    public static GrooveFeel ResolveEffectiveFeel(
-        GrooveSubdivisionPolicy subdivisionPolicy,
-        SegmentGrooveProfile? segmentProfile,
-        GrooveOverrideMergePolicy? mergePolicy = null)
-    {
-        // If policy disallows feel changes, use base only
-        if (mergePolicy is not null && !mergePolicy.OverrideCanChangeFeel)
-        {
-            return subdivisionPolicy.Feel;
-        }
-
-        return segmentProfile?.OverrideFeel ?? subdivisionPolicy.Feel;
-    }
-
-    /// <summary>
-    /// Resolves effective swing amount from segment override or policy fallback.
-    /// Story F1: When mergePolicy.OverrideCanChangeFeel=false, ignores segment override.
-    /// Result is clamped to [0.0..1.0].
-    /// </summary>
-    /// <param name="subdivisionPolicy">Base subdivision policy with SwingAmount01.</param>
-    /// <param name="segmentProfile">Optional segment profile with swing override.</param>
-    /// <param name="mergePolicy">Optional merge policy (null = allow overrides).</param>
-    /// <returns>Effective swing amount clamped to [0.0..1.0].</returns>
-    public static double ResolveEffectiveSwingAmount(
-        GrooveSubdivisionPolicy subdivisionPolicy,
-        SegmentGrooveProfile? segmentProfile,
-        GrooveOverrideMergePolicy? mergePolicy = null)
-    {
-        // If policy disallows feel changes, use base only (swing is part of feel)
-        if (mergePolicy is not null && !mergePolicy.OverrideCanChangeFeel)
-        {
-            return Math.Clamp(subdivisionPolicy.SwingAmount01, 0.0, 1.0);
-        }
-
-        double rawValue = segmentProfile?.OverrideSwingAmount01 ?? subdivisionPolicy.SwingAmount01;
-        return Math.Clamp(rawValue, 0.0, 1.0);
     }
 
     /// <summary>
@@ -174,22 +118,20 @@ public static class FeelTimingEngine
     /// Computes feel offset with diagnostic information for debugging/tracing.
     /// </summary>
     /// <param name="onset">The onset to compute diagnostics for.</param>
-    /// <param name="subdivisionPolicy">Base subdivision policy.</param>
-    /// <param name="segmentProfile">Optional segment profile with overrides.</param>
-    /// <param name="mergePolicy">Optional merge policy controlling feel overrides.</param>
+    /// <param name="feel">The groove feel to apply.</param>
+    /// <param name="swingAmount01">Swing amount (0.0 to 1.0).</param>
+    /// <param name="allowedSubdivisions">Allowed subdivisions flags.</param>
     /// <returns>Diagnostics record with computed values and sources.</returns>
     public static FeelTimingDiagnostics ComputeFeelOffsetWithDiagnostics(
         GrooveOnset onset,
-        GrooveSubdivisionPolicy subdivisionPolicy,
-        SegmentGrooveProfile? segmentProfile,
-        GrooveOverrideMergePolicy? mergePolicy = null)
+        GrooveFeel feel = GrooveFeel.Straight,
+        double swingAmount01 = 0.0,
+        AllowedSubdivision allowedSubdivisions = AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth)
     {
-        var effectiveFeel = ResolveEffectiveFeel(subdivisionPolicy, segmentProfile, mergePolicy);
-        var effectiveSwingAmount = ResolveEffectiveSwingAmount(subdivisionPolicy, segmentProfile, mergePolicy);
-        bool eighthAllowed = subdivisionPolicy.AllowedSubdivisions.HasFlag(AllowedSubdivision.Eighth);
+        bool eighthAllowed = allowedSubdivisions.HasFlag(AllowedSubdivision.Eighth);
         bool isEligible = eighthAllowed && IsEighthOffbeat(onset.Beat);
-        int feelOffsetTicks = isEligible && effectiveFeel != GrooveFeel.Straight
-            ? ComputeFeelOffsetTicks(effectiveFeel, effectiveSwingAmount)
+        int feelOffsetTicks = isEligible && feel != GrooveFeel.Straight
+            ? ComputeFeelOffsetTicks(feel, swingAmount01)
             : 0;
         int existingOffset = onset.TimingOffsetTicks ?? 0;
         int finalOffset = existingOffset + feelOffsetTicks;
@@ -197,8 +139,8 @@ public static class FeelTimingEngine
         return new FeelTimingDiagnostics(
             Role: onset.Role,
             Beat: onset.Beat,
-            EffectiveFeel: effectiveFeel,
-            EffectiveSwingAmount01: effectiveSwingAmount,
+            EffectiveFeel: feel,
+            EffectiveSwingAmount01: swingAmount01,
             EighthAllowed: eighthAllowed,
             IsEligibleOffbeat: isEligible,
             ExistingOffsetTicks: existingOffset,

@@ -3,6 +3,8 @@
 // AI: deps=Uses all 7.2b extractors; outputs DrumTrackExtendedFeatureData.
 // AI: change=Story 7.2b; add new extractors as analysis capabilities expand.
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Drums.Diagnostics;
 
 /// <summary>

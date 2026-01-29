@@ -3,6 +3,7 @@
 // AI: deps=DrumCandidate, DrumOnsetCandidate, FillRole, DrumArticulation; consumed by DrummerCandidateSource.
 // AI: change=VelocityHint/TimingHint now flow directly instead of via tags.
 
+
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums

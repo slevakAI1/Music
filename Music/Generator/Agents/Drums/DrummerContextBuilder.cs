@@ -1,7 +1,7 @@
-// AI: purpose=Builds DrummerContext from GrooveBarContext, policy, and runtime state; pure builder for determinism.
+// AI: purpose=Builds DrummerContext from DrumBarContext and runtime state; pure builder for determinism.
 // AI: invariants=Builder is stateless; same inputs produce identical DrummerContext; bars/beats 1-based.
-// AI: deps=GrooveBarContext, DrumPolicyDecision, GrooveProtectionPolicy, PhraseHookWindowResolver, GrooveRoles.
-// AI: change=Story 2.1, 4.2; extend with additional input sources as drummer operators require.
+// AI: deps=DrumBarContext, DrumPolicyDecision, GrooveRoles.
+// AI: change=Story 5.3: Simplified, removed deleted policy dependencies.
 
 using Music.Generator.Agents.Common;
 using Music.Generator.Groove;
@@ -15,13 +15,10 @@ namespace Music.Generator.Agents.Drums
     public sealed record DrummerContextBuildInput
     {
         /// <summary>Per-bar groove context (section, phrase position).</summary>
-        public required GrooveBarContext BarContext { get; init; }
+        public required DrumBarContext BarContext { get; init; }
 
         /// <summary>Optional policy decision with overrides for this bar.</summary>
         public DrumPolicyDecision? PolicyDecision { get; init; }
-
-        /// <summary>Protection policy containing phrase hook settings and orchestration.</summary>
-        public GrooveProtectionPolicy? ProtectionPolicy { get; init; }
 
         /// <summary>Seed for deterministic generation.</summary>
         public int Seed { get; init; } = 42;
@@ -55,9 +52,9 @@ namespace Music.Generator.Agents.Drums
     }
 
     /// <summary>
-    /// Builds DrummerContext from GrooveBarContext and related inputs.
+    /// Builds DrummerContext from DrumBarContext and related inputs.
     /// Stateless builder ensuring deterministic output for same inputs.
-    /// Story 2.1: DrummerContextBuilder builds from GrooveBarContext + policies.
+    /// Story 2.1: DrummerContextBuilder builds from DrumBarContext + policies.
     /// </summary>
     public static class DrummerContextBuilder
     {
@@ -106,15 +103,11 @@ namespace Music.Generator.Agents.Drums
             // Compute phrase position (0.0 = start, 1.0 = end)
             double phrasePosition = ComputePhrasePosition(barContext);
 
-            // Determine active roles from orchestration policy or defaults
+            // Determine active roles from defaults or overrides
             var activeRoles = ResolveActiveRoles(input, sectionType);
 
             // Compute backbeat beats for the time signature
             var backbeatBeats = ComputeBackbeatBeats(input.BeatsPerBar);
-
-            // Resolve fill window using PhraseHookWindowResolver
-            var hookPolicy = input.ProtectionPolicy?.PhraseHookPolicy;
-            var windowInfo = PhraseHookWindowResolver.Resolve(barContext.ToBarContext(), hookPolicy);
 
             // Determine if at section boundary (first or last bar)
             bool isAtSectionBoundary = barContext.BarWithinSection == 0 || barContext.BarsUntilSectionEnd == 0;
@@ -146,7 +139,7 @@ namespace Music.Generator.Agents.Drums
                 LastSnareBeat = input.LastSnareBeat,
                 CurrentHatMode = hatMode,
                 HatSubdivision = hatSubdivision,
-                IsFillWindow = windowInfo.InPhraseEndWindow || windowInfo.InSectionEndWindow,
+                IsFillWindow = isAtSectionBoundary, // Simplified: fill at boundaries
                 IsAtSectionBoundary = isAtSectionBoundary,
                 BackbeatBeats = backbeatBeats,
                 BeatsPerBar = input.BeatsPerBar
@@ -157,7 +150,7 @@ namespace Music.Generator.Agents.Drums
         /// Computes phrase position (0.0 at phrase start, 1.0 at phrase end).
         /// Uses bar position within section as proxy for phrase position.
         /// </summary>
-        private static double ComputePhrasePosition(GrooveBarContext barContext)
+        private static double ComputePhrasePosition(DrumBarContext barContext)
         {
             if (barContext.Section == null)
                 return 0.0;
@@ -171,33 +164,13 @@ namespace Music.Generator.Agents.Drums
         }
 
         /// <summary>
-        /// Resolves active roles from orchestration policy or defaults.
+        /// Resolves active roles from override or defaults.
         /// </summary>
         private static IReadOnlySet<string> ResolveActiveRoles(DrummerContextBuildInput input, MusicConstants.eSectionType sectionType)
         {
             // Use explicit override if provided
             if (input.ActiveRolesOverride != null)
                 return ValidateRoles(input.ActiveRolesOverride);
-
-            // Try orchestration policy
-            var orchestration = input.ProtectionPolicy?.OrchestrationPolicy;
-            if (orchestration?.DefaultsBySectionType != null)
-            {
-                var sectionTypeName = sectionType.ToString();
-                var sectionDefaults = orchestration.DefaultsBySectionType
-                    .FirstOrDefault(d => d.SectionType.Equals(sectionTypeName, StringComparison.OrdinalIgnoreCase));
-
-                if (sectionDefaults?.RolePresent != null)
-                {
-                    var enabledRoles = sectionDefaults.RolePresent
-                        .Where(kvp => kvp.Value && AllDrumRoles.Contains(kvp.Key))
-                        .Select(kvp => kvp.Key)
-                        .ToHashSet();
-
-                    if (enabledRoles.Count > 0)
-                        return enabledRoles;
-                }
-            }
 
             // Fall back to defaults
             return DefaultActiveRoles;

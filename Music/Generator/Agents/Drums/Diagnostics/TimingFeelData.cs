@@ -3,6 +3,8 @@
 // AI: deps=Populated by TimingFeelExtractor; uses DrumMidiEvent timing offset data.
 // AI: change=Story 7.2b; add additional timing metrics as needed.
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Drums.Diagnostics;
 
 /// <summary>

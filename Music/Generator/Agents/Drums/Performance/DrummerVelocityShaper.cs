@@ -4,6 +4,7 @@
 // AI: change=Story 6.1; extend intent classification as operator patterns evolve.
 
 using Music.Generator.Agents.Common;
+
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Performance

@@ -3,6 +3,7 @@
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
 // AI: change=Story 3.3; adjust base score or velocity based on listening tests.
 
+
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation

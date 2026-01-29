@@ -3,6 +3,8 @@
 // AI: deps=Uses DrumTrackFeatureData; outputs TimingFeelData.
 // AI: change=Story 7.2b; improve swing detection algorithm as needed.
 
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Drums.Diagnostics;
 
 /// <summary>

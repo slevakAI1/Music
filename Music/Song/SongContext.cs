@@ -23,8 +23,7 @@ namespace Music.Generator
 
         // THIS IS THE NEW GROOVE STRUCTURE
         public GroovePresetDefinition GroovePresetDefinition { get; set; } = new();
-        public IReadOnlyList<SegmentGrooveProfile> SegmentGrooveProfiles { get; set; } = Array.Empty<SegmentGrooveProfile>();
-
+        // Story 5.2: SegmentGrooveProfiles removed - section-awareness now handled by DrummerPolicyProvider
 
 
         //======================================================================================

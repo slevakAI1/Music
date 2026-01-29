@@ -4,8 +4,9 @@
 // AI: change=Story 2.1, 9.3; extend with additional drum-specific fields as operators require; keep immutable.
 
 using Music.Generator.Agents.Common;
-using Music.Generator.Groove;
 using Music.Generator.Material;
+
+using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums
 {

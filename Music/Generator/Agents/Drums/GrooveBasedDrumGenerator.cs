@@ -3,9 +3,10 @@
 // AI: deps=DrummerAgent (data source), DrumSelectionEngine, BarContextBuilder, SongContext, PartTrack.
 // AI: change=Story RF-2, 4.2; correct architecture replaces DrummerAgent.Generate() with proper groove integration.
 
-using Music.Generator.Groove;
 using Music.Generator.Material;
 using Music.MyMidi;
+
+using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums
 {
@@ -101,7 +102,7 @@ namespace Music.Generator.Agents.Drums
 
             var barTrack = songContext.BarTrack;
             var sectionTrack = songContext.SectionTrack;
-            var segmentProfiles = songContext.SegmentGrooveProfiles;
+            // Story 5.2: SegmentGrooveProfiles removed - section-awareness now in DrummerPolicyProvider
             var groovePresetDefinition = songContext.GroovePresetDefinition;
             int totalBars = sectionTrack.TotalBars;
 
@@ -109,7 +110,7 @@ namespace Music.Generator.Agents.Drums
             int drumProgramNumber = GetDrumProgramNumber(songContext);
 
             // Build per-bar contexts
-            var barContexts = BarContextBuilder.Build(sectionTrack, segmentProfiles, totalBars);
+            var barContexts = DrumBarContextBuilder.Build(sectionTrack, totalBars);
 
             // Extract anchor onsets (foundation that's always present)
             var anchorOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars, barTrack);
@@ -224,7 +225,7 @@ namespace Music.Generator.Agents.Drums
 
             foreach (var barContext in barContexts)
             {
-                var grooveBarContext = GrooveBarContext.FromBarContext(barContext);
+                var drumBarContext = DrumBarContext.FromBarContext(barContext);
 
                 // Get anchors for this bar to avoid conflicts
                 var barAnchors = anchors.Where(a => a.BarNumber == barContext.BarNumber).ToList();
@@ -232,7 +233,7 @@ namespace Music.Generator.Agents.Drums
                 foreach (var role in activeRoles)
                 {
                     // Get policy decision for this bar+role
-                    var policy = _policyProvider.GetPolicy(grooveBarContext, role);
+                    var policy = _policyProvider.GetPolicy(drumBarContext, role);
 
                     // Calculate target count from density
                     int targetCount = CalculateTargetCount(policy, role);
@@ -241,7 +242,7 @@ namespace Music.Generator.Agents.Drums
                         continue; // No operators needed for this bar+role
 
                     // Get candidate groups from candidate source
-                    var candidateGroups = _candidateSource.GetCandidateGroups(grooveBarContext, role);
+                    var candidateGroups = _candidateSource.GetCandidateGroups(drumBarContext, role);
 
                     if (candidateGroups.Count == 0)
                         continue; // No candidates available
@@ -253,7 +254,7 @@ namespace Music.Generator.Agents.Drums
 
                     // SELECT using GrooveSelectionEngine
                     var selected = DrumSelectionEngine.SelectUntilTargetReached(
-                        grooveBarContext,
+                        drumBarContext,
                         role,
                         candidateGroups,
                         targetCount,

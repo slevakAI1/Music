@@ -3,6 +3,7 @@
 // AI: deps=GrooveRoles for role constants; consumed by LimbConflictDetector and PhysicalityFilter.
 // AI: change=Story 4.1 defines model; Story 4.3 integrates into PhysicalityFilter.
 
+
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Physicality

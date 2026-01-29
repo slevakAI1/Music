@@ -1,6 +1,6 @@
 namespace Music.Generator.Groove
 {
-    // AI: purpose=Container for multiple groove presets by name; enables mid-song preset switching via SegmentGrooveProfile.
+    // AI: purpose=Container for multiple groove presets by name; enables mid-song preset switching via object.
     // AI: invariants=Presets keyed by Identity.Name (case-insensitive); DefaultPresetName fallback when segment has no preset.
     // AI: usage=Add presets via Add(); lookup via TryGetPreset(); GetPresetForBar resolves bar->preset via segment profiles.
     // AI: change=Add presets with unique Identity.Name; DefaultPresetName used when segment.GroovePresetName is null/not found.
@@ -30,21 +30,11 @@ namespace Music.Generator.Groove
             return Presets.TryGetValue(name, out preset);
         }
 
-        // AI: GetPresetForBar resolves bar->preset via segment profiles; returns default if no segment covers bar.
-        public GroovePresetDefinition? GetPresetForBar(int bar, IReadOnlyList<SegmentGrooveProfile> segmentProfiles)
+        // AI: Story 5.2: Method disabled - will be deleted in Story 5.4
+        // GetPresetForBar resolves bar->preset via segment profiles; returns default if no segment covers bar.
+        public GroovePresetDefinition? GetPresetForBar(int bar, IReadOnlyList<object>? segmentProfiles)
         {
-            foreach (var segment in segmentProfiles)
-            {
-                bool inRange = true;
-                if (segment.StartBar.HasValue && bar < segment.StartBar.Value)
-                    inRange = false;
-                if (segment.EndBar.HasValue && bar > segment.EndBar.Value)
-                    inRange = false;
-
-                if (inRange && TryGetPreset(segment.GroovePresetName, out var preset))
-                    return preset;
-            }
-
+            // Story 5.2: SegmentGrooveProfile removed - return default preset
             TryGetPreset(DefaultPresetName, out var defaultPreset);
             return defaultPreset;
         }

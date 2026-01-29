@@ -1,6 +1,8 @@
 // AI: purpose=Implements sticking validation rules for drum candidates.
 // AI: invariants=Defaults: MaxConsecutiveSameHand=4, MaxGhostsPerBar=4, MinGapBetweenFastHits=TPQN/4.
 // AI: deps=LimbModel, LimbAssignment, DrumCandidate, MusicConstants.TicksPerQuarterNote.
+using Music.Generator.Groove;
+
 namespace Music.Generator.Agents.Drums.Physicality
 {
     public sealed class StickingRules
