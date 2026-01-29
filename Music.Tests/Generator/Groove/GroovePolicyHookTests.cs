@@ -1,25 +1,26 @@
-// AI: purpose=Unit tests for Story A3 drummer policy hook (IGroovePolicyProvider, GroovePolicyDecision, DefaultGroovePolicyProvider).
+// AI: purpose=Unit tests for Story A3, 4.2 drummer policy hook (IDrumPolicyProvider, DrumPolicyDecision, DefaultGroovePolicyProvider).
 // AI: deps=xunit for test framework; Music.Generator for types under test.
-// AI: change=Story A3 acceptance criteria: verify hook interface, default provider, and no behavior change.
+// AI: change=Story A3, 4.2: verify hook interface, default provider, and no behavior change; updated to use Drum types.
 
+using Music.Generator.Agents.Drums;
 using Music.Generator.Groove;
 using Xunit;
 
 namespace Music.Generator.Tests
 {
     /// <summary>
-    /// Story A3: Tests for drummer policy hook.
-    /// Verifies IGroovePolicyProvider interface, GroovePolicyDecision, and DefaultGroovePolicyProvider.
+    /// Story A3, 4.2: Tests for drummer policy hook.
+    /// Verifies IDrumPolicyProvider interface, DrumPolicyDecision, and DefaultGroovePolicyProvider.
     /// </summary>
     public class GroovePolicyHookTests
     {
-        #region GroovePolicyDecision Tests
+        #region DrumPolicyDecision Tests
 
         [Fact]
-        public void GroovePolicyDecision_NoOverrides_HasNoOverrides()
+        public void DrumPolicyDecision_NoOverrides_HasNoOverrides()
         {
             // Arrange & Act
-            var decision = GroovePolicyDecision.NoOverrides;
+            var decision = DrumPolicyDecision.NoOverrides;
 
             // Assert
             Assert.False(decision.HasAnyOverrides);
@@ -33,10 +34,10 @@ namespace Music.Generator.Tests
         }
 
         [Fact]
-        public void GroovePolicyDecision_WithVariationTagsOverride_HasOverrides()
+        public void DrumPolicyDecision_WithVariationTagsOverride_HasOverrides()
         {
             // Arrange & Act
-            var decision = new GroovePolicyDecision
+            var decision = new DrumPolicyDecision
             {
                 EnabledVariationTagsOverride = new List<string> { "Fill", "Intense" }
             };
@@ -50,10 +51,10 @@ namespace Music.Generator.Tests
         }
 
         [Fact]
-        public void GroovePolicyDecision_WithDensityOverride_HasOverrides()
+        public void DrumPolicyDecision_WithDensityOverride_HasOverrides()
         {
             // Arrange & Act
-            var decision = new GroovePolicyDecision
+            var decision = new DrumPolicyDecision
             {
                 Density01Override = 0.75
             };
@@ -64,10 +65,10 @@ namespace Music.Generator.Tests
         }
 
         [Fact]
-        public void GroovePolicyDecision_WithMaxEventsOverride_HasOverrides()
+        public void DrumPolicyDecision_WithMaxEventsOverride_HasOverrides()
         {
             // Arrange & Act
-            var decision = new GroovePolicyDecision
+            var decision = new DrumPolicyDecision
             {
                 MaxEventsPerBarOverride = 8
             };
@@ -78,10 +79,10 @@ namespace Music.Generator.Tests
         }
 
         [Fact]
-        public void GroovePolicyDecision_WithTimingFeelOverride_HasOverrides()
+        public void DrumPolicyDecision_WithTimingFeelOverride_HasOverrides()
         {
             // Arrange & Act
-            var decision = new GroovePolicyDecision
+            var decision = new DrumPolicyDecision
             {
                 RoleTimingFeelOverride = TimingFeel.Behind
             };
@@ -92,10 +93,10 @@ namespace Music.Generator.Tests
         }
 
         [Fact]
-        public void GroovePolicyDecision_WithTimingBiasOverride_HasOverrides()
+        public void DrumPolicyDecision_WithTimingBiasOverride_HasOverrides()
         {
             // Arrange & Act
-            var decision = new GroovePolicyDecision
+            var decision = new DrumPolicyDecision
             {
                 RoleTimingBiasTicksOverride = -10
             };
@@ -106,10 +107,10 @@ namespace Music.Generator.Tests
         }
 
         [Fact]
-        public void GroovePolicyDecision_WithVelocityBiasOverride_HasOverrides()
+        public void DrumPolicyDecision_WithVelocityBiasOverride_HasOverrides()
         {
             // Arrange & Act
-            var decision = new GroovePolicyDecision
+            var decision = new DrumPolicyDecision
             {
                 VelocityBiasOverride = 15
             };
@@ -120,10 +121,10 @@ namespace Music.Generator.Tests
         }
 
         [Fact]
-        public void GroovePolicyDecision_WithOperatorAllowList_HasOverrides()
+        public void DrumPolicyDecision_WithOperatorAllowList_HasOverrides()
         {
             // Arrange & Act
-            var decision = new GroovePolicyDecision
+            var decision = new DrumPolicyDecision
             {
                 OperatorAllowList = new List<string> { "Operator1", "Operator2" }
             };
@@ -135,10 +136,10 @@ namespace Music.Generator.Tests
         }
 
         [Fact]
-        public void GroovePolicyDecision_WithMultipleOverrides_HasOverrides()
+        public void DrumPolicyDecision_WithMultipleOverrides_HasOverrides()
         {
             // Arrange & Act
-            var decision = new GroovePolicyDecision
+            var decision = new DrumPolicyDecision
             {
                 Density01Override = 0.5,
                 MaxEventsPerBarOverride = 6,
@@ -155,20 +156,20 @@ namespace Music.Generator.Tests
         }
 
         [Fact]
-        public void GroovePolicyDecision_DefaultConstruction_HasNoOverrides()
+        public void DrumPolicyDecision_DefaultConstruction_HasNoOverrides()
         {
             // Arrange & Act
-            var decision = new GroovePolicyDecision();
+            var decision = new DrumPolicyDecision();
 
             // Assert
             Assert.False(decision.HasAnyOverrides);
         }
 
         [Fact]
-        public void GroovePolicyDecision_IsImmutable_RecordSemantics()
+        public void DrumPolicyDecision_IsImmutable_RecordSemantics()
         {
             // Arrange
-            var decision1 = new GroovePolicyDecision
+            var decision1 = new DrumPolicyDecision
             {
                 Density01Override = 0.8
             };
@@ -304,10 +305,10 @@ namespace Music.Generator.Tests
         #region Interface Contract Tests
 
         [Fact]
-        public void IGroovePolicyProvider_DefaultProvider_ImplementsInterface()
+        public void IDrumPolicyProvider_DefaultProvider_ImplementsInterface()
         {
             // Arrange & Act
-            IGroovePolicyProvider provider = DefaultGroovePolicyProvider.Instance;
+            IDrumPolicyProvider provider = DefaultGroovePolicyProvider.Instance;
             var barContext = new GrooveBarContext(
                 BarNumber: 1,
                 Section: null,
@@ -324,7 +325,7 @@ namespace Music.Generator.Tests
         }
 
         [Fact]
-        public void IGroovePolicyProvider_CanReturnNull_TreatedAsNoOverrides()
+        public void IDrumPolicyProvider_CanReturnNull_TreatedAsNoOverrides()
         {
             // Arrange
             var provider = new NullReturningPolicyProvider();
@@ -349,9 +350,9 @@ namespace Music.Generator.Tests
         /// <summary>
         /// Test policy provider that returns null (valid per interface contract).
         /// </summary>
-        private sealed class NullReturningPolicyProvider : IGroovePolicyProvider
+        private sealed class NullReturningPolicyProvider : IDrumPolicyProvider
         {
-            public GroovePolicyDecision? GetPolicy(GrooveBarContext barContext, string role)
+            public DrumPolicyDecision? GetPolicy(GrooveBarContext barContext, string role)
             {
                 return null;
             }
@@ -360,4 +361,5 @@ namespace Music.Generator.Tests
         #endregion
     }
 }
+
 

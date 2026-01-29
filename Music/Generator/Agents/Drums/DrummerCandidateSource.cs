@@ -1,7 +1,7 @@
-// AI: purpose=Implements IGrooveCandidateSource for drummer agent; gathers operator candidates, maps, groups, filters.
+// AI: purpose=Implements IDrumCandidateSource for drummer agent; gathers operator candidates, maps, groups, filters.
 // AI: invariants=Deterministic: same context + seed → same groups; operators invoked in registry order; errors isolated.
-// AI: deps=IGrooveCandidateSource, DrumOperatorRegistry, DrumCandidateMapper, PhysicalityFilter, DrummerContextBuilder.
-// AI: change=Story 2.4; extend with diagnostics and additional filtering as physicality system matures.
+// AI: deps=IDrumCandidateSource, DrumOperatorRegistry, DrumCandidateMapper, PhysicalityFilter, DrummerContextBuilder.
+// AI: change=Story 2.4, 4.2; extend with diagnostics and additional filtering as physicality system matures.
 
 using Music.Generator.Agents.Common;
 using Music.Generator.Agents.Drums.Physicality;
@@ -46,16 +46,17 @@ namespace Music.Generator.Agents.Drums
     }
 
     /// <summary>
-    /// Drummer agent implementation of IGrooveCandidateSource.
-    /// Gathers candidates from registered operators, maps to GrooveOnsetCandidate,
+    /// Drummer agent implementation of IDrumCandidateSource.
+    /// Gathers candidates from registered operators, maps to DrumOnsetCandidate,
     /// groups by operator family, and applies physicality filtering.
     /// Story 2.4: Implement Drummer Candidate Source.
+    /// Story 4.2: Moved interface ownership from Groove to Drums namespace.
     /// </summary>
     /// <remarks>
-    /// Pipeline: Operators → DrumCandidates → Map → Group → PhysicalityFilter → GrooveCandidateGroups
+    /// Pipeline: Operators → DrumCandidates → Map → Group → PhysicalityFilter → DrumCandidateGroups
     /// All operations are deterministic given same context, seed, and registry state.
     /// </remarks>
-    public sealed class DrummerCandidateSource : IGrooveCandidateSource
+    public sealed class DrummerCandidateSource : IDrumCandidateSource
     {
         private readonly DrumOperatorRegistry _registry;
         private readonly StyleConfiguration _styleConfig;

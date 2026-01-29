@@ -1,7 +1,7 @@
-// AI: purpose=Adapter that wraps GrooveVariationCatalog as IGrooveCandidateSource (Story B4).
+// AI: purpose=Adapter that wraps GrooveVariationCatalog as IDrumCandidateSource (Story B4, 4.2).
 // AI: invariants=Deterministic; uses GrooveVariationLayerMerger and GrooveCandidateFilter.
-// AI: deps=IGrooveCandidateSource, GrooveVariationCatalog, GrooveVariationLayerMerger, GrooveCandidateFilter.
-// AI: change=Story B4 acceptance criteria: default implementation adapting existing catalog.
+// AI: deps=IDrumCandidateSource, GrooveVariationCatalog, GrooveVariationLayerMerger, GrooveCandidateFilter.
+// AI: change=Story B4, 4.2: updated to use Drum interfaces (scheduled for deletion in Story 5.4).
 
 using Music.Generator.Agents.Drums;
 
@@ -10,12 +10,13 @@ namespace Music.Generator.Groove
     /// <summary>
     /// Default candidate source that adapts GrooveVariationCatalog using layer merger and filter.
     /// Operator Candidate Source Hook - baseline implementation for catalog-based candidates.
+    /// Story 4.2: Updated to use IDrumCandidateSource (scheduled for deletion in Story 5.4).
     /// </summary>
-    public sealed class CatalogGrooveCandidateSource : IGrooveCandidateSource
+    public sealed class CatalogGrooveCandidateSource : IDrumCandidateSource
     {
         private readonly GrooveVariationCatalog _catalog;
         private readonly GroovePhraseHookPolicy? _phraseHookPolicy;
-        private readonly IGroovePolicyProvider? _policyProvider;
+        private readonly IDrumPolicyProvider? _policyProvider;
 
         /// <summary>
         /// Creates a catalog-based candidate source.
@@ -26,7 +27,7 @@ namespace Music.Generator.Groove
         public CatalogGrooveCandidateSource(
             GrooveVariationCatalog catalog,
             GroovePhraseHookPolicy? phraseHookPolicy = null,
-            IGroovePolicyProvider? policyProvider = null)
+            IDrumPolicyProvider? policyProvider = null)
         {
             ArgumentNullException.ThrowIfNull(catalog);
             _catalog = catalog;

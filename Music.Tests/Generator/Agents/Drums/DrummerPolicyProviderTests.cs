@@ -443,7 +443,7 @@ namespace Music.Generator.Agents.Drums.Tests
 
             // Assert
             Assert.NotNull(decision);
-            Assert.True(decision.HasAnyOverrides || decision == GroovePolicyDecision.NoOverrides);
+            Assert.True(decision.HasAnyOverrides || decision == DrumPolicyDecision.NoOverrides);
         }
 
         #endregion
@@ -480,4 +480,5 @@ namespace Music.Generator.Agents.Drums.Tests
         #endregion
     }
 }
+
 

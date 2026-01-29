@@ -1,7 +1,9 @@
-// AI: purpose=Apply per-role micro-timing (feel/bias) on top of E1 feel timing (Story E2).
+// AI: purpose=Apply per-role micro-timing (feel/bias) on top of E1 feel timing (Story E2, 4.2).
 // AI: invariants=Deterministic output; Beat unchanged, only TimingOffsetTicks modified; final offset clamped to [-MaxAbsTimingBiasTicks..+MaxAbsTimingBiasTicks].
-// AI: deps=GrooveTimingPolicy, TimingFeel, GroovePolicyDecision, GrooveOnset; E2 runs after E1 (additive semantics).
-// AI: change=TimingFeel maps to fixed ticks: Ahead=-10, OnTop=0, Behind=+10, LaidBack=+20; unknown roles default to OnTop/0 bias.
+// AI: deps=GrooveTimingPolicy, TimingFeel, DrumPolicyDecision, GrooveOnset; E2 runs after E1 (additive semantics).
+// AI: change=TimingFeel maps to fixed ticks: Ahead=-10, OnTop=0, Behind=+10, LaidBack=+20; unknown roles default to OnTop/0 bias; Story 4.2: updated to use Drum types.
+
+using Music.Generator.Agents.Drums;
 
 namespace Music.Generator.Groove;
 
@@ -41,7 +43,7 @@ public static class RoleTimingEngine
     public static IReadOnlyList<GrooveOnset> ApplyRoleTiming(
         IReadOnlyList<GrooveOnset> onsets,
         GrooveTimingPolicy? timingPolicy,
-        GroovePolicyDecision? policyDecision = null)
+        DrumPolicyDecision? policyDecision = null)
     {
         ArgumentNullException.ThrowIfNull(onsets);
 
@@ -85,7 +87,7 @@ public static class RoleTimingEngine
     public static int ComputeRoleOffset(
         string role,
         GrooveTimingPolicy? timingPolicy,
-        GroovePolicyDecision? policyDecision = null)
+        DrumPolicyDecision? policyDecision = null)
     {
         timingPolicy ??= new GrooveTimingPolicy();
 
@@ -99,12 +101,12 @@ public static class RoleTimingEngine
 
     /// <summary>
     /// Resolves effective timing feel for a role using field-level override precedence.
-    /// Order: GroovePolicyDecision override → GrooveTimingPolicy → default (OnTop)
+    /// Order: DrumPolicyDecision override → GrooveTimingPolicy → default (OnTop)
     /// </summary>
     public static TimingFeel ResolveEffectiveFeel(
         string role,
         GrooveTimingPolicy? timingPolicy,
-        GroovePolicyDecision? policyDecision = null)
+        DrumPolicyDecision? policyDecision = null)
     {
         // Policy decision override wins first
         if (policyDecision?.RoleTimingFeelOverride.HasValue == true)
@@ -121,12 +123,12 @@ public static class RoleTimingEngine
 
     /// <summary>
     /// Resolves effective timing bias in ticks for a role using field-level override precedence.
-    /// Order: GroovePolicyDecision override → GrooveTimingPolicy → default (0)
+    /// Order: DrumPolicyDecision override → GrooveTimingPolicy → default (0)
     /// </summary>
     public static int ResolveEffectiveBias(
         string role,
         GrooveTimingPolicy? timingPolicy,
-        GroovePolicyDecision? policyDecision = null)
+        DrumPolicyDecision? policyDecision = null)
     {
         // Policy decision override wins first
         if (policyDecision?.RoleTimingBiasTicksOverride.HasValue == true)
@@ -161,7 +163,7 @@ public static class RoleTimingEngine
     public static RoleTimingDiagnostics ComputeRoleTimingWithDiagnostics(
         GrooveOnset onset,
         GrooveTimingPolicy? timingPolicy,
-        GroovePolicyDecision? policyDecision = null)
+        DrumPolicyDecision? policyDecision = null)
     {
         timingPolicy ??= new GrooveTimingPolicy();
 

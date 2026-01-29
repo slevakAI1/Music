@@ -1,24 +1,24 @@
-// AI: purpose=Define candidate source interface for groove system (Story B4).
+// AI: purpose=Define candidate source interface for drum generator (Story 4.2).
 // AI: invariants=Implementations must be deterministic; same inputs => same output.
 // AI: deps=GrooveBarContext for bar context; DrumCandidateGroup for return type.
-// AI: change=Story B4 acceptance criteria: abstraction layer for future operator-based drummer logic.
+// AI: change=Story 4.2: moved from Groove namespace; Drum generator owns candidate contracts.
 
-using Music.Generator.Agents.Drums;
+using Music.Generator.Groove;
 
-namespace Music.Generator.Groove
+namespace Music.Generator.Agents.Drums
 {
     /// <summary>
-    /// Interface for providing candidate groups to the groove engine.
-    /// Story B4: Operator Candidate Source Hook - allows future operator-based drummer logic
-    /// to supply candidates without changing the engine.
+    /// Interface for providing candidate groups to the drum generator.
+    /// Story 4.2: Moved from Groove namespace - Drum generator owns candidate contracts.
+    /// Enables operator-based drummer logic to supply candidates.
     /// </summary>
-    public interface IGrooveCandidateSource
+    public interface IDrumCandidateSource
     {
         /// <summary>
         /// Gets candidate groups for a specific bar and role.
         /// </summary>
         /// <param name="barContext">Bar context with section, segment profile, and phrase position.</param>
-        /// <param name="role">Role name (e.g., "Kick", "Snare", "Bass"). See GrooveRoles constants.</param>
+        /// <param name="role">Role name (e.g., "Kick", "Snare", "ClosedHat"). See GrooveRoles constants.</param>
         /// <returns>
         /// List of candidate groups available for this bar and role.
         /// Groups should already be merged from hierarchical layers and filtered by enabled tags.
@@ -31,7 +31,7 @@ namespace Music.Generator.Groove
         /// - Apply tag-based filtering if applicable
         /// - Return groups in deterministic order
         /// 
-        /// The engine will consume these groups for weighted selection.
+        /// The generator will consume these groups for weighted selection.
         /// </remarks>
         IReadOnlyList<DrumCandidateGroup> GetCandidateGroups(
             GrooveBarContext barContext,

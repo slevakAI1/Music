@@ -1,4 +1,4 @@
-// AI: purpose=Unit tests for Story B4 operator candidate source hook (IGrooveCandidateSource, CatalogGrooveCandidateSource).
+// AI: purpose=Unit tests for Story B4 operator candidate source hook (IDrumCandidateSource, CatalogGrooveCandidateSource).
 // AI: deps=xunit for test framework; Music.Generator for types under test.
 // AI: change=Story B4 acceptance criteria: test adapter output equals direct catalog processing.
 
@@ -10,7 +10,7 @@ namespace Music.Generator.Tests
 {
     /// <summary>
     /// Story B4: Tests for operator candidate source hook.
-    /// Verifies IGrooveCandidateSource interface and CatalogGrooveCandidateSource adapter.
+    /// Verifies IDrumCandidateSource interface and CatalogGrooveCandidateSource adapter.
     /// </summary>
     public class GrooveCandidateSourceTests
     {
@@ -90,7 +90,7 @@ namespace Music.Generator.Tests
             {
                 EnabledVariationTags = new List<string> { "Drive" }
             };
-            var policyProvider = new TestPolicyProvider(new GroovePolicyDecision
+            var policyProvider = new TestPolicyProvider(new DrumPolicyDecision
             {
                 EnabledVariationTagsOverride = new List<string> { "Ghost" }
             });
@@ -368,7 +368,7 @@ namespace Music.Generator.Tests
             var catalog = CreateTestCatalog();
 
             // Act
-            IGrooveCandidateSource source = new CatalogGrooveCandidateSource(catalog);
+            IDrumCandidateSource source = new CatalogGrooveCandidateSource(catalog);
 
             // Assert
             Assert.NotNull(source);
@@ -450,16 +450,16 @@ namespace Music.Generator.Tests
         /// <summary>
         /// Test policy provider that returns a fixed policy decision.
         /// </summary>
-        private sealed class TestPolicyProvider : IGroovePolicyProvider
+        private sealed class TestPolicyProvider : IDrumPolicyProvider
         {
-            private readonly GroovePolicyDecision _decision;
+            private readonly DrumPolicyDecision _decision;
 
-            public TestPolicyProvider(GroovePolicyDecision decision)
+            public TestPolicyProvider(DrumPolicyDecision decision)
             {
                 _decision = decision;
             }
 
-            public GroovePolicyDecision? GetPolicy(GrooveBarContext barContext, string role)
+            public DrumPolicyDecision? GetPolicy(GrooveBarContext barContext, string role)
             {
                 return _decision;
             }
@@ -468,5 +468,6 @@ namespace Music.Generator.Tests
         #endregion
     }
 }
+
 
 

@@ -1,7 +1,9 @@
-// AI: purpose=Compute density target count for groove candidate selection (Story C1, F1).
+// AI: purpose=Compute density target count for groove candidate selection (Story C1, F1, 4.2).
 // AI: invariants=Deterministic; same inputs => same output; no RNG; clamps to [0..MaxEvents].
-// AI: deps=GrooveBarContext, RoleDensityTarget, GrooveOrchestrationPolicy, GroovePolicyDecision, GrooveOverrideMergePolicy.
-// AI: change=Story F1: OverrideCanRelaxConstraints controls whether segment can increase caps beyond base.
+// AI: deps=GrooveBarContext, RoleDensityTarget, GrooveOrchestrationPolicy, DrumPolicyDecision, GrooveOverrideMergePolicy.
+// AI: change=Story F1, 4.2: OverrideCanRelaxConstraints controls whether segment can increase caps beyond base; updated to use Drum types.
+
+using Music.Generator.Agents.Drums;
 
 namespace Music.Generator.Groove
 {
@@ -39,7 +41,7 @@ namespace Music.Generator.Groove
             string role,
             GrooveRoleConstraintPolicy? roleConstraintPolicy = null,
             GrooveOrchestrationPolicy? orchestrationPolicy = null,
-            GroovePolicyDecision? policyDecision = null,
+            DrumPolicyDecision? policyDecision = null,
             GrooveOverrideMergePolicy? mergePolicy = null)
         {
             ArgumentNullException.ThrowIfNull(barContext);

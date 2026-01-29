@@ -28,7 +28,7 @@ namespace Music.Generator.Tests
             {
                 EnabledFillTags = new List<string> { "Fill", "Pickup" }
             };
-            var policyDecision = new GroovePolicyDecision
+            var policyDecision = new DrumPolicyDecision
             {
                 EnabledVariationTagsOverride = new List<string> { "Override1", "Override2" }
             };
@@ -529,5 +529,6 @@ namespace Music.Generator.Tests
         #endregion
     }
 }
+
 
 

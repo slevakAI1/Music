@@ -1,4 +1,5 @@
 using Music.Generator;
+using Music.Generator.Agents.Drums;
 using Music.Generator.Groove;
 using Xunit;
 
@@ -9,7 +10,7 @@ namespace Music.Tests.Generator.Groove;
 /// - AC1: Read RoleTimingFeel[role] from GrooveTimingPolicy
 /// - AC2: Convert TimingFeel to base tick offset (Ahead=-10, OnTop=0, Behind=+10, LaidBack=+20)
 /// - AC3: Apply RoleTimingBiasTicks[role] from GrooveTimingPolicy
-/// - AC4: Respect RoleTimingFeelOverride and RoleTimingBiasTicksOverride from GroovePolicyDecision
+/// - AC4: Respect RoleTimingFeelOverride and RoleTimingBiasTicksOverride from DrumPolicyDecision
 /// - AC5: Clamp combined per-role timing by MaxAbsTimingBiasTicks
 /// - AC6: Unit tests verify clamping and override precedence
 /// </summary>
@@ -144,7 +145,7 @@ public class RoleTimingEngineTests
     public void ResolveEffectiveFeel_UsesOverride_WhenProvided()
     {
         var policy = CreateTestTimingPolicy();
-        var decision = new GroovePolicyDecision
+        var decision = new DrumPolicyDecision
         {
             RoleTimingFeelOverride = TimingFeel.Ahead
         };
@@ -168,7 +169,7 @@ public class RoleTimingEngineTests
     public void ResolveEffectiveBias_UsesOverride_WhenProvided()
     {
         var policy = CreateTestTimingPolicy();
-        var decision = new GroovePolicyDecision
+        var decision = new DrumPolicyDecision
         {
             RoleTimingBiasTicksOverride = 25
         };
@@ -183,7 +184,7 @@ public class RoleTimingEngineTests
     {
         // Override feel but not bias
         var policy = CreateTestTimingPolicy();
-        var decision = new GroovePolicyDecision
+        var decision = new DrumPolicyDecision
         {
             RoleTimingFeelOverride = TimingFeel.LaidBack
             // No bias override - should use policy (5 for Kick)
@@ -201,7 +202,7 @@ public class RoleTimingEngineTests
     {
         // Override bias but not feel
         var policy = CreateTestTimingPolicy();
-        var decision = new GroovePolicyDecision
+        var decision = new DrumPolicyDecision
         {
             RoleTimingBiasTicksOverride = -8
             // No feel override - should use policy (Behind for Kick)
@@ -591,4 +592,5 @@ public class RoleTimingEngineTests
         Assert.Equal(expectedClamped, diagnostics.WasClamped);
     }
 }
+
 

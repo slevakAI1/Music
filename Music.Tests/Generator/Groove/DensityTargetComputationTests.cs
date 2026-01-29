@@ -1,7 +1,8 @@
 // AI: purpose=Unit tests for Story C1 density target computation (GrooveDensityCalculator).
 // AI: deps=xunit for test framework; Music.Generator for types under test.
-// AI: change=Story C1 acceptance criteria: test rounding, clamping, multipliers, overrides.
+// AI: change=Story C1, 4.2: test rounding, clamping, multipliers, overrides; updated to use Drum types.
 
+using Music.Generator.Agents.Drums;
 using Music.Generator.Groove;
 using Xunit;
 
@@ -151,7 +152,7 @@ namespace Music.Generator.Tests
             // Arrange - base density 0.2, multiplier 2.0 => would be 0.4, but override 0.9
             var barContext = CreateBarContextWithSection(density: 0.2, maxEvents: 10, sectionType: "Chorus");
             var orchestrationPolicy = CreateOrchestrationPolicy("Chorus", "Kick", multiplier: 2.0);
-            var policyDecision = new GroovePolicyDecision { Density01Override = 0.9 };
+            var policyDecision = new DrumPolicyDecision { Density01Override = 0.9 };
 
             // Act
             var result = GrooveDensityCalculator.ComputeDensityTarget(
@@ -167,7 +168,7 @@ namespace Music.Generator.Tests
         {
             // Arrange - base max 10, override 3
             var barContext = CreateBarContext(density: 0.5, maxEvents: 10);
-            var policyDecision = new GroovePolicyDecision { MaxEventsPerBarOverride = 3 };
+            var policyDecision = new DrumPolicyDecision { MaxEventsPerBarOverride = 3 };
 
             // Act
             var result = GrooveDensityCalculator.ComputeDensityTarget(
@@ -183,7 +184,7 @@ namespace Music.Generator.Tests
         {
             // Arrange
             var barContext = CreateBarContext(density: 0.5, maxEvents: 10);
-            var policyDecision = new GroovePolicyDecision
+            var policyDecision = new DrumPolicyDecision
             {
                 Density01Override = 0.8,
                 MaxEventsPerBarOverride = 5
@@ -527,4 +528,5 @@ namespace Music.Generator.Tests
         #endregion
     }
 }
+
 

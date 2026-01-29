@@ -1,7 +1,7 @@
-// AI: purpose=Drummer policy provider implementing IGroovePolicyProvider; computes per-bar policy decisions from style + context + memory.
-// AI: invariants=Deterministic: same inputs → same GroovePolicyDecision; read-only access to memory; never mutates inputs.
-// AI: deps=IGroovePolicyProvider, GroovePolicyDecision, StyleConfiguration, IAgentMemory, DrummerContext, MotifPresenceMap (Story 9.3).
-// AI: change=Story 2.3, 9.3; extend with additional override logic as operators are implemented.
+// AI: purpose=Drummer policy provider implementing IDrumPolicyProvider; computes per-bar policy decisions from style + context + memory.
+// AI: invariants=Deterministic: same inputs → same DrumPolicyDecision; read-only access to memory; never mutates inputs.
+// AI: deps=IDrumPolicyProvider, DrumPolicyDecision, StyleConfiguration, IAgentMemory, DrummerContext, MotifPresenceMap (Story 9.3).
+// AI: change=Story 2.3, 9.3, 4.2; extend with additional override logic as operators are implemented.
 
 using Music.Generator.Agents.Common;
 using Music.Generator.Groove;
@@ -38,15 +38,16 @@ namespace Music.Generator.Agents.Drums
 
     /// <summary>
     /// Drummer agent policy provider that computes per-bar policy decisions.
-    /// Implements IGroovePolicyProvider to drive groove system behavior from drummer context.
+    /// Implements IDrumPolicyProvider to drive drum generation behavior.
     /// Story 2.3: Implement Drummer Policy Provider.
     /// Story 9.3: Motif-aware density reduction and variation tags.
+    /// Story 4.2: Moved interface ownership from Groove to Drums namespace.
     /// </summary>
     /// <remarks>
     /// Precedence order for overrides: immediate context > memory > style config.
     /// All computations are deterministic and read-only.
     /// </remarks>
-    public sealed class DrummerPolicyProvider : IGroovePolicyProvider
+    public sealed class DrummerPolicyProvider : IDrumPolicyProvider
     {
         private readonly StyleConfiguration _styleConfig;
         private readonly IAgentMemory? _memory;
@@ -74,14 +75,14 @@ namespace Music.Generator.Agents.Drums
         }
 
         /// <inheritdoc />
-        public GroovePolicyDecision? GetPolicy(GrooveBarContext barContext, string role)
+        public DrumPolicyDecision? GetPolicy(GrooveBarContext barContext, string role)
         {
             ArgumentNullException.ThrowIfNull(barContext);
             ArgumentNullException.ThrowIfNull(role);
 
             // Unknown role: return no overrides (safe fallback)
             if (!IsDrumRole(role))
-                return GroovePolicyDecision.NoOverrides;
+                return DrumPolicyDecision.NoOverrides;
 
             // Compute density override from energy + section type
             double density01 = ComputeDensityOverride(barContext);
@@ -101,7 +102,7 @@ namespace Music.Generator.Agents.Drums
             // Compute enabled variation tags based on context
             var variationTags = ComputeVariationTagsOverride(barContext);
 
-            return new GroovePolicyDecision
+            return new DrumPolicyDecision
             {
                 Density01Override = density01,
                 MaxEventsPerBarOverride = maxEventsPerBar,

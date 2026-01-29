@@ -1,7 +1,9 @@
-// AI: purpose=Default policy provider that returns no overrides, preserving current system behavior (Story A3).
+// AI: purpose=Default policy provider that returns no overrides, preserving current system behavior (Story A3, 4.2).
 // AI: invariants=Always returns NoOverrides; thread-safe; stateless.
-// AI: deps=IGroovePolicyProvider interface; GroovePolicyDecision for result.
-// AI: change=Story A3 acceptance criteria: default provider produces identical output to current system.
+// AI: deps=IDrumPolicyProvider interface; DrumPolicyDecision for result.
+// AI: change=Story A3, 4.2: updated to use Drum interfaces (scheduled for deletion in Story 5.4).
+
+using Music.Generator.Agents.Drums;
 
 namespace Music.Generator.Groove
 {
@@ -9,8 +11,9 @@ namespace Music.Generator.Groove
     /// Default policy provider that returns no overrides.
     /// Drummer Policy Hook - baseline implementation that preserves current behavior.
     /// Thread-safe and stateless; can be used as singleton.
+    /// Story 4.2: Updated to use IDrumPolicyProvider (scheduled for deletion in Story 5.4).
     /// </summary>
-    public sealed class DefaultGroovePolicyProvider : IGroovePolicyProvider
+    public sealed class DefaultGroovePolicyProvider : IDrumPolicyProvider
     {
         /// <summary>
         /// Singleton instance for default provider.
@@ -22,11 +25,11 @@ namespace Music.Generator.Groove
         /// </summary>
         /// <param name="barContext">Bar context (ignored - no overrides generated).</param>
         /// <param name="role">Role name (ignored - no overrides generated).</param>
-        /// <returns>GroovePolicyDecision with no overrides set.</returns>
-        public GroovePolicyDecision? GetPolicy(GrooveBarContext barContext, string role)
+        /// <returns>DrumPolicyDecision with no overrides set.</returns>
+        public DrumPolicyDecision? GetPolicy(GrooveBarContext barContext, string role)
         {
             // Story A3: Default provider returns "no overrides" to produce identical output
-            return GroovePolicyDecision.NoOverrides;
+            return DrumPolicyDecision.NoOverrides;
         }
     }
 }

@@ -1,16 +1,18 @@
-// AI: purpose=Define policy decision with optional overrides for future drummer model (Story A3).
+// AI: purpose=Define policy decision with optional overrides for drummer model (Story 4.2).
 // AI: invariants=All overrides are nullable; null means "use default system behavior"; no overrides changes output.
-// AI: deps=TimingFeel from Groove.cs for timing feel overrides.
-// AI: change=Story A3 acceptance criteria: drummer policy hook with no behavior change when defaults used.
+// AI: deps=TimingFeel from Groove namespace for timing feel overrides.
+// AI: change=Story 4.2: moved from Groove namespace; Drum generator owns policy decision types.
 
-namespace Music.Generator.Groove
+using Music.Generator.Groove;
+
+namespace Music.Generator.Agents.Drums
 {
     /// <summary>
-    /// Policy decision that can override groove behavior for a specific bar and role.
-    /// Story A3: Drummer Policy Hook - allows future human drummer model to drive groove decisions.
+    /// Policy decision that can override drum generation behavior for a specific bar and role.
+    /// Story 4.2: Moved from Groove namespace - Drum generator owns policy decision types.
     /// All fields are nullable; null means "use default system behavior".
     /// </summary>
-    public sealed record GroovePolicyDecision
+    public sealed record DrumPolicyDecision
     {
         /// <summary>
         /// Override the enabled variation tags for this bar/role.
@@ -62,17 +64,15 @@ namespace Music.Generator.Groove
         public double? VelocityMultiplierOverride { get; init; }
 
         /// <summary>
-        /// Reserved for future operator-based drummer logic.
-        /// Will contain list of allowed operator IDs when operator system is implemented.
+        /// List of allowed operator IDs when operator system is active.
         /// When null or empty, all operators allowed (or none if no operator system active).
-        /// Currently unused - reserved for future Pop Rock Human Drummer epic.
         /// </summary>
         public List<string>? OperatorAllowList { get; init; }
 
         /// <summary>
         /// Creates a policy decision with no overrides (default behavior).
         /// </summary>
-        public static GroovePolicyDecision NoOverrides => new();
+        public static DrumPolicyDecision NoOverrides => new();
 
         /// <summary>
         /// Checks if this decision contains any actual overrides.

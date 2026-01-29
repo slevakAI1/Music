@@ -1,7 +1,7 @@
 // AI: purpose=DrummerAgent facade class; unifies policy provider, candidate source, memory, and registry for drum generation.
-// AI: invariants=Implements IGroovePolicyProvider and IGrooveCandidateSource via delegation; deterministic output for same inputs.
+// AI: invariants=Implements IDrumPolicyProvider and IDrumCandidateSource via delegation; deterministic output for same inputs.
 // AI: deps=DrummerPolicyProvider, DrummerCandidateSource, DrummerMemory, DrumOperatorRegistry, StyleConfiguration.
-// AI: change=Story 8.1; facade pattern enables integration with Generator.cs and future testing.
+// AI: change=Story 8.1, 4.2; facade pattern enables integration with Generator.cs and future testing.
 
 using Music.Generator.Agents.Common;
 using Music.Generator.Agents.Drums.Diagnostics;
@@ -35,20 +35,21 @@ namespace Music.Generator.Agents.Drums
 
     /// <summary>
     /// Data source for drum generation. Does NOT generate PartTracks directly. Use GrooveBasedDrumGenerator pipeline.
-    /// Implements IGroovePolicyProvider and IGrooveCandidateSource to hook into the groove system.
+    /// Implements IDrumPolicyProvider and IDrumCandidateSource to hook into the groove system.
+    /// Story 4.2: Updated to use Drum interfaces.
     /// </summary>
     /// <remarks>
     /// <para>This class owns and manages the lifecycle of:</para>
     /// <list type="bullet">
     ///   <item>DrumOperatorRegistry (built from DrumOperatorRegistryBuilder)</item>
     ///   <item>DrummerMemory (persists for agent lifetime)</item>
-    ///   <item>DrummerPolicyProvider (delegates IGroovePolicyProvider)</item>
-    ///   <item>DrummerCandidateSource (delegates IGrooveCandidateSource)</item>
+    ///   <item>DrummerPolicyProvider (delegates IDrumPolicyProvider)</item>
+    ///   <item>DrummerCandidateSource (delegates IDrumCandidateSource)</item>
     /// </list>
     /// <para>Memory persists for agent lifetime, supporting anti-repetition across multiple generation calls.
     /// Different songs should use different DrummerAgent instances.</para>
     /// </remarks>
-    public sealed class DrummerAgent : IGroovePolicyProvider, IGrooveCandidateSource
+    public sealed class DrummerAgent : IDrumPolicyProvider, IDrumCandidateSource
     {
         private readonly StyleConfiguration _styleConfig;
         private readonly DrumOperatorRegistry _registry;
@@ -118,17 +119,17 @@ namespace Music.Generator.Agents.Drums
         /// </summary>
         public DrummerMemory Memory => _memory;
 
-        #region IGroovePolicyProvider Implementation
+        #region IDrumPolicyProvider Implementation
 
         /// <inheritdoc />
-        public GroovePolicyDecision? GetPolicy(GrooveBarContext barContext, string role)
+        public DrumPolicyDecision? GetPolicy(GrooveBarContext barContext, string role)
         {
             return _policyProvider.GetPolicy(barContext, role);
         }
 
         #endregion
 
-        #region IGrooveCandidateSource Implementation
+        #region IDrumCandidateSource Implementation
 
         /// <inheritdoc />
         public IReadOnlyList<DrumCandidateGroup> GetCandidateGroups(

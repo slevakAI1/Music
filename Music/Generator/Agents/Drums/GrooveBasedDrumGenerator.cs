@@ -1,7 +1,7 @@
-// AI: purpose=Pipeline orchestrator for drum generation using IGroovePolicyProvider + IGrooveCandidateSource.
-// AI: invariants=Uses GrooveSelectionEngine for weighted selection; enforces density targets/caps from policy.
-// AI: deps=DrummerAgent (data source), GrooveSelectionEngine, BarContextBuilder, SongContext, PartTrack.
-// AI: change=Story RF-2; correct architecture replaces DrummerAgent.Generate() with proper groove integration.
+// AI: purpose=Pipeline orchestrator for drum generation using IDrumPolicyProvider + IDrumCandidateSource.
+// AI: invariants=Uses DrumSelectionEngine for weighted selection; enforces density targets/caps from policy.
+// AI: deps=DrummerAgent (data source), DrumSelectionEngine, BarContextBuilder, SongContext, PartTrack.
+// AI: change=Story RF-2, 4.2; correct architecture replaces DrummerAgent.Generate() with proper groove integration.
 
 using Music.Generator.Groove;
 using Music.Generator.Material;
@@ -37,23 +37,24 @@ namespace Music.Generator.Agents.Drums
 
     /// <summary>
     /// Pipeline orchestrator for drum generation using groove system integration.
-    /// Story RF-2: Creates drum tracks by properly using IGroovePolicyProvider + IGrooveCandidateSource
-    /// with GrooveSelectionEngine for weighted selection and density enforcement.
+    /// Story RF-2: Creates drum tracks by properly using IDrumPolicyProvider + IDrumCandidateSource
+    /// with DrumSelectionEngine for weighted selection and density enforcement.
+    /// Story 4.2: Moved interface ownership from Groove to Drums namespace.
     /// </summary>
     /// <remarks>
     /// <para>Architecture:</para>
     /// <list type="bullet">
     ///   <item>Takes policy provider + candidate source (typically DrummerAgent)</item>
     ///   <item>Extracts anchors from groove preset</item>
-    ///   <item>For each bar+role: gets policy → calculates target → gets candidates → selects via GrooveSelectionEngine</item>
+    ///   <item>For each bar+role: gets policy → calculates target → gets candidates → selects via DrumSelectionEngine</item>
     ///   <item>Combines anchors + selected operators → converts to MIDI</item>
     /// </list>
     /// <para>Enforces density targets, operator caps, and weighted selection per policy decisions.</para>
     /// </remarks>
     public sealed class GrooveBasedDrumGenerator
     {
-        private readonly IGroovePolicyProvider _policyProvider;
-        private readonly IGrooveCandidateSource _candidateSource;
+        private readonly IDrumPolicyProvider _policyProvider;
+        private readonly IDrumCandidateSource _candidateSource;
         private readonly GrooveBasedDrumGeneratorSettings _settings;
 
         /// <summary>
@@ -64,8 +65,8 @@ namespace Music.Generator.Agents.Drums
         /// <param name="settings">Optional settings (diagnostics, active roles, default velocity).</param>
         /// <exception cref="ArgumentNullException">If policyProvider or candidateSource is null.</exception>
         public GrooveBasedDrumGenerator(
-            IGroovePolicyProvider policyProvider,
-            IGrooveCandidateSource candidateSource,
+            IDrumPolicyProvider policyProvider,
+            IDrumCandidateSource candidateSource,
             GrooveBasedDrumGeneratorSettings? settings = null)
         {
             ArgumentNullException.ThrowIfNull(policyProvider);
@@ -278,7 +279,7 @@ namespace Music.Generator.Agents.Drums
             return result;
         }
 
-        private int CalculateTargetCount(GroovePolicyDecision? policy, string role)
+        private int CalculateTargetCount(DrumPolicyDecision? policy, string role)
         {
             // If no policy or no density override, return 0 (anchor-only)
             if (policy?.Density01Override == null)

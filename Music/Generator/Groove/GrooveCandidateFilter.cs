@@ -1,7 +1,7 @@
-// AI: purpose=Filters groove candidate groups and candidates by enabled tags (Story B2).
+// AI: purpose=Filters groove candidate groups and candidates by enabled tags (Story B2, 4.2).
 // AI: invariants=Deterministic filtering; empty/null tags = "match all"; same inputs => same output.
-// AI: deps=DrumCandidateGroup, DrumOnsetCandidate, SegmentGrooveProfile, GroovePhraseHookPolicy, GroovePolicyDecision.
-// AI: change=Story B2 acceptance criteria: resolve tags, filter groups/candidates by tag intersection.
+// AI: deps=DrumCandidateGroup, DrumOnsetCandidate, SegmentGrooveProfile, GroovePhraseHookPolicy, DrumPolicyDecision.
+// AI: change=Story B2, 4.2: resolve tags, filter groups/candidates by tag intersection; updated to use Drum types.
 
 using Music.Generator.Agents.Drums;
 
@@ -25,7 +25,7 @@ namespace Music.Generator.Groove
         public static IReadOnlySet<string> ResolveEnabledTags(
             SegmentGrooveProfile? segmentProfile,
             GroovePhraseHookPolicy? phraseHookPolicy,
-            GroovePolicyDecision? policyDecision,
+            DrumPolicyDecision? policyDecision,
             bool isInFillWindow = false)
         {
             // Story B2: Policy override takes precedence if provided
