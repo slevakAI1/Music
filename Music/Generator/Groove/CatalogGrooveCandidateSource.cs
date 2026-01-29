@@ -7,7 +7,7 @@ namespace Music.Generator.Groove
 {
     /// <summary>
     /// Default candidate source that adapts GrooveVariationCatalog using layer merger and filter.
-    /// Story B4: Operator Candidate Source Hook - baseline implementation for catalog-based candidates.
+    /// Operator Candidate Source Hook - baseline implementation for catalog-based candidates.
     /// </summary>
     public sealed class CatalogGrooveCandidateSource : IGrooveCandidateSource
     {

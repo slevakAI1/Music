@@ -7,7 +7,7 @@ namespace Music.Generator.Groove
 {
     /// <summary>
     /// Default policy provider that returns no overrides.
-    /// Story A3: Drummer Policy Hook - baseline implementation that preserves current behavior.
+    /// Drummer Policy Hook - baseline implementation that preserves current behavior.
     /// Thread-safe and stateless; can be used as singleton.
     /// </summary>
     public sealed class DefaultGroovePolicyProvider : IGroovePolicyProvider
