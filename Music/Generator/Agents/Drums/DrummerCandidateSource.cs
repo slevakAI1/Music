@@ -96,7 +96,7 @@ namespace Music.Generator.Agents.Drums
         }
 
         /// <inheritdoc />
-        public IReadOnlyList<GrooveCandidateGroup> GetCandidateGroups(
+        public IReadOnlyList<DrumCandidateGroup> GetCandidateGroups(
             GrooveBarContext barContext,
             string role)
         {
@@ -113,7 +113,7 @@ namespace Music.Generator.Agents.Drums
 
             if (enabledOperators.Count == 0)
             {
-                return Array.Empty<GrooveCandidateGroup>();
+                return Array.Empty<DrumCandidateGroup>();
             }
 
             // Generate candidates from all enabled operators
@@ -121,7 +121,7 @@ namespace Music.Generator.Agents.Drums
 
             if (allCandidates.Count == 0)
             {
-                return Array.Empty<GrooveCandidateGroup>();
+                return Array.Empty<DrumCandidateGroup>();
             }
 
             // Map DrumCandidates to GrooveOnsetCandidates
@@ -297,7 +297,7 @@ namespace Music.Generator.Agents.Drums
         /// <summary>
         /// Maps DrumCandidates to GrooveOnsetCandidates.
         /// </summary>
-        private static IReadOnlyList<GrooveOnsetCandidate> MapCandidates(List<DrumCandidate> candidates)
+        private static IReadOnlyList<DrumOnsetCandidate> MapCandidates(List<DrumCandidate> candidates)
         {
             return DrumCandidateMapper.MapAll(candidates);
         }
@@ -305,19 +305,19 @@ namespace Music.Generator.Agents.Drums
         /// <summary>
         /// Groups candidates by operator family.
         /// </summary>
-        private List<GrooveCandidateGroup> GroupByOperatorFamily(
+        private List<DrumCandidateGroup> GroupByOperatorFamily(
             List<DrumCandidate> originalCandidates,
-            IReadOnlyList<GrooveOnsetCandidate> mappedCandidates)
+            IReadOnlyList<DrumOnsetCandidate> mappedCandidates)
         {
             // Build lookup from candidate ID to mapped candidate
-            var mappedLookup = new Dictionary<string, GrooveOnsetCandidate>();
+            var mappedLookup = new Dictionary<string, DrumOnsetCandidate>();
             for (int i = 0; i < originalCandidates.Count; i++)
             {
                 mappedLookup[originalCandidates[i].CandidateId] = mappedCandidates[i];
             }
 
             // Group by operator ID to family mapping
-            var familyGroups = new Dictionary<OperatorFamily, List<GrooveOnsetCandidate>>();
+            var familyGroups = new Dictionary<OperatorFamily, List<DrumOnsetCandidate>>();
             var familyScores = new Dictionary<OperatorFamily, List<double>>();
 
             foreach (var original in originalCandidates)
@@ -327,7 +327,7 @@ namespace Music.Generator.Agents.Drums
 
                 if (!familyGroups.TryGetValue(family, out var list))
                 {
-                    list = new List<GrooveOnsetCandidate>();
+                    list = new List<DrumOnsetCandidate>();
                     familyGroups[family] = list;
                     familyScores[family] = new List<double>();
                 }
@@ -337,14 +337,14 @@ namespace Music.Generator.Agents.Drums
             }
 
             // Build groups sorted by family enum value for determinism
-            var result = new List<GrooveCandidateGroup>();
+            var result = new List<DrumCandidateGroup>();
             foreach (var family in familyGroups.Keys.OrderBy(f => (int)f))
             {
                 var candidates = familyGroups[family];
                 var scores = familyScores[family];
                 double avgScore = scores.Count > 0 ? scores.Average() : 0.5;
 
-                result.Add(new GrooveCandidateGroup
+                result.Add(new DrumCandidateGroup
                 {
                     GroupId = family.ToString(),
                     GroupTags = new List<string> { family.ToString() },
@@ -360,15 +360,15 @@ namespace Music.Generator.Agents.Drums
         /// <summary>
         /// Applies physicality filter to remove unplayable candidates.
         /// </summary>
-        private List<GrooveCandidateGroup> ApplyPhysicalityFilter(
-            List<GrooveCandidateGroup> groups,
+        private List<DrumCandidateGroup> ApplyPhysicalityFilter(
+            List<DrumCandidateGroup> groups,
             int barNumber)
         {
             if (_physicalityFilter == null)
                 return groups;
 
             // Collect all candidates for global filtering
-            var allCandidates = new List<GrooveOnsetCandidate>();
+            var allCandidates = new List<DrumOnsetCandidate>();
             foreach (var group in groups)
             {
                 allCandidates.AddRange(group.Candidates);
@@ -376,14 +376,14 @@ namespace Music.Generator.Agents.Drums
 
             // Filter candidates
             var validCandidates = _physicalityFilter.Filter(allCandidates, barNumber);
-            var validSet = new HashSet<GrooveOnsetCandidate>(validCandidates);
+            var validSet = new HashSet<DrumOnsetCandidate>(validCandidates);
 
             // Rebuild groups with only valid candidates
-            var result = new List<GrooveCandidateGroup>();
+            var result = new List<DrumCandidateGroup>();
             foreach (var group in groups)
             {
                 var filtered = group.Candidates.Where(c => validSet.Contains(c)).ToList();
-                result.Add(new GrooveCandidateGroup
+                result.Add(new DrumCandidateGroup
                 {
                     GroupId = group.GroupId,
                     GroupTags = group.GroupTags,

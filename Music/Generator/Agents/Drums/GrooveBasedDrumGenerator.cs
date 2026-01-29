@@ -251,7 +251,7 @@ namespace Music.Generator.Agents.Drums
                         .ToList();
 
                     // SELECT using GrooveSelectionEngine
-                    var selected = GrooveSelectionEngine.SelectUntilTargetReached(
+                    var selected = DrumSelectionEngine.SelectUntilTargetReached(
                         grooveBarContext,
                         role,
                         candidateGroups,

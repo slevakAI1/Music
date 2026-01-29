@@ -620,3 +620,4 @@ public class FeelTimingEngineTests
         Assert.Equal(10 + MaxShiftTicks, diag.FinalOffsetTicks);
     }
 }
+

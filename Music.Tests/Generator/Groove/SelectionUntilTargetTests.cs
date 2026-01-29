@@ -1,7 +1,8 @@
-// AI: purpose=Unit tests for Story C2 selection until target reached (GrooveSelectionEngine).
+// AI: purpose=Unit tests for Story C2 selection until target reached (DrumSelectionEngine).
 // AI: deps=xunit for test framework; Music.Generator for types under test.
 // AI: change=Story C2 acceptance criteria: test target enforcement, pool exhaustion, anchors, caps, determinism.
 
+using Music.Generator.Agents.Drums;
 using Music.Generator.Groove;
 using Xunit;
 
@@ -31,7 +32,7 @@ namespace Music.Generator.Tests
         {
             // Arrange - Story C2: small pool + high density => selects all without error
             var barContext = CreateBarContext();
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
                 CreateGroup("Group1", new[] { 1.0m, 2.0m, 3.0m }) // Only 3 candidates
             };
@@ -39,7 +40,7 @@ namespace Music.Generator.Tests
 
             // Act - Request 10, but only 3 available
             Rng.Initialize(12345);
-            var result = GrooveSelectionEngine.SelectUntilTargetReached(
+            var result = DrumSelectionEngine.SelectUntilTargetReached(
                 barContext, "Kick", groups, targetCount: 10, anchors);
 
             // Assert - Pool exhaustion safety: selects all 3 without error
@@ -51,11 +52,11 @@ namespace Music.Generator.Tests
         {
             // Arrange
             var barContext = CreateBarContext();
-            var groups = new List<GrooveCandidateGroup>();
+            var groups = new List<DrumCandidateGroup>();
             var anchors = Array.Empty<GrooveOnset>();
 
             // Act
-            var result = GrooveSelectionEngine.SelectUntilTargetReached(
+            var result = DrumSelectionEngine.SelectUntilTargetReached(
                 barContext, "Kick", groups, targetCount: 5, anchors);
 
             // Assert
@@ -71,7 +72,7 @@ namespace Music.Generator.Tests
         {
             // Arrange
             var barContext = CreateBarContext();
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
                 CreateGroup("Group1", new[] { 1.0m, 2.0m, 3.0m, 4.0m }) // 4 candidates
             };
@@ -79,7 +80,7 @@ namespace Music.Generator.Tests
 
             // Act - Request 2
             Rng.Initialize(12345);
-            var result = GrooveSelectionEngine.SelectUntilTargetReached(
+            var result = DrumSelectionEngine.SelectUntilTargetReached(
                 barContext, "Kick", groups, targetCount: 2, anchors);
 
             // Assert - Story C2: stop when target reached
@@ -91,14 +92,14 @@ namespace Music.Generator.Tests
         {
             // Arrange
             var barContext = CreateBarContext();
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
                 CreateGroup("Group1", new[] { 1.0m, 2.0m })
             };
             var anchors = Array.Empty<GrooveOnset>();
 
             // Act
-            var result = GrooveSelectionEngine.SelectUntilTargetReached(
+            var result = DrumSelectionEngine.SelectUntilTargetReached(
                 barContext, "Kick", groups, targetCount: 0, anchors);
 
             // Assert
@@ -110,14 +111,14 @@ namespace Music.Generator.Tests
         {
             // Arrange
             var barContext = CreateBarContext();
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
                 CreateGroup("Group1", new[] { 1.0m, 2.0m })
             };
             var anchors = Array.Empty<GrooveOnset>();
 
             // Act
-            var result = GrooveSelectionEngine.SelectUntilTargetReached(
+            var result = DrumSelectionEngine.SelectUntilTargetReached(
                 barContext, "Kick", groups, targetCount: -5, anchors);
 
             // Assert
@@ -133,7 +134,7 @@ namespace Music.Generator.Tests
         {
             // Arrange - Story C2: preserve anchors, selection only adds
             var barContext = CreateBarContext();
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
                 CreateGroup("Group1", new[] { 1.0m, 2.0m, 3.0m })
             };
@@ -144,7 +145,7 @@ namespace Music.Generator.Tests
 
             // Act
             Rng.Initialize(12345);
-            var result = GrooveSelectionEngine.SelectUntilTargetReached(
+            var result = DrumSelectionEngine.SelectUntilTargetReached(
                 barContext, "Kick", groups, targetCount: 10, anchors);
 
             // Assert - Only 2 candidates available (beat 1 and 3), beat 2 excluded
@@ -157,7 +158,7 @@ namespace Music.Generator.Tests
         {
             // Arrange - Anchors for different role should not conflict
             var barContext = CreateBarContext();
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
                 CreateGroup("Group1", new[] { 1.0m, 2.0m, 3.0m })
             };
@@ -168,7 +169,7 @@ namespace Music.Generator.Tests
 
             // Act
             Rng.Initialize(12345);
-            var result = GrooveSelectionEngine.SelectUntilTargetReached(
+            var result = DrumSelectionEngine.SelectUntilTargetReached(
                 barContext, "Kick", groups, targetCount: 10, anchors);
 
             // Assert - All 3 candidates available (anchor is for different role)
@@ -180,7 +181,7 @@ namespace Music.Generator.Tests
         {
             // Arrange
             var barContext = CreateBarContext();
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
                 CreateGroup("Group1", new[] { 1.0m, 2.0m, 3.0m, 4.0m })
             };
@@ -192,7 +193,7 @@ namespace Music.Generator.Tests
 
             // Act
             Rng.Initialize(12345);
-            var result = GrooveSelectionEngine.SelectUntilTargetReached(
+            var result = DrumSelectionEngine.SelectUntilTargetReached(
                 barContext, "Kick", groups, targetCount: 10, anchors);
 
             // Assert - Only beats 2 and 4 available
@@ -210,14 +211,14 @@ namespace Music.Generator.Tests
         {
             // Arrange - Candidate with MaxAddsPerBar = 1
             var barContext = CreateBarContext();
-            var group = new GrooveCandidateGroup
+            var group = new DrumCandidateGroup
             {
                 GroupId = "Group1",
                 BaseProbabilityBias = 1.0,
                 MaxAddsPerBar = 0, // Unlimited group
-                Candidates = new List<GrooveOnsetCandidate>
+                Candidates = new List<DrumOnsetCandidate>
                 {
-                    new GrooveOnsetCandidate
+                    new DrumOnsetCandidate
                     {
                         OnsetBeat = 1.0m,
                         ProbabilityBias = 1.0,
@@ -225,12 +226,12 @@ namespace Music.Generator.Tests
                     }
                 }
             };
-            var groups = new List<GrooveCandidateGroup> { group };
+            var groups = new List<DrumCandidateGroup> { group };
             var anchors = Array.Empty<GrooveOnset>();
 
             // Act - Request 5, but candidate only allows 1
             Rng.Initialize(12345);
-            var result = GrooveSelectionEngine.SelectUntilTargetReached(
+            var result = DrumSelectionEngine.SelectUntilTargetReached(
                 barContext, "Kick", groups, targetCount: 5, anchors);
 
             // Assert - Only 1 selected (candidate cap enforced)
@@ -242,19 +243,19 @@ namespace Music.Generator.Tests
         {
             // Arrange - MaxAddsPerBar = 0 means unlimited
             var barContext = CreateBarContext();
-            var group = new GrooveCandidateGroup
+            var group = new DrumCandidateGroup
             {
                 GroupId = "Group1",
                 BaseProbabilityBias = 1.0,
-                Candidates = new List<GrooveOnsetCandidate>
+                Candidates = new List<DrumOnsetCandidate>
                 {
-                    new GrooveOnsetCandidate
+                    new DrumOnsetCandidate
                     {
                         OnsetBeat = 1.0m,
                         ProbabilityBias = 1.0,
                         MaxAddsPerBar = 0 // Unlimited
                     },
-                    new GrooveOnsetCandidate
+                    new DrumOnsetCandidate
                     {
                         OnsetBeat = 2.0m,
                         ProbabilityBias = 1.0,
@@ -262,12 +263,12 @@ namespace Music.Generator.Tests
                     }
                 }
             };
-            var groups = new List<GrooveCandidateGroup> { group };
+            var groups = new List<DrumCandidateGroup> { group };
             var anchors = Array.Empty<GrooveOnset>();
 
             // Act - Request 2, both unlimited
             Rng.Initialize(12345);
-            var result = GrooveSelectionEngine.SelectUntilTargetReached(
+            var result = DrumSelectionEngine.SelectUntilTargetReached(
                 barContext, "Kick", groups, targetCount: 2, anchors);
 
             // Assert - Both selected (unlimited)
@@ -283,12 +284,12 @@ namespace Music.Generator.Tests
         {
             // Arrange - Group with MaxAddsPerBar = 2
             var barContext = CreateBarContext();
-            var group = new GrooveCandidateGroup
+            var group = new DrumCandidateGroup
             {
                 GroupId = "Group1",
                 BaseProbabilityBias = 1.0,
                 MaxAddsPerBar = 2, // Can only add 2 from this group
-                Candidates = new List<GrooveOnsetCandidate>
+                Candidates = new List<DrumOnsetCandidate>
                 {
                     CreateCandidate(1.0m),
                     CreateCandidate(2.0m),
@@ -296,12 +297,12 @@ namespace Music.Generator.Tests
                     CreateCandidate(4.0m)
                 }
             };
-            var groups = new List<GrooveCandidateGroup> { group };
+            var groups = new List<DrumCandidateGroup> { group };
             var anchors = Array.Empty<GrooveOnset>();
 
             // Act - Request 10, but group only allows 2
             Rng.Initialize(12345);
-            var result = GrooveSelectionEngine.SelectUntilTargetReached(
+            var result = DrumSelectionEngine.SelectUntilTargetReached(
                 barContext, "Kick", groups, targetCount: 10, anchors);
 
             // Assert - Only 2 selected (group cap enforced)
@@ -313,25 +314,25 @@ namespace Music.Generator.Tests
         {
             // Arrange
             var barContext = CreateBarContext();
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "Group1",
                     BaseProbabilityBias = 1.0,
                     MaxAddsPerBar = 1,
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
                         CreateCandidate(1.0m),
                         CreateCandidate(2.0m)
                     }
                 },
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "Group2",
                     BaseProbabilityBias = 1.0,
                     MaxAddsPerBar = 1,
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
                         CreateCandidate(3.0m),
                         CreateCandidate(4.0m)
@@ -342,7 +343,7 @@ namespace Music.Generator.Tests
 
             // Act - Request 10, but each group only allows 1
             Rng.Initialize(12345);
-            var result = GrooveSelectionEngine.SelectUntilTargetReached(
+            var result = DrumSelectionEngine.SelectUntilTargetReached(
                 barContext, "Kick", groups, targetCount: 10, anchors);
 
             // Assert - Only 2 selected total (1 from each group)
@@ -363,15 +364,15 @@ namespace Music.Generator.Tests
 
             // Act - Run multiple times with same seed
             Rng.Initialize(12345);
-            var result1 = GrooveSelectionEngine.SelectUntilTargetReached(
+            var result1 = DrumSelectionEngine.SelectUntilTargetReached(
                 barContext, "Kick", groups, targetCount: 3, anchors);
 
             Rng.Initialize(12345);
-            var result2 = GrooveSelectionEngine.SelectUntilTargetReached(
+            var result2 = DrumSelectionEngine.SelectUntilTargetReached(
                 barContext, "Kick", groups, targetCount: 3, anchors);
 
             Rng.Initialize(12345);
-            var result3 = GrooveSelectionEngine.SelectUntilTargetReached(
+            var result3 = DrumSelectionEngine.SelectUntilTargetReached(
                 barContext, "Kick", groups, targetCount: 3, anchors);
 
             // Assert - All runs produce identical results
@@ -389,11 +390,11 @@ namespace Music.Generator.Tests
 
             // Act
             Rng.Initialize(12345);
-            var result1 = GrooveSelectionEngine.SelectUntilTargetReached(
+            var result1 = DrumSelectionEngine.SelectUntilTargetReached(
                 barContext, "Kick", groups, targetCount: 2, anchors);
 
             Rng.Initialize(99999);
-            var result2 = GrooveSelectionEngine.SelectUntilTargetReached(
+            var result2 = DrumSelectionEngine.SelectUntilTargetReached(
                 barContext, "Kick", groups, targetCount: 2, anchors);
 
             // Assert - Both return valid results with correct count
@@ -418,7 +419,7 @@ namespace Music.Generator.Tests
 
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                GrooveSelectionEngine.SelectUntilTargetReached(null!, "Kick", groups, 5, anchors));
+                DrumSelectionEngine.SelectUntilTargetReached(null!, "Kick", groups, 5, anchors));
         }
 
         [Fact]
@@ -431,7 +432,7 @@ namespace Music.Generator.Tests
 
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                GrooveSelectionEngine.SelectUntilTargetReached(barContext, null!, groups, 5, anchors));
+                DrumSelectionEngine.SelectUntilTargetReached(barContext, null!, groups, 5, anchors));
         }
 
         [Fact]
@@ -443,7 +444,7 @@ namespace Music.Generator.Tests
 
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                GrooveSelectionEngine.SelectUntilTargetReached(barContext, "Kick", null!, 5, anchors));
+                DrumSelectionEngine.SelectUntilTargetReached(barContext, "Kick", null!, 5, anchors));
         }
 
         [Fact]
@@ -455,7 +456,7 @@ namespace Music.Generator.Tests
 
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                GrooveSelectionEngine.SelectUntilTargetReached(barContext, "Kick", groups, 5, null!));
+                DrumSelectionEngine.SelectUntilTargetReached(barContext, "Kick", groups, 5, null!));
         }
 
         #endregion
@@ -472,9 +473,9 @@ namespace Music.Generator.Tests
                 BarsUntilSectionEnd: 4);
         }
 
-        private static GrooveCandidateGroup CreateGroup(string groupId, decimal[] beats)
+        private static DrumCandidateGroup CreateGroup(string groupId, decimal[] beats)
         {
-            return new GrooveCandidateGroup
+            return new DrumCandidateGroup
             {
                 GroupId = groupId,
                 BaseProbabilityBias = 1.0,
@@ -483,9 +484,9 @@ namespace Music.Generator.Tests
             };
         }
 
-        private static GrooveOnsetCandidate CreateCandidate(decimal beat)
+        private static DrumOnsetCandidate CreateCandidate(decimal beat)
         {
-            return new GrooveOnsetCandidate
+            return new DrumOnsetCandidate
             {
                 OnsetBeat = beat,
                 ProbabilityBias = 1.0,
@@ -510,16 +511,16 @@ namespace Music.Generator.Tests
             };
         }
 
-        private static List<GrooveCandidateGroup> CreateTestGroups()
+        private static List<DrumCandidateGroup> CreateTestGroups()
         {
-            return new List<GrooveCandidateGroup>
+            return new List<DrumCandidateGroup>
             {
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "TestGroup",
                     BaseProbabilityBias = 1.0,
                     MaxAddsPerBar = 0,
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
                         CreateCandidate(1.0m),
                         CreateCandidate(2.0m),
@@ -529,15 +530,15 @@ namespace Music.Generator.Tests
             };
         }
 
-        private static List<GrooveCandidateGroup> CreateTestGroupsWithManyOptions()
+        private static List<DrumCandidateGroup> CreateTestGroupsWithManyOptions()
         {
-            return new List<GrooveCandidateGroup>
+            return new List<DrumCandidateGroup>
             {
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "GroupA",
                     BaseProbabilityBias = 1.0,
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
                         CreateCandidate(1.0m),
                         CreateCandidate(1.5m),
@@ -545,11 +546,11 @@ namespace Music.Generator.Tests
                         CreateCandidate(2.5m)
                     }
                 },
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "GroupB",
                     BaseProbabilityBias = 1.0,
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
                         CreateCandidate(3.0m),
                         CreateCandidate(3.5m),
@@ -562,3 +563,5 @@ namespace Music.Generator.Tests
         #endregion
     }
 }
+
+

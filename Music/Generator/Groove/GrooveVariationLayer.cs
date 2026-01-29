@@ -1,3 +1,5 @@
+using Music.Generator.Agents.Drums;
+
 namespace Music.Generator.Groove
 {
     // AI: purpose=Hierarchical layer of variation candidates; later layers refine earlier ones.
@@ -7,7 +9,8 @@ namespace Music.Generator.Groove
     {
         public string LayerId { get; set; } = "";
         public List<string> AppliesWhenTagsAll { get; set; } = new();
-        public List<GrooveCandidateGroup> CandidateGroups { get; set; } = new();
+        public List<DrumCandidateGroup> CandidateGroups { get; set; } = new();
         public bool IsAdditiveOnly { get; set; }
     }
 }
+

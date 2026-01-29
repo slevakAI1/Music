@@ -20,7 +20,7 @@ public class PhysicalityFilterTests
         var collector = new GrooveDiagnosticsCollector(1, "Snare");
         var filter = new PhysicalityFilter(rules, collector);
 
-        var input = new List<GrooveOnsetCandidate>();
+        var input = new List<DrumOnsetCandidate>();
         var result = filter.Filter(input, 1);
 
         result.Should().BeEmpty();
@@ -33,7 +33,7 @@ public class PhysicalityFilterTests
         var filter = new PhysicalityFilter(rules);
 
         var candidate = CreateCandidate("Snare", 2.0m, 0.5, "Op1", "C1");
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { candidate }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { candidate }, 1);
 
         result.Should().ContainSingle()
             .Which.Should().BeEquivalentTo(candidate);
@@ -53,7 +53,7 @@ public class PhysicalityFilterTests
         var protectedSnare = CreateCandidate("Snare", 2.0m, 0.6, "Op1", "C1", isProtected: true);
         var unprotectedTom = CreateCandidate("Tom1", 2.0m, 0.4, "Op2", "C2", isProtected: false);
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { protectedSnare, unprotectedTom }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { protectedSnare, unprotectedTom }, 1);
 
         // Protected must remain; unprotected conflicting should be removed
         result.Should().ContainSingle()
@@ -69,7 +69,7 @@ public class PhysicalityFilterTests
         var p1 = CreateCandidate("Snare", 2.0m, 0.6, "Op1", "C1", isProtected: true);
         var p2 = CreateCandidate("Kick", 1.0m, 0.8, "Op2", "C2", isProtected: true);
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { p1, p2 }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { p1, p2 }, 1);
 
         result.Should().HaveCount(2);
     }
@@ -88,7 +88,7 @@ public class PhysicalityFilterTests
         var snare = CreateCandidate("Snare", 2.0m, 0.7, "OpSnare", "CS");
         var tom = CreateCandidate("Tom1", 2.0m, 0.3, "OpTom", "CT");
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { snare, tom }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { snare, tom }, 1);
 
         // Higher-scored (snare) should be kept
         result.Should().ContainSingle()
@@ -105,7 +105,7 @@ public class PhysicalityFilterTests
         var snare = CreateCandidate("Snare", 2.0m, 0.5, "Op1", "C1");
         var hat = CreateCandidate("ClosedHat", 2.0m, 0.5, "Op2", "C2");
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { snare, hat }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { snare, hat }, 1);
 
         result.Should().HaveCount(2);
     }
@@ -120,7 +120,7 @@ public class PhysicalityFilterTests
         var unknown = CreateCandidate("UnknownRole", 2.0m, 0.5, "Op1", "C1");
         var snare = CreateCandidate("Snare", 2.0m, 0.5, "Op2", "C2");
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { unknown, snare }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { unknown, snare }, 1);
 
         // Both should pass (unknown doesn't participate in limb conflicts)
         result.Should().HaveCount(2);
@@ -140,7 +140,7 @@ public class PhysicalityFilterTests
         var s1 = CreateCandidate("Snare", 2.0m, 0.6, "Op1", "C1");
         var s2 = CreateCandidate("Tom1", 2.0m, 0.4, "Op2", "C2");
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { s1, s2 }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { s1, s2 }, 1);
 
         // Strict mode removes ALL non-protected violators
         result.Should().BeEmpty();
@@ -155,7 +155,7 @@ public class PhysicalityFilterTests
         var high = CreateCandidate("Snare", 2.0m, 0.9, "OpHigh", "CH");
         var low = CreateCandidate("Tom1", 2.0m, 0.2, "OpLow", "CL");
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { high, low }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { high, low }, 1);
 
         result.Should().ContainSingle()
             .Which.ProbabilityBias.Should().Be(0.9);
@@ -171,7 +171,7 @@ public class PhysicalityFilterTests
         var s1 = CreateCandidate("Snare", 2.0m, 0.6, "Op1", "C1");
         var s2 = CreateCandidate("Tom1", 2.0m, 0.4, "Op2", "C2");
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { s1, s2 }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { s1, s2 }, 1);
 
         // Both kept in Loose mode
         result.Should().HaveCount(2);
@@ -195,7 +195,7 @@ public class PhysicalityFilterTests
         var c1 = CreateCandidate("Snare", 2.0m, 0.5, "OpA", "C1");
         var c2 = CreateCandidate("Tom1", 2.0m, 0.5, "OpB", "C2");
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { c1, c2 }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { c1, c2 }, 1);
 
         // OpA < OpB alphabetically, so c1 should be kept
         result.Should().ContainSingle();
@@ -217,7 +217,7 @@ public class PhysicalityFilterTests
         var c2 = CreateCandidate("Snare", 2.0m, 0.5, "Op2", "C2");
         var c3 = CreateCandidate("ClosedHat", 1.5m, 0.3, "Op3", "C3");
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { c1, c2, c3 }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { c1, c2, c3 }, 1);
 
         // MaxHitsPerBar=2, so lowest scored (c3) should be pruned
         result.Should().HaveCount(2);
@@ -233,7 +233,7 @@ public class PhysicalityFilterTests
         var protectedC = CreateCandidate("Kick", 1.0m, 0.3, "Op1", "C1", isProtected: true);
         var unprotectedC = CreateCandidate("Snare", 2.0m, 0.9, "Op2", "C2");
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { protectedC, unprotectedC }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { protectedC, unprotectedC }, 1);
 
         // Protected must remain even with lower score
         result.Should().ContainSingle()
@@ -261,7 +261,7 @@ public class PhysicalityFilterTests
         // 1 candidate on beat 2.0 (should be unaffected)
         var c4 = CreateCandidate("Snare", 2.0m, 0.8, "Op4", "C4");
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { c1, c2, c3, c4 }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { c1, c2, c3, c4 }, 1);
 
         // Beat 1.0: 2 kept (highest scored), beat 2.0: 1 kept = 3 total
         result.Should().HaveCount(3);
@@ -284,7 +284,7 @@ public class PhysicalityFilterTests
         var p2 = CreateCandidate("Snare", 1.0m, 0.4, "Op2", "C2", isProtected: true);
         var u1 = CreateCandidate("ClosedHat", 1.0m, 0.9, "Op3", "C3");
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { p1, p2, u1 }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { p1, p2, u1 }, 1);
 
         // Both protected kept; unprotected pruned (cap exceeded by protected alone)
         result.Should().HaveCount(2);
@@ -307,7 +307,7 @@ public class PhysicalityFilterTests
         var c3 = CreateCandidate("Snare", 2.0m, 0.5, "Op3", "C3");
         var c4 = CreateCandidate("ClosedHat", 2.5m, 0.5, "Op4", "C4");
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { c1, c2, c3, c4 }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { c1, c2, c3, c4 }, 1);
 
         // All under per-beat cap, all kept
         result.Should().HaveCount(4);
@@ -327,7 +327,7 @@ public class PhysicalityFilterTests
         var c1 = CreateCandidate("Kick", 1.0m, 0.5, "OpB", "C1");
         var c2 = CreateCandidate("Snare", 1.0m, 0.5, "OpA", "C2"); // OpA < OpB
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { c1, c2 }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { c1, c2 }, 1);
 
         result.Should().ContainSingle();
         // OpA wins tie-break
@@ -361,7 +361,7 @@ public class PhysicalityFilterTests
         var s1 = CreateCandidate("Snare", 2.0m, 0.8, "Op4", "S1");
         var s2 = CreateCandidate("Snare", 4.0m, 0.5, "Op5", "S2");
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { k1, k2, k3, s1, s2 }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { k1, k2, k3, s1, s2 }, 1);
 
         // Kicks: 2 kept (k1, k2 - highest scored), Snares: 1 kept (s1 - highest)
         result.Should().HaveCount(3);
@@ -395,7 +395,7 @@ public class PhysicalityFilterTests
         var h4 = CreateCandidate("ClosedHat", 2.5m, 0.5, "Op6", "H4");
         var h5 = CreateCandidate("ClosedHat", 3.0m, 0.5, "Op7", "H5");
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { k1, k2, h1, h2, h3, h4, h5 }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { k1, k2, h1, h2, h3, h4, h5 }, 1);
 
         // Kicks: 1 kept, Hats: all 5 kept
         result.Should().HaveCount(6);
@@ -423,7 +423,7 @@ public class PhysicalityFilterTests
         var k2 = CreateCandidate("Kick", 3.0m, 0.4, "Op2", "K2", isProtected: true);
         var k3 = CreateCandidate("Kick", 4.0m, 0.9, "Op3", "K3");
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { k1, k2, k3 }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { k1, k2, k3 }, 1);
 
         // Both protected kept, unprotected pruned
         result.Should().HaveCount(2);
@@ -483,7 +483,7 @@ public class PhysicalityFilterTests
         var h3 = CreateCandidate("ClosedHat", 2.0m, 0.4, "Op8", "H3");
         var h4 = CreateCandidate("ClosedHat", 2.5m, 0.3, "Op9", "H4");
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate>
+        var result = filter.Filter(new List<DrumOnsetCandidate>
             { k1, k2, k3, s1, s2, h1, h2, h3, h4 }, 1);
 
         // Role cap prunes k3 (3rd kick)
@@ -513,7 +513,7 @@ public class PhysicalityFilterTests
         var k2 = CreateCandidate("Kick", 2.0m, 0.3, "Op2", "K2"); // Will be pruned by role cap
         var s1 = CreateCandidate("Snare", 2.0m, 0.8, "Op3", "S1");
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { k1, k2, s1 }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { k1, k2, s1 }, 1);
 
         // K2 pruned by role cap, rest kept (under bar cap)
         result.Should().HaveCount(2);
@@ -541,7 +541,7 @@ public class PhysicalityFilterTests
         var k2 = CreateCandidate("Kick", 1.0m, 0.5, "Op2", "K2");
         var k3 = CreateCandidate("Kick", 1.0m, 0.3, "Op3", "K3");
 
-        var result = filter.Filter(new List<GrooveOnsetCandidate> { k1, k2, k3 }, 1);
+        var result = filter.Filter(new List<DrumOnsetCandidate> { k1, k2, k3 }, 1);
 
         // Role cap passes all 3, but beat cap prunes to 1
         result.Should().ContainSingle();
@@ -562,7 +562,7 @@ public class PhysicalityFilterTests
         var c1 = CreateCandidate("Kick", 1.0m, 0.9, "Op1", "C1");
         var c2 = CreateCandidate("Kick", 2.0m, 0.3, "Op2", "C2");
 
-        filter.Filter(new List<GrooveOnsetCandidate> { c1, c2 }, 1);
+        filter.Filter(new List<DrumOnsetCandidate> { c1, c2 }, 1);
 
         var diag = collector.Build();
         diag.PruneEvents.Should().ContainSingle();
@@ -584,7 +584,7 @@ public class PhysicalityFilterTests
         var c1 = CreateCandidate("Kick", 1.0m, 0.9, "Op1", "C1");
         var c2 = CreateCandidate("Snare", 1.0m, 0.3, "Op2", "C2");
 
-        filter.Filter(new List<GrooveOnsetCandidate> { c1, c2 }, 1);
+        filter.Filter(new List<DrumOnsetCandidate> { c1, c2 }, 1);
 
         var diag = collector.Build();
         diag.PruneEvents.Should().ContainSingle();
@@ -607,7 +607,7 @@ public class PhysicalityFilterTests
         var k1 = CreateCandidate("Kick", 1.0m, 0.9, "Op1", "K1");
         var k2 = CreateCandidate("Kick", 2.0m, 0.3, "Op2", "K2");
 
-        filter.Filter(new List<GrooveOnsetCandidate> { k1, k2 }, 1);
+        filter.Filter(new List<DrumOnsetCandidate> { k1, k2 }, 1);
 
         var diag = collector.Build();
         diag.PruneEvents.Should().ContainSingle();
@@ -624,7 +624,7 @@ public class PhysicalityFilterTests
         var rules = PhysicalityRules.Default with { MaxHitsPerBar = 3 };
 
         // Run twice with same input
-        var candidates = new List<GrooveOnsetCandidate>
+        var candidates = new List<DrumOnsetCandidate>
         {
             CreateCandidate("Kick", 1.0m, 0.5, "Op1", "C1"),
             CreateCandidate("Snare", 2.0m, 0.5, "Op2", "C2"),
@@ -658,9 +658,9 @@ public class PhysicalityFilterTests
         var filter = new PhysicalityFilter(rules);
 
         // Different input orders
-        var result1 = filter.Filter(new List<GrooveOnsetCandidate> { c1, c2, c3 }, 1);
-        var result2 = filter.Filter(new List<GrooveOnsetCandidate> { c3, c1, c2 }, 1);
-        var result3 = filter.Filter(new List<GrooveOnsetCandidate> { c2, c3, c1 }, 1);
+        var result1 = filter.Filter(new List<DrumOnsetCandidate> { c1, c2, c3 }, 1);
+        var result2 = filter.Filter(new List<DrumOnsetCandidate> { c3, c1, c2 }, 1);
+        var result3 = filter.Filter(new List<DrumOnsetCandidate> { c2, c3, c1 }, 1);
 
         // Same candidates kept regardless of input order
         var ids1 = result1.Select(c => DrumCandidateMapper.ExtractCandidateId(c)).OrderBy(x => x).ToList();
@@ -675,7 +675,7 @@ public class PhysicalityFilterTests
 
     #region Helpers
 
-    private static GrooveOnsetCandidate CreateCandidate(
+    private static DrumOnsetCandidate CreateCandidate(
         string role,
         decimal beat,
         double score,
@@ -694,7 +694,7 @@ public class PhysicalityFilterTests
             tags.Add(DrumCandidateMapper.ProtectedTag);
         }
 
-        return new GrooveOnsetCandidate
+        return new DrumOnsetCandidate
         {
             Role = role,
             OnsetBeat = beat,
@@ -706,3 +706,4 @@ public class PhysicalityFilterTests
 
     #endregion
 }
+

@@ -3,6 +3,8 @@
 // AI: deps=IGrooveCandidateSource, GrooveVariationCatalog, GrooveVariationLayerMerger, GrooveCandidateFilter.
 // AI: change=Story B4 acceptance criteria: default implementation adapting existing catalog.
 
+using Music.Generator.Agents.Drums;
+
 namespace Music.Generator.Groove
 {
     /// <summary>
@@ -39,7 +41,7 @@ namespace Music.Generator.Groove
         /// <param name="barContext">Bar context with segment profile and phrase position.</param>
         /// <param name="role">Role name for policy decision lookup.</param>
         /// <returns>Merged and filtered candidate groups for this bar and role.</returns>
-        public IReadOnlyList<GrooveCandidateGroup> GetCandidateGroups(
+        public IReadOnlyList<DrumCandidateGroup> GetCandidateGroups(
             GrooveBarContext barContext,
             string role)
         {

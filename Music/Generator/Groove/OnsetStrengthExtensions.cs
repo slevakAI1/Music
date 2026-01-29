@@ -1,3 +1,5 @@
+using Music.Generator.Agents.Drums;
+
 namespace Music.Generator.Groove;
 
 /// <summary>
@@ -28,14 +30,14 @@ public static class OnsetStrengthExtensions
     }
 
     /// <summary>
-    /// Classifies a GrooveOnsetCandidate's strength based on its position.
+    /// Classifies a DrumOnsetCandidate's strength based on its position.
     /// The candidate's explicit Strength field takes precedence over computed classification.
     /// </summary>
     /// <param name="candidate">The candidate to classify</param>
     /// <param name="beatsPerBar">Meter numerator</param>
     /// <param name="allowedSubdivisions">Active subdivision grid for grid-relative detection</param>
     public static OnsetStrength GetEffectiveStrength(
-        this GrooveOnsetCandidate candidate, 
+        this DrumOnsetCandidate candidate, 
         int beatsPerBar,
         AllowedSubdivision allowedSubdivisions)
     {
@@ -130,7 +132,7 @@ public static class OnsetStrengthUsageExamples
     /// <param name="beatsPerBar">Meter numerator</param>
     /// <param name="allowedSubdivisions">Active subdivision grid</param>
     public static OnsetStrength GetCandidateStrength(
-        GrooveOnsetCandidate candidate,
+        DrumOnsetCandidate candidate,
         int beatsPerBar,
         AllowedSubdivision allowedSubdivisions)
     {
@@ -150,8 +152,8 @@ public static class OnsetStrengthUsageExamples
     /// <param name="beatsPerBar">Meter numerator</param>
     /// <param name="allowedSubdivisions">Active subdivision grid</param>
     /// <param name="allowedStrengths">Allowed strength values</param>
-    public static List<GrooveOnsetCandidate> FilterCandidatesByStrength(
-        List<GrooveOnsetCandidate> candidates,
+    public static List<DrumOnsetCandidate> FilterCandidatesByStrength(
+        List<DrumOnsetCandidate> candidates,
         int beatsPerBar,
         AllowedSubdivision allowedSubdivisions,
         params OnsetStrength[] allowedStrengths)
@@ -182,3 +184,4 @@ public static class OnsetStrengthUsageExamples
             .ToList();
     }
 }
+

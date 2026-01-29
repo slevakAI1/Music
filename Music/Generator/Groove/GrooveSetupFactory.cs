@@ -1,3 +1,5 @@
+using Music.Generator.Agents.Drums;
+
 namespace Music.Generator.Groove
 {
     public static class GrooveSetupFactory
@@ -445,56 +447,56 @@ namespace Music.Generator.Groove
             };
 
             // Candidate groups MUST include actual candidates; otherwise enabling tags does nothing.
-            var baseGroups = new List<GrooveCandidateGroup>
+            var baseGroups = new List<DrumCandidateGroup>
             {
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "Drive_Hats16",
                     GroupTags = new List<string> { "Drive" },
                     MaxAddsPerBar = 4,
                     BaseProbabilityBias = 1.0,
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
                         // Add 16th-like pushes by inserting between existing 8ths (you already allow decimal beats).
-                        new GrooveOnsetCandidate { Role = GrooveRoles.ClosedHat, OnsetBeat = 1.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
-                        new GrooveOnsetCandidate { Role = GrooveRoles.ClosedHat, OnsetBeat = 2.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
-                        new GrooveOnsetCandidate { Role = GrooveRoles.ClosedHat, OnsetBeat = 3.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
-                        new GrooveOnsetCandidate { Role = GrooveRoles.ClosedHat, OnsetBeat = 4.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
+                        new DrumOnsetCandidate { Role = GrooveRoles.ClosedHat, OnsetBeat = 1.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
+                        new DrumOnsetCandidate { Role = GrooveRoles.ClosedHat, OnsetBeat = 2.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
+                        new DrumOnsetCandidate { Role = GrooveRoles.ClosedHat, OnsetBeat = 3.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
+                        new DrumOnsetCandidate { Role = GrooveRoles.ClosedHat, OnsetBeat = 4.25m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.6, Tags = new List<string>{ "Drive" } },
                     }
                 },
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "Pickups",
                     GroupTags = new List<string> { "Pickup" },
                     MaxAddsPerBar = 2,
                     BaseProbabilityBias = 0.6,
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
-                        new GrooveOnsetCandidate { Role = GrooveRoles.Snare, OnsetBeat = 4.75m, Strength = OnsetStrength.Pickup, MaxAddsPerBar = 1, ProbabilityBias = 0.35, Tags = new List<string>{ "Pickup", "Fill" } },
-                        new GrooveOnsetCandidate { Role = GrooveRoles.Kick,  OnsetBeat = 4.75m, Strength = OnsetStrength.Pickup, MaxAddsPerBar = 1, ProbabilityBias = 0.35, Tags = new List<string>{ "Pickup", "Fill" } },
+                        new DrumOnsetCandidate { Role = GrooveRoles.Snare, OnsetBeat = 4.75m, Strength = OnsetStrength.Pickup, MaxAddsPerBar = 1, ProbabilityBias = 0.35, Tags = new List<string>{ "Pickup", "Fill" } },
+                        new DrumOnsetCandidate { Role = GrooveRoles.Kick,  OnsetBeat = 4.75m, Strength = OnsetStrength.Pickup, MaxAddsPerBar = 1, ProbabilityBias = 0.35, Tags = new List<string>{ "Pickup", "Fill" } },
                     }
                 },
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "GhostSnare",
                     GroupTags = new List<string> { "GhostSnare" },
                     MaxAddsPerBar = 2,
                     BaseProbabilityBias = 0.5,
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
-                        new GrooveOnsetCandidate { Role = GrooveRoles.Snare, OnsetBeat = 1.5m, Strength = OnsetStrength.Ghost, MaxAddsPerBar = 1, ProbabilityBias = 0.25, Tags = new List<string>{ "GhostSnare" } },
-                        new GrooveOnsetCandidate { Role = GrooveRoles.Snare, OnsetBeat = 3.5m, Strength = OnsetStrength.Ghost, MaxAddsPerBar = 1, ProbabilityBias = 0.25, Tags = new List<string>{ "GhostSnare" } },
+                        new DrumOnsetCandidate { Role = GrooveRoles.Snare, OnsetBeat = 1.5m, Strength = OnsetStrength.Ghost, MaxAddsPerBar = 1, ProbabilityBias = 0.25, Tags = new List<string>{ "GhostSnare" } },
+                        new DrumOnsetCandidate { Role = GrooveRoles.Snare, OnsetBeat = 3.5m, Strength = OnsetStrength.Ghost, MaxAddsPerBar = 1, ProbabilityBias = 0.25, Tags = new List<string>{ "GhostSnare" } },
                     }
                 },
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "OpenHat",
                     GroupTags = new List<string> { "OpenHat", "Fill" },
                     MaxAddsPerBar = 1,
                     BaseProbabilityBias = 0.35,
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
-                        new GrooveOnsetCandidate { Role = GrooveRoles.OpenHat, OnsetBeat = 4.5m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.3, Tags = new List<string>{ "OpenHat", "Fill" } },
+                        new DrumOnsetCandidate { Role = GrooveRoles.OpenHat, OnsetBeat = 4.5m, Strength = OnsetStrength.Offbeat, MaxAddsPerBar = 1, ProbabilityBias = 0.3, Tags = new List<string>{ "OpenHat", "Fill" } },
                     }
                 }
             };
@@ -620,3 +622,4 @@ namespace Music.Generator.Groove
         }
     }
 }
+

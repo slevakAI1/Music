@@ -527,3 +527,4 @@ namespace Music.Generator.Tests
         #endregion
     }
 }
+

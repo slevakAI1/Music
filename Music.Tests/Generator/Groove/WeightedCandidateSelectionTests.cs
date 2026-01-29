@@ -1,7 +1,8 @@
-// AI: purpose=Unit tests for Story B3 weighted candidate selection (GrooveWeightedCandidateSelector).
+// AI: purpose=Unit tests for Story B3 weighted candidate selection (DrumWeightedCandidateSelector).
 // AI: deps=xunit for test framework; Music.Generator for types under test.
 // AI: change=Story B3 acceptance criteria: test determinism, weight computation, tie-breaking, zero weights.
 
+using Music.Generator.Agents.Drums;
 using Music.Generator.Groove;
 using Xunit;
 
@@ -30,11 +31,11 @@ namespace Music.Generator.Tests
         public void ComputeWeight_PositiveBiases_ReturnsProduct()
         {
             // Arrange
-            var candidate = new GrooveOnsetCandidate { ProbabilityBias = 0.5 };
-            var group = new GrooveCandidateGroup { BaseProbabilityBias = 0.8 };
+            var candidate = new DrumOnsetCandidate { ProbabilityBias = 0.5 };
+            var group = new DrumCandidateGroup { BaseProbabilityBias = 0.8 };
 
             // Act
-            double weight = GrooveWeightedCandidateSelector.ComputeWeight(candidate, group);
+            double weight = DrumWeightedCandidateSelector.ComputeWeight(candidate, group);
 
             // Assert
             Assert.Equal(0.4, weight, precision: 10);
@@ -44,11 +45,11 @@ namespace Music.Generator.Tests
         public void ComputeWeight_ZeroCandidateBias_ReturnsZero()
         {
             // Arrange
-            var candidate = new GrooveOnsetCandidate { ProbabilityBias = 0.0 };
-            var group = new GrooveCandidateGroup { BaseProbabilityBias = 0.8 };
+            var candidate = new DrumOnsetCandidate { ProbabilityBias = 0.0 };
+            var group = new DrumCandidateGroup { BaseProbabilityBias = 0.8 };
 
             // Act
-            double weight = GrooveWeightedCandidateSelector.ComputeWeight(candidate, group);
+            double weight = DrumWeightedCandidateSelector.ComputeWeight(candidate, group);
 
             // Assert
             Assert.Equal(0.0, weight);
@@ -58,11 +59,11 @@ namespace Music.Generator.Tests
         public void ComputeWeight_NegativeCandidateBias_ReturnsZero()
         {
             // Arrange
-            var candidate = new GrooveOnsetCandidate { ProbabilityBias = -0.5 };
-            var group = new GrooveCandidateGroup { BaseProbabilityBias = 0.8 };
+            var candidate = new DrumOnsetCandidate { ProbabilityBias = -0.5 };
+            var group = new DrumCandidateGroup { BaseProbabilityBias = 0.8 };
 
             // Act
-            double weight = GrooveWeightedCandidateSelector.ComputeWeight(candidate, group);
+            double weight = DrumWeightedCandidateSelector.ComputeWeight(candidate, group);
 
             // Assert
             Assert.Equal(0.0, weight);
@@ -72,11 +73,11 @@ namespace Music.Generator.Tests
         public void ComputeWeight_ZeroGroupBias_ReturnsZero()
         {
             // Arrange
-            var candidate = new GrooveOnsetCandidate { ProbabilityBias = 0.5 };
-            var group = new GrooveCandidateGroup { BaseProbabilityBias = 0.0 };
+            var candidate = new DrumOnsetCandidate { ProbabilityBias = 0.5 };
+            var group = new DrumCandidateGroup { BaseProbabilityBias = 0.0 };
 
             // Act
-            double weight = GrooveWeightedCandidateSelector.ComputeWeight(candidate, group);
+            double weight = DrumWeightedCandidateSelector.ComputeWeight(candidate, group);
 
             // Assert
             Assert.Equal(0.0, weight);
@@ -86,11 +87,11 @@ namespace Music.Generator.Tests
         public void ComputeWeight_NegativeGroupBias_ReturnsZero()
         {
             // Arrange
-            var candidate = new GrooveOnsetCandidate { ProbabilityBias = 0.5 };
-            var group = new GrooveCandidateGroup { BaseProbabilityBias = -0.3 };
+            var candidate = new DrumOnsetCandidate { ProbabilityBias = 0.5 };
+            var group = new DrumCandidateGroup { BaseProbabilityBias = -0.3 };
 
             // Act
-            double weight = GrooveWeightedCandidateSelector.ComputeWeight(candidate, group);
+            double weight = DrumWeightedCandidateSelector.ComputeWeight(candidate, group);
 
             // Assert
             Assert.Equal(0.0, weight);
@@ -104,23 +105,23 @@ namespace Music.Generator.Tests
         public void BuildWeightedCandidates_SameWeight_SortsByStableId()
         {
             // Arrange
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "Group1",
                     BaseProbabilityBias = 1.0,
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
-                        new GrooveOnsetCandidate { OnsetBeat = 3.0m, ProbabilityBias = 0.5 },
-                        new GrooveOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.5 },
-                        new GrooveOnsetCandidate { OnsetBeat = 2.0m, ProbabilityBias = 0.5 }
+                        new DrumOnsetCandidate { OnsetBeat = 3.0m, ProbabilityBias = 0.5 },
+                        new DrumOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.5 },
+                        new DrumOnsetCandidate { OnsetBeat = 2.0m, ProbabilityBias = 0.5 }
                     }
                 }
             };
 
             // Act
-            var result = GrooveWeightedCandidateSelector.BuildWeightedCandidates(groups);
+            var result = DrumWeightedCandidateSelector.BuildWeightedCandidates(groups);
 
             // Assert - Same weight, sorted by stable ID (which includes beat)
             Assert.Equal(3, result.Count);
@@ -133,23 +134,23 @@ namespace Music.Generator.Tests
         public void BuildWeightedCandidates_DifferentWeights_SortsByWeightDesc()
         {
             // Arrange
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "Group1",
                     BaseProbabilityBias = 1.0,
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
-                        new GrooveOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.3 },
-                        new GrooveOnsetCandidate { OnsetBeat = 2.0m, ProbabilityBias = 0.9 },
-                        new GrooveOnsetCandidate { OnsetBeat = 3.0m, ProbabilityBias = 0.6 }
+                        new DrumOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.3 },
+                        new DrumOnsetCandidate { OnsetBeat = 2.0m, ProbabilityBias = 0.9 },
+                        new DrumOnsetCandidate { OnsetBeat = 3.0m, ProbabilityBias = 0.6 }
                     }
                 }
             };
 
             // Act
-            var result = GrooveWeightedCandidateSelector.BuildWeightedCandidates(groups);
+            var result = DrumWeightedCandidateSelector.BuildWeightedCandidates(groups);
 
             // Assert - Sorted by weight descending
             Assert.Equal(3, result.Count);
@@ -162,30 +163,30 @@ namespace Music.Generator.Tests
         public void BuildWeightedCandidates_MixedWeights_WeightThenStableId()
         {
             // Arrange
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "GroupA",
                     BaseProbabilityBias = 1.0,
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
-                        new GrooveOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.5 }
+                        new DrumOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.5 }
                     }
                 },
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "GroupB",
                     BaseProbabilityBias = 1.0,
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
-                        new GrooveOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.5 }
+                        new DrumOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.5 }
                     }
                 }
             };
 
             // Act
-            var result = GrooveWeightedCandidateSelector.BuildWeightedCandidates(groups);
+            var result = DrumWeightedCandidateSelector.BuildWeightedCandidates(groups);
 
             // Assert - Same weight, GroupA comes before GroupB alphabetically
             Assert.Equal(2, result.Count);
@@ -205,13 +206,13 @@ namespace Music.Generator.Tests
 
             // Act - Run multiple times with same seed (re-initialize to reset RNG state)
             Rng.Initialize(12345);
-            var result1 = GrooveWeightedCandidateSelector.SelectCandidates(groups, 2, barNumber: 1, role: "Kick");
+            var result1 = DrumWeightedCandidateSelector.SelectCandidates(groups, 2, barNumber: 1, role: "Kick");
 
             Rng.Initialize(12345);
-            var result2 = GrooveWeightedCandidateSelector.SelectCandidates(groups, 2, barNumber: 1, role: "Kick");
+            var result2 = DrumWeightedCandidateSelector.SelectCandidates(groups, 2, barNumber: 1, role: "Kick");
 
             Rng.Initialize(12345);
-            var result3 = GrooveWeightedCandidateSelector.SelectCandidates(groups, 2, barNumber: 1, role: "Kick");
+            var result3 = DrumWeightedCandidateSelector.SelectCandidates(groups, 2, barNumber: 1, role: "Kick");
 
             // Assert - All runs produce identical results
             Assert.Equal(result1.Select(w => w.StableId), result2.Select(w => w.StableId));
@@ -226,10 +227,10 @@ namespace Music.Generator.Tests
 
             // Act - Same bar, same results
             Rng.Initialize(12345);
-            var bar1Result1 = GrooveWeightedCandidateSelector.SelectCandidates(groups, 2, barNumber: 1, role: "Kick");
+            var bar1Result1 = DrumWeightedCandidateSelector.SelectCandidates(groups, 2, barNumber: 1, role: "Kick");
 
             Rng.Initialize(12345);
-            var bar1Result2 = GrooveWeightedCandidateSelector.SelectCandidates(groups, 2, barNumber: 1, role: "Kick");
+            var bar1Result2 = DrumWeightedCandidateSelector.SelectCandidates(groups, 2, barNumber: 1, role: "Kick");
 
             // Assert
             Assert.Equal(bar1Result1.Select(w => w.StableId), bar1Result2.Select(w => w.StableId));
@@ -247,10 +248,10 @@ namespace Music.Generator.Tests
 
             // Act
             Rng.Initialize(12345);
-            var result1 = GrooveWeightedCandidateSelector.SelectCandidates(groups, 3, barNumber: 1, role: "Kick");
+            var result1 = DrumWeightedCandidateSelector.SelectCandidates(groups, 3, barNumber: 1, role: "Kick");
 
             Rng.Initialize(99999);
-            var result2 = GrooveWeightedCandidateSelector.SelectCandidates(groups, 3, barNumber: 1, role: "Kick");
+            var result2 = DrumWeightedCandidateSelector.SelectCandidates(groups, 3, barNumber: 1, role: "Kick");
 
             // Assert - Different seeds should produce different selections
             // Note: With enough candidates and similar weights, different seeds should select differently
@@ -264,7 +265,7 @@ namespace Music.Generator.Tests
 
             // For determinism test, we verify the results are reproducible within each seed
             Rng.Initialize(12345);
-            var result1Again = GrooveWeightedCandidateSelector.SelectCandidates(groups, 3, barNumber: 1, role: "Kick");
+            var result1Again = DrumWeightedCandidateSelector.SelectCandidates(groups, 3, barNumber: 1, role: "Kick");
             Assert.Equal(ids1, result1Again.Select(w => w.StableId).ToList());
         }
 
@@ -276,23 +277,23 @@ namespace Music.Generator.Tests
         public void BuildWeightedCandidates_ZeroWeightCandidates_Filtered()
         {
             // Arrange
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "Group1",
                     BaseProbabilityBias = 1.0,
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
-                        new GrooveOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.5 },
-                        new GrooveOnsetCandidate { OnsetBeat = 2.0m, ProbabilityBias = 0.0 }, // Zero
-                        new GrooveOnsetCandidate { OnsetBeat = 3.0m, ProbabilityBias = -0.5 } // Negative
+                        new DrumOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.5 },
+                        new DrumOnsetCandidate { OnsetBeat = 2.0m, ProbabilityBias = 0.0 }, // Zero
+                        new DrumOnsetCandidate { OnsetBeat = 3.0m, ProbabilityBias = -0.5 } // Negative
                     }
                 }
             };
 
             // Act
-            var result = GrooveWeightedCandidateSelector.BuildWeightedCandidates(groups);
+            var result = DrumWeightedCandidateSelector.BuildWeightedCandidates(groups);
 
             // Assert - Only positive weight candidate included
             Assert.Single(result);
@@ -303,22 +304,22 @@ namespace Music.Generator.Tests
         public void BuildWeightedCandidates_AllZeroWeights_ReturnsEmpty()
         {
             // Arrange
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "Group1",
                     BaseProbabilityBias = 0.0, // Group bias is zero
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
-                        new GrooveOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.5 },
-                        new GrooveOnsetCandidate { OnsetBeat = 2.0m, ProbabilityBias = 0.8 }
+                        new DrumOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.5 },
+                        new DrumOnsetCandidate { OnsetBeat = 2.0m, ProbabilityBias = 0.8 }
                     }
                 }
             };
 
             // Act
-            var result = GrooveWeightedCandidateSelector.BuildWeightedCandidates(groups);
+            var result = DrumWeightedCandidateSelector.BuildWeightedCandidates(groups);
 
             // Assert
             Assert.Empty(result);
@@ -328,22 +329,22 @@ namespace Music.Generator.Tests
         public void SelectCandidates_ZeroWeightGroup_SafelyHandled()
         {
             // Arrange
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "Group1",
                     BaseProbabilityBias = 0.0,
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
-                        new GrooveOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.5 }
+                        new DrumOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.5 }
                     }
                 }
             };
 
             // Act
             Rng.Initialize(12345);
-            var result = GrooveWeightedCandidateSelector.SelectCandidates(groups, 5, barNumber: 1, role: "Kick");
+            var result = DrumWeightedCandidateSelector.SelectCandidates(groups, 5, barNumber: 1, role: "Kick");
 
             // Assert - No candidates selected (all have zero weight)
             Assert.Empty(result);
@@ -361,7 +362,7 @@ namespace Music.Generator.Tests
 
             // Act
             Rng.Initialize(12345);
-            var result = GrooveWeightedCandidateSelector.SelectCandidates(groups, 2, barNumber: 1, role: "Kick");
+            var result = DrumWeightedCandidateSelector.SelectCandidates(groups, 2, barNumber: 1, role: "Kick");
 
             // Assert
             Assert.Equal(2, result.Count);
@@ -375,7 +376,7 @@ namespace Music.Generator.Tests
 
             // Act
             Rng.Initialize(12345);
-            var result = GrooveWeightedCandidateSelector.SelectCandidates(groups, 10, barNumber: 1, role: "Kick");
+            var result = DrumWeightedCandidateSelector.SelectCandidates(groups, 10, barNumber: 1, role: "Kick");
 
             // Assert
             Assert.Equal(3, result.Count);
@@ -388,7 +389,7 @@ namespace Music.Generator.Tests
             var groups = CreateTestGroups();
 
             // Act
-            var result = GrooveWeightedCandidateSelector.SelectCandidates(groups, 0, barNumber: 1, role: "Kick");
+            var result = DrumWeightedCandidateSelector.SelectCandidates(groups, 0, barNumber: 1, role: "Kick");
 
             // Assert
             Assert.Empty(result);
@@ -401,7 +402,7 @@ namespace Music.Generator.Tests
             var groups = CreateTestGroups();
 
             // Act
-            var result = GrooveWeightedCandidateSelector.SelectCandidates(groups, -5, barNumber: 1, role: "Kick");
+            var result = DrumWeightedCandidateSelector.SelectCandidates(groups, -5, barNumber: 1, role: "Kick");
 
             // Assert
             Assert.Empty(result);
@@ -415,11 +416,11 @@ namespace Music.Generator.Tests
         public void SelectCandidates_EmptyGroups_ReturnsEmpty()
         {
             // Arrange
-            var groups = new List<GrooveCandidateGroup>();
+            var groups = new List<DrumCandidateGroup>();
 
             // Act
             Rng.Initialize(12345);
-            var result = GrooveWeightedCandidateSelector.SelectCandidates(groups, 5, barNumber: 1, role: "Kick");
+            var result = DrumWeightedCandidateSelector.SelectCandidates(groups, 5, barNumber: 1, role: "Kick");
 
             // Assert
             Assert.Empty(result);
@@ -430,7 +431,7 @@ namespace Music.Generator.Tests
         {
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                GrooveWeightedCandidateSelector.SelectCandidates(null!, 5, barNumber: 1, role: "Kick"));
+                DrumWeightedCandidateSelector.SelectCandidates(null!, 5, barNumber: 1, role: "Kick"));
         }
 
         [Fact]
@@ -440,7 +441,7 @@ namespace Music.Generator.Tests
             var groups = CreateTestGroups();
 
             // Act
-            var result = GrooveWeightedCandidateSelector.GetTopByWeight(groups, topN: 2);
+            var result = DrumWeightedCandidateSelector.GetTopByWeight(groups, topN: 2);
 
             // Assert
             Assert.Equal(2, result.Count);
@@ -451,20 +452,20 @@ namespace Music.Generator.Tests
         public void SelectFromGroup_SingleGroup_Works()
         {
             // Arrange
-            var group = new GrooveCandidateGroup
+            var group = new DrumCandidateGroup
             {
                 GroupId = "TestGroup",
                 BaseProbabilityBias = 1.0,
-                Candidates = new List<GrooveOnsetCandidate>
+                Candidates = new List<DrumOnsetCandidate>
                 {
-                    new GrooveOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.5 },
-                    new GrooveOnsetCandidate { OnsetBeat = 2.0m, ProbabilityBias = 0.8 }
+                    new DrumOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.5 },
+                    new DrumOnsetCandidate { OnsetBeat = 2.0m, ProbabilityBias = 0.8 }
                 }
             };
 
             // Act
             Rng.Initialize(12345);
-            var result = GrooveWeightedCandidateSelector.SelectFromGroup(group, 1, barNumber: 1, role: "Kick");
+            var result = DrumWeightedCandidateSelector.SelectFromGroup(group, 1, barNumber: 1, role: "Kick");
 
             // Assert
             Assert.Single(result);
@@ -478,11 +479,11 @@ namespace Music.Generator.Tests
         public void CreateStableId_ConsistentFormat()
         {
             // Arrange
-            var group = new GrooveCandidateGroup { GroupId = "TestGroup" };
-            var candidate = new GrooveOnsetCandidate { OnsetBeat = 2.5m };
+            var group = new DrumCandidateGroup { GroupId = "TestGroup" };
+            var candidate = new DrumOnsetCandidate { OnsetBeat = 2.5m };
 
             // Act
-            var stableId = GrooveWeightedCandidateSelector.CreateStableId(group, candidate);
+            var stableId = DrumWeightedCandidateSelector.CreateStableId(group, candidate);
 
             // Assert
             Assert.Equal("TestGroup:2.5000", stableId);
@@ -492,13 +493,13 @@ namespace Music.Generator.Tests
         public void CreateStableId_DifferentGroups_DifferentIds()
         {
             // Arrange
-            var group1 = new GrooveCandidateGroup { GroupId = "Group1" };
-            var group2 = new GrooveCandidateGroup { GroupId = "Group2" };
-            var candidate = new GrooveOnsetCandidate { OnsetBeat = 1.0m };
+            var group1 = new DrumCandidateGroup { GroupId = "Group1" };
+            var group2 = new DrumCandidateGroup { GroupId = "Group2" };
+            var candidate = new DrumOnsetCandidate { OnsetBeat = 1.0m };
 
             // Act
-            var id1 = GrooveWeightedCandidateSelector.CreateStableId(group1, candidate);
-            var id2 = GrooveWeightedCandidateSelector.CreateStableId(group2, candidate);
+            var id1 = DrumWeightedCandidateSelector.CreateStableId(group1, candidate);
+            var id2 = DrumWeightedCandidateSelector.CreateStableId(group2, candidate);
 
             // Assert
             Assert.NotEqual(id1, id2);
@@ -508,49 +509,49 @@ namespace Music.Generator.Tests
 
         #region Test Helpers
 
-        private static List<GrooveCandidateGroup> CreateTestGroups()
+        private static List<DrumCandidateGroup> CreateTestGroups()
         {
-            return new List<GrooveCandidateGroup>
+            return new List<DrumCandidateGroup>
             {
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "TestGroup",
                     BaseProbabilityBias = 1.0,
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
-                        new GrooveOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.5 },
-                        new GrooveOnsetCandidate { OnsetBeat = 2.0m, ProbabilityBias = 0.8 },
-                        new GrooveOnsetCandidate { OnsetBeat = 3.0m, ProbabilityBias = 0.3 }
+                        new DrumOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.5 },
+                        new DrumOnsetCandidate { OnsetBeat = 2.0m, ProbabilityBias = 0.8 },
+                        new DrumOnsetCandidate { OnsetBeat = 3.0m, ProbabilityBias = 0.3 }
                     }
                 }
             };
         }
 
-        private static List<GrooveCandidateGroup> CreateTestGroupsWithManyOptions()
+        private static List<DrumCandidateGroup> CreateTestGroupsWithManyOptions()
         {
-            return new List<GrooveCandidateGroup>
+            return new List<DrumCandidateGroup>
             {
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "GroupA",
                     BaseProbabilityBias = 1.0,
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
-                        new GrooveOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.5 },
-                        new GrooveOnsetCandidate { OnsetBeat = 1.5m, ProbabilityBias = 0.5 },
-                        new GrooveOnsetCandidate { OnsetBeat = 2.0m, ProbabilityBias = 0.5 },
-                        new GrooveOnsetCandidate { OnsetBeat = 2.5m, ProbabilityBias = 0.5 }
+                        new DrumOnsetCandidate { OnsetBeat = 1.0m, ProbabilityBias = 0.5 },
+                        new DrumOnsetCandidate { OnsetBeat = 1.5m, ProbabilityBias = 0.5 },
+                        new DrumOnsetCandidate { OnsetBeat = 2.0m, ProbabilityBias = 0.5 },
+                        new DrumOnsetCandidate { OnsetBeat = 2.5m, ProbabilityBias = 0.5 }
                     }
                 },
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "GroupB",
                     BaseProbabilityBias = 1.0,
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
-                        new GrooveOnsetCandidate { OnsetBeat = 3.0m, ProbabilityBias = 0.5 },
-                        new GrooveOnsetCandidate { OnsetBeat = 3.5m, ProbabilityBias = 0.5 },
-                        new GrooveOnsetCandidate { OnsetBeat = 4.0m, ProbabilityBias = 0.5 }
+                        new DrumOnsetCandidate { OnsetBeat = 3.0m, ProbabilityBias = 0.5 },
+                        new DrumOnsetCandidate { OnsetBeat = 3.5m, ProbabilityBias = 0.5 },
+                        new DrumOnsetCandidate { OnsetBeat = 4.0m, ProbabilityBias = 0.5 }
                     }
                 }
             };
@@ -559,3 +560,5 @@ namespace Music.Generator.Tests
         #endregion
     }
 }
+
+

@@ -657,3 +657,4 @@ namespace Music.Generator.Agents.Drums.Operators.Tests
         #endregion
     }
 }
+

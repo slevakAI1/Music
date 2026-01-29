@@ -1,6 +1,6 @@
-// AI: purpose=Maps DrumCandidate to GrooveOnsetCandidate for groove system integration.
-// AI: invariants=Deterministic: same input → same output; VelocityHint/TimingHint flow directly to GrooveOnsetCandidate.
-// AI: deps=DrumCandidate, GrooveOnsetCandidate, FillRole, DrumArticulation; consumed by DrummerCandidateSource.
+// AI: purpose=Maps DrumCandidate to DrumOnsetCandidate for groove system integration.
+// AI: invariants=Deterministic: same input → same output; VelocityHint/TimingHint flow directly to DrumOnsetCandidate.
+// AI: deps=DrumCandidate, DrumOnsetCandidate, FillRole, DrumArticulation; consumed by DrummerCandidateSource.
 // AI: change=VelocityHint/TimingHint now flow directly instead of via tags.
 
 using Music.Generator.Groove;
@@ -8,9 +8,9 @@ using Music.Generator.Groove;
 namespace Music.Generator.Agents.Drums
 {
     /// <summary>
-    /// Maps DrumCandidate to GrooveOnsetCandidate for groove system consumption.
+    /// Maps DrumCandidate to DrumOnsetCandidate for groove system consumption.
     /// Preserves candidate identity and translates drum-specific hints.
-    /// VelocityHint and TimingHint flow directly to GrooveOnsetCandidate.
+    /// VelocityHint and TimingHint flow directly to DrumOnsetCandidate.
     /// Story 2.4: Implement Drummer Candidate Source.
     /// </summary>
     public static class DrumCandidateMapper
@@ -31,18 +31,18 @@ namespace Music.Generator.Agents.Drums
         public const string ProtectedTag = "Protected";
 
         /// <summary>
-        /// Maps a DrumCandidate to a GrooveOnsetCandidate.
+        /// Maps a DrumCandidate to a DrumOnsetCandidate.
         /// </summary>
         /// <param name="candidate">Source drum candidate.</param>
         /// <returns>Mapped groove onset candidate with hints and tags.</returns>
         /// <exception cref="ArgumentNullException">If candidate is null.</exception>
-        public static GrooveOnsetCandidate Map(DrumCandidate candidate)
+        public static DrumOnsetCandidate Map(DrumCandidate candidate)
         {
             ArgumentNullException.ThrowIfNull(candidate);
 
             var tags = BuildTags(candidate);
 
-            return new GrooveOnsetCandidate
+            return new DrumOnsetCandidate
             {
                 Role = candidate.Role,
                 OnsetBeat = candidate.Beat,
@@ -56,15 +56,15 @@ namespace Music.Generator.Agents.Drums
         }
 
         /// <summary>
-        /// Maps multiple DrumCandidates to GrooveOnsetCandidates.
+        /// Maps multiple DrumCandidates to DrumOnsetCandidates.
         /// </summary>
         /// <param name="candidates">Source candidates.</param>
         /// <returns>Mapped candidates in same order.</returns>
-        public static IReadOnlyList<GrooveOnsetCandidate> MapAll(IEnumerable<DrumCandidate> candidates)
+        public static IReadOnlyList<DrumOnsetCandidate> MapAll(IEnumerable<DrumCandidate> candidates)
         {
             ArgumentNullException.ThrowIfNull(candidates);
 
-            var result = new List<GrooveOnsetCandidate>();
+            var result = new List<DrumOnsetCandidate>();
             foreach (var candidate in candidates)
             {
                 result.Add(Map(candidate));
@@ -108,18 +108,18 @@ namespace Music.Generator.Agents.Drums
                 tags.Add($"Strength:{candidate.Strength}");
             }
 
-            // Note: VelocityHint and TimingHint now flow directly via GrooveOnsetCandidate properties,
+            // Note: VelocityHint and TimingHint now flow directly via DrumOnsetCandidate properties,
             // not via tags. Tags are kept for traceability/diagnostics only.
 
             return tags;
         }
 
         /// <summary>
-        /// Extracts the original CandidateId from a mapped GrooveOnsetCandidate's tags.
+        /// Extracts the original CandidateId from a mapped DrumOnsetCandidate's tags.
         /// </summary>
         /// <param name="candidate">Mapped candidate with tags.</param>
         /// <returns>Original CandidateId if found, null otherwise.</returns>
-        public static string? ExtractCandidateId(GrooveOnsetCandidate candidate)
+        public static string? ExtractCandidateId(DrumOnsetCandidate candidate)
         {
             ArgumentNullException.ThrowIfNull(candidate);
 
@@ -134,11 +134,11 @@ namespace Music.Generator.Agents.Drums
         }
 
         /// <summary>
-        /// Extracts the original OperatorId from a mapped GrooveOnsetCandidate's tags.
+        /// Extracts the original OperatorId from a mapped DrumOnsetCandidate's tags.
         /// </summary>
         /// <param name="candidate">Mapped candidate with tags.</param>
         /// <returns>Original OperatorId if found, null otherwise.</returns>
-        public static string? ExtractOperatorId(GrooveOnsetCandidate candidate)
+        public static string? ExtractOperatorId(DrumOnsetCandidate candidate)
         {
             ArgumentNullException.ThrowIfNull(candidate);
 
@@ -157,10 +157,11 @@ namespace Music.Generator.Agents.Drums
         /// </summary>
         /// <param name="candidate">Candidate to check.</param>
         /// <returns>True if candidate has Protected tag.</returns>
-        public static bool IsProtected(GrooveOnsetCandidate candidate)
+        public static bool IsProtected(DrumOnsetCandidate candidate)
         {
             ArgumentNullException.ThrowIfNull(candidate);
             return candidate.Tags.Contains(ProtectedTag);
         }
     }
 }
+

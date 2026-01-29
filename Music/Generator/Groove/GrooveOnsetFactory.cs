@@ -1,7 +1,9 @@
 // AI: purpose=Factory for creating GrooveOnset records with proper provenance tracking (Story G2).
 // AI: invariants=Anchor onsets get Source=Anchor; variation onsets get Source=Variation with GroupId/CandidateId.
-// AI: deps=GrooveOnset, GrooveOnsetProvenance, GrooveOnsetCandidate, GrooveCandidateGroup.
+// AI: deps=GrooveOnset, GrooveOnsetProvenance, DrumOnsetCandidate, DrumCandidateGroup.
 // AI: change=Story G2: Centralized onset creation ensures provenance is always populated correctly.
+
+using Music.Generator.Agents.Drums;
 
 namespace Music.Generator.Groove;
 
@@ -55,8 +57,8 @@ public static class GrooveOnsetFactory
     /// <param name="enabledTags">Tags that were enabled at selection time (optional).</param>
     /// <returns>GrooveOnset with Variation provenance.</returns>
     public static GrooveOnset FromVariation(
-        GrooveOnsetCandidate candidate,
-        GrooveCandidateGroup group,
+        DrumOnsetCandidate candidate,
+        DrumCandidateGroup group,
         int barNumber,
         IReadOnlyList<string>? enabledTags = null)
     {

@@ -1,4 +1,5 @@
 using Music.Generator;
+using Music.Generator.Agents.Drums;
 using Music.Generator.Groove;
 using Xunit;
 
@@ -314,15 +315,15 @@ namespace Music.Tests.Generator.Groove
                     new GrooveVariationLayer
                     {
                         LayerId = "Base",
-                        CandidateGroups = new List<GrooveCandidateGroup>
+                        CandidateGroups = new List<DrumCandidateGroup>
                         {
-                            new GrooveCandidateGroup
+                            new DrumCandidateGroup
                             {
                                 GroupId = "TestGroup",
                                 BaseProbabilityBias = 1.0,
-                                Candidates = new List<GrooveOnsetCandidate>
+                                Candidates = new List<DrumOnsetCandidate>
                                 {
-                                    new GrooveOnsetCandidate
+                                    new DrumOnsetCandidate
                                     {
                                         Role = "Kick",
                                         OnsetBeat = 1.5m,
@@ -371,22 +372,22 @@ namespace Music.Tests.Generator.Groove
                     new GrooveVariationLayer
                     {
                         LayerId = "Base",
-                        CandidateGroups = new List<GrooveCandidateGroup>
+                        CandidateGroups = new List<DrumCandidateGroup>
                         {
-                            new GrooveCandidateGroup
+                            new DrumCandidateGroup
                             {
                                 GroupId = "TestGroup",
                                 MaxAddsPerBar = 2,
                                 BaseProbabilityBias = 1.0,
-                                Candidates = new List<GrooveOnsetCandidate>
+                                Candidates = new List<DrumOnsetCandidate>
                                 {
-                                    new GrooveOnsetCandidate
+                                    new DrumOnsetCandidate
                                     {
                                         Role = "Kick",
                                         OnsetBeat = 1.5m,
                                         ProbabilityBias = 1.0
                                     },
-                                    new GrooveOnsetCandidate
+                                    new DrumOnsetCandidate
                                     {
                                         Role = "Kick",
                                         OnsetBeat = 2.5m,
@@ -632,3 +633,4 @@ namespace Music.Tests.Generator.Groove
         #endregion
     }
 }
+

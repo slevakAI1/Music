@@ -57,3 +57,4 @@ namespace Music.Tests.Generator.Agents.Drums.Snapshots
         public string Provenance { get; init; } = "Anchor";
     }
 }
+

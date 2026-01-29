@@ -1,6 +1,6 @@
 // AI: purpose=Physicality filter for Story 4.3/4.4; validates drum candidates for limb conflicts, sticking rules, and overcrowding.
 // AI: invariants=Protected candidates never removed; deterministic pruning (score desc, operatorId asc, candidateId asc).
-// AI: deps=GrooveOnsetCandidate, DrumCandidateMapper, LimbConflictDetector, StickingRules, GrooveDiagnosticsCollector.
+// AI: deps=DrumOnsetCandidate, DrumCandidateMapper, LimbConflictDetector, StickingRules, GrooveDiagnosticsCollector.
 // AI: change=Story 4.4 adds full overcrowding prevention: MaxHitsPerBeat, MaxHitsPerBar, MaxHitsPerRolePerBar.
 
 using Music.Generator.Groove;
@@ -47,8 +47,8 @@ namespace Music.Generator.Agents.Drums.Physicality
         /// <param name="candidates">Candidates to filter.</param>
         /// <param name="barNumber">Bar number for diagnostics and context.</param>
         /// <returns>Filtered candidates (playable subset).</returns>
-        public IReadOnlyList<GrooveOnsetCandidate> Filter(
-            IReadOnlyList<GrooveOnsetCandidate> candidates,
+        public IReadOnlyList<DrumOnsetCandidate> Filter(
+            IReadOnlyList<DrumOnsetCandidate> candidates,
             int barNumber)
         {
             ArgumentNullException.ThrowIfNull(candidates);
@@ -84,7 +84,7 @@ namespace Music.Generator.Agents.Drums.Physicality
         }
 
         private List<DrumCandidate> BuildDrumCandidates(
-            IReadOnlyList<GrooveOnsetCandidate> candidates,
+            IReadOnlyList<DrumOnsetCandidate> candidates,
             int barNumber)
         {
             var result = new List<DrumCandidate>();
@@ -112,10 +112,10 @@ namespace Music.Generator.Agents.Drums.Physicality
             return result;
         }
 
-        private static Dictionary<string, GrooveOnsetCandidate> BuildCandidateLookup(
-            IReadOnlyList<GrooveOnsetCandidate> candidates)
+        private static Dictionary<string, DrumOnsetCandidate> BuildCandidateLookup(
+            IReadOnlyList<DrumOnsetCandidate> candidates)
         {
-            var lookup = new Dictionary<string, GrooveOnsetCandidate>(StringComparer.Ordinal);
+            var lookup = new Dictionary<string, DrumOnsetCandidate>(StringComparer.Ordinal);
             foreach (var c in candidates)
             {
                 string cid = DrumCandidateMapper.ExtractCandidateId(c) ?? $"gen_{Guid.NewGuid():N}";
@@ -124,7 +124,7 @@ namespace Music.Generator.Agents.Drums.Physicality
             return lookup;
         }
 
-        private static FillRole ExtractFillRole(GrooveOnsetCandidate c)
+        private static FillRole ExtractFillRole(DrumOnsetCandidate c)
         {
             if (c.Tags == null) return FillRole.None;
             if (c.Tags.Contains(nameof(FillRole.FillStart))) return FillRole.FillStart;
@@ -136,7 +136,7 @@ namespace Music.Generator.Agents.Drums.Physicality
 
         private void ResolveConflicts(
             List<DrumCandidate> drumCandidates,
-            Dictionary<string, GrooveOnsetCandidate> candidateById,
+            Dictionary<string, DrumOnsetCandidate> candidateById,
             HashSet<string> toRemoveIds)
         {
             var conflicts = LimbConflictDetector.Default.DetectConflicts(drumCandidates, _rules.LimbModel);
@@ -150,7 +150,7 @@ namespace Music.Generator.Agents.Drums.Physicality
 
         private void ValidateSticking(
             List<DrumCandidate> drumCandidates,
-            Dictionary<string, GrooveOnsetCandidate> candidateById,
+            Dictionary<string, DrumOnsetCandidate> candidateById,
             HashSet<string> toRemoveIds)
         {
             var validation = _rules.StickingRules?.ValidatePattern(drumCandidates);
@@ -168,7 +168,7 @@ namespace Music.Generator.Agents.Drums.Physicality
             List<string> involvedIds,
             string reason,
             List<DrumCandidate> drumCandidates,
-            Dictionary<string, GrooveOnsetCandidate> candidateById,
+            Dictionary<string, DrumOnsetCandidate> candidateById,
             HashSet<string> toRemoveIds)
         {
             if (involvedIds.Count == 0) return;
@@ -237,11 +237,11 @@ namespace Music.Generator.Agents.Drums.Physicality
                 .ToList();
         }
 
-        private IReadOnlyList<GrooveOnsetCandidate> BuildFilteredResult(
-            IReadOnlyList<GrooveOnsetCandidate> candidates,
+        private IReadOnlyList<DrumOnsetCandidate> BuildFilteredResult(
+            IReadOnlyList<DrumOnsetCandidate> candidates,
             HashSet<string> toRemoveIds)
         {
-            var result = new List<GrooveOnsetCandidate>();
+            var result = new List<DrumOnsetCandidate>();
             foreach (var c in candidates)
             {
                 string id = DrumCandidateMapper.ExtractCandidateId(c) ?? "";
@@ -260,8 +260,8 @@ namespace Music.Generator.Agents.Drums.Physicality
         /// Protected candidates are never pruned.
         /// Order: per-role caps → per-beat caps → per-bar caps.
         /// </summary>
-        private IReadOnlyList<GrooveOnsetCandidate> ApplyOvercrowdingPrevention(
-            IReadOnlyList<GrooveOnsetCandidate> candidates,
+        private IReadOnlyList<DrumOnsetCandidate> ApplyOvercrowdingPrevention(
+            IReadOnlyList<DrumOnsetCandidate> candidates,
             int barNumber)
         {
             if (candidates.Count == 0)
@@ -278,15 +278,15 @@ namespace Music.Generator.Agents.Drums.Physicality
         /// <summary>
         /// Applies per-role-per-bar caps.
         /// </summary>
-        private IReadOnlyList<GrooveOnsetCandidate> ApplyRoleCaps(
-            IReadOnlyList<GrooveOnsetCandidate> candidates)
+        private IReadOnlyList<DrumOnsetCandidate> ApplyRoleCaps(
+            IReadOnlyList<DrumOnsetCandidate> candidates)
         {
             if (_rules.MaxHitsPerRolePerBar == null || _rules.MaxHitsPerRolePerBar.Count == 0)
                 return candidates;
 
-            var result = new List<GrooveOnsetCandidate>();
-            var protectedByRole = new Dictionary<string, List<GrooveOnsetCandidate>>(StringComparer.Ordinal);
-            var unprotectedByRole = new Dictionary<string, List<GrooveOnsetCandidate>>(StringComparer.Ordinal);
+            var result = new List<DrumOnsetCandidate>();
+            var protectedByRole = new Dictionary<string, List<DrumOnsetCandidate>>(StringComparer.Ordinal);
+            var unprotectedByRole = new Dictionary<string, List<DrumOnsetCandidate>>(StringComparer.Ordinal);
 
             // Group candidates by role
             foreach (var c in candidates)
@@ -296,7 +296,7 @@ namespace Music.Generator.Agents.Drums.Physicality
                 {
                     if (!protectedByRole.TryGetValue(role, out var protList))
                     {
-                        protList = new List<GrooveOnsetCandidate>();
+                        protList = new List<DrumOnsetCandidate>();
                         protectedByRole[role] = protList;
                     }
                     protList.Add(c);
@@ -305,7 +305,7 @@ namespace Music.Generator.Agents.Drums.Physicality
                 {
                     if (!unprotectedByRole.TryGetValue(role, out var unprotList))
                     {
-                        unprotList = new List<GrooveOnsetCandidate>();
+                        unprotList = new List<DrumOnsetCandidate>();
                         unprotectedByRole[role] = unprotList;
                     }
                     unprotList.Add(c);
@@ -317,8 +317,8 @@ namespace Music.Generator.Agents.Drums.Physicality
             foreach (var role in allRoles)
             {
                 var cap = _rules.GetRoleCap(role);
-                var protectedList = protectedByRole.GetValueOrDefault(role) ?? new List<GrooveOnsetCandidate>();
-                var unprotectedList = unprotectedByRole.GetValueOrDefault(role) ?? new List<GrooveOnsetCandidate>();
+                var protectedList = protectedByRole.GetValueOrDefault(role) ?? new List<DrumOnsetCandidate>();
+                var unprotectedList = unprotectedByRole.GetValueOrDefault(role) ?? new List<DrumOnsetCandidate>();
 
                 if (!cap.HasValue)
                 {
@@ -369,16 +369,16 @@ namespace Music.Generator.Agents.Drums.Physicality
         /// <summary>
         /// Applies per-beat caps.
         /// </summary>
-        private IReadOnlyList<GrooveOnsetCandidate> ApplyBeatCaps(
-            IReadOnlyList<GrooveOnsetCandidate> candidates)
+        private IReadOnlyList<DrumOnsetCandidate> ApplyBeatCaps(
+            IReadOnlyList<DrumOnsetCandidate> candidates)
         {
             if (!_rules.MaxHitsPerBeat.HasValue)
                 return candidates;
 
             int maxPerBeat = _rules.MaxHitsPerBeat.Value;
-            var result = new List<GrooveOnsetCandidate>();
-            var protectedByBeat = new Dictionary<decimal, List<GrooveOnsetCandidate>>();
-            var unprotectedByBeat = new Dictionary<decimal, List<GrooveOnsetCandidate>>();
+            var result = new List<DrumOnsetCandidate>();
+            var protectedByBeat = new Dictionary<decimal, List<DrumOnsetCandidate>>();
+            var unprotectedByBeat = new Dictionary<decimal, List<DrumOnsetCandidate>>();
 
             // Group candidates by beat
             foreach (var c in candidates)
@@ -388,7 +388,7 @@ namespace Music.Generator.Agents.Drums.Physicality
                 {
                     if (!protectedByBeat.TryGetValue(beat, out var protList))
                     {
-                        protList = new List<GrooveOnsetCandidate>();
+                        protList = new List<DrumOnsetCandidate>();
                         protectedByBeat[beat] = protList;
                     }
                     protList.Add(c);
@@ -397,7 +397,7 @@ namespace Music.Generator.Agents.Drums.Physicality
                 {
                     if (!unprotectedByBeat.TryGetValue(beat, out var unprotList))
                     {
-                        unprotList = new List<GrooveOnsetCandidate>();
+                        unprotList = new List<DrumOnsetCandidate>();
                         unprotectedByBeat[beat] = unprotList;
                     }
                     unprotList.Add(c);
@@ -408,8 +408,8 @@ namespace Music.Generator.Agents.Drums.Physicality
             var allBeats = protectedByBeat.Keys.Union(unprotectedByBeat.Keys).Distinct().OrderBy(b => b);
             foreach (var beat in allBeats)
             {
-                var protectedList = protectedByBeat.GetValueOrDefault(beat) ?? new List<GrooveOnsetCandidate>();
-                var unprotectedList = unprotectedByBeat.GetValueOrDefault(beat) ?? new List<GrooveOnsetCandidate>();
+                var protectedList = protectedByBeat.GetValueOrDefault(beat) ?? new List<DrumOnsetCandidate>();
+                var unprotectedList = unprotectedByBeat.GetValueOrDefault(beat) ?? new List<DrumOnsetCandidate>();
 
                 int totalForBeat = protectedList.Count + unprotectedList.Count;
                 if (totalForBeat <= maxPerBeat)
@@ -452,15 +452,15 @@ namespace Music.Generator.Agents.Drums.Physicality
         /// <summary>
         /// Applies per-bar cap.
         /// </summary>
-        private IReadOnlyList<GrooveOnsetCandidate> ApplyBarCap(
-            IReadOnlyList<GrooveOnsetCandidate> candidates)
+        private IReadOnlyList<DrumOnsetCandidate> ApplyBarCap(
+            IReadOnlyList<DrumOnsetCandidate> candidates)
         {
             int? maxHits = _rules.MaxHitsPerBar;
             if (!maxHits.HasValue || candidates.Count <= maxHits.Value)
                 return candidates;
 
-            var protectedCandidates = new List<GrooveOnsetCandidate>();
-            var unprotectedCandidates = new List<GrooveOnsetCandidate>();
+            var protectedCandidates = new List<DrumOnsetCandidate>();
+            var unprotectedCandidates = new List<DrumOnsetCandidate>();
 
             foreach (var candidate in candidates)
             {
@@ -491,7 +491,7 @@ namespace Music.Generator.Agents.Drums.Physicality
                 _diagnosticsCollector?.RecordPrune(id, "Overcrowding:MaxHitsPerBar", false);
             }
 
-            var result = new List<GrooveOnsetCandidate>(protectedCandidates);
+            var result = new List<DrumOnsetCandidate>(protectedCandidates);
             result.AddRange(selected);
             return result;
         }
@@ -499,8 +499,8 @@ namespace Music.Generator.Agents.Drums.Physicality
         /// <summary>
         /// Sorts candidates by score descending with deterministic tie-break.
         /// </summary>
-        private static List<GrooveOnsetCandidate> SortByScoreDescending(
-            IEnumerable<GrooveOnsetCandidate> candidates)
+        private static List<DrumOnsetCandidate> SortByScoreDescending(
+            IEnumerable<DrumOnsetCandidate> candidates)
         {
             return candidates
                 .OrderByDescending(c => c.ProbabilityBias)
@@ -518,3 +518,4 @@ namespace Music.Generator.Agents.Drums.Physicality
         }
     }
 }
+

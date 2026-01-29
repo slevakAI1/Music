@@ -220,7 +220,7 @@ namespace Music.Generator.Agents.Drums.Tests
         #region Mapping Tests
 
         [Fact]
-        public void GetCandidateGroups_MapsDrumCandidate_ToGrooveOnsetCandidate()
+        public void GetCandidateGroups_MapsDrumCandidate_ToDrumOnsetCandidate()
         {
             // Arrange
             var registry = CreateRegistryWithTestOperators();
@@ -434,3 +434,4 @@ namespace Music.Generator.Agents.Drums.Tests
         #endregion
     }
 }
+

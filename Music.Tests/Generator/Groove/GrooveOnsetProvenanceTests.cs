@@ -2,6 +2,7 @@
 // AI: deps=xunit for test framework; Music.Generator for types under test.
 // AI: change=Story G2 acceptance criteria: verify provenance fields, stability, and preservation.
 
+using Music.Generator.Agents.Drums;
 using Music.Generator.Groove;
 using Xunit;
 
@@ -196,18 +197,18 @@ public class GrooveOnsetProvenanceTests
     public void FromVariation_CreatesOnsetWithVariationProvenance()
     {
         // Arrange
-        var candidate = new GrooveOnsetCandidate
+        var candidate = new DrumOnsetCandidate
         {
             Role = "Snare",
             OnsetBeat = 1.5m,
             Strength = OnsetStrength.Ghost,
             ProbabilityBias = 0.5
         };
-        var group = new GrooveCandidateGroup
+        var group = new DrumCandidateGroup
         {
             GroupId = "GhostSnare",
             BaseProbabilityBias = 1.0,
-            Candidates = new List<GrooveOnsetCandidate> { candidate }
+            Candidates = new List<DrumOnsetCandidate> { candidate }
         };
 
         // Act
@@ -224,18 +225,18 @@ public class GrooveOnsetProvenanceTests
     public void FromVariation_CopiesCandidateProperties()
     {
         // Arrange
-        var candidate = new GrooveOnsetCandidate
+        var candidate = new DrumOnsetCandidate
         {
             Role = "ClosedHat",
             OnsetBeat = 2.5m,
             Strength = OnsetStrength.Offbeat,
             ProbabilityBias = 0.8
         };
-        var group = new GrooveCandidateGroup
+        var group = new DrumCandidateGroup
         {
             GroupId = "HatGhost",
             BaseProbabilityBias = 1.0,
-            Candidates = new List<GrooveOnsetCandidate> { candidate }
+            Candidates = new List<DrumOnsetCandidate> { candidate }
         };
 
         // Act
@@ -252,18 +253,18 @@ public class GrooveOnsetProvenanceTests
     public void FromVariation_IncludesEnabledTags()
     {
         // Arrange
-        var candidate = new GrooveOnsetCandidate
+        var candidate = new DrumOnsetCandidate
         {
             Role = "Snare",
             OnsetBeat = 4.75m,
             Strength = OnsetStrength.Pickup,
             ProbabilityBias = 0.3
         };
-        var group = new GrooveCandidateGroup
+        var group = new DrumCandidateGroup
         {
             GroupId = "Pickups",
             BaseProbabilityBias = 0.6,
-            Candidates = new List<GrooveOnsetCandidate> { candidate }
+            Candidates = new List<DrumOnsetCandidate> { candidate }
         };
         var enabledTags = new List<string> { "Fill", "Chorus" };
 
@@ -279,18 +280,18 @@ public class GrooveOnsetProvenanceTests
     public void FromWeightedCandidate_CreatesOnsetWithProvenance()
     {
         // Arrange
-        var candidate = new GrooveOnsetCandidate
+        var candidate = new DrumOnsetCandidate
         {
             Role = "Kick",
             OnsetBeat = 4.75m,
             Strength = OnsetStrength.Pickup,
             ProbabilityBias = 0.4
         };
-        var group = new GrooveCandidateGroup
+        var group = new DrumCandidateGroup
         {
             GroupId = "KickPickup",
             BaseProbabilityBias = 0.6,
-            Candidates = new List<GrooveOnsetCandidate> { candidate }
+            Candidates = new List<DrumOnsetCandidate> { candidate }
         };
         var weighted = new WeightedCandidate(candidate, group, ComputedWeight: 0.24, StableId: "KickPickup:4.7500");
 
@@ -368,17 +369,17 @@ public class GrooveOnsetProvenanceTests
     public void Provenance_IsStable_ForIdenticalVariationCreation()
     {
         // Arrange
-        var candidate = new GrooveOnsetCandidate
+        var candidate = new DrumOnsetCandidate
         {
             Role = "Snare",
             OnsetBeat = 1.5m,
             ProbabilityBias = 0.5
         };
-        var group = new GrooveCandidateGroup
+        var group = new DrumCandidateGroup
         {
             GroupId = "TestGroup",
             BaseProbabilityBias = 1.0,
-            Candidates = new List<GrooveOnsetCandidate> { candidate }
+            Candidates = new List<DrumOnsetCandidate> { candidate }
         };
 
         // Act - create same variation onset twice
@@ -397,8 +398,8 @@ public class GrooveOnsetProvenanceTests
         // Arrange - two onsets with same position but different provenance
         var anchor = GrooveOnsetFactory.FromAnchor("Kick", 1, 1.0m);
 
-        var candidate = new GrooveOnsetCandidate { Role = "Kick", OnsetBeat = 1.0m, ProbabilityBias = 1.0 };
-        var group = new GrooveCandidateGroup { GroupId = "Test", BaseProbabilityBias = 1.0, Candidates = new() { candidate } };
+        var candidate = new DrumOnsetCandidate { Role = "Kick", OnsetBeat = 1.0m, ProbabilityBias = 1.0 };
+        var group = new DrumCandidateGroup { GroupId = "Test", BaseProbabilityBias = 1.0, Candidates = new() { candidate } };
         var variation = GrooveOnsetFactory.FromVariation(candidate, group, 1);
 
         // Assert - they are not equal due to different provenance
@@ -430,11 +431,11 @@ public class GrooveOnsetProvenanceTests
     public void VariationProvenance_DistinguishesDifferentGroups()
     {
         // Arrange
-        var candidate1 = new GrooveOnsetCandidate { Role = "Snare", OnsetBeat = 1.5m, ProbabilityBias = 0.5 };
-        var group1 = new GrooveCandidateGroup { GroupId = "GhostSnare", BaseProbabilityBias = 0.5, Candidates = new() { candidate1 } };
+        var candidate1 = new DrumOnsetCandidate { Role = "Snare", OnsetBeat = 1.5m, ProbabilityBias = 0.5 };
+        var group1 = new DrumCandidateGroup { GroupId = "GhostSnare", BaseProbabilityBias = 0.5, Candidates = new() { candidate1 } };
 
-        var candidate2 = new GrooveOnsetCandidate { Role = "Snare", OnsetBeat = 1.5m, ProbabilityBias = 0.5 };
-        var group2 = new GrooveCandidateGroup { GroupId = "PickupSnare", BaseProbabilityBias = 0.6, Candidates = new() { candidate2 } };
+        var candidate2 = new DrumOnsetCandidate { Role = "Snare", OnsetBeat = 1.5m, ProbabilityBias = 0.5 };
+        var group2 = new DrumCandidateGroup { GroupId = "PickupSnare", BaseProbabilityBias = 0.6, Candidates = new() { candidate2 } };
 
         // Act
         var onset1 = GrooveOnsetFactory.FromVariation(candidate1, group1, 1);
@@ -447,3 +448,4 @@ public class GrooveOnsetProvenanceTests
 
     #endregion
 }
+

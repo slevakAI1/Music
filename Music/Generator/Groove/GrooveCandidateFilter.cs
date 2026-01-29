@@ -1,7 +1,9 @@
 // AI: purpose=Filters groove candidate groups and candidates by enabled tags (Story B2).
 // AI: invariants=Deterministic filtering; empty/null tags = "match all"; same inputs => same output.
-// AI: deps=GrooveCandidateGroup, GrooveOnsetCandidate, SegmentGrooveProfile, GroovePhraseHookPolicy, GroovePolicyDecision.
+// AI: deps=DrumCandidateGroup, DrumOnsetCandidate, SegmentGrooveProfile, GroovePhraseHookPolicy, GroovePolicyDecision.
 // AI: change=Story B2 acceptance criteria: resolve tags, filter groups/candidates by tag intersection.
+
+using Music.Generator.Agents.Drums;
 
 namespace Music.Generator.Groove
 {
@@ -64,14 +66,14 @@ namespace Music.Generator.Groove
         /// <param name="groups">Candidate groups to filter.</param>
         /// <param name="enabledTags">Currently enabled tags.</param>
         /// <returns>Filtered groups in deterministic order (preserves input order).</returns>
-        public static IReadOnlyList<GrooveCandidateGroup> FilterGroups(
-            IEnumerable<GrooveCandidateGroup> groups,
+        public static IReadOnlyList<DrumCandidateGroup> FilterGroups(
+            IEnumerable<DrumCandidateGroup> groups,
             IReadOnlySet<string> enabledTags)
         {
             ArgumentNullException.ThrowIfNull(groups);
             ArgumentNullException.ThrowIfNull(enabledTags);
 
-            var result = new List<GrooveCandidateGroup>();
+            var result = new List<DrumCandidateGroup>();
 
             foreach (var group in groups)
             {
@@ -92,14 +94,14 @@ namespace Music.Generator.Groove
         /// <param name="candidates">Candidates to filter.</param>
         /// <param name="enabledTags">Currently enabled tags.</param>
         /// <returns>Filtered candidates in deterministic order (preserves input order).</returns>
-        public static IReadOnlyList<GrooveOnsetCandidate> FilterCandidates(
-            IEnumerable<GrooveOnsetCandidate> candidates,
+        public static IReadOnlyList<DrumOnsetCandidate> FilterCandidates(
+            IEnumerable<DrumOnsetCandidate> candidates,
             IReadOnlySet<string> enabledTags)
         {
             ArgumentNullException.ThrowIfNull(candidates);
             ArgumentNullException.ThrowIfNull(enabledTags);
 
-            var result = new List<GrooveOnsetCandidate>();
+            var result = new List<DrumOnsetCandidate>();
 
             foreach (var candidate in candidates)
             {
@@ -119,14 +121,14 @@ namespace Music.Generator.Groove
         /// <param name="groups">Candidate groups to filter.</param>
         /// <param name="enabledTags">Currently enabled tags.</param>
         /// <returns>Filtered groups with filtered candidates, in deterministic order.</returns>
-        public static IReadOnlyList<GrooveCandidateGroup> FilterGroupsAndCandidates(
-            IEnumerable<GrooveCandidateGroup> groups,
+        public static IReadOnlyList<DrumCandidateGroup> FilterGroupsAndCandidates(
+            IEnumerable<DrumCandidateGroup> groups,
             IReadOnlySet<string> enabledTags)
         {
             ArgumentNullException.ThrowIfNull(groups);
             ArgumentNullException.ThrowIfNull(enabledTags);
 
-            var result = new List<GrooveCandidateGroup>();
+            var result = new List<DrumCandidateGroup>();
 
             foreach (var group in groups)
             {
@@ -141,7 +143,7 @@ namespace Music.Generator.Groove
                 if (filteredCandidates.Count > 0)
                 {
                     // Create a new group with filtered candidates (preserve other properties)
-                    var filteredGroup = new GrooveCandidateGroup
+                    var filteredGroup = new DrumCandidateGroup
                     {
                         GroupId = group.GroupId,
                         GroupTags = group.GroupTags,
@@ -161,7 +163,7 @@ namespace Music.Generator.Groove
         /// Empty/null GroupTags = "match all" (always matches).
         /// Non-empty GroupTags = match if ANY tag intersects with enabledTags.
         /// </summary>
-        private static bool GroupMatchesTags(GrooveCandidateGroup group, IReadOnlySet<string> enabledTags)
+        private static bool GroupMatchesTags(DrumCandidateGroup group, IReadOnlySet<string> enabledTags)
         {
             // Story B2: Treat empty/null GroupTags as "match all"
             if (group.GroupTags is null || group.GroupTags.Count == 0)
@@ -186,7 +188,7 @@ namespace Music.Generator.Groove
         /// Empty/null Tags = "match all" (always matches).
         /// Non-empty Tags = match if ANY tag intersects with enabledTags.
         /// </summary>
-        private static bool CandidateMatchesTags(GrooveOnsetCandidate candidate, IReadOnlySet<string> enabledTags)
+        private static bool CandidateMatchesTags(DrumOnsetCandidate candidate, IReadOnlySet<string> enabledTags)
         {
             // Story B2: Treat empty/null Candidate.Tags as "match all"
             if (candidate.Tags is null || candidate.Tags.Count == 0)

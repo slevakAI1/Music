@@ -1,7 +1,9 @@
 // AI: purpose=Merges variation layers from GrooveVariationCatalog with tag-gated additive/replace logic (Story B1).
 // AI: invariants=Deterministic ordering; same inputs => same output; stable sort by layer order + group id.
-// AI: deps=GrooveVariationCatalog, GrooveVariationLayer, GrooveCandidateGroup from Groove.cs.
+// AI: deps=GrooveVariationCatalog, GrooveVariationLayer, DrumCandidateGroup from Groove.cs.
 // AI: change=Story B1 acceptance criteria: iterate layers, apply tags, merge additive/replace, preserve ordering.
+
+using Music.Generator.Agents.Drums;
 
 namespace Music.Generator.Groove
 {
@@ -18,7 +20,7 @@ namespace Music.Generator.Groove
         /// <param name="catalog">The variation catalog containing hierarchical layers.</param>
         /// <param name="enabledTags">Tags currently enabled for this bar/segment.</param>
         /// <returns>Merged candidate groups in deterministic order (by layer order, then group id).</returns>
-        public static IReadOnlyList<GrooveCandidateGroup> MergeLayersForBar(
+        public static IReadOnlyList<DrumCandidateGroup> MergeLayersForBar(
             GrooveVariationCatalog catalog,
             IReadOnlySet<string> enabledTags)
         {
@@ -26,7 +28,7 @@ namespace Music.Generator.Groove
             ArgumentNullException.ThrowIfNull(enabledTags);
 
             // Working set of merged groups, keyed by GroupId for deduplication
-            var workingSet = new Dictionary<string, GrooveCandidateGroup>(StringComparer.Ordinal);
+            var workingSet = new Dictionary<string, DrumCandidateGroup>(StringComparer.Ordinal);
 
             // Track layer order for stable sorting
             var groupLayerOrder = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -90,7 +92,7 @@ namespace Music.Generator.Groove
         /// </summary>
         private static void ApplyAdditiveLayer(
             GrooveVariationLayer layer,
-            Dictionary<string, GrooveCandidateGroup> workingSet,
+            Dictionary<string, DrumCandidateGroup> workingSet,
             Dictionary<string, int> groupLayerOrder,
             int layerIndex)
         {
@@ -110,7 +112,7 @@ namespace Music.Generator.Groove
         /// </summary>
         private static void ApplyReplaceLayer(
             GrooveVariationLayer layer,
-            Dictionary<string, GrooveCandidateGroup> workingSet,
+            Dictionary<string, DrumCandidateGroup> workingSet,
             Dictionary<string, int> groupLayerOrder,
             int layerIndex)
         {
@@ -129,8 +131,8 @@ namespace Music.Generator.Groove
         /// <summary>
         /// Sorts groups deterministically by layer order (ascending), then by GroupId (ordinal).
         /// </summary>
-        private static IReadOnlyList<GrooveCandidateGroup> SortGroupsDeterministically(
-            IEnumerable<GrooveCandidateGroup> groups,
+        private static IReadOnlyList<DrumCandidateGroup> SortGroupsDeterministically(
+            IEnumerable<DrumCandidateGroup> groups,
             Dictionary<string, int> groupLayerOrder)
         {
             return groups
@@ -140,3 +142,4 @@ namespace Music.Generator.Groove
         }
     }
 }
+

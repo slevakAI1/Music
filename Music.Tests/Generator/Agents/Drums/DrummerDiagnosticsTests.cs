@@ -402,3 +402,4 @@ public sealed class DrummerDiagnosticsTests
 
     #endregion
 }
+

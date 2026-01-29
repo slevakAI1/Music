@@ -2,6 +2,7 @@
 // AI: deps=xunit for test framework; Music.Generator for types under test.
 // AI: change=Story B1 acceptance criteria: test additive union, replace, tag-gated apply/skip, deterministic ordering.
 
+using Music.Generator.Agents.Drums;
 using Music.Generator.Groove;
 using Xunit;
 
@@ -69,8 +70,8 @@ namespace Music.Generator.Tests
         public void MergeLayersForBar_AdditiveLayer_FirstWinsOnDuplicate()
         {
             // Arrange - GroupA in Layer1 has bias 0.5, GroupA in Layer2 has bias 0.9
-            var layer1GroupA = new GrooveCandidateGroup { GroupId = "GroupA", BaseProbabilityBias = 0.5 };
-            var layer2GroupA = new GrooveCandidateGroup { GroupId = "GroupA", BaseProbabilityBias = 0.9 };
+            var layer1GroupA = new DrumCandidateGroup { GroupId = "GroupA", BaseProbabilityBias = 0.5 };
+            var layer2GroupA = new DrumCandidateGroup { GroupId = "GroupA", BaseProbabilityBias = 0.9 };
 
             var catalog = new GrooveVariationCatalog
             {
@@ -80,13 +81,13 @@ namespace Music.Generator.Tests
                     {
                         LayerId = "Layer1",
                         IsAdditiveOnly = true,
-                        CandidateGroups = new List<GrooveCandidateGroup> { layer1GroupA }
+                        CandidateGroups = new List<DrumCandidateGroup> { layer1GroupA }
                     },
                     new GrooveVariationLayer
                     {
                         LayerId = "Layer2",
                         IsAdditiveOnly = true,
-                        CandidateGroups = new List<GrooveCandidateGroup> { layer2GroupA }
+                        CandidateGroups = new List<DrumCandidateGroup> { layer2GroupA }
                     }
                 }
             };
@@ -457,7 +458,7 @@ namespace Music.Generator.Tests
                     {
                         LayerId = "EmptyLayer",
                         IsAdditiveOnly = true,
-                        CandidateGroups = new List<GrooveCandidateGroup>()
+                        CandidateGroups = new List<DrumCandidateGroup>()
                     }
                 }
             };
@@ -481,7 +482,7 @@ namespace Music.Generator.Tests
                 LayerId = layerId,
                 IsAdditiveOnly = isAdditive,
                 AppliesWhenTagsAll = new List<string>(),
-                CandidateGroups = groups.Select(g => new GrooveCandidateGroup { GroupId = g }).ToList()
+                CandidateGroups = groups.Select(g => new DrumCandidateGroup { GroupId = g }).ToList()
             };
         }
 
@@ -492,10 +493,11 @@ namespace Music.Generator.Tests
                 LayerId = layerId,
                 IsAdditiveOnly = isAdditive,
                 AppliesWhenTagsAll = requiredTags.ToList(),
-                CandidateGroups = groups.Select(g => new GrooveCandidateGroup { GroupId = g }).ToList()
+                CandidateGroups = groups.Select(g => new DrumCandidateGroup { GroupId = g }).ToList()
             };
         }
 
         #endregion
     }
 }
+

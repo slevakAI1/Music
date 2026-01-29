@@ -591,3 +591,4 @@ public class RoleTimingEngineTests
         Assert.Equal(expectedClamped, diagnostics.WasClamped);
     }
 }
+

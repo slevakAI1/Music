@@ -2,6 +2,7 @@
 // AI: deps=xunit for test framework; Music.Generator for types under test.
 // AI: change=Story B2 acceptance criteria: test tag resolution, group/candidate filtering, empty-tag semantics, determinism.
 
+using Music.Generator.Agents.Drums;
 using Music.Generator.Groove;
 using Xunit;
 
@@ -135,7 +136,7 @@ namespace Music.Generator.Tests
         public void FilterGroups_GroupWithMatchingTag_Included()
         {
             // Arrange
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
                 CreateGroup("Group1", new[] { "Fill", "Drive" }),
                 CreateGroup("Group2", new[] { "Ghost" })
@@ -154,7 +155,7 @@ namespace Music.Generator.Tests
         public void FilterGroups_GroupWithNoMatchingTag_Excluded()
         {
             // Arrange
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
                 CreateGroup("Group1", new[] { "Fill" }),
                 CreateGroup("Group2", new[] { "Ghost" })
@@ -172,7 +173,7 @@ namespace Music.Generator.Tests
         public void FilterGroups_EmptyGroupTags_AlwaysMatches()
         {
             // Arrange - Story B2: "Treat empty/null GroupTags as match all"
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
                 CreateGroup("Group1", Array.Empty<string>()), // Empty tags
                 CreateGroup("Group2", new[] { "Fill" })
@@ -191,8 +192,8 @@ namespace Music.Generator.Tests
         public void FilterGroups_NullGroupTags_AlwaysMatches()
         {
             // Arrange
-            var group = new GrooveCandidateGroup { GroupId = "Group1", GroupTags = null! };
-            var groups = new List<GrooveCandidateGroup> { group };
+            var group = new DrumCandidateGroup { GroupId = "Group1", GroupTags = null! };
+            var groups = new List<DrumCandidateGroup> { group };
             var enabledTags = new HashSet<string> { "Drive" };
 
             // Act
@@ -206,7 +207,7 @@ namespace Music.Generator.Tests
         public void FilterGroups_AnyTagIntersection_Matches()
         {
             // Arrange - Group has multiple tags, only one needs to match
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
                 CreateGroup("Group1", new[] { "Fill", "Pickup", "Drive" })
             };
@@ -223,7 +224,7 @@ namespace Music.Generator.Tests
         public void FilterGroups_PreservesInputOrder()
         {
             // Arrange
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
                 CreateGroup("GroupZ", Array.Empty<string>()),
                 CreateGroup("GroupA", Array.Empty<string>()),
@@ -249,7 +250,7 @@ namespace Music.Generator.Tests
         public void FilterCandidates_CandidateWithMatchingTag_Included()
         {
             // Arrange
-            var candidates = new List<GrooveOnsetCandidate>
+            var candidates = new List<DrumOnsetCandidate>
             {
                 CreateCandidate(1.0m, new[] { "Fill" }),
                 CreateCandidate(2.0m, new[] { "Ghost" })
@@ -268,7 +269,7 @@ namespace Music.Generator.Tests
         public void FilterCandidates_EmptyCandidateTags_AlwaysMatches()
         {
             // Arrange - Story B2: "Treat empty/null Candidate.Tags as match all"
-            var candidates = new List<GrooveOnsetCandidate>
+            var candidates = new List<DrumOnsetCandidate>
             {
                 CreateCandidate(1.0m, Array.Empty<string>()), // Empty tags
                 CreateCandidate(2.0m, new[] { "Ghost" })
@@ -287,8 +288,8 @@ namespace Music.Generator.Tests
         public void FilterCandidates_NullCandidateTags_AlwaysMatches()
         {
             // Arrange
-            var candidate = new GrooveOnsetCandidate { OnsetBeat = 1.0m, Tags = null! };
-            var candidates = new List<GrooveOnsetCandidate> { candidate };
+            var candidate = new DrumOnsetCandidate { OnsetBeat = 1.0m, Tags = null! };
+            var candidates = new List<DrumOnsetCandidate> { candidate };
             var enabledTags = new HashSet<string> { "Drive" };
 
             // Act
@@ -302,7 +303,7 @@ namespace Music.Generator.Tests
         public void FilterCandidates_PreservesInputOrder()
         {
             // Arrange
-            var candidates = new List<GrooveOnsetCandidate>
+            var candidates = new List<DrumOnsetCandidate>
             {
                 CreateCandidate(3.0m, Array.Empty<string>()),
                 CreateCandidate(1.0m, Array.Empty<string>()),
@@ -328,13 +329,13 @@ namespace Music.Generator.Tests
         public void FilterGroupsAndCandidates_FiltersAtBothLevels()
         {
             // Arrange
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "FillGroup",
                     GroupTags = new List<string> { "Fill" },
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
                         CreateCandidate(1.0m, new[] { "Fill" }),
                         CreateCandidate(2.0m, new[] { "Pickup" }), // Won't match
@@ -359,13 +360,13 @@ namespace Music.Generator.Tests
         public void FilterGroupsAndCandidates_ExcludesGroupsWithNoCandidatesAfterFiltering()
         {
             // Arrange
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
-                new GrooveCandidateGroup
+                new DrumCandidateGroup
                 {
                     GroupId = "Group1",
                     GroupTags = new List<string>(), // Empty = match all
-                    Candidates = new List<GrooveOnsetCandidate>
+                    Candidates = new List<DrumOnsetCandidate>
                     {
                         CreateCandidate(1.0m, new[] { "Ghost" }) // Won't match
                     }
@@ -388,7 +389,7 @@ namespace Music.Generator.Tests
         public void FilterGroups_IsDeterministic_MultipleRuns()
         {
             // Arrange
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
                 CreateGroup("GroupA", new[] { "Fill" }),
                 CreateGroup("GroupB", new[] { "Drive" }),
@@ -411,7 +412,7 @@ namespace Music.Generator.Tests
         public void FilteringAcrossMultipleBars_DeterministicWithDifferentTags()
         {
             // Arrange - Simulate filtering across multiple bars with different segment tags
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
                 CreateGroup("BaseGroup", Array.Empty<string>()),
                 CreateGroup("FillGroup", new[] { "Fill" }),
@@ -451,7 +452,7 @@ namespace Music.Generator.Tests
         public void FilterGroups_EmptyGroupsList_ReturnsEmpty()
         {
             // Arrange
-            var groups = new List<GrooveCandidateGroup>();
+            var groups = new List<DrumCandidateGroup>();
             var enabledTags = new HashSet<string> { "Fill" };
 
             // Act
@@ -465,7 +466,7 @@ namespace Music.Generator.Tests
         public void FilterGroups_EmptyEnabledTags_OnlyMatchesEmptyTagGroups()
         {
             // Arrange
-            var groups = new List<GrooveCandidateGroup>
+            var groups = new List<DrumCandidateGroup>
             {
                 CreateGroup("Group1", Array.Empty<string>()), // Empty = match all
                 CreateGroup("Group2", new[] { "Fill" }) // Has tags, won't match empty enabledTags
@@ -495,7 +496,7 @@ namespace Music.Generator.Tests
         public void FilterGroups_NullEnabledTags_ThrowsArgumentNullException()
         {
             // Arrange
-            var groups = new List<GrooveCandidateGroup>();
+            var groups = new List<DrumCandidateGroup>();
 
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
@@ -506,19 +507,19 @@ namespace Music.Generator.Tests
 
         #region Test Helpers
 
-        private static GrooveCandidateGroup CreateGroup(string groupId, string[] tags)
+        private static DrumCandidateGroup CreateGroup(string groupId, string[] tags)
         {
-            return new GrooveCandidateGroup
+            return new DrumCandidateGroup
             {
                 GroupId = groupId,
                 GroupTags = tags.ToList(),
-                Candidates = new List<GrooveOnsetCandidate>()
+                Candidates = new List<DrumOnsetCandidate>()
             };
         }
 
-        private static GrooveOnsetCandidate CreateCandidate(decimal beat, string[] tags)
+        private static DrumOnsetCandidate CreateCandidate(decimal beat, string[] tags)
         {
-            return new GrooveOnsetCandidate
+            return new DrumOnsetCandidate
             {
                 OnsetBeat = beat,
                 Tags = tags.ToList()
@@ -528,3 +529,5 @@ namespace Music.Generator.Tests
         #endregion
     }
 }
+
+

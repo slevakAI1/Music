@@ -270,3 +270,4 @@ namespace Music.Tests.Generator.Agents.Drums.Snapshots
         }
     }
 }
+

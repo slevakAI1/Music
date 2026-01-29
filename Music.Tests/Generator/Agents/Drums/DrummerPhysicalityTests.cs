@@ -31,7 +31,7 @@ namespace Music.Generator.Agents.Drums.Tests
             var filter = new PhysicalityFilter(rules);
 
             var candidate = CreateGrooveCandidate("Snare", 2.0m);
-            var candidates = new List<GrooveOnsetCandidate> { candidate };
+            var candidates = new List<DrumOnsetCandidate> { candidate };
 
             // Act
             var filtered = filter.Filter(candidates, barNumber: 1);
@@ -49,7 +49,7 @@ namespace Music.Generator.Agents.Drums.Tests
             var filter = new PhysicalityFilter(rules);
 
             var protectedOnset = CreateGrooveCandidate("Snare", 2.0m, isProtected: true);
-            var candidates = new List<GrooveOnsetCandidate> { protectedOnset };
+            var candidates = new List<DrumOnsetCandidate> { protectedOnset };
 
             // Act
             var filtered = filter.Filter(candidates, barNumber: 1);
@@ -126,12 +126,12 @@ namespace Music.Generator.Agents.Drums.Tests
 
         #region Helper Methods
 
-        private static GrooveOnsetCandidate CreateGrooveCandidate(
+        private static DrumOnsetCandidate CreateGrooveCandidate(
             string role,
             decimal beat,
             bool isProtected = false)
         {
-            var candidate = new GrooveOnsetCandidate
+            var candidate = new DrumOnsetCandidate
             {
                 Role = role,
                 OnsetBeat = beat,
@@ -154,4 +154,5 @@ namespace Music.Generator.Agents.Drums.Tests
         #endregion
     }
 }
+
 

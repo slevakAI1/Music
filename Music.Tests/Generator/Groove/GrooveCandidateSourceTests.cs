@@ -2,6 +2,7 @@
 // AI: deps=xunit for test framework; Music.Generator for types under test.
 // AI: change=Story B4 acceptance criteria: test adapter output equals direct catalog processing.
 
+using Music.Generator.Agents.Drums;
 using Music.Generator.Groove;
 using Xunit;
 
@@ -125,7 +126,7 @@ namespace Music.Generator.Tests
                     {
                         LayerId = "Base",
                         IsAdditiveOnly = true,
-                        CandidateGroups = new List<GrooveCandidateGroup>
+                        CandidateGroups = new List<DrumCandidateGroup>
                         {
                             CreateGroup("GroupA", Array.Empty<string>())
                         }
@@ -134,7 +135,7 @@ namespace Music.Generator.Tests
                     {
                         LayerId = "Refinement",
                         IsAdditiveOnly = true,
-                        CandidateGroups = new List<GrooveCandidateGroup>
+                        CandidateGroups = new List<DrumCandidateGroup>
                         {
                             CreateGroup("GroupB", Array.Empty<string>())
                         }
@@ -163,7 +164,7 @@ namespace Music.Generator.Tests
                     {
                         LayerId = "Base",
                         IsAdditiveOnly = true,
-                        CandidateGroups = new List<GrooveCandidateGroup>
+                        CandidateGroups = new List<DrumCandidateGroup>
                         {
                             CreateGroup("GroupA", Array.Empty<string>())
                         }
@@ -172,7 +173,7 @@ namespace Music.Generator.Tests
                     {
                         LayerId = "Replace",
                         IsAdditiveOnly = false, // Replace
-                        CandidateGroups = new List<GrooveCandidateGroup>
+                        CandidateGroups = new List<DrumCandidateGroup>
                         {
                             CreateGroup("GroupB", Array.Empty<string>())
                         }
@@ -231,7 +232,7 @@ namespace Music.Generator.Tests
                     {
                         LayerId = "Base",
                         IsAdditiveOnly = true,
-                        CandidateGroups = new List<GrooveCandidateGroup>
+                        CandidateGroups = new List<DrumCandidateGroup>
                         {
                             CreateGroup("AlwaysGroup", Array.Empty<string>()) // Empty = match all
                         }
@@ -387,7 +388,7 @@ namespace Music.Generator.Tests
                     {
                         LayerId = "Base",
                         IsAdditiveOnly = true,
-                        CandidateGroups = new List<GrooveCandidateGroup>
+                        CandidateGroups = new List<DrumCandidateGroup>
                         {
                             CreateGroup("DriveGroup", new[] { "Drive" }),
                             CreateGroup("GhostGroup", new[] { "Ghost" })
@@ -407,7 +408,7 @@ namespace Music.Generator.Tests
                     {
                         LayerId = "Base",
                         IsAdditiveOnly = true,
-                        CandidateGroups = new List<GrooveCandidateGroup>
+                        CandidateGroups = new List<DrumCandidateGroup>
                         {
                             CreateGroup("DriveGroup", new[] { "Drive" }),
                             CreateGroup("FillGroup", new[] { "Fill" })
@@ -417,16 +418,16 @@ namespace Music.Generator.Tests
             };
         }
 
-        private static GrooveCandidateGroup CreateGroup(string groupId, string[] tags)
+        private static DrumCandidateGroup CreateGroup(string groupId, string[] tags)
         {
-            return new GrooveCandidateGroup
+            return new DrumCandidateGroup
             {
                 GroupId = groupId,
                 GroupTags = tags.ToList(),
                 BaseProbabilityBias = 1.0,
-                Candidates = new List<GrooveOnsetCandidate>
+                Candidates = new List<DrumOnsetCandidate>
                 {
-                    new GrooveOnsetCandidate
+                    new DrumOnsetCandidate
                     {
                         OnsetBeat = 1.0m,
                         ProbabilityBias = 0.5,
@@ -467,3 +468,5 @@ namespace Music.Generator.Tests
         #endregion
     }
 }
+
+

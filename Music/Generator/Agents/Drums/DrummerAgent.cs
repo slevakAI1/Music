@@ -131,7 +131,7 @@ namespace Music.Generator.Agents.Drums
         #region IGrooveCandidateSource Implementation
 
         /// <inheritdoc />
-        public IReadOnlyList<GrooveCandidateGroup> GetCandidateGroups(
+        public IReadOnlyList<DrumCandidateGroup> GetCandidateGroups(
             GrooveBarContext barContext,
             string role)
         {

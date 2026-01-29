@@ -225,7 +225,7 @@ public class OnsetStrengthClassifierTests
     }
 
     // ========================================================================
-    // AC 6: Support explicit GrooveOnsetCandidate.Strength override
+    // AC 6: Support explicit DrumOnsetCandidate.Strength override
     // ========================================================================
 
     [Fact]
@@ -497,4 +497,5 @@ public class OnsetStrengthClassifierTests
         Assert.Equal(OnsetStrength.Pickup, pickup);
     }
 }
+
 

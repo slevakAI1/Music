@@ -1,7 +1,9 @@
 // AI: purpose=Define candidate source interface for groove system (Story B4).
 // AI: invariants=Implementations must be deterministic; same inputs => same output.
-// AI: deps=GrooveBarContext for bar context; GrooveCandidateGroup for return type.
+// AI: deps=GrooveBarContext for bar context; DrumCandidateGroup for return type.
 // AI: change=Story B4 acceptance criteria: abstraction layer for future operator-based drummer logic.
+
+using Music.Generator.Agents.Drums;
 
 namespace Music.Generator.Groove
 {
@@ -31,7 +33,7 @@ namespace Music.Generator.Groove
         /// 
         /// The engine will consume these groups for weighted selection.
         /// </remarks>
-        IReadOnlyList<GrooveCandidateGroup> GetCandidateGroups(
+        IReadOnlyList<DrumCandidateGroup> GetCandidateGroups(
             GrooveBarContext barContext,
             string role);
     }

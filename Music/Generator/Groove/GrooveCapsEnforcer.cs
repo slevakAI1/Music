@@ -3,6 +3,8 @@
 // AI: deps=GrooveOverrideMergePolicy, OverrideMergePolicyEnforcer, GrooveDiagnosticsCollector for decision tracing.
 // AI: change=Story G1: Uses structured GrooveDiagnosticsCollector instead of string diagnostics.
 
+using Music.Generator.Agents.Drums;
+
 namespace Music.Generator.Groove
 {
     /// <summary>
@@ -520,7 +522,7 @@ namespace Music.Generator.Groove
             return score;
         }
 
-        private GrooveOnsetCandidate? FindCandidate(GrooveOnset onset, GrooveVariationCatalog catalog)
+        private DrumOnsetCandidate? FindCandidate(GrooveOnset onset, GrooveVariationCatalog catalog)
         {
             foreach (var layer in catalog.HierarchyLayers)
             {
@@ -541,7 +543,7 @@ namespace Music.Generator.Groove
             return null;
         }
 
-        private GrooveCandidateGroup? FindGroup(string groupId, GrooveVariationCatalog catalog)
+        private DrumCandidateGroup? FindGroup(string groupId, GrooveVariationCatalog catalog)
         {
             foreach (var layer in catalog.HierarchyLayers)
             {
@@ -554,3 +556,4 @@ namespace Music.Generator.Groove
         }
     }
 }
+

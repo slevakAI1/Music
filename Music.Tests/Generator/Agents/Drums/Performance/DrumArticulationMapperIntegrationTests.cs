@@ -198,3 +198,4 @@ namespace Music.Tests.Generator.Agents.Drums.Performance
         }
     }
 }
+
