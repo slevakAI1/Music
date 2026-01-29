@@ -28,16 +28,14 @@ namespace Music.MyMidi
 
         // AI: Play: stops existing playback, ensures an output device exists (auto-selects first), then starts playback.
         // AI: edge=If no output device is available Play returns silently; callers should check EnumerateOutputDevices first.
+        // AI: fix=Always get fresh output device to avoid using disposed device from previous Stop().
         public void Play(MidiSongDocument doc)
         {
             // Stop any existing playback first
             Stop();
 
-            // Get or create output device
-            if (_outputDevice == null)
-            {
-                _outputDevice = OutputDevice.GetAll().FirstOrDefault();
-            }
+            // Always get a fresh output device (disposed by previous Stop)
+            _outputDevice = OutputDevice.GetAll().FirstOrDefault();
 
             if (_outputDevice == null)
                 return;

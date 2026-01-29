@@ -58,7 +58,7 @@ namespace Music.Writer
             dgSong.DefaultCellStyle.ForeColor = Color.Black; // had trouble setting this in the forms designer
             dgSong.DefaultCellStyle.BackColor = Color.White;
 
-            cbCommand.SelectedIndex = 1; // harmony groove sync test
+            cbCommand.SelectedIndex = 2; // new groove test command
 
             // Configure dgSong with MIDI instrument dropdown
             SongGridManager.ConfigureSongGridView(
