@@ -1,11 +1,11 @@
-// AI: purpose=Compute density target count for groove candidate selection (Story C1, F1, 4.2).
+// AI: purpose=Compute density target count for drum candidate selection (moved from Groove in Story 4.3).
 // AI: invariants=Deterministic; same inputs => same output; no RNG; clamps to [0..MaxEvents].
 // AI: deps=GrooveBarContext, RoleDensityTarget, GrooveOrchestrationPolicy, DrumPolicyDecision, GrooveOverrideMergePolicy.
-// AI: change=Story F1, 4.2: OverrideCanRelaxConstraints controls whether segment can increase caps beyond base; updated to use Drum types.
+// AI: change=Story 4.3: Moved from Generator/Groove to Generator/Agents/Drums; domain ownership = Drum Generator.
 
-using Music.Generator.Agents.Drums;
+using Music.Generator.Groove;
 
-namespace Music.Generator.Groove
+namespace Music.Generator.Agents.Drums
 {
     /// <summary>
     /// Result of density target computation with provenance for diagnostics.
@@ -18,11 +18,12 @@ namespace Music.Generator.Groove
         string Explanation);
 
     /// <summary>
-    /// Computes density target count for groove candidate selection.
+    /// Computes density target count for drum candidate selection.
     /// Story C1: Implements role + section + policy-based density calculation.
     /// Story F1: OverrideCanRelaxConstraints controls whether segment can increase caps.
+    /// Story 4.3: Moved to Drum Generator namespace (part-generation concerns).
     /// </summary>
-    public static class GrooveDensityCalculator
+    public static class DrumDensityCalculator
     {
         /// <summary>
         /// Computes the target count of candidates to select for a role in a bar.

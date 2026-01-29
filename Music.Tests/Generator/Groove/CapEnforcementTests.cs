@@ -7,7 +7,7 @@ namespace Music.Tests.Generator.Groove
 {
     public class CapEnforcementTests
     {
-        private readonly GrooveCapsEnforcer _enforcer = new();
+        private readonly DrumCapsEnforcer _enforcer = new();
 
         #region Test Helpers
 

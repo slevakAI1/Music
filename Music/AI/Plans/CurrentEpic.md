@@ -257,9 +257,9 @@ The following classes ALREADY EXIST and should be reused (not recreated):
 
 ---
 
-### Phase 3: UI Integration for Audition
+### Phase 3: UI Integration for Audition (COMPLETED)
 
-#### Story 3.1 — Add Groove Preview Command to WriterForm
+#### Story 3.1 — Add Groove Preview Command to WriterForm (COMPLETED)
 
 **As a** user  
 **I want** to enter a seed and hear the generated groove  
@@ -289,7 +289,7 @@ The following classes ALREADY EXIST and should be reused (not recreated):
 
 ### Phase 4: Move Part-Generation Code to Drum Generator
 
-#### Story 4.1 — Move Candidate Types to Drum Generator
+#### Story 4.1 — Move Candidate Types to Drum Generator (COMPLETED)
 
 **As a** developer  
 **I want** candidate selection logic in the Drum Generator namespace  
@@ -324,7 +324,7 @@ The following classes ALREADY EXIST and should be reused (not recreated):
 
 ---
 
-#### Story 4.2 — Move Policy Interfaces to Drum Generator
+#### Story 4.2 — Move Policy Interfaces to Drum Generator  (COMPLETED)
 
 **As a** developer  
 **I want** policy provider interfaces in the Drum Generator  
@@ -350,7 +350,7 @@ The following classes ALREADY EXIST and should be reused (not recreated):
 
 ---
 
-#### Story 4.3 — Move Density/Caps Logic to Drum Generator
+#### Story 4.3 — Move Density/Caps Logic to Drum Generator (COMPLETED)
 
 **As a** developer  
 **I want** density and caps logic in the Drum Generator  

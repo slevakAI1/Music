@@ -1,8 +1,9 @@
 // AI: purpose=Story H1 narrow integration tests for groove pipeline cross-component verification.
 // AI: invariants=Single bar scope; deterministic; tests component interactions; fast (<2s).
-// AI: deps=GrooveTestSetup, VelocityShaper, FeelTimingEngine, RoleTimingEngine, GrooveCapsEnforcer.
+// AI: deps=GrooveTestSetup, VelocityShaper, FeelTimingEngine, RoleTimingEngine, DrumCapsEnforcer (moved Story 4.3).
 
 using Music.Generator;
+using Music.Generator.Agents.Drums;
 using Music.Generator.Groove;
 using Xunit;
 
@@ -199,7 +200,7 @@ public class GroovePhaseIntegrationTests
             FinalOnsets = new List<GrooveOnset>()
         };
 
-        var enforcer = new GrooveCapsEnforcer();
+        var enforcer = new DrumCapsEnforcer();
 
         // Act
         var result = enforcer.EnforceHardCaps(
@@ -238,7 +239,7 @@ public class GroovePhaseIntegrationTests
             FinalOnsets = new List<GrooveOnset>()
         };
 
-        var enforcer = new GrooveCapsEnforcer();
+        var enforcer = new DrumCapsEnforcer();
 
         // Act
         var result = enforcer.EnforceHardCaps(

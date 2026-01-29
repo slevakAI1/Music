@@ -1,7 +1,9 @@
 // AI: purpose=Enforce override merge policy for segment overrides (Story F1).
 // AI: invariants=Deterministic; same inputs => same output; respects all 4 policy booleans.
-// AI: deps=GrooveOverrideMergePolicy, SegmentGrooveProfile, RoleDensityTarget.
-// AI: change=Story F1: controls list merge/replace, protected removal, cap relaxation, feel changes.
+// AI: deps=GrooveOverrideMergePolicy, SegmentGrooveProfile, RoleDensityTarget (moved to Drums in Story 4.3).
+// AI: change=Story 4.3: Import RoleDensityTarget from Drums namespace.
+
+using Music.Generator.Agents.Drums;
 
 namespace Music.Generator.Groove;
 

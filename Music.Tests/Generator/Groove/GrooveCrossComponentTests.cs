@@ -1,8 +1,9 @@
 // AI: purpose=Story H1 cross-component tests verifying pipeline ordering and interactions.
 // AI: invariants=Deterministic; tests component boundaries; fast.
-// AI: deps=FeelTimingEngine, RoleTimingEngine, OnsetStrengthClassifier.
+// AI: deps=FeelTimingEngine, RoleTimingEngine, OnsetStrengthClassifier, DrumCapsEnforcer (moved Story 4.3).
 
 using Music.Generator;
+using Music.Generator.Agents.Drums;
 using Music.Generator.Groove;
 using Music.Tests.TestFixtures;
 using Xunit;
@@ -46,7 +47,7 @@ public class GrooveCrossComponentTests
             FinalOnsets = new List<GrooveOnset>()
         };
 
-        var enforcer = new GrooveCapsEnforcer();
+        var enforcer = new DrumCapsEnforcer();
 
         // Act
         var result = enforcer.EnforceHardCaps(

@@ -1,8 +1,10 @@
+using Music.Generator.Agents.Drums;
+
 namespace Music.Generator.Groove
 {
     // AI: purpose=Per-segment groove configuration; lightweight tag enabling/disabling + density targets for sections/phrases.
     // AI: invariants=GroovePresetName links to GroovePresetLibrary for mid-song switching; null=use default preset.
-    // AI: change=EnabledVariationTags/EnabledProtectionTags control layer activation; add tags to enable features per segment.
+    // AI: change=Story 4.3: RoleDensityTarget moved to Drums namespace; import required.
     public sealed class SegmentGrooveProfile
     {
         public string SegmentId { get; set; } = "";

@@ -1,20 +1,21 @@
-// AI: purpose=Enforce hard caps on groove onsets with policy-aware protection (Story C3, F1, G1).
+// AI: purpose=Enforce hard caps on drum onsets with policy-aware protection (Story C3, F1, G1, 4.3).
 // AI: invariants=IsMustHit/IsNeverRemove never pruned; IsProtected respects OverrideCanRemoveProtectedOnsets policy.
 // AI: deps=GrooveOverrideMergePolicy, OverrideMergePolicyEnforcer, GrooveDiagnosticsCollector for decision tracing.
-// AI: change=Story G1: Uses structured GrooveDiagnosticsCollector instead of string diagnostics.
+// AI: change=Story 4.3: Moved from Generator/Groove to Generator/Agents/Drums; domain ownership = Drum Generator.
 
-using Music.Generator.Agents.Drums;
+using Music.Generator.Groove;
 
-namespace Music.Generator.Groove
+namespace Music.Generator.Agents.Drums
 {
     /// <summary>
-    /// Enforces hard caps on groove onsets per bar, per beat, per role, per group, and per candidate.
+    /// Enforces hard caps on drum onsets per bar, per beat, per role, per group, and per candidate.
     /// Uses deterministic scoring and pruning to ensure constraints are satisfied while preserving protected onsets.
     /// </summary>
     /// <remarks>
     /// Story C3: Enforce Hard Caps (Per Bar / Per Beat / Per Role).
     /// Story F1: OverrideCanRemoveProtectedOnsets policy controls IsProtected onset pruning.
     /// Story G1: Supports structured diagnostics via GrooveDiagnosticsCollector.
+    /// Story 4.3: Moved to Drum Generator namespace (part-generation concerns).
     /// 
     /// Enforcement order: Candidate caps -> Group caps -> Role density -> MaxHitsPerBar -> MaxHitsPerBeat
     /// 
@@ -27,7 +28,7 @@ namespace Music.Generator.Groove
     /// RNG Usage: Currently uses Random(rngSeed) for deterministic tie-breaking.
     /// TODO: When Story A2 RngFor helper is implemented, replace with RngFor(bar, role, "PrunePick").
     /// </remarks>
-    public sealed class GrooveCapsEnforcer
+    public sealed class DrumCapsEnforcer
     {
         /// <summary>
         /// Enforces all hard caps on a groove bar plan, pruning excess onsets deterministically.
@@ -556,4 +557,3 @@ namespace Music.Generator.Groove
         }
     }
 }
-

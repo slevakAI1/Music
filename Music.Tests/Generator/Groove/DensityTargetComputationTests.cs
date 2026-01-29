@@ -1,4 +1,4 @@
-// AI: purpose=Unit tests for Story C1 density target computation (GrooveDensityCalculator).
+// AI: purpose=Unit tests for Story C1 density target computation (DrumDensityCalculator).
 // AI: deps=xunit for test framework; Music.Generator for types under test.
 // AI: change=Story C1, 4.2: test rounding, clamping, multipliers, overrides; updated to use Drum types.
 
@@ -23,7 +23,7 @@ namespace Music.Generator.Tests
             var barContext = CreateBarContext(density: 0.5, maxEvents: 5);
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick");
 
             // Assert
@@ -39,7 +39,7 @@ namespace Music.Generator.Tests
             var barContext = CreateBarContext(density: 0.25, maxEvents: 2);
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick");
 
             // Assert
@@ -53,7 +53,7 @@ namespace Music.Generator.Tests
             var barContext = CreateBarContext(density: 0.3, maxEvents: 10);
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick");
 
             // Assert
@@ -67,7 +67,7 @@ namespace Music.Generator.Tests
             var barContext = CreateBarContext(density: 0.7, maxEvents: 10);
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick");
 
             // Assert
@@ -86,7 +86,7 @@ namespace Music.Generator.Tests
             var orchestrationPolicy = CreateOrchestrationPolicy("Chorus", "Kick", multiplier: 1.5);
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick", orchestrationPolicy: orchestrationPolicy);
 
             // Assert
@@ -102,7 +102,7 @@ namespace Music.Generator.Tests
             var orchestrationPolicy = CreateOrchestrationPolicy("Chorus", "Kick", multiplier: 2.0);
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick", orchestrationPolicy: orchestrationPolicy);
 
             // Assert
@@ -118,7 +118,7 @@ namespace Music.Generator.Tests
             var orchestrationPolicy = CreateOrchestrationPolicy("Verse", "Kick", multiplier: -0.5);
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick", orchestrationPolicy: orchestrationPolicy);
 
             // Assert
@@ -134,7 +134,7 @@ namespace Music.Generator.Tests
             var orchestrationPolicy = CreateOrchestrationPolicy("Chorus", "Kick", multiplier: 2.0);
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick", orchestrationPolicy: orchestrationPolicy);
 
             // Assert - No multiplier applied, so density=0.5, target=5
@@ -155,7 +155,7 @@ namespace Music.Generator.Tests
             var policyDecision = new DrumPolicyDecision { Density01Override = 0.9 };
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick", orchestrationPolicy: orchestrationPolicy, policyDecision: policyDecision);
 
             // Assert - Override used: 0.9 * 10 = 9
@@ -171,7 +171,7 @@ namespace Music.Generator.Tests
             var policyDecision = new DrumPolicyDecision { MaxEventsPerBarOverride = 3 };
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick", policyDecision: policyDecision);
 
             // Assert - 0.5 * 3 = 1.5 rounds to 2
@@ -191,7 +191,7 @@ namespace Music.Generator.Tests
             };
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick", policyDecision: policyDecision);
 
             // Assert - 0.8 * 5 = 4
@@ -211,7 +211,7 @@ namespace Music.Generator.Tests
             var barContext = CreateBarContext(density: 1.5, maxEvents: 10);
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick");
 
             // Assert - Clamped to 1.0: 1.0 * 10 = 10
@@ -226,7 +226,7 @@ namespace Music.Generator.Tests
             var barContext = CreateBarContext(density: -0.5, maxEvents: 10);
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick");
 
             // Assert
@@ -241,7 +241,7 @@ namespace Music.Generator.Tests
             var barContext = CreateBarContext(density: 0.5, maxEvents: -5);
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick");
 
             // Assert
@@ -256,7 +256,7 @@ namespace Music.Generator.Tests
             var barContext = CreateBarContext(density: 1.0, maxEvents: 5);
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick");
 
             // Assert - 1.0 * 5 = 5, clamped to 5
@@ -288,7 +288,7 @@ namespace Music.Generator.Tests
             };
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick", roleConstraintPolicy: roleConstraintPolicy);
 
             // Assert - density=0.0 (fallback), maxEvents=8 (fallback) => target=0
@@ -309,7 +309,7 @@ namespace Music.Generator.Tests
                 BarsUntilSectionEnd: 4);
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick");
 
             // Assert
@@ -338,7 +338,7 @@ namespace Music.Generator.Tests
             };
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick", roleConstraintPolicy: roleConstraintPolicy);
 
             // Assert
@@ -357,9 +357,9 @@ namespace Music.Generator.Tests
             var barContext = CreateBarContext(density: 0.6, maxEvents: 7);
 
             // Act - Run multiple times
-            var result1 = GrooveDensityCalculator.ComputeDensityTarget(barContext, "Kick");
-            var result2 = GrooveDensityCalculator.ComputeDensityTarget(barContext, "Kick");
-            var result3 = GrooveDensityCalculator.ComputeDensityTarget(barContext, "Kick");
+            var result1 = DrumDensityCalculator.ComputeDensityTarget(barContext, "Kick");
+            var result2 = DrumDensityCalculator.ComputeDensityTarget(barContext, "Kick");
+            var result3 = DrumDensityCalculator.ComputeDensityTarget(barContext, "Kick");
 
             // Assert - All identical
             Assert.Equal(result1.TargetCount, result2.TargetCount);
@@ -379,7 +379,7 @@ namespace Music.Generator.Tests
             var barContext = CreateBarContext(density: 0.0, maxEvents: 10);
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick");
 
             // Assert
@@ -393,7 +393,7 @@ namespace Music.Generator.Tests
             var barContext = CreateBarContext(density: 0.5, maxEvents: 0);
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick");
 
             // Assert
@@ -405,7 +405,7 @@ namespace Music.Generator.Tests
         {
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                GrooveDensityCalculator.ComputeDensityTarget(null!, "Kick"));
+                DrumDensityCalculator.ComputeDensityTarget(null!, "Kick"));
         }
 
         [Fact]
@@ -416,7 +416,7 @@ namespace Music.Generator.Tests
 
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                GrooveDensityCalculator.ComputeDensityTarget(barContext, null!));
+                DrumDensityCalculator.ComputeDensityTarget(barContext, null!));
         }
 
         [Fact]
@@ -427,7 +427,7 @@ namespace Music.Generator.Tests
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() =>
-                GrooveDensityCalculator.ComputeDensityTarget(barContext, ""));
+                DrumDensityCalculator.ComputeDensityTarget(barContext, ""));
         }
 
         [Fact]
@@ -437,7 +437,7 @@ namespace Music.Generator.Tests
             var barContext = CreateBarContext(density: 0.5, maxEvents: 10);
 
             // Act
-            var result = GrooveDensityCalculator.ComputeDensityTarget(
+            var result = DrumDensityCalculator.ComputeDensityTarget(
                 barContext, "Kick");
 
             // Assert - Explanation should contain key information
