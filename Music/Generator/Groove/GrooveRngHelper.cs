@@ -42,18 +42,9 @@ namespace Music.Generator.Groove
             {
                 GrooveRngStreamKey.CandidatePick => RandomPurpose.GrooveCandidatePick,
                 GrooveRngStreamKey.TieBreak => RandomPurpose.GrooveTieBreak,
-                GrooveRngStreamKey.PrunePick => RandomPurpose.GroovePrunePick,
-                GrooveRngStreamKey.DensityPick => RandomPurpose.GrooveDensityPick,
                 GrooveRngStreamKey.VelocityJitter => RandomPurpose.GrooveVelocityJitter,
-                GrooveRngStreamKey.GhostVelocityPick => RandomPurpose.GrooveGhostVelocityPick,
                 GrooveRngStreamKey.TimingJitter => RandomPurpose.GrooveTimingJitter,
                 GrooveRngStreamKey.SwingJitter => RandomPurpose.GrooveSwingJitter,
-                GrooveRngStreamKey.FillPick => RandomPurpose.GrooveFillPick,
-                GrooveRngStreamKey.AccentPick => RandomPurpose.GrooveAccentPick,
-                GrooveRngStreamKey.GhostNotePick => RandomPurpose.GrooveGhostNotePick,
-                GrooveRngStreamKey.OrnamentPick => RandomPurpose.GrooveOrnamentPick,
-                GrooveRngStreamKey.CymbalPick => RandomPurpose.GrooveCymbalPick,
-                GrooveRngStreamKey.DynamicsPick => RandomPurpose.GrooveDynamicsPick,
                 _ => throw new ArgumentException($"Unknown GrooveRngStreamKey: {streamKey}", nameof(streamKey))
             };
         }

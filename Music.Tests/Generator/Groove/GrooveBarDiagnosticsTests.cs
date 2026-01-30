@@ -457,7 +457,6 @@ public class GrooveBarDiagnosticsTests
     [Theory]
     [InlineData(RandomPurpose.GrooveCandidatePick, "GrooveCandidatePick")]
     [InlineData(RandomPurpose.GrooveTieBreak, "GrooveTieBreak")]
-    [InlineData(RandomPurpose.GroovePrunePick, "GroovePrunePick")]
     public void Collector_RecordsRngStreamName_FromRandomPurpose(RandomPurpose purpose, string expectedName)
     {
         // Arrange

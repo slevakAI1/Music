@@ -79,7 +79,7 @@ namespace Music.Generator.Tests
 
             // Reset to ensure we're comparing from same starting point
             Rng.Initialize(42);
-            var purpose2 = GrooveRngHelper.RngFor(barNumber, role, GrooveRngStreamKey.PrunePick);
+            var purpose2 = GrooveRngHelper.RngFor(barNumber, role, GrooveRngStreamKey.TieBreak);
             var seq2 = new[] {
                 Rng.NextInt(purpose2, 0, 100),
                 Rng.NextInt(purpose2, 0, 100),
@@ -98,18 +98,9 @@ namespace Music.Generator.Tests
         [Theory]
         [InlineData(GrooveRngStreamKey.CandidatePick)]
         [InlineData(GrooveRngStreamKey.TieBreak)]
-        [InlineData(GrooveRngStreamKey.PrunePick)]
-        [InlineData(GrooveRngStreamKey.DensityPick)]
         [InlineData(GrooveRngStreamKey.VelocityJitter)]
-        [InlineData(GrooveRngStreamKey.GhostVelocityPick)]
         [InlineData(GrooveRngStreamKey.TimingJitter)]
         [InlineData(GrooveRngStreamKey.SwingJitter)]
-        [InlineData(GrooveRngStreamKey.FillPick)]
-        [InlineData(GrooveRngStreamKey.AccentPick)]
-        [InlineData(GrooveRngStreamKey.GhostNotePick)]
-        [InlineData(GrooveRngStreamKey.OrnamentPick)]
-        [InlineData(GrooveRngStreamKey.CymbalPick)]
-        [InlineData(GrooveRngStreamKey.DynamicsPick)]
         public void RngFor_AllStreamKeys_MapToValidPurpose(GrooveRngStreamKey streamKey)
         {
             // Arrange

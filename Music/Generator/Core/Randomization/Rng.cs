@@ -16,23 +16,15 @@ namespace Music.Generator
     {
         DrumGenerator,
 
-        // ===== Groove System Stream Keys (Story A2) =====
-        // Each GrooveRngStreamKey gets its own RandomPurpose for independent sequences
+        // ===== Groove System Stream Keys =====
+        // Timing, feel, and general weighted selection only
+        // Drum-specific variation handled by Drummer Agent namespace
 
         GrooveCandidatePick,
         GrooveTieBreak,
-        GroovePrunePick,
-        GrooveDensityPick,
         GrooveVelocityJitter,
-        GrooveGhostVelocityPick,
         GrooveTimingJitter,
-        GrooveSwingJitter,
-        GrooveFillPick,
-        GrooveAccentPick,
-        GrooveGhostNotePick,
-        GrooveOrnamentPick,
-        GrooveCymbalPick,
-        GrooveDynamicsPick
+        GrooveSwingJitter
     }
 
     // AI: public API=Initialize(seed), static NextInt(purpose[,min,max]), NextDouble(purpose); prefer static methods.
@@ -68,21 +60,12 @@ namespace Music.Generator
             {
                 [RandomPurpose.DrumGenerator] = new Rng(masterRng.Next()),
 
-                // Groove system stream keys (Story A2) - each gets independent seed
+                // Groove system stream keys - timing/feel/selection only
                 [RandomPurpose.GrooveCandidatePick] = new Rng(masterRng.Next()),
                 [RandomPurpose.GrooveTieBreak] = new Rng(masterRng.Next()),
-                [RandomPurpose.GroovePrunePick] = new Rng(masterRng.Next()),
-                [RandomPurpose.GrooveDensityPick] = new Rng(masterRng.Next()),
                 [RandomPurpose.GrooveVelocityJitter] = new Rng(masterRng.Next()),
-                [RandomPurpose.GrooveGhostVelocityPick] = new Rng(masterRng.Next()),
                 [RandomPurpose.GrooveTimingJitter] = new Rng(masterRng.Next()),
-                [RandomPurpose.GrooveSwingJitter] = new Rng(masterRng.Next()),
-                [RandomPurpose.GrooveFillPick] = new Rng(masterRng.Next()),
-                [RandomPurpose.GrooveAccentPick] = new Rng(masterRng.Next()),
-                [RandomPurpose.GrooveGhostNotePick] = new Rng(masterRng.Next()),
-                [RandomPurpose.GrooveOrnamentPick] = new Rng(masterRng.Next()),
-                [RandomPurpose.GrooveCymbalPick] = new Rng(masterRng.Next()),
-                [RandomPurpose.GrooveDynamicsPick] = new Rng(masterRng.Next())
+                [RandomPurpose.GrooveSwingJitter] = new Rng(masterRng.Next())
             };
         }
 
