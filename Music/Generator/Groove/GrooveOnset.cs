@@ -1,14 +1,14 @@
 // AI: purpose=Define groove onset with all metadata required for complete groove pipeline from Story A1.
 // AI: invariants=Beat is 1-based within bar; BarNumber is 1-based; Velocity 1-127 when set (hint only, not final); Role is instrument-agnostic string.
 // AI: deps=OnsetStrength from Groove.cs for strength classification; GrooveOnsetProvenance for provenance tracking (Story G2).
-// AI: change=Story 5.1 clarified Velocity is operator hint only; final velocity determined by Part Generator (DrummerVelocityShaper).
-// AI: change=Story C3 updated to use GrooveOnsetProvenance instead of MaterialProvenance for groove-specific tracking.
+// AI: change=clarified Velocity is operator hint only; final velocity determined by Part Generator (DrummerVelocityShaper).
+// AI: change=updated to use GrooveOnsetProvenance instead of MaterialProvenance for groove-specific tracking.
 
 namespace Music.Generator.Groove
 {
     /// <summary>
     /// Represents a single onset (note event) in the groove system.
-    /// Story A1: Stable groove output type for instrument-agnostic generation.
+    /// Stable groove output type for instrument-agnostic generation.
     /// Contains all metadata required for the complete groove pipeline:
     /// - Position (bar/beat)
     /// - Musical intent (strength, velocity, timing)

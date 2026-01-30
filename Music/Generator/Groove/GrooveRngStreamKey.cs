@@ -1,7 +1,7 @@
 // AI: purpose=Define canonical RNG stream keys for groove system deterministic randomness.
 // AI: invariants=Enum values stable; adding new values OK but never reorder/rename/remove existing ones.
 // AI: deps=Used by GrooveRngHelper for deriving stable per-bar per-role RNG instances.
-// AI: change=Only groove-specific operations; drum-specific RNG handled by Drummer Agent namespace.
+// AI: change=Only groove-specific operations
 
 namespace Music.Generator.Groove
 {
@@ -14,7 +14,6 @@ namespace Music.Generator.Groove
     /// CRITICAL: Never reorder, rename, or remove enum values. Only append new values at the end.
     /// Changing order breaks determinism for existing songs.
     /// Groove system handles only timing/feel/position concerns. 
-    /// Drum-specific variation and policy handled by Drummer Agent namespace.
     /// </remarks>
     public enum GrooveRngStreamKey
     {
