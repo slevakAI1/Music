@@ -259,7 +259,7 @@ namespace Music.Generator.Agents.Drums
                         .Where(a => string.Equals(a.Role, role, StringComparison.OrdinalIgnoreCase))
                         .ToList();
 
-                    // SELECT using GrooveSelectionEngine
+                    // SELECT using DrumSelectionEngine
                     var selected = DrumSelectionEngine.SelectUntilTargetReached(
                         drumBarContext,
                         role,

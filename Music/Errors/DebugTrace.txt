@@ -2312,3 +2312,8 @@
 [2026-01-29T23:34:23.4620552-05:00] StartPlaybackWithMeasureTracking: FINALLY block - stopping tracker and clearing highlights
 [2026-01-29T23:34:23.4625214-05:00] === StartPlaybackWithMeasureTrackingAsync END ===
 [2026-01-29T23:34:23.4627972-05:00] <<< btnPlay_Click END
+[2026-01-29T23:46:23.3072176-05:00] Rng.Initialize: seed=12345
+[2026-01-29T23:46:30.5773932-05:00] Rng.Initialize: seed=-1066828930
+[2026-01-30T00:02:14.8492736-05:00] Rng.Initialize: seed=94183068
+[2026-01-30T00:03:02.3897863-05:00] Rng.Initialize: seed=12345
+[2026-01-30T00:03:07.1385689-05:00] Rng.Initialize: seed=931275643
