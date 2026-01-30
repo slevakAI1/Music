@@ -1,7 +1,7 @@
-// AI: purpose=Pipeline orchestrator for drum generation using IDrumPolicyProvider + IDrumCandidateSource.
-// AI: invariants=Uses DrumSelectionEngine for weighted selection; enforces density targets/caps from policy.
+// AI: purpose=Generates a drum phrase (1-N bars) using operator-based variation over anchors.
+// AI: invariants=Output is a PartTrack representing a single phrase; reusable for MaterialBank storage.licy.
 // AI: deps=DrummerAgent (data source), DrumSelectionEngine, BarContextBuilder, SongContext, PartTrack.
-// AI: change=Story RF-2, 4.2; correct architecture replaces DrummerAgent.Generate() with proper groove integration.
+// AI: change=correct architecture replaces DrummerAgent.Generate() with proper groove integration.
 
 using Music.Generator.Groove;
 using Music.MyMidi;
@@ -50,7 +50,7 @@ namespace Music.Generator.Agents.Drums
     /// </list>
     /// <para>Enforces density targets, operator caps, and weighted selection per policy decisions.</para>
     /// </remarks>
-    public sealed class DrumGenerator
+    public sealed class DrumPhraseGenerator
     {
         private readonly IDrumPolicyProvider _policyProvider;
         private readonly IDrumCandidateSource _candidateSource;
@@ -63,7 +63,7 @@ namespace Music.Generator.Agents.Drums
         /// <param name="candidateSource">Candidate source (provides operator-generated candidates).</param>
         /// <param name="settings">Optional settings (diagnostics, active roles, default velocity).</param>
         /// <exception cref="ArgumentNullException">If policyProvider or candidateSource is null.</exception>
-        public DrumGenerator(
+        public DrumPhraseGenerator(
             IDrumPolicyProvider policyProvider,
             IDrumCandidateSource candidateSource,
             DrumGeneratorSettings? settings = null)

@@ -52,7 +52,7 @@ Phase 3: Track Generation
 
 ---
 
-#### Story 1.1: Rename GrooveBasedDrumGenerator to DrumPhraseGenerator
+#### Story 1.1: Rename GrooveBasedDrumGenerator to DrumPhraseGenerator (Completed)
 
 **Size:** Small (1-2 hours)
 
