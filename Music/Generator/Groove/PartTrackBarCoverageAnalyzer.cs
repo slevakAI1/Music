@@ -3,8 +3,6 @@
 // AI: deps=PartTrack.PartTrackNoteEvents; BarTrack.Bars; produces BarFillState map or BarCoverageReport.
 // AI: perf=O(events * bars) worst case; acceptable for typical song sizes; optimize with interval tree if needed.
 
-using Music.MyMidi;
-
 namespace Music.Generator.Groove
 {
     // AI: Static utility; all methods are pure; no instance state; thread-safe by design.

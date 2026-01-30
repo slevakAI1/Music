@@ -3,8 +3,6 @@
 // AI: deps=TimingFeel, GrooveOnset; E2 runs after E1 (additive semantics).
 // AI: change=Story 5.3: Simplified, removed policy dependencies (moved to Drum Generator domain).
 
-using Music.Generator.Agents.Drums;
-
 namespace Music.Generator.Groove;
 
 /// <summary>
