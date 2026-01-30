@@ -212,7 +212,7 @@ public class GrooveOnsetProvenanceTests
         };
 
         // Act
-        var onset = GrooveOnsetFactory.FromVariation(candidate, group, barNumber: 3);
+        var onset = DrumGrooveOnsetFactory.FromVariation(candidate, group, barNumber: 3);
 
         // Assert
         Assert.NotNull(onset.Provenance);
@@ -240,7 +240,7 @@ public class GrooveOnsetProvenanceTests
         };
 
         // Act
-        var onset = GrooveOnsetFactory.FromVariation(candidate, group, barNumber: 2);
+        var onset = DrumGrooveOnsetFactory.FromVariation(candidate, group, barNumber: 2);
 
         // Assert
         Assert.Equal("ClosedHat", onset.Role);
@@ -269,7 +269,7 @@ public class GrooveOnsetProvenanceTests
         var enabledTags = new List<string> { "Fill", "Chorus" };
 
         // Act
-        var onset = GrooveOnsetFactory.FromVariation(candidate, group, barNumber: 8, enabledTags);
+        var onset = DrumGrooveOnsetFactory.FromVariation(candidate, group, barNumber: 8, enabledTags);
 
         // Assert
         Assert.NotNull(onset.Provenance!.TagsSnapshot);
@@ -296,7 +296,7 @@ public class GrooveOnsetProvenanceTests
         var weighted = new WeightedCandidate(candidate, group, ComputedWeight: 0.24, StableId: "KickPickup:4.7500");
 
         // Act
-        var onset = GrooveOnsetFactory.FromWeightedCandidate(weighted, barNumber: 4);
+        var onset = DrumGrooveOnsetFactory.FromWeightedCandidate(weighted, barNumber: 4);
 
         // Assert
         Assert.NotNull(onset.Provenance);
@@ -383,8 +383,8 @@ public class GrooveOnsetProvenanceTests
         };
 
         // Act - create same variation onset twice
-        var onset1 = GrooveOnsetFactory.FromVariation(candidate, group, 1);
-        var onset2 = GrooveOnsetFactory.FromVariation(candidate, group, 1);
+        var onset1 = DrumGrooveOnsetFactory.FromVariation(candidate, group, 1);
+        var onset2 = DrumGrooveOnsetFactory.FromVariation(candidate, group, 1);
 
         // Assert - provenance should be equivalent
         Assert.Equal(onset1.Provenance!.Source, onset2.Provenance!.Source);
@@ -400,7 +400,7 @@ public class GrooveOnsetProvenanceTests
 
         var candidate = new DrumOnsetCandidate { Role = "Kick", OnsetBeat = 1.0m, ProbabilityBias = 1.0 };
         var group = new DrumCandidateGroup { GroupId = "Test", BaseProbabilityBias = 1.0, Candidates = new() { candidate } };
-        var variation = GrooveOnsetFactory.FromVariation(candidate, group, 1);
+        var variation = DrumGrooveOnsetFactory.FromVariation(candidate, group, 1);
 
         // Assert - they are not equal due to different provenance
         Assert.NotEqual(anchor, variation);
@@ -438,8 +438,8 @@ public class GrooveOnsetProvenanceTests
         var group2 = new DrumCandidateGroup { GroupId = "PickupSnare", BaseProbabilityBias = 0.6, Candidates = new() { candidate2 } };
 
         // Act
-        var onset1 = GrooveOnsetFactory.FromVariation(candidate1, group1, 1);
-        var onset2 = GrooveOnsetFactory.FromVariation(candidate2, group2, 1);
+        var onset1 = DrumGrooveOnsetFactory.FromVariation(candidate1, group1, 1);
+        var onset2 = DrumGrooveOnsetFactory.FromVariation(candidate2, group2, 1);
 
         // Assert - same beat but different groups should have different provenance
         Assert.NotEqual(onset1.Provenance!.GroupId, onset2.Provenance!.GroupId);

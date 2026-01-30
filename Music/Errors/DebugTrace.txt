@@ -2097,3 +2097,8 @@
 [2026-01-29T17:58:11.4831204-05:00] Player: Duration=15875ms, TotalDelay=16125ms
 [2026-01-29T17:58:11.4834405-05:00] Player: IsPlaying=True, IsPaused=False
 [2026-01-29T17:58:11.4836627-05:00] Player: Beginning cancellable Task.Delay(16125ms)
+[2026-01-29T18:59:29.6192652-05:00] Rng.Initialize: seed=12345
+[2026-01-29T18:59:35.1345302-05:00] Rng.Initialize: seed=1124377012
+[2026-01-29T18:59:39.6603278-05:00] Rng.Initialize: seed=1422396933
+[2026-01-29T18:59:43.0597348-05:00] Rng.Initialize: seed=-306609059
+[2026-01-29T18:59:46.7169809-05:00] Rng.Initialize: seed=417079687

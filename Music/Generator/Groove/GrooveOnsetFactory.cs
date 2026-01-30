@@ -1,29 +1,14 @@
 // AI: purpose=Factory for creating GrooveOnset records with proper provenance tracking (Story G2).
 // AI: invariants=Anchor onsets get Source=Anchor; variation onsets get Source=Variation with GroupId/CandidateId.
-// AI: deps=GrooveOnset, GrooveOnsetProvenance, DrumOnsetCandidate, DrumCandidateGroup.
-// AI: change=Story G2: Centralized onset creation ensures provenance is always populated correctly.
-
-using Music.Generator.Agents.Drums;
+// AI: deps=GrooveOnset, GrooveOnsetProvenance, OnsetCandidate, CandidateGroup.
+// AI: change=Refactored to use instrument-agnostic types; drum-specific methods moved to Drums namespace.
 
 namespace Music.Generator.Groove;
 
-/// <summary>
-/// Factory for creating GrooveOnset records with proper provenance tracking.
-/// Story G2: Ensures provenance is consistently populated for all onset sources.
-/// </summary>
+// AI: Factory for creating GrooveOnset with proper provenance tracking.
 public static class GrooveOnsetFactory
 {
-    /// <summary>
-    /// Creates a GrooveOnset from an anchor layer beat position.
-    /// Story G2: Sets Source=Anchor with null GroupId/CandidateId.
-    /// </summary>
-    /// <param name="role">Role name (e.g., "Kick", "Snare", "ClosedHat").</param>
-    /// <param name="barNumber">Bar number (1-based).</param>
-    /// <param name="beat">Beat position (1-based, can be fractional).</param>
-    /// <param name="isMustHit">Whether this is a must-hit anchor (optional).</param>
-    /// <param name="isNeverRemove">Whether this anchor cannot be removed (optional).</param>
-    /// <param name="isProtected">Whether this anchor is protected from pruning (optional).</param>
-    /// <returns>GrooveOnset with Anchor provenance.</returns>
+    // AI: Creates GrooveOnset from anchor with Source=Anchor provenance.
     public static GrooveOnset FromAnchor(
         string role,
         int barNumber,
@@ -46,19 +31,10 @@ public static class GrooveOnsetFactory
         };
     }
 
-    /// <summary>
-    /// Creates a GrooveOnset from a variation candidate selection.
-    /// Story G2: Sets Source=Variation with GroupId, CandidateId, and optional TagsSnapshot.
-    /// VelocityHint and TimingHint from candidate flow directly to GrooveOnset.
-    /// </summary>
-    /// <param name="candidate">The selected candidate.</param>
-    /// <param name="group">The group containing the candidate.</param>
-    /// <param name="barNumber">Bar number (1-based).</param>
-    /// <param name="enabledTags">Tags that were enabled at selection time (optional).</param>
-    /// <returns>GrooveOnset with Variation provenance.</returns>
+    // AI: Creates GrooveOnset from variation candidate with Source=Variation provenance.
     public static GrooveOnset FromVariation(
-        DrumOnsetCandidate candidate,
-        DrumCandidateGroup group,
+        OnsetCandidate candidate,
+        CandidateGroup group,
         int barNumber,
         IReadOnlyList<string>? enabledTags = null)
     {
@@ -79,32 +55,7 @@ public static class GrooveOnsetFactory
         };
     }
 
-    /// <summary>
-    /// Creates a GrooveOnset from a WeightedCandidate (used by selection engine).
-    /// Story G2: Convenience overload for GrooveSelectionEngine results.
-    /// </summary>
-    /// <param name="weightedCandidate">The weighted candidate from selection.</param>
-    /// <param name="barNumber">Bar number (1-based).</param>
-    /// <param name="enabledTags">Tags that were enabled at selection time (optional).</param>
-    /// <returns>GrooveOnset with Variation provenance.</returns>
-    public static GrooveOnset FromWeightedCandidate(
-        WeightedCandidate weightedCandidate,
-        int barNumber,
-        IReadOnlyList<string>? enabledTags = null)
-    {
-        ArgumentNullException.ThrowIfNull(weightedCandidate);
-        return FromVariation(weightedCandidate.Candidate, weightedCandidate.Group, barNumber, enabledTags);
-    }
-
-    /// <summary>
-    /// Creates a copy of a GrooveOnset with updated properties while preserving provenance.
-    /// Story G2: Ensures post-processing stages don't lose provenance.
-    /// </summary>
-    /// <param name="onset">Original onset to copy.</param>
-    /// <param name="strength">Optional new strength value.</param>
-    /// <param name="velocity">Optional new velocity value.</param>
-    /// <param name="timingOffsetTicks">Optional new timing offset.</param>
-    /// <returns>New GrooveOnset with updated values and preserved provenance.</returns>
+    // AI: Creates copy with updated properties; preserves provenance via 'with' expression.
     public static GrooveOnset WithUpdatedProperties(
         GrooveOnset onset,
         OnsetStrength? strength = null,
@@ -118,7 +69,6 @@ public static class GrooveOnsetFactory
             Strength = strength ?? onset.Strength,
             Velocity = velocity ?? onset.Velocity,
             TimingOffsetTicks = timingOffsetTicks ?? onset.TimingOffsetTicks
-            // Provenance is automatically preserved by 'with' expression
         };
     }
 }
