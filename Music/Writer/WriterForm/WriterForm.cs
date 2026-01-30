@@ -333,12 +333,12 @@ namespace Music.Writer
                     }
                     break;
 
-                case "Write Test Song": // THIS WAS TOO MUCH
-                    HandleCommandWriteTestSongNew.HandleWriteTestSong(_songContext, dgSong);
-                    break;
-
                 case "Groove Test": // Play groove instance as a test song
                     HandleCommandGrooveTest.HandleGrooveTest(_songContext, dgSong);
+                    break;
+
+                case "Agent Test": // THIS WAS TOO MUCH
+                    HandleCommandAgentTest.HandleAgentTest(_songContext, dgSong);
                     break;
 
 

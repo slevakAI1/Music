@@ -26,7 +26,7 @@ namespace Music.Writer
                 }
 
                 // Show input dialog
-                using var dialog = new GroovePreviewDialog();
+                using var dialog = new TestSettingsDialog();
                 if (dialog.ShowDialog() != DialogResult.OK)
                     return;
 

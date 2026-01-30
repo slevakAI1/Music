@@ -1,51 +1,49 @@
-// AI: purpose=Handler to generate groove-synced test tracks and add them to SongContext and UI grid.
-// AI: invariants=Uses SectionTrack.TotalBars to compute totalBars; mutates songContext.Song.PartTracks and Grid; callers expect these side-effects.
-// AI: deps=Relies on Generator.Generator.Generate, SongGridManager.AddNewPartTrack, and GrooveTrack presets; changing generator API breaks this.
+// AI: purpose=Handler to test drummer agent-based drum track generation and add result to SongContext and UI grid.
+// AI: invariants=Uses real groove anchor pattern; passes StyleConfiguration to enable operator-based generation; mutates songContext.Song.PartTracks and Grid.
+// AI: deps=Relies on Generator.Generator.Generate with StyleConfiguration, GrooveAnchorFactory, StyleConfigurationLibrary; changing generator API breaks this.
 // AI: perf=Generation may allocate; run on UI thread currently; consider backgrounding if UI stalls for large songs.
 
 using Music.Generator;
+using Music.Generator.Agents.Common;
 using Music.Generator.Groove;
 
 namespace Music.Writer
 {
-    // AI: Command handler for groove-driven generator test; wraps generator call and updates UI grid with results.
-    public static class HandleCommandWriteTestSongNew
+    // AI: Command handler for drummer agent test; wraps generator call with style configuration and updates UI grid with results.
+    public static class HandleCommandAgentTest
     {
-        // AI: HandleCommandWriteTestSong: runs generator, appends 4 PartTracks to Song and grid.
+        // AI: HandleAgentTest: runs drummer agent generator, appends 1 drum PartTrack to Song and grid.
         // AI: errors=any exception is shown via ShowError; no retry or partial-commit logic.
-        public static void HandleWriteTestSong(
+        public static void HandleAgentTest(
             SongContext songContext,
             DataGridView dgSong)
         {
             try
             {
-                // Generate all song tracks - GrooveSetupFactory deleted, use minimal preset
+                // Use real PopRock groove anchor pattern (not empty layer)
                 var groovePreset = new GroovePresetDefinition
                 {
                     Identity = new GroovePresetIdentity
                     {
-                        Name = "TestGroove",
+                        Name = "PopRock",
                         BeatsPerBar = 4,
                         StyleFamily = "PopRock"
                     },
-                    AnchorLayer = new GrooveInstanceLayer()
+                    AnchorLayer = GrooveAnchorFactory.GetAnchor("PopRock")
                 };
                 songContext.GroovePresetDefinition = groovePreset;
 
-                var result = Generator.Generator.Generate(songContext);
+                // Use StyleConfiguration to enable drummer agent (operator-based generation)
+                var drummerStyle = StyleConfigurationLibrary.PopRock;
+
+                // Generate drum track using drummer agent pipeline
+                var result = Generator.Generator.Generate(songContext, drummerStyle);
 
                 songContext.Song.PartTracks.Add(result);
 
-                //songContext.Song.PartTracks.Add(result.GuitarTrack);
-                //songContext.Song.PartTracks.Add(result.KeysTrack);
-                //songContext.Song.PartTracks.Add(result.DrumTrack);
-
-                // Update Grid with song tracks
-                //SongGridManager.AddNewPartTrack(result.BassTrack, dgSong);
-                //SongGridManager.AddNewPartTrack(result.GuitarTrack, dgSong);
-                //SongGridManager.AddNewPartTrack(result.KeysTrack, dgSong);
+                // Update Grid with drum track
                 SongGridManager.AddNewPartTrack(result, dgSong);
-                ShowSuccess(4);
+                ShowSuccess(1);
             }
             catch (Exception ex)
             {
@@ -59,8 +57,8 @@ namespace Music.Writer
         private static void ShowSuccess(int addedCount)
         {
             MessageBoxHelper.Show(
-                $"Successfully created {addedCount} tracks.",
-                "Write Test Song",
+                $"Successfully created {addedCount} drum track(s) using drummer agent.",
+                "Drummer Agent Test",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
         }

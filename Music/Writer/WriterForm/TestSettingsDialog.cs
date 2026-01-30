@@ -7,7 +7,7 @@ using Music.Generator.Groove;
 namespace Music.Writer
 {
     // AI: Modal dialog for groove preview parameter input; returns OK/Cancel with captured values.
-    public sealed class GroovePreviewDialog : Form
+    public sealed class TestSettingsDialog : Form
     {
         private NumericUpDown numSeed;
         private ComboBox cbGenre;
@@ -24,7 +24,7 @@ namespace Music.Writer
         public string Genre { get; private set; }
         public int Bars { get; private set; }
 
-        public GroovePreviewDialog()
+        public TestSettingsDialog()
         {
             InitializeDialog();
             SetDefaultValues();
