@@ -2,12 +2,12 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums;
 
-// AI: purpose=Drum-specific factory methods for creating GrooveOnset from drum types.
-// AI: invariants=Wraps generic GrooveOnsetFactory with conversion from drum types.
-// AI: change=Created to maintain drum-specific API after groove system became instrument-agnostic.
+// AI: purpose=Drum-specific factory for creating GrooveOnset from drum variation candidates with provenance.
+// AI: invariants=Creates GrooveOnset directly from drum types; no conversion to generic types needed.
+// AI: change=FromVariation updated (GC-5) to create GrooveOnset directly instead of using deleted conversion methods.
 public static class DrumGrooveOnsetFactory
 {
-    // AI: Creates GrooveOnset from DrumOnsetCandidate by converting to generic type first.
+    // AI: purpose=Creates GrooveOnset from drum variation candidate with provenance tracking.
     public static GrooveOnset FromVariation(
         DrumOnsetCandidate candidate,
         DrumCandidateGroup group,
@@ -17,14 +17,21 @@ public static class DrumGrooveOnsetFactory
         ArgumentNullException.ThrowIfNull(candidate);
         ArgumentNullException.ThrowIfNull(group);
 
-        return GrooveOnsetFactory.FromVariation(
-            candidate.ToOnsetCandidate(),
-            group.ToCandidateGroup(),
-            barNumber,
-            enabledTags);
+        string candidateId = GrooveOnsetProvenance.MakeCandidateId(group.GroupId, candidate.OnsetBeat);
+
+        return new GrooveOnset
+        {
+            Role = candidate.Role,
+            BarNumber = barNumber,
+            Beat = candidate.OnsetBeat,
+            Strength = candidate.Strength,
+            Velocity = candidate.VelocityHint,
+            TimingOffsetTicks = candidate.TimingHint,
+            Provenance = GrooveOnsetProvenance.ForVariation(group.GroupId, candidateId, enabledTags)
+        };
     }
 
-    // AI: Creates GrooveOnset from WeightedCandidate (drum selection engine result).
+    // AI: purpose=Creates GrooveOnset from WeightedCandidate (drum selection engine result).
     public static GrooveOnset FromWeightedCandidate(
         WeightedCandidate weightedCandidate,
         int barNumber,

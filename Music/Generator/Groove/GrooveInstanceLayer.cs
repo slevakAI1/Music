@@ -1,6 +1,5 @@
 namespace Music.Generator.Groove
 {
-    using Music.Generator;
     using Music.MyMidi;
 
     // AI: purpose=Instance layer holding onset lists per role; used for anchor onsets in GroovePresetDefinition.
@@ -66,90 +65,6 @@ namespace Music.Generator.Groove
                 GrooveRoles.Pads => PadsOnsets.Count > 0,
                 _ => false
             };
-        }
-
-        // AI: purpose=Creates varied groove from anchor by seed-based probabilistic onset additions.
-        // AI: invariants=Same seed+anchor always produces identical output; snare backbeat (2,4) never modified; deterministic.
-        // AI: deps=Rng must be initialized before calling; uses GrooveVariationGroupPick purpose for all decisions.
-        // AI: change=To add variation types, add new decision blocks; keep probabilities tunable via seed-derived thresholds.
-        public static GrooveInstanceLayer CreateVariation(GrooveInstanceLayer anchor, int seed)
-        {
-            ArgumentNullException.ThrowIfNull(anchor);
-
-            Rng.Initialize(seed);
-
-            GrooveInstanceLayer variation = new()
-            {
-                KickOnsets = new List<decimal>(anchor.KickOnsets),
-                SnareOnsets = new List<decimal>(anchor.SnareOnsets),
-                HatOnsets = new List<decimal>(anchor.HatOnsets),
-                BassOnsets = new List<decimal>(anchor.BassOnsets),
-                CompOnsets = new List<decimal>(anchor.CompOnsets),
-                PadsOnsets = new List<decimal>(anchor.PadsOnsets)
-            };
-
-            ApplyKickDoubles(variation);
-            ApplyHatSubdivision(variation);
-            ApplySyncopation(variation);
-
-            return variation;
-        }
-
-        // AI: purpose=Adds kick doubles at 1.5 or 3.5 with 50% probability for each position.
-        // AI: invariants=Only adds if position not already present; avoids duplicates.
-        private static void ApplyKickDoubles(GrooveInstanceLayer variation)
-        {
-            if (Rng.NextDouble(RandomPurpose.GrooveVariationGroupPick) < 0.5)
-            {
-                decimal kickDouble = 1.5m;
-                if (!variation.KickOnsets.Contains(kickDouble))
-                {
-                    variation.KickOnsets.Add(kickDouble);
-                }
-            }
-
-            if (Rng.NextDouble(RandomPurpose.GrooveVariationGroupPick) < 0.5)
-            {
-                decimal kickDouble = 3.5m;
-                if (!variation.KickOnsets.Contains(kickDouble))
-                {
-                    variation.KickOnsets.Add(kickDouble);
-                }
-            }
-        }
-
-        // AI: purpose=Upgrades 8th note hats to 16ths with 30% probability; adds .25 offsets between existing 8ths.
-        // AI: invariants=Only adds 16th positions that don't already exist; common pattern: 1.25, 2.25, 3.25, 4.25.
-        private static void ApplyHatSubdivision(GrooveInstanceLayer variation)
-        {
-            if (Rng.NextDouble(RandomPurpose.GrooveVariationGroupPick) < 0.3)
-            {
-                decimal[] sixteenthPositions = { 1.25m, 2.25m, 3.25m, 4.25m };
-                foreach (decimal position in sixteenthPositions)
-                {
-                    if (!variation.HatOnsets.Contains(position))
-                    {
-                        variation.HatOnsets.Add(position);
-                    }
-                }
-            }
-        }
-
-        // AI: purpose=Adds anticipation/syncopation onsets at .75 positions with 20% probability.
-        // AI: invariants=Adds to kick; avoids snare backbeat modification; typical anticipations: 1.75, 3.75 (anticipate beats 2,4).
-        private static void ApplySyncopation(GrooveInstanceLayer variation)
-        {
-            if (Rng.NextDouble(RandomPurpose.GrooveVariationGroupPick) < 0.2)
-            {
-                decimal[] anticipationPositions = { 1.75m, 3.75m };
-                foreach (decimal position in anticipationPositions)
-                {
-                    if (!variation.KickOnsets.Contains(position))
-                    {
-                        variation.KickOnsets.Add(position);
-                    }
-                }
-            }
         }
 
         // AI: purpose=Converts groove to playable drum PartTrack for audition; maps roles to GM MIDI drum notes.

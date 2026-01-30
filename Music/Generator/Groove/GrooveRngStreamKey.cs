@@ -17,12 +17,6 @@ namespace Music.Generator.Groove
     public enum GrooveRngStreamKey
     {
         // ===== Phase B: Variation Engine =====
-        
-        /// <summary>
-        /// Selecting which variation group to use when multiple groups match enabled tags.
-        /// Used in: Story B3 - Weighted Candidate Selection
-        /// </summary>
-        VariationGroupPick,
 
         /// <summary>
         /// Selecting individual candidates within a variation group.

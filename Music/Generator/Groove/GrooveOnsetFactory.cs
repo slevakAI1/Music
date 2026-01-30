@@ -1,14 +1,14 @@
-// AI: purpose=Factory for creating GrooveOnset records with proper provenance tracking (Story G2).
-// AI: invariants=Anchor onsets get Source=Anchor; variation onsets get Source=Variation with GroupId/CandidateId.
-// AI: deps=GrooveOnset, GrooveOnsetProvenance, OnsetCandidate, CandidateGroup.
-// AI: change=Refactored to use instrument-agnostic types; drum-specific methods moved to Drums namespace.
+// AI: purpose=Factory for creating GrooveOnset from anchors; variation handled by DrumGrooveOnsetFactory.
+// AI: invariants=Anchor onsets get Source=Anchor provenance; variation onsets created by instrument-specific factories.
+// AI: deps=GrooveOnset, GrooveOnsetProvenance.
+// AI: change=FromVariation removed (GC-3); variation creation delegated to instrument-specific factories (Drums namespace).
 
 namespace Music.Generator.Groove;
 
-// AI: Factory for creating GrooveOnset with proper provenance tracking.
+// AI: purpose=Factory for creating GrooveOnset from anchors; variation handled by DrumGrooveOnsetFactory.
 public static class GrooveOnsetFactory
 {
-    // AI: Creates GrooveOnset from anchor with Source=Anchor provenance.
+    // AI: purpose=Creates GrooveOnset from anchor with Source=Anchor provenance.
     public static GrooveOnset FromAnchor(
         string role,
         int barNumber,
@@ -31,31 +31,7 @@ public static class GrooveOnsetFactory
         };
     }
 
-    // AI: Creates GrooveOnset from variation candidate with Source=Variation provenance.
-    public static GrooveOnset FromVariation(
-        OnsetCandidate candidate,
-        CandidateGroup group,
-        int barNumber,
-        IReadOnlyList<string>? enabledTags = null)
-    {
-        ArgumentNullException.ThrowIfNull(candidate);
-        ArgumentNullException.ThrowIfNull(group);
-
-        string candidateId = GrooveOnsetProvenance.MakeCandidateId(group.GroupId, candidate.OnsetBeat);
-
-        return new GrooveOnset
-        {
-            Role = candidate.Role,
-            BarNumber = barNumber,
-            Beat = candidate.OnsetBeat,
-            Strength = candidate.Strength,
-            Velocity = candidate.VelocityHint,
-            TimingOffsetTicks = candidate.TimingHint,
-            Provenance = GrooveOnsetProvenance.ForVariation(group.GroupId, candidateId, enabledTags)
-        };
-    }
-
-    // AI: Creates copy with updated properties; preserves provenance via 'with' expression.
+    // AI: purpose=Creates copy with updated properties; preserves provenance via 'with' expression.
     public static GrooveOnset WithUpdatedProperties(
         GrooveOnset onset,
         OnsetStrength? strength = null,

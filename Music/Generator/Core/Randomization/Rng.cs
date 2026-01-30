@@ -19,7 +19,6 @@ namespace Music.Generator
         // ===== Groove System Stream Keys (Story A2) =====
         // Each GrooveRngStreamKey gets its own RandomPurpose for independent sequences
 
-        GrooveVariationGroupPick,
         GrooveCandidatePick,
         GrooveTieBreak,
         GroovePrunePick,
@@ -70,7 +69,6 @@ namespace Music.Generator
                 [RandomPurpose.DrumGenerator] = new Rng(masterRng.Next()),
 
                 // Groove system stream keys (Story A2) - each gets independent seed
-                [RandomPurpose.GrooveVariationGroupPick] = new Rng(masterRng.Next()),
                 [RandomPurpose.GrooveCandidatePick] = new Rng(masterRng.Next()),
                 [RandomPurpose.GrooveTieBreak] = new Rng(masterRng.Next()),
                 [RandomPurpose.GroovePrunePick] = new Rng(masterRng.Next()),

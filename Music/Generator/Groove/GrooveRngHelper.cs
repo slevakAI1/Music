@@ -40,7 +40,6 @@ namespace Music.Generator.Groove
         {
             return streamKey switch
             {
-                GrooveRngStreamKey.VariationGroupPick => RandomPurpose.GrooveVariationGroupPick,
                 GrooveRngStreamKey.CandidatePick => RandomPurpose.GrooveCandidatePick,
                 GrooveRngStreamKey.TieBreak => RandomPurpose.GrooveTieBreak,
                 GrooveRngStreamKey.PrunePick => RandomPurpose.GroovePrunePick,

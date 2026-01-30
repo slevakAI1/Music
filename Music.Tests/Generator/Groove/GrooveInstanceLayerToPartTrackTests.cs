@@ -333,9 +333,9 @@ namespace Music.Tests.Generator.Groove
         }
 
         [Fact]
-        public void ToPartTrack_WithGenerate_ProducesPlayableTrack()
+        public void ToPartTrack_WithAnchor_ProducesPlayableTrack()
         {
-            GrooveInstanceLayer groove = GrooveAnchorFactory.Generate("PopRock", 123);
+            GrooveInstanceLayer groove = GrooveAnchorFactory.GetAnchor("PopRock");
             BarTrack barTrack = CreateTestBarTrack(8);
 
             PartTrack partTrack = groove.ToPartTrack(barTrack, 8);
@@ -346,19 +346,17 @@ namespace Music.Tests.Generator.Groove
         }
 
         [Fact]
-        public void ToPartTrack_DifferentSeeds_ProduceDifferentTracks()
+        public void ToPartTrack_SameAnchor_ProducesSameTrack()
         {
-            GrooveInstanceLayer groove1 = GrooveAnchorFactory.Generate("PopRock", 111);
-            GrooveInstanceLayer groove2 = GrooveAnchorFactory.Generate("PopRock", 222);
+            GrooveInstanceLayer groove1 = GrooveAnchorFactory.GetAnchor("PopRock");
+            GrooveInstanceLayer groove2 = GrooveAnchorFactory.GetAnchor("PopRock");
             BarTrack barTrack = CreateTestBarTrack(4);
 
             PartTrack partTrack1 = groove1.ToPartTrack(barTrack, 4);
             PartTrack partTrack2 = groove2.ToPartTrack(barTrack, 4);
 
-            // Different grooves should produce different event counts (variations differ)
-            bool differentEventCounts = partTrack1.PartTrackNoteEvents.Count != partTrack2.PartTrackNoteEvents.Count;
-            Assert.True(differentEventCounts || HasDifferentTimings(partTrack1, partTrack2),
-                "Different seeds should produce different tracks");
+            // Same anchor should produce identical event counts (no variation at groove level)
+            Assert.Equal(partTrack1.PartTrackNoteEvents.Count, partTrack2.PartTrackNoteEvents.Count);
         }
 
         private static bool HasDifferentTimings(PartTrack track1, PartTrack track2)

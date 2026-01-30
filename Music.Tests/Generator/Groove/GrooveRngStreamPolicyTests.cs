@@ -96,7 +96,6 @@ namespace Music.Generator.Tests
         #region Stream Key Coverage Tests
 
         [Theory]
-        [InlineData(GrooveRngStreamKey.VariationGroupPick)]
         [InlineData(GrooveRngStreamKey.CandidatePick)]
         [InlineData(GrooveRngStreamKey.TieBreak)]
         [InlineData(GrooveRngStreamKey.PrunePick)]

@@ -129,29 +129,23 @@ namespace Music.Tests.Generator.Core
         }
 
         [Fact]
-        public void GenerateGroovePreview_DifferentSeeds_ProducesDifferentTracks()
+        public void GenerateGroovePreview_DifferentSeeds_ProducesIdenticalTracks()
         {
+            // After GC-Epic: GenerateGroovePreview uses anchors only (no seed-based variation)
             string genre = "PopRock";
             BarTrack barTrack = CreateTestBarTrack(4);
 
             PartTrack track1 = Generator.GenerateGroovePreview(111, genre, barTrack, 4);
             PartTrack track2 = Generator.GenerateGroovePreview(222, genre, barTrack, 4);
 
-            bool different = track1.PartTrackNoteEvents.Count != track2.PartTrackNoteEvents.Count;
-            if (!different && track1.PartTrackNoteEvents.Count > 0)
+            // Anchors are deterministic by genre, not seed
+            Assert.Equal(track1.PartTrackNoteEvents.Count, track2.PartTrackNoteEvents.Count);
+            for (int i = 0; i < track1.PartTrackNoteEvents.Count; i++)
             {
-                for (int i = 0; i < Math.Min(10, track1.PartTrackNoteEvents.Count); i++)
-                {
-                    if (track1.PartTrackNoteEvents[i].AbsoluteTimeTicks != 
-                        track2.PartTrackNoteEvents[i].AbsoluteTimeTicks)
-                    {
-                        different = true;
-                        break;
-                    }
-                }
+                Assert.Equal(
+                    track1.PartTrackNoteEvents[i].AbsoluteTimeTicks,
+                    track2.PartTrackNoteEvents[i].AbsoluteTimeTicks);
             }
-
-            Assert.True(different, "Different seeds should produce different tracks");
         }
 
         [Fact]

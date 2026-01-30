@@ -75,7 +75,7 @@ namespace Music.Generator
             ArgumentNullException.ThrowIfNull(genre);
             ArgumentNullException.ThrowIfNull(barTrack);
 
-            GrooveInstanceLayer groove = GrooveAnchorFactory.Generate(genre, seed);
+            GrooveInstanceLayer groove = GrooveAnchorFactory.GetAnchor(genre);
             return groove.ToPartTrack(barTrack, totalBars, velocity);
         }
 
