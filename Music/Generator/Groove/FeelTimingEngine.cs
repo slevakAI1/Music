@@ -1,7 +1,6 @@
 // AI: purpose=Apply groove feel timing (straight/swing/shuffle/triplet) to onset positions (Story E1).
 // AI: invariants=Deterministic output; only eighth offbeats (n+0.5) are eligible; Beat unchanged, only TimingOffsetTicks modified.
 // AI: deps=GrooveFeel, AllowedSubdivision, MusicConstants.TicksPerQuarterNote.
-// AI: change=Story 5.3: Simplified, removed policy dependencies (moved to Drum Generator domain).
 
 namespace Music.Generator.Groove;
 

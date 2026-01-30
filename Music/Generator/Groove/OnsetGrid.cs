@@ -7,7 +7,6 @@ namespace Music.Generator.Groove
     /// <summary>
     /// Represents an onset grid defining valid beat positions based on subdivision policy.
     /// Immutable after construction. Used across all generators for consistent rhythm quantization.
-    /// Story G2 extraction from DrumTrackGenerator.ApplySubdivisionFilter.
     /// </summary>
     public sealed class OnsetGrid
     {

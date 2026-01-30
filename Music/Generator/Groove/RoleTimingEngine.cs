@@ -1,13 +1,12 @@
 // AI: purpose=Apply per-role micro-timing (feel/bias) on top of E1 feel timing (Story E2).
 // AI: invariants=Deterministic output; Beat unchanged, only TimingOffsetTicks modified.
-// AI: deps=TimingFeel, GrooveOnset; E2 runs after E1 (additive semantics).
-// AI: change=Story 5.3: Simplified, removed policy dependencies (moved to Drum Generator domain).
+// AI: deps=TimingFeel, GrooveOnset; (additive semantics).
 
 namespace Music.Generator.Groove;
 
 /// <summary>
 /// Applies per-role micro-timing (feel/bias) on top of E1 feel timing.
-/// Story E2: Role timing shifts allow roles to sit ahead, on-top, behind, or laid-back relative to grid.
+/// Role timing shifts allow roles to sit ahead, on-top, behind, or laid-back relative to grid.
 /// </summary>
 /// <remarks>
 /// Operation order:

@@ -1,7 +1,6 @@
 // AI: purpose=Factory for creating GrooveOnset from anchors; variation handled by DrumGrooveOnsetFactory.
 // AI: invariants=Anchor onsets get Source=Anchor provenance; variation onsets created by instrument-specific factories.
 // AI: deps=GrooveOnset, GrooveOnsetProvenance.
-// AI: change=FromVariation removed (GC-3); variation creation delegated to instrument-specific factories (Drums namespace).
 
 namespace Music.Generator.Groove;
 

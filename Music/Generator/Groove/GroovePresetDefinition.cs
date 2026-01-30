@@ -2,7 +2,6 @@ namespace Music.Generator.Groove
 {
     // AI: purpose=Simplified groove preset definition; ties identity + anchor onsets.
     // AI: invariants=Identity.Name MUST be unique; AnchorLayer holds base onsets.
-    // AI: change=Protection policies moved to Drum Generator domain; variation catalog removed.
     public sealed class GroovePresetDefinition
     {
         public GroovePresetIdentity Identity { get; set; } = new();

@@ -6,7 +6,6 @@ namespace Music.Generator.Groove
 {
     /// <summary>
     /// Builder for constructing OnsetGrid instances from subdivision policies.
-    /// Story G2 extraction from DrumTrackGenerator.ApplySubdivisionFilter.
     /// </summary>
     public static class OnsetGridBuilder
     {

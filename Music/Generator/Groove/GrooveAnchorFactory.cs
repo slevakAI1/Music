@@ -3,7 +3,6 @@ namespace Music.Generator.Groove
     // AI: purpose=Centralized factory for retrieving groove anchor patterns by genre.
     // AI: invariants=Anchor patterns are hardcoded, deterministic; same genre always returns same pattern.
     // AI: errors=Throws ArgumentException for unknown genre; throws ArgumentNullException for null genre.
-    // AI: change=Generate method removed (GC-4); variation now handled by Drummer Agent, not groove layer.
     public static class GrooveAnchorFactory
     {
         // AI: purpose=Returns anchor pattern for specified genre; anchors define base rhythm without variation.

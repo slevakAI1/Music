@@ -1,7 +1,6 @@
 // AI: purpose=Extension methods for integrating OnsetStrengthClassifier with GrooveOnset.
 // AI: invariants=Respects existing Strength value if already set; returns new onset with computed strength.
 // AI: deps=OnsetStrengthClassifier for classification logic; AllowedSubdivision for grid context.
-// AI: change=If adding extensions for other types, ensure they stay in correct namespace (Drum types in Drum namespace).
 
 namespace Music.Generator.Groove;
 
