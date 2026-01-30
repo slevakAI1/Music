@@ -12,62 +12,95 @@ namespace Music.Writer
     // AI: Command handler for drummer agent test; wraps generator call with style configuration and updates UI grid with results.
     public static class HandleCommandAgentTest
     {
-        // AI: HandleAgentTest: runs drummer agent generator, appends 1 drum PartTrack to Song and grid.
-        // AI: errors=any exception is shown via ShowError; no retry or partial-commit logic.
+        // AI: HandleAgentTest: shows input dialog, runs drummer agent generator with seed/genre/bars, appends 1 drum PartTrack to Song and grid.
+        // AI: errors=any exception is shown via ShowError; no retry or partial-commit logic; invalid input caught by dialog validation.
         public static void HandleAgentTest(
             SongContext songContext,
             DataGridView dgSong)
         {
             try
             {
-                // Use real PopRock groove anchor pattern (not empty layer)
+                // Validate song context has required data
+                if (songContext?.BarTrack == null)
+                {
+                    ShowError("Song context not initialized. Please set up timing track first.");
+                    return;
+                }
+
+                // Show input dialog
+                using var dialog = new TestSettingsDialog();
+                if (dialog.ShowDialog() != DialogResult.OK)
+                    return;
+
+                // Capture parameters
+                int seed = dialog.Seed;
+                string genre = dialog.Genre;
+                int bars = dialog.Bars;
+
+                // Initialize RNG with seed for deterministic generation
+                Rng.Initialize(seed);
+
+                // Get groove anchor pattern for selected genre
                 var groovePreset = new GroovePresetDefinition
                 {
                     Identity = new GroovePresetIdentity
                     {
-                        Name = "PopRock",
+                        Name = genre,
                         BeatsPerBar = 4,
-                        StyleFamily = "PopRock"
+                        StyleFamily = genre
                     },
-                    AnchorLayer = GrooveAnchorFactory.GetAnchor("PopRock")
+                    AnchorLayer = GrooveAnchorFactory.GetAnchor(genre)
                 };
                 songContext.GroovePresetDefinition = groovePreset;
 
-                // Use StyleConfiguration to enable drummer agent (operator-based generation)
-                var drummerStyle = StyleConfigurationLibrary.PopRock;
+                // Get StyleConfiguration for selected genre (enables drummer agent)
+                var drummerStyle = StyleConfigurationLibrary.GetStyle(genre);
+                if (drummerStyle == null)
+                {
+                    ShowError($"Style configuration not found for genre: {genre}");
+                    return;
+                }
 
                 // Generate drum track using drummer agent pipeline
                 var result = Generator.Generator.Generate(songContext, drummerStyle);
+
+                // Set descriptive name with seed and mark as drum set for correct playback
+                result.MidiProgramName = $"Drummer Agent (Seed: {seed})";
+                result.MidiProgramNumber = 255; // 255 = Drum Set sentinel in MidiVoices
 
                 songContext.Song.PartTracks.Add(result);
 
                 // Update Grid with drum track
                 SongGridManager.AddNewPartTrack(result, dgSong);
-                ShowSuccess(1);
+                ShowSuccess(seed, genre, bars);
             }
             catch (Exception ex)
             {
-                ShowError(ex);
+                ShowError(ex.Message);
             }
         }
 
         #region MessageBox
 
-        // AI: ShowSuccess: message text should remain stable for tests that assert success dialogs.
-        private static void ShowSuccess(int addedCount)
+        // AI: ShowSuccess: displays seed for reproduction; message stable for testing.
+        private static void ShowSuccess(int seed, string genre, int bars)
         {
             MessageBoxHelper.Show(
-                $"Successfully created {addedCount} drum track(s) using drummer agent.",
+                $"Drummer agent track created successfully.\n\n" +
+                $"Genre: {genre}\n" +
+                $"Seed: {seed}\n" +
+                $"Bars: {bars}\n\n" +
+                $"Use this seed to reproduce the same drum track.",
                 "Drummer Agent Test",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
         }
 
-        // AI: ShowError: shows exception message; avoid leaking sensitive info in production UI.
-        private static void ShowError(Exception ex)
+        // AI: ShowError: shows error message; overload for exception and string message.
+        private static void ShowError(string message)
         {
             MessageBoxHelper.Show(
-                $"Generator error:\n{ex.Message}",
+                $"Generator error:\n{message}",
                 "Generation Error",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
