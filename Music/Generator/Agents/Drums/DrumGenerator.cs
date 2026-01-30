@@ -3,17 +3,15 @@
 // AI: deps=DrummerAgent (data source), DrumSelectionEngine, BarContextBuilder, SongContext, PartTrack.
 // AI: change=Story RF-2, 4.2; correct architecture replaces DrummerAgent.Generate() with proper groove integration.
 
-using Music.Generator.Material;
-using Music.MyMidi;
-
 using Music.Generator.Groove;
+using Music.MyMidi;
 
 namespace Music.Generator.Agents.Drums
 {
     /// <summary>
-    /// Settings for GrooveBasedDrumGenerator behavior.
+    /// Settings for DrumGenerator behavior.
     /// </summary>
-    public sealed record GrooveBasedDrumGeneratorSettings
+    public sealed record DrumGeneratorSettings
     {
         /// <summary>Whether to enable diagnostics collection (default: false).</summary>
         public bool EnableDiagnostics { get; init; } = false;
@@ -27,7 +25,7 @@ namespace Music.Generator.Agents.Drums
         public int DefaultVelocity { get; init; } = 100;
 
         /// <summary>Default settings instance.</summary>
-        public static GrooveBasedDrumGeneratorSettings Default => new();
+        public static DrumGeneratorSettings Default => new();
 
         /// <summary>Gets the active roles, falling back to default if not set.</summary>
         public IReadOnlyList<string> GetActiveRoles()
@@ -52,36 +50,37 @@ namespace Music.Generator.Agents.Drums
     /// </list>
     /// <para>Enforces density targets, operator caps, and weighted selection per policy decisions.</para>
     /// </remarks>
-    public sealed class GrooveBasedDrumGenerator
+    public sealed class DrumGenerator
     {
         private readonly IDrumPolicyProvider _policyProvider;
         private readonly IDrumCandidateSource _candidateSource;
-        private readonly GrooveBasedDrumGeneratorSettings _settings;
+        private readonly DrumGeneratorSettings _settings;
 
         /// <summary>
-        /// Creates a GrooveBasedDrumGenerator with the specified policy and candidate providers.
+        /// Creates a DrumGenerator with the specified policy and candidate providers.
         /// </summary>
         /// <param name="policyProvider">Policy provider (provides density targets, caps, weights).</param>
         /// <param name="candidateSource">Candidate source (provides operator-generated candidates).</param>
         /// <param name="settings">Optional settings (diagnostics, active roles, default velocity).</param>
         /// <exception cref="ArgumentNullException">If policyProvider or candidateSource is null.</exception>
-        public GrooveBasedDrumGenerator(
+        public DrumGenerator(
             IDrumPolicyProvider policyProvider,
             IDrumCandidateSource candidateSource,
-            GrooveBasedDrumGeneratorSettings? settings = null)
+            DrumGeneratorSettings? settings = null)
         {
             ArgumentNullException.ThrowIfNull(policyProvider);
             ArgumentNullException.ThrowIfNull(candidateSource);
 
             _policyProvider = policyProvider;
             _candidateSource = candidateSource;
-            _settings = settings ?? GrooveBasedDrumGeneratorSettings.Default;
+            _settings = settings ?? DrumGeneratorSettings.Default;
         }
 
         /// <summary>
         /// Generates a drum track from the provided song context.
         /// </summary>
         /// <param name="songContext">Song context with section, groove, and timing data.</param>
+        /// <param name="maxBars">Maximum number of bars to generate. When 0, generates full song. When > 0, limits generation to first N bars.</param>
         /// <returns>Generated drum PartTrack.</returns>
         /// <exception cref="ArgumentNullException">If songContext is null.</exception>
         /// <exception cref="ArgumentException">If required tracks are missing.</exception>
@@ -96,7 +95,7 @@ namespace Music.Generator.Agents.Drums
         ///   <item>Convert to MIDI events</item>
         /// </list>
         /// </remarks>
-        public PartTrack Generate(SongContext songContext)
+        public PartTrack Generate(SongContext songContext, int maxBars = 0)
         {
             ValidateSongContext(songContext);
 
@@ -106,17 +105,23 @@ namespace Music.Generator.Agents.Drums
             var groovePresetDefinition = songContext.GroovePresetDefinition;
             int totalBars = sectionTrack.TotalBars;
 
+            // Limit bars if maxBars > 0
+            if (maxBars > 0 && maxBars < totalBars)
+            {
+                totalBars = maxBars;
+            }
+
             // Resolve MIDI program number for drums
             int drumProgramNumber = GetDrumProgramNumber(songContext);
 
-            // Build per-bar contexts
+            // Build per-bar contexts (limited to totalBars)
             var barContexts = DrumBarContextBuilder.Build(sectionTrack, totalBars);
 
             // Extract anchor onsets (foundation that's always present)
             var anchorOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars, barTrack);
 
             // Generate operator-based candidates for each bar using GrooveSelectionEngine
-            var operatorOnsets = GenerateOperatorOnsets(barContexts, anchorOnsets, barTrack);
+            var operatorOnsets = GenerateOperatorOnsets(barContexts, anchorOnsets, barTrack, totalBars);
 
             // Combine anchors with operator onsets
             var allOnsets = CombineOnsets(anchorOnsets, operatorOnsets);
@@ -218,12 +223,14 @@ namespace Music.Generator.Agents.Drums
         private List<GrooveOnset> GenerateOperatorOnsets(
             IReadOnlyList<BarContext> barContexts,
             List<GrooveOnset> anchors,
-            BarTrack barTrack)
+            BarTrack barTrack,
+            int totalBars)
         {
             var result = new List<GrooveOnset>();
             var activeRoles = _settings.GetActiveRoles();
 
-            foreach (var barContext in barContexts)
+            // Iterate only through bars up to totalBars (respects maxBars limit)
+            foreach (var barContext in barContexts.Where(bc => bc.BarNumber <= totalBars))
             {
                 var drumBarContext = DrumBarContext.FromBarContext(barContext);
 

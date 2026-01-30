@@ -15,7 +15,7 @@
 //    /// <summary>
 //    /// Story RF-5: Tests for DrummerAgent as data source.
 //    /// Verifies construction and delegation to IGroovePolicyProvider + IGrooveCandidateSource.
-//    /// DrummerAgent does NOT generate PartTracks directly - use GrooveBasedDrumGenerator pipeline.
+//    /// DrummerAgent does NOT generate PartTracks directly - use DrumGenerator pipeline.
 //    /// </summary>
 //    [Collection("RngDependentTests")]
 //    public class DrummerAgentTests

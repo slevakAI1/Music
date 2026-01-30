@@ -1,4 +1,4 @@
-//// AI: purpose=Unit tests for Story RF-6 GrooveBasedDrumGenerator pipeline orchestrator.
+//// AI: purpose=Unit tests for Story RF-6 DrumGenerator pipeline orchestrator.
 //// AI: deps=xunit for test framework; verifies GrooveSelectionEngine integration, density enforcement, caps, weighted selection.
 //// AI: change=Story RF-6: comprehensive tests for pipeline that uses IGroovePolicyProvider + IGrooveCandidateSource.
 
@@ -12,7 +12,7 @@
 //namespace Music.Generator.Agents.Drums.Tests
 //{
 //    /// <summary>
-//    /// Story RF-6: Tests for GrooveBasedDrumGenerator pipeline orchestrator.
+//    /// Story RF-6: Tests for DrumGenerator pipeline orchestrator.
 //    /// Verifies proper use of GrooveSelectionEngine with density enforcement, caps, and weighted selection.
 //    /// </summary>
 //    [Collection("RngDependentTests")]
@@ -31,7 +31,7 @@
 //            // Arrange
 //            var songContext = CreateMinimalSongContext(barCount: 4);
 //            var agent = new DrummerAgent(StyleConfigurationLibrary.PopRock);
-//            var generator = new GrooveBasedDrumGenerator(agent, agent);
+//            var generator = new DrumGenerator(agent, agent);
 
 //            // Act
 //            var track = generator.Generate(songContext);
@@ -47,7 +47,7 @@
 //            // Arrange
 //            var songContext = CreateMinimalSongContext(barCount: 4);
 //            var agent = new DrummerAgent(StyleConfigurationLibrary.PopRock);
-//            var generator = new GrooveBasedDrumGenerator(agent, agent);
+//            var generator = new DrumGenerator(agent, agent);
 
 //            // Act
 //            var track = generator.Generate(songContext);
@@ -67,7 +67,7 @@
 //            // Arrange
 //            var songContext = CreateMinimalSongContext(barCount: 4);
 //            var agent = new DrummerAgent(StyleConfigurationLibrary.PopRock);
-//            var generator = new GrooveBasedDrumGenerator(agent, agent);
+//            var generator = new DrumGenerator(agent, agent);
 
 //            // Act
 //            var track = generator.Generate(songContext);
@@ -87,7 +87,7 @@
 //        {
 //            // Arrange
 //            var agent = new DrummerAgent(StyleConfigurationLibrary.PopRock);
-//            var generator = new GrooveBasedDrumGenerator(agent, agent);
+//            var generator = new DrumGenerator(agent, agent);
 
 //            // Act & Assert
 //            Assert.Throws<ArgumentNullException>(() => generator.Generate(null!));
@@ -100,7 +100,7 @@
 //            var agent = new DrummerAgent(StyleConfigurationLibrary.PopRock);
 
 //            // Act & Assert
-//            Assert.Throws<ArgumentNullException>(() => new GrooveBasedDrumGenerator(null!, agent));
+//            Assert.Throws<ArgumentNullException>(() => new DrumGenerator(null!, agent));
 //        }
 
 //        [Fact]
@@ -110,7 +110,7 @@
 //            var agent = new DrummerAgent(StyleConfigurationLibrary.PopRock);
 
 //            // Act & Assert
-//            Assert.Throws<ArgumentNullException>(() => new GrooveBasedDrumGenerator(agent, null!));
+//            Assert.Throws<ArgumentNullException>(() => new DrumGenerator(agent, null!));
 //        }
 
 //        #endregion
@@ -123,7 +123,7 @@
 //            // Arrange - Create real agent that will use GrooveSelectionEngine internally
 //            var songContext = CreateMinimalSongContext(barCount: 4);
 //            var agent = new DrummerAgent(StyleConfigurationLibrary.PopRock);
-//            var generator = new GrooveBasedDrumGenerator(agent, agent);
+//            var generator = new DrumGenerator(agent, agent);
 
 //            // Act
 //            var track = generator.Generate(songContext);
@@ -160,12 +160,12 @@
 //            // Use agent with very conservative settings (density will still be > 0 from policy)
 //            // To truly test zero density, we'd need a test-only policy provider
 //            // For now, test with minimal settings
-//            var settings = new GrooveBasedDrumGeneratorSettings
+//            var settings = new DrumGeneratorSettings
 //            {
 //                ActiveRoles = new[] { GrooveRoles.Kick }
 //            };
 //            var agent = new DrummerAgent(StyleConfigurationLibrary.PopRock);
-//            var generator = new GrooveBasedDrumGenerator(agent, agent, settings);
+//            var generator = new DrumGenerator(agent, agent, settings);
 
 //            // Act
 //            var track = generator.Generate(songContext);
@@ -187,7 +187,7 @@
 //            var chorusContext = CreateSongContextWithSection(MusicConstants.eSectionType.Chorus, barCount: 4);
             
 //            var agent = new DrummerAgent(StyleConfigurationLibrary.PopRock);
-//            var generator = new GrooveBasedDrumGenerator(agent, agent);
+//            var generator = new DrumGenerator(agent, agent);
 
 //            // Act
 //            var introTrack = generator.Generate(introContext);
@@ -214,12 +214,12 @@
 
 //            Rng.Initialize(123);
 //            var agent1 = new DrummerAgent(StyleConfigurationLibrary.PopRock);
-//            var generator1 = new GrooveBasedDrumGenerator(agent1, agent1);
+//            var generator1 = new DrumGenerator(agent1, agent1);
 //            var track1 = generator1.Generate(songContext1);
 
 //            Rng.Initialize(123);
 //            var agent2 = new DrummerAgent(StyleConfigurationLibrary.PopRock);
-//            var generator2 = new GrooveBasedDrumGenerator(agent2, agent2);
+//            var generator2 = new DrumGenerator(agent2, agent2);
 //            var track2 = generator2.Generate(songContext2);
 
 //            // Assert
@@ -242,12 +242,12 @@
 
 //            Rng.Initialize(123);
 //            var agent1 = new DrummerAgent(StyleConfigurationLibrary.PopRock);
-//            var generator1 = new GrooveBasedDrumGenerator(agent1, agent1);
+//            var generator1 = new DrumGenerator(agent1, agent1);
 //            var track1 = generator1.Generate(songContext1);
 
 //            Rng.Initialize(456);
 //            var agent2 = new DrummerAgent(StyleConfigurationLibrary.PopRock);
-//            var generator2 = new GrooveBasedDrumGenerator(agent2, agent2);
+//            var generator2 = new DrumGenerator(agent2, agent2);
 //            var track2 = generator2.Generate(songContext2);
 
 //            // Assert - With operators and longer track, should see differences
@@ -281,7 +281,7 @@
 //            // Arrange
 //            var songContext = CreateMinimalSongContext(barCount: 4);
 //            var agent = new DrummerAgent(StyleConfigurationLibrary.PopRock);
-//            var generator = new GrooveBasedDrumGenerator(agent, agent);
+//            var generator = new DrumGenerator(agent, agent);
 
 //            // Act
 //            var track = generator.Generate(songContext);
@@ -311,7 +311,7 @@
 //            // Arrange
 //            var songContext = CreateMinimalSongContext(barCount: 4);
 //            var agent = new DrummerAgent(StyleConfigurationLibrary.PopRock);
-//            var generator = new GrooveBasedDrumGenerator(agent, agent);
+//            var generator = new DrumGenerator(agent, agent);
 
 //            // Act
 //            var track = generator.Generate(songContext);

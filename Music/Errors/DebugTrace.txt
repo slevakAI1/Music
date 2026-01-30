@@ -2263,3 +2263,52 @@
 [2026-01-29T23:12:38.2381727-05:00] StartPlaybackWithMeasureTracking: FINALLY block - stopping tracker and clearing highlights
 [2026-01-29T23:12:38.2384349-05:00] === StartPlaybackWithMeasureTrackingAsync END ===
 [2026-01-29T23:12:38.2387874-05:00] <<< btnPlay_Click END
+[2026-01-29T23:33:55.4339105-05:00] Rng.Initialize: seed=12345
+[2026-01-29T23:34:00.9699881-05:00] Rng.Initialize: seed=-977730746
+[2026-01-29T23:34:06.6950775-05:00] >>> btnPlay_Click START
+[2026-01-29T23:34:06.6964696-05:00] === StartPlaybackWithMeasureTrackingAsync START ===
+[2026-01-29T23:34:06.6968331-05:00] StartPlaybackWithMeasureTracking: enableTracking=True
+[2026-01-29T23:34:06.6971362-05:00] StartPlaybackWithMeasureTracking: Setting up progress tracker
+[2026-01-29T23:34:06.7032722-05:00] StartPlaybackWithMeasureTracking: Progress tracker started, calling HandlePlayAsync
+[2026-01-29T23:34:06.7056767-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-01-29T23:34:06.7067791-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=1
+[2026-01-29T23:34:06.7072499-05:00] HandlePlayAsync: Converting 1 tracks to MIDI document
+[2026-01-29T23:34:06.7842924-05:00] HandlePlayAsync: MIDI document created, Duration=16000ms
+[2026-01-29T23:34:06.7846905-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-01-29T23:34:06.7861544-05:00] === Player.PlayMidiFromSongTracksAsync START ===
+[2026-01-29T23:34:06.7864835-05:00] Player: Stopping any existing playback
+[2026-01-29T23:34:06.7874439-05:00] MidiPlaybackService.Stop: START - IsPlaying=False, IsPaused=False
+[2026-01-29T23:34:06.7877536-05:00] MidiPlaybackService.Stop: _playback is null, nothing to stop
+[2026-01-29T23:34:06.7881423-05:00] MidiPlaybackService.Stop: END
+[2026-01-29T23:34:06.8304787-05:00] Player: Found output device: Microsoft GS Wavetable Synth
+[2026-01-29T23:34:06.8314428-05:00] Player: Starting playback
+[2026-01-29T23:34:06.8321645-05:00] MidiPlaybackService.Play: START
+[2026-01-29T23:34:06.8325092-05:00] MidiPlaybackService.Play: Calling Stop()
+[2026-01-29T23:34:06.8330423-05:00] MidiPlaybackService.Stop: START - IsPlaying=False, IsPaused=False
+[2026-01-29T23:34:06.8333173-05:00] MidiPlaybackService.Stop: _playback is null, nothing to stop
+[2026-01-29T23:34:06.8336389-05:00] MidiPlaybackService.Stop: Disposing output device
+[2026-01-29T23:34:06.8347025-05:00] MidiPlaybackService.Stop: END
+[2026-01-29T23:34:06.8349746-05:00] MidiPlaybackService.Play: Created new CancellationTokenSource
+[2026-01-29T23:34:06.8352791-05:00] MidiPlaybackService.Play: Getting fresh output device
+[2026-01-29T23:34:06.8358873-05:00] MidiPlaybackService.Play: Device=Microsoft GS Wavetable Synth
+[2026-01-29T23:34:06.8361543-05:00] MidiPlaybackService.Play: Creating playback from document
+[2026-01-29T23:34:06.8549194-05:00] MidiPlaybackService.Play: Starting playback
+[2026-01-29T23:34:07.0952763-05:00] MidiPlaybackService.Play: END - IsPlaying=True
+[2026-01-29T23:34:07.0958393-05:00] Player: Got CancellationToken, CanBeCanceled=True
+[2026-01-29T23:34:07.0961568-05:00] Player: Duration=16000ms, TotalDelay=16250ms
+[2026-01-29T23:34:07.0965732-05:00] Player: IsPlaying=True, IsPaused=False
+[2026-01-29T23:34:07.0970939-05:00] Player: Beginning cancellable Task.Delay(16250ms)
+[2026-01-29T23:34:23.3524635-05:00] Player: Task.Delay completed normally
+[2026-01-29T23:34:23.3529163-05:00] Player: Calling Stop to release resources
+[2026-01-29T23:34:23.3532440-05:00] MidiPlaybackService.Stop: START - IsPlaying=False, IsPaused=False
+[2026-01-29T23:34:23.3536020-05:00] MidiPlaybackService.Stop: Cancelling CancellationTokenSource
+[2026-01-29T23:34:23.3539861-05:00] MidiPlaybackService.Stop: Stopping playback
+[2026-01-29T23:34:23.3543358-05:00] MidiPlaybackService.Stop: Disposing playback
+[2026-01-29T23:34:23.3551932-05:00] MidiPlaybackService.Stop: Disposing output device
+[2026-01-29T23:34:23.4604981-05:00] MidiPlaybackService.Stop: END
+[2026-01-29T23:34:23.4608730-05:00] === Player.PlayMidiFromSongTracksAsync END ===
+[2026-01-29T23:34:23.4613785-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-01-29T23:34:23.4617280-05:00] StartPlaybackWithMeasureTracking: HandlePlayAsync returned (with tracking)
+[2026-01-29T23:34:23.4620552-05:00] StartPlaybackWithMeasureTracking: FINALLY block - stopping tracker and clearing highlights
+[2026-01-29T23:34:23.4625214-05:00] === StartPlaybackWithMeasureTrackingAsync END ===
+[2026-01-29T23:34:23.4627972-05:00] <<< btnPlay_Click END

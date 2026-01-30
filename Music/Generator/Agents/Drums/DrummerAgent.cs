@@ -33,7 +33,7 @@ namespace Music.Generator.Agents.Drums
     }
 
     /// <summary>
-    /// Data source for drum generation. Does NOT generate PartTracks directly. Use GrooveBasedDrumGenerator pipeline.
+    /// Data source for drum generation. Does NOT generate PartTracks directly. Use DrumGenerator pipeline.
     /// Implements IDrumPolicyProvider and IDrumCandidateSource to hook into the groove system.
     /// Story 4.2: Updated to use Drum interfaces.
     /// </summary>

@@ -1,6 +1,6 @@
-// AI: purpose=Generate drum track using GrooveBasedDrumGenerator pipeline (Story RF-4) or fallback to anchor-based generation.
-// AI: deps=GrooveBasedDrumGenerator for pipeline orchestration; DrummerAgent as data source; returns PartTrack sorted by AbsoluteTimeTicks.
-// AI: change=Story RF-4: uses GrooveBasedDrumGenerator pipeline with DrummerAgent; old anchor-based approach preserved as fallback.
+// AI: purpose=Generate drum track using DrumGenerator pipeline (Story RF-4) or fallback to anchor-based generation.
+// AI: deps=DrumGenerator for pipeline orchestration; DrummerAgent as data source; returns PartTrack sorted by AbsoluteTimeTicks.
+// AI: change=Story RF-4: uses DrumGenerator pipeline with DrummerAgent; old anchor-based approach preserved as fallback.
 
 using Music.Generator.Agents.Common;
 using Music.Generator.Agents.Drums;
@@ -55,7 +55,7 @@ namespace Music.Generator
         private const int TomLowMidiNote = 45;
 
         /// <summary>
-        /// Generates drum track using GrooveBasedDrumGenerator pipeline (Story RF-4).
+        /// Generates drum track using DrumGenerator pipeline (Story RF-4).
         /// Uses DrummerAgent as data source with PopRock style configuration.
         /// </summary>
         /// <param name="songContext">Song context containing all required data.</param>
@@ -65,7 +65,7 @@ namespace Music.Generator
         /// <para>Architecture (Story RF-4):</para>
         /// <list type="bullet">
         ///   <item>Creates DrummerAgent with PopRock style (data source)</item>
-        ///   <item>Creates GrooveBasedDrumGenerator (pipeline orchestrator)</item>
+        ///   <item>Creates DrumGenerator (pipeline orchestrator)</item>
         ///   <item>Generates via proper groove system with GrooveSelectionEngine</item>
         ///   <item>Enforces density targets, operator caps, weighted selection</item>
         /// </list>
@@ -78,15 +78,15 @@ namespace Music.Generator
             //  OK ITS USING AGENT HERE
 
 
-            // Story RF-4: Use GrooveBasedDrumGenerator pipeline with DrummerAgent as data source
+            // Story RF-4: Use DrumGenerator pipeline with DrummerAgent as data source
             var agent = new DrummerAgent(StyleConfigurationLibrary.PopRock);
-            var generator = new GrooveBasedDrumGenerator(agent, agent);
+            var generator = new DrumGenerator(agent, agent);
             return generator.Generate(songContext);
         }
 
         /// <summary>
         /// Original Generate method signature preserved for backward compatibility.
-        /// Builds SongContext and uses GrooveBasedDrumGenerator pipeline.
+        /// Builds SongContext and uses DrumGenerator pipeline.
         /// Story RF-4: Updated to use new pipeline architecture.
         /// </summary>
         public static PartTrack Generate(

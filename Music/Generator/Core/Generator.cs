@@ -1,8 +1,8 @@
 // AI: purpose=Generate PartTrack using for Drums only, Section+Bar timing;
 // AI: invariants=BarTrack is read-only and must NOT be rebuilt here.
-// AI: deps=MusicConstants.TicksPerQuarterNote; GrooveBasedDrumGenerator pipeline for drum generation.
+// AI: deps=MusicConstants.TicksPerQuarterNote; DrumGenerator pipeline for drum generation.
 // AI: perf=Single-run generation; avoid allocations in inner loops; use seed for deterministic results.
-// AI: change=Story RF-3 replaces DrummerAgent.Generate() with GrooveBasedDrumGenerator pipeline architecture.
+// AI: change=Story RF-3 replaces DrummerAgent.Generate() with DrumGenerator pipeline architecture.
 
 using Music.Generator.Agents.Common;
 using Music.Generator.Agents.Drums;
@@ -22,16 +22,18 @@ namespace Music.Generator
 
         /// <summary>
         /// Generates a drum track from the song context using the optional drummer style configuration.
-        /// Story RF-3: Wire GrooveBasedDrumGenerator pipeline with DrummerAgent as data source.
+        /// Story RF-3: Wire DrumGenerator pipeline with DrummerAgent as data source.
         /// </summary>
         /// <param name="songContext">Song context with section, groove, and timing data.</param>
         /// <param name="drummerStyle">Optional style configuration for operator-based drum generation.
         /// When null, falls back to groove-only DrumTrackGenerator.</param>
+        /// <param name="maxBars">Maximum number of bars to generate. When 0 (default), generates full song.
+        /// When > 0, limits generation to first N bars.</param>
         /// <returns>Generated drum PartTrack.</returns>
         /// <remarks>
         /// <para>Architecture (Story RF-3):</para>
         /// <list type="bullet">
-        ///   <item>When drummerStyle is provided: Creates DrummerAgent (data source) → passes to GrooveBasedDrumGenerator (pipeline) → uses GrooveSelectionEngine for weighted selection</item>
+        ///   <item>When drummerStyle is provided: Creates DrummerAgent (data source) → passes to DrumGenerator (pipeline) → uses GrooveSelectionEngine for weighted selection</item>
         ///   <item>When drummerStyle is null: Falls back to existing DrumTrackGenerator (anchor patterns only)</item>
         /// </list>
         /// <para>Benefits of new architecture:</para>
@@ -43,7 +45,7 @@ namespace Music.Generator
         ///   <item>Memory system prevents robotic repetition</item>
         /// </list>
         /// </remarks>
-        public static PartTrack Generate(SongContext songContext, StyleConfiguration? drummerStyle)
+        public static PartTrack Generate(SongContext songContext, StyleConfiguration? drummerStyle, int maxBars = 0)
         {
             ValidateSongContext(songContext);
             ValidateSectionTrack(songContext.SectionTrack);
@@ -54,8 +56,8 @@ namespace Music.Generator
             if (drummerStyle != null)
             {
                 var agent = new DrummerAgent(drummerStyle);
-                var generator = new GrooveBasedDrumGenerator(agent, agent);
-                return generator.Generate(songContext);
+                var generator = new DrumGenerator(agent, agent);
+                return generator.Generate(songContext, maxBars);
             }
 
             return DrumTrackGenerator.Generate(songContext);

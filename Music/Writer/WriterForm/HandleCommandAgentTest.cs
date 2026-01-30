@@ -61,11 +61,12 @@ namespace Music.Writer
                     return;
                 }
 
-                // Generate drum track using drummer agent pipeline
-                var result = Generator.Generator.Generate(songContext, drummerStyle);
+                // Generate drum track using drummer agent pipeline (bars=0 means full song, >0 limits generation)
+                var result = Generator.Generator.Generate(songContext, drummerStyle, bars);
 
                 // Set descriptive name with seed and mark as drum set for correct playback
-                result.MidiProgramName = $"Drummer Agent (Seed: {seed})";
+                string barsInfo = bars > 0 ? $" ({bars} bars)" : "";
+                result.MidiProgramName = $"Drummer Agent{barsInfo} (Seed: {seed})";
                 result.MidiProgramNumber = 255; // 255 = Drum Set sentinel in MidiVoices
 
                 songContext.Song.PartTracks.Add(result);
@@ -82,14 +83,18 @@ namespace Music.Writer
 
         #region MessageBox
 
-        // AI: ShowSuccess: displays seed for reproduction; message stable for testing.
+        // AI: ShowSuccess: displays seed for reproduction; message stable for testing; shows if limited or full song.
         private static void ShowSuccess(int seed, string genre, int bars)
         {
+            string barsMessage = bars > 0 
+                ? $"Generated first {bars} bars."
+                : "Generated full song.";
+
             MessageBoxHelper.Show(
                 $"Drummer agent track created successfully.\n\n" +
                 $"Genre: {genre}\n" +
                 $"Seed: {seed}\n" +
-                $"Bars: {bars}\n\n" +
+                $"{barsMessage}\n\n" +
                 $"Use this seed to reproduce the same drum track.",
                 "Drummer Agent Test",
                 MessageBoxButtons.OK,
