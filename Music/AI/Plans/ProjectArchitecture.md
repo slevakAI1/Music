@@ -56,8 +56,7 @@ Location: `Song/SongContext.cs`
 
 Key properties:
 - `BarTrack` — timing ruler
-- `GroovePresetDefinition` — groove configuration
-- `SegmentGrooveProfiles` — per-section overrides
+- `GroovePresetDefinition` — groove configuration (anchor layer only; Story 5.2 removed SegmentGrooveProfiles)
 - `HarmonyTrack` — chord progression
 - `SectionTrack` — song structure
 - `LyricTrack` — lyrics with phonetics
@@ -117,24 +116,25 @@ Location: `Generator/Core/Generator.cs`
 
 Validates SongContext and delegates to drum track generator.
 
-### DrumTrackGenerator Pipeline
-Location: `Generator/Drums/DrumTrackGenerator.cs`
+### GrooveBasedDrumGenerator Pipeline
+Location: `Generator/Agents/Drums/GrooveBasedDrumGenerator.cs`
+
+Pipeline orchestrator using `IDrumPolicyProvider` + `IDrumCandidateSource` (typically DrummerAgent).
 
 Pipeline stages:
-1. Build bar contexts
-2. Merge protection hierarchy
-3. Augment phrase hooks
-4. Extract anchor onsets
-5. Filter by subdivision
-6. Filter by syncopation/anticipation
-7. Filter by role presence
-8. Apply protections
-9. Apply feel timing
-10. Apply role micro-timing
-11. Generate operator candidates
-12. Apply physicality filter
-13. Select operators
-14. Convert to MIDI events
+1. Extract anchors from `GroovePresetDefinition`
+2. Build `DrumBarContext` for each bar (section info, phrase position, energy)
+3. For each bar + role:
+   - Get policy decision from `IDrumPolicyProvider` (density targets, caps, weights)
+   - Get candidate groups from `IDrumCandidateSource` (operator-generated candidates)
+   - Select candidates using `DrumSelectionEngine` (weighted selection, density enforcement)
+4. Combine anchors + selected operator onsets
+5. Convert to MIDI events via `PartTrack`
+
+### DrumTrackGenerator (Legacy)
+Location: `Generator/Drums/DrumTrackGenerator.cs`
+
+**Status:** Legacy groove-based pipeline; being replaced by GrooveBasedDrumGenerator + DrummerAgent architecture.
 
 ---
 
@@ -143,64 +143,58 @@ Pipeline stages:
 ### Core Components
 Location: `Generator/Groove/`
 
-**GroovePresetDefinition** — container for groove configuration
-- `GroovePresetIdentity`
-- `AnchorLayer` — base pattern
-- `ProtectionPolicy` — bundled policies
-- `VariationCatalog` — optional candidates
+**GroovePresetDefinition** — simplified groove configuration (Story 5.2, GC-Epic)
+- `GroovePresetIdentity` — name and metadata
+- `AnchorLayer` (`GrooveInstanceLayer`) — base pattern onsets only
 
-**GrooveProtectionPolicy** — bundled policies
-- `SubdivisionPolicy` — grid + feel
-- `RoleConstraintPolicy` — vocabulary constraints
-- `PhraseHookPolicy` — fill windows/cadence
-- `TimingPolicy` — micro-timing rules
-- `OrchestrationPolicy` — role presence
-- `HierarchyLayers` — layered protections
+**Note:** Variation infrastructure has been removed (GC-Epic). All variation is now handled by Drummer Agent operators.
 
-**SegmentGrooveProfile** — per-section overrides
-- Section-specific groove preset switching
-- Enabled variation tags
-- Density targets
-- Feel/swing overrides
+**GrooveInstanceLayer** — anchor onset container
+- List of `GrooveOnset` records
+- Query methods (`GetOnsets`, `GetActiveRoles`, `HasRole`)
+- `ToPartTrack()` for preview/audition
 
-**GrooveOnset** — output type
+**GrooveOnset** — single onset record
 - Role, bar, beat
 - Strength, velocity, timing offset
-- Provenance
-- Protection flags
+- Provenance (anchor/variation tracking)
 
-**GrooveBarPlan** — per-bar plan
-- Base onsets (anchors)
-- Selected variation onsets
-- Final onsets (after constraints)
-- Optional diagnostics
-
-**GrooveBarDiagnostics** — decision trace (opt-in)
-- Enabled tags
-- Candidate statistics
-- Filter decisions
-- Selection decisions
-- Prune events
-- Final onset summary
+**GrooveOnsetProvenance** — tracks onset origin
+- Anchor provenance (`ForAnchor`)
+- Variation provenance (`ForVariation`)
+- Candidate ID for tracing
 
 ### Groove Infrastructure Files
 
 | Component | Responsibility |
 |-----------|---------------|
-| `OnsetGrid` / `OnsetGridBuilder` | Valid beat positions from subdivision policy |
-| `OnsetStrengthClassifier` | Classify onset strength |
-| `FeelTimingEngine` | Apply feel timing to offbeats |
-| `RoleTimingEngine` | Apply per-role micro-timing |
-| `ProtectionPerBarBuilder` | Merge protection layers per bar |
-| `ProtectionApplier` | Apply must-hit/never-add/never-remove rules |
-| `RolePresenceGate` | Check role presence in section |
-| `RhythmVocabularyFilter` | Filter by syncopation/anticipation |
-| `PhraseHookProtectionAugmenter` | Protect anchors near phrase ends |
-| `BarContextBuilder` | Build per-bar context |
-| `GrooveSelectionEngine` | Select candidates until target reached |
-| `GrooveCapsEnforcer` | Enforce hard caps |
-| `OverrideMergePolicyEnforcer` | Enforce override merge policy |
-| `PartTrackBarCoverageAnalyzer` | Analyze per-bar fill state |
+| `OnsetGrid` / `OnsetGridBuilder` | Valid beat positions from subdivision rules |
+| `OnsetStrengthClassifier` | Classify onset strength (downbeat/backbeat/offbeat/etc.) |
+| `FeelTimingEngine` | Apply feel timing to offbeats (swing/shuffle/straight) |
+| `RoleTimingEngine` | Apply per-role micro-timing offsets |
+| `PartTrackBarCoverageAnalyzer` | Analyze per-bar fill state for density tracking |
+| `GrooveRoles` | Role name constants (Kick, Snare, ClosedHat, OpenHat, etc.) |
+| `AllowedSubdivision` | Subdivision policy enum (Eighth, Sixteenth, Triplet) |
+| `GrooveFeel` | Feel/swing policy enum (Straight, Swing, Shuffle, etc.) |
+| `TimingFeel` | Micro-timing style enum (OnTheGrid, Relaxed, Pushing, Dragging) |
+| `GrooveAnchorFactory` | Creates anchor layers for presets |
+| `GroovePresetLibrary` | Registry of preset definitions |
+| `GrooveBarPlan` | Per-bar plan record (planned for future use) |
+| `GrooveBarDiagnostics` | Decision trace (opt-in, planned for future use) |
+| `BarCoverageReport` | Bar fill state analysis result |
+| `BarFillState` | Enum for fill state (Empty, Sparse, Moderate, Dense, Full) |
+| `SectionRolePresenceDefaults` | Default role presence rules per section type |
+| `RoleRhythmVocabulary` | Rhythm vocabulary constraints per role |
+
+### Removed Components (GC-Epic)
+- `GrooveVariationCatalog` — deleted
+- `GrooveVariationLayer` — deleted
+- `GrooveVariationLayerMerger` — deleted
+- `OnsetCandidate` (generic) — deleted
+- `CandidateGroup` (generic) — deleted
+- `SegmentGrooveProfile` — removed in Story 5.2
+
+**Note:** Protection policy infrastructure was removed in Story 5.3. Density and constraint enforcement now handled by DrummerPolicyProvider and physicality systems.
 
 ---
 
@@ -322,7 +316,15 @@ Location: `Song/Voices/`
 ### Main Project Tests
 Location: in-project test files (compiled with app)
 
-Contains test data for sections, harmony, tempo, timing, material, and UI.
+Contains test data for sections, harmony, tempo, timing, and material.
+
+Files include:
+- `SectionTests.cs`
+- `HarmonyTests.cs`
+- `TempoTests.cs`
+- `TimingTests.cs`
+- `WriterFormTests.cs`
+- `TestDesigns.cs` and integration tests in `Generator/TestSetups/`
 
 ### Music.Tests Project
 Location: `Music.Tests/`
@@ -332,7 +334,21 @@ Framework: xUnit
 Conventions:
 - Constructor-based RNG initialization
 - Method naming: `<Component>_<Condition>_<ExpectedResult>`
+- Test collections for shared fixtures (`TestCollections.cs`)
 - `#region` blocks for organization
+- Golden snapshots for regression testing (`DrummerAgentTests`, `GoldenSnapshot.cs`)
+
+Test organization mirrors source structure:
+- `Generator/Agents/Common/` — shared agent infrastructure tests
+- `Generator/Agents/Drums/` — drummer agent tests
+- `Generator/Agents/Drums/Operators/` — operator family tests
+- `Generator/Agents/Drums/Physicality/` — physicality system tests
+- `Generator/Agents/Drums/Performance/` — performance rendering tests
+- `Generator/Agents/Drums/Diagnostics/` — diagnostics and feature extraction tests
+- `Generator/Groove/` — groove system tests
+- `Generator/Material/` — material system tests
+- `Generator/Core/Randomization/` — RNG tests
+- `TestFixtures/` — shared test utilities (`GrooveSnapshotHelper.cs`)
 
 ---
 
@@ -353,7 +369,8 @@ Conventions:
 ### Validation
 - Harmony validated before generation
 - MIDI export validates sorted event ordering
-- Protection system ensures must-hit onsets
+- Anchor onsets preserved from groove presets
+- Physicality filter ensures playable output
 
 ---
 
@@ -361,23 +378,39 @@ Conventions:
 
 | Folder | Contents |
 |--------|----------|
-| `Generator/Core/` | Entry point, RNG, overlap helpers |
-| `Generator/Drums/` | Drum track generator |
-| `Generator/Groove/` | Groove system (policies, selection, protection) |
+| `Generator/Core/` | Entry point (`Generator.cs`), RNG (`Rng.cs`, `RandomPurpose.cs`), overlap helpers (`NoteOverlapHelper.cs`, `NoteOverlapPreventer.cs`, `CreateRepeatingNotes.cs`) |
+| `Generator/Drums/` | Legacy drum track generator (`DrumTrackGenerator.cs`) |
+| `Generator/Groove/` | Groove system (onset grid, strength classifier, feel/timing engines, anchor factory, preset library, coverage analyzer) |
 | `Generator/Agents/` | Agent infrastructure |
-| `Generator/Agents/Common/` | Shared agent contracts (IMusicalOperator, AgentContext, IAgentMemory, StyleConfiguration) |
-| `Generator/Agents/Drums/` | Drummer agent implementation |
-| `Generator/Agents/Drums/Operators/` | Drum operator families (MicroAddition, SubdivisionTransform, PhrasePunctuation, PatternSubstitution, StyleIdiom) |
-| `Generator/Agents/Drums/Physicality/` | Playability constraints (LimbModel, StickingRules, PhysicalityFilter) |
-| `Generator/Agents/Drums/Performance/` | Performance rendering (velocity/timing shapers, articulation mapper) |
-| `Generator/Agents/Drums/Diagnostics/` | Decision tracing and MIDI feature extraction |
-| `Song/` | Data model (Section, Harmony, Tempo, Timing, PartTrack, Bar, Voices, Lyrics) |
-| `Song/Material/` | Material/motif system |
-| `Converters/` | PartTrack ↔ MIDI conversion |
-| `Midi/` | MIDI I/O and playback services |
-| `Writer/` | WinForms UI |
-| `Core/` | Globals, constants, helpers |
-| `Errors/` | Exception handling |
+| `Generator/Agents/Common/` | Shared agent contracts (`IMusicalOperator`, `AgentContext`, `IAgentMemory`, `AgentMemory`, `OperatorFamily`, `OperatorSelectionEngine`, `StyleConfiguration`, `StyleConfigurationLibrary`, `DecayCurve`, `FillShape`) |
+| `Generator/Agents/Drums/` | Drummer agent implementation (`DrummerAgent`, `DrummerPolicyProvider`, `DrummerCandidateSource`, `DrummerContext`, `DrummerContextBuilder`, `DrummerMemory`, `GrooveBasedDrumGenerator`, drum-specific types, interfaces, selection engine, policy provider implementations) |
+| `Generator/Agents/Drums/Operators/` | Drum operator families: `MicroAddition/` (7 operators), `SubdivisionTransform/` (5 operators), `PhrasePunctuation/` (7 operators), `PatternSubstitution/` (4 operators), `StyleIdiom/` (5 operators); base class (`DrumOperatorBase`), registry (`DrumOperatorRegistry`, `DrumOperatorRegistryBuilder`), interface (`IDrumOperator`) |
+| `Generator/Agents/Drums/Physicality/` | Playability constraints (`LimbModel`, `LimbAssignment`, `LimbConflictDetector`, `StickingRules`, `StickingValidation`, `PhysicalityFilter`, `PhysicalityRules`) |
+| `Generator/Agents/Drums/Performance/` | Performance rendering (`DrummerVelocityShaper`, `DrummerTimingShaper`, `DrumArticulationMapper`, `DynamicIntent`, `TimingIntent`, `DrumArticulation`, `DrummerVelocityHintSettings`, `DrummerTimingHintSettings`) |
+| `Generator/Agents/Drums/Diagnostics/` | Decision tracing (`DrummerDiagnosticsCollector`, `DrummerDiagnostics`); MIDI feature extraction (event extractors, pattern analysis, coordination analysis, structural markers, velocity/timing analysis, serializers) |
+| `Generator/Material/` | Material/motif system (`MotifPlacementPlanner`, `MotifPresenceMap`, `MotifRenderer`, `OnsetSlot`) |
+| `Generator/TestSetups/` | Test design data (`TestDesigns.cs`) and integration tests |
+| `Song/` | Data model (Bar, Section, Harmony, Tempo, Timing, PartTrack, Voices, Lyrics, Material) |
+| `Song/Bar/` | Bar and BarTrack timing ruler |
+| `Song/Section/` | Section, SectionTrack, SectionProfile |
+| `Song/Harmony/` | Harmony system (HarmonyTrack, HarmonyEvent, HarmonyPitchContext, HarmonyPitchContextBuilder, HarmonyValidator, HarmonyEventNormalizer, HarmonyPolicy, ChordRealization, VoiceLeadingSelector, CompVoicingSelector, StrumTimingEngine, PitchClassUtils, diagnostics) |
+| `Song/Tempo/` | TempoTrack, TempoEvent |
+| `Song/Timing/` | TimingTrack, TimingEvent |
+| `Song/PartTrack/` | PartTrack, PartTrackEvent, PartTrackEventType |
+| `Song/Voices/` | VoiceSet, Voice, VoiceCatalog |
+| `Song/Lyrics/` | Lyric classes, LyricTrack, LyricPhoneticsHelper, WordParser |
+| `Song/Material/` | Material system (MaterialBank, MotifSpec, MotifPlacement, MotifPlacementPlan, PartTrackMeta, PartTrackDomain, PartTrackKind, MaterialKind, MaterialProvenance, ContourIntent, RegisterIntent, TonePolicy, validation classes) |
+| `Converters/` | PartTrack ↔ MIDI conversion (3-step export pipeline, import pipeline, update logic) |
+| `Midi/` | MIDI I/O and playback services (`MidiIoService`, `MidiPlaybackService`, `MidiSongDocument`, `Player`, `AppState`, `MidiVoices`) |
+| `Writer/` | WinForms UI (WriterForm, editor forms, option form, song grid) |
+| `Writer/WriterForm/` | WriterForm main class, event handlers, grid operations, data management, test song generation, command handlers |
+| `Writer/EditorForms/` | Editor forms (GrooveEditorForm, HarmonyEditorForm, SectionEditorForm, TempoEditorForm, TimingEditorForm, LyricEditorForm, VoiceSelectorForm) |
+| `Writer/OptionForm/` | OptionForm for application settings |
+| `Writer/SongGrid/` | Song grid components (SongGridManager, GridControlLinesManager, PartTrackViewer, PlaybackProgressTracker, MeasureChangedEventArgs, MusicCalculations) |
+| `MainForm/` | MainForm (MDI container) |
+| `Core/` | Globals, constants (`MusicConstants`), helpers (`Helpers`, `ObjectViewer`) |
+| `Errors/` | Exception handling (`GlobalExceptionHandler`, `MessageBoxHelper`, `Tracer`, `MidiImportException`) |
+| `Properties/` | Resources |
 
 ---
 
@@ -423,17 +456,18 @@ Location: `Generator/Agents/Drums/`
 - Fill role
 - Score
 
-**DrummerPolicyProvider** — implements `IGroovePolicyProvider`
+**DrummerPolicyProvider** — implements `IDrumPolicyProvider`
 - Computes density overrides from section/energy
 - Gates fill operators based on context/memory
 - Provides timing feel and velocity bias overrides
+- Returns `DrumPolicyDecision` with density targets, caps, and weights
 
-**DrummerCandidateSource** — implements `IGrooveCandidateSource`
-- Queries enabled operators
-- Generates candidates via operator calls
-- Maps DrumCandidate → GrooveOnsetCandidate
+**DrummerCandidateSource** — implements `IDrumCandidateSource`
+- Queries enabled operators from `DrumOperatorRegistry`
+- Generates candidates via operator calls (all 28 operators)
+- Maps `DrumCandidate` → `DrumCandidateGroup`
 - Groups by operator family
-- Applies physicality filter
+- Applies physicality filter before returning
 
 **DrummerMemory** — extends AgentMemory
 - Tracks last fill shape
@@ -445,12 +479,72 @@ Location: `Generator/Agents/Drums/`
 - Registers all 28 operators across 5 families
 - Filters by style configuration
 - Filters by policy allow list
-- Immutable after freeze
+- Immutable after freeze via `DrumOperatorRegistryBuilder`
 
 **DrummerAgent** — facade
-- Delegates to policy provider and candidate source
-- Implements both `IGroovePolicyProvider` and `IGrooveCandidateSource`
+- Delegates to `DrummerPolicyProvider` and `DrummerCandidateSource`
+- Implements both `IDrumPolicyProvider` and `IDrumCandidateSource`
 - Owns memory and registry instances
+- Provides unified interface for `GrooveBasedDrumGenerator`
+
+**GrooveBasedDrumGenerator** — pipeline orchestrator
+- Takes `IDrumPolicyProvider` + `IDrumCandidateSource` (typically `DrummerAgent`)
+- Uses `DrumSelectionEngine` for weighted selection
+- Enforces density targets and caps from policy decisions
+- Combines anchors + selected operator candidates
+- Converts to MIDI via `PartTrack`
+
+### Drum-Specific Types
+
+**DrumBarContext** — bar context for drum generation
+- Section metadata
+- Phrase position
+- Energy level
+- Fill window status
+
+**DrumBarContextBuilder** — builds `DrumBarContext` from `SongContext`
+
+**DrumPolicyDecision** — policy result
+- Density targets per role
+- Operator caps
+- Weights
+- Feel/timing overrides
+
+**DrumOnsetCandidate** — drum-specific candidate (simplified)
+- No conversion methods to generic types (GC-Epic)
+- Direct onset representation
+
+**DrumCandidateGroup** — group of related candidates
+- No conversion methods to generic types (GC-Epic)
+- Operator family grouping
+
+**DrumGrooveOnsetFactory** — creates `GrooveOnset` from drum candidates
+- `FromVariation` creates onset directly (GC-Epic updated in GC-5)
+- `FromWeightedCandidate` for weighted selection results
+
+**DrumDensityCalculator** — computes density targets
+- Section-aware density calculation
+- Energy-based adjustments
+
+**RoleDensityTarget** — target density per role
+- Target onset count
+- Min/max bounds
+
+**DefaultDrumPolicyProvider** — fallback policy provider
+- Returns default policies when no custom provider
+- Used for testing and simple cases
+
+**DrumSelectionEngine** — weighted selection engine
+- Selects candidates until density target reached
+- Respects caps and weights from policy
+- Deterministic tie-breaking
+
+**DrumWeightedCandidateSelector** — candidate selection with scoring
+- Applies weights from style configuration
+- Handles protected candidates
+
+**DrumCandidateMapper** — maps between candidate representations
+- Handles conversion logic for pipeline stages
 
 ### Operator Families
 
@@ -473,11 +567,15 @@ Location: `Generator/Agents/Drums/Physicality/`
 **LimbConflictDetector** — detects same limb required for simultaneous events
 
 **StickingRules** — validates hand/foot playability constraints
+- `StickingValidation` helper class for rule enforcement
 
 **PhysicalityFilter** — integrates limb conflicts, sticking rules, and overcrowding prevention
 - Enforces per-role, per-beat, and per-bar density caps
 - Respects protected candidates
 - Deterministic pruning with tie-break
+- **PhysicalityRules** — consolidated physicality constraints
+
+**LimbAssignment** — assignment of roles to specific limbs
 
 ### Performance Rendering
 
@@ -487,17 +585,24 @@ Location: `Generator/Agents/Drums/Performance/`
 - Classifies dynamic intent (Low, MediumLow, Medium, StrongAccent, PeakAccent, FillRamp)
 - Maps intent to numeric targets via style configuration
 - Energy-aware adjustments
-- Runs before groove VelocityShaper
+- Returns velocity hints before final MIDI conversion
 
 **DrummerTimingShaper** — provides style-aware timing hints
 - Classifies timing intent (OnTop, SlightlyAhead, SlightlyBehind, Rushed, LaidBack)
 - Maps intent to tick offsets via style configuration
 - Deterministic jitter
-- Runs before groove RoleTimingEngine
+- Returns timing hints before `RoleTimingEngine`
 
 **DrumArticulationMapper** — maps articulations to GM2 MIDI notes
+- Handles `DrumArticulation` enum (Standard, OpenRim, ClosedRim, etc.)
 - Graceful fallback hierarchy
 - Always playable output
+
+**DynamicIntent** — enum for velocity classification
+**TimingIntent** — enum for timing feel classification
+**DrumArticulation** — enum for articulation types
+**DrummerVelocityHintSettings** — style-specific velocity mapping config
+**DrummerTimingHintSettings** — style-specific timing mapping config
 
 ### Diagnostics
 
@@ -509,35 +614,74 @@ Location: `Generator/Agents/Drums/Diagnostics/`
 - Captures density comparisons
 - Captures physicality violations
 - Zero-cost when disabled
+- Produces `DrummerDiagnostics` result
+
+**DrummerDiagnostics** — diagnostics result container
+- Per-bar decision traces
+- Operator statistics
+- Memory snapshots
 
 **Drum Feature Extraction** — MIDI analysis for benchmark workflows
-- Raw event extraction with role mapping
-- Per-bar pattern fingerprinting
-- Beat position matrices
-- Pattern repetition/similarity detection
-- Cross-role coordination analysis
-- Anchor candidate detection
-- Structural marker detection (fills, crashes, pattern changes)
-- Velocity dynamics and timing feel analysis
+- Raw event extraction with role mapping (`DrumTrackEventExtractor`, `DrumMidiEvent`, `DrumRoleMapper`)
+- Per-bar pattern fingerprinting (`BarPatternExtractor`, `BarPatternFingerprint`)
+- Beat position matrices (`BeatPositionMatrixBuilder`, `BeatPositionMatrix`)
+- Pattern repetition/similarity detection (`PatternRepetitionDetector`, `PatternSimilarityAnalyzer`, `PatternRepetitionData`, `PatternSimilarityData`, `SequencePatternDetector`, `SequencePatternData`)
+- Cross-role coordination analysis (`CrossRoleCoordinationExtractor`, `CrossRoleCoordinationData`)
+- Anchor candidate detection (`AnchorCandidateExtractor`, `AnchorCandidateData`)
+- Structural marker detection (`StructuralMarkerDetector`, `StructuralMarkerData`)
+- Velocity dynamics and timing feel analysis (`VelocityDynamicsExtractor`, `VelocityDynamicsData`, `TimingFeelExtractor`, `TimingFeelData`)
+- Bar onset statistics (`BarOnsetStatsExtractor`, `BarOnsetStats`)
+- Feature data builders (`DrumTrackFeatureDataBuilder`, `DrumTrackExtendedFeatureDataBuilder`)
+- Feature data containers (`DrumTrackFeatureData`, `DrumTrackExtendedFeatureData`)
+- Serializers (`DrumFeatureDataSerializer`, `DrumExtendedFeatureDataSerializer`)
 
 ---
 
 ## 16) Current System State
 
 ### Completed Components
-- Groove system (Stories A1-H1)
-- Drummer agent core (Stories 1.1-3.6, 4.1-4.4, 6.1-6.3, 7.1, 7.2a-7.2b, 8.1)
-- Material system data model
-- Drummer diagnostics and feature extraction
+- Groove system simplified (Stories A1-H1, 5.2, 5.3, GC-Epic)
+  - Anchor layer infrastructure complete
+  - Variation catalog removed (GC-Epic)
+  - Protection policies removed (Story 5.3)
+  - SegmentGrooveProfiles removed (Story 5.2)
+- Drummer agent complete (Stories 1.1-3.6, 4.1-4.4, 6.1-6.3, 7.1, 7.2a-7.2b, 8.1, RF-2)
+  - `IDrumPolicyProvider` and `IDrumCandidateSource` interfaces
+  - `GrooveBasedDrumGenerator` orchestrator
+  - All 28 operators across 5 families
+  - Physicality system (limb model, sticking rules, filter)
+  - Performance rendering (velocity/timing shapers, articulation mapper)
+  - Memory system (anti-repetition, pattern tracking)
+  - Operator registry with style filtering
+- Material system data model complete
+  - MaterialBank, MotifSpec, MotifPlacement
+  - MotifRenderer for rendering motifs to PartTracks
+  - MotifPresenceMap for coordination
+- Drummer diagnostics and feature extraction complete
+  - DrummerDiagnosticsCollector for decision tracing
+  - Comprehensive MIDI feature extraction pipeline
+  - Pattern analysis, coordination detection, structural markers
 
 ### Active Development
-- Drummer agent integration testing
-- Pop Rock style configuration tuning
+- Groove Cleanup Epic (GC-1 through GC-7) in progress
+  - Removing variation infrastructure from Groove namespace
+  - Consolidating all variation in Drummer Agent
+- Integration testing and refinement
+  - GrooveBasedDrumGenerator + DrummerAgent wiring
+  - End-to-end testing with audio verification
 
 ### Future Work
+- Complete Groove Cleanup Epic (GC-1 through GC-7)
+- Additional style configurations (Jazz, Funk, Metal, etc.)
 - Guitar, Keys, Bass, Vocal agents
-- Motif placement and rendering
-- Additional genre styles
+- Motif placement planning integration
+- Additional genre style presets
+
+### Known Architectural State
+- **Groove System:** Simplified to anchors only; all variation handled by agents
+- **Drummer Agent:** Fully implemented with operator-based architecture
+- **Pipeline:** Uses `GrooveBasedDrumGenerator` with `IDrumPolicyProvider` + `IDrumCandidateSource`
+- **Legacy Code:** `DrumTrackGenerator` exists but is superseded by `GrooveBasedDrumGenerator`
 
 ---
 
