@@ -1,4 +1,4 @@
-// AI: purpose=Handler to test drummer agent-based drum track generation and add result to SongContext and UI grid.
+// AI: purpose=Handler to test drummer agent V1-based phrase generation and add result to SongContext and UI grid.
 // AI: invariants=Uses real groove anchor pattern; passes StyleConfiguration to enable operator-based generation; mutates songContext.Song.PartTracks and Grid.
 // AI: deps=Relies on Generator.Generator.Generate with StyleConfiguration, GrooveAnchorFactory, StyleConfigurationLibrary; changing generator API breaks this.
 // AI: perf=Generation may allocate; run on UI thread currently; consider backgrounding if UI stalls for large songs.
@@ -10,11 +10,11 @@ using Music.Generator.Groove;
 namespace Music.Writer
 {
     // AI: Command handler for drummer agent test; wraps generator call with style configuration and updates UI grid with results.
-    public static class HandleCommandAgentTest
+    public static class HandleCommandPhraseTest
     {
-        // AI: HandleAgentTest: shows input dialog, runs drummer agent generator with seed/genre/bars, appends 1 drum PartTrack to Song and grid.
+        // AI: HandlePhraseTest: shows input dialog, runs drummer agent generator with seed/genre/bars, appends 1 drum PartTrack to Song and grid.
         // AI: errors=any exception is shown via ShowError; no retry or partial-commit logic; invalid input caught by dialog validation.
-        public static void HandleAgentTest(
+        public static void HandlePhraseTest(
             SongContext songContext,
             DataGridView dgSong)
         {

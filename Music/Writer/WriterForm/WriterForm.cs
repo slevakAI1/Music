@@ -337,10 +337,13 @@ namespace Music.Writer
                     HandleCommandGrooveTest.HandleGrooveTest(_songContext, dgSong);
                     break;
 
-                case "Agent Test": // THIS WAS TOO MUCH
-                    HandleCommandAgentTest.HandleAgentTest(_songContext, dgSong);
+                case "Phrase Test":
+                    HandleCommandPhraseTest.HandlePhraseTest(_songContext, dgSong);
                     break;
 
+                case "Drum Track Test":
+                    HandleCommandDrumTrackTest.HandleDrumTrackTest(_songContext, dgSong);
+                    break;
 
                 // Other cases will be added here later.
 
