@@ -254,7 +254,7 @@ namespace Music.Generator.Agents.Drums
                     if (candidateGroups.Count == 0)
                         continue; // No candidates available
 
-                    // Filter anchors for this role to pass to GrooveSelectionEngine
+                    // Filter anchors for this role to pass to DrumSelectionEngine
                     var roleAnchors = barAnchors
                         .Where(a => string.Equals(a.Role, role, StringComparison.OrdinalIgnoreCase))
                         .ToList();
