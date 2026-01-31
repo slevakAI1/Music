@@ -38,21 +38,26 @@ public sealed class DrumGenerator
         var planner = new DrumPhrasePlacementPlanner(songContext, effectiveSeed);
         var plan = planner.CreatePlan(songContext.SectionTrack, drumProgramNumber, maxBars);
 
-        return GenerateFromPlan(plan, songContext.BarTrack, drumProgramNumber);
+        return GenerateFromPlan(plan, songContext.BarTrack, drumProgramNumber, effectiveSeed);
     }
 
     private PartTrack GenerateFromPlan(
         DrumPhrasePlacementPlan plan,
         BarTrack barTrack,
-        int midiProgramNumber)
+        int midiProgramNumber,
+        int seed)
     {
         var allEvents = new List<PartTrackEvent>();
+        var evolver = new DrumPhraseEvolver(seed);
 
         foreach (var placement in plan.Placements)
         {
             var phrase = _materialBank.GetDrumPhraseById(placement.PhraseId);
             if (phrase == null)
                 continue;
+
+            if (placement.Evolution != null)
+                phrase = evolver.Evolve(phrase, placement.Evolution, barTrack);
 
             var phraseTrack = phrase.ToPartTrack(barTrack, placement.StartBar, midiProgramNumber);
             long placementEndTick = GetPlacementEndTick(barTrack, placement);

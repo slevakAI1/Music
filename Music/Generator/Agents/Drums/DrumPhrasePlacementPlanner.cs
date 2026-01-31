@@ -86,21 +86,50 @@ public sealed class DrumPhrasePlacementPlanner
         int sectionStart = section.StartBar;
         int sectionEnd = Math.Min(section.StartBar + section.BarCount - 1, totalBars);
         int currentBar = sectionStart;
+        int placementIndex = 0;
 
         while (currentBar <= sectionEnd)
         {
             int barsRemaining = sectionEnd - currentBar + 1;
             int placementBars = Math.Min(phrase.BarCount, barsRemaining);
 
+            var evolution = placementIndex == 0
+                ? null
+                : CreateEvolutionForRepeat(placementIndex, section.SectionType);
+
             plan.Placements.Add(new DrumPhrasePlacement
             {
                 PhraseId = phrase.PhraseId,
                 StartBar = currentBar,
-                BarCount = placementBars
+                BarCount = placementBars,
+                EvolutionLevel = placementIndex,
+                Evolution = evolution
             });
 
             currentBar += placementBars;
+            placementIndex++;
         }
+    }
+
+    private static DrumPhraseEvolutionParams? CreateEvolutionForRepeat(
+        int repeatIndex,
+        MusicConstants.eSectionType sectionType)
+    {
+        if (repeatIndex <= 0)
+            return null;
+
+        double baseVariation = Math.Min(repeatIndex * 0.1, 0.3);
+        if (baseVariation <= 0)
+            return null;
+
+        return new DrumPhraseEvolutionParams
+        {
+            RandomVariation = baseVariation,
+            GhostIntensity = sectionType == MusicConstants.eSectionType.Chorus
+                ? baseVariation * 0.5
+                : 0,
+            HatVariation = baseVariation * 0.3
+        };
     }
 
     private static bool IsSectionMatch(MaterialPhrase phrase, MusicConstants.eSectionType sectionType)

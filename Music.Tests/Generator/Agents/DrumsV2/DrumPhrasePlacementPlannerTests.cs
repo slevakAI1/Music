@@ -73,6 +73,53 @@ public class DrumPhrasePlacementPlannerTests
         Assert.Equal(planA.Placements[0].PhraseId, planB.Placements[0].PhraseId);
     }
 
+    [Fact]
+    public void CreatePlan_WithRepeats_AssignsProgressiveEvolution()
+    {
+        var songContext = new SongContext();
+        songContext.MaterialBank.AddDrumPhrase(CreatePhrase("phrase-a", barCount: 1,
+            sectionTypes: [MusicConstants.eSectionType.Verse]));
+
+        var sectionTrack = new SectionTrack();
+        sectionTrack.Add(MusicConstants.eSectionType.Verse, 3);
+
+        var planner = new DrumPhrasePlacementPlanner(songContext, seed: 9001);
+        var plan = planner.CreatePlan(sectionTrack, midiProgramNumber: 255);
+
+        var placements = plan.Placements.OrderBy(p => p.StartBar).ToList();
+
+        Assert.Equal(0, placements[0].EvolutionLevel);
+        Assert.Null(placements[0].Evolution);
+
+        Assert.Equal(1, placements[1].EvolutionLevel);
+        Assert.NotNull(placements[1].Evolution);
+        Assert.Equal(0.1, placements[1].Evolution!.RandomVariation, 3);
+
+        Assert.Equal(2, placements[2].EvolutionLevel);
+        Assert.NotNull(placements[2].Evolution);
+        Assert.Equal(0.2, placements[2].Evolution!.RandomVariation, 3);
+    }
+
+    [Fact]
+    public void CreatePlan_WithChorusRepeats_AssignsGhostIntensity()
+    {
+        var songContext = new SongContext();
+        songContext.MaterialBank.AddDrumPhrase(CreatePhrase("phrase-a", barCount: 1,
+            sectionTypes: [MusicConstants.eSectionType.Chorus]));
+
+        var sectionTrack = new SectionTrack();
+        sectionTrack.Add(MusicConstants.eSectionType.Chorus, 2);
+
+        var planner = new DrumPhrasePlacementPlanner(songContext, seed: 4242);
+        var plan = planner.CreatePlan(sectionTrack, midiProgramNumber: 255);
+
+        var placements = plan.Placements.OrderBy(p => p.StartBar).ToList();
+
+        Assert.Null(placements[0].Evolution);
+        Assert.NotNull(placements[1].Evolution);
+        Assert.Equal(0.05, placements[1].Evolution!.GhostIntensity, 3);
+    }
+
     private static MaterialPhrase CreatePhrase(
         string phraseId,
         int barCount,

@@ -75,6 +75,27 @@ public class DrumGeneratorTests
         Assert.True(maxTick < endTick);
     }
 
+    [Fact]
+    public void Generate_WithRepeats_AppliesEvolutionToLaterPlacements()
+    {
+        var songContext = CreateSongContext(totalBars: 2);
+        var materialBank = songContext.MaterialBank;
+        var phrase = CreateSingleNotePhrase("phrase1", barCount: 1, songContext.BarTrack, noteNumber: 42);
+        materialBank.AddDrumPhrase(phrase);
+
+        var generator = new DrumGenerator(materialBank);
+        var track = generator.Generate(songContext, seed: 123, maxBars: 0);
+
+        var orderedNotes = track.PartTrackNoteEvents
+            .OrderBy(e => e.AbsoluteTimeTicks)
+            .Select(e => e.NoteNumber)
+            .ToList();
+
+        Assert.Equal(2, orderedNotes.Count);
+        Assert.Equal(42, orderedNotes[0]);
+        Assert.Equal(46, orderedNotes[1]);
+    }
+
     private static SongContext CreateSongContext(int totalBars)
     {
         var songContext = new SongContext();
@@ -91,6 +112,31 @@ public class DrumGeneratorTests
         {
             new(36, (int)barTrack.ToTick(1, 1m), 120, 100),
             new(38, (int)barTrack.ToTick(2, 1m), 120, 100)
+        };
+
+        return new MaterialPhrase
+        {
+            PhraseNumber = 1,
+            PhraseId = phraseId,
+            Name = "Test Phrase",
+            Description = "Test phrase description",
+            BarCount = barCount,
+            MidiProgramNumber = 255,
+            Seed = 123,
+            Events = events,
+            SectionTypes = [MusicConstants.eSectionType.Verse]
+        };
+    }
+
+    private static MaterialPhrase CreateSingleNotePhrase(
+        string phraseId,
+        int barCount,
+        BarTrack barTrack,
+        int noteNumber)
+    {
+        var events = new List<PartTrackEvent>
+        {
+            new(noteNumber, (int)barTrack.ToTick(1, 1m), 120, 100)
         };
 
         return new MaterialPhrase
