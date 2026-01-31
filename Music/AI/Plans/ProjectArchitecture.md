@@ -115,9 +115,10 @@ Timeline of `HarmonyEvent` records containing key, degree, quality, bass.
 Location: `Generator/Core/Generator.cs`
 
 Validates SongContext and delegates to drum track generator.
+Includes phrase-based entry point for `MaterialBank` phrases (`GenerateFromPhrases`).
 
-### GrooveBasedDrumGenerator Pipeline
-Location: `Generator/Agents/Drums/GrooveBasedDrumGenerator.cs`
+### DrumPhraseGenerator Pipeline
+Location: `Generator/Agents/Drums/DrumPhraseGenerator.cs`
 
 Pipeline orchestrator using `IDrumPolicyProvider` + `IDrumCandidateSource` (typically DrummerAgent).
 
@@ -130,6 +131,12 @@ Pipeline stages:
    - Select candidates using `DrumSelectionEngine` (weighted selection, density enforcement)
 4. Combine anchors + selected operator onsets
 5. Convert to MIDI events via `PartTrack`
+
+### Phrase-Based Drum Generation
+Location: `Generator/Agents/Drums/DrumGenerator.cs`
+
+Uses `MaterialPhrase` entries stored in `MaterialBank` and a `DrumPhrasePlacementPlan` to build a full drum `PartTrack`.
+Placement planning is handled by `DrumPhrasePlacementPlanner`.
 
 ### DrumTrackGenerator (Legacy)
 Location: `Generator/Drums/DrumTrackGenerator.cs`
@@ -228,6 +235,11 @@ Location: `Song/Material/`
 **MaterialBank** — container
 - Add/remove/query motifs
 - Query by kind, material kind, role, name
+- Stores phrase material (`MaterialPhrase`) for phrase-based drum generation
+
+**MaterialPhrase** — reusable phrase data for placement
+- `PhraseId`, `Name`, `BarCount`, `Seed`, `MidiProgramNumber`, `Events`
+- `SectionTypes`, `Tags`, `EnergyHint`
 
 ### Motif Pipeline
 
