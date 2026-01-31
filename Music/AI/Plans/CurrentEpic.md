@@ -1060,7 +1060,7 @@ Phase 3: Track Generation
 
 ---
 
-#### Story 4.1: Create DrumPhraseEvolver
+#### Story 4.1: Create DrumPhraseEvolver (Completed)
 
 **Size:** Medium (3-4 hours)
 
@@ -1245,17 +1245,17 @@ Phase 3: Track Generation
    ```
 
 **Acceptance Criteria:**
-- [ ] `DrumPhraseEvolver` created with all evolution methods
-- [ ] Simplification removes non-essential hits progressively
-- [ ] Ghost intensity adds ghost notes appropriately
-- [ ] Hat variation opens some closed hats
-- [ ] Random variation adds small velocity/timing changes
-- [ ] Evolution is deterministic (same seed → same result)
-- [ ] Original phrase is not modified (immutable)
+- [x] `DrumPhraseEvolver` created with all evolution methods
+- [x] Simplification removes non-essential hits progressively
+- [x] Ghost intensity adds ghost notes appropriately
+- [x] Hat variation opens some closed hats
+- [x] Random variation adds small velocity/timing changes
+- [x] Evolution is deterministic (same seed → same result)
+- [x] Original phrase is not modified (immutable)
 
 ---
 
-#### Story 4.X (Small): Phrase start offset / pickup support
+#### Story 4.1X (Small): Phrase start offset / pickup support (Completed)
 
 **Why:** Some phrases start before beat 1 (pickup) and must be placed earlier to preserve cadence.
 
@@ -1264,10 +1264,10 @@ Phase 3: Track Generation
 **Design constraint:** Do not add extra future-layer hooks; only add minimal metadata needed for correct placement.
 
 **Acceptance Criteria:**
-- [ ] Phrase material can declare a start offset within its first bar (ticks from bar start)
-- [ ] Renderer uses this offset when converting phrase events to `PartTrack` at a target bar
-- [ ] Placement can target a bar boundary while phrase audio starts before that boundary when offset < 0
-- [ ] Determinism preserved: same phrase + same placement → identical absolute ticks
+- [x] Phrase material can declare a start offset within its first bar (ticks from bar start)
+- [x] Renderer uses this offset when converting phrase events to `PartTrack` at a target bar
+- [x] Placement can target a bar boundary while phrase audio starts before that boundary when offset < 0
+- [x] Determinism preserved: same phrase + same placement → identical absolute ticks
 
 ---
 
