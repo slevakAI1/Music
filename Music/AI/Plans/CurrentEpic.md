@@ -34,6 +34,10 @@ Phase 3: Track Generation
   SongContext + MaterialBank → DrumGenerator → (phrase placement + evolution) → PartTrack
 ```
 
+**NOTE:** Keep MVP contracts stable so later layers (coordination/performance shaping/evolution) are additive.
+
+**Contract:** Phrase=material (`MaterialPhrase`), Plan=intent (`DrumPhrasePlacementPlan`), Renderer=realization (track assembly from plan).
+
 ### Key Types
 
 | Type | Location | Purpose |
@@ -1062,6 +1066,11 @@ Phase 3: Track Generation
 
 **Goal:** Create a component that applies bounded evolution to phrases for variation.
 
+**Contract note (do not expand scope):**
+- Evolver operates on phrase event data only.
+- Placement remains in `DrumPhrasePlacementPlan`.
+- Rendering remains in `DrumGenerator` (assemble `PartTrack` from plan + phrase material).
+
 **Files to Create:**
 - `Generator/Agents/Drums/DrumPhraseEvolver.cs`
 
@@ -1243,6 +1252,22 @@ Phase 3: Track Generation
 - [ ] Random variation adds small velocity/timing changes
 - [ ] Evolution is deterministic (same seed → same result)
 - [ ] Original phrase is not modified (immutable)
+
+---
+
+#### Story 4.X (Small): Phrase start offset / pickup support
+
+**Why:** Some phrases start before beat 1 (pickup) and must be placed earlier to preserve cadence.
+
+**Goal:** Support phrase material with a non-zero start offset (e.g., last 1/8 of prior bar) during placement/rendering.
+
+**Design constraint:** Do not add extra future-layer hooks; only add minimal metadata needed for correct placement.
+
+**Acceptance Criteria:**
+- [ ] Phrase material can declare a start offset within its first bar (ticks from bar start)
+- [ ] Renderer uses this offset when converting phrase events to `PartTrack` at a target bar
+- [ ] Placement can target a bar boundary while phrase audio starts before that boundary when offset < 0
+- [ ] Determinism preserved: same phrase + same placement → identical absolute ticks
 
 ---
 
