@@ -7,6 +7,7 @@
 using Music.Generator.Agents.Common;
 using Music.Generator.Agents.Drums;
 using Music.Generator.Groove;
+using Music.Song.Material;
 
 namespace Music.Generator
 {
@@ -61,6 +62,23 @@ namespace Music.Generator
             }
 
             return DrumTrackGenerator.Generate(songContext);
+        }
+
+        // AI: purpose=Phrase-based drum track generation using MaterialBank phrases.
+        // AI: invariants=MaterialBank must contain drum phrases for requested genre.
+        public static PartTrack GenerateFromPhrases(
+            SongContext songContext,
+            string genre,
+            int maxBars = 0)
+        {
+            ValidateSongContext(songContext);
+            ValidateSectionTrack(songContext.SectionTrack);
+
+            var materialBank = songContext.MaterialBank
+                ?? throw new ArgumentException("MaterialBank must be provided", nameof(songContext));
+
+            var generator = new DrumGenerator(materialBank);
+            return generator.Generate(songContext, genre, maxBars);
         }
 
         // AI: purpose=Single-method groove preview for audition; generates groove from seed+genre, converts to playable PartTrack.

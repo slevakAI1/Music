@@ -13,6 +13,7 @@ namespace Music.Song.Material;
 public sealed class MaterialBank
 {
     private readonly Dictionary<PartTrack.PartTrackId, PartTrack> _tracks = [];
+    private readonly List<MaterialPhrase> _drumPhrases = [];
 
     public IReadOnlyCollection<PartTrack> Tracks => _tracks.Values;
 
@@ -44,6 +45,25 @@ public sealed class MaterialBank
             .Where(t => string.Equals(t.Meta.IntendedRole, intendedRole, StringComparison.OrdinalIgnoreCase))
             .ToList();
 
+    // AI: drum phrases are stored separately from PartTracks; keep this list independent of TrackId dictionary.
+    public void AddDrumPhrase(MaterialPhrase phrase)
+    {
+        ArgumentNullException.ThrowIfNull(phrase);
+        _drumPhrases.Add(phrase);
+    }
+
+    public IReadOnlyList<MaterialPhrase> GetDrumPhrases() => _drumPhrases.AsReadOnly();
+
+    public IReadOnlyList<MaterialPhrase> GetDrumPhrasesByGenre(string genre)
+        => _drumPhrases
+            .Where(p => string.Equals(p.Genre, genre, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+    public MaterialPhrase? GetDrumPhraseById(string phraseId)
+        => _drumPhrases.FirstOrDefault(p => p.PhraseId == phraseId);
+
+    public void ClearDrumPhrases() => _drumPhrases.Clear();
+
     // AI: Motif-specific query methods (Story 8.2)
     public IReadOnlyList<PartTrack> GetMotifsByRole(string intendedRole)
         => GetByRole(intendedRole)
@@ -61,5 +81,9 @@ public sealed class MaterialBank
                 t.Meta.Kind == PartTrackKind.MaterialFragment &&
                 string.Equals(t.Meta.Name, name, StringComparison.OrdinalIgnoreCase));
 
-    public void Clear() => _tracks.Clear();
+    public void Clear()
+    {
+        _tracks.Clear();
+        _drumPhrases.Clear();
+    }
 }

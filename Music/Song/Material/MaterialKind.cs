@@ -16,5 +16,6 @@ public enum MaterialKind
     DrumFill = 4,
     BassFill = 5,
     CompPattern = 6,
-    KeysPattern = 7
+    KeysPattern = 7,
+    DrumPhrase = 8
 }

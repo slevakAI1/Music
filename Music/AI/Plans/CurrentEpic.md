@@ -92,7 +92,7 @@ Phase 3: Track Generation
 
 ---
 
-#### Story 1.2: Add "Generate Phrase" Command to WriterForm
+#### Story 1.2: Add "Generate Phrase" Command to WriterForm (Completed)
 
 **Size:** Medium (2-3 hours)
 
@@ -571,7 +571,7 @@ Phase 3: Track Generation
 
 #### Story 3.1: Create DrumGenerator Skeleton with Phrase Placement
 
-**Size:** Medium (3-4 hours)
+**Size:** Medium (3-4 hours) (Completed)
 
 **Goal:** Create a new `DrumGenerator` class that generates drum tracks by placing phrases from the MaterialBank.
 
@@ -794,12 +794,12 @@ Phase 3: Track Generation
    ```
 
 **Acceptance Criteria:**
-- [ ] `DrumGenerator` class created with `Generate` method
-- [ ] `DrumPhrasePlacementPlan` and related types created
-- [ ] Simple placement repeats single phrase throughout song
-- [ ] Events correctly offset to placement start bars
-- [ ] Partial phrases at song end handled correctly
-- [ ] Entry point added to `Generator.cs`
+- [x] `DrumGenerator` class created with `Generate` method
+- [x] `DrumPhrasePlacementPlan` and related types created
+- [x] Simple placement repeats single phrase throughout song
+- [x] Events correctly offset to placement start bars
+- [x] Partial phrases at song end handled correctly
+- [x] Entry point added to `Generator.cs`
 
 ---
 
