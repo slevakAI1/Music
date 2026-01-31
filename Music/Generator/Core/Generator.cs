@@ -68,8 +68,14 @@ namespace Music.Generator
         // AI: invariants=MaterialBank must contain drum phrases for requested genre.
         public static PartTrack GenerateFromPhrases(
             SongContext songContext,
-            string genre,
             int maxBars = 0)
+            => GenerateFromPhrases(songContext, seed: 0, maxBars);
+
+        // AI: purpose=Phrase-based drum track generation with optional seed for deterministic section mapping.
+        public static PartTrack GenerateFromPhrases(
+            SongContext songContext,
+            int seed,
+            int maxBars)
         {
             ValidateSongContext(songContext);
             ValidateSectionTrack(songContext.SectionTrack);
@@ -78,7 +84,7 @@ namespace Music.Generator
                 ?? throw new ArgumentException("MaterialBank must be provided", nameof(songContext));
 
             var generator = new DrumGenerator(materialBank);
-            return generator.Generate(songContext, genre, maxBars);
+            return generator.Generate(songContext, seed, maxBars);
         }
 
         // AI: purpose=Single-method groove preview for audition; generates groove from seed+genre, converts to playable PartTrack.

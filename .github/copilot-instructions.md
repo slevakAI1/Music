@@ -27,7 +27,6 @@
 - Do NOT introduce newlines inside a comment to “cheat” the limits.
 
 ### Code Change Rules
-- Do NOT change runtime behavior. No logic changes. No refactors. Only comments and whitespace if needed for comment placement.
 - If the file is missing critical context, add 1–3 lines of `// TODO?` questions at the top (counting toward the limit).
 
 ### Where to Place Comments (prefer fewer, higher leverage)

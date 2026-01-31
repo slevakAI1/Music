@@ -1,6 +1,6 @@
 // AI: purpose=Manual test for phrase-based DrumGenerator; uses MaterialBank phrases to build full track.
 // AI: invariants=MaterialBank must contain drum phrases; bars=0 means full song; bars>0 limits generation.
-// AI: deps=Generator.GenerateFromPhrases; TestSettingsDialog for seed/genre/bars.
+// AI: deps=Generator.GenerateFromPhrases; TestSettingsDialog for seed/bars.
 
 using Music.Generator;
 
@@ -34,12 +34,11 @@ namespace Music.Writer
                     return;
 
                 int seed = dialog.Seed;
-                string genre = dialog.Genre;
                 int bars = dialog.Bars;
 
                 Rng.Initialize(seed);
 
-                var result = Generator.Generator.GenerateFromPhrases(songContext, genre, bars);
+                var result = Generator.Generator.GenerateFromPhrases(songContext, seed, bars);
 
                 string barsInfo = bars > 0 ? $" ({bars} bars)" : string.Empty;
                 result.MidiProgramName = $"Drums (Phrase-Based){barsInfo} (Seed: {seed})";
@@ -47,7 +46,7 @@ namespace Music.Writer
 
                 songContext.Song.PartTracks.Add(result);
                 SongGridManager.AddNewPartTrack(result, dgSong);
-                ShowSuccess(seed, genre, bars);
+                ShowSuccess(seed, bars);
             }
             catch (Exception ex)
             {
@@ -56,7 +55,7 @@ namespace Music.Writer
         }
 
         // AI: ShowSuccess: displays seed for reproduction; message stable for testing; shows if limited or full song.
-        private static void ShowSuccess(int seed, string genre, int bars)
+        private static void ShowSuccess(int seed, int bars)
         {
             string barsMessage = bars > 0
                 ? $"Generated first {bars} bars."
@@ -64,7 +63,6 @@ namespace Music.Writer
 
             MessageBoxHelper.Show(
                 $"Phrase-based drum track created successfully.\n\n" +
-                $"Genre: {genre}\n" +
                 $"Seed: {seed}\n" +
                 $"{barsMessage}\n\n" +
                 $"Use this seed to reproduce the same drum track.",

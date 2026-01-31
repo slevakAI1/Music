@@ -569,7 +569,7 @@ Phase 3: Track Generation
 
 ---
 
-#### Story 3.1: Create DrumGenerator Skeleton with Phrase Placement
+#### Story 3.1: Create DrumGenerator Skeleton with Phrase Placement (Completed)
 
 **Size:** Medium (3-4 hours) (Completed)
 
@@ -803,7 +803,7 @@ Phase 3: Track Generation
 
 ---
 
-#### Story 3.2: Add "Generate Drums (Phrases)" Command to WriterForm
+#### Story 3.2: Add "Generate Drums (Phrases)" Command to WriterForm (Completed)
 
 **Size:** Small (1-2 hours)
 
@@ -883,7 +883,7 @@ Phase 3: Track Generation
 
 ---
 
-#### Story 3.3: Section-Aware Phrase Selection
+#### Story 3.3: Section-Aware Phrase Selection (Completed)
 
 **Size:** Medium (2-3 hours)
 
@@ -1037,12 +1037,12 @@ Phase 3: Track Generation
    ```
 
 **Acceptance Criteria:**
-- [ ] `DrumPhrasePlacementPlanner` created
-- [ ] Same section type uses same phrase throughout song
-- [ ] Different section types can use different phrases
-- [ ] Phrase selection is deterministic based on seed
-- [ ] Tags influence phrase selection (verse phrase for verse, etc.)
-- [ ] Works with fewer phrases than section types (reuses phrases)
+- [x] `DrumPhrasePlacementPlanner` created
+- [x] Same section type uses same phrase throughout song
+- [x] Different section types can use different phrases
+- [x] Phrase selection is deterministic based on seed
+- [x] Tags influence phrase selection (verse phrase for verse, etc.)
+- [x] Works with fewer phrases than section types (reuses phrases)
 
 **Test Cases:**
 1. Single phrase → repeated everywhere

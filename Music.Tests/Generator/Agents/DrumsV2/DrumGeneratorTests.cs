@@ -13,11 +13,11 @@ public class DrumGeneratorTests
     {
         var songContext = CreateSongContext(totalBars: 4);
         var materialBank = songContext.MaterialBank;
-        var phrase = CreatePhrase("phrase1", barCount: 2, genre: "PopRock", songContext.BarTrack);
+        var phrase = CreatePhrase("phrase1", barCount: 2, songContext.BarTrack);
         materialBank.AddDrumPhrase(phrase);
 
         var generator = new DrumGenerator(materialBank);
-        var track = generator.Generate(songContext, "PopRock");
+        var track = generator.Generate(songContext);
 
         Assert.Equal(4, track.PartTrackNoteEvents.Count);
     }
@@ -27,11 +27,11 @@ public class DrumGeneratorTests
     {
         var songContext = CreateSongContext(totalBars: 4);
         var materialBank = songContext.MaterialBank;
-        var phrase = CreatePhrase("phrase1", barCount: 2, genre: "PopRock", songContext.BarTrack);
+        var phrase = CreatePhrase("phrase1", barCount: 2, songContext.BarTrack);
         materialBank.AddDrumPhrase(phrase);
 
         var generator = new DrumGenerator(materialBank);
-        var track = generator.Generate(songContext, "PopRock");
+        var track = generator.Generate(songContext);
 
         long bar1Tick = songContext.BarTrack.ToTick(1, 1m);
         long bar2Tick = songContext.BarTrack.ToTick(2, 1m);
@@ -49,11 +49,11 @@ public class DrumGeneratorTests
     {
         var songContext = CreateSongContext(totalBars: 3);
         var materialBank = songContext.MaterialBank;
-        var phrase = CreatePhrase("phrase1", barCount: 2, genre: "PopRock", songContext.BarTrack);
+        var phrase = CreatePhrase("phrase1", barCount: 2, songContext.BarTrack);
         materialBank.AddDrumPhrase(phrase);
 
         var generator = new DrumGenerator(materialBank);
-        var track = generator.Generate(songContext, "PopRock");
+        var track = generator.Generate(songContext);
 
         Assert.Equal(3, track.PartTrackNoteEvents.Count);
     }
@@ -63,11 +63,11 @@ public class DrumGeneratorTests
     {
         var songContext = CreateSongContext(totalBars: 3);
         var materialBank = songContext.MaterialBank;
-        var phrase = CreatePhrase("phrase1", barCount: 2, genre: "PopRock", songContext.BarTrack);
+        var phrase = CreatePhrase("phrase1", barCount: 2, songContext.BarTrack);
         materialBank.AddDrumPhrase(phrase);
 
         var generator = new DrumGenerator(materialBank);
-        var track = generator.Generate(songContext, "PopRock");
+        var track = generator.Generate(songContext);
 
         long endTick = songContext.BarTrack.GetBarEndTick(3);
         long maxTick = track.PartTrackNoteEvents.Max(e => e.AbsoluteTimeTicks);
@@ -85,7 +85,7 @@ public class DrumGeneratorTests
         return songContext;
     }
 
-    private static MaterialPhrase CreatePhrase(string phraseId, int barCount, string genre, BarTrack barTrack)
+    private static MaterialPhrase CreatePhrase(string phraseId, int barCount, BarTrack barTrack)
     {
         var events = new List<PartTrackEvent>
         {
@@ -100,7 +100,7 @@ public class DrumGeneratorTests
             Name = "Test Phrase",
             Description = "Test phrase description",
             BarCount = barCount,
-            Genre = genre,
+            MidiProgramNumber = 255,
             Seed = 123,
             Events = events,
             SectionTypes = [MusicConstants.eSectionType.Verse]

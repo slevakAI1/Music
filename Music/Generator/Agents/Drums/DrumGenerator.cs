@@ -17,55 +17,34 @@ public sealed class DrumGenerator
         _materialBank = materialBank;
     }
 
-    public PartTrack Generate(SongContext songContext, string genre, int maxBars = 0)
+    public PartTrack Generate(SongContext songContext, int maxBars = 0)
+        => Generate(songContext, seed: 0, maxBars);
+
+    // AI: purpose=Generates drum track using phrase placement; seed controls section phrase selection.
+    public PartTrack Generate(SongContext songContext, int seed, int maxBars)
     {
         ArgumentNullException.ThrowIfNull(songContext);
-        if (string.IsNullOrWhiteSpace(genre))
-            throw new ArgumentException("Genre must be provided", nameof(genre));
         if (songContext.SectionTrack == null || songContext.SectionTrack.Sections.Count == 0)
             throw new ArgumentException("SectionTrack must have sections", nameof(songContext));
         if (songContext.BarTrack == null)
             throw new ArgumentException("BarTrack must be provided", nameof(songContext));
 
-        var phrases = _materialBank.GetDrumPhrasesByGenre(genre);
+        const int drumProgramNumber = 255;
+        var phrases = _materialBank.GetDrumPhrasesByMidiProgram(drumProgramNumber);
         if (phrases.Count == 0)
-            throw new InvalidOperationException($"No drum phrases found for genre '{genre}'");
+            throw new InvalidOperationException("No drum phrases found for the drum program");
 
-        int totalBars = songContext.SectionTrack.TotalBars;
-        if (maxBars > 0 && maxBars < totalBars)
-            totalBars = maxBars;
+        int effectiveSeed = seed > 0 ? seed : Random.Shared.Next(1, 100_000);
+        var planner = new DrumPhrasePlacementPlanner(songContext, effectiveSeed);
+        var plan = planner.CreatePlan(songContext.SectionTrack, drumProgramNumber, maxBars);
 
-        var plan = CreateSimplePlacementPlan(phrases, totalBars);
-        return GenerateFromPlan(plan, songContext.BarTrack);
+        return GenerateFromPlan(plan, songContext.BarTrack, drumProgramNumber);
     }
 
-    private static DrumPhrasePlacementPlan CreateSimplePlacementPlan(
-        IReadOnlyList<MaterialPhrase> phrases,
-        int totalBars)
-    {
-        var plan = new DrumPhrasePlacementPlan();
-        var phrase = phrases[0];
-
-        int currentBar = 1;
-        while (currentBar <= totalBars)
-        {
-            int barsRemaining = totalBars - currentBar + 1;
-            int placementBars = Math.Min(phrase.BarCount, barsRemaining);
-
-            plan.Placements.Add(new DrumPhrasePlacement
-            {
-                PhraseId = phrase.PhraseId,
-                StartBar = currentBar,
-                BarCount = placementBars
-            });
-
-            currentBar += placementBars;
-        }
-
-        return plan;
-    }
-
-    private PartTrack GenerateFromPlan(DrumPhrasePlacementPlan plan, BarTrack barTrack)
+    private PartTrack GenerateFromPlan(
+        DrumPhrasePlacementPlan plan,
+        BarTrack barTrack,
+        int midiProgramNumber)
     {
         var allEvents = new List<PartTrackEvent>();
 
@@ -75,7 +54,7 @@ public sealed class DrumGenerator
             if (phrase == null)
                 continue;
 
-            var phraseTrack = phrase.ToPartTrack(barTrack, placement.StartBar, 255);
+            var phraseTrack = phrase.ToPartTrack(barTrack, placement.StartBar, midiProgramNumber);
             long placementEndTick = GetPlacementEndTick(barTrack, placement);
 
             allEvents.AddRange(phraseTrack.PartTrackNoteEvents
@@ -87,7 +66,7 @@ public sealed class DrumGenerator
         return new PartTrack(ordered)
         {
             MidiProgramName = "Drums (Phrase-Based)",
-            MidiProgramNumber = 255
+            MidiProgramNumber = midiProgramNumber
         };
     }
 

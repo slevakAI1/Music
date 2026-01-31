@@ -14,7 +14,7 @@ public sealed record MaterialPhrase
     public required string Name { get; init; }
     public required string Description { get; init; }
     public required int BarCount { get; init; }
-    public required string Genre { get; init; }
+    public required int MidiProgramNumber { get; init; }
     public required int Seed { get; init; }
     public required IReadOnlyList<PartTrackEvent> Events { get; init; }
     public IReadOnlyList<MusicConstants.eSectionType> SectionTypes { get; init; } = [];
@@ -28,7 +28,6 @@ public sealed record MaterialPhrase
         string name,
         string description,
         int barCount,
-        string genre,
         int seed,
         IReadOnlyList<MusicConstants.eSectionType>? sectionTypes = null,
         IReadOnlyList<string>? tags = null,
@@ -45,9 +44,6 @@ public sealed record MaterialPhrase
             throw new ArgumentException("Description must be provided", nameof(description));
         if (barCount < 1)
             throw new ArgumentOutOfRangeException(nameof(barCount), "BarCount must be >= 1");
-        if (string.IsNullOrWhiteSpace(genre))
-            throw new ArgumentException("Genre must be provided", nameof(genre));
-
         return new MaterialPhrase
         {
             PhraseNumber = phraseNumber,
@@ -55,7 +51,7 @@ public sealed record MaterialPhrase
             Name = name,
             Description = description,
             BarCount = barCount,
-            Genre = genre,
+            MidiProgramNumber = partTrack.MidiProgramNumber,
             Seed = seed,
             Events = partTrack.PartTrackNoteEvents.ToList(),
             SectionTypes = sectionTypes ?? [],

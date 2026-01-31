@@ -54,9 +54,10 @@ public sealed class MaterialBank
 
     public IReadOnlyList<MaterialPhrase> GetDrumPhrases() => _drumPhrases.AsReadOnly();
 
-    public IReadOnlyList<MaterialPhrase> GetDrumPhrasesByGenre(string genre)
+    // AI: purpose=Filter drum phrases by MIDI program number; used by phrase placement planners.
+    public IReadOnlyList<MaterialPhrase> GetDrumPhrasesByMidiProgram(int midiProgramNumber)
         => _drumPhrases
-            .Where(p => string.Equals(p.Genre, genre, StringComparison.OrdinalIgnoreCase))
+            .Where(phrase => phrase.MidiProgramNumber == midiProgramNumber)
             .ToList();
 
     public MaterialPhrase? GetDrumPhraseById(string phraseId)
