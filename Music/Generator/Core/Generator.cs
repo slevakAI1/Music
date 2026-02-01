@@ -4,6 +4,7 @@
 // AI: perf=Single-run generation; avoid allocations in inner loops; use seed for deterministic results.
 // AI: change=Story RF-3 replaces DrummerAgent.Generate() with DrumGenerator pipeline architecture.
 
+using Music;
 using Music.Generator.Agents.Common;
 using Music.Generator.Agents.Drums;
 using Music.Generator.Groove;
@@ -82,6 +83,8 @@ namespace Music.Generator
 
             var materialBank = songContext.MaterialBank
                 ?? throw new ArgumentException("MaterialBank must be provided", nameof(songContext));
+
+            Tracer.DebugTrace($"[GenerateFromPhrases] phrases={materialBank.GetPhrases().Count}; seed={seed}; maxBars={maxBars}");
 
             var generator = new DrumGenerator(materialBank);
             return generator.Generate(songContext, seed, maxBars);

@@ -59,6 +59,19 @@ namespace Music
                 var entry = $"[{timestamp:O}] {text}{Environment.NewLine}";
 
                 File.AppendAllText(fullPath, entry);
+
+                if (Path.GetFileName(filename).Equals("DebugTrace.txt", StringComparison.OrdinalIgnoreCase))
+                {
+                    var projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
+                    var repoRoot = Path.GetFullPath(Path.Combine(projectRoot, "..", "Music"));
+                    var repoTracePath = Path.Combine(repoRoot, "Errors", Path.GetFileName(filename));
+                    var repoDir = Path.GetDirectoryName(repoTracePath);
+
+                    if (repoDir != null && !Directory.Exists(repoDir))
+                        Directory.CreateDirectory(repoDir);
+
+                    File.AppendAllText(repoTracePath, entry);
+                }
             }
             catch (Exception ex)
             {

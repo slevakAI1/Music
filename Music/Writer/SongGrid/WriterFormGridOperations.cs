@@ -260,20 +260,20 @@ namespace Music.Writer
 
         private static int GetPhraseBarCount(BarTrack barTrack, PartTrack track)
         {
-            if (track.PartTrackNoteEvents.Count == 0)
+            if (track.PartTrackNoteEvents.Count == 0 || barTrack.Bars.Count == 0)
                 return 1;
 
-            if (barTrack.Bars.Count == 0)
+            long firstTick = track.PartTrackNoteEvents.Min(e => e.AbsoluteTimeTicks);
+            long lastTick = track.PartTrackNoteEvents.Max(e => e.AbsoluteTimeTicks + e.NoteDurationTicks);
+            long phraseDuration = lastTick - firstTick;
+
+            if (!barTrack.TryGetBar(1, out var bar1))
                 return 1;
 
-            long lastTick = track.PartTrackNoteEvents
-                .Max(e => e.AbsoluteTimeTicks + e.NoteDurationTicks);
+            long ticksPerBar = bar1.TicksPerMeasure;
+            int barCount = (int)Math.Ceiling((double)phraseDuration / ticksPerBar);
 
-            var matchingBar = barTrack.Bars.LastOrDefault(bar => bar.EndTick >= lastTick);
-            if (matchingBar != null)
-                return matchingBar.BarNumber;
-
-            return barTrack.Bars.Last().BarNumber;
+            return Math.Max(1, barCount);
         }
 
         #region Error Messages
