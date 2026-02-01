@@ -124,7 +124,7 @@ namespace Music.Writer
             // btnSaveWav
             // 
             btnSaveWav.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSaveWav.Location = new Point(1628, 772);
+            btnSaveWav.Location = new Point(1789, 772);
             btnSaveWav.Name = "btnSaveWav";
             btnSaveWav.Size = new Size(80, 23);
             btnSaveWav.TabIndex = 48;
@@ -134,7 +134,7 @@ namespace Music.Writer
             // btnLoadDesign
             // 
             btnLoadDesign.ForeColor = Color.FromArgb(0, 192, 0);
-            btnLoadDesign.Location = new Point(1541, 772);
+            btnLoadDesign.Location = new Point(1702, 772);
             btnLoadDesign.Name = "btnLoadDesign";
             btnLoadDesign.Size = new Size(84, 23);
             btnLoadDesign.TabIndex = 47;
@@ -145,7 +145,7 @@ namespace Music.Writer
             // btnSaveDesign
             // 
             btnSaveDesign.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSaveDesign.Location = new Point(1457, 772);
+            btnSaveDesign.Location = new Point(1618, 772);
             btnSaveDesign.Name = "btnSaveDesign";
             btnSaveDesign.Size = new Size(80, 23);
             btnSaveDesign.TabIndex = 46;
@@ -156,9 +156,9 @@ namespace Music.Writer
             // btnPause
             // 
             btnPause.ForeColor = Color.FromArgb(0, 192, 0);
-            btnPause.Location = new Point(865, 774);
+            btnPause.Location = new Point(859, 774);
             btnPause.Name = "btnPause";
-            btnPause.Size = new Size(72, 23);
+            btnPause.Size = new Size(50, 23);
             btnPause.TabIndex = 45;
             btnPause.Text = "Pause";
             btnPause.UseVisualStyleBackColor = true;
@@ -167,20 +167,20 @@ namespace Music.Writer
             // btnClearSelectedTracks
             // 
             btnClearSelectedTracks.ForeColor = Color.FromArgb(0, 192, 0);
-            btnClearSelectedTracks.Location = new Point(174, 774);
+            btnClearSelectedTracks.Location = new Point(164, 774);
             btnClearSelectedTracks.Name = "btnClearSelectedTracks";
-            btnClearSelectedTracks.Size = new Size(116, 23);
+            btnClearSelectedTracks.Size = new Size(65, 23);
             btnClearSelectedTracks.TabIndex = 44;
-            btnClearSelectedTracks.Text = "Clear Selected";
+            btnClearSelectedTracks.Text = "Clear";
             btnClearSelectedTracks.UseVisualStyleBackColor = true;
             btnClearSelectedTracks.Click += btnClearSelected_Click;
             // 
             // btnStop
             // 
             btnStop.ForeColor = Color.FromArgb(0, 192, 0);
-            btnStop.Location = new Point(783, 774);
+            btnStop.Location = new Point(805, 774);
             btnStop.Name = "btnStop";
-            btnStop.Size = new Size(72, 23);
+            btnStop.Size = new Size(50, 23);
             btnStop.TabIndex = 43;
             btnStop.Text = "Stop";
             btnStop.UseVisualStyleBackColor = true;
@@ -189,7 +189,7 @@ namespace Music.Writer
             // btnExport
             // 
             btnExport.ForeColor = Color.FromArgb(0, 192, 0);
-            btnExport.Location = new Point(535, 772);
+            btnExport.Location = new Point(1501, 772);
             btnExport.Name = "btnExport";
             btnExport.Size = new Size(75, 23);
             btnExport.TabIndex = 42;
@@ -200,7 +200,7 @@ namespace Music.Writer
             // btnImport
             // 
             btnImport.ForeColor = Color.FromArgb(0, 192, 0);
-            btnImport.Location = new Point(457, 772);
+            btnImport.Location = new Point(1423, 772);
             btnImport.Name = "btnImport";
             btnImport.Size = new Size(72, 23);
             btnImport.TabIndex = 41;
@@ -213,7 +213,7 @@ namespace Music.Writer
             btnAddTrack.ForeColor = Color.FromArgb(0, 192, 0);
             btnAddTrack.Location = new Point(15, 774);
             btnAddTrack.Name = "btnAddTrack";
-            btnAddTrack.Size = new Size(72, 23);
+            btnAddTrack.Size = new Size(70, 23);
             btnAddTrack.TabIndex = 40;
             btnAddTrack.Text = "Add";
             btnAddTrack.UseVisualStyleBackColor = true;
@@ -222,9 +222,9 @@ namespace Music.Writer
             // btnDeleteTrack
             // 
             btnDeleteTrack.ForeColor = Color.FromArgb(0, 192, 0);
-            btnDeleteTrack.Location = new Point(95, 774);
+            btnDeleteTrack.Location = new Point(90, 774);
             btnDeleteTrack.Name = "btnDeleteTrack";
-            btnDeleteTrack.Size = new Size(72, 23);
+            btnDeleteTrack.Size = new Size(70, 23);
             btnDeleteTrack.TabIndex = 39;
             btnDeleteTrack.Text = "Delete";
             btnDeleteTrack.UseVisualStyleBackColor = true;
@@ -233,9 +233,9 @@ namespace Music.Writer
             // btnClearAll
             // 
             btnClearAll.ForeColor = Color.FromArgb(0, 192, 0);
-            btnClearAll.Location = new Point(313, 774);
+            btnClearAll.Location = new Point(233, 774);
             btnClearAll.Name = "btnClearAll";
-            btnClearAll.Size = new Size(72, 23);
+            btnClearAll.Size = new Size(70, 23);
             btnClearAll.TabIndex = 38;
             btnClearAll.Text = "Clear All";
             btnClearAll.UseVisualStyleBackColor = true;
@@ -244,9 +244,9 @@ namespace Music.Writer
             // btnPlayTracks
             // 
             btnPlayTracks.ForeColor = Color.FromArgb(0, 192, 0);
-            btnPlayTracks.Location = new Point(703, 774);
+            btnPlayTracks.Location = new Point(750, 774);
             btnPlayTracks.Name = "btnPlayTracks";
-            btnPlayTracks.Size = new Size(72, 23);
+            btnPlayTracks.Size = new Size(50, 23);
             btnPlayTracks.TabIndex = 32;
             btnPlayTracks.Text = "Play";
             btnPlayTracks.UseVisualStyleBackColor = true;
