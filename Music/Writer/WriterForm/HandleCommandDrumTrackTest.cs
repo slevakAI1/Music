@@ -29,7 +29,7 @@ namespace Music.Writer
                     return;
                 }
 
-                using var dialog = new TestSettingsDialog();
+                using var dialog = new PhraseTestSettingsDialog();
                 if (dialog.ShowDialog() != DialogResult.OK)
                     return;
 

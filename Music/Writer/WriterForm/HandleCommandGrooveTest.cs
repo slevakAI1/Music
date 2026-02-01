@@ -26,7 +26,7 @@ namespace Music.Writer
                 }
 
                 // Show input dialog
-                using var dialog = new TestSettingsDialog();
+                using var dialog = new PhraseTestSettingsDialog();
                 if (dialog.ShowDialog() != DialogResult.OK)
                     return;
 
