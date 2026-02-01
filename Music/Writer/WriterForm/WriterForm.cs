@@ -156,7 +156,7 @@ namespace Music.Writer
 
             // If the fixed Lyrics row was double-clicked, open the Lyrics editor and write back to the local _songContext
             if (e.RowIndex == SongGridManager.FIXED_ROW_LYRICS)
-			{
+            {
                 if (_songContext == null)
                     _songContext = new SongContext();
 
@@ -551,6 +551,11 @@ namespace Music.Writer
             {
                 // Silently fail to avoid crashing the UI - measure tracking is non-critical
             }
+        }
+
+        private void btnSavePhrase_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

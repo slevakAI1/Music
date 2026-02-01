@@ -35,6 +35,7 @@ namespace Music.Writer
             btnClearAll = new Button();
             btnPlayTracks = new Button();
             dgSong = new DataGridView();
+            btnSavePhrase = new Button();
             groupBox3.SuspendLayout();
             gbSong.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgSong).BeginInit();
@@ -100,6 +101,7 @@ namespace Music.Writer
             // gbSong
             // 
             gbSong.BackColor = Color.Black;
+            gbSong.Controls.Add(btnSavePhrase);
             gbSong.Controls.Add(btnSaveWav);
             gbSong.Controls.Add(btnLoadDesign);
             gbSong.Controls.Add(btnSaveDesign);
@@ -264,6 +266,17 @@ namespace Music.Writer
             dgSong.TabIndex = 37;
             dgSong.CellDoubleClick += dgSong_CellDoubleClick;
             // 
+            // btnSavePhrase
+            // 
+            btnSavePhrase.ForeColor = Color.FromArgb(0, 192, 0);
+            btnSavePhrase.Location = new Point(375, 772);
+            btnSavePhrase.Name = "btnSavePhrase";
+            btnSavePhrase.Size = new Size(84, 23);
+            btnSavePhrase.TabIndex = 49;
+            btnSavePhrase.Text = "Save Phrase";
+            btnSavePhrase.UseVisualStyleBackColor = true;
+            btnSavePhrase.Click += btnSavePhrase_Click;
+            // 
             // WriterForm
             // 
             BackColor = Color.White;
@@ -296,5 +309,6 @@ namespace Music.Writer
         private Button btnSaveDesign;
         private Button btnTestWordparser;
         private Button btnSaveWav;
+        private Button btnSavePhrase;
     }
 }

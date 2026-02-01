@@ -222,13 +222,19 @@ Phase 3: Track Generation
 **Goal:** Allow user to select phrase tracks in the song grid and save them to the MaterialBank.
 
 **Files to Create:**
-- `Writer/WriterForm/HandleCommandSaveToBank.cs`
 - `Writer/WriterForm/SaveToBankDialog.cs` + `.Designer.cs`
 
 **Files to Modify:**
 - `Writer/WriterForm/WriterForm.cs` — add button click handler
 - `Writer/WriterForm/WriterForm.Designer.cs` — add "Save to Bank" button
+- gridOperations.HandleCommandSaveToBank.cs - this is where the save to material bank logic will go.
+   The writer form already has button click handler but it is empty and should call the save phrase handler.
+- this is in writeform.cs:
+   private void btnSavePhrase_Click(object sender, EventArgs e)
+        {
 
+        }
+- 
 **Implementation Steps:**
 
 1. **Add button to WriterForm.Designer.cs**:
