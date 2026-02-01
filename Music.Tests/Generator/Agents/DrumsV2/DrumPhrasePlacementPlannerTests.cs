@@ -29,9 +29,8 @@ public class DrumPhrasePlacementPlannerTests
         var placements = plan.Placements.OrderBy(p => p.StartBar).ToList();
 
         Assert.Equal("verse-phrase", placements[0].PhraseId);
-        Assert.Equal("verse-phrase", placements[1].PhraseId);
+        Assert.Equal("chorus-phrase", placements[1].PhraseId);
         Assert.Equal("chorus-phrase", placements[2].PhraseId);
-        Assert.Equal("chorus-phrase", placements[3].PhraseId);
     }
 
     [Fact]
@@ -71,6 +70,26 @@ public class DrumPhrasePlacementPlannerTests
         var planB = plannerB.CreatePlan(sectionTrack, midiProgramNumber: 255);
 
         Assert.Equal(planA.Placements[0].PhraseId, planB.Placements[0].PhraseId);
+    }
+
+    [Fact]
+    public void CreatePlan_WithFillBar_SkipsOverlappingPlacement()
+    {
+        var songContext = new SongContext();
+        songContext.MaterialBank.AddDrumPhrase(CreatePhrase("phrase-a", barCount: 2,
+            sectionTypes: [MusicConstants.eSectionType.Verse]));
+
+        var sectionTrack = new SectionTrack();
+        sectionTrack.Add(MusicConstants.eSectionType.Verse, 4);
+        sectionTrack.Add(MusicConstants.eSectionType.Chorus, 2);
+
+        var planner = new DrumPhrasePlacementPlanner(songContext, seed: 444);
+        var plan = planner.CreatePlan(sectionTrack, midiProgramNumber: 255);
+
+        Assert.Contains(4, plan.FillBars);
+        Assert.Equal(2, plan.Placements.Count);
+        Assert.Equal(1, plan.Placements[0].StartBar);
+        Assert.Equal(5, plan.Placements[1].StartBar);
     }
 
     [Fact]

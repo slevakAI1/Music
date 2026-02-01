@@ -39,6 +39,14 @@ public sealed class DrumPhrasePlacementPlanner
         var plan = new DrumPhrasePlacementPlan();
         var sectionPhraseMap = AssignPhrasesToSectionTypes(phrases, sectionTrack);
 
+        for (int i = 0; i < sectionTrack.Sections.Count - 1; i++)
+        {
+            var section = sectionTrack.Sections[i];
+            int fillBar = section.StartBar + section.BarCount - 1;
+            if (fillBar <= totalBars)
+                plan.FillBars.Add(fillBar);
+        }
+
         foreach (var section in sectionTrack.Sections)
         {
             if (section.StartBar > totalBars)
@@ -93,6 +101,12 @@ public sealed class DrumPhrasePlacementPlanner
             int barsRemaining = sectionEnd - currentBar + 1;
             int placementBars = Math.Min(phrase.BarCount, barsRemaining);
 
+            if (OverlapsFillBar(plan, currentBar, placementBars))
+            {
+                currentBar++;
+                continue;
+            }
+
             var evolution = placementIndex == 0
                 ? null
                 : CreateEvolutionForRepeat(placementIndex, section.SectionType);
@@ -109,6 +123,18 @@ public sealed class DrumPhrasePlacementPlanner
             currentBar += placementBars;
             placementIndex++;
         }
+    }
+
+    private static bool OverlapsFillBar(DrumPhrasePlacementPlan plan, int startBar, int barCount)
+    {
+        int endBar = startBar + barCount - 1;
+        for (int bar = startBar; bar <= endBar; bar++)
+        {
+            if (plan.IsFillBar(bar))
+                return true;
+        }
+
+        return false;
     }
 
     private static DrumPhraseEvolutionParams? CreateEvolutionForRepeat(
