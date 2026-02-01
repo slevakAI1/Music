@@ -219,15 +219,15 @@ Phase 3: Track Generation
 
 **Size:** Medium (2-3 hours)
 
-**Goal:** Allow user to select phrase tracks in the song grid and save them to the MaterialBank.
+**Goal:** Allow user to select phrase tracks in the song grid and save them to the MaterialBank in the SongContext.
 
 **Files to Create:**
 - `Writer/WriterForm/SaveToBankDialog.cs` + `.Designer.cs`
 
 **Files to Modify:**
-- `Writer/WriterForm/WriterForm.cs` — add button click handler
-- `Writer/WriterForm/WriterForm.Designer.cs` — add "Save to Bank" button
-- gridOperations.HandleCommandSaveToBank.cs - this is where the save to material bank logic will go.
+- `Writer/WriterForm/WriterForm.cs` — button click handler already exists
+- `Writer/WriterForm/WriterForm.Designer.cs` — "Save to Bank" button already exists
+- GridOperations.cs - this is where the save to material bank logic will go e.g. method HandleCommandSaveToBank()
    The writer form already has button click handler but it is empty and should call the save phrase handler.
 - this is in writeform.cs:
    private void btnSavePhrase_Click(object sender, EventArgs e)
@@ -237,53 +237,27 @@ Phase 3: Track Generation
 - 
 **Implementation Steps:**
 
-1. **Add button to WriterForm.Designer.cs**:
-   - Add `btnSaveToBank` button near track management buttons
-   - Text: "Save to Bank"
-   - Wire to `btnSaveToBank_Click` handler
 
-2. **Create `SaveToBankDialog`**:
-   ```
-   Layout:
-   ┌─────────────────────────────────────────┐
-   │ Save Phrase to Material Bank            │
-   ├─────────────────────────────────────────┤
-   │  Phrase Name: [__________________]      │
-   │  Genre:       [PopRock ▼]               │
-   │  Tags:        [________________] (comma-separated)
-   │  Energy Hint: [====o====] (TrackBar 0-100, default 50)
-   │                                         │
-   │  Source Track: "Phrase (Seed: 12345, 4 bars)"
-   │  Bar Count: 4                           │
-   │                                         │
-   │              [Save]  [Cancel]           │
-   └─────────────────────────────────────────┘
-   ```
-   - Properties: `PhraseName`, `Genre`, `Tags` (List<string>), `EnergyHint` (0.0-1.0)
-   - Pre-populate name from track name if it looks like a phrase
-   - Pre-populate genre from track name if detectable
+1. **Create `SaveToBankDialog`**:
+  
+  foer now, just need a popup confirmation that it was saved properly.
 
 3. **Create `HandleCommandSaveToBank.cs`**:
 
+       - The phrase names and other properties can default to reasonable values based on the midi program number instrument name.
+       For instance Drum Set Phrase 1, Drum Set Phrase 2, etc.
+ 
 4. **Update WriterForm.cs**:
 
 **Acceptance Criteria:**
-- [ ] "Save to Bank" button visible in WriterForm
 - [ ] Clicking with no selection shows error message
-- [ ] Clicking with selection opens SaveToBankDialog
-- [ ] Dialog pre-populates fields from track name
-- [ ] Saved phrase appears in MaterialBank
-- [ ] Phrase can be retrieved by ID, genre, or GetDrumPhrases()
-- [ ] Multiple phrases can be saved in sequence
+- [ ] Popup confirmation or error message works
+- [ ] Saved phrase are in SongContext MaterialBank
+- [ ] Phrase(s) can be retrieved by ID or midi program number
+- [ ] Multiple phrases can be saved in sequence, each gets unique name and keeps their midi program numbers.
 
 **Testing Workflow:**
-1. Generate a phrase (Story 1.2)
-2. Select the phrase row in grid
-3. Click "Save to Bank"
-4. Enter name, genre, tags
-5. Click Save
-6. Verify phrase in MaterialBank (via debug or diagnostic)
-
+- Do not create unit tests for this story, manual testing only.
 ---
 
 #### Story 2.2: Add Material Bank Diagnostic View
