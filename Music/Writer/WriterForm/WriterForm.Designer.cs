@@ -124,9 +124,9 @@ namespace Music.Writer
             // btnSaveWav
             // 
             btnSaveWav.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSaveWav.Location = new Point(994, 772);
+            btnSaveWav.Location = new Point(1628, 772);
             btnSaveWav.Name = "btnSaveWav";
-            btnSaveWav.Size = new Size(85, 23);
+            btnSaveWav.Size = new Size(80, 23);
             btnSaveWav.TabIndex = 48;
             btnSaveWav.Text = "Save Wav";
             btnSaveWav.UseVisualStyleBackColor = true;
@@ -134,9 +134,9 @@ namespace Music.Writer
             // btnLoadDesign
             // 
             btnLoadDesign.ForeColor = Color.FromArgb(0, 192, 0);
-            btnLoadDesign.Location = new Point(1249, 772);
+            btnLoadDesign.Location = new Point(1541, 772);
             btnLoadDesign.Name = "btnLoadDesign";
-            btnLoadDesign.Size = new Size(89, 23);
+            btnLoadDesign.Size = new Size(84, 23);
             btnLoadDesign.TabIndex = 47;
             btnLoadDesign.Text = "Load Design";
             btnLoadDesign.UseVisualStyleBackColor = true;
@@ -145,9 +145,9 @@ namespace Music.Writer
             // btnSaveDesign
             // 
             btnSaveDesign.ForeColor = Color.FromArgb(0, 192, 0);
-            btnSaveDesign.Location = new Point(1154, 772);
+            btnSaveDesign.Location = new Point(1457, 772);
             btnSaveDesign.Name = "btnSaveDesign";
-            btnSaveDesign.Size = new Size(85, 23);
+            btnSaveDesign.Size = new Size(80, 23);
             btnSaveDesign.TabIndex = 46;
             btnSaveDesign.Text = "Save Design";
             btnSaveDesign.UseVisualStyleBackColor = true;
