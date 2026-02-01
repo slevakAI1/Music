@@ -178,7 +178,7 @@ Phase 3: Track Generation
 - [ ] `MaterialKind.DrumPhrase` enum value added
 - [ ] `MaterialBank` has add/get/query methods for drum phrases
 - [ ] `FromPartTrack` factory method works correctly
-- [ ] Unit tests for DrumPhrase creation and MaterialBank storage
+- [ ] Unit tests for MaterialPhrase creation and MaterialBank storage
 
 ---
 
@@ -604,7 +604,7 @@ Each phase has a clear testing path:
 |-------|-------|
 | 1.1 | Existing tests pass after rename |
 | 1.2 | Dialog validation, determinism |
-| 1.3 | DrumPhrase creation, MaterialBank storage |
+| 1.3 | MaterialPhrase creation, MaterialBank storage |
 | 1.4 | ToPartTrack tick offset calculations |
 | 2.1 | Save workflow, phrase extraction |
 | 2.2 | Viewer displays correct data |
@@ -623,7 +623,7 @@ Each phase has a clear testing path:
 ```
 Story 1.1 (rename) — no dependencies
 Story 1.2 (generate phrase command) — depends on 1.1
-Story 1.3 (DrumPhrase type) — no dependencies
+Story 1.3 (MaterialPhrase type) — no dependencies
 Story 1.4 (ToPartTrack) — depends on 1.3
 Story 2.1 (save to bank) — depends on 1.2, 1.3, 1.4
 Story 2.2 (bank viewer) — depends on 1.3
@@ -638,7 +638,7 @@ Story 5.2 (fill placeholder) — depends on 5.1
 
 **Recommended Execution Order:**
 1. Story 1.1 (rename)
-2. Story 1.3, 1.4 (DrumPhrase type)
+2. Story 1.3, 1.4 (MaterialPhrase type)
 3. Story 1.2 (generate phrase command)
 4. Story 2.1 (save to bank)
 5. Story 2.2 (bank viewer)
