@@ -14,7 +14,7 @@
 //        var songContext = CreateSongContext(totalBars: 4);
 //        var materialBank = songContext.MaterialBank;
 //        var phrase = CreatePhrase("phrase1", barCount: 2, songContext.BarTrack);
-//        materialBank.AddDrumPhrase(phrase);
+//        materialBank.AddPhrase(phrase);
 
 //        var generator = new DrumGenerator(materialBank);
 //        var track = generator.Generate(songContext);
@@ -28,7 +28,7 @@
 //        var songContext = CreateSongContext(totalBars: 4);
 //        var materialBank = songContext.MaterialBank;
 //        var phrase = CreatePhrase("phrase1", barCount: 2, songContext.BarTrack);
-//        materialBank.AddDrumPhrase(phrase);
+//        materialBank.AddPhrase(phrase);
 
 //        var generator = new DrumGenerator(materialBank);
 //        var track = generator.Generate(songContext);
@@ -50,7 +50,7 @@
 //        var songContext = CreateSongContext(totalBars: 3);
 //        var materialBank = songContext.MaterialBank;
 //        var phrase = CreatePhrase("phrase1", barCount: 2, songContext.BarTrack);
-//        materialBank.AddDrumPhrase(phrase);
+//        materialBank.AddPhrase(phrase);
 
 //        var generator = new DrumGenerator(materialBank);
 //        var track = generator.Generate(songContext);
@@ -64,7 +64,7 @@
 //        var songContext = CreateSongContext(totalBars: 3);
 //        var materialBank = songContext.MaterialBank;
 //        var phrase = CreatePhrase("phrase1", barCount: 2, songContext.BarTrack);
-//        materialBank.AddDrumPhrase(phrase);
+//        materialBank.AddPhrase(phrase);
 
 //        var generator = new DrumGenerator(materialBank);
 //        var track = generator.Generate(songContext);
@@ -81,7 +81,7 @@
 //        var songContext = CreateSongContext(totalBars: 2);
 //        var materialBank = songContext.MaterialBank;
 //        var phrase = CreateSingleNotePhrase("phrase1", barCount: 1, songContext.BarTrack, noteNumber: 42);
-//        materialBank.AddDrumPhrase(phrase);
+//        materialBank.AddPhrase(phrase);
 
 //        var generator = new DrumGenerator(materialBank);
 //        var track = generator.Generate(songContext, seed: 123, maxBars: 0);

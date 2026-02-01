@@ -1,6 +1,6 @@
 // AI: purpose=Manual test for phrase-based DrumGenerator; uses MaterialBank phrases to build full track.
-// AI: invariants=MaterialBank must contain drum phrases; bars=0 means full song; bars>0 limits generation.
-// AI: deps=Generator.GenerateFromPhrases; TestSettingsDialog for seed/bars.
+// AI: invariants=MaterialBank must contain phrases; always generates full song.
+// AI: deps=Generator.GenerateFromPhrases; DrumTrackTestSettingsDialog for seed input.
 
 using Music.Generator;
 
@@ -29,24 +29,22 @@ namespace Music.Writer
                     return;
                 }
 
-                using var dialog = new PhraseTestSettingsDialog();
+                using var dialog = new DrumTrackTestSettingsDialog();
                 if (dialog.ShowDialog() != DialogResult.OK)
                     return;
 
                 int seed = dialog.Seed;
-                int bars = dialog.Bars;
 
                 Rng.Initialize(seed);
 
-                var result = Generator.Generator.GenerateFromPhrases(songContext, seed, bars);
+                var result = Generator.Generator.GenerateFromPhrases(songContext, seed, maxBars: 0);
 
-                string barsInfo = bars > 0 ? $" ({bars} bars)" : string.Empty;
-                result.MidiProgramName = $"Drums (Phrase-Based){barsInfo} (Seed: {seed})";
+                result.MidiProgramName = $"Drums (Phrase-Based) (Seed: {seed})";
                 result.MidiProgramNumber = 255;
 
                 songContext.Song.PartTracks.Add(result);
                 SongGridManager.AddNewPartTrack(result, dgSong);
-                ShowSuccess(seed, bars);
+                ShowSuccess(seed);
             }
             catch (Exception ex)
             {
@@ -54,17 +52,13 @@ namespace Music.Writer
             }
         }
 
-        // AI: ShowSuccess: displays seed for reproduction; message stable for testing; shows if limited or full song.
-        private static void ShowSuccess(int seed, int bars)
+        // AI: ShowSuccess: displays seed for reproduction; generates full song.
+        private static void ShowSuccess(int seed)
         {
-            string barsMessage = bars > 0
-                ? $"Generated first {bars} bars."
-                : "Generated full song.";
-
             MessageBoxHelper.Show(
                 $"Phrase-based drum track created successfully.\n\n" +
                 $"Seed: {seed}\n" +
-                $"{barsMessage}\n\n" +
+                $"Generated full song.\n\n" +
                 $"Use this seed to reproduce the same drum track.",
                 "Drum Track Test",
                 MessageBoxButtons.OK,
