@@ -28,7 +28,7 @@ public sealed class DrumPhrasePlacementPlanner
         if (midiProgramNumber < 0 || midiProgramNumber > 255)
             throw new ArgumentOutOfRangeException(nameof(midiProgramNumber), "MIDI program must be 0-255.");
 
-        var phrases = _materialBank.GetDrumPhrasesByMidiProgram(midiProgramNumber);
+        var phrases = _materialBank.GetPhrasesByMidiProgram(midiProgramNumber);
         if (phrases.Count == 0)
             throw new InvalidOperationException("No drum phrases found for the requested MIDI program");
 

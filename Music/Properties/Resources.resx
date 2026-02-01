@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -117,4 +117,46 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="SavePhrase_DefaultDescription" xml:space="preserve">
+    <value>Saved from song grid</value>
+  </data>
+  <data name="SavePhrase_MissingInstrumentMessage" xml:space="preserve">
+    <value>No instrument selected for row #{0}. Please select an instrument before saving.</value>
+  </data>
+  <data name="SavePhrase_MissingInstrumentTitle" xml:space="preserve">
+    <value>Missing Instrument</value>
+  </data>
+  <data name="SavePhrase_MissingTimingMessage" xml:space="preserve">
+    <value>No time signature events defined. Please add at least one time signature event.</value>
+  </data>
+  <data name="SavePhrase_MissingTimingTitle" xml:space="preserve">
+    <value>Missing Time Signature</value>
+  </data>
+  <data name="SavePhrase_MissingTrackMessage" xml:space="preserve">
+    <value>No track data for row #{0}. Please add or assign a track before saving.</value>
+  </data>
+  <data name="SavePhrase_MissingTrackTitle" xml:space="preserve">
+    <value>Missing Track</value>
+  </data>
+  <data name="SavePhrase_NoSelectionMessage" xml:space="preserve">
+    <value>Please select one or more rows to save.</value>
+  </data>
+  <data name="SavePhrase_NoSelectionTitle" xml:space="preserve">
+    <value>Save Phrase</value>
+  </data>
+  <data name="SavePhrase_SuccessMessage" xml:space="preserve">
+    <value>Saved {0} phrase(s) to the material bank.</value>
+  </data>
+  <data name="SavePhrase_SuccessTitle" xml:space="preserve">
+    <value>Save Phrase</value>
+  </data>
+  <data name="SavePhrase_UnknownInstrument" xml:space="preserve">
+    <value>Unknown Instrument</value>
+  </data>
+  <data name="SavePhrase_NoSongContextMessage" xml:space="preserve">
+    <value>Song context is not available. Please load or create a design first.</value>
+  </data>
+  <data name="SavePhrase_NoSongContextTitle" xml:space="preserve">
+    <value>Save Phrase</value>
+  </data>
 </root>

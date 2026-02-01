@@ -30,7 +30,7 @@ public sealed class DrumGenerator
             throw new ArgumentException("BarTrack must be provided", nameof(songContext));
 
         const int drumProgramNumber = 255;
-        var phrases = _materialBank.GetDrumPhrasesByMidiProgram(drumProgramNumber);
+        var phrases = _materialBank.GetPhrasesByMidiProgram(drumProgramNumber);
         if (phrases.Count == 0)
             throw new InvalidOperationException("No drum phrases found for the drum program");
 
@@ -52,7 +52,7 @@ public sealed class DrumGenerator
 
         foreach (var placement in plan.Placements)
         {
-            var phrase = _materialBank.GetDrumPhraseById(placement.PhraseId);
+            var phrase = _materialBank.GetPhraseById(placement.PhraseId);
             if (phrase == null)
                 continue;
 

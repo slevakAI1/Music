@@ -13,7 +13,7 @@ namespace Music.Song.Material;
 public sealed class MaterialBank
 {
     private readonly Dictionary<PartTrack.PartTrackId, PartTrack> _tracks = [];
-    private readonly List<MaterialPhrase> _drumPhrases = [];
+    private readonly List<MaterialPhrase> _phrases = [];
 
     public IReadOnlyCollection<PartTrack> Tracks => _tracks.Values;
 
@@ -45,25 +45,42 @@ public sealed class MaterialBank
             .Where(t => string.Equals(t.Meta.IntendedRole, intendedRole, StringComparison.OrdinalIgnoreCase))
             .ToList();
 
-    // AI: drum phrases are stored separately from PartTracks; keep this list independent of TrackId dictionary.
-    public void AddDrumPhrase(MaterialPhrase phrase)
+
+
+
+
+
+
+
+
+    // AI: phrases are stored separately from PartTracks; keep this list independent of TrackId dictionary.
+    public void AddPhrase(MaterialPhrase phrase)
     {
         ArgumentNullException.ThrowIfNull(phrase);
-        _drumPhrases.Add(phrase);
+        _phrases.Add(phrase);
     }
 
-    public IReadOnlyList<MaterialPhrase> GetDrumPhrases() => _drumPhrases.AsReadOnly();
+    public IReadOnlyList<MaterialPhrase> GetPhrases() => _phrases.AsReadOnly();
 
-    // AI: purpose=Filter drum phrases by MIDI program number; used by phrase placement planners.
-    public IReadOnlyList<MaterialPhrase> GetDrumPhrasesByMidiProgram(int midiProgramNumber)
-        => _drumPhrases
+    // AI: purpose=Filter phrases by MIDI program number; used by phrase placement planners.
+    public IReadOnlyList<MaterialPhrase> GetPhrasesByMidiProgram(int midiProgramNumber)
+        => _phrases
             .Where(phrase => phrase.MidiProgramNumber == midiProgramNumber)
             .ToList();
 
-    public MaterialPhrase? GetDrumPhraseById(string phraseId)
-        => _drumPhrases.FirstOrDefault(p => p.PhraseId == phraseId);
+    public MaterialPhrase? GetPhraseById(string phraseId)
+        => _phrases.FirstOrDefault(p => p.PhraseId == phraseId);
 
-    public void ClearDrumPhrases() => _drumPhrases.Clear();
+    public void ClearPhrases() => _phrases.Clear();
+
+
+
+
+
+
+
+
+
 
     // AI: Motif-specific query methods (Story 8.2)
     public IReadOnlyList<PartTrack> GetMotifsByRole(string intendedRole)
@@ -85,6 +102,6 @@ public sealed class MaterialBank
     public void Clear()
     {
         _tracks.Clear();
-        _drumPhrases.Clear();
+        _phrases.Clear();
     }
 }

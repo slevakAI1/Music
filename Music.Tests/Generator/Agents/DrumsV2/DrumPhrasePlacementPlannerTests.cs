@@ -16,8 +16,8 @@ public class DrumPhrasePlacementPlannerTests
             sectionTypes: [MusicConstants.eSectionType.Verse]);
         var chorusPhrase = CreatePhrase("chorus-phrase", barCount: 1,
             sectionTypes: [MusicConstants.eSectionType.Chorus]);
-        songContext.MaterialBank.AddDrumPhrase(versePhrase);
-        songContext.MaterialBank.AddDrumPhrase(chorusPhrase);
+        songContext.MaterialBank.AddPhrase(versePhrase);
+        songContext.MaterialBank.AddPhrase(chorusPhrase);
 
         var sectionTrack = new SectionTrack();
         sectionTrack.Add(MusicConstants.eSectionType.Verse, 2);
@@ -39,8 +39,8 @@ public class DrumPhrasePlacementPlannerTests
         var songContext = new SongContext();
         var taggedPhrase = CreatePhrase("tagged-phrase", barCount: 1, tags: ["Verse"]);
         var genericPhrase = CreatePhrase("generic-phrase", barCount: 1);
-        songContext.MaterialBank.AddDrumPhrase(taggedPhrase);
-        songContext.MaterialBank.AddDrumPhrase(genericPhrase);
+        songContext.MaterialBank.AddPhrase(taggedPhrase);
+        songContext.MaterialBank.AddPhrase(genericPhrase);
 
         var sectionTrack = new SectionTrack();
         sectionTrack.Add(MusicConstants.eSectionType.Verse, 2);
@@ -55,9 +55,9 @@ public class DrumPhrasePlacementPlannerTests
     public void CreatePlan_WithSameSeed_IsDeterministic()
     {
         var songContext = new SongContext();
-        songContext.MaterialBank.AddDrumPhrase(CreatePhrase("phrase-a", barCount: 1,
+        songContext.MaterialBank.AddPhrase(CreatePhrase("phrase-a", barCount: 1,
             sectionTypes: [MusicConstants.eSectionType.Verse]));
-        songContext.MaterialBank.AddDrumPhrase(CreatePhrase("phrase-b", barCount: 1,
+        songContext.MaterialBank.AddPhrase(CreatePhrase("phrase-b", barCount: 1,
             sectionTypes: [MusicConstants.eSectionType.Verse]));
 
         var sectionTrack = new SectionTrack();
@@ -76,7 +76,7 @@ public class DrumPhrasePlacementPlannerTests
     public void CreatePlan_WithFillBar_SkipsOverlappingPlacement()
     {
         var songContext = new SongContext();
-        songContext.MaterialBank.AddDrumPhrase(CreatePhrase("phrase-a", barCount: 2,
+        songContext.MaterialBank.AddPhrase(CreatePhrase("phrase-a", barCount: 2,
             sectionTypes: [MusicConstants.eSectionType.Verse]));
 
         var sectionTrack = new SectionTrack();
@@ -96,7 +96,7 @@ public class DrumPhrasePlacementPlannerTests
     public void CreatePlan_WithRepeats_AssignsProgressiveEvolution()
     {
         var songContext = new SongContext();
-        songContext.MaterialBank.AddDrumPhrase(CreatePhrase("phrase-a", barCount: 1,
+        songContext.MaterialBank.AddPhrase(CreatePhrase("phrase-a", barCount: 1,
             sectionTypes: [MusicConstants.eSectionType.Verse]));
 
         var sectionTrack = new SectionTrack();
@@ -123,7 +123,7 @@ public class DrumPhrasePlacementPlannerTests
     public void CreatePlan_WithChorusRepeats_AssignsGhostIntensity()
     {
         var songContext = new SongContext();
-        songContext.MaterialBank.AddDrumPhrase(CreatePhrase("phrase-a", barCount: 1,
+        songContext.MaterialBank.AddPhrase(CreatePhrase("phrase-a", barCount: 1,
             sectionTypes: [MusicConstants.eSectionType.Chorus]));
 
         var sectionTrack = new SectionTrack();

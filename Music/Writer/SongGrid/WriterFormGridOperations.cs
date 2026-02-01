@@ -3,14 +3,18 @@
 // AI: deps=Relies on SongGridManager, GridControlLinesManager, Midi services, and PartTrack DTO; renaming breaks many callers.
 // AI: change=If adding new grid behaviors update unit tests and grid population helpers accordingly.
 
+using System.Globalization;
 using System.Reflection;
 using Music.Generator;
 using Music.MyMidi;
+using Music.Properties;
+using Music.Song.Material;
 
 namespace Music.Writer
 {
     public class WriterFormGridOperations
     {
+        private static int _nextPhraseDescriptionNumber = 1;
         // AI: HandleAddSongTrack: create an empty PartTrack row and select it; expects SongGridManager.AddNewPartTrack semantics.
         public void HandleAddSongTrack(DataGridView dgSong)
         {
@@ -169,5 +173,147 @@ namespace Music.Writer
                 MessageBoxHelper.Show($"Playback control failed: {ex.Message}", "Playback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        public void HandleSaveSelectedPhrases(DataGridView dgSong, SongContext? songContext)
+        {
+            ArgumentNullException.ThrowIfNull(dgSong);
+
+            if (songContext == null)
+            {
+                ShowNoSongContextError();
+                return;
+            }
+
+            var hasTrackSelection = dgSong.SelectedRows
+                .Cast<DataGridViewRow>()
+                .Any(r => r.Index >= SongGridManager.FIXED_ROWS_COUNT);
+
+            if (!hasTrackSelection)
+            {
+                ShowNoSelectionError();
+                return;
+            }
+
+            // ========================================================================================
+            // This is to ensure bartrack is current - don't know if this is necessary. leave it for now, doesn't hurt.
+            var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
+            var timeSignatureTrack = timeSignatureRow.Cells["colData"].Value as Timingtrack;
+            if (timeSignatureTrack == null || timeSignatureTrack.Events.Count == 0)
+            {
+                ShowMissingTimingError();
+                return;
+            }
+
+            if (songContext.BarTrack.Bars.Count == 0)
+            {
+                songContext.BarTrack.RebuildFromTimingTrack(timeSignatureTrack);
+            }
+            // ========================================================================================
+
+            int savedCount = 0;
+
+            foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
+            {
+                if (selectedRow.Index < SongGridManager.FIXED_ROWS_COUNT)
+                    continue;
+
+                var dataObj = selectedRow.Cells["colData"].Value;
+                if (dataObj is not PartTrack track || track.PartTrackNoteEvents.Count == 0)
+                    continue;
+
+                var instrObj = selectedRow.Cells["colType"].Value;
+                int programNumber = (instrObj != null && instrObj != DBNull.Value) ? Convert.ToInt32(instrObj) : 255;
+                if (programNumber == -1)  // what is this? TO DO
+                    programNumber = 255;
+
+                track.MidiProgramNumber = programNumber;
+
+                var instrumentName = MidiVoices.MidiVoiceList()
+                    .FirstOrDefault(voice => voice.ProgramNumber == programNumber)?.Name
+                    ?? "Unknown Instrument";
+
+                int phraseNumber = songContext.MaterialBank.GetPhrasesByMidiProgram(programNumber).Count + 1;
+                string phraseId = Guid.NewGuid().ToString("N");
+                string phraseName = $"{instrumentName} Phrase {phraseNumber}";
+                string description = $"Phrase {_nextPhraseDescriptionNumber++}";
+                int barCount = GetPhraseBarCount(songContext.BarTrack, track);
+                int seed = track.Meta.Provenance?.BaseSeed ?? track.Meta.Provenance?.DerivedSeed ?? 0;
+
+                var phrase = MaterialPhrase.FromPartTrack(
+                    track,
+                    phraseNumber,
+                    phraseId,
+                    phraseName,
+                    description,
+                    barCount,
+                    seed);
+
+                songContext.MaterialBank.AddPhrase(phrase);
+                savedCount++;
+            }
+
+            if (savedCount > 0)
+            {
+                ShowSuccessMessage(savedCount);
+            }
+        }
+
+        private static int GetPhraseBarCount(BarTrack barTrack, PartTrack track)
+        {
+            if (track.PartTrackNoteEvents.Count == 0)
+                return 1;
+
+            if (barTrack.Bars.Count == 0)
+                return 1;
+
+            long lastTick = track.PartTrackNoteEvents
+                .Max(e => e.AbsoluteTimeTicks + e.NoteDurationTicks);
+
+            var matchingBar = barTrack.Bars.LastOrDefault(bar => bar.EndTick >= lastTick);
+            if (matchingBar != null)
+                return matchingBar.BarNumber;
+
+            return barTrack.Bars.Last().BarNumber;
+        }
+
+        #region Error Messages
+
+        private static void ShowNoSongContextError()
+        {
+            MessageBoxHelper.Show(
+                "Song context is not available. Please load or create a design first.",
+                "Save Phrase",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+
+        private static void ShowNoSelectionError()
+        {
+            MessageBoxHelper.Show(
+                "Please select one or more tracks to save as phrases.",
+                "Save Phrase",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+
+        private static void ShowMissingTimingError()
+        {
+            MessageBoxHelper.Show(
+                "No time signature events defined. Please add at least one time signature event.",
+                "Missing Time Signature",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning);
+        }
+
+        private static void ShowSuccessMessage(int count)
+        {
+            MessageBoxHelper.Show(
+                $"Successfully saved {count} phrase(s) to the material bank.",
+                "Save Phrase",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+
+        #endregion
     }
 }

@@ -23,9 +23,9 @@ namespace Music.Writer
                     return;
                 }
 
-                if (songContext.MaterialBank.GetDrumPhrases().Count == 0)
+                if (songContext.MaterialBank.GetPhrases().Count == 0)
                 {
-                    ShowError("No drum phrases found in MaterialBank. Generate and save phrases first.");
+                    ShowError("No phrases found in MaterialBank. Generate and save phrases first.");
                     return;
                 }
 

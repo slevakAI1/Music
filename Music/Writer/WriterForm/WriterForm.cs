@@ -555,7 +555,10 @@ namespace Music.Writer
 
         private void btnSavePhrase_Click(object sender, EventArgs e)
         {
+            _gridOperations.HandleSaveSelectedPhrases(dgSong, _songContext);
 
+            if (_songContext != null)
+                Globals.SongContext = _songContext;
         }
     }
 }
