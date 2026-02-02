@@ -59,7 +59,6 @@ namespace Music.Generator.Agents.Drums
     {
         private readonly DrumOperatorRegistry _registry;
         private readonly StyleConfiguration _styleConfig;
-        private readonly IAgentMemory? _memory;
         private readonly GrooveDiagnosticsCollector? _diagnosticsCollector;
         private readonly DrummerCandidateSourceSettings _settings;
 
@@ -71,13 +70,11 @@ namespace Music.Generator.Agents.Drums
         /// </summary>
         /// <param name="registry">Registry of drum operators.</param>
         /// <param name="styleConfig">Style configuration for operator filtering and weights.</param>
-        /// <param name="memory">Optional agent memory for repetition penalties.</param>
         /// <param name="diagnosticsCollector">Optional collector for structured diagnostics.</param>
         /// <param name="settings">Optional settings for error handling and diagnostics.</param>
         public DrummerCandidateSource(
             DrumOperatorRegistry registry,
             StyleConfiguration styleConfig,
-            IAgentMemory? memory = null,
             GrooveDiagnosticsCollector? diagnosticsCollector = null,
             DrummerCandidateSourceSettings? settings = null)
         {
@@ -86,7 +83,6 @@ namespace Music.Generator.Agents.Drums
 
             _registry = registry;
             _styleConfig = styleConfig;
-            _memory = memory;
             _diagnosticsCollector = diagnosticsCollector;
             _settings = settings ?? DrummerCandidateSourceSettings.Default;
         }

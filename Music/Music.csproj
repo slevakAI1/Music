@@ -56,6 +56,7 @@
     <Compile Remove="Generator\Agents\Drums\Performance\DrummerVelocityShaper.cs" />
     <Compile Remove="Generator\Agents\Drums\Physicality\**" />
     <Compile Remove="Generator\Agents\Drums\Policy\**" />
+    <Compile Remove="Generator\Agents\Drums\Agent\DrummerMemory.cs" />
   </ItemGroup>
 
   <ItemGroup>

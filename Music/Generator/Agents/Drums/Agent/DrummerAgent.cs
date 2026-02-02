@@ -1,6 +1,6 @@
-// AI: purpose=DrummerAgent facade class; unifies candidate source, memory, and registry for drum generation.
+// AI: purpose=DrummerAgent facade class; unifies candidate source and registry for drum generation.
 // AI: invariants=Implements IDrumCandidateSource via delegation; deterministic output for same inputs.
-// AI: deps=DrummerCandidateSource, DrummerMemory, DrumOperatorRegistry, StyleConfiguration.
+// AI: deps=DrummerCandidateSource, DrumOperatorRegistry, StyleConfiguration.
 // AI: change=Story 8.1, 4.2; facade pattern enables integration with Generator.cs and future testing.
 
 using Music.Generator.Agents.Common;
@@ -33,17 +33,13 @@ namespace Music.Generator.Agents.Drums
     /// <para>This class owns and manages the lifecycle of:</para>
     /// <list type="bullet">
     ///   <item>DrumOperatorRegistry (built from DrumOperatorRegistryBuilder)</item>
-    ///   <item>DrummerMemory (persists for agent lifetime)</item>
     ///   <item>DrummerCandidateSource (delegates IDrumCandidateSource)</item>
     /// </list>
-    /// <para>Memory persists for agent lifetime, supporting anti-repetition across multiple generation calls.
-    /// Different songs should use different DrummerAgent instances.</para>
     /// </remarks>
     public sealed class DrummerAgent : IDrumCandidateSource
     {
         private readonly StyleConfiguration _styleConfig;
         private readonly DrumOperatorRegistry _registry;
-        private readonly DrummerMemory _memory;
         private readonly DrummerCandidateSource _candidateSource;
         private readonly DrummerAgentSettings _settings;
 
@@ -67,14 +63,10 @@ namespace Music.Generator.Agents.Drums
             // Build operator registry (internally builds and freezes all 28 operators)
             _registry = DrumOperatorRegistryBuilder.BuildComplete();
 
-            // Create memory (persists for agent lifetime)
-            _memory = new DrummerMemory();
-
             // Create candidate source (delegates IGrooveCandidateSource)
             _candidateSource = new DrummerCandidateSource(
                 _registry,
                 styleConfig,
-                _memory,
                 diagnosticsCollector: null,
                 _settings.CandidateSourceSettings);
         }
@@ -89,11 +81,6 @@ namespace Music.Generator.Agents.Drums
         /// </summary>
         public DrumOperatorRegistry Registry => _registry;
 
-        /// <summary>
-        /// Gets the drummer memory (for diagnostics/inspection).
-        /// </summary>
-        public DrummerMemory Memory => _memory;
-
         #region IDrumCandidateSource Implementation
 
         /// <inheritdoc />
@@ -106,17 +93,5 @@ namespace Music.Generator.Agents.Drums
 
         #endregion
 
-        #region Reset
-
-        /// <summary>
-        /// Resets the agent memory for a new song.
-        /// Call this if reusing the same DrummerAgent instance for multiple songs.
-        /// </summary>
-        public void ResetMemory()
-        {
-            _memory.Clear();
-        }
-
-        #endregion
     }
 }

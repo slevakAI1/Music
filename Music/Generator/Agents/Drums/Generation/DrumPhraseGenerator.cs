@@ -240,6 +240,10 @@ namespace Music.Generator.Agents.Drums
                         .ComputeDensityTarget(drumBarContext, role)
                         .TargetCount;
 
+
+                    targetCount = 2;
+
+
                     if (targetCount <= 0)
                         continue; // No operators needed for this bar+role
 

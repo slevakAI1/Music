@@ -18,6 +18,7 @@
     <Compile Remove="Generator\Agents\Drums\Physicality\**" />
     <Compile Remove="Generator\Agents\Drums\Policy\**" />
     <Compile Remove="Generator\Agents\Drums\DrummerPhysicalityTests.cs" />
+    <Compile Remove="Generator\Agents\Drums\DrummerMemoryTests.cs" />
   </ItemGroup>
 
   <ItemGroup>
