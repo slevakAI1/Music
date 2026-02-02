@@ -52,26 +52,21 @@ namespace Music.Generator.Agents.Drums
     /// </remarks>
     public sealed class DrumPhraseGenerator
     {
-        private readonly IDrumPolicyProvider _policyProvider;
         private readonly IDrumCandidateSource _candidateSource;
         private readonly DrumGeneratorSettings _settings;
 
         /// <summary>
-        /// Creates a DrumGenerator with the specified policy and candidate providers.
+        /// Creates a DrumGenerator with the specified candidate provider.
         /// </summary>
-        /// <param name="policyProvider">Policy provider (provides density targets, caps, weights).</param>
         /// <param name="candidateSource">Candidate source (provides operator-generated candidates).</param>
         /// <param name="settings">Optional settings (diagnostics, active roles, default velocity).</param>
-        /// <exception cref="ArgumentNullException">If policyProvider or candidateSource is null.</exception>
+        /// <exception cref="ArgumentNullException">If candidateSource is null.</exception>
         public DrumPhraseGenerator(
-            IDrumPolicyProvider policyProvider,
             IDrumCandidateSource candidateSource,
             DrumGeneratorSettings? settings = null)
         {
-            ArgumentNullException.ThrowIfNull(policyProvider);
             ArgumentNullException.ThrowIfNull(candidateSource);
 
-            _policyProvider = policyProvider;
             _candidateSource = candidateSource;
             _settings = settings ?? DrumGeneratorSettings.Default;
         }
@@ -126,6 +121,7 @@ namespace Music.Generator.Agents.Drums
             // Combine anchors with operator onsets
             var allOnsets = CombineOnsets(anchorOnsets, operatorOnsets);
 
+            // AI: disconnect=Performance; no timing/velocity shaping in this phrase pass.
             // Convert to MIDI events
             return ConvertToPartTrack(allOnsets, barTrack, drumProgramNumber);
         }
@@ -239,11 +235,10 @@ namespace Music.Generator.Agents.Drums
 
                 foreach (var role in activeRoles)
                 {
-                    // Get policy decision for this bar+role
-                    var policy = _policyProvider.GetPolicy(drumBarContext, role);
-
-                    // Calculate target count from density
-                    int targetCount = CalculateTargetCount(policy, role);
+                    // AI: disconnect=Policy; use default density targets to isolate operator behavior.
+                    int targetCount = DrumDensityCalculator
+                        .ComputeDensityTarget(drumBarContext, role)
+                        .TargetCount;
 
                     if (targetCount <= 0)
                         continue; // No operators needed for this bar+role
@@ -285,28 +280,6 @@ namespace Music.Generator.Agents.Drums
             }
 
             return result;
-        }
-
-        private int CalculateTargetCount(DrumPolicyDecision? policy, string role)
-        {
-            // If no policy or no density override, return 0 (anchor-only)
-            if (policy?.Density01Override == null)
-                return 0;
-
-            double density01 = policy.Density01Override.Value;
-
-            // Base count on beats per bar (assume 4/4 for MVP)
-            const int beatsPerBar = 4;
-            int baseCount = beatsPerBar;
-
-            // Scale by density (allows up to 8 hits in 4/4 at density 1.0)
-            int targetCount = (int)(baseCount * density01 * 2.0);
-
-            // Clamp to policy max if present
-            int maxCount = policy.MaxEventsPerBarOverride ?? 16;
-            targetCount = Math.Clamp(targetCount, 0, maxCount);
-
-            return targetCount;
         }
 
         private static List<GrooveOnset> CombineOnsets(

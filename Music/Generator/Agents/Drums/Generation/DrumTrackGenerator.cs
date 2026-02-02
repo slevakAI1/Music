@@ -80,7 +80,7 @@ namespace Music.Generator
 
             // Story RF-4: Use DrumGenerator pipeline with DrummerAgent as data source
             var agent = new DrummerAgent(StyleConfigurationLibrary.PopRock);
-            var generator = new DrumPhraseGenerator(agent, agent);
+            var generator = new DrumPhraseGenerator(agent);
             return generator.Generate(songContext);
         }
 

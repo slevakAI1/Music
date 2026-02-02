@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -48,6 +48,14 @@
     <None Remove="Patches\**" />
     <None Remove="Song\GrooveOld\**" />
     <None Remove="Tests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Generator\Agents\Drums\Performance\DrumArticulationMapper.cs" />
+    <Compile Remove="Generator\Agents\Drums\Performance\DrummerTimingShaper.cs" />
+    <Compile Remove="Generator\Agents\Drums\Performance\DrummerVelocityShaper.cs" />
+    <Compile Remove="Generator\Agents\Drums\Physicality\**" />
+    <Compile Remove="Generator\Agents\Drums\Policy\**" />
   </ItemGroup>
 
   <ItemGroup>

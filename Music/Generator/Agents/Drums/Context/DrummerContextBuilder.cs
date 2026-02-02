@@ -1,6 +1,6 @@
 // AI: purpose=Builds DrummerContext from DrumBarContext and runtime state; pure builder for determinism.
 // AI: invariants=Builder is stateless; same inputs produce identical DrummerContext; bars/beats 1-based.
-// AI: deps=DrumBarContext, DrumPolicyDecision, GrooveRoles.
+// AI: deps=DrumBarContext, GrooveRoles.
 // AI: change=Story 5.3: Simplified, removed deleted policy dependencies.
 
 using Music.Generator.Agents.Common;
@@ -17,8 +17,7 @@ namespace Music.Generator.Agents.Drums
         /// <summary>Per-bar groove context (section, phrase position).</summary>
         public required DrumBarContext BarContext { get; init; }
 
-        /// <summary>Optional policy decision with overrides for this bar.</summary>
-        public DrumPolicyDecision? PolicyDecision { get; init; }
+        // AI: disconnect=Policy; policy decision removed while validating operator-only phrase generation.
 
         /// <summary>Seed for deterministic generation.</summary>
         public int Seed { get; init; } = 42;

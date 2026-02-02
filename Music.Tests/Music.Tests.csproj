@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0-windows7.0</TargetFramework>
@@ -11,6 +11,13 @@
     <Compile Remove="Tests - Not Xunit must convert\**" />
     <EmbeddedResource Remove="Tests - Not Xunit must convert\**" />
     <None Remove="Tests - Not Xunit must convert\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Generator\Agents\Drums\Performance\**" />
+    <Compile Remove="Generator\Agents\Drums\Physicality\**" />
+    <Compile Remove="Generator\Agents\Drums\Policy\**" />
+    <Compile Remove="Generator\Agents\Drums\DrummerPhysicalityTests.cs" />
   </ItemGroup>
 
   <ItemGroup>

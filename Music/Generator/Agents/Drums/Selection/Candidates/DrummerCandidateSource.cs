@@ -1,11 +1,9 @@
 // AI: purpose=Implements IDrumCandidateSource for drummer agent; gathers operator candidates, maps, groups, filters.
 // AI: invariants=Deterministic: same context + seed → same groups; operators invoked in registry order; errors isolated.
-// AI: deps=IDrumCandidateSource, DrumOperatorRegistry, DrumCandidateMapper, PhysicalityFilter, DrummerContextBuilder.
+// AI: deps=IDrumCandidateSource, DrumOperatorRegistry, DrumCandidateMapper, DrummerContextBuilder.
 // AI: change=Story 2.4, 4.2; extend with diagnostics and additional filtering as physicality system matures.
 
 using Music.Generator.Agents.Common;
-using Music.Generator.Agents.Drums.Physicality;
-
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums
@@ -62,7 +60,6 @@ namespace Music.Generator.Agents.Drums
         private readonly DrumOperatorRegistry _registry;
         private readonly StyleConfiguration _styleConfig;
         private readonly IAgentMemory? _memory;
-        private readonly PhysicalityFilter? _physicalityFilter;
         private readonly GrooveDiagnosticsCollector? _diagnosticsCollector;
         private readonly DrummerCandidateSourceSettings _settings;
 
@@ -75,14 +72,12 @@ namespace Music.Generator.Agents.Drums
         /// <param name="registry">Registry of drum operators.</param>
         /// <param name="styleConfig">Style configuration for operator filtering and weights.</param>
         /// <param name="memory">Optional agent memory for repetition penalties.</param>
-        /// <param name="physicalityFilter">Optional physicality filter for playability validation.</param>
         /// <param name="diagnosticsCollector">Optional collector for structured diagnostics.</param>
         /// <param name="settings">Optional settings for error handling and diagnostics.</param>
         public DrummerCandidateSource(
             DrumOperatorRegistry registry,
             StyleConfiguration styleConfig,
             IAgentMemory? memory = null,
-            PhysicalityFilter? physicalityFilter = null,
             GrooveDiagnosticsCollector? diagnosticsCollector = null,
             DrummerCandidateSourceSettings? settings = null)
         {
@@ -92,7 +87,6 @@ namespace Music.Generator.Agents.Drums
             _registry = registry;
             _styleConfig = styleConfig;
             _memory = memory;
-            _physicalityFilter = physicalityFilter;
             _diagnosticsCollector = diagnosticsCollector;
             _settings = settings ?? DrummerCandidateSourceSettings.Default;
         }
@@ -132,11 +126,7 @@ namespace Music.Generator.Agents.Drums
             // Group by operator family
             var groups = GroupByOperatorFamily(allCandidates, mappedCandidates);
 
-            // Apply physicality filter
-            if (_physicalityFilter != null)
-            {
-                groups = ApplyPhysicalityFilter(groups, barContext.BarNumber);
-            }
+            // AI: disconnect=Physicality; skip playability filtering during phrase validation.
 
             return groups;
         }
@@ -353,45 +343,6 @@ namespace Music.Generator.Agents.Drums
                     MaxAddsPerBar = candidates.Count, // Allow up to all candidates
                     BaseProbabilityBias = avgScore,
                     Candidates = candidates
-                });
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Applies physicality filter to remove unplayable candidates.
-        /// </summary>
-        private List<DrumCandidateGroup> ApplyPhysicalityFilter(
-            List<DrumCandidateGroup> groups,
-            int barNumber)
-        {
-            if (_physicalityFilter == null)
-                return groups;
-
-            // Collect all candidates for global filtering
-            var allCandidates = new List<DrumOnsetCandidate>();
-            foreach (var group in groups)
-            {
-                allCandidates.AddRange(group.Candidates);
-            }
-
-            // Filter candidates
-            var validCandidates = _physicalityFilter.Filter(allCandidates, barNumber);
-            var validSet = new HashSet<DrumOnsetCandidate>(validCandidates);
-
-            // Rebuild groups with only valid candidates
-            var result = new List<DrumCandidateGroup>();
-            foreach (var group in groups)
-            {
-                var filtered = group.Candidates.Where(c => validSet.Contains(c)).ToList();
-                result.Add(new DrumCandidateGroup
-                {
-                    GroupId = group.GroupId,
-                    GroupTags = group.GroupTags,
-                    MaxAddsPerBar = group.MaxAddsPerBar,
-                    BaseProbabilityBias = group.BaseProbabilityBias,
-                    Candidates = filtered
                 });
             }
 
