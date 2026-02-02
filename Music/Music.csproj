@@ -9,6 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="AI\Completed\AIDialog\**" />
+    <Compile Remove="AI\Completed\Dialog\**" />
     <Compile Remove="Archives\**" />
     <Compile Remove="Files\OutputSamples\**" />
     <Compile Remove="Future Ideas\**" />
@@ -20,6 +22,8 @@
     <Compile Remove="Patches\**" />
     <Compile Remove="Song\GrooveOld\**" />
     <Compile Remove="Tests\**" />
+    <EmbeddedResource Remove="AI\Completed\AIDialog\**" />
+    <EmbeddedResource Remove="AI\Completed\Dialog\**" />
     <EmbeddedResource Remove="Archives\**" />
     <EmbeddedResource Remove="Files\OutputSamples\**" />
     <EmbeddedResource Remove="Future Ideas\**" />
@@ -31,6 +35,8 @@
     <EmbeddedResource Remove="Patches\**" />
     <EmbeddedResource Remove="Song\GrooveOld\**" />
     <EmbeddedResource Remove="Tests\**" />
+    <None Remove="AI\Completed\AIDialog\**" />
+    <None Remove="AI\Completed\Dialog\**" />
     <None Remove="Archives\**" />
     <None Remove="Files\OutputSamples\**" />
     <None Remove="Future Ideas\**" />

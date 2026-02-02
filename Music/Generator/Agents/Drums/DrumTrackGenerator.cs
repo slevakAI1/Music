@@ -1,6 +1,6 @@
-// AI: purpose=Generate drum track using DrumGenerator pipeline (Story RF-4) or fallback to anchor-based generation.
+// AI: purpose=Generate drum track using DrumGenerator pipeline or fallback to anchor-based generation.
 // AI: deps=DrumGenerator for pipeline orchestration; DrummerAgent as data source; returns PartTrack sorted by AbsoluteTimeTicks.
-// AI: change=Story RF-4: uses DrumGenerator pipeline with DrummerAgent; old anchor-based approach preserved as fallback.
+// AI: change= uses DrumGenerator pipeline with DrummerAgent; old anchor-based approach preserved as fallback.
 
 using Music.Generator.Agents.Common;
 using Music.Generator.Agents.Drums;
@@ -23,9 +23,9 @@ namespace Music.Generator
         TomLow
     }
 
-    // AI: DrumOnset captures a single drum hit; minimal fields for MVP. Strength field added in Story 18 (velocity shaping).
+    // AI: DrumOnset captures a single drum hit; minimal fields for MVP. Strength field.
     // AI: invariants=Beat is 1-based within bar; BarNumber is 1-based; Velocity 1-127; TickPosition computed from BarTrack.
-    // AI: Story 9 adds protection flags: IsMustHit, IsNeverRemove, IsProtected for enforcement logic.
+    // AI: adds protection flags: IsMustHit, IsNeverRemove, IsProtected for enforcement logic.
     public sealed record DrumOnset(
         DrumRole Role,
         int BarNumber,
