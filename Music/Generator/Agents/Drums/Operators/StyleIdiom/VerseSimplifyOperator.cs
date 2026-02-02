@@ -63,10 +63,6 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             if (context.SectionType != MusicConstants.eSectionType.Verse)
                 return false;
 
-            // Suppress during fill windows
-            if (context.IsFillWindow)
-                return false;
-
             return true;
         }
 

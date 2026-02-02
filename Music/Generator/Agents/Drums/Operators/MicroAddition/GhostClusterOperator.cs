@@ -1,5 +1,5 @@
 // AI: purpose=MicroAddition operator generating 2-3 ghost notes as a mini-fill cluster.
-// AI: invariants=VelocityHint in [30,50]; only applies when Snare in ActiveRoles, energy >= 0.5, not in fill window.
+// AI: invariants=VelocityHint in [30,50]; only applies when Snare in ActiveRoles and energy >= 0.5.
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
 // AI: change=Story 3.1, 9.3; adjust cluster patterns and placement based on listening tests; reduces score when motif active.
 
@@ -56,10 +56,6 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
         public override bool CanApply(DrummerContext context)
         {
             if (!base.CanApply(context))
-                return false;
-
-            // Suppress during fill windows - actual fills handle this
-            if (context.IsFillWindow)
                 return false;
 
             // Need enough beats for cluster placement

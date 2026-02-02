@@ -64,9 +64,9 @@ namespace Music.Generator.Agents.Drums.Operators
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            // Energy check
-            if (context.EnergyLevel < MinEnergyThreshold || context.EnergyLevel > MaxEnergyThreshold)
-                return false;
+            // Energy check - This is for future development where operators may have energy constraints
+            //if (context.EnergyLevel < MinEnergyThreshold || context.EnergyLevel > MaxEnergyThreshold)
+            //    return false;
 
             // Required role check
             if (RequiredRole is not null && !context.ActiveRoles.Contains(RequiredRole))

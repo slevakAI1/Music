@@ -58,10 +58,6 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             if (!IsPopRockStyle(context))
                 return false;
 
-            // Suppress during fill windows (fills have their own kick patterns)
-            if (context.IsFillWindow)
-                return false;
-
             // Need at least 4 beats for the primary pattern
             if (context.BeatsPerBar < 4)
                 return false;

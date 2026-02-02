@@ -73,10 +73,6 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
             if (!isSuitableSection)
                 return false;
 
-            // Suppress during fill windows
-            if (context.IsFillWindow)
-                return false;
-
             return true;
         }
 

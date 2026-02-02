@@ -61,10 +61,6 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             if (context.BackbeatBeats.Count == 0)
                 return false;
 
-            // Suppress during fill windows (fills have their own timing)
-            if (context.IsFillWindow)
-                return false;
-
             return true;
         }
 

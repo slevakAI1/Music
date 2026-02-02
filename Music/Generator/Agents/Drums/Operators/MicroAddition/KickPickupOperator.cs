@@ -41,10 +41,6 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
             if (!base.CanApply(context))
                 return false;
 
-            // Suppress during fill windows - fills handle their own transitions
-            if (context.IsFillWindow)
-                return false;
-
             // Need at least 4 beats in bar for 4.75 pickup
             if (context.BeatsPerBar < 4)
                 return false;

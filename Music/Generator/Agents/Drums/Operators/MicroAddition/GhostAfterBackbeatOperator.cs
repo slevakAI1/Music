@@ -47,10 +47,6 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
             if (!base.CanApply(context))
                 return false;
 
-            // Suppress during fill windows
-            if (context.IsFillWindow)
-                return false;
-
             // Need backbeat beats defined
             if (context.BackbeatBeats.Count == 0)
                 return false;

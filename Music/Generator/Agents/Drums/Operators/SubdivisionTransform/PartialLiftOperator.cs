@@ -43,10 +43,6 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
             if (!base.CanApply(context))
                 return false;
 
-            // Suppress during fill windows
-            if (context.IsFillWindow)
-                return false;
-
             // Only lift from 8ths
             if (context.HatSubdivision != HatSubdivision.Eighth)
                 return false;

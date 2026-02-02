@@ -115,8 +115,14 @@ namespace Music.Generator.Agents.Drums
             // Extract anchor onsets (foundation that's always present)
             var anchorOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars, barTrack);
 
+
+
+
+
             // Generate operator-based candidates for each bar using GrooveSelectionEngine
             var operatorOnsets = GenerateOperatorOnsets(barContexts, anchorOnsets, barTrack, totalBars);
+
+
 
             // Combine anchors with operator onsets
             var allOnsets = CombineOnsets(anchorOnsets, operatorOnsets);

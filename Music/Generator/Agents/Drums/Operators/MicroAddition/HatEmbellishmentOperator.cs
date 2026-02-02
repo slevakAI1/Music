@@ -50,10 +50,6 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
             if (!base.CanApply(context))
                 return false;
 
-            // Suppress during fill windows
-            if (context.IsFillWindow)
-                return false;
-
             // Only apply when base pattern is 8ths (room for 16th embellishment)
             if (context.HatSubdivision != HatSubdivision.Eighth)
                 return false;

@@ -43,10 +43,6 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
             if (!base.CanApply(context))
                 return false;
 
-            // Suppress during fill windows
-            if (context.IsFillWindow)
-                return false;
-
             // Only swap from hat to ride (not if already on ride)
             if (context.CurrentHatMode == HatMode.Ride)
                 return false;

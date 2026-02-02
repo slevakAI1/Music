@@ -56,10 +56,6 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
             if (context.BackbeatBeats.Count == 0)
                 return false;
 
-            // Suppress during fill windows (fills have their own patterns)
-            if (context.IsFillWindow)
-                return false;
-
             return true;
         }
 

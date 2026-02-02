@@ -69,10 +69,6 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
             if (!base.CanApply(context))
                 return false;
 
-            // Suppress during fill windows (fills have their own kick patterns)
-            if (context.IsFillWindow)
-                return false;
-
             // Need at least 2 beats for meaningful pattern
             if (context.BeatsPerBar < 2)
                 return false;
