@@ -3,6 +3,7 @@
 // AI: deps=DrummerAgent (data source), DrumSelectionEngine, BarContextBuilder, SongContext, PartTrack.
 // AI: change=correct architecture replaces DrummerAgent.Generate() with proper groove integration.
 
+using Music.Generator.Agents.Common;
 using Music.Generator.Groove;
 using Music.MyMidi;
 

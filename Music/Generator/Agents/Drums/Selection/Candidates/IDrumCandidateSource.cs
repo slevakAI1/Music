@@ -4,6 +4,7 @@
 // AI: change=Story 4.2: moved from Groove namespace; Drum generator owns candidate contracts.
 
 
+using Music.Generator.Agents.Common;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums

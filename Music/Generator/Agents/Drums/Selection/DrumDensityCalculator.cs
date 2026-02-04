@@ -4,6 +4,7 @@
 // AI: change=Story 5.3: Simplified, removed deleted policy dependencies.
 
 
+using Music.Generator.Agents.Common;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums

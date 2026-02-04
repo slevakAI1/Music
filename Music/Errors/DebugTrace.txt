@@ -6403,3 +6403,31 @@
 [2026-02-03T23:26:46.9050726-05:00] MidiPlaybackService.Stop: END
 [2026-02-03T23:26:46.9054042-05:00] <<< btnStop_Click END
 [2026-02-03T23:26:46.9054042-05:00] <<< btnStop_Click END
+[2026-02-03T23:35:59.4350533-05:00] Rng.Initialize: seed=12345
+[2026-02-03T23:35:59.4350533-05:00] Rng.Initialize: seed=12345
+[2026-02-03T23:39:00.1639355-05:00] >>> btnPlay_Click START
+[2026-02-03T23:39:00.1639355-05:00] >>> btnPlay_Click START
+[2026-02-03T23:39:00.1654564-05:00] === StartPlaybackWithMeasureTrackingAsync START ===
+[2026-02-03T23:39:00.1654564-05:00] === StartPlaybackWithMeasureTrackingAsync START ===
+[2026-02-03T23:39:00.1661427-05:00] StartPlaybackWithMeasureTracking: enableTracking=True
+[2026-02-03T23:39:00.1661427-05:00] StartPlaybackWithMeasureTracking: enableTracking=True
+[2026-02-03T23:39:00.1667001-05:00] StartPlaybackWithMeasureTracking: Setting up progress tracker
+[2026-02-03T23:39:00.1667001-05:00] StartPlaybackWithMeasureTracking: Setting up progress tracker
+[2026-02-03T23:39:00.1728424-05:00] StartPlaybackWithMeasureTracking: Progress tracker started, calling HandlePlayAsync
+[2026-02-03T23:39:00.1728424-05:00] StartPlaybackWithMeasureTracking: Progress tracker started, calling HandlePlayAsync
+[2026-02-03T23:39:00.1748545-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-03T23:39:00.1748545-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-03T23:39:00.1753238-05:00] HandlePlayAsync: No pitch events to play
+[2026-02-03T23:39:00.1753238-05:00] HandlePlayAsync: No pitch events to play
+[2026-02-03T23:39:02.2325760-05:00] StartPlaybackWithMeasureTracking: HandlePlayAsync returned (with tracking)
+[2026-02-03T23:39:02.2325760-05:00] StartPlaybackWithMeasureTracking: HandlePlayAsync returned (with tracking)
+[2026-02-03T23:39:02.2333148-05:00] StartPlaybackWithMeasureTracking: FINALLY block - stopping tracker and clearing highlights
+[2026-02-03T23:39:02.2333148-05:00] StartPlaybackWithMeasureTracking: FINALLY block - stopping tracker and clearing highlights
+[2026-02-03T23:39:02.4820466-05:00] === StartPlaybackWithMeasureTrackingAsync END ===
+[2026-02-03T23:39:02.4820466-05:00] === StartPlaybackWithMeasureTrackingAsync END ===
+[2026-02-03T23:39:02.4827209-05:00] <<< btnPlay_Click END
+[2026-02-03T23:39:02.4827209-05:00] <<< btnPlay_Click END
+[2026-02-03T23:39:05.8980876-05:00] Rng.Initialize: seed=1581440616
+[2026-02-03T23:39:05.8980876-05:00] Rng.Initialize: seed=1581440616
+[2026-02-03T23:43:52.2904176-05:00] Rng.Initialize: seed=12345
+[2026-02-03T23:43:52.2904176-05:00] Rng.Initialize: seed=12345

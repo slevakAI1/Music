@@ -4,6 +4,7 @@
 // AI: change=Story G1: Added optional diagnostics collection via GrooveDiagnosticsCollector.
 
 
+using Music.Generator.Agents.Common;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums;

@@ -2,6 +2,8 @@
 // AI: deps=SectionTrack.GetActiveSection; returns immutable list.
 // AI: change=Story 5.2: Moved from Groove namespace, removed segment profile resolution (section-awareness now in DrummerPolicyProvider).
 
+using Music.Generator.Agents.Common;
+
 namespace Music.Generator.Agents.Drums
 {
     /// <summary>
