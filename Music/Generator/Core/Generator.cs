@@ -58,7 +58,7 @@ namespace Music.Generator
             if (drummerStyle != null)
             {
                 var agent = new DrummerAgent(drummerStyle);
-                var generator = new DrumPhraseGenerator(agent);
+                var generator = new DrumPhraseGenerator(agent.CandidateSource);
                 return generator.Generate(songContext, maxBars);
             }
 

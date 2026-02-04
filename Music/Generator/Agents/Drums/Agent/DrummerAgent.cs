@@ -1,5 +1,5 @@
 // AI: purpose=DrummerAgent facade class; unifies candidate source and registry for drum generation.
-// AI: invariants=Implements IDrumCandidateSource via delegation; deterministic output for same inputs.
+// AI: invariants=Deterministic output for same inputs; exposes candidate source used by generator.
 // AI: deps=DrummerCandidateSource, DrumOperatorRegistry, StyleConfiguration.
 // AI: change=Story 8.1, 4.2; facade pattern enables integration with Generator.cs and future testing.
 
@@ -26,7 +26,6 @@ namespace Music.Generator.Agents.Drums
 
     /// <summary>
     /// Data source for drum generation. Does NOT generate PartTracks directly. Use DrumGenerator pipeline.
-    /// Implements IDrumCandidateSource to hook into the groove system.
     /// Story 4.2: Updated to use Drum interfaces.
     /// </summary>
     /// <remarks>
@@ -36,7 +35,7 @@ namespace Music.Generator.Agents.Drums
     ///   <item>DrummerCandidateSource (delegates IDrumCandidateSource)</item>
     /// </list>
     /// </remarks>
-    public sealed class DrummerAgent : IDrumCandidateSource
+    public sealed class DrummerAgent
     {
         private readonly StyleConfiguration _styleConfig;
         private readonly DrumOperatorRegistry _registry;
@@ -81,17 +80,10 @@ namespace Music.Generator.Agents.Drums
         /// </summary>
         public DrumOperatorRegistry Registry => _registry;
 
-        #region IDrumCandidateSource Implementation
-
-        /// <inheritdoc />
-        public IReadOnlyList<DrumCandidateGroup> GetCandidateGroups(
-            BarContext barContext,
-            string role)
-        {
-            return _candidateSource.GetCandidateGroups(barContext, role);
-        }
-
-        #endregion
+        /// <summary>
+        /// Gets the candidate source used by the generator pipeline.
+        /// </summary>
+        public IDrumCandidateSource CandidateSource => _candidateSource;
 
     }
 }
