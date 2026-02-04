@@ -119,7 +119,7 @@ namespace Music.Generator.Agents.Drums
 
 
 
-            // Generate operator-based candidates for each bar using GrooveSelectionEngine
+            // Generate operator-based candidates for each bar using DrumSelectionEngine
             var operatorOnsets = GenerateOperatorOnsets(barContexts, anchorOnsets, barTrack, totalBars);
 
 
