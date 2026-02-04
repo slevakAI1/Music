@@ -1,6 +1,6 @@
 // AI: purpose=Compute density target count for drum candidate selection (moved from Groove in Story 4.3).
 // AI: invariants=Deterministic; same inputs => same output; no RNG; clamps to [0..MaxEvents].
-// AI: deps=DrumBarContext, RoleDensityTarget, DrumPolicyDecision.
+// AI: deps=BarContext, RoleDensityTarget, DrumPolicyDecision.
 // AI: change=Story 5.3: Simplified, removed deleted policy dependencies.
 
 
@@ -36,7 +36,7 @@ namespace Music.Generator.Agents.Drums
         /// <param name="maxEventsPerBar">Maximum events per bar.</param>
         /// <returns>Density result with target count and provenance information.</returns>
         public static GrooveDensityResult ComputeDensityTarget(
-            DrumBarContext barContext,
+            BarContext barContext,
             string role,
             double density01 = 0.5,
             int maxEventsPerBar = 16)

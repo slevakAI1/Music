@@ -1,6 +1,6 @@
-// AI: purpose=Builds DrummerContext from DrumBarContext and runtime state; pure builder for determinism.
+// AI: purpose=Builds DrummerContext from BarContext and runtime state; pure builder for determinism.
 // AI: invariants=Builder is stateless; same inputs produce identical DrummerContext; bars/beats 1-based.
-// AI: deps=DrumBarContext, GrooveRoles.
+// AI: deps=BarContext, GrooveRoles.
 // AI: change=Story 5.3: Simplified, removed deleted policy dependencies.
 
 using Music.Generator.Agents.Common;
@@ -15,7 +15,7 @@ namespace Music.Generator.Agents.Drums
     public sealed record DrummerContextBuildInput
     {
         /// <summary>Per-bar groove context (section, phrase position).</summary>
-        public required DrumBarContext BarContext { get; init; }
+        public required BarContext BarContext { get; init; }
 
         // AI: disconnect=Policy; policy decision removed while validating operator-only phrase generation.
 
@@ -51,7 +51,7 @@ namespace Music.Generator.Agents.Drums
     }
 
     /// <summary>
-    /// Builds DrummerContext from DrumBarContext and related inputs.
+    /// Builds DrummerContext from BarContext and related inputs.
     /// Stateless builder ensuring deterministic output for same inputs.
     /// Story 2.1: DrummerContextBuilder builds from DrumBarContext + policies.
     /// </summary>
@@ -149,7 +149,7 @@ namespace Music.Generator.Agents.Drums
         /// Computes phrase position (0.0 at phrase start, 1.0 at phrase end).
         /// Uses bar position within section as proxy for phrase position.
         /// </summary>
-        private static double ComputePhrasePosition(DrumBarContext barContext)
+        private static double ComputePhrasePosition(BarContext barContext)
         {
             if (barContext.Section == null)
                 return 0.0;

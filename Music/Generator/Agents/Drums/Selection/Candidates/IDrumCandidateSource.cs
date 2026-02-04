@@ -1,6 +1,6 @@
 // AI: purpose=Define candidate source interface for drum generator (Story 4.2).
 // AI: invariants=Implementations must be deterministic; same inputs => same output.
-// AI: deps=DrumBarContext for bar context; DrumCandidateGroup for return type.
+// AI: deps=BarContext for bar context; DrumCandidateGroup for return type.
 // AI: change=Story 4.2: moved from Groove namespace; Drum generator owns candidate contracts.
 
 
@@ -35,7 +35,7 @@ namespace Music.Generator.Agents.Drums
         /// The generator will consume these groups for weighted selection.
         /// </remarks>
         IReadOnlyList<DrumCandidateGroup> GetCandidateGroups(
-            DrumBarContext barContext,
+            BarContext barContext,
             string role);
     }
 }

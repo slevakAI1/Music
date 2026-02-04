@@ -28,7 +28,7 @@ public static class DrumSelectionEngine
     /// <param name="diagnostics">Optional diagnostics collector for decision tracing (Story G1).</param>
     /// <returns>List of selected candidates in selection order.</returns>
     public static IReadOnlyList<DrumOnsetCandidate> SelectUntilTargetReached(
-        DrumBarContext barContext,
+        BarContext barContext,
         string role,
         IReadOnlyList<DrumCandidateGroup> groups,
         int targetCount,

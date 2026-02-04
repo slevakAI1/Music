@@ -85,7 +85,7 @@ namespace Music.Generator.Agents.Drums
 
         /// <inheritdoc />
         public IReadOnlyList<DrumCandidateGroup> GetCandidateGroups(
-            DrumBarContext barContext,
+            BarContext barContext,
             string role)
         {
             return _candidateSource.GetCandidateGroups(barContext, role);

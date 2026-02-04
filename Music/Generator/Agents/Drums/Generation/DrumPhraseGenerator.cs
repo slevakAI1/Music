@@ -96,7 +96,6 @@ namespace Music.Generator.Agents.Drums
 
             var barTrack = songContext.BarTrack;
             var sectionTrack = songContext.SectionTrack;
-            // Story 5.2: SegmentGrooveProfiles removed - section-awareness now in DrummerPolicyProvider
             var groovePresetDefinition = songContext.GroovePresetDefinition;
             int totalBars = sectionTrack.TotalBars;
 
@@ -234,16 +233,14 @@ namespace Music.Generator.Agents.Drums
             // Iterate only through bars up to totalBars (respects maxBars limit)
             foreach (var barContext in barContexts.Where(bc => bc.BarNumber <= totalBars))
             {
-                var drumBarContext = DrumBarContext.FromBarContext(barContext);
-
-                // Get anchors for this bar to avoid conflicts
+                                // Get anchors for this bar to avoid conflicts
                 var barAnchors = anchors.Where(a => a.BarNumber == barContext.BarNumber).ToList();
 
                 foreach (var role in activeRoles)
                 {
                     // AI: disconnect=Policy; use default density targets to isolate operator behavior.
                     int targetCount = DrumDensityCalculator
-                        .ComputeDensityTarget(drumBarContext, role)
+                        .ComputeDensityTarget(barContext, role)
                         .TargetCount;
 
 
@@ -254,7 +251,7 @@ namespace Music.Generator.Agents.Drums
                         continue; // No operators needed for this bar+role
 
                     // Get candidate groups from candidate source
-                    var candidateGroups = _candidateSource.GetCandidateGroups(drumBarContext, role);
+                    var candidateGroups = _candidateSource.GetCandidateGroups(barContext, role);
 
                     if (candidateGroups.Count == 0)
                         continue; // No candidates available
@@ -266,7 +263,7 @@ namespace Music.Generator.Agents.Drums
 
                     // SELECT using DrumSelectionEngine
                     var selected = DrumSelectionEngine.SelectUntilTargetReached(
-                        drumBarContext,
+                        barContext,
                         role,
                         candidateGroups,
                         targetCount,

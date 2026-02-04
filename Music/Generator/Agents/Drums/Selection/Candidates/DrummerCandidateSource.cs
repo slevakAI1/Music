@@ -89,7 +89,7 @@ namespace Music.Generator.Agents.Drums
 
         /// <inheritdoc />
         public IReadOnlyList<DrumCandidateGroup> GetCandidateGroups(
-            DrumBarContext barContext,
+            BarContext barContext,
             string role)
         {
             ArgumentNullException.ThrowIfNull(barContext);
@@ -134,9 +134,9 @@ namespace Music.Generator.Agents.Drums
         public IReadOnlyList<OperatorExecutionDiagnostic>? LastExecutionDiagnostics => _lastExecutionDiagnostics;
 
         /// <summary>
-        /// Builds DrummerContext from DrumBarContext.
+        /// Builds DrummerContext from BarContext.
         /// </summary>
-        private DrummerContext BuildDrummerContext(DrumBarContext barContext, string role)
+        private DrummerContext BuildDrummerContext(BarContext barContext, string role)
         {
             var input = new DrummerContextBuildInput
             {
@@ -152,7 +152,7 @@ namespace Music.Generator.Agents.Drums
         /// <summary>
         /// Gets enabled operators based on style and policy.
         /// </summary>
-        private IReadOnlyList<IDrumOperator> GetEnabledOperators(DrumBarContext barContext, string role)
+        private IReadOnlyList<IDrumOperator> GetEnabledOperators(BarContext barContext, string role)
         {
             // Start with style-enabled operators
             var styleEnabled = _registry.GetEnabledOperators(_styleConfig);
@@ -348,7 +348,7 @@ namespace Music.Generator.Agents.Drums
         /// <summary>
         /// Gets seed from bar context or defaults.
         /// </summary>
-        private static int GetSeed(DrumBarContext barContext)
+        private static int GetSeed(BarContext barContext)
         {
             // Use bar number as component of seed for per-bar variation
             return 42 + barContext.BarNumber;
@@ -357,7 +357,7 @@ namespace Music.Generator.Agents.Drums
         /// <summary>
         /// Derives energy level from section type.
         /// </summary>
-        private static double GetEnergyLevel(DrumBarContext barContext)
+        private static double GetEnergyLevel(BarContext barContext)
         {
             var sectionType = barContext.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
             return sectionType switch
