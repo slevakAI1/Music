@@ -1,5 +1,5 @@
 // AI: purpose=SubdivisionTransform operator adding open hi-hat accents on specific offbeats for emphasis.
-// AI: invariants=Only applies when ClosedHat/OpenHat in ActiveRoles and EnergyLevel>=0.5; places open hats on &s.
+// AI: invariants=Only applies when ClosedHat/OpenHat in ActiveRoles ; places open hats on &s.
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
 // AI: change=Story 3.2; adjust beat positions (1&, 3&) or velocity based on listening tests.
 

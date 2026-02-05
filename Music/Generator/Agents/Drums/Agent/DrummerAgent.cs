@@ -4,8 +4,6 @@
 // AI: change=Story 8.1, 4.2; facade pattern enables integration with Generator.cs and future testing.
 
 using Music.Generator.Agents.Common;
-using Music.Generator.Agents.Drums.Diagnostics;
-using Music.MyMidi;
 
 namespace Music.Generator.Agents.Drums
 {

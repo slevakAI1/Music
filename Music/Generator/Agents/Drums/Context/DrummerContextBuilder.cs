@@ -1,9 +1,8 @@
-// AI: purpose=Builds DrummerContext from Bar and runtime state; pure builder for determinism.
+// AI: purpose=Builds DrummerContext from Bar and cross-bar state; minimal stateless builder.
 // AI: invariants=Builder is stateless; same inputs produce identical DrummerContext; bars/beats 1-based.
-// AI: deps=Bar, GrooveRoles.
-// AI: change=Story 5.3: Simplified, removed deleted policy dependencies.
+// AI: deps=Bar (contains all bar-derivable properties); no policy dependencies.
+// AI: change=Epic DrummerContext-Dedup; simplified to minimal cross-bar state only.
 
-using Music.Generator.Groove;
 using Music.Generator;
 
 namespace Music.Generator.Agents.Drums
@@ -27,39 +26,13 @@ namespace Music.Generator.Agents.Drums
         public decimal? LastSnareBeat { get; init; }
     }
 
-        /// <summary>
-        /// Builds DrummerContext from Bar and related inputs.
-        /// Stateless builder ensuring deterministic output for same inputs.
-        /// Story 2.1: DrummerContextBuilder builds from Bar + policies.
-        /// </summary>
+    /// <summary>
+    /// Builds DrummerContext from Bar and cross-bar state.
+    /// Stateless builder ensuring deterministic output for same inputs.
+    /// Story 2.1: DrummerContextBuilder builds from Bar + cross-bar state only.
+    /// </summary>
     public static class DrummerContextBuilder
     {
-        /// <summary>
-        /// Default drum roles enabled when no orchestration policy is present.
-        /// </summary>
-        private static readonly IReadOnlySet<string> DefaultActiveRoles = new HashSet<string>
-        {
-            GrooveRoles.Kick,
-            GrooveRoles.Snare,
-            GrooveRoles.ClosedHat
-        };
-
-        /// <summary>
-        /// All possible drum roles for validation.
-        /// </summary>
-        private static readonly IReadOnlySet<string> AllDrumRoles = new HashSet<string>
-        {
-            GrooveRoles.Kick,
-            GrooveRoles.Snare,
-            GrooveRoles.ClosedHat,
-            GrooveRoles.OpenHat,
-            "Crash",
-            "Ride",
-            "Tom1",
-            "Tom2",
-            "FloorTom"
-        };
-
         /// <summary>
         /// Builds a DrummerContext from the provided input configuration.
         /// </summary>

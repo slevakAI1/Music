@@ -1,5 +1,5 @@
 // AI: purpose=MicroAddition operator generating ghost snare notes just before backbeats (1.75→2, 3.75→4).
-// AI: invariants=VelocityHint in [30,50]; only applies when Snare in ActiveRoles and energy >= 0.3.
+// AI: invariants=VelocityHint in [30,50]; only applies when Snare in ActiveRoles 
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
 // AI: change=Story 3.1, 9.3; adjust energy threshold or beat positions based on listening tests; reduces score when motif active.
 

@@ -1,5 +1,5 @@
 // AI: purpose=SubdivisionTransform operator switching hi-hat from 8ths to 16ths for energy increase.
-// AI: invariants=Only applies when HatSubdivision==Eighth and EnergyLevel>=0.6; generates full 16th pattern for bar.
+// AI: invariants=Applies in suitable sections; generates full 16th pattern for bar.
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
 // AI: change=Story 3.2; adjust energy threshold or velocity curve based on listening tests.
 

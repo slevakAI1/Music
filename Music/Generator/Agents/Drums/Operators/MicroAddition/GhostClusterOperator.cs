@@ -1,5 +1,5 @@
 // AI: purpose=MicroAddition operator generating 2-3 ghost notes as a mini-fill cluster.
-// AI: invariants=VelocityHint in [30,50]; only applies when Snare in ActiveRoles and energy >= 0.5.
+// AI: invariants=VelocityHint in [30,50]; only applies when Snare in ActiveRoles 
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
 // AI: change=Story 3.1, 9.3; adjust cluster patterns and placement based on listening tests; reduces score when motif active.
 

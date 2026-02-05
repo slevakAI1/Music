@@ -1,5 +1,5 @@
 // AI: purpose=MicroAddition operator generating floor tom anticipation at 4.75.
-// AI: invariants=VelocityHint in [60,80]; only applies when FloorTom in ActiveRoles and energy >= 0.5.
+// AI: invariants=VelocityHint in [60,80]; only applies when FloorTom in ActiveRoles 
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
 // AI: change=Story 3.1; adjust energy threshold based on listening tests.
 

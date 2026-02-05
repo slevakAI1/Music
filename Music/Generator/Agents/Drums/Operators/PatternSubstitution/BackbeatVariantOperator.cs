@@ -1,5 +1,5 @@
 // AI: purpose=PatternSubstitution operator generating backbeat articulation variants (flam, rimshot, sidestick).
-// AI: invariants=Only applies when Snare in ActiveRoles; generates backbeat candidates with articulation hints; energy gates variants.
+// AI: invariants=Only applies when Snare in ActiveRoles; generates backbeat candidates with articulation hints.
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate, DrumArticulation; registered in DrumOperatorRegistry.
 // AI: change=Story 3.4; adjust articulation selection and energy thresholds based on style and listening tests.
 

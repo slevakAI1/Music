@@ -1,5 +1,5 @@
 // AI: purpose=SubdivisionTransform operator lifting to 16ths only on last half of bar (beats 3-4 in 4/4).
-// AI: invariants=Only applies when HatSubdivision==Eighth and EnergyLevel>=0.5; creates energy build within bar.
+// AI: invariants=Applies in suitable sections; creates energy build within bar.
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
 // AI: change=Story 3.2; adjust beat range or velocity curve based on listening tests.
 

@@ -1,12 +1,9 @@
-// AI: purpose=Drummer-specific context extending AgentContext; immutable record for deterministic operator decisions.
-// AI: invariants=All fields immutable; Bar is canonical; ActiveRoles subset of GrooveRoles; BackbeatBeats valid for time signature.
-// AI: deps=AgentContext base type; MotifPresenceMap optional; GrooveRoles; consumed by DrummerOperators.
-// AI: change=Story 2.1, 9.3; extend with additional drum-specific fields as operators require; keep immutable.
+// AI: purpose=Drummer-specific context extending AgentContext; minimal contract for deterministic operator decisions.
+// AI: invariants=All fields immutable; Bar is canonical; cross-bar state only (LastKickBeat, LastSnareBeat).
+// AI: deps=AgentContext base type; Bar contains all bar-derivable properties; consumed by DrummerOperators.
+// AI: change=Story 2.1, Epic DrummerContext-Dedup; Bar owns IsAtSectionBoundary, IsFillWindow, BackbeatBeats, BeatsPerBar.
 
 using Music.Generator.Agents.Common;
-
-using Music.Generator.Groove;
-using Music.Generator.Material;
 
 namespace Music.Generator.Agents.Drums
 {

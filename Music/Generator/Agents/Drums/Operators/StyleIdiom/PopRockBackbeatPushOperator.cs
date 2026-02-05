@@ -1,5 +1,5 @@
 // AI: purpose=StyleIdiom operator adding slight timing push (early offset) to snare backbeats for Pop Rock urgency.
-// AI: invariants=Only applies when StyleId=="PopRock" and Snare in ActiveRoles; timing offset negative (early); energy-scaled.
+// AI: invariants=Only applies when StyleId=="PopRock" and Snare in ActiveRoles; timing offset negative (early).
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
 // AI: change=Story 3.5; tune timing offset ranges based on listening tests.
 

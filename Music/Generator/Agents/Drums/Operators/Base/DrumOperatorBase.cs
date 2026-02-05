@@ -1,7 +1,7 @@
 // AI: purpose=Abstract base for all drum operators; provides common CanApply checks and helper methods.
-// AI: invariants=Subclasses must provide OperatorId and OperatorFamily; base CanApply checks null context and ActiveRoles.
-// AI: deps=IDrumOperator interface, DrummerContext, DrumCandidate; consumed by all MicroAddition/SubdivisionTransform operators.
-// AI: change=Story 3.1; extend with additional helper methods as operator patterns emerge.
+// AI: invariants=Subclasses must provide OperatorId and OperatorFamily; base CanApply validates context type.
+// AI: deps=IDrumOperator interface, DrummerContext (minimal: Bar + cross-bar state), DrumCandidate.
+// AI: change=Epic DrummerContext-Dedup; removed energy thresholds; bar properties accessed via context.Bar.
 
 
 using Music.Generator;

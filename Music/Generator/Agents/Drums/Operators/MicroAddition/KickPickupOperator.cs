@@ -1,5 +1,5 @@
 // AI: purpose=MicroAddition operator generating kick anticipation at 4.75 leading into next bar.
-// AI: invariants=VelocityHint in [60,80]; only applies when Kick in ActiveRoles and energy >= 0.4.
+// AI: invariants=VelocityHint in [60,80]; only applies when Kick in ActiveRoles 
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
 // AI: change=Story 3.1; adjust energy threshold based on listening tests.
 

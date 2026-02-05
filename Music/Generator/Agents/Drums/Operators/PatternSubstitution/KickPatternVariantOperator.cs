@@ -1,5 +1,5 @@
 // AI: purpose=PatternSubstitution operator generating kick pattern variants (four-on-floor, syncopated, half-time).
-// AI: invariants=Only applies when Kick in ActiveRoles; generates full-bar kick pattern; energy gates pattern complexity.
+// AI: invariants=Only applies when Kick in ActiveRoles; generates full-bar kick pattern.
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
 // AI: change=Story 3.4; adjust pattern selection and energy thresholds based on style and listening tests.
 
