@@ -226,7 +226,7 @@ namespace Music.Generator.Agents.Drums
         /// </summary>
         private List<string>? ComputeFillGatedOperatorList(Bar bar)
         {
-            if (ShouldAllowFills(barContext))
+            if (ShouldAllowFills(bar))
                 return null; // All operators allowed
 
             // Return explicit exclusion by not including fill operators
@@ -241,11 +241,11 @@ namespace Music.Generator.Agents.Drums
         /// Determines whether fill operators should be allowed for this bar.
         /// Fills are allowed when: IsFillWindow AND memory doesn't disallow.
         /// </summary>
-        private bool ShouldAllowFills(DrumBarContext barContext)
+        private bool ShouldAllowFills(Bar bar)
         {
             // Check if in fill window (determined by PhraseHookWindowResolver upstream)
             // For now, use BarsUntilSectionEnd as proxy: fills allowed in last 1-2 bars
-            bool inFillWindow = barContext.BarsUntilSectionEnd <= _settings.FillWindowBars;
+            bool inFillWindow = bar.BarsUntilSectionEnd <= _settings.FillWindowBars;
 
             if (!inFillWindow)
                 return false;
@@ -256,7 +256,7 @@ namespace Music.Generator.Agents.Drums
                 var lastFill = _memory.GetLastFillShape();
                 if (lastFill != null && lastFill.HasContent)
                 {
-                    int barsSinceLastFill = barContext.BarNumber - lastFill.BarPosition;
+                    int barsSinceLastFill = bar.BarNumber - lastFill.BarPosition;
                     if (barsSinceLastFill < _settings.MinBarsBetweenFills)
                         return false;
                 }
@@ -281,7 +281,7 @@ namespace Music.Generator.Agents.Drums
         /// Computes velocity bias override based on energy.
         /// Higher energy = positive bias (louder), lower energy = negative bias.
         /// </summary>
-        private int? ComputeVelocityBiasOverride(DrumBarContext barContext)
+        private int? ComputeVelocityBiasOverride(Bar bar)
         {
             var sectionType = bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
 
@@ -304,32 +304,32 @@ namespace Music.Generator.Agents.Drums
         /// Section boundaries enable punctuation tags; fills enable fill tags.
         /// Story 9.3: Adds "MotifPresent" tag when a motif is active in the bar.
         /// </summary>
-        private List<string>? ComputeVariationTagsOverride(DrumBarContext barContext)
+        private List<string>? ComputeVariationTagsOverride(Bar bar)
         {
             var tags = new List<string>();
 
             // Story 9.3: Add MotifPresent tag when motif is active
-            if (_motifPresenceMap != null && _motifPresenceMap.IsMotifActive(barContext.BarNumber))
+            if (_motifPresenceMap != null && _motifPresenceMap.IsMotifActive(bar.BarNumber))
             {
                 tags.Add("MotifPresent");
             }
 
             // Enable fill tags when in fill window
-            if (ShouldAllowFills(barContext))
+            if (ShouldAllowFills(bar))
             {
                 tags.Add("Fill");
                 tags.Add("TurnAround");
             }
 
             // Enable punctuation at section start
-            if (barContext.BarWithinSection == 0)
+            if (bar.BarWithinSection == 0)
             {
                 tags.Add("SectionStart");
                 tags.Add("Crash");
             }
 
             // Enable buildup tags near section end
-            if (barContext.BarsUntilSectionEnd <= 2)
+            if (bar.BarsUntilSectionEnd <= 2)
             {
                 tags.Add("Buildup");
                 tags.Add("SectionEnd");

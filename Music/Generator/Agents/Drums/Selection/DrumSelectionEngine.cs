@@ -5,7 +5,6 @@
 
 
 using Music.Generator;
-using Music.Generator.Agents.Common;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums;
@@ -123,31 +122,6 @@ public static class DrumSelectionEngine
         }
 
         return selected;
-    }
-
-    public static IReadOnlyList<DrumOnsetCandidate> SelectUntilTargetReached(
-        BarContext barContext,
-        string role,
-        IReadOnlyList<DrumCandidateGroup> groups,
-        int targetCount,
-        IReadOnlyList<GrooveOnset> existingAnchors,
-        GrooveDiagnosticsCollector? diagnostics = null)
-    {
-        ArgumentNullException.ThrowIfNull(barContext);
-
-        var bar = new Bar
-        {
-            BarNumber = barContext.BarNumber,
-            Section = barContext.Section,
-            BarWithinSection = barContext.BarWithinSection,
-            BarsUntilSectionEnd = barContext.BarsUntilSectionEnd,
-            Numerator = 4,
-            Denominator = 4,
-            StartTick = 0
-        };
-        bar.EndTick = bar.StartTick + bar.TicksPerMeasure;
-
-        return SelectUntilTargetReached(bar, role, groups, targetCount, existingAnchors, diagnostics);
     }
 
     /// <summary>

@@ -5,7 +5,6 @@
 
 
 using Music.Generator;
-using Music.Generator.Agents.Common;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums
@@ -64,29 +63,6 @@ namespace Music.Generator.Agents.Drums
                 Density01Used: densityEffective,
                 MaxEventsPerBarUsed: maxEventsEffective,
                 Explanation: explanation);
-        }
-
-        public static GrooveDensityResult ComputeDensityTarget(
-            BarContext barContext,
-            string role,
-            double density01 = 0.5,
-            int maxEventsPerBar = 16)
-        {
-            ArgumentNullException.ThrowIfNull(barContext);
-
-            var bar = new Bar
-            {
-                BarNumber = barContext.BarNumber,
-                Section = barContext.Section,
-                BarWithinSection = barContext.BarWithinSection,
-                BarsUntilSectionEnd = barContext.BarsUntilSectionEnd,
-                Numerator = 4,
-                Denominator = 4,
-                StartTick = 0
-            };
-            bar.EndTick = bar.StartTick + bar.TicksPerMeasure;
-
-            return ComputeDensityTarget(bar, role, density01, maxEventsPerBar);
         }
 
 

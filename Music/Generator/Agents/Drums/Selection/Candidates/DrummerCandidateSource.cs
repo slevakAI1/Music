@@ -98,7 +98,7 @@ namespace Music.Generator.Agents.Drums
 
             _lastExecutionDiagnostics = new List<OperatorExecutionDiagnostic>();
 
-            // Build DrummerContext from DrumBarContext
+            // Build DrummerContext from Bar
             var drummerContext = BuildDrummerContext(bar, role);
 
             // Get enabled operators (style + policy filtering)

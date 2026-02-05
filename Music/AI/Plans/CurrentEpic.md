@@ -338,6 +338,8 @@ public int BarsUntilSectionEnd => Bar.BarsUntilSectionEnd;
 
 ### Story 8: Delete BarContext and DrumBarContextBuilder
 
+**Status:** Completed
+
 **Size:** Small (15-30 min)
 
 **Goal:** Remove the now-unused BarContext type and DrumBarContextBuilder.

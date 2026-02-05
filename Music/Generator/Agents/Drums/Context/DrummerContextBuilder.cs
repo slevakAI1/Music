@@ -54,7 +54,7 @@ namespace Music.Generator.Agents.Drums
         /// <summary>
         /// Builds DrummerContext from Bar and related inputs.
         /// Stateless builder ensuring deterministic output for same inputs.
-        /// Story 2.1: DrummerContextBuilder builds from DrumBarContext + policies.
+        /// Story 2.1: DrummerContextBuilder builds from Bar + policies.
         /// </summary>
     public static class DrummerContextBuilder
     {
