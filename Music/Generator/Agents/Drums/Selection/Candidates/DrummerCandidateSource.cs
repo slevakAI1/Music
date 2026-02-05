@@ -90,19 +90,19 @@ namespace Music.Generator.Agents.Drums
 
         /// <inheritdoc />
         public IReadOnlyList<DrumCandidateGroup> GetCandidateGroups(
-            BarContext barContext,
+            Bar bar,
             string role)
         {
-            ArgumentNullException.ThrowIfNull(barContext);
+            ArgumentNullException.ThrowIfNull(bar);
             ArgumentNullException.ThrowIfNull(role);
 
             _lastExecutionDiagnostics = new List<OperatorExecutionDiagnostic>();
 
             // Build DrummerContext from DrumBarContext
-            var drummerContext = BuildDrummerContext(barContext, role);
+            var drummerContext = BuildDrummerContext(bar, role);
 
             // Get enabled operators (style + policy filtering)
-            var enabledOperators = GetEnabledOperators(barContext, role);
+            var enabledOperators = GetEnabledOperators(bar, role);
 
             if (enabledOperators.Count == 0)
             {
@@ -135,28 +135,16 @@ namespace Music.Generator.Agents.Drums
         public IReadOnlyList<OperatorExecutionDiagnostic>? LastExecutionDiagnostics => _lastExecutionDiagnostics;
 
         /// <summary>
-        /// Builds DrummerContext from BarContext.
+        /// Builds DrummerContext from Bar.
         /// </summary>
-        private DrummerContext BuildDrummerContext(BarContext barContext, string role)
+        private DrummerContext BuildDrummerContext(Bar bar, string role)
         {
-            var bar = new Bar
-            {
-                BarNumber = barContext.BarNumber,
-                Section = barContext.Section,
-                BarWithinSection = barContext.BarWithinSection,
-                BarsUntilSectionEnd = barContext.BarsUntilSectionEnd,
-                Numerator = 4,
-                Denominator = 4,
-                StartTick = 0
-            };
-            bar.EndTick = bar.StartTick + bar.TicksPerMeasure;
-
             var input = new DrummerContextBuildInput
             {
                 Bar = bar,
-                Seed = GetSeed(barContext),
-                EnergyLevel = GetEnergyLevel(barContext),
-                BeatsPerBar = 4 // TODO: Extract from time signature when available
+                Seed = GetSeed(bar),
+                EnergyLevel = GetEnergyLevel(bar),
+                BeatsPerBar = bar.BeatsPerBar
             };
 
             return DrummerContextBuilder.Build(input);
@@ -165,7 +153,7 @@ namespace Music.Generator.Agents.Drums
         /// <summary>
         /// Gets enabled operators based on style and policy.
         /// </summary>
-        private IReadOnlyList<IDrumOperator> GetEnabledOperators(BarContext barContext, string role)
+        private IReadOnlyList<IDrumOperator> GetEnabledOperators(Bar bar, string role)
         {
             // Start with style-enabled operators
             var styleEnabled = _registry.GetEnabledOperators(_styleConfig);
@@ -361,18 +349,18 @@ namespace Music.Generator.Agents.Drums
         /// <summary>
         /// Gets seed from bar context or defaults.
         /// </summary>
-        private static int GetSeed(BarContext barContext)
+        private static int GetSeed(Bar bar)
         {
             // Use bar number as component of seed for per-bar variation
-            return 42 + barContext.BarNumber;
+            return 42 + bar.BarNumber;
         }
 
         /// <summary>
         /// Derives energy level from section type.
         /// </summary>
-        private static double GetEnergyLevel(BarContext barContext)
+        private static double GetEnergyLevel(Bar bar)
         {
-            var sectionType = barContext.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            var sectionType = bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
             return sectionType switch
             {
                 MusicConstants.eSectionType.Chorus => 0.8,

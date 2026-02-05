@@ -1,3 +1,5 @@
+using Music.Generator;
+
 namespace Music.Generator.Agents.Drums;
 
 // AI: purpose=Default drum policy provider that returns no overrides, preserving baseline behavior.
@@ -11,7 +13,7 @@ public sealed class DefaultDrumPolicyProvider : IDrumPolicyProvider
     private DefaultDrumPolicyProvider() { }
 
     // AI: Returns NoOverrides for all contexts; preserves current system behavior without modification.
-    public DrumPolicyDecision? GetPolicy(DrumBarContext barContext, string role)
+    public DrumPolicyDecision? GetPolicy(Bar bar, string role)
     {
         return DrumPolicyDecision.NoOverrides;
     }

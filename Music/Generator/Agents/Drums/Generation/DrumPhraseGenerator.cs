@@ -251,8 +251,11 @@ namespace Music.Generator.Agents.Drums
                     if (targetCount <= 0)
                         continue; // No operators needed for this bar+role
 
+                    if (!barTrack.TryGetBar(barContext.BarNumber, out var bar))
+                        continue;
+
                     // Get candidate groups from candidate source
-                    var candidateGroups = _candidateSource.GetCandidateGroups(barContext, role);
+                    var candidateGroups = _candidateSource.GetCandidateGroups(bar, role);
 
                     if (candidateGroups.Count == 0)
                         continue; // No candidates available

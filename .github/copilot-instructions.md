@@ -9,6 +9,7 @@
 
 ## Response Format
 - When the request is to implement a story, do not write the summary to the Copilot chat pane, write the response to a markdown file in the Music/AIDialog folder. In the Copilot chat pane, just state it was completed and provide a clickable link to the summary file.
+- Always write story implementation summaries to C:\Users\sleva\source\repos\Music\Music\AI\Completed\.
 
 ## File Output Format
 - Always write files using Windows line endings (CRLF).

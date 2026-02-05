@@ -259,6 +259,8 @@ public int BarsUntilSectionEnd => Bar.BarsUntilSectionEnd;
 
 ### Story 5: Update Interface Signatures (IDrumCandidateSource, IDrumPolicyProvider)
 
+**Status:** Completed
+
 **Size:** Small (30-45 min)
 
 **Goal:** Update interfaces to use Bar instead of BarContext.

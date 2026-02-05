@@ -1,10 +1,10 @@
 // AI: purpose=Define candidate source interface for drum generator (Story 4.2).
 // AI: invariants=Implementations must be deterministic; same inputs => same output.
-// AI: deps=BarContext for bar context; DrumCandidateGroup for return type.
+// AI: deps=Bar for bar context; DrumCandidateGroup for return type.
 // AI: change=Story 4.2: moved from Groove namespace; Drum generator owns candidate contracts.
 
 
-using Music.Generator.Agents.Common;
+using Music.Generator;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums
@@ -19,7 +19,7 @@ namespace Music.Generator.Agents.Drums
         /// <summary>
         /// Gets candidate groups for a specific bar and role.
         /// </summary>
-        /// <param name="barContext">Bar context with section, segment profile, and phrase position.</param>
+        /// <param name="bar">Bar context with section, segment profile, and phrase position.</param>
         /// <param name="role">Role name (e.g., "Kick", "Snare", "ClosedHat"). See GrooveRoles constants.</param>
         /// <returns>
         /// List of candidate groups available for this bar and role.
@@ -36,7 +36,7 @@ namespace Music.Generator.Agents.Drums
         /// The generator will consume these groups for weighted selection.
         /// </remarks>
         IReadOnlyList<DrumCandidateGroup> GetCandidateGroups(
-            BarContext barContext,
+            Bar bar,
             string role);
     }
 }

@@ -3,9 +3,9 @@
 // AI: deps=IDrumPolicyProvider, DrumPolicyDecision, StyleConfiguration, IAgentMemory, DrummerContext, MotifPresenceMap (Story 9.3).
 // AI: change=Story 2.3, 9.3, 4.2; extend with additional override logic as operators are implemented.
 
+using Music.Generator;
 using Music.Generator.Agents.Common;
 using Music.Generator.Material;
-
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums
@@ -76,9 +76,9 @@ namespace Music.Generator.Agents.Drums
         }
 
         /// <inheritdoc />
-        public DrumPolicyDecision? GetPolicy(DrumBarContext barContext, string role)
+        public DrumPolicyDecision? GetPolicy(Bar bar, string role)
         {
-            ArgumentNullException.ThrowIfNull(barContext);
+            ArgumentNullException.ThrowIfNull(bar);
             ArgumentNullException.ThrowIfNull(role);
 
             // Unknown role: return no overrides (safe fallback)
@@ -86,22 +86,22 @@ namespace Music.Generator.Agents.Drums
                 return DrumPolicyDecision.NoOverrides;
 
             // Compute density override from energy + section type
-            double density01 = ComputeDensityOverride(barContext);
+            double density01 = ComputeDensityOverride(bar);
 
             // Compute max events per bar from style caps
             int? maxEventsPerBar = ComputeMaxEventsOverride(role);
 
             // Compute operator allow list based on context + memory
-            var operatorAllowList = ComputeOperatorAllowList(barContext, role);
+            var operatorAllowList = ComputeOperatorAllowList(bar, role);
 
             // Compute timing feel override (style-driven)
             TimingFeel? timingFeel = ComputeTimingFeelOverride(role);
 
             // Compute velocity bias override (energy-driven)
-            int? velocityBias = ComputeVelocityBiasOverride(barContext);
+            int? velocityBias = ComputeVelocityBiasOverride(bar);
 
             // Compute enabled variation tags based on context
-            var variationTags = ComputeVariationTagsOverride(barContext);
+            var variationTags = ComputeVariationTagsOverride(bar);
 
             return new DrumPolicyDecision
             {
@@ -119,10 +119,10 @@ namespace Music.Generator.Agents.Drums
         /// Uses style default density as base, then applies energy modifier.
         /// Story 9.3: Applies motif-based density reduction when motif is active.
         /// </summary>
-        private double ComputeDensityOverride(DrumBarContext barContext)
+        private double ComputeDensityOverride(Bar bar)
         {
             // Get section type from bar context
-            var sectionType = barContext.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            var sectionType = bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
 
             // Get base density from style config (role-agnostic section density)
             double baseDensity = GetSectionBaseDensity(sectionType);
@@ -134,10 +134,10 @@ namespace Music.Generator.Agents.Drums
             double adjustedDensity = baseDensity + (energyModifier * _settings.EnergyDensityScale);
 
             // Story 9.3: Apply motif-based density reduction (bounded)
-            if (_motifPresenceMap != null && _motifPresenceMap.IsMotifActive(barContext.BarNumber))
+            if (_motifPresenceMap != null && _motifPresenceMap.IsMotifActive(bar.BarNumber))
             {
                 // Compute reduction based on motif density (0.5 for one motif, 1.0 for two or more)
-                double motifDensity = _motifPresenceMap.GetMotifDensity(barContext.BarNumber);
+                double motifDensity = _motifPresenceMap.GetMotifDensity(bar.BarNumber);
                 
                 // Scale the reduction by motif density: more motifs = more reduction, up to the configured max
                 double reductionFactor = _settings.MotifDensityReductionPercent * motifDensity / 0.5;
@@ -196,7 +196,7 @@ namespace Music.Generator.Agents.Drums
         /// Computes operator allow list based on context and memory.
         /// Fill operators are gated by IsFillWindow and memory state.
         /// </summary>
-        private List<string>? ComputeOperatorAllowList(DrumBarContext barContext, string role)
+        private List<string>? ComputeOperatorAllowList(Bar bar, string role)
         {
             // Get all allowed operators from style
             var allowedByStyle = _styleConfig.AllowedOperatorIds;
@@ -205,14 +205,14 @@ namespace Music.Generator.Agents.Drums
             if (allowedByStyle.Count == 0)
             {
                 // Still need to gate fills based on context
-                return ComputeFillGatedOperatorList(barContext);
+                return ComputeFillGatedOperatorList(bar);
             }
 
             // Start with style-allowed operators
             var result = new List<string>(allowedByStyle);
 
             // Apply fill gating
-            if (!ShouldAllowFills(barContext))
+            if (!ShouldAllowFills(bar))
             {
                 result.RemoveAll(id => FillOperatorIds.All.Contains(id));
             }
@@ -224,7 +224,7 @@ namespace Music.Generator.Agents.Drums
         /// Computes fill-gated operator list when style allows all.
         /// Returns null if fills are allowed; returns list excluding fills if not.
         /// </summary>
-        private List<string>? ComputeFillGatedOperatorList(DrumBarContext barContext)
+        private List<string>? ComputeFillGatedOperatorList(Bar bar)
         {
             if (ShouldAllowFills(barContext))
                 return null; // All operators allowed
@@ -283,7 +283,7 @@ namespace Music.Generator.Agents.Drums
         /// </summary>
         private int? ComputeVelocityBiasOverride(DrumBarContext barContext)
         {
-            var sectionType = barContext.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            var sectionType = bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
 
             // Section-based energy bias
             int bias = sectionType switch
