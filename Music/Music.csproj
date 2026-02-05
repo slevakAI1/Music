@@ -56,7 +56,6 @@
     <Compile Remove="Generator\Agents\Drums\Performance\DrummerVelocityShaper.cs" />
     <Compile Remove="Generator\Agents\Drums\Physicality\**" />
     <Compile Remove="Generator\Agents\Drums\Policy\**" />
-    <Compile Remove="Generator\Agents\Drums\Agent\DrummerMemory.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -214,7 +213,6 @@
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
-    <Folder Include="Generator\Agents\Drums\Agent\" />
   </ItemGroup>
 
   <ItemGroup>
