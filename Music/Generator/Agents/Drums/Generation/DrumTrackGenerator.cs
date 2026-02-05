@@ -5,7 +5,6 @@
 using Music.Generator.Agents.Drums;
 using Music.Generator.Core;
 using Music.Generator.Groove;
-using Music.MyMidi;
 
 namespace Music.Generator
 {
@@ -113,74 +112,6 @@ namespace Music.Generator
             return Generate(songContext);
         }
 
-        // AI: ExtractAnchorOnsets reads kick/snare/hat patterns from GroovePreset anchor layer per bar; returns DrumOnset list with beat positions and default velocity.
-        private static List<DrumOnset> ExtractAnchorOnsets(GroovePresetDefinition groovePresetDefinition, int totalBars)
-        {
-            var allOnsets = new List<DrumOnset>();
-
-            for (int bar = 1; bar <= totalBars; bar++)
-            {
-                var groovePreset = groovePresetDefinition.GetActiveGroovePreset(bar);
-                var anchorLayer = groovePreset.AnchorLayer;
-
-                foreach (var beat in anchorLayer.KickOnsets)
-                {
-                    allOnsets.Add(new DrumOnset(
-                        Role: DrumRole.Kick,
-                        BarNumber: bar,
-                        Beat: beat,
-                        Velocity: 100,
-                        TickPosition: 0));
-                }
-
-                foreach (var beat in anchorLayer.SnareOnsets)
-                {
-                    allOnsets.Add(new DrumOnset(
-                        Role: DrumRole.Snare,
-                        BarNumber: bar,
-                        Beat: beat,
-                        Velocity: 100,
-                        TickPosition: 0));
-                }
-
-                foreach (var beat in anchorLayer.HatOnsets)
-                {
-                    allOnsets.Add(new DrumOnset(
-                        Role: DrumRole.ClosedHat,
-                        BarNumber: bar,
-                        Beat: beat,
-                        Velocity: 100,
-                        TickPosition: 0));
-                }
-            }
-
-            return allOnsets;
-        }
-
-        // AI: ConvertOnsetsToMidiEvents converts DrumOnset list to PartTrackEvent notes using BarTrack for tick conversion.
-        private static void ConvertOnsetsToMidiEvents(List<DrumOnset> onsets, BarTrack barTrack, List<PartTrackEvent> notes)
-        {
-            if (onsets == null) return;
-            if (barTrack == null) throw new ArgumentNullException(nameof(barTrack));
-            if (notes == null) throw new ArgumentNullException(nameof(notes));
-
-            foreach (var onset in onsets)
-            {
-                long absoluteTick = barTrack.ToTick(onset.BarNumber, onset.Beat);
-                int midiNote = GetMidiNoteNumber(onset.Role);
-
-                var noteEvent = new PartTrackEvent(
-                    noteNumber: midiNote,
-                    absoluteTimeTicks: (int)absoluteTick,
-                    noteDurationTicks: 60,
-                    noteOnVelocity: onset.Velocity);
-
-                notes.Add(noteEvent);
-            }
-
-            notes.Sort((a, b) => a.AbsoluteTimeTicks.CompareTo(b.AbsoluteTimeTicks));
-        }
-
         // AI: GetMidiNoteNumber maps DrumRole to General MIDI note; throws for unknown roles.
         public static int GetMidiNoteNumber(DrumRole role) => role switch
         {
@@ -195,18 +126,5 @@ namespace Music.Generator
             DrumRole.TomLow => TomLowMidiNote,
             _ => throw new ArgumentOutOfRangeException(nameof(role), $"Unknown drum role: {role}")
         };
-
-        // AI: GetDrumProgramNumber retrieves drum MIDI program from VoiceSet (defaults to 0 for standard GM drums).
-        private static int GetDrumProgramNumber(VoiceSet voiceSet)
-        {
-            // GM drums are on channel 10 (MIDI track 10) and typically use program 0
-            // Look for a voice with "Drum" in the name
-            var drumVoice = voiceSet.Voices.FirstOrDefault(v =>
-                v.VoiceName.Contains("Drum", StringComparison.OrdinalIgnoreCase) ||
-                v.GrooveRole == GrooveRoles.DrumKit);
-
-            // GM drums default to program 0 (Standard Kit)
-            return drumVoice != null ? 0 : 0;
-        }
     }
 }
