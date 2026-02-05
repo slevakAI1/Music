@@ -3,7 +3,7 @@
 // AI: deps=GrooveFeel and AllowedSubdivision from Groove.cs; GrooveRoles for role constants; DrummerVelocityHintSettings, DrummerTimingHintSettings for performance hints.
 // AI: change=Add new styles by extending StyleConfigurationLibrary; Story 6.1 added DrummerVelocityHints; Story 6.2 added DrummerTimingHints.
 
-using Music.Generator.Agents.Drums.Performance;
+using Music.Generator.Drums.Performance;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Core

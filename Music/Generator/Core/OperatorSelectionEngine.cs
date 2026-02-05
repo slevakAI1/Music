@@ -4,8 +4,6 @@
 // AI: perf=O(n log n) sort; greedy selection O(n); no hotpath concerns for typical candidate counts (<100).
 // AI: change=Extend with additional selection strategies (weighted random, probabilistic) if needed.
 
-using Music.Generator.Agents.Common;
-
 namespace Music.Generator.Core
 {
     /// <summary>
@@ -263,7 +261,7 @@ namespace Music.Generator.Core
             double baseScore,
             double styleWeight,
             double densityContribution,
-            AgentMemory memory)
+            GeneratorMemory memory)
         {
             ArgumentNullException.ThrowIfNull(candidate);
             ArgumentNullException.ThrowIfNull(operatorId);

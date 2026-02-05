@@ -51,11 +51,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Generator\Agents\Drums\Performance\DrumArticulationMapper.cs" />
-    <Compile Remove="Generator\Agents\Drums\Performance\DrummerTimingShaper.cs" />
-    <Compile Remove="Generator\Agents\Drums\Performance\DrummerVelocityShaper.cs" />
-    <Compile Remove="Generator\Agents\Drums\Physicality\**" />
-    <Compile Remove="Generator\Agents\Drums\Policy\**" />
+    <Compile Remove="Generator\Drums\Performance\DrumArticulationMapper.cs" />
+    <Compile Remove="Generator\Drums\Performance\DrummerTimingShaper.cs" />
+    <Compile Remove="Generator\Drums\Performance\DrummerVelocityShaper.cs" />
+    <Compile Remove="Generator\Drums\Physicality\**" />
+    <Compile Remove="Generator\Drums\Policy\**" />
   </ItemGroup>
 
   <ItemGroup>

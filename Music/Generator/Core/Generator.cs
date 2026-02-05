@@ -4,11 +4,11 @@
 // AI: perf=Single-run generation; avoid allocations in inner loops; use seed for deterministic results.
 // AI: change=Story RF-3 uses DrumPhraseGenerator pipeline when style is provided.
 
-using Music;
-using Music.Generator.Agents.Drums;
 using Music.Generator.Core;
+using Music.Generator.Drums.Generation;
+using Music.Generator.Drums.Operators;
+using Music.Generator.Drums.Selection.Candidates;
 using Music.Generator.Groove;
-using Music.Song.Material;
 
 namespace Music.Generator
 {

@@ -3,7 +3,7 @@
 // AI: deps=StyleConfiguration, FeelRules, GridRules, GrooveRoles; DrummerVelocityHintSettings, DrummerTimingHintSettings for performance hints.
 // AI: change=Add new styles as static properties; Story 6.1 added velocity hints; Story 6.2 added timing hints.
 
-using Music.Generator.Agents.Drums.Performance;
+using Music.Generator.Drums.Performance;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Core
