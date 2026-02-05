@@ -40,7 +40,6 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
         /// <summary>
         /// Requires at least moderate energy for the push to be noticeable.
         /// </summary>
-        protected override double MinEnergyThreshold => 0.2;
 
         /// <summary>
         /// Requires snare role for backbeat hits.
@@ -58,7 +57,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
                 return false;
 
             // Need backbeat positions defined
-            if (context.BackbeatBeats.Count == 0)
+            if (context.Bar.BackbeatBeats.Count == 0)
                 return false;
 
             return true;
@@ -75,11 +74,11 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             if (!CanApply(drummerContext))
                 yield break;
 
-            int timingOffset = ComputeTimingOffset(drummerContext.EnergyLevel);
+            int timingOffset = ComputeTimingOffset(0.5); // default energy
 
-            foreach (int backbeat in drummerContext.BackbeatBeats)
+            foreach (int backbeat in drummerContext.Bar.BackbeatBeats)
             {
-                if (backbeat > drummerContext.BeatsPerBar)
+                if (backbeat > drummerContext.Bar.BeatsPerBar)
                     continue;
 
                 decimal beat = backbeat;
@@ -131,8 +130,6 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
                 score += 0.1;
 
             // Slight boost at higher energy
-            score += 0.1 * context.EnergyLevel;
-
             return Math.Clamp(score, 0.0, 1.0);
         }
     }

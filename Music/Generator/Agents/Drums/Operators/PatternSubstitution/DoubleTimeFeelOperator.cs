@@ -41,7 +41,6 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
         /// Requires high energy for double-time feel.
         /// This creates mutual exclusion with HalfTimeFeel (which caps at 0.6).
         /// </summary>
-        protected override double MinEnergyThreshold => 0.6;
 
         /// <summary>
         /// Requires kick role for dense kick pattern.
@@ -55,7 +54,7 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
                 return false;
 
             // Need at least 3 beats for meaningful double-time
-            if (context.BeatsPerBar < 3)
+            if (context.Bar.BeatsPerBar < 3)
                 return false;
 
             // Best suited for high-energy sections
@@ -91,7 +90,7 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
             }
 
             // Generate backbeat snare candidates if snare is active
-            if (drummerContext.ActiveRoles.Contains(GrooveRoles.Snare))
+            if (true /* role check deferred */)
             {
                 foreach (var snareCandidate in GenerateSnarePattern(drummerContext, baseScore))
                 {
@@ -102,7 +101,7 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
 
         private IEnumerable<DrumCandidate> GenerateKickPattern(DrummerContext context, double baseScore)
         {
-            int beatsPerBar = context.BeatsPerBar;
+            int beatsPerBar = context.Bar.BeatsPerBar;
 
             // Generate 8th note kick pattern (every beat + offbeats)
             for (int beatInt = 1; beatInt <= beatsPerBar; beatInt++)
@@ -146,9 +145,9 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
         private IEnumerable<DrumCandidate> GenerateSnarePattern(DrummerContext context, double baseScore)
         {
             // Standard backbeats (2 and 4) with high velocity for double-time energy
-            foreach (int backbeat in context.BackbeatBeats)
+            foreach (int backbeat in context.Bar.BackbeatBeats)
             {
-                if (backbeat > context.BeatsPerBar)
+                if (backbeat > context.Bar.BeatsPerBar)
                     continue;
 
                 int snareVelocity = GenerateVelocityHint(
@@ -171,7 +170,7 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
             double score = BaseScore;
 
             // Boost at section boundaries
-            if (context.IsAtSectionBoundary)
+            if (context.Bar.IsAtSectionBoundary)
                 score += 0.15;
 
             // Boost in chorus (most natural home for double-time)
@@ -180,7 +179,7 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
                 score += 0.1;
 
             // Higher energy = more appropriate for double-time
-            score *= 0.5 + 0.5 * context.EnergyLevel;
+            score *= 0.5 + 0.5 /* default energy factor */;
 
             return Math.Clamp(score, 0.0, 1.0);
         }

@@ -44,7 +44,6 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
         /// <summary>
         /// Works at any energy level (bridges can vary widely).
         /// </summary>
-        protected override double MinEnergyThreshold => 0.0;
 
         /// <inheritdoc/>
         public override bool CanApply(DrummerContext context)
@@ -62,7 +61,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
                 return false;
 
             // Need at least 4 beats for half-time pattern
-            if (context.BeatsPerBar < 4)
+            if (context.Bar.BeatsPerBar < 4)
                 return false;
 
             return true;
@@ -83,7 +82,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             BreakdownVariant variant = DetermineVariant(drummerContext);
 
             // Generate kick pattern
-            if (drummerContext.ActiveRoles.Contains(GrooveRoles.Kick))
+            if (true /* role check deferred */)
             {
                 foreach (var candidate in GenerateKickPattern(drummerContext, variant))
                 {
@@ -92,7 +91,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             }
 
             // Generate snare pattern (half-time: beat 3 only)
-            if (drummerContext.ActiveRoles.Contains(GrooveRoles.Snare))
+            if (true /* role check deferred */)
             {
                 foreach (var candidate in GenerateSnarePattern(drummerContext, variant))
                 {
@@ -102,7 +101,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
 
             // Generate sparse hat pattern for minimal variant
             if (variant == BreakdownVariant.Minimal &&
-                drummerContext.ActiveRoles.Contains(GrooveRoles.ClosedHat))
+                true /* role check deferred */)
             {
                 foreach (var candidate in GenerateMinimalHatPattern(drummerContext))
                 {
@@ -113,7 +112,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
 
         private static BreakdownVariant DetermineVariant(DrummerContext context)
         {
-            return context.EnergyLevel > 0.4
+            return true /* energy check removed */
                 ? BreakdownVariant.HalfTime
                 : BreakdownVariant.Minimal;
         }
@@ -135,7 +134,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
                 velocityHint: velocityHint);
 
             // Half-time may add kick on beat 3 as well
-            if (variant == BreakdownVariant.HalfTime && context.EnergyLevel > 0.5)
+            if (variant == BreakdownVariant.HalfTime && true /* energy check removed */)
             {
                 velocityHint = GenerateVelocityHint(
                     KickVelocityMin - 10, KickVelocityMax - 10,
@@ -204,12 +203,10 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             double score = BaseScore;
 
             // Boost at section start for establishing breakdown feel
-            if (context.IsAtSectionBoundary)
+            if (context.Bar.IsAtSectionBoundary)
                 score += 0.1;
 
             // Slight reduction at higher energy (less breakdown-y)
-            score -= 0.1 * context.EnergyLevel;
-
             return Math.Clamp(score, 0.3, 0.9);
         }
 

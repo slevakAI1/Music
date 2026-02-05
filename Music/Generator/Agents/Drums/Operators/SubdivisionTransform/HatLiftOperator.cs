@@ -30,7 +30,6 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
         /// <summary>
         /// Requires high energy (>= 0.6) for 16th note density increase.
         /// </summary>
-        protected override double MinEnergyThreshold => 0.6;
 
         /// <summary>
         /// Requires closed hi-hat to be in active roles.
@@ -44,11 +43,11 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
                 return false;
 
             // Only lift from 8ths to 16ths
-            if (context.HatSubdivision != HatSubdivision.Eighth)
+            if (HatSubdivision.Eighth /* default assumption */ != HatSubdivision.Eighth)
                 return false;
 
             // Requires hat mode (not ride)
-            if (context.CurrentHatMode == HatMode.Ride)
+            if (HatMode.Closed /* default assumption */ == HatMode.Ride)
                 return false;
 
             return true;
@@ -66,7 +65,7 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
                 yield break;
 
             // Generate full bar of 16th notes
-            int beatsPerBar = drummerContext.BeatsPerBar;
+            int beatsPerBar = drummerContext.Bar.BeatsPerBar;
             
             for (int beatInt = 1; beatInt <= beatsPerBar; beatInt++)
             {
@@ -119,12 +118,10 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
             if (context.Bar.BarsUntilSectionEnd <= 2)
                 score *= 1.15;
             
-            if (context.IsAtSectionBoundary)
+            if (context.Bar.IsAtSectionBoundary)
                 score *= 1.1;
             
-            // Energy scaling
-            score *= (0.7 + 0.3 * context.EnergyLevel);
-            
+            // Energy scaling            
             // Downbeats score higher (more important to select)
             if (isDownbeat)
                 score *= 1.1;

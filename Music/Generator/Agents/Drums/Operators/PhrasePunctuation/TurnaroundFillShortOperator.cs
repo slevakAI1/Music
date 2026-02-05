@@ -31,7 +31,6 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
         /// <summary>
         /// Requires minimum energy for fill to sound musical (not too sparse).
         /// </summary>
-        protected override double MinEnergyThreshold => 0.3;
 
         /// <summary>
         /// Requires snare for fill hits (primary fill role).
@@ -45,11 +44,11 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
                 return false;
 
             // Only in fill window
-            if (!context.IsFillWindow)
+            if (!context.Bar.IsFillWindow)
                 return false;
 
             // Need at least 2 beats for a short fill
-            if (context.BeatsPerBar < 2)
+            if (context.Bar.BeatsPerBar < 2)
                 return false;
 
             return true;
@@ -67,11 +66,11 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
                 yield break;
 
             // Fill occupies last 2 beats of the bar
-            int beatsPerBar = drummerContext.BeatsPerBar;
+            int beatsPerBar = drummerContext.Bar.BeatsPerBar;
             decimal fillStartBeat = beatsPerBar - 1; // e.g., beat 3 in 4/4
 
             // Compute hit count based on energy (4-8 hits for 2-beat fill)
-            int hitCount = ComputeHitCount(drummerContext.EnergyLevel);
+            int hitCount = ComputeHitCount(0.5); // default energy
 
             // Generate fill pattern positions (16th grid within last 2 beats)
             var positions = GenerateFillPositions(fillStartBeat, beatsPerBar, hitCount, drummerContext.Seed, drummerContext.Bar.BarNumber);
@@ -171,12 +170,10 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
             double score = BaseScore;
 
             // Higher score at section boundaries
-            if (context.IsAtSectionBoundary)
+            if (context.Bar.IsAtSectionBoundary)
                 score *= 1.15;
 
             // Energy scaling
-            score *= (0.7 + 0.3 * context.EnergyLevel);
-
             // Boost near section end
             if (context.Bar.BarsUntilSectionEnd <= 1)
                 score *= 1.1;

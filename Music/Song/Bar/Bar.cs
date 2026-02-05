@@ -48,6 +48,16 @@ namespace Music.Generator
         // AI: computed=phrase position within section [0..1]; 0 for null/short sections.
         public double PhrasePosition => ComputePhrasePosition();
 
+        // AI: computed=true if first or last bar of section; depends on BarWithinSection and BarsUntilSectionEnd.
+        public bool IsAtSectionBoundary => BarWithinSection == 0 || BarsUntilSectionEnd == 0;
+
+        // AI: computed=true if within fill window (default 2 bars from section end); phrase-end fill triggers.
+        public bool IsFillWindow => BarsUntilSectionEnd <= 2;
+
+        // AI: computed=backbeat positions for current time signature; cached for efficiency.
+        public IReadOnlyList<int> BackbeatBeats => _backbeatBeats ??= ComputeBackbeatBeats();
+        private IReadOnlyList<int>? _backbeatBeats;
+
 
         // AI: heuristic for compound meters: if Denominator==8 and Numerator divisible by 3 and >=6, group beats by 3.
         private int CalculateBeatsPerBar()
@@ -78,6 +88,24 @@ namespace Music.Generator
             }
 
             return (double)BarWithinSection / (totalBars - 1);
+        }
+
+        // AI: backbeat positions vary by time signature; 4/4=[2,4], 3/4=[2], 6/8=[4], etc.
+        private IReadOnlyList<int> ComputeBackbeatBeats()
+        {
+            int beats = BeatsPerBar;
+            return beats switch
+            {
+                2 => [2],
+                3 => [2],
+                4 => [2, 4],
+                5 => [3, 5],
+                6 => [4],
+                7 => [3, 5, 7],
+                _ => beats >= 4
+                    ? Enumerable.Range(1, beats).Where(b => b % 2 == 0).ToList()
+                    : [beats > 1 ? 2 : 1]
+            };
         }
     }
 }

@@ -30,7 +30,6 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
         /// <summary>
         /// Requires moderate-high energy (>= 0.5) for partial lift.
         /// </summary>
-        protected override double MinEnergyThreshold => 0.5;
 
         /// <summary>
         /// Requires closed hi-hat to be in active roles.
@@ -44,15 +43,15 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
                 return false;
 
             // Only lift from 8ths
-            if (context.HatSubdivision != HatSubdivision.Eighth)
+            if (HatSubdivision.Eighth /* default assumption */ != HatSubdivision.Eighth)
                 return false;
 
             // Requires hat mode (not ride)
-            if (context.CurrentHatMode == HatMode.Ride)
+            if (HatMode.Closed /* default assumption */ == HatMode.Ride)
                 return false;
 
             // Needs at least 4 beats for meaningful partial lift
-            if (context.BeatsPerBar < 4)
+            if (context.Bar.BeatsPerBar < 4)
                 return false;
 
             return true;
@@ -69,7 +68,7 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
             if (!CanApply(drummerContext))
                 yield break;
 
-            int beatsPerBar = drummerContext.BeatsPerBar;
+            int beatsPerBar = drummerContext.Bar.BeatsPerBar;
             int halfwayBeat = (beatsPerBar / 2) + 1; // Beat 3 in 4/4, Beat 4 in 6/8
 
             // Generate 8ths for first half, 16ths for second half
@@ -123,9 +122,7 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
             if (context.Bar.BarsUntilSectionEnd <= 2)
                 score *= 1.2;
             
-            // Energy scaling
-            score *= (0.6 + 0.4 * context.EnergyLevel);
-            
+            // Energy scaling            
             // Second half 16ths are the "feature" of this operator
             if (isSecondHalf)
                 score *= 1.05;

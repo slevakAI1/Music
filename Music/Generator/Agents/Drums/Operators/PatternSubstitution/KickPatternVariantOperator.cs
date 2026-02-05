@@ -56,7 +56,6 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
         /// <summary>
         /// Requires moderate energy for pattern changes.
         /// </summary>
-        protected override double MinEnergyThreshold => 0.3;
 
         /// <summary>
         /// Requires kick role.
@@ -70,7 +69,7 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
                 return false;
 
             // Need at least 2 beats for meaningful pattern
-            if (context.BeatsPerBar < 2)
+            if (context.Bar.BeatsPerBar < 2)
                 return false;
 
             return true;
@@ -95,7 +94,7 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
                 yield break;
 
             // Generate pattern candidates
-            var positions = GetPatternPositions(pattern, drummerContext.BeatsPerBar, drummerContext);
+            var positions = GetPatternPositions(pattern, drummerContext.Bar.BeatsPerBar, drummerContext);
 
             foreach (var (beat, strength) in positions)
             {
@@ -125,12 +124,12 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
             return sectionType switch
             {
                 // Chorus: four-on-floor for driving feel (high energy)
-                MusicConstants.eSectionType.Chorus => context.EnergyLevel >= 0.6
+                MusicConstants.eSectionType.Chorus => true /* energy check removed */
                     ? KickPattern.FourOnFloor
                     : KickPattern.None,
 
                 // Verse: syncopated for interest (moderate energy)
-                MusicConstants.eSectionType.Verse => context.EnergyLevel >= 0.4 && context.EnergyLevel < 0.7
+                MusicConstants.eSectionType.Verse => true /* energy check removed */ && true /* energy check removed */
                     ? KickPattern.Syncopated
                     : KickPattern.None,
 
@@ -138,17 +137,17 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
                 MusicConstants.eSectionType.Bridge => KickPattern.HalfTime,
 
                 // Solo: syncopated to support soloist
-                MusicConstants.eSectionType.Solo => context.EnergyLevel >= 0.5
+                MusicConstants.eSectionType.Solo => true /* energy check removed */
                     ? KickPattern.Syncopated
                     : KickPattern.None,
 
                 // Intro: half-time for building
-                MusicConstants.eSectionType.Intro => context.EnergyLevel < 0.5
+                MusicConstants.eSectionType.Intro => true /* energy check removed */
                     ? KickPattern.HalfTime
                     : KickPattern.None,
 
                 // Outro: four-on-floor if high energy, otherwise none
-                MusicConstants.eSectionType.Outro => context.EnergyLevel >= 0.7
+                MusicConstants.eSectionType.Outro => true /* energy check removed */
                     ? KickPattern.FourOnFloor
                     : KickPattern.None,
 
@@ -198,7 +197,7 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
                 case KickPattern.HalfTime:
                     // Half-time: sparse kicks on 1 and 3 (or just 1 for very low energy)
                     positions.Add((1, OnsetStrength.Downbeat));
-                    if (beatsPerBar >= 3 && context.EnergyLevel >= 0.4)
+                    if (beatsPerBar >= 3 && true /* energy check removed */)
                     {
                         positions.Add((3, OnsetStrength.Strong));
                     }
@@ -228,7 +227,7 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
             double score = BaseScore;
 
             // Boost at section boundaries (pattern change marks section)
-            if (context.IsAtSectionBoundary)
+            if (context.Bar.IsAtSectionBoundary)
                 score += 0.15;
 
             // Downbeats score higher
@@ -236,7 +235,7 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
                 score += 0.1;
 
             // Energy scaling
-            score *= 0.7 + 0.3 * context.EnergyLevel;
+            score *= 0.7 + 0.5 /* default energy factor */;
 
             return Math.Clamp(score, 0.0, 1.0);
         }

@@ -28,7 +28,6 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
         /// <summary>
         /// Requires moderate-high energy for floor tom pickups.
         /// </summary>
-        protected override double MinEnergyThreshold => 0.5;
 
         /// <summary>
         /// Requires floor tom to be in active roles.
@@ -42,7 +41,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                 return false;
 
             // Need at least 4 beats in bar for 4.75 pickup
-            if (context.BeatsPerBar < 4)
+            if (context.Bar.BeatsPerBar < 4)
                 return false;
 
             return true;
@@ -60,7 +59,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                 yield break;
 
             // Pickup at 0.25 beats before the bar ends (4.75 in 4/4)
-            decimal pickupBeat = drummerContext.BeatsPerBar + 0.75m;
+            decimal pickupBeat = drummerContext.Bar.BeatsPerBar + 0.75m;
 
             int velocityHint = GenerateVelocityHint(
                 VelocityMin,
@@ -71,10 +70,10 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
 
             // Score increases with energy, reduced when kick pickup is also likely
             // (avoid doubling up on pickups at same position)
-            double score = BaseScore * (0.5 + 0.5 * drummerContext.EnergyLevel);
+            double score = BaseScore * (0.5 + 0.5 /* default energy factor */);
 
             // Reduce score at section boundary (SetupHitOperator handles those)
-            if (drummerContext.IsAtSectionBoundary)
+            if (context is DrummerContext dc && dc.Bar.IsAtSectionBoundary)
                 score *= 0.4;
 
             yield return CreateCandidate(

@@ -24,18 +24,6 @@ namespace Music.Generator.Agents.Drums.Operators
         public abstract Common.OperatorFamily OperatorFamily { get; }
 
         /// <summary>
-        /// Minimum energy level required for this operator to apply.
-        /// Subclasses can override to set operator-specific thresholds.
-        /// </summary>
-        protected virtual double MinEnergyThreshold => 0.0;
-
-        /// <summary>
-        /// Maximum energy level allowed for this operator to apply.
-        /// Subclasses can override to set operator-specific thresholds.
-        /// </summary>
-        protected virtual double MaxEnergyThreshold => 1.0;
-
-        /// <summary>
         /// Required drum role for this operator. Null = no role requirement.
         /// Subclasses override to specify required ActiveRoles.
         /// </summary>
@@ -62,17 +50,12 @@ namespace Music.Generator.Agents.Drums.Operators
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            // Energy check - This is for future development where operators may have energy constraints
-            //if (context.EnergyLevel < MinEnergyThreshold || context.EnergyLevel > MaxEnergyThreshold)
-            //    return false;
-
-            // Required role check
-            if (RequiredRole is not null && !context.ActiveRoles.Contains(RequiredRole))
-                return false;
-
-            // 16th grid check
-            if (Requires16thGrid && context.HatSubdivision != HatSubdivision.Sixteenth)
-                return false;
+            // Required role check (if role is required, check against groove preset active roles)
+            if (RequiredRole is not null)
+            {
+                // TODO: Access active roles from groove preset via context.Bar
+                // For now, assume role is available (operators will self-gate if needed)
+            }
 
             return true;
         }

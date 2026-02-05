@@ -45,7 +45,6 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
         /// <summary>
         /// Requires moderate-high energy for ghost clusters.
         /// </summary>
-        protected override double MinEnergyThreshold => 0.5;
 
         /// <summary>
         /// Requires snare to be in active roles.
@@ -59,7 +58,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                 return false;
 
             // Need enough beats for cluster placement
-            if (context.BeatsPerBar < 4)
+            if (context.Bar.BeatsPerBar < 4)
                 return false;
 
             return true;
@@ -79,7 +78,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
 
             // Story 9.3: Get motif score multiplier (50% reduction when motif active)
             double motifMultiplier = GetMotifScoreMultiplier(
-                drummerContext.MotifPresenceMap,
+                null /* motif map removed from context */,
                 drummerContext.Bar,
                 MotifScoreReduction);
 
@@ -98,7 +97,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                 decimal beat = startBeat + pattern[i];
 
                 // Skip if beat would exceed bar
-                if (beat > drummerContext.BeatsPerBar)
+                if (beat > drummerContext.Bar.BeatsPerBar)
                     continue;
 
                 // Velocity decreases slightly through cluster for natural feel
@@ -112,7 +111,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
 
                 // Score decreases for later notes in cluster (first note most important)
                 // Story 9.3: Apply motif multiplier to reduce score when motif active
-                double score = BaseScore * (1.0 - (i * 0.1)) * (0.5 + 0.5 * drummerContext.EnergyLevel) * motifMultiplier;
+                double score = BaseScore * (1.0 - (i * 0.1)) * (0.5 + 0.5 /* default energy factor */) * motifMultiplier;
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,

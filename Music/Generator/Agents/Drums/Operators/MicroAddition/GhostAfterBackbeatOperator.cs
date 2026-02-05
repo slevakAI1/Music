@@ -34,7 +34,6 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
         /// <summary>
         /// Requires slightly higher energy than before-backbeat ghosts.
         /// </summary>
-        protected override double MinEnergyThreshold => 0.4;
 
         /// <summary>
         /// Requires snare to be in active roles.
@@ -48,7 +47,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                 return false;
 
             // Need backbeat beats defined
-            if (context.BackbeatBeats.Count == 0)
+            if (context.Bar.BackbeatBeats.Count == 0)
                 return false;
 
             return true;
@@ -67,19 +66,19 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
 
             // Story 9.3: Get motif score multiplier (20% reduction when motif active)
             double motifMultiplier = GetMotifScoreMultiplier(
-                drummerContext.MotifPresenceMap,
+                null /* motif map removed from context */,
                 drummerContext.Bar,
                 MotifScoreReduction);
 
             // Generate ghost note after each backbeat
-            foreach (int backbeat in drummerContext.BackbeatBeats)
+            foreach (int backbeat in drummerContext.Bar.BackbeatBeats)
             {
                 // Ghost at 0.25 beats after backbeat (e.g., 2.25 after beat 2)
                 decimal ghostBeat = backbeat + 0.25m;
 
                 // Skip if ghost would land beyond valid 16th grid positions
                 // (BeatsPerBar + 0.75 is the last valid 16th position)
-                if (ghostBeat > drummerContext.BeatsPerBar + 0.75m)
+                if (ghostBeat > drummerContext.Bar.BeatsPerBar + 0.75m)
                     continue;
 
                 int velocityHint = GenerateVelocityHint(
@@ -91,7 +90,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
 
                 // Score increases with energy
                 // Story 9.3: Apply motif multiplier to reduce score when motif active
-                double score = BaseScore * (0.5 + 0.5 * drummerContext.EnergyLevel) * motifMultiplier;
+                double score = BaseScore * (0.5 + 0.5 /* default energy factor */) * motifMultiplier;
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,

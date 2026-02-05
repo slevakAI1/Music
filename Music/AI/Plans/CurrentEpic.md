@@ -28,6 +28,35 @@ Remove redundant fields from `Music.Generator.Agents.Drums.Context.DrummerContex
 **Acceptance Criteria**
 - A concrete list of `DrummerContext` properties to delete and the exact replacement expression(s) per usage site.
 
+**Story 1 Findings (Target Contract)**
+- Keep: `Bar` (required), `LastKickBeat`, `LastSnareBeat`, plus `AgentContext.Seed`/`RngStreamKey`.
+- Remove: `EnergyLevel` (and all energy-level logic), `MotifPresenceMap`, `ActiveRoles`, `CurrentHatMode`,
+  `HatSubdivision`, `IsFillWindow`, `IsAtSectionBoundary`, `BackbeatBeats`, `BeatsPerBar`.
+
+**Replacement Sources (per property usage)**
+- `EnergyLevel`:
+  - Remove entirely (no replacement). Eliminate all energy-level logic from drum generator down the stack.
+- `MotifPresenceMap`:
+  - Remove from `DrummerContext`; motif awareness already belongs in policy (`DrummerPolicyProvider`
+    takes `MotifPresenceMap`), or from song-level material systems.
+- `ActiveRoles`:
+  - Derive from groove preset anchor roles via `SongContext.GroovePresetDefinition`
+    → `GetActiveGroovePreset(bar.BarNumber).AnchorLayer.GetActiveRoles()`.
+- `CurrentHatMode` / `HatSubdivision`:
+  - Derive from bar/energy + overrides (reuse existing builder logic in new helper),
+    or from `DrummerMemory.GetHatModeAt(bar.BarNumber)` when memory drives continuity.
+- `IsFillWindow`:
+  - Derive from bar section position and policy settings; current default logic matches
+    `bar.BarsUntilSectionEnd <= DrummerPolicySettings.Default.FillWindowBars`.
+- `IsAtSectionBoundary`:
+  - Derive from `bar.BarWithinSection == 0 || bar.BarsUntilSectionEnd == 0`.
+- `BackbeatBeats`:
+  - Compute from `bar.BeatsPerBar` using existing `ComputeBackbeatBeats` logic from
+    `DrummerContextBuilder` (move helper in Story 2).
+- `BeatsPerBar`:
+  - Replace with `bar.BeatsPerBar`.
+  
+
 **Notes**
 - This story intentionally allows breaking changes because the next story will do the mechanical refactor.
 
@@ -37,11 +66,12 @@ Remove redundant fields from `Music.Generator.Agents.Drums.Context.DrummerContex
 **Scope / Tasks**
 1. Edit `DrummerContext`:
    - Delete redundant properties (everything except `Bar` (inherited/required), plus `LastKickBeat`, `LastSnareBeat`).
-   - Remove `ResolveEnergyLevel` and any energy-level storage in `DrummerContext`.
+   - Remove all energy-level related code (properties, helpers, defaults).
    - Simplify `CreateMinimal` accordingly.
 2. Update all usage sites:
    - Replace property reads with bar-derived equivalents.
    - Replace property writes/initializers with no-ops or bar-derived sources.
+   - Remove all energy-level usage in drum generator and dependencies (operators, builders, policies, etc.).
 3. Build and run the existing smoke path (`dotnet build`, optional `dotnet run --project Music/Music.csproj --no-build`).
 
 **Acceptance Criteria**

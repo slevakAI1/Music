@@ -26,8 +26,7 @@ namespace Music.Generator.Agents.Drums.Performance
         /// <returns>New candidate list with timing hints applied</returns>
         public static IReadOnlyList<DrumCandidate> ApplyHints(
             IReadOnlyList<DrumCandidate> candidates,
-            StyleConfiguration? styleConfig,
-            double energyLevel = 0.5)
+            StyleConfiguration? styleConfig)
         {
             ArgumentNullException.ThrowIfNull(candidates);
 
@@ -41,7 +40,7 @@ namespace Music.Generator.Agents.Drums.Performance
 
             foreach (var candidate in candidates)
             {
-                var hintedCandidate = ApplyHintToCandidate(candidate, settings, energyLevel);
+                var hintedCandidate = ApplyHintToCandidate(candidate, settings);
                 result.Add(hintedCandidate);
             }
 
@@ -55,8 +54,7 @@ namespace Music.Generator.Agents.Drums.Performance
         /// </summary>
         public static DrumCandidate ApplyHintToCandidate(
             DrumCandidate candidate,
-            DrummerTimingHintSettings settings,
-            double energyLevel = 0.5)
+            DrummerTimingHintSettings settings)
         {
             ArgumentNullException.ThrowIfNull(candidate);
             settings ??= DrummerTimingHintSettings.ConservativeDefaults;
@@ -66,9 +64,6 @@ namespace Music.Generator.Agents.Drums.Performance
 
             // Get target tick offset for this intent
             int targetOffset = settings.GetTickOffset(intent);
-
-            // Apply energy-based adjustment (±2 ticks based on energy level)
-            targetOffset = ApplyEnergyAdjustment(targetOffset, energyLevel);
 
             // Compute base hint before jitter
             int hintOffset;
@@ -130,58 +125,17 @@ namespace Music.Generator.Agents.Drums.Performance
         }
 
         /// <summary>
-        /// Adjusts existing timing hint minimally toward target.
-        /// Preserves operator intent while nudging toward style.
-        /// </summary>
-        private static int AdjustMinimally(int currentHint, int target, int maxDelta)
-        {
-            if (maxDelta <= 0)
-                return currentHint;
-
-            int diff = target - currentHint;
-
-            if (Math.Abs(diff) <= maxDelta)
-            {
-                // Within adjustment range: move to target
-                return target;
-            }
-
-            // Outside range: move by maxDelta toward target
-            return diff > 0
-                ? currentHint + maxDelta
-                : currentHint - maxDelta;
-        }
-
-        /// <summary>
-        /// Applies energy-based adjustment to timing offset.
-        /// High energy (>0.5) nudges toward earlier (rush).
-        /// Low energy (<0.5) nudges toward later (laid-back).
-        /// Range: ±2 ticks.
-        /// </summary>
-        private static int ApplyEnergyAdjustment(int offset, double energyLevel)
-        {
-            // Energy adjustment: ±2 ticks based on energy level (0.5 = neutral)
-            // energyLevel 0.0 → +2 ticks (laid-back)
-            // energyLevel 1.0 → -2 ticks (rush)
-            double energyAdjustment = (0.5 - energyLevel) * 4.0;
-
-            return offset + (int)Math.Round(energyAdjustment, MidpointRounding.AwayFromZero);
-        }
-
-        /// <summary>
         /// Applies timing hints with full diagnostics for debugging.
         /// </summary>
         public static (DrumCandidate candidate, TimingHintDiagnostics diagnostics) ApplyHintWithDiagnostics(
             DrumCandidate candidate,
-            DrummerTimingHintSettings settings,
-            double energyLevel = 0.5)
+            DrummerTimingHintSettings settings)
         {
             ArgumentNullException.ThrowIfNull(candidate);
             settings ??= DrummerTimingHintSettings.ConservativeDefaults;
 
             var intent = ClassifyTimingIntent(candidate, settings);
             int baseTarget = settings.GetTickOffset(intent);
-            int energyAdjustedTarget = ApplyEnergyAdjustment(baseTarget, energyLevel);
 
             int? originalHint = candidate.TimingHint;
             int hintBeforeJitter;
@@ -190,12 +144,12 @@ namespace Music.Generator.Agents.Drums.Performance
             {
                 hintBeforeJitter = AdjustMinimally(
                     candidate.TimingHint.Value,
-                    energyAdjustedTarget,
+                    baseTarget,
                     settings.MaxAdjustmentDelta);
             }
             else
             {
-                hintBeforeJitter = energyAdjustedTarget;
+                hintBeforeJitter = baseTarget;
             }
 
             int jitter = settings.ComputeJitter(
@@ -215,8 +169,8 @@ namespace Music.Generator.Agents.Drums.Performance
                 FillRole: candidate.FillRole,
                 ClassifiedIntent: intent,
                 BaseTargetOffset: baseTarget,
-                EnergyLevel: energyLevel,
-                EnergyAdjustedTarget: energyAdjustedTarget,
+                EnergyLevel: 0.5,
+                EnergyAdjustedTarget: baseTarget,
                 OriginalHint: originalHint,
                 HintBeforeJitter: hintBeforeJitter,
                 Jitter: jitter,

@@ -41,7 +41,6 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
         /// <summary>
         /// Requires moderate energy for syncopation to feel natural.
         /// </summary>
-        protected override double MinEnergyThreshold => 0.4;
 
         /// <summary>
         /// Requires kick role.
@@ -59,7 +58,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
                 return false;
 
             // Need at least 4 beats for the primary pattern
-            if (context.BeatsPerBar < 4)
+            if (context.Bar.BeatsPerBar < 4)
                 return false;
 
             return true;
@@ -83,7 +82,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             }
 
             // Secondary patterns at higher energy
-            if (drummerContext.EnergyLevel >= 0.6)
+            if (true /* assume suitable for syncopation */)
             {
                 foreach (var candidate in GenerateSecondaryPattern(drummerContext))
                 {
@@ -118,7 +117,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             bool use2And = (Math.Abs(hash) % 3) == 0;
             bool use3And = (Math.Abs(hash) % 4) == 0;
 
-            if (use2And && context.BeatsPerBar >= 3)
+            if (use2And && context.Bar.BeatsPerBar >= 3)
             {
                 int velocityHint = GenerateVelocityHint(
                     VelocityMin - 10, VelocityMax - 10,
@@ -134,7 +133,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
                     velocityHint: velocityHint);
             }
 
-            if (use3And && context.BeatsPerBar >= 4)
+            if (use3And && context.Bar.BeatsPerBar >= 4)
             {
                 int velocityHint = GenerateVelocityHint(
                     VelocityMin - 10, VelocityMax - 10,
@@ -167,12 +166,10 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
                 score += 0.1;
 
             // Boost at section boundaries (drive into next section)
-            if (context.IsAtSectionBoundary && context.Bar.BarsUntilSectionEnd <= 1)
+            if (context.Bar.IsAtSectionBoundary && context.Bar.BarsUntilSectionEnd <= 1)
                 score += 0.15;
 
             // Energy scaling
-            score += 0.1 * context.EnergyLevel;
-
             return Math.Clamp(score, 0.0, 1.0);
         }
     }

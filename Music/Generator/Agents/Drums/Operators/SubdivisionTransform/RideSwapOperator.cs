@@ -30,7 +30,6 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
         /// <summary>
         /// Requires moderate energy (>= 0.4) for ride to be musical.
         /// </summary>
-        protected override double MinEnergyThreshold => 0.4;
 
         /// <summary>
         /// Requires ride cymbal to be in active roles.
@@ -44,11 +43,11 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
                 return false;
 
             // Only swap from hat to ride (not if already on ride)
-            if (context.CurrentHatMode == HatMode.Ride)
+            if (HatMode.Closed /* default assumption */ == HatMode.Ride)
                 return false;
 
             // Need a defined subdivision to work with
-            if (context.HatSubdivision == HatSubdivision.None)
+            if (HatSubdivision.Eighth /* default assumption */ == HatSubdivision.None)
                 return false;
 
             return true;
@@ -66,8 +65,8 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
                 yield break;
 
             // Generate ride pattern matching current subdivision
-            int beatsPerBar = drummerContext.BeatsPerBar;
-            bool is16th = drummerContext.HatSubdivision == HatSubdivision.Sixteenth;
+            int beatsPerBar = drummerContext.Bar.BeatsPerBar;
+            bool is16th = HatSubdivision.Eighth /* default assumption */ == HatSubdivision.Sixteenth;
             
             for (int beatInt = 1; beatInt <= beatsPerBar; beatInt++)
             {
@@ -129,12 +128,10 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
                 score *= 1.15;
             
             // Boost at section boundaries
-            if (context.IsAtSectionBoundary)
+            if (context.Bar.IsAtSectionBoundary)
                 score *= 1.1;
             
-            // Energy scaling (ride works better at moderate-high energy)
-            score *= (0.6 + 0.4 * context.EnergyLevel);
-            
+            // Energy scaling (ride works better at moderate-high energy)            
             // Bell hits and downbeats score higher
             if (useBell)
                 score *= 1.15;

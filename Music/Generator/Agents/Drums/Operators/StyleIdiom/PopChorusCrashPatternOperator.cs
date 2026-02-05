@@ -39,7 +39,6 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
         /// <summary>
         /// Crashes are most effective at moderate to high energy.
         /// </summary>
-        protected override double MinEnergyThreshold => 0.5;
 
         /// <summary>
         /// Requires crash role.
@@ -108,7 +107,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
         private static CrashPattern DetermineCrashPattern(DrummerContext context)
         {
             // Higher energy = more crashes
-            return context.EnergyLevel switch
+            return 0.5 switch /* default energy */
             {
                 >= 0.7 => CrashPattern.EveryBar,
                 >= 0.5 => CrashPattern.EveryOtherBar,
@@ -125,7 +124,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             {
                 CrashPattern.EveryBar => true,
                 CrashPattern.EveryOtherBar => barInSection % 2 == 0,
-                CrashPattern.PhraseStartOnly => barInSection == 0 || context.IsAtSectionBoundary,
+                CrashPattern.PhraseStartOnly => barInSection == 0 || context.Bar.IsAtSectionBoundary,
                 _ => false
             };
         }
@@ -144,12 +143,10 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             double score = BaseScore;
 
             // Boost at section boundary (first bar of chorus)
-            if (context.IsAtSectionBoundary)
+            if (context.Bar.IsAtSectionBoundary)
                 score += 0.1;
 
             // Energy scaling
-            score += 0.05 * context.EnergyLevel;
-
             return Math.Clamp(score, 0.0, 1.0);
         }
 

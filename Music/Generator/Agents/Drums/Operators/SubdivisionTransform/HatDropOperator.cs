@@ -1,7 +1,7 @@
-// AI: purpose=SubdivisionTransform operator switching hi-hat from 16ths to 8ths for energy decrease.
-// AI: invariants=Only applies when HatSubdivision==Sixteenth and EnergyLevel<=0.4; generates full 8th pattern for bar.
+// AI: purpose=SubdivisionTransform operator switching hi-hat from 16ths to 8ths for density decrease.
+// AI: invariants=Only applies in suitable sections (verse, bridge); generates full 8th pattern for bar.
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.2; adjust energy threshold or velocity curve based on listening tests.
+// AI: change=Story 3.2; adjust section checks based on listening tests.
 
 
 using Music.Generator.Groove;
@@ -28,12 +28,7 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
         public override Common.OperatorFamily OperatorFamily => Common.OperatorFamily.SubdivisionTransform;
 
         /// <summary>
-        /// Only applies at low energy (<= 0.4) for density decrease.
-        /// </summary>
-        protected override double MaxEnergyThreshold => 0.4;
-
-        /// <summary>
-        /// Requires closed hi-hat to be in active roles.
+        /// Only applies in appropriate sections (verse, bridge, intro).
         /// </summary>
         protected override string? RequiredRole => GrooveRoles.ClosedHat;
 
@@ -43,12 +38,9 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
             if (!base.CanApply(context))
                 return false;
 
-            // Only drop from 16ths to 8ths
-            if (context.HatSubdivision != HatSubdivision.Sixteenth)
-                return false;
-
-            // Requires hat mode (not ride)
-            if (context.CurrentHatMode == HatMode.Ride)
+            // Suitable for verse, bridge, intro (not chorus)
+            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            if (sectionType == MusicConstants.eSectionType.Chorus)
                 return false;
 
             return true;
@@ -66,7 +58,7 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
                 yield break;
 
             // Generate full bar of 8th notes
-            int beatsPerBar = drummerContext.BeatsPerBar;
+            int beatsPerBar = drummerContext.Bar.BeatsPerBar;
             
             for (int beatInt = 1; beatInt <= beatsPerBar; beatInt++)
             {
@@ -111,21 +103,18 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
         private double ComputeScore(DrummerContext context, bool isDownbeat)
         {
             double score = BaseScore;
-            
+
             // Boost at section transitions (verse/bridge entry often drops density)
             if (context.Bar.BarsUntilSectionEnd <= 2)
                 score *= 1.1;
-            
-            if (context.IsAtSectionBoundary)
+
+            if ( context.Bar.IsAtSectionBoundary)
                 score *= 1.15;
-            
-            // Lower energy increases relevance of drop
-            score *= (1.0 - 0.3 * context.EnergyLevel);
-            
+
             // Downbeats score higher (more important to select)
             if (isDownbeat)
                 score *= 1.1;
-            
+
             return Math.Clamp(score, 0.0, 1.0);
         }
     }

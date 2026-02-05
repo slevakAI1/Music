@@ -42,12 +42,10 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
         /// <summary>
         /// Works at any energy level (verses can be low or moderate energy).
         /// </summary>
-        protected override double MinEnergyThreshold => 0.0;
 
         /// <summary>
         /// Works best at lower energy; high energy verses should be busier.
         /// </summary>
-        protected override double MaxEnergyThreshold => 0.7;
 
         /// <inheritdoc/>
         public override bool CanApply(DrummerContext context)
@@ -79,7 +77,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
                 yield break;
 
             // Generate simplified kick pattern (1 and 3 only)
-            if (drummerContext.ActiveRoles.Contains(GrooveRoles.Kick))
+            if (true /* role check deferred */)
             {
                 foreach (var candidate in GenerateSimplifiedKickPattern(drummerContext))
                 {
@@ -88,7 +86,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             }
 
             // Generate sparser hat pattern (eighth notes only, lower velocity)
-            if (drummerContext.ActiveRoles.Contains(GrooveRoles.ClosedHat))
+            if (true /* role check deferred */)
             {
                 foreach (var candidate in GenerateSimplifiedHatPattern(drummerContext))
                 {
@@ -100,7 +98,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
         private IEnumerable<DrumCandidate> GenerateSimplifiedKickPattern(DrummerContext context)
         {
             // Simple "1 and 3" kick pattern for verses
-            decimal[] kickBeats = context.BeatsPerBar >= 4
+            decimal[] kickBeats = context.Bar.BeatsPerBar >= 4
                 ? [1.0m, 3.0m]
                 : [1.0m];
 
@@ -126,7 +124,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
         private IEnumerable<DrumCandidate> GenerateSimplifiedHatPattern(DrummerContext context)
         {
             // Eighth note pattern only (simpler than 16ths)
-            for (int beatInt = 1; beatInt <= context.BeatsPerBar; beatInt++)
+            for (int beatInt = 1; beatInt <= context.Bar.BeatsPerBar; beatInt++)
             {
                 decimal beat = beatInt;
 
@@ -161,10 +159,8 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             double score = BaseScore;
 
             // Lower score at higher energy (let busier patterns win)
-            score -= 0.2 * context.EnergyLevel;
-
             // Slight boost at section start for establishing the simple pattern
-            if (context.IsAtSectionBoundary)
+            if (context.Bar.IsAtSectionBoundary)
                 score += 0.05;
 
             return Math.Clamp(score, 0.2, 0.8);

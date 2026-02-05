@@ -31,7 +31,6 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
         /// <summary>
         /// Requires minimum energy for full-bar fill.
         /// </summary>
-        protected override double MinEnergyThreshold => 0.4;
 
         /// <summary>
         /// Requires snare for fill hits (primary fill role).
@@ -45,7 +44,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
                 return false;
 
             // Only in fill window
-            if (!context.IsFillWindow)
+            if (!context.Bar.IsFillWindow)
                 return false;
 
             // Full-bar fills are for section ends (last bar of section)
@@ -66,10 +65,10 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
             if (!CanApply(drummerContext))
                 yield break;
 
-            int beatsPerBar = drummerContext.BeatsPerBar;
+            int beatsPerBar = drummerContext.Bar.BeatsPerBar;
 
             // Compute hit count based on energy (8-16 hits for full bar fill)
-            int hitCount = ComputeHitCount(drummerContext.EnergyLevel);
+            int hitCount = ComputeHitCount(0.5); // default energy
 
             // Generate fill pattern spanning full bar
             var positions = GenerateFillPositions(beatsPerBar, hitCount, drummerContext.Seed, drummerContext.Bar.BarNumber);
@@ -188,8 +187,6 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
             double score = BaseScore;
 
             // Energy scaling
-            score *= (0.6 + 0.4 * context.EnergyLevel);
-
             // Higher at actual section end
             if (context.Bar.BarsUntilSectionEnd == 0)
                 score *= 1.2;

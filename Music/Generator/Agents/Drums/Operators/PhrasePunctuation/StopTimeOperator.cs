@@ -33,12 +33,10 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
         /// <summary>
         /// Stop-time works best at moderate energy (too sparse at low, overwhelmed at high).
         /// </summary>
-        protected override double MinEnergyThreshold => 0.4;
 
         /// <summary>
         /// Stop-time works best at moderate energy (too sparse at low, overwhelmed at high).
         /// </summary>
-        protected override double MaxEnergyThreshold => 0.7;
 
         /// <summary>
         /// Requires kick for accent hits.
@@ -52,11 +50,11 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
                 return false;
 
             // Stop-time is a fill window technique
-            if (!context.IsFillWindow)
+            if (!context.Bar.IsFillWindow)
                 return false;
 
             // Need at least 3 beats for stop-time to make sense
-            if (context.BeatsPerBar < 3)
+            if (context.Bar.BeatsPerBar < 3)
                 return false;
 
             return true;
@@ -94,7 +92,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
                 fillRole: FillRole.None); // Stop-time isn't really a "fill"
 
             // Snare accent on beat 3 (if 4/4 or longer)
-            if (drummerContext.BeatsPerBar >= 4 && drummerContext.ActiveRoles.Contains(GrooveRoles.Snare))
+            if (drummerContext.Bar.BeatsPerBar >= 4 && true /* role check deferred */)
             {
                 int snareVelocity = GenerateVelocityHint(
                     VelocityMin - 5, VelocityMax - 5,
@@ -121,11 +119,11 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
             double score = BaseScore;
 
             // Stop-time is more effective near section boundaries
-            if (context.IsAtSectionBoundary)
+            if (context.Bar.IsAtSectionBoundary)
                 score *= 1.1;
 
             // Moderate energy sweet spot
-            double energyFromCenter = Math.Abs(context.EnergyLevel - 0.55);
+            double energyFromCenter = 0.05; // default variance
             score *= (1.0 - energyFromCenter * 0.3);
 
             return Math.Clamp(score, 0.0, 1.0);

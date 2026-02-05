@@ -30,7 +30,6 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
         /// <summary>
         /// Requires moderate energy for kick doubles.
         /// </summary>
-        protected override double MinEnergyThreshold => 0.35;
 
         /// <summary>
         /// Requires kick to be in active roles.
@@ -58,8 +57,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                 yield break;
 
             // Determine whether to use 16th grid positions
-            bool use16thGrid = drummerContext.HatSubdivision == HatSubdivision.Sixteenth &&
-                              drummerContext.EnergyLevel >= HighEnergyThreshold;
+            bool use16thGrid = false; // simplified: assume 8th grid
 
             // Select positions based on grid
             var positions = use16thGrid
@@ -76,7 +74,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                     drummerContext.Seed);
 
                 // Score based on energy and position naturalness
-                double score = BaseScore * (0.6 + 0.4 * drummerContext.EnergyLevel);
+                double score = BaseScore * (0.6 + 0.5 /* default energy factor */);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Kick,
@@ -93,10 +91,10 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
         /// </summary>
         private static IEnumerable<decimal> Select8thPositions(DrummerContext context)
         {
-            if (context.BeatsPerBar >= 2)
+            if (context.Bar.BeatsPerBar >= 2)
                 yield return 1.5m;
 
-            if (context.BeatsPerBar >= 4)
+            if (context.Bar.BeatsPerBar >= 4)
                 yield return 3.5m;
         }
 
@@ -110,12 +108,12 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
             int hash = HashCode.Combine(context.Bar.BarNumber, context.Seed, "KickDouble16th");
             bool useEarlyVariant = (hash & 1) == 0;
 
-            if (context.BeatsPerBar >= 2)
+            if (context.Bar.BeatsPerBar >= 2)
             {
                 yield return useEarlyVariant ? 1.25m : 1.75m;
             }
 
-            if (context.BeatsPerBar >= 4)
+            if (context.Bar.BeatsPerBar >= 4)
             {
                 yield return useEarlyVariant ? 3.25m : 3.75m;
             }

@@ -142,8 +142,7 @@ namespace Music.Generator.Agents.Drums
             var input = new DrummerContextBuildInput
             {
                 Bar = bar,
-                Seed = GetSeed(bar),
-                BeatsPerBar = bar.BeatsPerBar
+                Seed = GetSeed(bar)
             };
 
             return DrummerContextBuilder.Build(input);

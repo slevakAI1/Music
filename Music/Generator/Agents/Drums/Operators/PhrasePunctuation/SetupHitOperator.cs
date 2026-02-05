@@ -28,7 +28,6 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
         /// <summary>
         /// Requires moderate energy for setup hits.
         /// </summary>
-        protected override double MinEnergyThreshold => 0.3;
 
         /// <summary>
         /// Requires kick for setup hit (primary).
@@ -42,15 +41,15 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
                 return false;
 
             // Setup hits are at section boundaries (end of section leading to next)
-            if (!context.IsFillWindow && !context.IsAtSectionBoundary)
+            if (!context.Bar.IsFillWindow && !context.Bar.IsAtSectionBoundary)
                 return false;
 
             // Only in last bar of section or fill window
-            if (context.Bar.BarsUntilSectionEnd > 1 && !context.IsFillWindow)
+            if (context.Bar.BarsUntilSectionEnd > 1 && !context.Bar.IsFillWindow)
                 return false;
 
             // Need at least 4 beats for "4&" position
-            if (context.BeatsPerBar < 4)
+            if (context.Bar.BeatsPerBar < 4)
                 return false;
 
             return true;
@@ -68,7 +67,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
                 yield break;
 
             // Setup hit on the "and" of the last beat (e.g., 4.5 in 4/4)
-            decimal setupBeat = drummerContext.BeatsPerBar + 0.5m;
+            decimal setupBeat = drummerContext.Bar.BeatsPerBar + 0.5m;
 
             // Generate kick on setup beat
             int kickVelocity = GenerateVelocityHint(
@@ -88,7 +87,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
                 fillRole: FillRole.Setup);
 
             // Optionally add snare if energy is high enough and snare is active
-            if (drummerContext.EnergyLevel >= 0.6 && drummerContext.ActiveRoles.Contains(GrooveRoles.Snare))
+            if (true /* snare assumed available */)
             {
                 int snareVelocity = GenerateVelocityHint(
                     VelocityMin - 10, VelocityMax - 10,
@@ -115,8 +114,6 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
                 score *= 1.2;
 
             // Energy scaling
-            score *= (0.6 + 0.4 * context.EnergyLevel);
-
             return Math.Clamp(score, 0.0, 1.0);
         }
     }

@@ -28,8 +28,7 @@ namespace Music.Generator.Agents.Drums.Performance
         /// <returns>New candidate list with velocity hints applied</returns>
         public static IReadOnlyList<DrumCandidate> ApplyHints(
             IReadOnlyList<DrumCandidate> candidates,
-            StyleConfiguration? styleConfig,
-            double energyLevel = 0.5)
+            StyleConfiguration? styleConfig)
         {
             ArgumentNullException.ThrowIfNull(candidates);
 
@@ -43,7 +42,7 @@ namespace Music.Generator.Agents.Drums.Performance
 
             foreach (var candidate in candidates)
             {
-                var hintedCandidate = ApplyHintToCandidate(candidate, settings, energyLevel);
+                var hintedCandidate = ApplyHintToCandidate(candidate, settings);
                 result.Add(hintedCandidate);
             }
 
@@ -57,8 +56,7 @@ namespace Music.Generator.Agents.Drums.Performance
         /// </summary>
         public static DrumCandidate ApplyHintToCandidate(
             DrumCandidate candidate,
-            DrummerVelocityHintSettings settings,
-            double energyLevel = 0.5)
+            DrummerVelocityHintSettings settings)
         {
             ArgumentNullException.ThrowIfNull(candidate);
             settings ??= DrummerVelocityHintSettings.ConservativeDefaults;
@@ -68,9 +66,6 @@ namespace Music.Generator.Agents.Drums.Performance
 
             // Get target velocity for this intent
             int targetVelocity = settings.GetTargetVelocity(intent);
-
-            // Apply energy-based adjustment (±10% based on energy level)
-            targetVelocity = ApplyEnergyAdjustment(targetVelocity, energyLevel);
 
             // Compute final hint
             int hintVelocity;
@@ -135,55 +130,17 @@ namespace Music.Generator.Agents.Drums.Performance
         }
 
         /// <summary>
-        /// Adjusts existing velocity hint minimally toward target.
-        /// Preserves operator intent while nudging toward style.
-        /// </summary>
-        private static int AdjustMinimally(int currentHint, int target, int maxDelta)
-        {
-            if (maxDelta <= 0)
-                return currentHint;
-
-            int diff = target - currentHint;
-
-            if (Math.Abs(diff) <= maxDelta)
-            {
-                // Within adjustment range: move to target
-                return target;
-            }
-
-            // Outside range: move by maxDelta toward target
-            return diff > 0
-                ? currentHint + maxDelta
-                : currentHint - maxDelta;
-        }
-
-        /// <summary>
-        /// Applies energy-based adjustment to velocity target.
-        /// Higher energy = slightly higher velocities.
-        /// </summary>
-        private static int ApplyEnergyAdjustment(int velocity, double energyLevel)
-        {
-            // Energy adjustment: ±10% based on energy level (0.5 = neutral)
-            // energyLevel 0.0 → -5%, energyLevel 1.0 → +5%
-            double energyMultiplier = 1.0 + (energyLevel - 0.5) * 0.1;
-
-            return (int)Math.Round(velocity * energyMultiplier, MidpointRounding.AwayFromZero);
-        }
-
-        /// <summary>
         /// Applies velocity hints with full diagnostics for debugging.
         /// </summary>
         public static (DrumCandidate candidate, VelocityHintDiagnostics diagnostics) ApplyHintWithDiagnostics(
             DrumCandidate candidate,
-            DrummerVelocityHintSettings settings,
-            double energyLevel = 0.5)
+            DrummerVelocityHintSettings settings)
         {
             ArgumentNullException.ThrowIfNull(candidate);
             settings ??= DrummerVelocityHintSettings.ConservativeDefaults;
 
             var intent = ClassifyDynamicIntent(candidate);
             int baseTarget = settings.GetTargetVelocity(intent);
-            int energyAdjustedTarget = ApplyEnergyAdjustment(baseTarget, energyLevel);
 
             int? originalHint = candidate.VelocityHint;
             int finalHint;
@@ -192,12 +149,12 @@ namespace Music.Generator.Agents.Drums.Performance
             {
                 finalHint = AdjustMinimally(
                     candidate.VelocityHint.Value,
-                    energyAdjustedTarget,
+                    baseTarget,
                     settings.MaxAdjustmentDelta);
             }
             else
             {
-                finalHint = energyAdjustedTarget;
+                finalHint = baseTarget;
             }
 
             finalHint = Math.Clamp(finalHint, 1, 127);
@@ -212,8 +169,8 @@ namespace Music.Generator.Agents.Drums.Performance
                 FillRole = candidate.FillRole,
                 ClassifiedIntent = intent,
                 BaseTargetVelocity = baseTarget,
-                EnergyLevel = energyLevel,
-                EnergyAdjustedTarget = energyAdjustedTarget,
+                EnergyLevel = 0.5,
+                EnergyAdjustedTarget = baseTarget,
                 OriginalHint = originalHint,
                 FinalHint = finalHint,
                 WasAdjusted = originalHint.HasValue && originalHint.Value != finalHint

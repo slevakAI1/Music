@@ -37,7 +37,6 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
         /// <summary>
         /// Requires moderate energy for embellishments.
         /// </summary>
-        protected override double MinEnergyThreshold => 0.45;
 
         /// <summary>
         /// Requires hi-hat to be in active roles.
@@ -51,7 +50,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                 return false;
 
             // Only apply when base pattern is 8ths (room for 16th embellishment)
-            if (context.HatSubdivision != HatSubdivision.Eighth)
+            if (HatSubdivision.Eighth /* default assumption */ != HatSubdivision.Eighth)
                 return false;
 
             return true;
@@ -70,20 +69,20 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
 
             // Story 9.3: Get motif score multiplier (30% reduction when motif active)
             double motifMultiplier = GetMotifScoreMultiplier(
-                drummerContext.MotifPresenceMap,
+                null /* motif map removed from context */,
                 drummerContext.Bar,
                 MotifScoreReduction);
 
             // Filter positions to those within the bar
             var validPositions = EmbellishmentPositions
-                .Where(p => p <= drummerContext.BeatsPerBar)
+                .Where(p => p <= drummerContext.Bar.BeatsPerBar)
                 .ToList();
 
             if (validPositions.Count == 0)
                 yield break;
 
             // Determine how many embellishments to add (1-2 based on energy)
-            int count = drummerContext.EnergyLevel >= 0.7 ? 2 : 1;
+            int count = 1; // default
 
             // Select positions deterministically
             var selectedPositions = SelectPositions(validPositions, count, drummerContext);
@@ -98,7 +97,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                     drummerContext.Seed);
 
                 // Story 9.3: Apply motif multiplier to reduce score when motif active
-                double score = BaseScore * (0.5 + 0.5 * drummerContext.EnergyLevel) * motifMultiplier;
+                double score = BaseScore * (0.5 + 0.5 /* default energy factor */) * motifMultiplier;
 
                 yield return CreateCandidate(
                     role: GrooveRoles.ClosedHat,

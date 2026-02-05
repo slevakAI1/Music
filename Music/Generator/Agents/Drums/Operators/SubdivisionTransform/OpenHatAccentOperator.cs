@@ -31,7 +31,6 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
         /// <summary>
         /// Requires moderate-high energy (>= 0.5) for open hat accents.
         /// </summary>
-        protected override double MinEnergyThreshold => 0.5;
 
         /// <summary>
         /// Requires open hi-hat to be in active roles.
@@ -45,11 +44,11 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
                 return false;
 
             // Requires hat mode (not ride)
-            if (context.CurrentHatMode == HatMode.Ride)
+            if (HatMode.Closed /* default assumption */ == HatMode.Ride)
                 return false;
 
             // Need at least 4 beats for standard accent positions
-            if (context.BeatsPerBar < 4)
+            if (context.Bar.BeatsPerBar < 4)
                 return false;
 
             return true;
@@ -68,11 +67,11 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
 
             // Filter positions to those within the bar
             var validPositions = AccentPositions
-                .Where(p => p <= drummerContext.BeatsPerBar)
+                .Where(p => p <= drummerContext.Bar.BeatsPerBar)
                 .ToList();
 
             // Determine how many accents based on energy
-            int maxAccents = drummerContext.EnergyLevel >= 0.7 ? 2 : 1;
+            int maxAccents = 1; // default
             int count = Math.Min(maxAccents, validPositions.Count);
 
             // Select positions deterministically
@@ -134,9 +133,7 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
             if (context.Bar.BarsUntilSectionEnd <= 2)
                 score *= 1.1;
             
-            // Energy scaling
-            score *= (0.6 + 0.4 * context.EnergyLevel);
-            
+            // Energy scaling            
             // Beat 1.5 (first accent) often more important than 3.5
             if (beat == 1.5m)
                 score *= 1.05;

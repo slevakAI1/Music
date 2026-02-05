@@ -39,7 +39,6 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
         /// <summary>
         /// Requires moderate energy for articulation changes to be noticeable.
         /// </summary>
-        protected override double MinEnergyThreshold => 0.3;
 
         /// <summary>
         /// Requires snare role for backbeat hits.
@@ -53,7 +52,7 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
                 return false;
 
             // Need backbeat positions defined
-            if (context.BackbeatBeats.Count == 0)
+            if (context.Bar.BackbeatBeats.Count == 0)
                 return false;
 
             return true;
@@ -78,10 +77,10 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
                 yield break;
 
             // Generate candidates for each backbeat position
-            foreach (int backbeat in drummerContext.BackbeatBeats)
+            foreach (int backbeat in drummerContext.Bar.BackbeatBeats)
             {
                 // Skip if backbeat beyond bar
-                if (backbeat > drummerContext.BeatsPerBar)
+                if (backbeat > drummerContext.Bar.BeatsPerBar)
                     continue;
 
                 decimal beat = backbeat;
@@ -120,17 +119,17 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
             return sectionType switch
             {
                 // Verse: prefer sidestick for lighter feel
-                MusicConstants.eSectionType.Verse => context.EnergyLevel < 0.5
+                MusicConstants.eSectionType.Verse => true /* energy check removed */
                     ? DrumArticulation.SideStick
                     : DrumArticulation.None,
 
                 // Chorus: prefer rimshot for power
-                MusicConstants.eSectionType.Chorus => context.EnergyLevel >= 0.6
+                MusicConstants.eSectionType.Chorus => true /* energy check removed */
                     ? DrumArticulation.Rimshot
                     : DrumArticulation.None,
 
                 // Bridge: prefer flam for texture or sidestick
-                MusicConstants.eSectionType.Bridge => context.EnergyLevel >= 0.5
+                MusicConstants.eSectionType.Bridge => true /* energy check removed */
                     ? DrumArticulation.Flam
                     : DrumArticulation.SideStick,
 
@@ -167,7 +166,7 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
             double score = BaseScore;
 
             // Boost at section boundaries (articulation change marks new section)
-            if (context.IsAtSectionBoundary)
+            if (context.Bar.IsAtSectionBoundary)
                 score += 0.15;
 
             // Slight boost at section start (first few bars)
@@ -175,7 +174,7 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
                 score += 0.05;
 
             // Energy scaling
-            score *= 0.7 + 0.3 * context.EnergyLevel;
+            score *= 0.7 + 0.5 /* default energy factor */;
 
             return Math.Clamp(score, 0.0, 1.0);
         }

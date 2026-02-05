@@ -34,7 +34,6 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
         /// <summary>
         /// Requires minimum energy of 0.3 for ghost notes to be musical.
         /// </summary>
-        protected override double MinEnergyThreshold => 0.3;
 
         /// <summary>
         /// Requires snare to be in active roles.
@@ -48,7 +47,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                 return false;
 
             // Need backbeat beats defined
-            if (context.BackbeatBeats.Count == 0)
+            if (context.Bar.BackbeatBeats.Count == 0)
                 return false;
 
             return true;
@@ -67,12 +66,12 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
 
             // Story 9.3: Get motif score multiplier (20% reduction when motif active)
             double motifMultiplier = GetMotifScoreMultiplier(
-                drummerContext.MotifPresenceMap,
+                null /* motif map removed from context */,
                 drummerContext.Bar,
                 MotifScoreReduction);
 
             // Generate ghost note before each backbeat
-            foreach (int backbeat in drummerContext.BackbeatBeats)
+            foreach (int backbeat in drummerContext.Bar.BackbeatBeats)
             {
                 // Ghost at 0.25 beats before backbeat (e.g., 1.75 before beat 2)
                 decimal ghostBeat = backbeat - 0.25m;
@@ -90,7 +89,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
 
                 // Score increases with energy (more appropriate at higher energy)
                 // Story 9.3: Apply motif multiplier to reduce score when motif active
-                double score = BaseScore * (0.5 + 0.5 * drummerContext.EnergyLevel) * motifMultiplier;
+                double score = BaseScore * (0.5 + 0.5 /* default energy factor */) * motifMultiplier;
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,

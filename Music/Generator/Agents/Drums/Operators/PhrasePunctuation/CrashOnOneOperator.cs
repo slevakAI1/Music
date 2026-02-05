@@ -37,7 +37,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
                 return false;
 
             // Only at section boundaries (start of new section)
-            if (!context.IsAtSectionBoundary)
+            if (!context.Bar.IsAtSectionBoundary)
                 return false;
 
             // Crash on 1 is for section STARTS, not ends
@@ -71,7 +71,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
                 drummerContext.Seed);
 
             // Score increases with energy (crashes are more appropriate at higher energy)
-            double score = BaseScore * (0.7 + 0.3 * drummerContext.EnergyLevel);
+            double score = BaseScore * (0.7 + 0.5 /* default energy factor */);
 
             yield return CreateCandidate(
                 role: GrooveRoles.Crash,
