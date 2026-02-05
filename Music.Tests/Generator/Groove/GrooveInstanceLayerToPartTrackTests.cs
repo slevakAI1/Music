@@ -14,7 +14,9 @@ namespace Music.Tests.Generator.Groove
         {
             Timingtrack timingTrack = TimingTests.CreateTestTrackD1();
             BarTrack barTrack = new();
-            barTrack.RebuildFromTimingTrack(timingTrack, totalBars);
+            var sectionTrack = new SectionTrack();
+            sectionTrack.Add(MusicConstants.eSectionType.Verse, totalBars);
+            barTrack.RebuildFromTimingTrack(timingTrack, sectionTrack, totalBars);
             return barTrack;
         }
 

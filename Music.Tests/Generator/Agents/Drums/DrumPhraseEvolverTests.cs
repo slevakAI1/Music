@@ -168,7 +168,9 @@ namespace Music.Generator.Agents.Drums.Tests
         private static BarTrack CreateBarTrack()
         {
             var barTrack = new BarTrack();
-            barTrack.RebuildFromTimingTrack(TimingTests.CreateTestTrackD1(), totalBars: 1);
+        var sectionTrack = new SectionTrack();
+        sectionTrack.Add(MusicConstants.eSectionType.Verse, 1);
+        barTrack.RebuildFromTimingTrack(TimingTests.CreateTestTrackD1(), sectionTrack, totalBars: 1);
             return barTrack;
         }
 

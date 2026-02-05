@@ -428,7 +428,9 @@ public class DrumTrackFeatureDataTests
         var barTrack = new BarTrack();
         var timingTrack = new Timingtrack();
         timingTrack.Events.Add(new TimingEvent { StartBar = 1, Numerator = 4, Denominator = 4 });
-        barTrack.RebuildFromTimingTrack(timingTrack, totalBars);
+        var sectionTrack = new SectionTrack();
+        sectionTrack.Add(MusicConstants.eSectionType.Verse, totalBars);
+        barTrack.RebuildFromTimingTrack(timingTrack, sectionTrack, totalBars);
         return barTrack;
     }
 

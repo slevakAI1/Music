@@ -20,7 +20,9 @@ public class PartTrackBarCoverageAnalyzerTests
         timingTrack.Add(new TimingEvent { StartBar = 1, Numerator = numerator, Denominator = denominator });
 
         var barTrack = new BarTrack();
-        barTrack.RebuildFromTimingTrack(timingTrack, totalBars);
+        var sectionTrack = new SectionTrack();
+        sectionTrack.Add(MusicConstants.eSectionType.Verse, totalBars);
+        barTrack.RebuildFromTimingTrack(timingTrack, sectionTrack, totalBars);
         return barTrack;
     }
 

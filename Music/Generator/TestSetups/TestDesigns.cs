@@ -38,7 +38,10 @@ namespace Music.Generator
 
             // 6) Build bar track from timing track using SectionTrack total bars
             // AI: note=BarTrack must be built before GrooveTrack since GrooveEvent constructor requires non-null BarTrack.
-            songContext.BarTrack.RebuildFromTimingTrack(songContext.Song.TimeSignatureTrack, songContext.SectionTrack.TotalBars);
+            songContext.BarTrack.RebuildFromTimingTrack(
+                songContext.Song.TimeSignatureTrack,
+                songContext.SectionTrack,
+                songContext.SectionTrack.TotalBars);
 
             // 8) Material bank: populate with test motifs for Stage 9+ testing
             // AI: note=Adds all 4 hardcoded test motifs from MotifLibrary; motifs stored as PartTracks with MaterialLocal domain.

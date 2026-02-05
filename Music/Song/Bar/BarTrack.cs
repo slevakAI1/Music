@@ -1,8 +1,8 @@
-﻿namespace Music.Generator
+namespace Music.Generator
 {
     // AI: purpose=Represents derived sequence of Bars for one track; not the authoritative timing source.
     // AI: invariants=Bar.BarNumber is 1-based; Bars list mirrors last RebuildFromTimingTrack(); StartTick strictly increases.
-    // AI: deps=Depends on Timingtrack.Events providing StartBar,Numerator,Denominator; caller must validate events.
+    // AI: deps=Timingtrack.Events for timing; SectionTrack for section context; caller must validate both tracks.
     // AI: change=If changing timing calc update GetActiveTimingEvent and keep numbering/tick semantics stable.
 
     public class BarTrack
@@ -12,14 +12,17 @@
         // AI: Bars: live IReadOnlyList wrapper over internal list; reflects rebuild/clear; not thread-safe.
         public IReadOnlyList<Bar> Bars => _bars.AsReadOnly();
 
-        // AI: RebuildFromTimingTrack: derive bars using latest TimingEvent with StartBar<=barNumber.
+        // AI: RebuildFromTimingTrack: derive bars using Timingtrack and populate section context via SectionTrack.
         // AI: behavior: skips bars with no active event; totalBars is a maximum cap; non-positive totalBars yields no loop.
         // AI: tickcalc: StartTick starts at 0 and advances by each bar's TicksPerMeasure; relies on Bar.TicksPerMeasure.
-        public void RebuildFromTimingTrack(Timingtrack timingTrack, int totalBars = 100)
+        public void RebuildFromTimingTrack(Timingtrack timingTrack, SectionTrack sectionTrack, int totalBars = 100)
         {
+            ArgumentNullException.ThrowIfNull(timingTrack);
+            ArgumentNullException.ThrowIfNull(sectionTrack);
+
             _bars.Clear();
 
-            if (timingTrack == null || timingTrack.Events.Count == 0)
+            if (timingTrack.Events.Count == 0)
             {
                 // No timing events - can't build bars
                 return;
@@ -38,10 +41,24 @@
                     continue;
                 }
 
+                sectionTrack.GetActiveSection(barNumber, out var section);
+                var barWithinSection = 0;
+                var barsUntilSectionEnd = 0;
+
+                if (section != null)
+                {
+                    barWithinSection = barNumber - section.StartBar;
+                    var sectionEndBar = section.StartBar + section.BarCount - 1;
+                    barsUntilSectionEnd = sectionEndBar - barNumber;
+                }
+
                 // Create the bar with the active time signature
                 var bar = new Bar
                 {
                     BarNumber = barNumber,
+                    Section = section,
+                    BarWithinSection = barWithinSection,
+                    BarsUntilSectionEnd = barsUntilSectionEnd,
                     Numerator = activeEvent.Numerator,
                     Denominator = activeEvent.Denominator,
                     StartTick = currentTick

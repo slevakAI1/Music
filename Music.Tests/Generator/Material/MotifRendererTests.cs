@@ -54,12 +54,12 @@ public class MotifRendererTests
         timingTrack.Add(new TimingEvent { StartBar = 1, Numerator = 4, Denominator = 4 });
 
         var barTrack = new BarTrack();
-        barTrack.RebuildFromTimingTrack(timingTrack, 8);
-
-        var groove = new GroovePresetDefinition();
-
         var sectionTrack = new SectionTrack();
         sectionTrack.Add(MusicConstants.eSectionType.Verse, 8);
+
+        barTrack.RebuildFromTimingTrack(timingTrack, sectionTrack, 8);
+
+        var groove = new GroovePresetDefinition();
 
         return (spec, placement, harmony, barTrack, groove, sectionTrack);
     }

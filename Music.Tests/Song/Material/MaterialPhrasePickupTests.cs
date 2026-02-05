@@ -156,7 +156,9 @@ namespace Music.Song.Material.Tests
         private static BarTrack CreateBarTrack()
         {
             var barTrack = new BarTrack();
-            barTrack.RebuildFromTimingTrack(TimingTests.CreateTestTrackD1(), totalBars: 20);
+            var sectionTrack = new SectionTrack();
+            sectionTrack.Add(MusicConstants.eSectionType.Verse, 20);
+            barTrack.RebuildFromTimingTrack(TimingTests.CreateTestTrackD1(), sectionTrack, totalBars: 20);
             return barTrack;
         }
 

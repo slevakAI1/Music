@@ -206,7 +206,9 @@ namespace Music.Writer
 
             if (songContext.BarTrack.Bars.Count == 0)
             {
-                songContext.BarTrack.RebuildFromTimingTrack(timeSignatureTrack);
+                songContext.BarTrack.RebuildFromTimingTrack(
+                    timeSignatureTrack,
+                    songContext.SectionTrack);
             }
             // ========================================================================================
 
