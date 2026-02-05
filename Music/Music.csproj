@@ -101,8 +101,6 @@
     <None Remove="AI\Completed\PreAnalysis_8.1.md" />
     <None Remove="AI\Completed\PreAnalysis_9.3.md" />
     <None Remove="AI\Completed\RefactorEpic.md" />
-    <None Remove="AI\Completed\Story1.md" />
-    <None Remove="AI\Completed\Story2.md" />
     <None Remove="AI\Completed\Story3.3_Complete.md" />
     <None Remove="AI\Completed\Story6.3_Complete.md" />
     <None Remove="AI\Completed\Story7.2_DrumFeatureExtraction.md" />
