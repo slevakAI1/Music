@@ -91,7 +91,7 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
 
                 int velocityHint = GenerateVelocityHint(
                     velMin, velMax,
-                    drummerContext.BarNumber, beat,
+                    drummerContext.Bar.BarNumber, beat,
                     drummerContext.Seed);
 
                 // Optional timing offset for flam (grace note effect simulated via timing)
@@ -101,7 +101,7 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,
-                    barNumber: drummerContext.BarNumber,
+                    barNumber: drummerContext.Bar.BarNumber,
                     beat: beat,
                     strength: OnsetStrength.Backbeat,
                     score: score,
@@ -114,9 +114,10 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
         private static DrumArticulation SelectArticulation(DrummerContext context)
         {
             // Deterministic selection based on section type and bar number
-            int hash = HashCode.Combine(context.BarNumber, context.SectionType, context.Seed, "BackbeatVariant");
+            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            int hash = HashCode.Combine(context.Bar.BarNumber, sectionType, context.Seed, "BackbeatVariant");
 
-            return context.SectionType switch
+            return sectionType switch
             {
                 // Verse: prefer sidestick for lighter feel
                 MusicConstants.eSectionType.Verse => context.EnergyLevel < 0.5
@@ -170,7 +171,7 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
                 score += 0.15;
 
             // Slight boost at section start (first few bars)
-            if (context.BarsUntilSectionEnd >= 6)
+            if (context.Bar.BarsUntilSectionEnd >= 6)
                 score += 0.05;
 
             // Energy scaling

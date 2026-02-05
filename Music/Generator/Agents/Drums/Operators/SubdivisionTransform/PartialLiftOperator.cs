@@ -99,14 +99,14 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
                     
                     int velocityHint = GenerateVelocityHint(
                         velMin, velMax,
-                        drummerContext.BarNumber, beat,
+                        drummerContext.Bar.BarNumber, beat,
                         drummerContext.Seed);
 
                     double score = ComputeScore(drummerContext, isDownbeat, isSecondHalf);
 
                     yield return CreateCandidate(
                         role: GrooveRoles.ClosedHat,
-                        barNumber: drummerContext.BarNumber,
+                        barNumber: drummerContext.Bar.BarNumber,
                         beat: beat,
                         strength: strength,
                         score: score,
@@ -120,7 +120,7 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
             double score = BaseScore;
             
             // Partial lift works well leading into section ends
-            if (context.BarsUntilSectionEnd <= 2)
+            if (context.Bar.BarsUntilSectionEnd <= 2)
                 score *= 1.2;
             
             // Energy scaling

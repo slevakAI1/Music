@@ -81,7 +81,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                 int velocityHint = GenerateVelocityHint(
                     VelocityMin,
                     VelocityMax,
-                    drummerContext.BarNumber,
+                    drummerContext.Bar.BarNumber,
                     ghostBeat,
                     drummerContext.Seed);
 
@@ -91,7 +91,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,
-                    barNumber: drummerContext.BarNumber,
+                    barNumber: drummerContext.Bar.BarNumber,
                     beat: ghostBeat,
                     strength: OnsetStrength.Ghost,
                     score: Math.Clamp(score, 0.0, 1.0),

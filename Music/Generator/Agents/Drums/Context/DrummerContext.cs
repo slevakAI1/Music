@@ -134,11 +134,7 @@ namespace Music.Generator.Agents.Drums
             {
                 // Base AgentContext fields
                 Bar = bar,
-                BarNumber = barNumber,
                 Beat = 1.0m,
-                SectionType = sectionType,
-                PhrasePosition = bar.PhrasePosition,
-                BarsUntilSectionEnd = bar.BarsUntilSectionEnd,
                 EnergyLevel = 0.5,
                 TensionLevel = 0.0,
                 MotifPresenceScore = 0.0,

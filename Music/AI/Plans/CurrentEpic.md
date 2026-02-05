@@ -364,6 +364,8 @@ public int BarsUntilSectionEnd => Bar.BarsUntilSectionEnd;
 
 ### Story 9: Remove Backward-Compatibility Properties from AgentContext
 
+**Status:** Completed
+
 **Size:** Small (30-45 min)
 
 **Goal:** Clean up AgentContext by removing delegating properties added for backward compatibility.

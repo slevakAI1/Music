@@ -71,7 +71,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                 int velocityHint = GenerateVelocityHint(
                     VelocityMin,
                     VelocityMax,
-                    drummerContext.BarNumber,
+                    drummerContext.Bar.BarNumber,
                     beat,
                     drummerContext.Seed);
 
@@ -80,7 +80,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Kick,
-                    barNumber: drummerContext.BarNumber,
+                    barNumber: drummerContext.Bar.BarNumber,
                     beat: beat,
                     strength: OnsetStrength.Offbeat,
                     score: Math.Clamp(score, 0.0, 1.0),
@@ -107,7 +107,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
         private static IEnumerable<decimal> Select16thPositions(DrummerContext context)
         {
             // Deterministic selection based on bar number and seed
-            int hash = HashCode.Combine(context.BarNumber, context.Seed, "KickDouble16th");
+            int hash = HashCode.Combine(context.Bar.BarNumber, context.Seed, "KickDouble16th");
             bool useEarlyVariant = (hash & 1) == 0;
 
             if (context.BeatsPerBar >= 2)

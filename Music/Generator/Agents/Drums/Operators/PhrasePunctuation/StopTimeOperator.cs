@@ -79,14 +79,14 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
             // Kick accent on beat 1
             int kickVelocity = GenerateVelocityHint(
                 VelocityMin, VelocityMax,
-                drummerContext.BarNumber, 1.0m,
+                drummerContext.Bar.BarNumber, 1.0m,
                 drummerContext.Seed);
 
             double score = ComputeScore(drummerContext);
 
             yield return CreateCandidate(
                 role: GrooveRoles.Kick,
-                barNumber: drummerContext.BarNumber,
+                barNumber: drummerContext.Bar.BarNumber,
                 beat: 1.0m,
                 strength: OnsetStrength.Downbeat,
                 score: score,
@@ -98,12 +98,12 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
             {
                 int snareVelocity = GenerateVelocityHint(
                     VelocityMin - 5, VelocityMax - 5,
-                    drummerContext.BarNumber, 3.0m,
+                    drummerContext.Bar.BarNumber, 3.0m,
                     drummerContext.Seed);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,
-                    barNumber: drummerContext.BarNumber,
+                    barNumber: drummerContext.Bar.BarNumber,
                     beat: 3.0m,
                     strength: OnsetStrength.Backbeat,
                     score: score * 0.95,

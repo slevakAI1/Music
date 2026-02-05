@@ -81,7 +81,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
             double motifMultiplier = GetMotifScoreMultiplier(drummerContext, MotifScoreReduction);
 
             // Select cluster pattern and start position deterministically
-            int hash = HashCode.Combine(drummerContext.BarNumber, drummerContext.Seed, "GhostCluster");
+            int hash = HashCode.Combine(drummerContext.Bar.BarNumber, drummerContext.Seed, "GhostCluster");
 
             int patternIndex = Math.Abs(hash) % ClusterPatterns.Length;
             int startIndex = Math.Abs(hash >> 8) % ClusterStarts.Length;
@@ -103,7 +103,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                 int velocityHint = GenerateVelocityHint(
                     VelocityMin,
                     Math.Max(VelocityMin, velocityBase),
-                    drummerContext.BarNumber,
+                    drummerContext.Bar.BarNumber,
                     beat,
                     drummerContext.Seed);
 
@@ -113,7 +113,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,
-                    barNumber: drummerContext.BarNumber,
+                    barNumber: drummerContext.Bar.BarNumber,
                     beat: beat,
                     strength: OnsetStrength.Ghost,
                     score: Math.Clamp(score, 0.0, 1.0),

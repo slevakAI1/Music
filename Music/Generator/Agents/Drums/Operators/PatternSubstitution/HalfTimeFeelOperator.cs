@@ -64,7 +64,8 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
 
             // Best suited for bridge and breakdown sections
             // Also allow in verse for contrast
-            bool isSuitableSection = context.SectionType is
+            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            bool isSuitableSection = sectionType is
                 MusicConstants.eSectionType.Bridge or
                 MusicConstants.eSectionType.Verse or
                 MusicConstants.eSectionType.Intro or
@@ -106,12 +107,12 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
         {
             int velocityHint = GenerateVelocityHint(
                 SnareVelocityMin, SnareVelocityMax,
-                context.BarNumber, beat,
+                context.Bar.BarNumber, beat,
                 context.Seed);
 
             return CreateCandidate(
                 role: GrooveRoles.Snare,
-                barNumber: context.BarNumber,
+                barNumber: context.Bar.BarNumber,
                 beat: beat,
                 strength: OnsetStrength.Backbeat,
                 score: baseScore,
@@ -123,12 +124,12 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
             // Half-time kick: beat 1 always, beat 3 optional based on energy
             int kickVelocity1 = GenerateVelocityHint(
                 KickVelocityMin, KickVelocityMax,
-                context.BarNumber, 1,
+                context.Bar.BarNumber, 1,
                 context.Seed);
 
             yield return CreateCandidate(
                 role: GrooveRoles.Kick,
-                barNumber: context.BarNumber,
+                barNumber: context.Bar.BarNumber,
                 beat: 1,
                 strength: OnsetStrength.Downbeat,
                 score: baseScore,
@@ -139,12 +140,12 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
             {
                 int kickVelocity3 = GenerateVelocityHint(
                     KickVelocityMin - 10, KickVelocityMax - 10, // Slightly softer
-                    context.BarNumber, 3,
+                    context.Bar.BarNumber, 3,
                     context.Seed);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Kick,
-                    barNumber: context.BarNumber,
+                    barNumber: context.Bar.BarNumber,
                     beat: 3,
                     strength: OnsetStrength.Strong,
                     score: baseScore * 0.9, // Slightly lower score
@@ -161,7 +162,8 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
                 score += 0.2;
 
             // Boost in bridge section (most natural home for half-time)
-            if (context.SectionType == MusicConstants.eSectionType.Bridge)
+            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            if (sectionType == MusicConstants.eSectionType.Bridge)
                 score += 0.1;
 
             // Lower energy = more appropriate for half-time

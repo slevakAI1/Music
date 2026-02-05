@@ -97,14 +97,14 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             // Always generate the 4& kick (primary rock syncopation)
             int velocityHint = GenerateVelocityHint(
                 VelocityMin, VelocityMax,
-                context.BarNumber, PrimaryAnticipationBeat,
+                context.Bar.BarNumber, PrimaryAnticipationBeat,
                 context.Seed);
 
             double score = ComputeScore(context, isPrimary: true);
 
             yield return CreateCandidate(
                 role: GrooveRoles.Kick,
-                barNumber: context.BarNumber,
+                barNumber: context.Bar.BarNumber,
                 beat: PrimaryAnticipationBeat,
                 strength: OnsetStrength.Pickup,
                 score: score,
@@ -114,7 +114,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
         private IEnumerable<DrumCandidate> GenerateSecondaryPattern(DrummerContext context)
         {
             // Deterministic selection of secondary pattern based on bar and seed
-            int hash = HashCode.Combine(context.BarNumber, context.Seed, "RockKickSecondary");
+            int hash = HashCode.Combine(context.Bar.BarNumber, context.Seed, "RockKickSecondary");
             bool use2And = (Math.Abs(hash) % 3) == 0;
             bool use3And = (Math.Abs(hash) % 4) == 0;
 
@@ -122,12 +122,12 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             {
                 int velocityHint = GenerateVelocityHint(
                     VelocityMin - 10, VelocityMax - 10,
-                    context.BarNumber, SecondaryAnticipationBeat2,
+                    context.Bar.BarNumber, SecondaryAnticipationBeat2,
                     context.Seed);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Kick,
-                    barNumber: context.BarNumber,
+                    barNumber: context.Bar.BarNumber,
                     beat: SecondaryAnticipationBeat2,
                     strength: OnsetStrength.Offbeat,
                     score: SecondaryPatternScore,
@@ -138,12 +138,12 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             {
                 int velocityHint = GenerateVelocityHint(
                     VelocityMin - 10, VelocityMax - 10,
-                    context.BarNumber, SecondaryAnticipationBeat3,
+                    context.Bar.BarNumber, SecondaryAnticipationBeat3,
                     context.Seed);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Kick,
-                    barNumber: context.BarNumber,
+                    barNumber: context.Bar.BarNumber,
                     beat: SecondaryAnticipationBeat3,
                     strength: OnsetStrength.Offbeat,
                     score: SecondaryPatternScore,
@@ -162,11 +162,12 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             double score = isPrimary ? BaseScore : SecondaryPatternScore;
 
             // Boost for chorus (more energy, more drive)
-            if (context.SectionType == MusicConstants.eSectionType.Chorus)
+            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            if (sectionType == MusicConstants.eSectionType.Chorus)
                 score += 0.1;
 
             // Boost at section boundaries (drive into next section)
-            if (context.IsAtSectionBoundary && context.BarsUntilSectionEnd <= 1)
+            if (context.IsAtSectionBoundary && context.Bar.BarsUntilSectionEnd <= 1)
                 score += 0.15;
 
             // Energy scaling

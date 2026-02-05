@@ -44,7 +44,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
             // Check if we're at the beginning of a section using PhrasePosition (0.0 = phrase start)
             // or by checking BarsUntilSectionEnd is high (indicating we're early in section)
             // A phrase position near 0.0 means we're at the start
-            bool isAtSectionStart = context.PhrasePosition < 0.1;
+            bool isAtSectionStart = context.Bar.PhrasePosition < 0.1;
 
             if (!isAtSectionStart)
                 return false;
@@ -66,7 +66,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
             int velocityHint = GenerateVelocityHint(
                 VelocityMin,
                 VelocityMax,
-                drummerContext.BarNumber,
+                drummerContext.Bar.BarNumber,
                 1.0m,
                 drummerContext.Seed);
 
@@ -75,7 +75,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
 
             yield return CreateCandidate(
                 role: GrooveRoles.Crash,
-                barNumber: drummerContext.BarNumber,
+                barNumber: drummerContext.Bar.BarNumber,
                 beat: 1.0m,
                 strength: OnsetStrength.Downbeat,
                 score: Math.Clamp(score, 0.0, 1.0),

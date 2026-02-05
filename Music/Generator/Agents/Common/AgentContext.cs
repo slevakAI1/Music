@@ -1,5 +1,5 @@
 // AI: purpose=Shared context for all agent decisions; immutable record ensures determinism.
-// AI: invariants=Beat is 1-based; EnergyLevel/TensionLevel/MotifPresenceScore are 0.0-1.0.
+// AI: invariants=Beat is 1-based; EnergyLevel/TensionLevel/MotifPresenceScore are 0.0-1.0; Bar required.
 // AI: deps=Bar for bar context; Rng system for RngStreamKey; MotifPresenceMap for ducking (Story 9.3).
 // AI: change=Extend via inheritance for instrument-specific contexts (DrummerContext, GuitarContext, etc.).
 
@@ -15,51 +15,14 @@ namespace Music.Generator.Agents.Common
     /// </summary>
     public record AgentContext
     {
-        // AI: note=Prefer setting Bar; legacy inits still supported to avoid breaking callers.
-        public Bar? Bar { get; init; }
-
-        /// <summary>
-        /// Current bar number (1-based).
-        /// </summary>
-        public int BarNumber
-        {
-            get => Bar?.BarNumber ?? _barNumber;
-            init => _barNumber = value;
-        }
+        // AI: note=Bar is the single source of truth for bar context.
+        public required Bar Bar { get; init; }
 
         /// <summary>
         /// Current beat within the bar (1-based, can be fractional like 1.5 for eighth offbeat).
         /// </summary>
         public required decimal Beat { get; init; }
 
-        /// <summary>
-        /// Section type for the current bar (Intro, Verse, Chorus, etc.).
-        /// </summary>
-        public MusicConstants.eSectionType SectionType
-        {
-            get => Bar?.Section?.SectionType ?? _sectionType;
-            init => _sectionType = value;
-        }
-
-        /// <summary>
-        /// Position within the current phrase (0.0 = phrase start, 1.0 = phrase end).
-        /// Derived from bar position relative to phrase boundaries.
-        /// </summary>
-        public double PhrasePosition
-        {
-            get => Bar?.PhrasePosition ?? _phrasePosition;
-            init => _phrasePosition = value;
-        }
-
-        /// <summary>
-        /// Number of bars remaining until the current section ends.
-        /// Used for fill window decisions and section-end behaviors.
-        /// </summary>
-        public int BarsUntilSectionEnd
-        {
-            get => Bar?.BarsUntilSectionEnd ?? _barsUntilSectionEnd;
-            init => _barsUntilSectionEnd = value;
-        }
 
         /// <summary>
         /// Overall energy level for this moment (0.0 = minimal, 1.0 = maximum).
@@ -98,11 +61,6 @@ namespace Music.Generator.Agents.Common
         /// </summary>
         public MotifPresenceMap? MotifPresenceMap { get; init; }
 
-        private int _barNumber;
-        private MusicConstants.eSectionType _sectionType = MusicConstants.eSectionType.Verse;
-        private double _phrasePosition;
-        private int _barsUntilSectionEnd;
-
         /// <summary>
         /// Creates a minimal context for testing purposes.
         /// All numeric values default to mid-range or zero.
@@ -129,11 +87,7 @@ namespace Music.Generator.Agents.Common
             return new AgentContext
             {
                 Bar = bar,
-                BarNumber = barNumber,
                 Beat = 1.0m,
-                SectionType = sectionType,
-                PhrasePosition = bar.PhrasePosition,
-                BarsUntilSectionEnd = bar.BarsUntilSectionEnd,
                 EnergyLevel = 0.5,
                 TensionLevel = 0.0,
                 MotifPresenceScore = 0.0,

@@ -86,14 +86,14 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
 
                 int velocityHint = GenerateVelocityHint(
                     VelocityMin, VelocityMax,
-                    drummerContext.BarNumber, beat,
+                    drummerContext.Bar.BarNumber, beat,
                     drummerContext.Seed);
 
                 double score = ComputeScore(drummerContext);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,
-                    barNumber: drummerContext.BarNumber,
+                    barNumber: drummerContext.Bar.BarNumber,
                     beat: beat,
                     strength: OnsetStrength.Backbeat,
                     score: score,
@@ -126,7 +126,8 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             double score = BaseScore;
 
             // Boost for chorus sections (urgency matters more)
-            if (context.SectionType == MusicConstants.eSectionType.Chorus)
+            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            if (sectionType == MusicConstants.eSectionType.Chorus)
                 score += 0.1;
 
             // Slight boost at higher energy

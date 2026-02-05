@@ -82,7 +82,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
             var availableToms = GetAvailableTomsDescending(drummerContext.ActiveRoles);
 
             // Generate descending pattern
-            var positions = GenerateFillPositions(fillStartBeat, beatsPerBar, hitCount, drummerContext.Seed, drummerContext.BarNumber);
+            var positions = GenerateFillPositions(fillStartBeat, beatsPerBar, hitCount, drummerContext.Seed, drummerContext.Bar.BarNumber);
 
             int positionIndex = 0;
             int positionCount = positions.Count;
@@ -99,7 +99,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
 
                 int velocityHint = GenerateVelocityHint(
                     velMin, velMax,
-                    drummerContext.BarNumber, beat,
+                    drummerContext.Bar.BarNumber, beat,
                     drummerContext.Seed);
 
                 FillRole fillRole = positionIndex == 0 ? FillRole.FillStart :
@@ -110,7 +110,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
 
                 yield return CreateCandidate(
                     role: role,
-                    barNumber: drummerContext.BarNumber,
+                    barNumber: drummerContext.Bar.BarNumber,
                     beat: beat,
                     strength: OnsetStrength.Strong,
                     score: score,
@@ -211,7 +211,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
             double score = BaseScore;
 
             // Drop fills are good after builds (at section end)
-            if (context.BarsUntilSectionEnd <= 1)
+            if (context.Bar.BarsUntilSectionEnd <= 1)
                 score *= 1.15;
 
             // Energy scaling

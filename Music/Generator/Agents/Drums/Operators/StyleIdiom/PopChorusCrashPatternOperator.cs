@@ -57,7 +57,8 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
                 return false;
 
             // Section gating: only chorus
-            if (context.SectionType != MusicConstants.eSectionType.Chorus)
+            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            if (sectionType != MusicConstants.eSectionType.Chorus)
                 return false;
 
             return true;
@@ -83,14 +84,14 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             // Generate crash on beat 1
             int velocityHint = GenerateVelocityHint(
                 VelocityMin, VelocityMax,
-                drummerContext.BarNumber, 1.0m,
+                drummerContext.Bar.BarNumber, 1.0m,
                 drummerContext.Seed);
 
             double score = ComputeScore(drummerContext);
 
             yield return CreateCandidate(
                 role: GrooveRoles.Crash,
-                barNumber: drummerContext.BarNumber,
+                barNumber: drummerContext.Bar.BarNumber,
                 beat: 1.0m,
                 strength: OnsetStrength.Downbeat,
                 score: score,
@@ -133,8 +134,8 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
         {
             // Approximate position based on BarsUntilSectionEnd
             // This is a simplification; actual implementation may use more context
-            int totalBarsInSection = context.BarsUntilSectionEnd + 1;
-            int barInSection = totalBarsInSection - context.BarsUntilSectionEnd - 1;
+            int totalBarsInSection = context.Bar.BarsUntilSectionEnd + 1;
+            int barInSection = totalBarsInSection - context.Bar.BarsUntilSectionEnd - 1;
             return Math.Max(0, barInSection);
         }
 

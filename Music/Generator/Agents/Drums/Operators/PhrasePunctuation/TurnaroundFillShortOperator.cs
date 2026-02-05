@@ -74,7 +74,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
             int hitCount = ComputeHitCount(drummerContext.EnergyLevel);
 
             // Generate fill pattern positions (16th grid within last 2 beats)
-            var positions = GenerateFillPositions(fillStartBeat, beatsPerBar, hitCount, drummerContext.Seed, drummerContext.BarNumber);
+            var positions = GenerateFillPositions(fillStartBeat, beatsPerBar, hitCount, drummerContext.Seed, drummerContext.Bar.BarNumber);
 
             bool isFirst = true;
             foreach (var (beat, isAccent) in positions)
@@ -87,7 +87,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
 
                 int velocityHint = GenerateVelocityHint(
                     velMin, velMax,
-                    drummerContext.BarNumber, beat,
+                    drummerContext.Bar.BarNumber, beat,
                     drummerContext.Seed);
 
                 OnsetStrength strength = isAccent ? OnsetStrength.Strong : OnsetStrength.Ghost;
@@ -97,7 +97,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,
-                    barNumber: drummerContext.BarNumber,
+                    barNumber: drummerContext.Bar.BarNumber,
                     beat: beat,
                     strength: strength,
                     score: score,
@@ -178,7 +178,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
             score *= (0.7 + 0.3 * context.EnergyLevel);
 
             // Boost near section end
-            if (context.BarsUntilSectionEnd <= 1)
+            if (context.Bar.BarsUntilSectionEnd <= 1)
                 score *= 1.1;
 
             return Math.Clamp(score, 0.0, 1.0);

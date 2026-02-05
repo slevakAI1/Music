@@ -60,7 +60,8 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
                 return false;
 
             // Section gating: only verse
-            if (context.SectionType != MusicConstants.eSectionType.Verse)
+            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            if (sectionType != MusicConstants.eSectionType.Verse)
                 return false;
 
             return true;
@@ -107,14 +108,14 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             {
                 int velocityHint = GenerateVelocityHint(
                     KickVelocityMin, KickVelocityMax,
-                    context.BarNumber, beat,
+                    context.Bar.BarNumber, beat,
                     context.Seed);
 
                 OnsetStrength strength = beat == 1.0m ? OnsetStrength.Downbeat : OnsetStrength.Strong;
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Kick,
-                    barNumber: context.BarNumber,
+                    barNumber: context.Bar.BarNumber,
                     beat: beat,
                     strength: strength,
                     score: ComputeScore(context),
@@ -131,7 +132,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
 
                 int velocityHint = GenerateVelocityHint(
                     HatVelocityMin, HatVelocityMax,
-                    context.BarNumber, beat,
+                    context.Bar.BarNumber, beat,
                     context.Seed);
 
                 // Lower score for off-beats to prefer sparse selection
@@ -141,7 +142,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
 
                 yield return CreateCandidate(
                     role: GrooveRoles.ClosedHat,
-                    barNumber: context.BarNumber,
+                    barNumber: context.Bar.BarNumber,
                     beat: beat,
                     strength: beatInt == 1 ? OnsetStrength.Downbeat : OnsetStrength.Strong,
                     score: score,

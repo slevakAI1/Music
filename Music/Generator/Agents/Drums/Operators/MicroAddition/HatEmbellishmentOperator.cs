@@ -90,7 +90,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                 int velocityHint = GenerateVelocityHint(
                     VelocityMin,
                     VelocityMax,
-                    drummerContext.BarNumber,
+                    drummerContext.Bar.BarNumber,
                     beat,
                     drummerContext.Seed);
 
@@ -99,7 +99,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
 
                 yield return CreateCandidate(
                     role: GrooveRoles.ClosedHat,
-                    barNumber: drummerContext.BarNumber,
+                    barNumber: drummerContext.Bar.BarNumber,
                     beat: beat,
                     strength: OnsetStrength.Offbeat,
                     score: Math.Clamp(score, 0.0, 1.0),
@@ -116,7 +116,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
             DrummerContext context)
         {
             // Use hash to shuffle positions deterministically
-            int hash = HashCode.Combine(context.BarNumber, context.Seed, "HatEmb");
+            int hash = HashCode.Combine(context.Bar.BarNumber, context.Seed, "HatEmb");
 
             // Simple deterministic selection: hash mod count to pick starting index
             int startIndex = Math.Abs(hash) % validPositions.Count;

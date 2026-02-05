@@ -82,14 +82,14 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
             {
                 int velocityHint = GenerateVelocityHint(
                     VelocityMin, VelocityMax,
-                    drummerContext.BarNumber, beat,
+                    drummerContext.Bar.BarNumber, beat,
                     drummerContext.Seed);
 
                 double score = ComputeScore(drummerContext, beat);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.OpenHat,
-                    barNumber: drummerContext.BarNumber,
+                    barNumber: drummerContext.Bar.BarNumber,
                     beat: beat,
                     strength: OnsetStrength.Offbeat,
                     score: score,
@@ -109,7 +109,7 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
             }
 
             // Deterministic selection based on bar/seed
-            int hash = HashCode.Combine(context.BarNumber, context.Seed, "OpenHatAccent");
+            int hash = HashCode.Combine(context.Bar.BarNumber, context.Seed, "OpenHatAccent");
             int startIndex = Math.Abs(hash) % validPositions.Count;
 
             var result = new List<decimal>(count);
@@ -126,11 +126,12 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
             double score = BaseScore;
             
             // Open hats work well in choruses and high-energy sections
-            if (context.SectionType == MusicConstants.eSectionType.Chorus)
+            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            if (sectionType == MusicConstants.eSectionType.Chorus)
                 score *= 1.15;
             
             // Section transitions can benefit from open hat emphasis
-            if (context.BarsUntilSectionEnd <= 2)
+            if (context.Bar.BarsUntilSectionEnd <= 2)
                 score *= 1.1;
             
             // Energy scaling

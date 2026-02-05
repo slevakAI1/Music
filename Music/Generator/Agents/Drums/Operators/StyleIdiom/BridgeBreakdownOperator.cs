@@ -57,7 +57,8 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
                 return false;
 
             // Section gating: only bridge
-            if (context.SectionType != MusicConstants.eSectionType.Bridge)
+            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            if (sectionType != MusicConstants.eSectionType.Bridge)
                 return false;
 
             // Need at least 4 beats for half-time pattern
@@ -122,12 +123,12 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             // Kick on beat 1 for both variants
             int velocityHint = GenerateVelocityHint(
                 KickVelocityMin, KickVelocityMax,
-                context.BarNumber, 1.0m,
+                context.Bar.BarNumber, 1.0m,
                 context.Seed);
 
             yield return CreateCandidate(
                 role: GrooveRoles.Kick,
-                barNumber: context.BarNumber,
+                barNumber: context.Bar.BarNumber,
                 beat: 1.0m,
                 strength: OnsetStrength.Downbeat,
                 score: ComputeScore(context),
@@ -138,12 +139,12 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             {
                 velocityHint = GenerateVelocityHint(
                     KickVelocityMin - 10, KickVelocityMax - 10,
-                    context.BarNumber, 3.0m,
+                    context.Bar.BarNumber, 3.0m,
                     context.Seed);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Kick,
-                    barNumber: context.BarNumber,
+                    barNumber: context.Bar.BarNumber,
                     beat: 3.0m,
                     strength: OnsetStrength.Strong,
                     score: ComputeScore(context) * 0.8,
@@ -158,12 +159,12 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             decimal snareBeat = 3.0m;
 
             int velocityHint = variant == BreakdownVariant.HalfTime
-                ? GenerateVelocityHint(SnareVelocityMin, SnareVelocityMax, context.BarNumber, snareBeat, context.Seed)
-                : GenerateVelocityHint(SnareVelocityMin - 15, SnareVelocityMax - 15, context.BarNumber, snareBeat, context.Seed);
+                ? GenerateVelocityHint(SnareVelocityMin, SnareVelocityMax, context.Bar.BarNumber, snareBeat, context.Seed)
+                : GenerateVelocityHint(SnareVelocityMin - 15, SnareVelocityMax - 15, context.Bar.BarNumber, snareBeat, context.Seed);
 
             yield return CreateCandidate(
                 role: GrooveRoles.Snare,
-                barNumber: context.BarNumber,
+                barNumber: context.Bar.BarNumber,
                 beat: snareBeat,
                 strength: OnsetStrength.Backbeat,
                 score: ComputeScore(context),
@@ -179,12 +180,12 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
             {
                 int velocityHint = GenerateVelocityHint(
                     HatVelocityMin, HatVelocityMax,
-                    context.BarNumber, beat,
+                    context.Bar.BarNumber, beat,
                     context.Seed);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.ClosedHat,
-                    barNumber: context.BarNumber,
+                    barNumber: context.Bar.BarNumber,
                     beat: beat,
                     strength: beat == 1.0m ? OnsetStrength.Downbeat : OnsetStrength.Strong,
                     score: ComputeScore(context) * 0.6,

@@ -46,7 +46,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
                 return false;
 
             // Only in last bar of section or fill window
-            if (context.BarsUntilSectionEnd > 1 && !context.IsFillWindow)
+            if (context.Bar.BarsUntilSectionEnd > 1 && !context.IsFillWindow)
                 return false;
 
             // Need at least 4 beats for "4&" position
@@ -73,14 +73,14 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
             // Generate kick on setup beat
             int kickVelocity = GenerateVelocityHint(
                 VelocityMin, VelocityMax,
-                drummerContext.BarNumber, setupBeat,
+                drummerContext.Bar.BarNumber, setupBeat,
                 drummerContext.Seed);
 
             double score = ComputeScore(drummerContext);
 
             yield return CreateCandidate(
                 role: GrooveRoles.Kick,
-                barNumber: drummerContext.BarNumber,
+                barNumber: drummerContext.Bar.BarNumber,
                 beat: setupBeat,
                 strength: OnsetStrength.Pickup,
                 score: score,
@@ -92,12 +92,12 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
             {
                 int snareVelocity = GenerateVelocityHint(
                     VelocityMin - 10, VelocityMax - 10,
-                    drummerContext.BarNumber, setupBeat + 0.01m, // Slightly different seed
+                    drummerContext.Bar.BarNumber, setupBeat + 0.01m, // Slightly different seed
                     drummerContext.Seed);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,
-                    barNumber: drummerContext.BarNumber,
+                    barNumber: drummerContext.Bar.BarNumber,
                     beat: setupBeat,
                     strength: OnsetStrength.Pickup,
                     score: score * 0.9, // Slightly lower score than kick
@@ -111,7 +111,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
             double score = BaseScore;
 
             // Higher at actual section end
-            if (context.BarsUntilSectionEnd <= 1)
+            if (context.Bar.BarsUntilSectionEnd <= 1)
                 score *= 1.2;
 
             // Energy scaling

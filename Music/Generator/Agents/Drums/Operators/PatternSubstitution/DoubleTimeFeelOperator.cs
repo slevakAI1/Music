@@ -59,7 +59,8 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
                 return false;
 
             // Best suited for high-energy sections
-            bool isSuitableSection = context.SectionType is
+            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            bool isSuitableSection = sectionType is
                 MusicConstants.eSectionType.Chorus or
                 MusicConstants.eSectionType.Solo or
                 MusicConstants.eSectionType.Outro;
@@ -109,14 +110,14 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
                 // Downbeat kick
                 int downbeatVelocity = GenerateVelocityHint(
                     KickDownbeatVelocityMin, KickDownbeatVelocityMax,
-                    context.BarNumber, beatInt,
+                    context.Bar.BarNumber, beatInt,
                     context.Seed);
 
                 OnsetStrength downbeatStrength = beatInt == 1 ? OnsetStrength.Downbeat : OnsetStrength.Strong;
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Kick,
-                    barNumber: context.BarNumber,
+                    barNumber: context.Bar.BarNumber,
                     beat: beatInt,
                     strength: downbeatStrength,
                     score: baseScore,
@@ -128,12 +129,12 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
                 {
                     int offbeatVelocity = GenerateVelocityHint(
                         KickOffbeatVelocityMin, KickOffbeatVelocityMax,
-                        context.BarNumber, offbeatPosition,
+                        context.Bar.BarNumber, offbeatPosition,
                         context.Seed);
 
                     yield return CreateCandidate(
                         role: GrooveRoles.Kick,
-                        barNumber: context.BarNumber,
+                        barNumber: context.Bar.BarNumber,
                         beat: offbeatPosition,
                         strength: OnsetStrength.Offbeat,
                         score: baseScore * 0.85, // Lower score for offbeats
@@ -152,12 +153,12 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
 
                 int snareVelocity = GenerateVelocityHint(
                     SnareVelocityMin, SnareVelocityMax,
-                    context.BarNumber, backbeat,
+                    context.Bar.BarNumber, backbeat,
                     context.Seed);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,
-                    barNumber: context.BarNumber,
+                    barNumber: context.Bar.BarNumber,
                     beat: backbeat,
                     strength: OnsetStrength.Backbeat,
                     score: baseScore,
@@ -174,7 +175,8 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
                 score += 0.15;
 
             // Boost in chorus (most natural home for double-time)
-            if (context.SectionType == MusicConstants.eSectionType.Chorus)
+            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            if (sectionType == MusicConstants.eSectionType.Chorus)
                 score += 0.1;
 
             // Higher energy = more appropriate for double-time

@@ -104,14 +104,14 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
 
                 int velocityHint = GenerateVelocityHint(
                     velMin, velMax,
-                    drummerContext.BarNumber, beat,
+                    drummerContext.Bar.BarNumber, beat,
                     drummerContext.Seed);
 
                 double score = ComputeScore(drummerContext, strength);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Kick,
-                    barNumber: drummerContext.BarNumber,
+                    barNumber: drummerContext.Bar.BarNumber,
                     beat: beat,
                     strength: strength,
                     score: score,
@@ -121,7 +121,8 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
 
         private static KickPattern SelectPattern(DrummerContext context)
         {
-            return context.SectionType switch
+            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            return sectionType switch
             {
                 // Chorus: four-on-floor for driving feel (high energy)
                 MusicConstants.eSectionType.Chorus => context.EnergyLevel >= 0.6

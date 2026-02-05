@@ -155,7 +155,7 @@ namespace Music.Generator.Agents.Drums.Operators
             if (context.MotifPresenceMap is null)
                 return 1.0;
 
-            if (!context.MotifPresenceMap.IsMotifActive(context.BarNumber))
+            if (!context.MotifPresenceMap.IsMotifActive(context.Bar.BarNumber))
                 return 1.0;
 
             // Reduction factor is how much to reduce by (e.g., 0.5 = reduce by 50%)

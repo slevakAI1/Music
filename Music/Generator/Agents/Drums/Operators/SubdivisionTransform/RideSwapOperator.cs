@@ -97,7 +97,7 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
                     
                     int velocityHint = GenerateVelocityHint(
                         velMin, velMax,
-                        drummerContext.BarNumber, beat,
+                        drummerContext.Bar.BarNumber, beat,
                         drummerContext.Seed);
 
                     double score = ComputeScore(drummerContext, isDownbeat, useBell);
@@ -107,7 +107,7 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
 
                     yield return CreateCandidate(
                         role: GrooveRoles.Ride,
-                        barNumber: drummerContext.BarNumber,
+                        barNumber: drummerContext.Bar.BarNumber,
                         beat: beat,
                         strength: strength,
                         score: score,
@@ -122,9 +122,10 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
             double score = BaseScore;
             
             // Ride swap is often used at chorus or bridge sections
-            if (context.SectionType == MusicConstants.eSectionType.Chorus)
+            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            if (sectionType == MusicConstants.eSectionType.Chorus)
                 score *= 1.2;
-            else if (context.SectionType == MusicConstants.eSectionType.Bridge)
+            else if (sectionType == MusicConstants.eSectionType.Bridge)
                 score *= 1.15;
             
             // Boost at section boundaries

@@ -91,7 +91,7 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
                     
                     int velocityHint = GenerateVelocityHint(
                         velMin, velMax,
-                        drummerContext.BarNumber, beat,
+                        drummerContext.Bar.BarNumber, beat,
                         drummerContext.Seed);
 
                     // Score increases at section transitions (verse entry, bridge)
@@ -99,7 +99,7 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
 
                     yield return CreateCandidate(
                         role: GrooveRoles.ClosedHat,
-                        barNumber: drummerContext.BarNumber,
+                        barNumber: drummerContext.Bar.BarNumber,
                         beat: beat,
                         strength: strength,
                         score: score,
@@ -113,7 +113,7 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
             double score = BaseScore;
             
             // Boost at section transitions (verse/bridge entry often drops density)
-            if (context.BarsUntilSectionEnd <= 2)
+            if (context.Bar.BarsUntilSectionEnd <= 2)
                 score *= 1.1;
             
             if (context.IsAtSectionBoundary)

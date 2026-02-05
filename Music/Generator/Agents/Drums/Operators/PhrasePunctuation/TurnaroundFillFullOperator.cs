@@ -49,7 +49,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
                 return false;
 
             // Full-bar fills are for section ends (last bar of section)
-            if (context.BarsUntilSectionEnd > 1)
+            if (context.Bar.BarsUntilSectionEnd > 1)
                 return false;
 
             return true;
@@ -72,7 +72,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
             int hitCount = ComputeHitCount(drummerContext.EnergyLevel);
 
             // Generate fill pattern spanning full bar
-            var positions = GenerateFillPositions(beatsPerBar, hitCount, drummerContext.Seed, drummerContext.BarNumber);
+            var positions = GenerateFillPositions(beatsPerBar, hitCount, drummerContext.Seed, drummerContext.Bar.BarNumber);
 
             bool isFirst = true;
             int positionCount = positions.Count();
@@ -101,7 +101,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
 
                 int velocityHint = GenerateVelocityHint(
                     velMin, velMax,
-                    drummerContext.BarNumber, beat,
+                    drummerContext.Bar.BarNumber, beat,
                     drummerContext.Seed);
 
                 OnsetStrength strength = isAccent ? OnsetStrength.Strong : OnsetStrength.Offbeat;
@@ -110,7 +110,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
 
                 yield return CreateCandidate(
                     role: role,
-                    barNumber: drummerContext.BarNumber,
+                    barNumber: drummerContext.Bar.BarNumber,
                     beat: beat,
                     strength: strength,
                     score: score,
@@ -191,7 +191,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
             score *= (0.6 + 0.4 * context.EnergyLevel);
 
             // Higher at actual section end
-            if (context.BarsUntilSectionEnd == 0)
+            if (context.Bar.BarsUntilSectionEnd == 0)
                 score *= 1.2;
 
             return Math.Clamp(score, 0.0, 1.0);
