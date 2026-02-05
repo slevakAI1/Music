@@ -3,7 +3,6 @@
 // AI: deps=Bar, GrooveRoles.
 // AI: change=Story 5.3: Simplified, removed deleted policy dependencies.
 
-using Music.Generator.Agents.Common;
 using Music.Generator.Groove;
 using Music.Generator;
 
@@ -22,15 +21,6 @@ namespace Music.Generator.Agents.Drums
 
         /// <summary>Seed for deterministic generation.</summary>
         public int Seed { get; init; } = 42;
-
-        /// <summary>Energy level for this bar (0.0-1.0).</summary>
-        public double EnergyLevel { get; init; } = 0.5;
-
-        /// <summary>Tension level for this bar (0.0-1.0).</summary>
-        public double TensionLevel { get; init; } = 0.0;
-
-        /// <summary>Motif presence score for this bar (0.0-1.0).</summary>
-        public double MotifPresenceScore { get; init; } = 0.0;
 
         /// <summary>Beats per bar (time signature numerator).</summary>
         public int BeatsPerBar { get; init; } = 4;
@@ -109,9 +99,11 @@ namespace Music.Generator.Agents.Drums
             // Determine if at section boundary (first or last bar)
             bool isAtSectionBoundary = bar.BarWithinSection == 0 || bar.BarsUntilSectionEnd == 0;
 
+            var energyLevel = DrummerContext.ResolveEnergyLevel(bar);
+
             // Determine hat mode and subdivision based on energy and overrides
-            var hatMode = ResolveHatMode(input);
-            var hatSubdivision = ResolveHatSubdivision(input);
+            var hatMode = ResolveHatMode(input, energyLevel);
+            var hatSubdivision = ResolveHatSubdivision(input, energyLevel);
 
             // Build RNG stream key
             string rngStreamKey = $"Drummer_Bar{bar.BarNumber}";
@@ -120,10 +112,7 @@ namespace Music.Generator.Agents.Drums
             {
                 // Base AgentContext fields
                 Bar = bar,
-                Beat = 1.0m,
-                EnergyLevel = input.EnergyLevel,
-                TensionLevel = input.TensionLevel,
-                MotifPresenceScore = input.MotifPresenceScore,
+                EnergyLevel = energyLevel,
                 Seed = input.Seed,
                 RngStreamKey = rngStreamKey,
 
@@ -184,14 +173,14 @@ namespace Music.Generator.Agents.Drums
         /// <summary>
         /// Resolves hat mode based on override or energy-based defaults.
         /// </summary>
-        private static HatMode ResolveHatMode(DrummerContextBuildInput input)
+        private static HatMode ResolveHatMode(DrummerContextBuildInput input, double energyLevel)
         {
             // Use explicit override if provided
             if (input.HatModeOverride.HasValue)
                 return input.HatModeOverride.Value;
 
             // Energy-based defaults: higher energy may use ride
-            if (input.EnergyLevel >= 0.8)
+            if (energyLevel >= 0.8)
                 return HatMode.Ride;
 
             return HatMode.Closed;
@@ -200,16 +189,16 @@ namespace Music.Generator.Agents.Drums
         /// <summary>
         /// Resolves hat subdivision based on override or energy-based defaults.
         /// </summary>
-        private static HatSubdivision ResolveHatSubdivision(DrummerContextBuildInput input)
+        private static HatSubdivision ResolveHatSubdivision(DrummerContextBuildInput input, double energyLevel)
         {
             // Use explicit override if provided
             if (input.HatSubdivisionOverride.HasValue)
                 return input.HatSubdivisionOverride.Value;
 
             // Energy-based defaults: higher energy uses denser subdivision
-            if (input.EnergyLevel >= 0.7)
+            if (energyLevel >= 0.7)
                 return HatSubdivision.Sixteenth;
-            if (input.EnergyLevel >= 0.3)
+            if (energyLevel >= 0.3)
                 return HatSubdivision.Eighth;
 
             return HatSubdivision.None;

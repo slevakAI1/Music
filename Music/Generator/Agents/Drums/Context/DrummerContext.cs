@@ -1,12 +1,12 @@
 // AI: purpose=Drummer-specific context extending AgentContext; immutable record for deterministic operator decisions.
-// AI: invariants=All fields immutable; bars/beats 1-based; ActiveRoles subset of GrooveRoles; BackbeatBeats valid for time signature.
-// AI: deps=AgentContext base type; GrooveRoles for role constants; MotifPresenceMap (Story 9.3); consumed by DrummerOperators and DrummerPolicyProvider.
+// AI: invariants=All fields immutable; Bar is canonical; ActiveRoles subset of GrooveRoles; BackbeatBeats valid for time signature.
+// AI: deps=AgentContext base type; MotifPresenceMap optional; GrooveRoles; consumed by DrummerOperators.
 // AI: change=Story 2.1, 9.3; extend with additional drum-specific fields as operators require; keep immutable.
 
 using Music.Generator.Agents.Common;
-using Music.Generator.Material;
 
 using Music.Generator.Groove;
+using Music.Generator.Material;
 
 namespace Music.Generator.Agents.Drums
 {
@@ -42,12 +42,26 @@ namespace Music.Generator.Agents.Drums
 
     /// <summary>
     /// Drummer-specific context extending AgentContext with drum-relevant fields.
-    /// Provides operators with information about active roles, recent hits, subdivision modes, and phrase positions.
+    /// Provides operators with information about bar context, roles, recent hits, subdivision modes, and phrase positions.
     /// Story 2.1: Define Drummer-Specific Context.
-    /// Story 9.3: Inherits MotifPresenceMap from AgentContext for motif-aware ducking.
     /// </summary>
     public sealed record DrummerContext : AgentContext
     {
+        /// <summary>
+        /// Canonical bar context for the current decisions.
+        /// </summary>
+        public required Bar Bar { get; init; }
+
+        /// <summary>
+        /// Energy level for this bar (0.0-1.0), derived from section intent.
+        /// </summary>
+        public required double EnergyLevel { get; init; }
+
+        /// <summary>
+        /// Optional motif presence map for motif-aware ducking.
+        /// </summary>
+        public MotifPresenceMap? MotifPresenceMap { get; init; }
+
         /// <summary>
         /// Which drum roles are enabled for this bar.
         /// Subset of GrooveRoles (Kick, Snare, ClosedHat, OpenHat, Crash, Ride, Tom1, Tom2, FloorTom).
@@ -109,6 +123,20 @@ namespace Music.Generator.Agents.Drums
         /// Creates a minimal DrummerContext for testing purposes.
         /// Extends AgentContext.CreateMinimal with drum-specific defaults.
         /// </summary>
+        internal static double ResolveEnergyLevel(Bar bar)
+        {
+            var sectionType = bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            return sectionType switch
+            {
+                MusicConstants.eSectionType.Chorus => 0.8,
+                MusicConstants.eSectionType.Solo => 0.7,
+                MusicConstants.eSectionType.Bridge => 0.4,
+                MusicConstants.eSectionType.Intro => 0.4,
+                MusicConstants.eSectionType.Outro => 0.5,
+                _ => 0.5
+            };
+        }
+
         public static DrummerContext CreateMinimal(
             int barNumber = 1,
             MusicConstants.eSectionType sectionType = MusicConstants.eSectionType.Verse,
@@ -130,14 +158,13 @@ namespace Music.Generator.Agents.Drums
             };
             bar.EndTick = bar.StartTick + bar.TicksPerMeasure;
 
+            var energyLevel = ResolveEnergyLevel(bar);
+
             return new DrummerContext
             {
                 // Base AgentContext fields
                 Bar = bar,
-                Beat = 1.0m,
-                EnergyLevel = 0.5,
-                TensionLevel = 0.0,
-                MotifPresenceScore = 0.0,
+                EnergyLevel = energyLevel,
                 Seed = seed,
                 RngStreamKey = $"Drummer_{barNumber}",
                 MotifPresenceMap = motifPresenceMap,

@@ -147,27 +147,11 @@ namespace Music.Generator.Agents.Common.Tests
             // Arrange & Act
             var context = new AgentContext
             {
-                BarNumber = 5,
-                Beat = 2.5m,
-                SectionType = MusicConstants.eSectionType.Chorus,
-                PhrasePosition = 0.5,
-                BarsUntilSectionEnd = 3,
-                EnergyLevel = 0.8,
-                TensionLevel = 0.3,
-                MotifPresenceScore = 0.6,
                 Seed = 42,
                 RngStreamKey = "Drum_Bar5"
             };
 
             // Assert
-            Assert.Equal(5, context.BarNumber);
-            Assert.Equal(2.5m, context.Beat);
-            Assert.Equal(MusicConstants.eSectionType.Chorus, context.SectionType);
-            Assert.Equal(0.5, context.PhrasePosition);
-            Assert.Equal(3, context.BarsUntilSectionEnd);
-            Assert.Equal(0.8, context.EnergyLevel);
-            Assert.Equal(0.3, context.TensionLevel);
-            Assert.Equal(0.6, context.MotifPresenceScore);
             Assert.Equal(42, context.Seed);
             Assert.Equal("Drum_Bar5", context.RngStreamKey);
         }
@@ -176,17 +160,9 @@ namespace Music.Generator.Agents.Common.Tests
         public void AgentContext_CreateMinimal_ReturnsValidContext()
         {
             // Act
-            var context = AgentContext.CreateMinimal(barNumber: 10, sectionType: MusicConstants.eSectionType.Bridge, seed: 123);
+            var context = AgentContext.CreateMinimal(barNumber: 10, seed: 123);
 
             // Assert
-            Assert.Equal(10, context.BarNumber);
-            Assert.Equal(1.0m, context.Beat);
-            Assert.Equal(MusicConstants.eSectionType.Bridge, context.SectionType);
-            Assert.Equal(0.0, context.PhrasePosition);
-            Assert.Equal(4, context.BarsUntilSectionEnd);
-            Assert.Equal(0.5, context.EnergyLevel);
-            Assert.Equal(0.0, context.TensionLevel);
-            Assert.Equal(0.0, context.MotifPresenceScore);
             Assert.Equal(123, context.Seed);
             Assert.Equal("Test_10", context.RngStreamKey);
         }
@@ -198,28 +174,11 @@ namespace Music.Generator.Agents.Common.Tests
             var original = AgentContext.CreateMinimal();
 
             // Act
-            var modified = original with { BarNumber = 99 };
+            var modified = original with { Seed = 99 };
 
             // Assert - original unchanged
-            Assert.Equal(1, original.BarNumber);
-            Assert.Equal(99, modified.BarNumber);
-        }
-
-        [Theory]
-        [InlineData(MusicConstants.eSectionType.Intro)]
-        [InlineData(MusicConstants.eSectionType.Verse)]
-        [InlineData(MusicConstants.eSectionType.Chorus)]
-        [InlineData(MusicConstants.eSectionType.Solo)]
-        [InlineData(MusicConstants.eSectionType.Bridge)]
-        [InlineData(MusicConstants.eSectionType.Outro)]
-        [InlineData(MusicConstants.eSectionType.Custom)]
-        public void AgentContext_AllSectionTypes_Supported(MusicConstants.eSectionType sectionType)
-        {
-            // Act
-            var context = AgentContext.CreateMinimal(sectionType: sectionType);
-
-            // Assert
-            Assert.Equal(sectionType, context.SectionType);
+            Assert.Equal(42, original.Seed);
+            Assert.Equal(99, modified.Seed);
         }
 
         #endregion

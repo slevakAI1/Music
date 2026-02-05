@@ -78,7 +78,10 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                 yield break;
 
             // Story 9.3: Get motif score multiplier (50% reduction when motif active)
-            double motifMultiplier = GetMotifScoreMultiplier(drummerContext, MotifScoreReduction);
+            double motifMultiplier = GetMotifScoreMultiplier(
+                drummerContext.MotifPresenceMap,
+                drummerContext.Bar,
+                MotifScoreReduction);
 
             // Select cluster pattern and start position deterministically
             int hash = HashCode.Combine(drummerContext.Bar.BarNumber, drummerContext.Seed, "GhostCluster");

@@ -4,7 +4,9 @@
 // AI: change=Story 3.1; extend with additional helper methods as operator patterns emerge.
 
 
+using Music.Generator;
 using Music.Generator.Groove;
+using Music.Generator.Material;
 
 namespace Music.Generator.Agents.Drums.Operators
 {
@@ -49,14 +51,10 @@ namespace Music.Generator.Agents.Drums.Operators
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            if (context is DrummerContext drummerContext)
-            {
-                return CanApply(drummerContext);
-            }
+            if (context is not DrummerContext drummerContext)
+                return false;
 
-            // Non-drummer context: check energy only
-            return context.EnergyLevel >= MinEnergyThreshold &&
-                   context.EnergyLevel <= MaxEnergyThreshold;
+            return CanApply(drummerContext);
         }
 
         /// <inheritdoc/>
@@ -147,15 +145,18 @@ namespace Music.Generator.Agents.Drums.Operators
         /// Applies motif presence score reduction. Story 9.3.
         /// Returns 1.0 if no motif is active or MotifPresenceMap is null.
         /// </summary>
-        /// <param name="context">Agent context with optional MotifPresenceMap.</param>
+        /// <param name="motifPresenceMap">Optional motif presence map for the current song.</param>
+        /// <param name="bar">Canonical bar context.</param>
         /// <param name="reductionFactor">Score reduction factor when motif active (e.g., 0.5 = 50% reduction).</param>
         /// <returns>Multiplier to apply to score (1.0 = no reduction, 0.5 = 50% of original score).</returns>
-        protected static double GetMotifScoreMultiplier(Common.AgentContext context, double reductionFactor)
+        protected static double GetMotifScoreMultiplier(MotifPresenceMap? motifPresenceMap, Bar bar, double reductionFactor)
         {
-            if (context.MotifPresenceMap is null)
+            ArgumentNullException.ThrowIfNull(bar);
+
+            if (motifPresenceMap is null)
                 return 1.0;
 
-            if (!context.MotifPresenceMap.IsMotifActive(context.Bar.BarNumber))
+            if (!motifPresenceMap.IsMotifActive(bar.BarNumber))
                 return 1.0;
 
             // Reduction factor is how much to reduce by (e.g., 0.5 = reduce by 50%)

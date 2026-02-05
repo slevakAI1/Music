@@ -69,7 +69,10 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                 yield break;
 
             // Story 9.3: Get motif score multiplier (30% reduction when motif active)
-            double motifMultiplier = GetMotifScoreMultiplier(drummerContext, MotifScoreReduction);
+            double motifMultiplier = GetMotifScoreMultiplier(
+                drummerContext.MotifPresenceMap,
+                drummerContext.Bar,
+                MotifScoreReduction);
 
             // Filter positions to those within the bar
             var validPositions = EmbellishmentPositions

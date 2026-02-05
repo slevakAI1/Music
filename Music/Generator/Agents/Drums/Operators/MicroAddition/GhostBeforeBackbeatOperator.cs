@@ -66,7 +66,10 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
                 yield break;
 
             // Story 9.3: Get motif score multiplier (20% reduction when motif active)
-            double motifMultiplier = GetMotifScoreMultiplier(drummerContext, MotifScoreReduction);
+            double motifMultiplier = GetMotifScoreMultiplier(
+                drummerContext.MotifPresenceMap,
+                drummerContext.Bar,
+                MotifScoreReduction);
 
             // Generate ghost note before each backbeat
             foreach (int backbeat in drummerContext.BackbeatBeats)

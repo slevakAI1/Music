@@ -1,9 +1,7 @@
 // AI: purpose=Shared context for all agent decisions; immutable record ensures determinism.
-// AI: invariants=Beat is 1-based; EnergyLevel/TensionLevel/MotifPresenceScore are 0.0-1.0; Bar required.
-// AI: deps=Bar for bar context; Rng system for RngStreamKey; MotifPresenceMap for ducking (Story 9.3).
+// AI: invariants=Seed and RngStreamKey are required; keep deterministic RNG stream isolation stable.
+// AI: deps=Rng system for RngStreamKey.
 // AI: change=Extend via inheritance for instrument-specific contexts (DrummerContext, GuitarContext, etc.).
-
-using Music.Generator.Material;
 
 namespace Music.Generator.Agents.Common
 {
@@ -14,33 +12,6 @@ namespace Music.Generator.Agents.Common
     /// </summary>
     public record AgentContext
     {
-        // AI: note=Bar is the single source of truth for bar context.
-        public required Bar Bar { get; init; }
-
-        /// <summary>
-        /// Current beat within the bar (1-based, can be fractional like 1.5 for eighth offbeat).
-        /// </summary>
-        public required decimal Beat { get; init; }
-
-
-        /// <summary>
-        /// Overall energy level for this moment (0.0 = minimal, 1.0 = maximum).
-        /// Derived from arrangement intent (Stage 7 energy system).
-        /// </summary>
-        public required double EnergyLevel { get; init; }
-
-        /// <summary>
-        /// Harmonic/rhythmic tension level (0.0 = resolved, 1.0 = maximum tension).
-        /// Influences operator choices for tension-building or release.
-        /// </summary>
-        public required double TensionLevel { get; init; }
-
-        /// <summary>
-        /// How busy the arrangement is at this point (0.0 = sparse, 1.0 = dense).
-        /// Derived from MotifPresenceMap; used to avoid over-cluttering.
-        /// </summary>
-        public required double MotifPresenceScore { get; init; }
-
         /// <summary>
         /// Master seed for deterministic generation.
         /// Same seed + same context = identical operator outputs.
@@ -54,45 +25,17 @@ namespace Music.Generator.Agents.Common
         public required string RngStreamKey { get; init; }
 
         /// <summary>
-        /// Optional reference to MotifPresenceMap for motif-aware ducking.
-        /// Story 9.3: When set, operators can query motif presence to reduce scores/density.
-        /// Null = no motif-aware behavior (backward compatible).
-        /// </summary>
-        public MotifPresenceMap? MotifPresenceMap { get; init; }
-
-        /// <summary>
         /// Creates a minimal context for testing purposes.
         /// All numeric values default to mid-range or zero.
         /// </summary>
         public static AgentContext CreateMinimal(
             int barNumber = 1,
-            MusicConstants.eSectionType sectionType = MusicConstants.eSectionType.Verse,
-            int seed = 42,
-            MotifPresenceMap? motifPresenceMap = null)
+            int seed = 42)
         {
-            var section = new Section { SectionType = sectionType, StartBar = 1, BarCount = 8 };
-            var bar = new Bar
-            {
-                BarNumber = barNumber,
-                Section = section,
-                BarWithinSection = Math.Max(0, barNumber - section.StartBar),
-                BarsUntilSectionEnd = Math.Max(0, section.StartBar + section.BarCount - 1 - barNumber),
-                Numerator = 4,
-                Denominator = 4,
-                StartTick = 0
-            };
-            bar.EndTick = bar.StartTick + bar.TicksPerMeasure;
-
             return new AgentContext
             {
-                Bar = bar,
-                Beat = 1.0m,
-                EnergyLevel = 0.5,
-                TensionLevel = 0.0,
-                MotifPresenceScore = 0.0,
                 Seed = seed,
-                RngStreamKey = $"Test_{barNumber}",
-                MotifPresenceMap = motifPresenceMap
+                RngStreamKey = $"Test_{barNumber}"
             };
         }
     }

@@ -143,7 +143,6 @@ namespace Music.Generator.Agents.Drums
             {
                 Bar = bar,
                 Seed = GetSeed(bar),
-                EnergyLevel = GetEnergyLevel(bar),
                 BeatsPerBar = bar.BeatsPerBar
             };
 
@@ -355,21 +354,5 @@ namespace Music.Generator.Agents.Drums
             return 42 + bar.BarNumber;
         }
 
-        /// <summary>
-        /// Derives energy level from section type.
-        /// </summary>
-        private static double GetEnergyLevel(Bar bar)
-        {
-            var sectionType = bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
-            return sectionType switch
-            {
-                MusicConstants.eSectionType.Chorus => 0.8,
-                MusicConstants.eSectionType.Solo => 0.7,
-                MusicConstants.eSectionType.Bridge => 0.4,
-                MusicConstants.eSectionType.Intro => 0.4,
-                MusicConstants.eSectionType.Outro => 0.5,
-                _ => 0.5
-            };
-        }
     }
 }
