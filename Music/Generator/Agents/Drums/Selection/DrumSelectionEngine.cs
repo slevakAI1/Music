@@ -1,9 +1,10 @@
 // AI: purpose=Select groove candidates until target count reached with pool exhaustion safety (Story C2).
 // AI: invariants=Deterministic; same seed => same selections; never exceeds target; respects anchors and caps.
-// AI: deps=DrumWeightedCandidateSelector, GrooveRngHelper for RNG; GrooveOnset for anchors; GrooveDiagnosticsCollector for G1.
+// AI: deps=Bar for context; DrumWeightedCandidateSelector, GrooveRngHelper for RNG; GrooveOnset for anchors.
 // AI: change=Story G1: Added optional diagnostics collection via GrooveDiagnosticsCollector.
 
 
+using Music.Generator;
 using Music.Generator.Agents.Common;
 using Music.Generator.Groove;
 
@@ -21,7 +22,7 @@ public static class DrumSelectionEngine
     /// Story C2: Deterministic selection with RNG, respects anchors and per-group/per-candidate caps.
     /// Story G1: Optional diagnostics collection for decision tracing.
     /// </summary>
-    /// <param name="barContext">Bar context for RNG seed derivation.</param>
+    /// <param name="bar">Bar context for RNG seed derivation.</param>
     /// <param name="role">Role name for selection.</param>
     /// <param name="groups">Candidate groups to select from (should be merged and filtered by caller).</param>
     /// <param name="targetCount">Target number of candidates to select.</param>
@@ -29,14 +30,14 @@ public static class DrumSelectionEngine
     /// <param name="diagnostics">Optional diagnostics collector for decision tracing (Story G1).</param>
     /// <returns>List of selected candidates in selection order.</returns>
     public static IReadOnlyList<DrumOnsetCandidate> SelectUntilTargetReached(
-        BarContext barContext,
+        Bar bar,
         string role,
         IReadOnlyList<DrumCandidateGroup> groups,
         int targetCount,
         IReadOnlyList<GrooveOnset> existingAnchors,
         GrooveDiagnosticsCollector? diagnostics = null)
     {
-        ArgumentNullException.ThrowIfNull(barContext);
+        ArgumentNullException.ThrowIfNull(bar);
         ArgumentException.ThrowIfNullOrWhiteSpace(role);
         ArgumentNullException.ThrowIfNull(groups);
         ArgumentNullException.ThrowIfNull(existingAnchors);
@@ -92,7 +93,7 @@ public static class DrumSelectionEngine
             var selectedCandidates = DrumWeightedCandidateSelector.SelectCandidates(
                 selectableGroups,
                 targetCount: 1,
-                barNumber: barContext.BarNumber,
+                barNumber: bar.BarNumber,
                 role: role);
 
             if (selectedCandidates.Count == 0)
@@ -122,6 +123,31 @@ public static class DrumSelectionEngine
         }
 
         return selected;
+    }
+
+    public static IReadOnlyList<DrumOnsetCandidate> SelectUntilTargetReached(
+        BarContext barContext,
+        string role,
+        IReadOnlyList<DrumCandidateGroup> groups,
+        int targetCount,
+        IReadOnlyList<GrooveOnset> existingAnchors,
+        GrooveDiagnosticsCollector? diagnostics = null)
+    {
+        ArgumentNullException.ThrowIfNull(barContext);
+
+        var bar = new Bar
+        {
+            BarNumber = barContext.BarNumber,
+            Section = barContext.Section,
+            BarWithinSection = barContext.BarWithinSection,
+            BarsUntilSectionEnd = barContext.BarsUntilSectionEnd,
+            Numerator = 4,
+            Denominator = 4,
+            StartTick = 0
+        };
+        bar.EndTick = bar.StartTick + bar.TicksPerMeasure;
+
+        return SelectUntilTargetReached(bar, role, groups, targetCount, existingAnchors, diagnostics);
     }
 
     /// <summary>

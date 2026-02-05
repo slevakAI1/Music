@@ -288,6 +288,8 @@ public int BarsUntilSectionEnd => Bar.BarsUntilSectionEnd;
 
 ### Story 6: Update DrumDensityCalculator and DrumSelectionEngine
 
+**Status:** Completed
+
 **Size:** Small (30-45 min)
 
 **Goal:** Update calculation utilities to use Bar.

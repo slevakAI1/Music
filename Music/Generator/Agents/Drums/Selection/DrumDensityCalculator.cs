@@ -1,9 +1,10 @@
 // AI: purpose=Compute density target count for drum candidate selection (moved from Groove in Story 4.3).
 // AI: invariants=Deterministic; same inputs => same output; no RNG; clamps to [0..MaxEvents].
-// AI: deps=BarContext, RoleDensityTarget, DrumPolicyDecision.
+// AI: deps=Bar for context; RoleDensityTarget, DrumPolicyDecision.
 // AI: change=Story 5.3: Simplified, removed deleted policy dependencies.
 
 
+using Music.Generator;
 using Music.Generator.Agents.Common;
 using Music.Generator.Groove;
 
@@ -31,18 +32,18 @@ namespace Music.Generator.Agents.Drums
         /// Computes the target count of candidates to select for a role in a bar.
         /// Story C1: TargetCount = round(Density01 * MaxEventsPerBar) clamped to [0..MaxEventsPerBar].
         /// </summary>
-        /// <param name="barContext">Bar context with segment profile.</param>
+        /// <param name="bar">Bar context with segment profile.</param>
         /// <param name="role">Role name (e.g., "Kick", "Snare").</param>
         /// <param name="density01">Density value [0.0..1.0].</param>
         /// <param name="maxEventsPerBar">Maximum events per bar.</param>
         /// <returns>Density result with target count and provenance information.</returns>
         public static GrooveDensityResult ComputeDensityTarget(
-            BarContext barContext,
+            Bar bar,
             string role,
             double density01 = 0.5,
             int maxEventsPerBar = 16)
         {
-            ArgumentNullException.ThrowIfNull(barContext);
+            ArgumentNullException.ThrowIfNull(bar);
             ArgumentException.ThrowIfNullOrWhiteSpace(role);
 
             // Clamp inputs
@@ -63,6 +64,29 @@ namespace Music.Generator.Agents.Drums
                 Density01Used: densityEffective,
                 MaxEventsPerBarUsed: maxEventsEffective,
                 Explanation: explanation);
+        }
+
+        public static GrooveDensityResult ComputeDensityTarget(
+            BarContext barContext,
+            string role,
+            double density01 = 0.5,
+            int maxEventsPerBar = 16)
+        {
+            ArgumentNullException.ThrowIfNull(barContext);
+
+            var bar = new Bar
+            {
+                BarNumber = barContext.BarNumber,
+                Section = barContext.Section,
+                BarWithinSection = barContext.BarWithinSection,
+                BarsUntilSectionEnd = barContext.BarsUntilSectionEnd,
+                Numerator = 4,
+                Denominator = 4,
+                StartTick = 0
+            };
+            bar.EndTick = bar.StartTick + bar.TicksPerMeasure;
+
+            return ComputeDensityTarget(bar, role, density01, maxEventsPerBar);
         }
 
 

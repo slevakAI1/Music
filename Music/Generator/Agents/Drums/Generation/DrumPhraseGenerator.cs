@@ -239,9 +239,12 @@ namespace Music.Generator.Agents.Drums
 
                 foreach (var role in activeRoles)
                 {
+                    if (!barTrack.TryGetBar(barContext.BarNumber, out var bar))
+                        continue;
+
                     // AI: disconnect=Policy; use default density targets to isolate operator behavior.
                     int targetCount = DrumDensityCalculator
-                        .ComputeDensityTarget(barContext, role)
+                        .ComputeDensityTarget(bar, role)
                         .TargetCount;
 
 
@@ -250,9 +253,6 @@ namespace Music.Generator.Agents.Drums
 
                     if (targetCount <= 0)
                         continue; // No operators needed for this bar+role
-
-                    if (!barTrack.TryGetBar(barContext.BarNumber, out var bar))
-                        continue;
 
                     // Get candidate groups from candidate source
                     var candidateGroups = _candidateSource.GetCandidateGroups(bar, role);
@@ -267,7 +267,7 @@ namespace Music.Generator.Agents.Drums
 
                     // SELECT using DrumSelectionEngine
                     var selected = DrumSelectionEngine.SelectUntilTargetReached(
-                        barContext,
+                        bar,
                         role,
                         candidateGroups,
                         targetCount,
