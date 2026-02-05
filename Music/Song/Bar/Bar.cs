@@ -1,6 +1,6 @@
-﻿// AI: purpose=Represents a musical bar; authoritative StartTick; caches timing values.
+// AI: purpose=Represents a musical bar; authoritative StartTick; caches timing values; holds section context.
 // AI: invariants=Numerator>0; Denominator!=0; StartTick init-only; caches stale if TS fields change.
-// AI: deps=MusicConstants.TicksPerQuarterNote; thread-safety=none; change=when altering TS, clear caches & notify callers.
+// AI: deps=MusicConstants.TicksPerQuarterNote; SectionTrack populates section fields; thread-safety=none.
 
 namespace Music.Generator
 {
@@ -9,6 +9,15 @@ namespace Music.Generator
     {
         // AI: logical position; no enforcement of 0/1 base; callers maintain uniqueness/order if required.
         public int BarNumber;
+
+        // AI: section context for this bar; set during BarTrack rebuild; may be null when unknown.
+        public Section? Section { get; set; }
+
+        // AI: 0-based index within section; valid when Section is set; 0 at section start.
+        public int BarWithinSection { get; set; }
+
+        // AI: bars remaining until section end; valid when Section is set; 0 at last bar.
+        public int BarsUntilSectionEnd { get; set; }
 
         // AI: authoritative start tick for events in this bar - set by RebuildFromTimingTrack()
         public long StartTick { get; set; }
@@ -36,6 +45,9 @@ namespace Music.Generator
         // AI: computed=musical beats in bar; heuristic: for 6/8,9/8,12/8 returns Numerator/3; cached.
         public int BeatsPerBar => _beatsPerBar ??= CalculateBeatsPerBar();
 
+        // AI: computed=phrase position within section [0..1]; 0 for null/short sections.
+        public double PhrasePosition => ComputePhrasePosition();
+
 
         // AI: heuristic for compound meters: if Denominator==8 and Numerator divisible by 3 and >=6, group beats by 3.
         private int CalculateBeatsPerBar()
@@ -49,6 +61,23 @@ namespace Music.Generator
 
             // Default: simple meter - beats per bar equals numerator
             return Numerator;
+        }
+
+        // AI: phrase position uses section length; returns 0.0 when section missing or single-bar.
+        private double ComputePhrasePosition()
+        {
+            if (Section == null)
+            {
+                return 0.0;
+            }
+
+            int totalBars = Section.BarCount;
+            if (totalBars <= 1)
+            {
+                return 0.0;
+            }
+
+            return (double)BarWithinSection / (totalBars - 1);
         }
     }
 }
