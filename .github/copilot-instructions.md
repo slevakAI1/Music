@@ -8,13 +8,7 @@
 - Do update the plan document source of story, only output what has been asked for.
 
 ## Response Format
-- When the request is to implement a story, do not write the summary to the Copilot chat pane, write the response to a markdown file in the Music/AIDialog folder. In the Copilot chat pane, just state it was completed and provide a clickable link to the summary file.
-- Always write story implementation summaries to C:\Users\sleva\source\repos\Music\Music\AI\Completed\.
-
-## File Output Format
-- Always write files using Windows line endings (CRLF).
-- Never mix LF and CRLF in the same file.
-- Match the repository .editorconfig and .gitattributes settings exactly.
+- When the request is to implement a story, do not write the summary to the Copilot chat pane, write story implementation summaries to C:\Users\sleva\source\repos\Music\Music\AI\Completed\.
 
 ## Documentation
 - Add/update/delete/replace documentation with ONLY compact AI-facing comments that improve future code-change accuracy. Keep comments concise and information-dense.
@@ -47,7 +41,6 @@
   - // AI: errors=throws Foo when ...; returns null when ...
   - // AI: perf=hotpath O(n); avoid alloc; cache=...
   - // AI: security=no PII logs; sanitize=...; auth=...
-  - // AI: change=when adding X, update Y and keep Z stable
 
 ### Priority of Information (only include if applicable)
 1) Invariants / “must not break” rules
