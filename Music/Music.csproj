@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -73,6 +73,7 @@
   <ItemGroup>
     <None Remove="AI\Completed\CurrentEpic_2.md" />
     <None Remove="AI\Completed\CurrentEpic_3.md" />
+    <None Remove="AI\Completed\CurrentEpic_barcontext_1.md" />
     <None Remove="AI\Completed\Done_Story_10.8.1_Technical_Debt.md" />
     <None Remove="AI\Completed\DrummerAgentEpic.md" />
     <None Remove="AI\Completed\GrooveCleanUpEpic.md" />
@@ -206,6 +207,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="AI\Completed\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />

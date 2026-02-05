@@ -4,7 +4,6 @@
 // AI: change=Extend via inheritance for instrument-specific contexts (DrummerContext, GuitarContext, etc.).
 
 using Music.Generator.Material;
-using Music.Generator;
 
 namespace Music.Generator.Agents.Common
 {
