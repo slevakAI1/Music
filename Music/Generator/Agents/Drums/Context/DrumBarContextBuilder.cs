@@ -1,11 +1,12 @@
 // AI: purpose=Builds bar context list from song structure; maps bar → section and phrase position.
 // AI: deps=SectionTrack.GetActiveSection; returns immutable list.
-// AI: change=Story 5.2: Moved from Groove namespace, removed segment profile resolution (section-awareness now in DrummerPolicyProvider).
+// AI: change=Obsolete; prefer BarTrack.RebuildFromTimingTrack to populate Bar context.
 
 using Music.Generator.Agents.Common;
 
 namespace Music.Generator.Agents.Drums
 {
+    [Obsolete("Use BarTrack.RebuildFromTimingTrack with SectionTrack to populate bar context.")]
     /// <summary>
     /// Builds drum-specific bar contexts for all bars in song.
     /// Story 5.2: Simplified from Groove.BarContextBuilder, removed segment profile logic.

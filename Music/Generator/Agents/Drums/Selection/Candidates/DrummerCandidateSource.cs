@@ -3,6 +3,7 @@
 // AI: deps=IDrumCandidateSource, DrumOperatorRegistry, DrumCandidateMapper, DrummerContextBuilder.
 // AI: change=Story 2.4, 4.2; extend with diagnostics and additional filtering as physicality system matures.
 
+using Music.Generator;
 using Music.Generator.Agents.Common;
 using Music.Generator.Groove;
 
@@ -138,9 +139,21 @@ namespace Music.Generator.Agents.Drums
         /// </summary>
         private DrummerContext BuildDrummerContext(BarContext barContext, string role)
         {
+            var bar = new Bar
+            {
+                BarNumber = barContext.BarNumber,
+                Section = barContext.Section,
+                BarWithinSection = barContext.BarWithinSection,
+                BarsUntilSectionEnd = barContext.BarsUntilSectionEnd,
+                Numerator = 4,
+                Denominator = 4,
+                StartTick = 0
+            };
+            bar.EndTick = bar.StartTick + bar.TicksPerMeasure;
+
             var input = new DrummerContextBuildInput
             {
-                BarContext = barContext,
+                Bar = bar,
                 Seed = GetSeed(barContext),
                 EnergyLevel = GetEnergyLevel(barContext),
                 BeatsPerBar = 4 // TODO: Extract from time signature when available

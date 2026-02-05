@@ -231,6 +231,8 @@ public int BarsUntilSectionEnd => Bar.BarsUntilSectionEnd;
 
 ### Story 4: Update DrummerContext and DrummerContextBuilder
 
+**Status:** Completed
+
 **Size:** Medium (45-60 min)
 
 **Goal:** Update drummer-specific context to use consolidated Bar.

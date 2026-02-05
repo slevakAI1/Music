@@ -1,10 +1,11 @@
-// AI: purpose=Builds DrummerContext from BarContext and runtime state; pure builder for determinism.
+// AI: purpose=Builds DrummerContext from Bar and runtime state; pure builder for determinism.
 // AI: invariants=Builder is stateless; same inputs produce identical DrummerContext; bars/beats 1-based.
-// AI: deps=BarContext, GrooveRoles.
+// AI: deps=Bar, GrooveRoles.
 // AI: change=Story 5.3: Simplified, removed deleted policy dependencies.
 
 using Music.Generator.Agents.Common;
 using Music.Generator.Groove;
+using Music.Generator;
 
 namespace Music.Generator.Agents.Drums
 {
@@ -14,8 +15,8 @@ namespace Music.Generator.Agents.Drums
     /// </summary>
     public sealed record DrummerContextBuildInput
     {
-        /// <summary>Per-bar groove context (section, phrase position).</summary>
-        public required BarContext BarContext { get; init; }
+        /// <summary>Per-bar context (section, phrase position).</summary>
+        public required Bar Bar { get; init; }
 
         // AI: disconnect=Policy; policy decision removed while validating operator-only phrase generation.
 
@@ -50,11 +51,11 @@ namespace Music.Generator.Agents.Drums
         public HatSubdivision? HatSubdivisionOverride { get; init; }
     }
 
-    /// <summary>
-    /// Builds DrummerContext from BarContext and related inputs.
-    /// Stateless builder ensuring deterministic output for same inputs.
-    /// Story 2.1: DrummerContextBuilder builds from DrumBarContext + policies.
-    /// </summary>
+        /// <summary>
+        /// Builds DrummerContext from Bar and related inputs.
+        /// Stateless builder ensuring deterministic output for same inputs.
+        /// Story 2.1: DrummerContextBuilder builds from DrumBarContext + policies.
+        /// </summary>
     public static class DrummerContextBuilder
     {
         /// <summary>
@@ -88,19 +89,16 @@ namespace Music.Generator.Agents.Drums
         /// </summary>
         /// <param name="input">Input configuration containing all required data.</param>
         /// <returns>Immutable DrummerContext for operator decisions.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when input or input.BarContext is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when input or input.Bar is null.</exception>
         public static DrummerContext Build(DrummerContextBuildInput input)
         {
             ArgumentNullException.ThrowIfNull(input);
-            ArgumentNullException.ThrowIfNull(input.BarContext);
+            ArgumentNullException.ThrowIfNull(input.Bar);
 
-            var barContext = input.BarContext;
+            var bar = input.Bar;
 
-            // Resolve section type from BarContext
-            var sectionType = barContext.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
-
-            // Compute phrase position (0.0 = start, 1.0 = end)
-            double phrasePosition = ComputePhrasePosition(barContext);
+            // Resolve section type from Bar
+            var sectionType = bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
 
             // Determine active roles from defaults or overrides
             var activeRoles = ResolveActiveRoles(input, sectionType);
@@ -109,23 +107,24 @@ namespace Music.Generator.Agents.Drums
             var backbeatBeats = ComputeBackbeatBeats(input.BeatsPerBar);
 
             // Determine if at section boundary (first or last bar)
-            bool isAtSectionBoundary = barContext.BarWithinSection == 0 || barContext.BarsUntilSectionEnd == 0;
+            bool isAtSectionBoundary = bar.BarWithinSection == 0 || bar.BarsUntilSectionEnd == 0;
 
             // Determine hat mode and subdivision based on energy and overrides
             var hatMode = ResolveHatMode(input);
             var hatSubdivision = ResolveHatSubdivision(input);
 
             // Build RNG stream key
-            string rngStreamKey = $"Drummer_Bar{barContext.BarNumber}";
+            string rngStreamKey = $"Drummer_Bar{bar.BarNumber}";
 
             return new DrummerContext
             {
                 // Base AgentContext fields
-                BarNumber = barContext.BarNumber,
+                Bar = bar,
+                BarNumber = bar.BarNumber,
                 Beat = 1.0m,
                 SectionType = sectionType,
-                PhrasePosition = phrasePosition,
-                BarsUntilSectionEnd = barContext.BarsUntilSectionEnd,
+                PhrasePosition = bar.PhrasePosition,
+                BarsUntilSectionEnd = bar.BarsUntilSectionEnd,
                 EnergyLevel = input.EnergyLevel,
                 TensionLevel = input.TensionLevel,
                 MotifPresenceScore = input.MotifPresenceScore,
@@ -143,23 +142,6 @@ namespace Music.Generator.Agents.Drums
                 BackbeatBeats = backbeatBeats,
                 BeatsPerBar = input.BeatsPerBar
             };
-        }
-
-        /// <summary>
-        /// Computes phrase position (0.0 at phrase start, 1.0 at phrase end).
-        /// Uses bar position within section as proxy for phrase position.
-        /// </summary>
-        private static double ComputePhrasePosition(BarContext barContext)
-        {
-            if (barContext.Section == null)
-                return 0.0;
-
-            int totalBars = barContext.Section.BarCount;
-            if (totalBars <= 1)
-                return 0.0;
-
-            // BarWithinSection is 0-based; compute position as fraction of section
-            return (double)barContext.BarWithinSection / (totalBars - 1);
         }
 
         /// <summary>

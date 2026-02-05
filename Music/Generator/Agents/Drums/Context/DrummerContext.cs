@@ -117,14 +117,28 @@ namespace Music.Generator.Agents.Drums
             IReadOnlyList<int>? backbeatBeats = null,
             MotifPresenceMap? motifPresenceMap = null)
         {
+            var section = new Section { SectionType = sectionType, StartBar = 1, BarCount = 8 };
+            var bar = new Bar
+            {
+                BarNumber = barNumber,
+                Section = section,
+                BarWithinSection = Math.Max(0, barNumber - section.StartBar),
+                BarsUntilSectionEnd = Math.Max(0, section.StartBar + section.BarCount - 1 - barNumber),
+                Numerator = 4,
+                Denominator = 4,
+                StartTick = 0
+            };
+            bar.EndTick = bar.StartTick + bar.TicksPerMeasure;
+
             return new DrummerContext
             {
                 // Base AgentContext fields
+                Bar = bar,
                 BarNumber = barNumber,
                 Beat = 1.0m,
                 SectionType = sectionType,
-                PhrasePosition = 0.0,
-                BarsUntilSectionEnd = 4,
+                PhrasePosition = bar.PhrasePosition,
+                BarsUntilSectionEnd = bar.BarsUntilSectionEnd,
                 EnergyLevel = 0.5,
                 TensionLevel = 0.0,
                 MotifPresenceScore = 0.0,
