@@ -1,6 +1,6 @@
 // AI: purpose=Generate drum track using DrumGenerator pipeline or fallback to anchor-based generation.
-// AI: deps=DrumGenerator for pipeline orchestration; DrummerAgent as data source; returns PartTrack sorted by AbsoluteTimeTicks.
-// AI: change= uses DrumGenerator pipeline with DrummerAgent; old anchor-based approach preserved as fallback.
+// AI: deps=DrumGenerator for pipeline orchestration; candidate source built from operator registry; returns PartTrack sorted by AbsoluteTimeTicks.
+// AI: change= uses DrumGenerator pipeline with operator registry + DrummerCandidateSource; old anchor-based approach preserved as fallback.
 
 using Music.Generator.Agents.Drums;
 using Music.Generator.Core;
@@ -55,7 +55,7 @@ namespace Music.Generator
 
         /// <summary>
         /// Generates drum track using DrumGenerator pipeline (Story RF-4).
-        /// Uses DrummerAgent as data source with PopRock style configuration.
+        /// Uses operator registry + DrummerCandidateSource with PopRock style configuration.
         /// </summary>
         /// <param name="songContext">Song context containing all required data.</param>
         /// <returns>Generated drum PartTrack.</returns>
@@ -63,7 +63,7 @@ namespace Music.Generator
         /// <remarks>
         /// <para>Architecture (Story RF-4):</para>
         /// <list type="bullet">
-        ///   <item>Creates DrummerAgent with PopRock style (data source)</item>
+        ///   <item>Builds operator registry + DrummerCandidateSource with PopRock style</item>
         ///   <item>Creates DrumGenerator (pipeline orchestrator)</item>
         ///   <item>Generates via proper groove system with GrooveSelectionEngine</item>
         ///   <item>Enforces density targets, operator caps, weighted selection</item>
@@ -77,9 +77,14 @@ namespace Music.Generator
             //  OK ITS USING AGENT HERE
 
 
-            // Story RF-4: Use DrumGenerator pipeline with DrummerAgent as data source
-            var agent = new DrummerAgent(StyleConfigurationLibrary.PopRock);
-            var generator = new DrumPhraseGenerator(agent.CandidateSource);
+            // Story RF-4: Use DrumGenerator pipeline with operator registry as data source
+            var registry = DrumOperatorRegistryBuilder.BuildComplete();
+            var candidateSource = new DrummerCandidateSource(
+                registry,
+                StyleConfigurationLibrary.PopRock,
+                diagnosticsCollector: null,
+                settings: null);
+            var generator = new DrumPhraseGenerator(candidateSource);
             return generator.Generate(songContext);
         }
 

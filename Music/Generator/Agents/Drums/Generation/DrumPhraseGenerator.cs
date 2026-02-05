@@ -1,6 +1,6 @@
 // AI: purpose=Generates a drum phrase (1-N bars) using operator-based variation over anchors.
 // AI: invariants=Output is a PartTrack representing a single phrase; reusable for MaterialBank storage.licy.
-// AI: deps=DrummerAgent (data source), DrumSelectionEngine, BarTrack bars, SongContext, PartTrack.
+// AI: deps=DrummerCandidateSource, DrumSelectionEngine, BarTrack bars, SongContext, PartTrack.
 // AI: change=correct architecture replaces DrummerAgent.Generate() with proper groove integration.
 
 using Music.Generator;
@@ -44,7 +44,7 @@ namespace Music.Generator.Agents.Drums
     /// <remarks>
     /// <para>Architecture:</para>
     /// <list type="bullet">
-    ///   <item>Takes policy provider + candidate source (typically DrummerAgent)</item>
+    ///   <item>Takes policy provider + candidate source (built from operator registry)</item>
     ///   <item>Extracts anchors from groove preset</item>
     ///   <item>For each bar+role: gets policy → calculates target → gets candidates → selects via DrumSelectionEngine</item>
     ///   <item>Combines anchors + selected operators → converts to MIDI</item>

@@ -2,7 +2,7 @@
 // AI: invariants=BarTrack is read-only and must NOT be rebuilt here.
 // AI: deps=MusicConstants.TicksPerQuarterNote; DrumGenerator pipeline for drum generation.
 // AI: perf=Single-run generation; avoid allocations in inner loops; use seed for deterministic results.
-// AI: change=Story RF-3 replaces DrummerAgent.Generate() with DrumGenerator pipeline architecture.
+// AI: change=Story RF-3 uses DrumPhraseGenerator pipeline when style is provided.
 
 using Music;
 using Music.Generator.Agents.Drums;
@@ -24,7 +24,7 @@ namespace Music.Generator
 
         /// <summary>
         /// Generates a drum track from the song context using the optional drummer style configuration.
-        /// Story RF-3: Wire DrumGenerator pipeline with DrummerAgent as data source.
+        /// Story RF-3: Wire DrumPhraseGenerator pipeline with operator registry + candidate source.
         /// </summary>
         /// <param name="songContext">Song context with section, groove, and timing data.</param>
         /// <param name="drummerStyle">Optional style configuration for operator-based drum generation.
@@ -35,7 +35,7 @@ namespace Music.Generator
         /// <remarks>
         /// <para>Architecture (Story RF-3):</para>
         /// <list type="bullet">
-        ///   <item>When drummerStyle is provided: Creates DrummerAgent (data source) → passes to DrumGenerator (pipeline) → uses GrooveSelectionEngine for weighted selection</item>
+        ///   <item>When drummerStyle is provided: Builds operator registry + DrummerCandidateSource → passes to DrumPhraseGenerator (pipeline) → uses GrooveSelectionEngine for weighted selection</item>
         ///   <item>When drummerStyle is null: Falls back to existing DrumTrackGenerator (anchor patterns only)</item>
         /// </list>
         /// <para>Benefits of new architecture:</para>
@@ -57,8 +57,13 @@ namespace Music.Generator
             // When drummer style is provided, use custom style; otherwise use DrumTrackGenerator's default (PopRock)
             if (drummerStyle != null)
             {
-                var agent = new DrummerAgent(drummerStyle);
-                var generator = new DrumPhraseGenerator(agent.CandidateSource);
+                var registry = DrumOperatorRegistryBuilder.BuildComplete();
+                var candidateSource = new DrummerCandidateSource(
+                    registry,
+                    drummerStyle,
+                    diagnosticsCollector: null,
+                    settings: null);
+                var generator = new DrumPhraseGenerator(candidateSource);
                 return generator.Generate(songContext, maxBars);
             }
 
