@@ -18,6 +18,8 @@ This creates:
 
 **UnitTests:** Do not write or update unit tests as part of this epic. A separate epic will address test updates after the structural changes are complete.
 
+**Implementation Summary:** Write the implementation summary to folder C:\Users\sleva\source\repos\Music\Music\AI\Completed\
+
 ---
 
 ## Current State
@@ -194,6 +196,8 @@ public record AgentContext
 ---
 
 ### Story 3: Update AgentContext to Reference Bar
+
+**Status:** Completed
 
 **Size:** Medium (45-60 min)
 

@@ -101,6 +101,9 @@
     <None Remove="AI\Completed\PreAnalysis_8.1.md" />
     <None Remove="AI\Completed\PreAnalysis_9.3.md" />
     <None Remove="AI\Completed\RefactorEpic.md" />
+    <None Remove="AI\Completed\Story1.md" />
+    <None Remove="AI\Completed\Story2.md" />
+    <None Remove="AI\Completed\Story3.3_Complete.md" />
     <None Remove="AI\Completed\Story6.3_Complete.md" />
     <None Remove="AI\Completed\Story7.2_DrumFeatureExtraction.md" />
     <None Remove="AI\Completed\Story_10.8.1_COMPLETE.md" />
@@ -197,7 +200,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="AI\Completed\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
