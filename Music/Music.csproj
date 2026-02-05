@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -112,7 +112,6 @@
     <None Remove="AI\Completed\Story7.2_DrumFeatureExtraction.md" />
     <None Remove="AI\Completed\Story7.md" />
     <None Remove="AI\Completed\Story8.md" />
-    <None Remove="AI\Completed\Story9.md" />
     <None Remove="AI\Completed\Story_10.8.1_COMPLETE.md" />
     <None Remove="AI\Completed\Story_10.8.1_Completion_Report.md" />
     <None Remove="AI\Completed\Story_10.8.2_COMPLETE.md" />
@@ -207,7 +206,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="AI\Completed\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
