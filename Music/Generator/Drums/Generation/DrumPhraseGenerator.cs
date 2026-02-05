@@ -3,6 +3,8 @@
 // AI: deps=DrummerCandidateSource, DrumSelectionEngine, BarTrack bars, SongContext, PartTrack.
 // AI: change=correct architecture replaces DrummerAgent.Generate() with proper groove integration.
 
+using Music.Generator.Core;
+using Music.Generator.Drums.Operators;
 using Music.Generator.Drums.Selection;
 using Music.Generator.Drums.Selection.Candidates;
 using Music.Generator.Groove;
@@ -70,6 +72,27 @@ namespace Music.Generator.Drums.Generation
             ArgumentNullException.ThrowIfNull(candidateSource);
 
             _candidateSource = candidateSource;
+            _settings = settings ?? DrumGeneratorSettings.Default;
+        }
+
+        /// <summary>
+        /// Creates a DrumGenerator from a style configuration by building the operator registry and candidate source.
+        /// </summary>
+        /// <param name="drummerStyle">Style configuration for operator-based generation.</param>
+        /// <param name="settings">Optional settings (diagnostics, active roles, default velocity).</param>
+        /// <exception cref="ArgumentNullException">If drummerStyle is null.</exception>
+        public DrumPhraseGenerator(
+            StyleConfiguration drummerStyle,
+            DrumGeneratorSettings? settings = null)
+        {
+            ArgumentNullException.ThrowIfNull(drummerStyle);
+
+            var registry = DrumOperatorRegistryBuilder.BuildComplete();
+            _candidateSource = new DrummerCandidateSource(
+                registry,
+                drummerStyle,
+                diagnosticsCollector: null,
+                settings: null);
             _settings = settings ?? DrumGeneratorSettings.Default;
         }
 

@@ -6,8 +6,6 @@
 
 using Music.Generator.Core;
 using Music.Generator.Drums.Generation;
-using Music.Generator.Drums.Operators;
-using Music.Generator.Drums.Selection.Candidates;
 using Music.Generator.Groove;
 
 namespace Music.Generator
@@ -57,13 +55,7 @@ namespace Music.Generator
             // When drummer style is provided, use custom style; otherwise use DrumTrackGenerator's default (PopRock)
             if (drummerStyle != null)
             {
-                var registry = DrumOperatorRegistryBuilder.BuildComplete();
-                var candidateSource = new DrummerCandidateSource(
-                    registry,
-                    drummerStyle,
-                    diagnosticsCollector: null,
-                    settings: null);
-                var generator = new DrumPhraseGenerator(candidateSource);
+                var generator = new DrumPhraseGenerator(drummerStyle);
                 return generator.Generate(songContext, maxBars);
             }
 
