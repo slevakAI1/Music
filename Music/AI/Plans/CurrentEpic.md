@@ -16,6 +16,8 @@ This creates:
 
 **Solution:** Consolidate `BarContext` properties into `Bar`, making `Bar` the single source of truth (SSOT) for all bar-related context. Remove redundant properties from `AgentContext` and eliminate `BarContext` entirely.
 
+**UnitTests:** Do not write or update unit tests as part of this epic. A separate epic will address test updates after the structural changes are complete.
+
 ---
 
 ## Current State

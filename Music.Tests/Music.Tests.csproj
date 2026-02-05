@@ -8,17 +8,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Errors\**" />
+    <Compile Remove="Generator\**" />
+    <Compile Remove="Song\**" />
+    <Compile Remove="TestFixtures\**" />
     <Compile Remove="Tests - Not Xunit must convert\**" />
+    <Compile Remove="Tests\**" />
+    <EmbeddedResource Remove="Errors\**" />
+    <EmbeddedResource Remove="Generator\**" />
+    <EmbeddedResource Remove="Song\**" />
+    <EmbeddedResource Remove="TestFixtures\**" />
     <EmbeddedResource Remove="Tests - Not Xunit must convert\**" />
+    <EmbeddedResource Remove="Tests\**" />
+    <None Remove="Errors\**" />
+    <None Remove="Generator\**" />
+    <None Remove="Song\**" />
+    <None Remove="TestFixtures\**" />
     <None Remove="Tests - Not Xunit must convert\**" />
+    <None Remove="Tests\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Generator\Agents\Drums\Performance\**" />
-    <Compile Remove="Generator\Agents\Drums\Physicality\**" />
-    <Compile Remove="Generator\Agents\Drums\Policy\**" />
-    <Compile Remove="Generator\Agents\Drums\DrummerPhysicalityTests.cs" />
-    <Compile Remove="Generator\Agents\Drums\DrummerMemoryTests.cs" />
+    <Compile Remove="TestCollections.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,10 +48,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Music\Music.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Tests\" />
   </ItemGroup>
 
 </Project>
