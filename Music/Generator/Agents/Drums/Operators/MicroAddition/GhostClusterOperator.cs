@@ -4,6 +4,7 @@
 // AI: change=Story 3.1, 9.3; adjust cluster patterns and placement based on listening tests; reduces score when motif active.
 
 
+using Music.Generator.Core;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Operators.MicroAddition
@@ -40,7 +41,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
         public override string OperatorId => "DrumGhostCluster";
 
         /// <inheritdoc/>
-        public override Common.OperatorFamily OperatorFamily => Common.OperatorFamily.MicroAddition;
+        public override OperatorFamily OperatorFamily => OperatorFamily.MicroAddition;
 
         /// <summary>
         /// Requires moderate-high energy for ghost clusters.

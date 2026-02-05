@@ -4,6 +4,7 @@
 // AI: change=Story 3.2; adjust section checks based on listening tests.
 
 
+using Music.Generator.Core;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
@@ -25,7 +26,7 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
         public override string OperatorId => "DrumHatDrop";
 
         /// <inheritdoc/>
-        public override Common.OperatorFamily OperatorFamily => Common.OperatorFamily.SubdivisionTransform;
+        public override OperatorFamily OperatorFamily => OperatorFamily.SubdivisionTransform;
 
         /// <summary>
         /// Only applies in appropriate sections (verse, bridge, intro).

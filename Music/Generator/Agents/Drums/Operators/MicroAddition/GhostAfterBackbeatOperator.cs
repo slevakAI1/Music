@@ -4,6 +4,7 @@
 // AI: change=Story 3.1, 9.3; adjust energy threshold or beat positions based on listening tests; reduces score when motif active.
 
 
+using Music.Generator.Core;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Operators.MicroAddition
@@ -29,7 +30,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
         public override string OperatorId => "DrumGhostAfterBackbeat";
 
         /// <inheritdoc/>
-        public override Common.OperatorFamily OperatorFamily => Common.OperatorFamily.MicroAddition;
+        public override OperatorFamily OperatorFamily => OperatorFamily.MicroAddition;
 
         /// <summary>
         /// Requires slightly higher energy than before-backbeat ghosts.

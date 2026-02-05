@@ -4,6 +4,7 @@
 // AI: change=Story 3.2; adjust beat positions (1&, 3&) or velocity based on listening tests.
 
 
+using Music.Generator.Core;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
@@ -26,7 +27,7 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
         public override string OperatorId => "DrumOpenHatAccent";
 
         /// <inheritdoc/>
-        public override Common.OperatorFamily OperatorFamily => Common.OperatorFamily.SubdivisionTransform;
+        public override OperatorFamily OperatorFamily => OperatorFamily.SubdivisionTransform;
 
         /// <summary>
         /// Requires moderate-high energy (>= 0.5) for open hat accents.

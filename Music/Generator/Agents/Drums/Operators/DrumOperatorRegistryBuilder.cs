@@ -8,6 +8,7 @@ using Music.Generator.Agents.Drums.Operators.SubdivisionTransform;
 using Music.Generator.Agents.Drums.Operators.PhrasePunctuation;
 using Music.Generator.Agents.Drums.Operators.PatternSubstitution;
 using Music.Generator.Agents.Drums.Operators.StyleIdiom;
+using Music.Generator.Core;
 
 namespace Music.Generator.Agents.Drums
 {
@@ -63,7 +64,7 @@ namespace Music.Generator.Agents.Drums
             sb.AppendLine($"Operator count validation failed. Expected {expected}, found {registry.Count}.");
             sb.AppendLine("Registered operators by family:");
 
-            foreach (Common.OperatorFamily family in Enum.GetValues<Common.OperatorFamily>())
+            foreach (OperatorFamily family in Enum.GetValues<OperatorFamily>())
             {
                 var ops = registry.GetOperatorsByFamily(family);
                 sb.AppendLine($"  {family}: {ops.Count} operators");

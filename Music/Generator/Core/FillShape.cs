@@ -3,7 +3,7 @@
 // AI: deps=Referenced by IAgentMemory.GetLastFillShape(); agents use to avoid repetitive fill patterns.
 // AI: change=Extend with additional fields if fill analysis needs more metadata (keep backward compat).
 
-namespace Music.Generator.Agents.Common
+namespace Music.Generator.Core
 {
     /// <summary>
     /// Describes the shape/characteristics of a fill for anti-repetition memory.

@@ -3,7 +3,7 @@
 // AI: deps=Used by AgentMemory.GetRepetitionPenalty(); affects how quickly penalty decreases with distance.
 // AI: change=Add new curves at END only to preserve ordinals.
 
-namespace Music.Generator.Agents.Common
+namespace Music.Generator.Core
 {
     /// <summary>
     /// Defines how repetition penalty decays over the memory window.

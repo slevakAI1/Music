@@ -3,6 +3,8 @@
 // AI: deps=FillShape for fill memory; MusicConstants.eSectionType for section signatures.
 // AI: change=Implement AgentMemory in Story 1.2; may add additional query methods as agent needs emerge.
 
+using Music.Generator.Core;
+
 namespace Music.Generator.Agents.Common
 {
     /// <summary>

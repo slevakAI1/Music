@@ -4,7 +4,9 @@
 // AI: perf=O(n log n) sort; greedy selection O(n); no hotpath concerns for typical candidate counts (<100).
 // AI: change=Extend with additional selection strategies (weighted random, probabilistic) if needed.
 
-namespace Music.Generator.Agents.Common
+using Music.Generator.Agents.Common;
+
+namespace Music.Generator.Core
 {
     /// <summary>
     /// Metadata wrapper for a candidate during selection.

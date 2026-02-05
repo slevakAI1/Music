@@ -6,7 +6,7 @@
 using Music.Generator.Agents.Drums.Performance;
 using Music.Generator.Groove;
 
-namespace Music.Generator.Agents.Common
+namespace Music.Generator.Core
 {
     /// <summary>
     /// Rules for rhythmic feel and timing behavior in a style.

@@ -5,8 +5,8 @@
 // AI: change=Story RF-3 replaces DrummerAgent.Generate() with DrumGenerator pipeline architecture.
 
 using Music;
-using Music.Generator.Agents.Common;
 using Music.Generator.Agents.Drums;
+using Music.Generator.Core;
 using Music.Generator.Groove;
 using Music.Song.Material;
 

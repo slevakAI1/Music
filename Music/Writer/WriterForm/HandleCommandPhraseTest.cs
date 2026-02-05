@@ -4,7 +4,7 @@
 // AI: perf=Generation may allocate; run on UI thread currently; consider backgrounding if UI stalls for large songs.
 
 using Music.Generator;
-using Music.Generator.Agents.Common;
+using Music.Generator.Core;
 using Music.Generator.Groove;
 
 namespace Music.Writer

@@ -4,6 +4,7 @@
 // AI: change=Story 3.2; adjust scoring for section types (bridges, choruses) based on listening tests.
 
 
+using Music.Generator.Core;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
@@ -25,7 +26,7 @@ namespace Music.Generator.Agents.Drums.Operators.SubdivisionTransform
         public override string OperatorId => "DrumRideSwap";
 
         /// <inheritdoc/>
-        public override Common.OperatorFamily OperatorFamily => Common.OperatorFamily.SubdivisionTransform;
+        public override OperatorFamily OperatorFamily => OperatorFamily.SubdivisionTransform;
 
         /// <summary>
         /// Requires moderate energy (>= 0.4) for ride to be musical.

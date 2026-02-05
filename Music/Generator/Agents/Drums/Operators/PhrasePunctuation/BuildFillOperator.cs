@@ -4,6 +4,7 @@
 // AI: change=Story 3.3; adjust pattern and velocity curve based on listening tests.
 
 
+using Music.Generator.Core;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
@@ -26,7 +27,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
         public override string OperatorId => FillOperatorIds.BuildFill;
 
         /// <inheritdoc/>
-        public override Common.OperatorFamily OperatorFamily => Common.OperatorFamily.PhrasePunctuation;
+        public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
         /// <summary>
         /// Requires moderate-high energy for build fills.

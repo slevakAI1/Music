@@ -3,7 +3,7 @@
 // AI: deps=Used by IMusicalOperator<T>.OperatorFamily; selection engine may weight by family.
 // AI: change=Add new values at END only to preserve existing ordinals.
 
-namespace Music.Generator.Agents.Common
+namespace Music.Generator.Core
 {
     /// <summary>
     /// Classifies musical operators by functional category.

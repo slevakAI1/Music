@@ -4,6 +4,7 @@
 // AI: change=Story 3.5; tune frequency and patterns based on listening tests.
 
 
+using Music.Generator.Core;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
@@ -36,7 +37,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
         public override string OperatorId => "DrumRockKickSyncopation";
 
         /// <inheritdoc/>
-        public override Common.OperatorFamily OperatorFamily => Common.OperatorFamily.StyleIdiom;
+        public override OperatorFamily OperatorFamily => OperatorFamily.StyleIdiom;
 
         /// <summary>
         /// Requires moderate energy for syncopation to feel natural.

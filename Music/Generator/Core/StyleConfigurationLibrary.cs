@@ -6,7 +6,7 @@
 using Music.Generator.Agents.Drums.Performance;
 using Music.Generator.Groove;
 
-namespace Music.Generator.Agents.Common
+namespace Music.Generator.Core
 {
     /// <summary>
     /// Registry of predefined style configurations.

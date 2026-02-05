@@ -4,6 +4,7 @@
 // AI: change=Story 3.1; adjust energy threshold based on listening tests.
 
 
+using Music.Generator.Core;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Operators.MicroAddition
@@ -23,7 +24,7 @@ namespace Music.Generator.Agents.Drums.Operators.MicroAddition
         public override string OperatorId => "DrumKickPickup";
 
         /// <inheritdoc/>
-        public override Common.OperatorFamily OperatorFamily => Common.OperatorFamily.MicroAddition;
+        public override OperatorFamily OperatorFamily => OperatorFamily.MicroAddition;
 
         /// <summary>
         /// Requires moderate energy for pickup to be musical.

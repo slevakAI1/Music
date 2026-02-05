@@ -2,8 +2,8 @@
 // AI: deps=DrumGenerator for pipeline orchestration; DrummerAgent as data source; returns PartTrack sorted by AbsoluteTimeTicks.
 // AI: change= uses DrumGenerator pipeline with DrummerAgent; old anchor-based approach preserved as fallback.
 
-using Music.Generator.Agents.Common;
 using Music.Generator.Agents.Drums;
+using Music.Generator.Core;
 using Music.Generator.Groove;
 using Music.MyMidi;
 

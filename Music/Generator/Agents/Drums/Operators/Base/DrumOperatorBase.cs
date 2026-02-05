@@ -5,6 +5,7 @@
 
 
 using Music.Generator;
+using Music.Generator.Core;
 using Music.Generator.Groove;
 using Music.Generator.Material;
 
@@ -21,7 +22,7 @@ namespace Music.Generator.Agents.Drums.Operators
         public abstract string OperatorId { get; }
 
         /// <inheritdoc/>
-        public abstract Common.OperatorFamily OperatorFamily { get; }
+        public abstract OperatorFamily OperatorFamily { get; }
 
         /// <summary>
         /// Required drum role for this operator. Null = no role requirement.

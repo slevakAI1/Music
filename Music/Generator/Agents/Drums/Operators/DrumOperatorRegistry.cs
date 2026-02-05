@@ -3,7 +3,7 @@
 // AI: deps=IDrumOperator, OperatorFamily, StyleConfiguration; consumed by DrummerCandidateSource.
 // AI: change=Story 2.4 stub; full implementation in Story 3.6 when operators exist.
 
-using Music.Generator.Agents.Common;
+using Music.Generator.Core;
 
 namespace Music.Generator.Agents.Drums
 {

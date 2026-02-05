@@ -4,7 +4,7 @@
 // AI: change=Story 2.4; base interface for all drum operators in Stories 3.1-3.5.
 
 using Music.Generator.Agents.Common;
-
+using Music.Generator.Core;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums

@@ -3,7 +3,7 @@
 // AI: deps=DrummerCandidateSource, DrumOperatorRegistry, StyleConfiguration.
 // AI: change=Story 8.1, 4.2; facade pattern enables integration with Generator.cs and future testing.
 
-using Music.Generator.Agents.Common;
+using Music.Generator.Core;
 
 namespace Music.Generator.Agents.Drums
 {

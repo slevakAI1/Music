@@ -4,6 +4,7 @@
 // AI: change=Story 3.3; this is a "negative space" operator that suppresses rather than generates.
 
 
+using Music.Generator.Core;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
@@ -28,7 +29,7 @@ namespace Music.Generator.Agents.Drums.Operators.PhrasePunctuation
         public override string OperatorId => FillOperatorIds.StopTime;
 
         /// <inheritdoc/>
-        public override Common.OperatorFamily OperatorFamily => Common.OperatorFamily.PhrasePunctuation;
+        public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
         /// <summary>
         /// Stop-time works best at moderate energy (too sparse at low, overwhelmed at high).

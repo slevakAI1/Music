@@ -4,6 +4,7 @@
 // AI: change=Story 3.5; crash pattern is a section signature (allowed repetition for consistency).
 
 
+using Music.Generator.Core;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
@@ -34,7 +35,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
         public override string OperatorId => "DrumPopChorusCrashPattern";
 
         /// <inheritdoc/>
-        public override Common.OperatorFamily OperatorFamily => Common.OperatorFamily.StyleIdiom;
+        public override OperatorFamily OperatorFamily => OperatorFamily.StyleIdiom;
 
         /// <summary>
         /// Crashes are most effective at moderate to high energy.

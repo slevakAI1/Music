@@ -3,7 +3,9 @@
 // AI: deps=Generic over TCandidate; agent-specific contexts extend AgentContext.
 // AI: change=Extend with additional methods if cross-cutting operator behaviors emerge.
 
-namespace Music.Generator.Agents.Common
+using Music.Generator.Agents.Common;
+
+namespace Music.Generator.Core
 {
     /// <summary>
     /// Generic interface for musical operators that generate and score candidates.

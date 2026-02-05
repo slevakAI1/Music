@@ -4,6 +4,8 @@
 // AI: perf=Circular buffer O(1) insert; usage lookup O(windowSize); sorted keys for determinism.
 // AI: change=Extend with DrummerMemory for instrument-specific tracking; keep interface stable.
 
+using Music.Generator.Core;
+
 namespace Music.Generator.Agents.Common
 {
     /// <summary>

@@ -4,6 +4,7 @@
 // AI: change=Story 3.4; adjust pattern selection and energy thresholds based on style and listening tests.
 
 
+using Music.Generator.Core;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
@@ -51,7 +52,7 @@ namespace Music.Generator.Agents.Drums.Operators.PatternSubstitution
         public override string OperatorId => "DrumKickPatternVariant";
 
         /// <inheritdoc/>
-        public override Common.OperatorFamily OperatorFamily => Common.OperatorFamily.PatternSubstitution;
+        public override OperatorFamily OperatorFamily => OperatorFamily.PatternSubstitution;
 
         /// <summary>
         /// Requires moderate energy for pattern changes.

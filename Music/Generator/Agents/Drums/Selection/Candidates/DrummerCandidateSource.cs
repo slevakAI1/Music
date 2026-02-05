@@ -4,7 +4,7 @@
 // AI: change=Story 2.4, 4.2; extend with diagnostics and additional filtering as physicality system matures.
 
 using Music.Generator;
-using Music.Generator.Agents.Common;
+using Music.Generator.Core;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums

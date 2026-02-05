@@ -4,6 +4,7 @@
 // AI: change=Story 3.5; breakdown variant (half-time vs minimal) configurable in PopRockStyleConfiguration.
 
 
+using Music.Generator.Core;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
@@ -39,7 +40,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
         public override string OperatorId => "DrumBridgeBreakdown";
 
         /// <inheritdoc/>
-        public override Common.OperatorFamily OperatorFamily => Common.OperatorFamily.StyleIdiom;
+        public override OperatorFamily OperatorFamily => OperatorFamily.StyleIdiom;
 
         /// <summary>
         /// Works at any energy level (bridges can vary widely).

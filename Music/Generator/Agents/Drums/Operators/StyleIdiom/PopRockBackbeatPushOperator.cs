@@ -4,6 +4,7 @@
 // AI: change=Story 3.5; tune timing offset ranges based on listening tests.
 
 
+using Music.Generator.Core;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
@@ -35,7 +36,7 @@ namespace Music.Generator.Agents.Drums.Operators.StyleIdiom
         public override string OperatorId => "DrumPopRockBackbeatPush";
 
         /// <inheritdoc/>
-        public override Common.OperatorFamily OperatorFamily => Common.OperatorFamily.StyleIdiom;
+        public override OperatorFamily OperatorFamily => OperatorFamily.StyleIdiom;
 
         /// <summary>
         /// Requires at least moderate energy for the push to be noticeable.
