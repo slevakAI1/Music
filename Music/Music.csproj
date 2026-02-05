@@ -71,6 +71,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="AI\Completed\2026-02-05-Story2-AgentContext-Removal.md" />
+    <None Remove="AI\Completed\2026-02-05-Story3-AgentContext-Refactor.md" />
+    <None Remove="AI\Completed\2026-02-05-Story4-Smoke-Validation.md" />
+    <None Remove="AI\Completed\CurrentEpic.md" />
     <None Remove="AI\Completed\CurrentEpic_2.md" />
     <None Remove="AI\Completed\CurrentEpic_3.md" />
     <None Remove="AI\Completed\CurrentEpic_barcontext_1.md" />
@@ -207,6 +211,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="AI\Completed\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
