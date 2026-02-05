@@ -312,6 +312,8 @@ public int BarsUntilSectionEnd => Bar.BarsUntilSectionEnd;
 
 ### Story 7: Update DrumPhraseGenerator and DrumTrackGenerator
 
+**Status:** Completed
+
 **Size:** Medium (45-60 min)
 
 **Goal:** Update generators to use consolidated Bar.
@@ -334,42 +336,7 @@ public int BarsUntilSectionEnd => Bar.BarsUntilSectionEnd;
 
 ---
 
-### Story 8: Update All Test Files
-
-**Size:** Large (2-3 hours)
-
-**Goal:** Update all test files to use Bar instead of BarContext.
-
-**Breaking Change:** NO - Test files only.
-
-**Files to Modify:**
-- `Music.Tests\Generator\Groove\DensityTargetComputationTests.cs` (55 refs)
-- `Music.Tests\Generator\Agents\Drums\DrummerContextTests.cs` (49 refs)
-- `Music.Tests\Generator\Agents\Drums\DrummerPolicyProviderTests.cs` (49 refs)
-- `Music.Tests\Generator\Groove\SelectionUntilTargetTests.cs` (40 refs)
-- `Music.Tests\Generator\Agents\Drums\DrummerAgentTests.cs` (29 refs)
-- `Music.Tests\Generator\Groove\GrooveCandidateSourceTests.cs` (28 refs)
-- `Music.Tests\Generator\Agents\Drums\DrummerCandidateSourceTests.cs` (26 refs)
-- `Music.Tests\Generator\Groove\GrooveOutputContractsTests.cs` (19 refs - many commented)
-- `Music.Tests\Generator\PhraseHookWindowResolverTests.cs` (17 refs)
-- `Music.Tests\Generator\Groove\GroovePolicyHookTests.cs` (16 refs)
-- `Music.Tests\Generator\Agents\Drums\DrummerMotifIntegrationTests.cs` (15 refs)
-- `Music.Tests\Generator\Agents\Drums\DrummerDeterminismTests.cs` (10 refs)
-- `Music.Tests\Generator\Agents\Drums\DrummerSelectionTests.cs` (6 refs)
-
-**Implementation:**
-1. Create test helper: `CreateTestBar(int barNumber, Section? section = null)` 
-2. Replace `new BarContext(...)` with `CreateTestBar(...)`
-3. Update assertions to use Bar properties
-
-**Acceptance Criteria:**
-- [ ] All tests compile
-- [ ] All tests pass
-- [ ] No BarContext usage in test files
-
----
-
-### Story 9: Delete BarContext and DrumBarContextBuilder
+### Story 8: Delete BarContext and DrumBarContextBuilder
 
 **Size:** Small (15-30 min)
 
@@ -393,7 +360,7 @@ public int BarsUntilSectionEnd => Bar.BarsUntilSectionEnd;
 
 ---
 
-### Story 10: Remove Backward-Compatibility Properties from AgentContext
+### Story 9: Remove Backward-Compatibility Properties from AgentContext
 
 **Size:** Small (30-45 min)
 
@@ -433,14 +400,14 @@ Story 3 (AgentContext refs Bar) ──┬── BREAKING ──► Story 4 (Drum
 Story 7 (Generators) ◄────────────────────────────────────────────────────┘
          │
          ▼
-Story 8 (Tests) ─────────► Story 9 (Delete BarContext) ─────► Story 10 (Cleanup AgentContext)
+Story 8 ─────► Story 9 
 ```
 
 **Breaking Changes Timeline:**
 - Stories 1-2: Additive, no breaks
 - Stories 3-6: Breaking changes, must be done together
 - Stories 7-8: Fix all consumers
-- Stories 9-10: Final cleanup
+- Stories 9: Final cleanup
 
 ---
 

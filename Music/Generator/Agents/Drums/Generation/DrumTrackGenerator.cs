@@ -38,8 +38,7 @@ namespace Music.Generator
         public bool IsProtected { get; set; }
     }
 
-    // AI: DrumBarContext removed in Story G1; replaced by shared Music.Generator.BarContext.
-    // AI: change=Use BarContext from Music.Generator namespace for cross-generator bar context.
+    // AI: Bar holds bar context; avoid reintroducing BarContext/DrumBarContext types.
 
     public static class DrumTrackGenerator
     {

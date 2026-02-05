@@ -1,9 +1,9 @@
 // AI: purpose=Generates a drum phrase (1-N bars) using operator-based variation over anchors.
 // AI: invariants=Output is a PartTrack representing a single phrase; reusable for MaterialBank storage.licy.
-// AI: deps=DrummerAgent (data source), DrumSelectionEngine, BarContextBuilder, SongContext, PartTrack.
+// AI: deps=DrummerAgent (data source), DrumSelectionEngine, BarTrack bars, SongContext, PartTrack.
 // AI: change=correct architecture replaces DrummerAgent.Generate() with proper groove integration.
 
-using Music.Generator.Agents.Common;
+using Music.Generator;
 using Music.Generator.Groove;
 using Music.MyMidi;
 
@@ -109,8 +109,7 @@ namespace Music.Generator.Agents.Drums
             // Resolve MIDI program number for drums
             int drumProgramNumber = GetDrumProgramNumber(songContext);
 
-            // Build per-bar contexts (limited to totalBars)
-            var barContexts = DrumBarContextBuilder.Build(sectionTrack, totalBars);
+            var bars = barTrack.Bars.Where(b => b.BarNumber <= totalBars).ToList();
 
             // Extract anchor onsets (foundation that's always present)
             var anchorOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars, barTrack);
@@ -120,7 +119,7 @@ namespace Music.Generator.Agents.Drums
 
 
             // Generate operator-based candidates for each bar using DrumSelectionEngine
-            var operatorOnsets = GenerateOperatorOnsets(barContexts, anchorOnsets, barTrack, totalBars);
+            var operatorOnsets = GenerateOperatorOnsets(bars, anchorOnsets, totalBars);
 
 
 
@@ -223,25 +222,21 @@ namespace Music.Generator.Agents.Drums
         }
 
         private List<GrooveOnset> GenerateOperatorOnsets(
-            IReadOnlyList<BarContext> barContexts,
+            IReadOnlyList<Bar> bars,
             List<GrooveOnset> anchors,
-            BarTrack barTrack,
             int totalBars)
         {
             var result = new List<GrooveOnset>();
             var activeRoles = _settings.GetActiveRoles();
 
             // Iterate only through bars up to totalBars (respects maxBars limit)
-            foreach (var barContext in barContexts.Where(bc => bc.BarNumber <= totalBars))
+            foreach (var bar in bars.Where(b => b.BarNumber <= totalBars))
             {
                                 // Get anchors for this bar to avoid conflicts
-                var barAnchors = anchors.Where(a => a.BarNumber == barContext.BarNumber).ToList();
+                var barAnchors = anchors.Where(a => a.BarNumber == bar.BarNumber).ToList();
 
                 foreach (var role in activeRoles)
                 {
-                    if (!barTrack.TryGetBar(barContext.BarNumber, out var bar))
-                        continue;
-
                     // AI: disconnect=Policy; use default density targets to isolate operator behavior.
                     int targetCount = DrumDensityCalculator
                         .ComputeDensityTarget(bar, role)
@@ -280,7 +275,7 @@ namespace Music.Generator.Agents.Drums
                         result.Add(new GrooveOnset
                         {
                             Role = role,
-                            BarNumber = barContext.BarNumber,
+                            BarNumber = bar.BarNumber,
                             Beat = candidate.OnsetBeat,
                             Velocity = candidate.VelocityHint ?? _settings.DefaultVelocity,
                             Strength = candidate.Strength,
