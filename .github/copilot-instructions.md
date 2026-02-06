@@ -3,9 +3,7 @@
 ## General Guidelines
 - Always use the minimum changes possible to meet each and every acceptance criteria.
 - After code is completed, ensure each individual acceptance criterion is met.
-- When implementing a story, ensure correct functionality and coverage by adding/updating/replacing/deleting unit tests as appropriate. Ensure the unit tests pass. Avoid duplicate tests. Only write tests that test code functionality, do not write tests that only test C# framework.
-- Do not create separate summary documents for story or test implementations.
-- Do update the plan document source of story, only output what has been asked for.
+- Do not update the epic containing he story, only update what has been asked for.
 
 ## Response Format
 - When the request is to implement a story, do not write the summary to the Copilot chat pane, write story implementation summaries to C:\Users\sleva\source\repos\Music\Music\AI\Completed\.
@@ -51,6 +49,6 @@
 6) Security / logging constraints
 7) Extension guidance (“if adding feature, modify these places”)
 
-## Guidance
+### Guidance
 - Assume existing comments are of good quality but they may be out of date, incomplete or potentially do not benefit AI coding.
 - Analyze nearby methods (i.e. there is a reference between the classes/methods) for context to better understand intent of the method(s) in this class.

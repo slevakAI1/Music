@@ -5,12 +5,6 @@ Remove all code references to `Music.Generator.Core.StyleConfiguration` and `Mus
 Keep drum phrase generation intact by basing everything on existing groove preset anchors + operators.
 Assume all operators are allowed (no style filtering/weights/caps).
 
-## Progress
-- Story 1 completed (breaking change applied; generator entry point no longer takes `StyleConfiguration`).
-- Story 2 completed (candidate source no longer depends on `StyleConfiguration`).
-- Story 3 completed (drum phrase generator no longer uses style configuration).
-- Stories 4-5 pending.
-
 ## Non-goals
 - No unit test updates in this epic.
 - No replacement style system.
@@ -28,7 +22,7 @@ Assume all operators are allowed (no style filtering/weights/caps).
 
 ---
 
-## Story 1: Remove style parameter from public drum generation entry points (Breaking)
+## Story 1: Remove style parameter from public drum generation entry points (Breaking)  (COMPLETED)
 ### Intent
 Stop passing `StyleConfiguration` through public drum generation APIs.
 
@@ -48,7 +42,7 @@ Stop passing `StyleConfiguration` through public drum generation APIs.
 
 ---
 
-## Story 2: Make `DrummerCandidateSource` style-free (Breaking)
+## Story 2: Make `DrummerCandidateSource` style-free (Breaking)    (COMPLETED)
 ### Intent
 Eliminate `StyleConfiguration` dependency inside candidate generation.
 
@@ -70,7 +64,7 @@ Eliminate `StyleConfiguration` dependency inside candidate generation.
 
 ---
 
-## Story 3: Update `DrumPhraseGenerator` to build candidate source without style (Fix break)
+## Story 3: Update `DrumPhraseGenerator` to build candidate source without style (Fix break)   (COMPLETED)
 ### Intent
 Keep orchestration local to `DrumPhraseGenerator` without style config.
 
@@ -87,7 +81,7 @@ Keep orchestration local to `DrumPhraseGenerator` without style config.
 
 ---
 
-## Story 4: Remove remaining references to `StyleConfigurationLibrary` in production code
+## Story 4: Remove remaining references to `StyleConfigurationLibrary` in production code  
 ### Intent
 Ensure `StyleConfigurationLibrary` is fully dereferenced from non-test code.
 
