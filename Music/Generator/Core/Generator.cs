@@ -2,10 +2,12 @@
 // AI: invariants=BarTrack is read-only and must NOT be rebuilt here.
 // AI: deps=MusicConstants.TicksPerQuarterNote; DrumGenerator pipeline for drum generation.
 // AI: perf=Single-run generation; avoid allocations in inner loops; use seed for deterministic results.
-// AI: change=Story RF-3 uses DrumPhraseGenerator pipeline when style is provided.
+// AI: change=Story 1 removes style-based entry point; Generator uses default drum pipeline.
 
 using Music.Generator.Core;
 using Music.Generator.Drums.Generation;
+using Music.Generator.Drums.Operators;
+using Music.Generator.Drums.Selection.Candidates;
 using Music.Generator.Groove;
 
 namespace Music.Generator
@@ -15,51 +17,27 @@ namespace Music.Generator
         // AI: Generate: validates harmony track before generation; fast-fail on invalid data prevents silent errors.
         // AI: behavior=Runs HarmonyValidator with default options (StrictDiatonicChordTones=true) to catch F# minor crashes.
         // AI: Story RF-3: Original signature preserved for backward compatibility; uses DrumTrackGenerator fallback.
+        // AI: behavior=Validates required tracks; uses default style config for operator pipeline.
         public static PartTrack Generate(SongContext songContext)
         {
-            return Generate(songContext, drummerStyle: null);
+            return Generate(songContext, maxBars: 0);
         }
 
-        /// <summary>
-        /// Generates a drum track from the song context using the optional drummer style configuration.
-        /// Story RF-3: Wire DrumPhraseGenerator pipeline with operator registry + candidate source.
-        /// </summary>
-        /// <param name="songContext">Song context with section, groove, and timing data.</param>
-        /// <param name="drummerStyle">Optional style configuration for operator-based drum generation.
-        /// When null, falls back to groove-only DrumTrackGenerator.</param>
-        /// <param name="maxBars">Maximum number of bars to generate. When 0 (default), generates full song.
-        /// When > 0, limits generation to first N bars.</param>
-        /// <returns>Generated drum PartTrack.</returns>
-        /// <remarks>
-        /// <para>Architecture (Story RF-3):</para>
-        /// <list type="bullet">
-        ///   <item>When drummerStyle is provided: Builds operator registry + DrummerCandidateSource → passes to DrumPhraseGenerator (pipeline) → uses GrooveSelectionEngine for weighted selection</item>
-        ///   <item>When drummerStyle is null: Falls back to existing DrumTrackGenerator (anchor patterns only)</item>
-        /// </list>
-        /// <para>Benefits of new architecture:</para>
-        /// <list type="bullet">
-        ///   <item>Enforces density targets from policy</item>
-        ///   <item>Respects operator caps and weights</item>
-        ///   <item>Uses GrooveSelectionEngine for proper weighted selection</item>
-        ///   <item>Supports operator-based generation with physicality constraints</item>
-        ///   <item>Memory system prevents robotic repetition</item>
-        /// </list>
-        /// </remarks>
-        public static PartTrack Generate(SongContext songContext, StyleConfiguration? drummerStyle, int maxBars = 0)
+        // AI: behavior=Uses PopRock defaults until style-free pipeline lands; maxBars limits phrase generator bars.
+        public static PartTrack Generate(SongContext songContext, int maxBars = 0)
         {
             ValidateSongContext(songContext);
             ValidateSectionTrack(songContext.SectionTrack);
             ValidateTimeSignatureTrack(songContext.Song.TimeSignatureTrack);
             ValidateGrooveTrack(songContext.GroovePresetDefinition);
 
-            // When drummer style is provided, use custom style; otherwise use DrumTrackGenerator's default (PopRock)
-            if (drummerStyle != null)
-            {
-                var generator = new DrumPhraseGenerator(drummerStyle);
-                return generator.Generate(songContext, maxBars);
-            }
-
-            return DrumTrackGenerator.Generate(songContext);
+            var registry = DrumOperatorRegistryBuilder.BuildComplete();
+            var candidateSource = new DrummerCandidateSource(
+                registry,
+                diagnosticsCollector: null,
+                settings: null);
+            var generator = new DrumPhraseGenerator(candidateSource);
+            return generator.Generate(songContext, maxBars);
         }
 
         // AI: purpose=Phrase-based drum track generation using MaterialBank phrases.

@@ -81,7 +81,6 @@ namespace Music.Generator.Drums.Generation
             var registry = DrumOperatorRegistryBuilder.BuildComplete();
             var candidateSource = new DrummerCandidateSource(
                 registry,
-                StyleConfigurationLibrary.PopRock,
                 diagnosticsCollector: null,
                 settings: null);
             var generator = new DrumPhraseGenerator(candidateSource);

@@ -60,7 +60,6 @@ namespace Music.Generator.Drums.Selection.Candidates
     public sealed class DrummerCandidateSource : IDrumCandidateSource
     {
         private readonly DrumOperatorRegistry _registry;
-        private readonly StyleConfiguration _styleConfig;
         private readonly GrooveDiagnosticsCollector? _diagnosticsCollector;
         private readonly DrummerCandidateSourceSettings _settings;
 
@@ -71,20 +70,16 @@ namespace Music.Generator.Drums.Selection.Candidates
         /// Creates a DrummerCandidateSource with the specified dependencies.
         /// </summary>
         /// <param name="registry">Registry of drum operators.</param>
-        /// <param name="styleConfig">Style configuration for operator filtering and weights.</param>
         /// <param name="diagnosticsCollector">Optional collector for structured diagnostics.</param>
         /// <param name="settings">Optional settings for error handling and diagnostics.</param>
         public DrummerCandidateSource(
             DrumOperatorRegistry registry,
-            StyleConfiguration styleConfig,
             GrooveDiagnosticsCollector? diagnosticsCollector = null,
             DrummerCandidateSourceSettings? settings = null)
         {
             ArgumentNullException.ThrowIfNull(registry);
-            ArgumentNullException.ThrowIfNull(styleConfig);
 
             _registry = registry;
-            _styleConfig = styleConfig;
             _diagnosticsCollector = diagnosticsCollector;
             _settings = settings ?? DrummerCandidateSourceSettings.Default;
         }
@@ -150,16 +145,13 @@ namespace Music.Generator.Drums.Selection.Candidates
         }
 
         /// <summary>
-        /// Gets enabled operators based on style and policy.
+        /// Gets enabled operators based on policy.
         /// </summary>
         private IReadOnlyList<IDrumOperator> GetEnabledOperators(Bar bar, string role)
         {
-            // Start with style-enabled operators
-            var styleEnabled = _registry.GetEnabledOperators(_styleConfig);
-
             // TODO: Apply policy allow list filtering from DrummerPolicyProvider
-            // For now, return style-enabled operators
-            return styleEnabled;
+            // For now, return all registered operators
+            return _registry.GetAllOperators();
         }
 
         /// <summary>

@@ -1,97 +1,118 @@
-# Epic: DrummerContext de-duplication and bar-derived context
+# Epic: Disconnect `StyleConfiguration` + `StyleConfigurationLibrary` from drum phrase generation
 
 ## Goal
-Remove redundant fields from `Music.Generator.Agents.Drums.Context.DrummerContext` so it contains only non-bar-derivable state, while keeping runtime behavior intact.
+Remove all code references to `Music.Generator.Core.StyleConfiguration` and `Music.Generator.Core.StyleConfigurationLibrary`.
+Keep drum phrase generation intact by basing everything on existing groove preset anchors + operators.
+Assume all operators are allowed (no style filtering/weights/caps).
 
-## Constraints
-- Minimum-change refactor; preserve behavior.
-- OK to introduce temporary breaking changes if it speeds delivery, but note them and when they get fixed.
-- Unit tests: do not add/update tests in this epic.
-- Output of this epic is structural cleanup; a later epic will address test updates.
+## Progress
+- Story 1 completed (breaking change applied; generator entry point no longer takes `StyleConfiguration`).
+- Story 2 completed (candidate source no longer depends on `StyleConfiguration`).
+- Story 3 completed (drum phrase generator no longer uses style configuration).
+- Stories 4-5 pending.
 
-## Story 1 (Breaking): Inventory DrummerContext usage and define the target contract
-**Intent:** Identify every current consumer of `DrummerContext` and classify each property as either (a) available via `Bar`/`SongContext` object graph, (b) trivially computable from `Bar`, or (c) truly cross-bar state.
+## Non-goals
+- No unit test updates in this epic.
+- No replacement style system.
+- No functional enhancements unrelated to dereferencing.
 
-**Scope / Tasks**
-1. Search repo for:
-   - `DrummerContext.` property access
-   - `new DrummerContext {` initializers
-   - `CreateMinimal(` usage
-2. Locate `SongContext`/`AgentContext` definitions and confirm which fields already exist there or are reachable from `Bar`.
-3. Produce the “new minimal DrummerContext contract”:
-   - Keep: `LastKickBeat`, `LastSnareBeat`
-   - Remove: all other drum properties currently in `DrummerContext` that are bar-derivable or reachable.
-4. Decide replacement access patterns for removed properties, e.g.:
-   - `context.Bar` and its object graph
-   - helper/extension methods already in repo (prefer reuse)
+## Current state (to validate)
+- `Generator.Generate(songContext, drummerStyle, ...)` routes to `DrumPhraseGenerator` when style is provided.
+- `DrumPhraseGenerator` constructs `DrummerCandidateSource`, which currently depends on `StyleConfiguration`.
+- `DrummerCandidateSource` uses style config for filtering and/or weighting.
 
-**Acceptance Criteria**
-- A concrete list of `DrummerContext` properties to delete and the exact replacement expression(s) per usage site.
+## Target state
+- Drum phrase generation uses `songContext.GroovePresetDefinition` anchors + operator registry.
+- Candidate generation enables all operators.
+- `StyleConfiguration` + `StyleConfigurationLibrary` remain but have zero references from production code.
 
-**Story 1 Findings (Target Contract)**
-- Keep: `Bar` (required), `LastKickBeat`, `LastSnareBeat`, plus `AgentContext.Seed`/`RngStreamKey`.
-- Remove: `EnergyLevel` (and all energy-level logic), `MotifPresenceMap`, `ActiveRoles`, `CurrentHatMode`,
-  `HatSubdivision`, `IsFillWindow`, `IsAtSectionBoundary`, `BackbeatBeats`, `BeatsPerBar`.
+---
 
-**Replacement Sources (per property usage)**
-- `EnergyLevel`:
-  - Remove entirely (no replacement). Eliminate all energy-level logic from drum generator down the stack.
-- `MotifPresenceMap`:
-  - Remove from `DrummerContext`; motif awareness already belongs in policy (`DrummerPolicyProvider`
-    takes `MotifPresenceMap`), or from song-level material systems.
-- `ActiveRoles`:
-  - Derive from groove preset anchor roles via `SongContext.GroovePresetDefinition`
-    → `GetActiveGroovePreset(bar.BarNumber).AnchorLayer.GetActiveRoles()`.
-- `CurrentHatMode` / `HatSubdivision`:
-  - Derive from bar/energy + overrides (reuse existing builder logic in new helper),
-    or from `DrummerMemory.GetHatModeAt(bar.BarNumber)` when memory drives continuity.
-- `IsFillWindow`:
-  - Derive from bar section position and policy settings; current default logic matches
-    `bar.BarsUntilSectionEnd <= DrummerPolicySettings.Default.FillWindowBars`.
-- `IsAtSectionBoundary`:
-  - Derive from `bar.BarWithinSection == 0 || bar.BarsUntilSectionEnd == 0`.
-- `BackbeatBeats`:
-  - Compute from `bar.BeatsPerBar` using existing `ComputeBackbeatBeats` logic from
-    `DrummerContextBuilder` (move helper in Story 2).
-- `BeatsPerBar`:
-  - Replace with `bar.BeatsPerBar`.
-  
+## Story 1: Remove style parameter from public drum generation entry points (Breaking)
+### Intent
+Stop passing `StyleConfiguration` through public drum generation APIs.
 
-**Notes**
-- This story intentionally allows breaking changes because the next story will do the mechanical refactor.
+### Changes
+- Modify `Music.Generator.Generator.Generate(SongContext, StyleConfiguration?, int)`:
+  - Remove the `StyleConfiguration?` parameter (or replace with a non-style primitive).
+  - Route operator-based generation without any style object.
+- Remove/adjust overloads whose purpose is only style-based routing.
 
-## Story 2: Refactor code to eliminate redundant DrummerContext properties
-**Intent:** Remove redundant properties from `DrummerContext` and update all call sites to use `Bar` / existing context sources.
+### Breaking change notes
+- Breaks callers that pass `StyleConfiguration`.
+- Fixed by providing style-free routing in Story 3.
 
-**Scope / Tasks**
-1. Edit `DrummerContext`:
-   - Delete redundant properties (everything except `Bar` (inherited/required), plus `LastKickBeat`, `LastSnareBeat`).
-   - Remove all energy-level related code (properties, helpers, defaults).
-   - Simplify `CreateMinimal` accordingly.
-2. Update all usage sites:
-   - Replace property reads with bar-derived equivalents.
-   - Replace property writes/initializers with no-ops or bar-derived sources.
-   - Remove all energy-level usage in drum generator and dependencies (operators, builders, policies, etc.).
-3. Build and run the existing smoke path (`dotnet build`, optional `dotnet run --project Music/Music.csproj --no-build`).
+### Acceptance criteria
+- No production API surface requires `StyleConfiguration`.
+- Solution builds.
 
-**Acceptance Criteria**
-- `DrummerContext` contains no redundant fields.
-- Solution builds successfully.
-- WinForms app still starts via existing smoke command.
+---
 
-## Story 3: Cleanup and documentation alignment
-**Intent:** Ensure no dead code remains and the codebase reflects the new contract.
+## Story 2: Make `DrummerCandidateSource` style-free (Breaking)
+### Intent
+Eliminate `StyleConfiguration` dependency inside candidate generation.
 
-**Scope / Tasks**
-1. Remove any now-unused constants/helpers/imports made obsolete by the refactor.
-2. Update any AI-facing comments that describe `DrummerContext` semantics to match the new minimal contract.
-3. Confirm `CreateMinimal` is still usable by existing callers (or adjust callers).
+### Changes
+- Update `Music.Generator.Drums.Selection.Candidates.DrummerCandidateSource`:
+  - Remove `_styleConfig`.
+  - Change constructor to not accept `StyleConfiguration`.
+  - Replace enabled-operator logic with “all operators enabled”.
+  - If weights/caps were used: use neutral/default behavior (no per-style multipliers).
 
-**Acceptance Criteria**
-- No references to removed `DrummerContext` properties remain.
-- Build succeeds.
+### Breaking change notes
+- Breaks existing constructors call sites.
+- Updated in Story 3.
 
-## Implementation Summary (post-epic)
-Write summary to: `Music\\AI\\Completed\\<date>-Epic-DrummerContext-Dedup.md`
-- Mention removed fields and the new access pattern (`context.Bar...`).
-- Mention any breaking changes introduced and how/when resolved within the epic.
+### Acceptance criteria
+- `DrummerCandidateSource` has zero references to `StyleConfiguration`.
+- Candidate generation still returns groups for existing operators.
+- Solution builds.
+
+---
+
+## Story 3: Update `DrumPhraseGenerator` to build candidate source without style (Fix break)
+### Intent
+Keep orchestration local to `DrumPhraseGenerator` without style config.
+
+### Changes
+- Update `Music.Generator.Drums.Generation.DrumPhraseGenerator`:
+  - Remove the style-based constructor.
+  - Build `DrumOperatorRegistry` + `DrummerCandidateSource` using the new style-free constructor.
+  - Keep anchor extraction from `songContext.GroovePresetDefinition`.
+
+### Acceptance criteria
+- `DrumPhraseGenerator` has zero references to `StyleConfiguration`.
+- `Generator` can call it without style.
+- Solution builds.
+
+---
+
+## Story 4: Remove remaining references to `StyleConfigurationLibrary` in production code
+### Intent
+Ensure `StyleConfigurationLibrary` is fully dereferenced from non-test code.
+
+### Changes
+- Search non-test projects for `StyleConfigurationLibrary` usage.
+- Replace any usage with existing genre/groove selection mechanisms.
+- Keep library code intact but unused.
+
+### Acceptance criteria
+- No non-test project references `StyleConfigurationLibrary`.
+- Solution builds.
+
+---
+
+## Story 5: Verification + cleanup (Non-breaking)
+### Intent
+Confirm epic goal is met.
+
+### Changes
+- Repo-wide search confirms zero references (production) to:
+  - `StyleConfiguration`
+  - `StyleConfigurationLibrary`
+- Remove unused `using` directives.
+- Run `dotnet build`.
+
+### Acceptance criteria
+- `dotnet build` succeeds.
+- Production code has zero references to both types.

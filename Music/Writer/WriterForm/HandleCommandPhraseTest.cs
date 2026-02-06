@@ -1,6 +1,6 @@
-// AI: purpose=Handler to test drummer agent V1-based phrase generation and add result to SongContext and UI grid.
-// AI: invariants=Uses real groove anchor pattern; passes StyleConfiguration to enable operator-based generation; mutates songContext.Song.PartTracks and Grid.
-// AI: deps=Relies on Generator.Generator.Generate with StyleConfiguration, GrooveAnchorFactory, StyleConfigurationLibrary; changing generator API breaks this.
+// AI: purpose=Handler to test drummer agent phrase generation and add result to SongContext and UI grid.
+// AI: invariants=Uses groove anchor pattern; mutates songContext.Song.PartTracks and Grid.
+// AI: deps=Relies on Generator.Generator.Generate with maxBars, GrooveAnchorFactory; keep in sync with generator API.
 // AI: perf=Generation may allocate; run on UI thread currently; consider backgrounding if UI stalls for large songs.
 
 using Music.Generator;
@@ -53,16 +53,8 @@ namespace Music.Writer
                 };
                 songContext.GroovePresetDefinition = groovePreset;
 
-                // Get StyleConfiguration for selected genre (enables drummer agent)
-                var drummerStyle = StyleConfigurationLibrary.GetStyle(genre);
-                if (drummerStyle == null)
-                {
-                    ShowError($"Style configuration not found for genre: {genre}");
-                    return;
-                }
-
                 // Generate drum track using drummer agent pipeline (bars=0 means full song, >0 limits generation)
-                var result = Generator.Generator.Generate(songContext, drummerStyle, bars);
+                var result = Generator.Generator.Generate(songContext, bars);
 
                 // Set descriptive name with seed and mark as drum set for correct playback
                 string barsInfo = bars > 0 ? $" ({bars} bars)" : "";
