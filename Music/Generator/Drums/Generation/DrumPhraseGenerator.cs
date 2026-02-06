@@ -37,22 +37,9 @@ namespace Music.Generator.Drums.Generation
         }
     }
 
-    /// <summary>
-    /// Pipeline orchestrator for drum generation using groove system integration.
-    /// Story RF-2: Creates drum tracks by properly using IDrumPolicyProvider + IDrumOperatorCandidates
-    /// with OperatorSelector for weighted selection and density enforcement.
-    /// Story 4.2: Moved interface ownership from Groove to Drums namespace.
-    /// </summary>
-    /// <remarks>
-    /// <para>Architecture:</para>
-    /// <list type="bullet">
-    ///   <item>Takes policy provider + candidate source (built from operator registry)</item>
-    ///   <item>Extracts anchors from groove preset</item>
-    ///   <item>For each bar+role: gets policy → calculates target → gets candidates → selects via OperatorSelector</item>
-    ///   <item>Combines anchors + selected operators → converts to MIDI</item>
-    /// </list>
-    /// <para>Enforces density targets, operator caps, and weighted selection per policy decisions.</para>
-    /// </remarks>
+    // AI: purpose=Orchestrates drum generation: anchors from groove + operator candidates via OperatorSelector.
+    // AI: arch=candidate source→anchors→per bar/role: policy→target→candidates→select→combine→MIDI
+    // AI: enforces=density targets, operator caps, weighted selection per policy decisions
     public sealed class DrumPhraseGenerator
     {
         private readonly IDrumOperatorCandidates _drumOperatorCandidates;
@@ -64,12 +51,6 @@ namespace Music.Generator.Drums.Generation
         {
         }
 
-        /// <summary>
-        /// Creates a DrumTrackGenerator with the specified candidate provider.
-        /// </summary>
-        /// <param name="drumOperatorCandidates">Candidate source (provides operator-generated candidates).</param>
-        /// <param name="settings">Optional settings (diagnostics, active roles, default velocity).</param>
-        /// <exception cref="ArgumentNullException">If drumOperatorcandidates is null.</exception>
         public DrumPhraseGenerator(
             IDrumOperatorCandidates drumOperatorCandidates,
             DrumGeneratorSettings? settings = null)
