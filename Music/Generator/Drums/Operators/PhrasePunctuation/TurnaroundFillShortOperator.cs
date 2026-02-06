@@ -1,12 +1,8 @@
-// AI: purpose=PhrasePunctuation operator generating 2-beat fills at phrase end (beats 3-4 in 4/4).
-// AI: invariants=Only applies when IsFillWindow=true; generates 4-8 hits based on energy; adapts to time signature.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate, DrummerMemory for anti-repetition.
-// AI: change=Story 3.3; adjust hit density and pattern selection based on listening tests.
-
-
+// AI: purpose=PhrasePunctuation: produce 2-beat turnaround fills (last 2 beats of bar) to punctuate phrases.
+// AI: invariants=Apply only when Bar.IsFillWindow true; 16th-grid positions within last 2 beats; deterministic from seed.
+// AI: deps=DrummerContext, DrumCandidate; roles map to snare primary; anti-repetition handled outside this operator.
 using Music.Generator.Core;
 using Music.Generator.Drums.Context;
-using Music.Generator.Drums.Operators;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Drums.Selection.Candidates;
@@ -14,11 +10,8 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.PhrasePunctuation
 {
-    /// <summary>
-    /// Generates a 2-beat turnaround fill at the end of phrases (beats 3-4 in 4/4).
-    /// Provides light punctuation for phrase boundaries without interrupting flow.
-    /// Story 3.3: Phrase Punctuation Operators (Boundaries &amp; Fills).
-    /// </summary>
+    // AI: purpose=Create short 2-beat fills occupying the final two beats; velocity accents on downbeats.
+    // AI: note=Positions selected deterministically from 16th grid; hitCount scales with energy; no external side-effects.
     public sealed class TurnaroundFillShortOperator : DrumOperatorBase
     {
         private const int GhostVelocityMin = 40;

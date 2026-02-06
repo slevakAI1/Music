@@ -2,12 +2,12 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Selection.Candidates;
 
-// AI: purpose=Drum-specific candidate onset for variation; may be added or used as replacement.
-// AI: invariants=OnsetBeat in 1-based quarter-note units; MaxAddsPerBar caps this candidate; ProbabilityBias in [0..1].
-// AI: deps=Music.Generator.Groove for OnsetStrength enum.
-// AI: change=Conversion methods removed (GC-4); drum candidates stand alone, no generic conversion needed.
+// AI: purpose=DrumOnsetCandidate: drum-specific onset data used by selection and groove layers.
+// AI: invariants=OnsetBeat is 1-based quarter-note units; MaxAddsPerBar caps adds; ProbabilityBias in [0,1].
+// AI: deps=Uses OnsetStrength from Music.Generator.Groove; Tags used for traceability and selection hints.
 public sealed class DrumOnsetCandidate
 {
+    // AI: contract=Mutable DTO used by selection pipeline; keep property names stable when persisting or tagging
     public string Role { get; set; } = "";
     public decimal OnsetBeat { get; set; }
     public OnsetStrength Strength { get; set; }

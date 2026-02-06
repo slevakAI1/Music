@@ -1,75 +1,21 @@
-// AI: purpose=Per-style velocity hint configuration for DrummerVelocityShaper; immutable settings record.
-// AI: invariants=All velocity values in [1..127]; FillVelocityMin <= FillVelocityMax; defaults conservative.
-// AI: deps=FillRampDirection enum; consumed by DrummerVelocityShaper; stored in StyleConfiguration.
-// AI: change=Story 6.1; add additional settings as velocity hinting requirements evolve.
-
 namespace Music.Generator.Drums.Performance
 {
-    /// <summary>
-    /// Per-style velocity hint configuration for the DrummerVelocityShaper.
-    /// Defines target velocities for each dynamic intent and fill ramp behavior.
-    /// Story 6.1: Implement Drummer Velocity Shaper.
-    /// </summary>
+    // AI: purpose=Per-style velocity hint settings for DrummerVelocityShaper; immutable record.
+    // AI: invariants=Velocities in [1..127]; FillVelocityMin <= FillVelocityMax; MaxAdjustmentDelta >= 0.
+    // AI: deps=FillRampDirection enum; persisted in StyleConfiguration; consumed by Shaper.
     public sealed record DrummerVelocityHintSettings
     {
-        /// <summary>
-        /// Target velocity for ghost notes (DynamicIntent.Low).
-        /// Default: 35 (soft but audible).
-        /// </summary>
         public int GhostVelocityTarget { get; init; } = 35;
-
-        /// <summary>
-        /// Target velocity for medium-low intensity (DynamicIntent.MediumLow).
-        /// Default: 60.
-        /// </summary>
         public int MediumLowVelocityTarget { get; init; } = 60;
-
-        /// <summary>
-        /// Target velocity for standard groove hits (DynamicIntent.Medium).
-        /// Default: 80.
-        /// </summary>
         public int MediumVelocityTarget { get; init; } = 80;
-
-        /// <summary>
-        /// Target velocity for strong accents/backbeats (DynamicIntent.StrongAccent).
-        /// Default: 100.
-        /// </summary>
         public int BackbeatVelocityTarget { get; init; } = 100;
-
-        /// <summary>
-        /// Target velocity for peak accents/crashes (DynamicIntent.PeakAccent).
-        /// Default: 115.
-        /// </summary>
         public int CrashVelocityTarget { get; init; } = 115;
-
-        /// <summary>
-        /// Minimum velocity for fill ramp patterns.
-        /// Default: 60.
-        /// </summary>
         public int FillVelocityMin { get; init; } = 60;
-
-        /// <summary>
-        /// Maximum velocity for fill ramp patterns.
-        /// Default: 110.
-        /// </summary>
         public int FillVelocityMax { get; init; } = 110;
-
-        /// <summary>
-        /// Direction of velocity ramp for fill patterns.
-        /// Default: Ascending (builds to climax).
-        /// </summary>
         public FillRampDirection FillRampDirection { get; init; } = FillRampDirection.Ascending;
-
-        /// <summary>
-        /// Maximum velocity adjustment when existing hint is present.
-        /// Preserves operator intent while nudging toward style target.
-        /// Default: 10 velocity units.
-        /// </summary>
         public int MaxAdjustmentDelta { get; init; } = 10;
 
-        /// <summary>
-        /// Default conservative settings for Pop/Rock style.
-        /// </summary>
+        // Preset: Pop/Rock conservative defaults
         public static DrummerVelocityHintSettings PopRockDefaults => new()
         {
             GhostVelocityTarget = 35,
@@ -83,9 +29,7 @@ namespace Music.Generator.Drums.Performance
             MaxAdjustmentDelta = 10
         };
 
-        /// <summary>
-        /// Default settings for Jazz style (more dynamic range, softer overall).
-        /// </summary>
+        // Preset: Jazz defaults (softer, wider pocket)
         public static DrummerVelocityHintSettings JazzDefaults => new()
         {
             GhostVelocityTarget = 30,
@@ -99,9 +43,7 @@ namespace Music.Generator.Drums.Performance
             MaxAdjustmentDelta = 8
         };
 
-        /// <summary>
-        /// Default settings for Metal style (harder, more consistent dynamics).
-        /// </summary>
+        // Preset: Metal defaults (harder, consistent dynamics)
         public static DrummerVelocityHintSettings MetalDefaults => new()
         {
             GhostVelocityTarget = 45,
@@ -115,14 +57,9 @@ namespace Music.Generator.Drums.Performance
             MaxAdjustmentDelta = 12
         };
 
-        /// <summary>
-        /// Conservative fallback defaults when no style-specific settings exist.
-        /// </summary>
         public static DrummerVelocityHintSettings ConservativeDefaults => new();
 
-        /// <summary>
-        /// Gets the target velocity for a given dynamic intent.
-        /// </summary>
+        // Get target velocity for a dynamic intent; FillRamp mapped to ramp positions.
         public int GetTargetVelocity(DynamicIntent intent)
         {
             return intent switch
@@ -139,9 +76,7 @@ namespace Music.Generator.Drums.Performance
             };
         }
 
-        /// <summary>
-        /// Computes velocity for fill ramp based on position (0.0 = start, 1.0 = end).
-        /// </summary>
+        // Compute fill ramp velocity for position [0.0..1.0] according to FillRampDirection.
         public int ComputeFillRampVelocity(double position)
         {
             position = Math.Clamp(position, 0.0, 1.0);
@@ -157,9 +92,7 @@ namespace Music.Generator.Drums.Performance
             };
         }
 
-        /// <summary>
-        /// Validates that all velocity values are in valid MIDI range [1..127].
-        /// </summary>
+        // Validate velocity ranges and invariants: MIDI range and min<=max and non-negative adjustments.
         public bool IsValid(out string? errorMessage)
         {
             if (GhostVelocityTarget < 1 || GhostVelocityTarget > 127)

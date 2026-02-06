@@ -1,12 +1,10 @@
-// AI: purpose=PhrasePunctuation operator generating crash cymbal on beat 1 at section starts.
-// AI: invariants=Only applies when IsAtSectionBoundary=true and Crash in ActiveRoles; VelocityHint in [100,127].
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.3; adjust base score or velocity based on listening tests.
+// AI: purpose=PhrasePunctuation operator: crash cymbal on beat 1 for section starts.
+// AI: invariants=Apply only when Bar.IsAtSectionBoundary && Bar.PhrasePosition near start; Crash role required.
+// AI: deps=DrummerContext, DrumCandidate, FillRole semantics; deterministic velocity from (bar,seed).
 
 
 using Music.Generator.Core;
 using Music.Generator.Drums.Context;
-using Music.Generator.Drums.Operators;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Performance;
 using Music.Generator.Drums.Planning;
@@ -15,29 +13,21 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.PhrasePunctuation
 {
-    /// <summary>
-    /// Generates a crash cymbal hit on beat 1 at section/phrase starts.
-    /// Provides clear punctuation marking transitions between sections.
-    /// Story 3.3: Phrase Punctuation Operators (Boundaries &amp; Fills).
-    /// </summary>
+    // AI: purpose=Emit crash cymbal at bar 1 for section starts; marks transitions and fill ends.
+    // AI: note=VelocityHint range [100,127]; reduced when not high energy; uses FillRole.FillEnd by convention.
     public sealed class CrashOnOneOperator : DrumOperatorBase
     {
         private const int VelocityMin = 100;
         private const int VelocityMax = 127;
         private const double BaseScore = 0.85;
 
-        /// <inheritdoc/>
         public override string OperatorId => FillOperatorIds.CrashOnOne;
 
-        /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
-        /// <summary>
-        /// Requires crash cymbal to be in active roles.
-        /// </summary>
+        // Requires crash cymbal to be an active role in the groove preset.
         protected override string? RequiredRole => GrooveRoles.Crash;
 
-        /// <inheritdoc/>
         public override bool CanApply(DrummerContext context)
         {
             if (!base.CanApply(context))
@@ -59,7 +49,7 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
             return true;
         }
 
-        /// <inheritdoc/>
+        // Generate a single crash candidate at beat 1 when at section start. Use deterministic velocity hint.
         public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
         {
             ArgumentNullException.ThrowIfNull(context);

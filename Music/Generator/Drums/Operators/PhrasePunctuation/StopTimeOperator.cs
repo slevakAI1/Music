@@ -1,12 +1,8 @@
-// AI: purpose=PhrasePunctuation operator creating brief dropout (hats off for 2 beats) for emphasis.
-// AI: invariants=Generates NO candidates during dropout beats; signals thinning through absence.
-// AI: deps=DrumOperatorBase, DrummerContext; downstream interprets fewer candidates as natural thinning.
-// AI: change=Story 3.3; this is a "negative space" operator that suppresses rather than generates.
-
-
+// AI: purpose=PhrasePunctuation operator creating brief dropout (sparse accents) to emphasize transitions.
+// AI: invariants=During dropout generate only sparse accents (kick/snare); absence of hats produces "dropout".
+// AI: deps=DrummerContext; downstream systems interpret fewer candidates as thinning; deterministic from seed.
 using Music.Generator.Core;
 using Music.Generator.Drums.Context;
-using Music.Generator.Drums.Operators;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Drums.Selection.Candidates;
@@ -14,16 +10,8 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.PhrasePunctuation
 {
-    /// <summary>
-    /// Creates a brief stop-time effect by NOT generating candidates during fill window.
-    /// This operator generates a minimal accent pattern, leaving space for musical breath.
-    /// Story 3.3: Phrase Punctuation Operators (Boundaries &amp; Fills).
-    /// </summary>
-    /// <remarks>
-    /// Stop-time works by providing sparse accents only (kick on 1, snare on 3 if 4/4),
-    /// allowing the natural thinning of the groove during fill windows.
-    /// Downstream systems interpret fewer total candidates as the "dropout" effect.
-    /// </remarks>
+    // AI: purpose=Emit sparse accents (kick on 1, optional snare on 3) during fill windows to create stop-time.
+    // AI: note=Produces no hat candidates; keep behavior deterministic and minimal; use FillRole.None for accents.
     public sealed class StopTimeOperator : DrumOperatorBase
     {
         private const int VelocityMin = 90;
@@ -36,20 +24,10 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
         /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
-        /// <summary>
-        /// Stop-time works best at moderate energy (too sparse at low, overwhelmed at high).
-        /// </summary>
-
-        /// <summary>
-        /// Stop-time works best at moderate energy (too sparse at low, overwhelmed at high).
-        /// </summary>
-
-        /// <summary>
-        /// Requires kick for accent hits.
-        /// </summary>
+        // Requires kick role for accents; snare optional. Energy gating is handled by selector/policy.
         protected override string? RequiredRole => GrooveRoles.Kick;
 
-        /// <inheritdoc/>
+        // CanApply: apply only in fill windows with at least 3 beats to make stop-time musical.
         public override bool CanApply(DrummerContext context)
         {
             if (!base.CanApply(context))
@@ -66,7 +44,7 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
             return true;
         }
 
-        /// <inheritdoc/>
+        // Generate sparse accents (kick on 1, optional snare on 3) to create a dropout; no hat candidates emitted.
         public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
         {
             ArgumentNullException.ThrowIfNull(context);

@@ -1,7 +1,6 @@
-// AI: purpose=PatternSubstitution operator generating half-time feel (snare on 3 only, sparse kicks).
-// AI: invariants=Only applies at low-moderate energy; generates coordinated snare+kick pattern; mutually exclusive with DoubleTimeFeel.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.4; adjust energy threshold and pattern based on style and listening tests.
+// AI: purpose=PatternSubstitution: apply half-time feel (snare on beat 3, sparse kicks) for contrast.
+// AI: invariants=Intended for low-moderate energy sections; uses Bar.BeatsPerBar and Bar.BackbeatBeats.
+// AI: deps=DrummerContext, DrumCandidate; deterministic from (barNumber, seed); avoid high-energy misuse.
 
 
 using Music.Generator.Core;
@@ -12,19 +11,8 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.PatternSubstitution
 {
-    /// <summary>
-    /// Generates half-time feel pattern where the snare lands on beat 3 only
-    /// (instead of standard backbeats on 2 and 4) creating a slower, heavier feel.
-    /// Story 3.4: Pattern Substitution Operators (Groove Swaps).
-    /// </summary>
-    /// <remarks>
-    /// Half-time feel characteristics:
-    /// - Snare on beat 3 only (not 2 and 4)
-    /// - Kick pattern is sparse (1 and 3)
-    /// - Creates perception of half the tempo
-    /// Best used in bridges, breakdowns, or for dynamic contrast.
-    /// Mutually exclusive with DoubleTimeFeelOperator (enforced via energy thresholds).
-    /// </remarks>
+    // AI: purpose=Generate half-time feel: snare on 3, sparse kicks to create heavy, slower feel.
+    // AI: note=Best in bridge/breakdown/verse for contrast; score computed to prefer section starts/boundaries.
     public sealed class HalfTimeFeelOperator : DrumOperatorBase
     {
         private const int SnareVelocityMin = 95;
@@ -33,28 +21,14 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
         private const int KickVelocityMax = 110;
         private const double BaseScore = 0.45; // Lower for sparing use
 
-        /// <inheritdoc/>
         public override string OperatorId => "DrumHalfTimeFeel";
 
-        /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.PatternSubstitution;
 
-        /// <summary>
-        /// Requires low-to-moderate energy for half-time feel.
-        /// Higher energy should use standard or double-time feel.
-        /// </summary>
-
-        /// <summary>
-        /// Maximum energy threshold - half-time is inappropriate at high energy.
-        /// This creates mutual exclusion with DoubleTimeFeel (which requires >= 0.6).
-        /// </summary>
-
-        /// <summary>
-        /// Requires snare role for half-time backbeat.
-        /// </summary>
+        // Requires snare role; half-time best at lower energy. Mutual exclusion with double-time handled elsewhere.
         protected override string? RequiredRole => GrooveRoles.Snare;
 
-        /// <inheritdoc/>
+        // CanApply: ensure bar length and suitable section types for half-time feel.
         public override bool CanApply(DrummerContext context)
         {
             if (!base.CanApply(context))
@@ -79,7 +53,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
             return true;
         }
 
-        /// <inheritdoc/>
+        // Generate snare on beat 3 and complementary sparse kick pattern; deterministic via (bar,seed).
         public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -105,6 +79,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
             }
         }
 
+        // Create snare candidate at specified beat with deterministic velocity hint.
         private DrumCandidate CreateSnareCandidate(DrummerContext context, int beat, double baseScore)
         {
             int velocityHint = GenerateVelocityHint(
@@ -121,6 +96,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
                 velocityHint: velocityHint);
         }
 
+        // Generate complementary kick candidates for half-time feel (beat 1 and optional 3).
         private IEnumerable<DrumCandidate> GenerateKickPattern(DrummerContext context, double baseScore)
         {
             // Half-time kick: beat 1 always, beat 3 optional based on energy
@@ -155,6 +131,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
             }
         }
 
+        // Compute operator score: boost at boundaries/bridge; scale by low-energy preference.
         private double ComputeScore(DrummerContext context)
         {
             double score = BaseScore;

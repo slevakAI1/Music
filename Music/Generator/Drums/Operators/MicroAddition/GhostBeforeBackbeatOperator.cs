@@ -1,7 +1,6 @@
-// AI: purpose=MicroAddition operator generating ghost snare notes just before backbeats (1.75→2, 3.75→4).
-// AI: invariants=VelocityHint in [30,50]; only applies when Snare in ActiveRoles 
+// AI: purpose=MicroAddition operator generating ghost snare notes just before backbeats (e.g., 1.75→2).
+// AI: invariants=VelocityHint in [30,50]; uses Bar.BackbeatBeats; skips ghosts outside valid 16th grid.
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.1, 9.3; adjust energy threshold or beat positions based on listening tests; reduces score when motif active.
 
 
 using Music.Generator.Core;
@@ -12,36 +11,22 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.MicroAddition
 {
-    /// <summary>
-    /// Generates ghost snare notes just before backbeats (beats 2 and 4 in 4/4).
-    /// Places ghost notes at 1.75 and 3.75 to lead into the backbeat.
-    /// Story 3.1: Micro-Addition Operators (Ghost Notes &amp; Embellishments).
-    /// Story 9.3: Reduces score by 20% when motif is active.
-    /// </summary>
+    // Generate ghost snare notes immediately before backbeats (quarter before backbeat).
+    // Score reduced by motif multiplier when motif active; motif map not present in context here.
     public sealed class GhostBeforeBackbeatOperator : DrumOperatorBase
     {
         private const int VelocityMin = 30;
         private const int VelocityMax = 50;
         private const double BaseScore = 0.7;
 
-        /// <summary>
-        /// Story 9.3: Score reduction when motif is active (20% = 0.2).
-        /// </summary>
+        // Fractional score reduction to apply when motif is active (e.g., 0.2 = -20%).
         private const double MotifScoreReduction = 0.2;
 
-        /// <inheritdoc/>
         public override string OperatorId => "DrumGhostBeforeBackbeat";
 
-        /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.MicroAddition;
 
-        /// <summary>
-        /// Requires minimum energy of 0.3 for ghost notes to be musical.
-        /// </summary>
-
-        /// <summary>
-        /// Requires snare to be in active roles.
-        /// </summary>
+        // Requires snare role active; operator expects backbeat beats defined in Bar.BackbeatBeats.
         protected override string? RequiredRole => GrooveRoles.Snare;
 
         /// <inheritdoc/>
@@ -57,7 +42,8 @@ namespace Music.Generator.Drums.Operators.MicroAddition
             return true;
         }
 
-        /// <inheritdoc/>
+        // Generate ghost snare candidates immediately before each backbeat (0.25 beats before).
+        // Skip ghosts that would fall before beat 1 or outside valid 16th grid positions.
         public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -68,9 +54,9 @@ namespace Music.Generator.Drums.Operators.MicroAddition
             if (!CanApply(drummerContext))
                 yield break;
 
-            // Story 9.3: Get motif score multiplier (20% reduction when motif active)
+            // Compute motif multiplier; motif map not available in context so pass null.
             double motifMultiplier = GetMotifScoreMultiplier(
-                null /* motif map removed from context */,
+                null,
                 drummerContext.Bar,
                 MotifScoreReduction);
 

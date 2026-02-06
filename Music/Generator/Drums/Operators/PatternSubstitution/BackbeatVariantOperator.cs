@@ -1,7 +1,6 @@
-// AI: purpose=PatternSubstitution operator generating backbeat articulation variants (flam, rimshot, sidestick).
-// AI: invariants=Only applies when Snare in ActiveRoles; generates backbeat candidates with articulation hints.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate, DrumArticulation; registered in DrumOperatorRegistry.
-// AI: change=Story 3.4; adjust articulation selection and energy thresholds based on style and listening tests.
+// AI: purpose=Produce backbeat articulation variants (flam, rimshot, sidestick) to vary snare tone.
+// AI: invariants=Uses Bar.BackbeatBeats; applies only when Snare role active; deterministic selection by (bar,seed).
+// AI: deps=DrummerContext, DrumArticulation, DrumCandidate; integrates with Groove section types for selection.
 
 
 using Music.Generator.Core;
@@ -13,18 +12,8 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.PatternSubstitution
 {
-    /// <summary>
-    /// Generates backbeat articulation variants (flam, rimshot, sidestick) to provide
-    /// section character through snare sound changes rather than pattern changes.
-    /// Story 3.4: Pattern Substitution Operators (Groove Swaps).
-    /// </summary>
-    /// <remarks>
-    /// Articulation selection is section-aware:
-    /// - Verse: SideStick for lighter feel
-    /// - Chorus: Rimshot for power and cut
-    /// - Bridge: Normal or Flam for texture variation
-    /// Pattern substitution operators have lower base scores to encourage sparing use.
-    /// </remarks>
+    // AI: purpose=Generate alternative snare articulations for backbeat hits to change section character.
+    // AI: note=Selection is section-aware (verse/chorus/bridge/etc.); lower base score to encourage sparing use.
     public sealed class BackbeatVariantOperator : DrumOperatorBase
     {
         private const int SideStickVelocityMin = 60;
@@ -35,22 +24,13 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
         private const int FlamVelocityMax = 105;
         private const double BaseScore = 0.5; // Lower than MicroAddition for sparing use
 
-        /// <inheritdoc/>
         public override string OperatorId => "DrumBackbeatVariant";
 
-        /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.PatternSubstitution;
 
-        /// <summary>
-        /// Requires moderate energy for articulation changes to be noticeable.
-        /// </summary>
-
-        /// <summary>
-        /// Requires snare role for backbeat hits.
-        /// </summary>
+        // Requires snare role active; articulation changes intended for audible section-level effect.
         protected override string? RequiredRole => GrooveRoles.Snare;
 
-        /// <inheritdoc/>
         public override bool CanApply(DrummerContext context)
         {
             if (!base.CanApply(context))
@@ -63,7 +43,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
             return true;
         }
 
-        /// <inheritdoc/>
+        // Generate articulation-variant candidates for each backbeat; velocity/timing reflect articulation.
         public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -74,7 +54,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
             if (!CanApply(drummerContext))
                 yield break;
 
-            // Select articulation based on section type and energy
+            // Determine articulation variant for this bar based on section and deterministic hash
             DrumArticulation articulation = SelectArticulation(drummerContext);
 
             // Skip if no articulation change (use standard backbeat)
@@ -115,6 +95,8 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
             }
         }
 
+        // Select articulation deterministically from section type and (bar,seed) entropy.
+        // Prefer SideStick in Verse, Rimshot in Chorus, Flam/SideStick in Bridge when appropriate.
         private static DrumArticulation SelectArticulation(DrummerContext context)
         {
             // Deterministic selection based on section type and bar number
@@ -124,19 +106,13 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
             return sectionType switch
             {
                 // Verse: prefer sidestick for lighter feel
-                MusicConstants.eSectionType.Verse => true /* energy check removed */
-                    ? DrumArticulation.SideStick
-                    : DrumArticulation.None,
+                MusicConstants.eSectionType.Verse => DrumArticulation.SideStick,
 
                 // Chorus: prefer rimshot for power
-                MusicConstants.eSectionType.Chorus => true /* energy check removed */
-                    ? DrumArticulation.Rimshot
-                    : DrumArticulation.None,
+                MusicConstants.eSectionType.Chorus => DrumArticulation.Rimshot,
 
                 // Bridge: prefer flam for texture or sidestick
-                MusicConstants.eSectionType.Bridge => true /* energy check removed */
-                    ? DrumArticulation.Flam
-                    : DrumArticulation.SideStick,
+                MusicConstants.eSectionType.Bridge => DrumArticulation.Flam,
 
                 // Solo: rimshot for cutting through
                 MusicConstants.eSectionType.Solo => DrumArticulation.Rimshot,

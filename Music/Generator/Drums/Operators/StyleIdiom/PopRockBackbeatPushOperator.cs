@@ -1,7 +1,6 @@
-// AI: purpose=StyleIdiom operator adding slight timing push (early offset) to snare backbeats for Pop Rock urgency.
-// AI: invariants=Only applies when StyleId=="PopRock" and Snare in ActiveRoles; timing offset negative (early).
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.5; tune timing offset ranges based on listening tests.
+// AI: purpose=StyleIdiom operator: apply slight early timing offset to snare backbeats for PopRock urgency.
+// AI: invariants=Apply only when style=PopRock and Snare role active; timingHint is negative (early) in ticks.
+// AI: deps=DrummerContext, DrumCandidate; deterministic timing from seed; no pattern mutation performed.
 
 
 using Music.Generator.Core;
@@ -12,19 +11,8 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.StyleIdiom
 {
-    /// <summary>
-    /// Adds a slight timing push (early offset) to snare backbeats for Pop Rock urgency.
-    /// The snare lands slightly ahead of the grid, creating a driving feel.
-    /// Story 3.5: Style Idiom Operators (Pop Rock Specifics).
-    /// </summary>
-    /// <remarks>
-    /// Timing offsets are energy-scaled:
-    /// - High energy (>0.7): -8 ticks (more push)
-    /// - Low energy (&lt;0.3): -4 ticks (subtle push)
-    /// - Default: -6 ticks
-    /// 
-    /// This operator is PopRock-specific and will not apply for other styles.
-    /// </remarks>
+    // AI: purpose=Apply a small early timing offset to snare backbeats to create urgency in PopRock bridges/chorus.
+    // AI: note=Timing offset chosen from energy bands; use negative timingHint ticks; deterministic from seed.
     public sealed class PopRockBackbeatPushOperator : DrumOperatorBase
     {
         private const string PopRockStyleId = "PopRock";
@@ -41,16 +29,10 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
         /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.StyleIdiom;
 
-        /// <summary>
-        /// Requires at least moderate energy for the push to be noticeable.
-        /// </summary>
-
-        /// <summary>
-        /// Requires snare role for backbeat hits.
-        /// </summary>
+        // Requires snare role and PopRock style; energy gating handled in selector/policy.
         protected override string? RequiredRole => GrooveRoles.Snare;
 
-        /// <inheritdoc/>
+        // CanApply: style must be PopRock and Bar must define backbeat beats; ensure BeatsPerBar covers backbeats.
         public override bool CanApply(DrummerContext context)
         {
             if (!base.CanApply(context))
@@ -67,7 +49,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
             return true;
         }
 
-        /// <inheritdoc/>
+        // Generate candidates for each backbeat with a negative timingHint (early) determined by energy/seed.
         public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
         {
             ArgumentNullException.ThrowIfNull(context);

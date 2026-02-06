@@ -1,6 +1,6 @@
-// AI: purpose=Builds a full drum track by placing stored drum phrases across song bars.
-// AI: invariants=Requires MaterialBank drum phrases; placement covers all bars unless maxBars limits.
-// AI: deps=MaterialPhrase.ToPartTrack for placement; BarTrack.GetBarEndTick for clipping.
+// AI: purpose=Place stored drum phrases across song bars to produce a full drum PartTrack.
+// AI: invariants=Requires MaterialBank with drum phrases; covers bars up to maxBars when provided.
+// AI: deps=MaterialPhrase.ToPartTrack for placement; BarTrack.GetBarEndTick used to clip endings.
 
 using Music.Generator.Drums.Planning;
 using Music.MyMidi;
@@ -10,10 +10,12 @@ namespace Music.Generator.Drums.Generation;
 
 public sealed class DrumTrackGenerator
 {
+    // AI: purpose=Convenience entry: generate with implicit seed. Delegates to seeded overload.
     public PartTrack Generate(SongContext songContext, int maxBars = 0)
         => Generate(songContext, seed: 0, maxBars);
 
-    // AI: purpose=Generates drum track using phrase placement; seed controls section phrase selection.
+    // AI: purpose=Generate drum PartTrack by planning phrase placements and converting to events.
+    // AI: invariants=Throws on null/missing songContext.MaterialBank or required tracks; stable seed affects phrase selection.
     public PartTrack Generate(SongContext songContext, int seed, int maxBars)
     {
         ArgumentNullException.ThrowIfNull(songContext);

@@ -1,12 +1,8 @@
 // AI: purpose=PhrasePunctuation operator generating ascending tom fill for tension building.
-// AI: invariants=Only applies when IsFillWindow=true and toms are active; generates 6-12 ascending hits.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; uses Tom1, Tom2, FloorTom for ascending pattern.
-// AI: change=Story 3.3; adjust pattern and velocity curve based on listening tests.
-
-
+// AI: invariants=Apply only when Bar.IsFillWindow true and at least one tom/snare active; produces 6-12 hits.
+// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; uses Tom1/Tom2/FloorTom mapping for ascending pitch.
 using Music.Generator.Core;
 using Music.Generator.Drums.Context;
-using Music.Generator.Drums.Operators;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Drums.Selection.Candidates;
@@ -14,11 +10,8 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.PhrasePunctuation
 {
-    /// <summary>
-    /// Generates an ascending tom fill pattern for tension building.
-    /// Moves from floor tom (low) to high tom, creating upward energy.
-    /// Story 3.3: Phrase Punctuation Operators (Boundaries &amp; Fills).
-    /// </summary>
+    // AI: purpose=Create ascending tom fill in fill window; maps positions to available toms low->high.
+    // AI: note=Fill occupies last two beats by default; velocity crescendos; deterministic selection from (seed,bar).
     public sealed class BuildFillOperator : DrumOperatorBase
     {
         private const int VelocityStartMin = 60;
@@ -34,10 +27,8 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
         /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
-        /// <summary>
-        /// Requires moderate-high energy for build fills.
-        /// </summary>
-
+        // Requires moderate-high energy for build fills (energy gating handled by selector/policy).
+        
         /// <inheritdoc/>
         public override bool CanApply(DrummerContext context)
         {

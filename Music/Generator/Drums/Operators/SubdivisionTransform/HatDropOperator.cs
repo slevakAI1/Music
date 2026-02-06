@@ -1,7 +1,6 @@
-// AI: purpose=SubdivisionTransform operator switching hi-hat from 16ths to 8ths for density decrease.
-// AI: invariants=Only applies in suitable sections (verse, bridge); generates full 8th pattern for bar.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.2; adjust section checks based on listening tests.
+// AI: purpose=SubdivisionTransform operator switching hats from 16ths to 8ths to decrease rhythmic density.
+// AI: invariants=Apply in verse/bridge/intro; produces full-bar 8th hat candidates (beat.00 and beat.50).
+// AI: deps=DrummerContext, DrumCandidate, Groove; uses Bar.BeatsPerBar for positions; deterministic via seed.
 
 
 using Music.Generator.Core;
@@ -12,11 +11,8 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.SubdivisionTransform
 {
-    /// <summary>
-    /// Switches hi-hat pattern from 16ths to 8ths for decreased rhythmic density.
-    /// Generates full bar of 8th hi-hat candidates when energy is low.
-    /// Story 3.2: Subdivision Transform Operators (Timekeeping Changes).
-    /// </summary>
+    // AI: purpose=Emit full-bar 8th hi-hat pattern (two 8th positions per beat) to reduce hat density.
+    // AI: note=Downbeats are accented; skip positions beyond bar end; scoring boosted near transitions.
     public sealed class HatDropOperator : DrumOperatorBase
     {
         private const int VelocityMin = 70;

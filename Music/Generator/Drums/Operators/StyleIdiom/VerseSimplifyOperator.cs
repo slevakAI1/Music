@@ -1,7 +1,6 @@
-// AI: purpose=StyleIdiom operator that thins out verse grooves for contrast with chorus sections.
-// AI: invariants=Only applies when StyleId=="PopRock" and SectionType==Verse; reduces density via lower velocities and score.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.5; simplification intensity configurable in PopRockStyleConfiguration.
+// AI: purpose=StyleIdom operator that thins verse grooves for contrast with chorus.
+// AI: invariants=Apply in PopRock verses only; reduces density via lower velocities and scores.
+// AI: deps=DrummerContext, DrumCandidate; deterministic outputs from (barNumber,seed); no stylistic side-effects.
 
 
 using Music.Generator.Core;
@@ -12,22 +11,8 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.StyleIdiom
 {
-    /// <summary>
-    /// Thins out verse grooves for contrast with chorus sections.
-    /// Achieves simplification through lower velocity hints and reduced scoring.
-    /// Story 3.5: Style Idiom Operators (Pop Rock Specifics).
-    /// </summary>
-    /// <remarks>
-    /// Simplification strategies:
-    /// - Lower velocity hints by 10-20 across all roles
-    /// - Generate "thin" candidates that compete with busier patterns
-    /// - Prefer minimal kick patterns (1 and 3 only)
-    /// - Reduce hat density by generating fewer hat candidates
-    /// 
-    /// This operator produces candidates that, when selected, create a sparser feel.
-    /// The selection engine's density targets and weights determine final outcome.
-    /// This operator is PopRock-specific and will not apply for other styles.
-    /// </remarks>
+    // AI: purpose=Produce simplified verse candidates (sparser kick/hat patterns, lower velocities).
+    // AI: note=Prefer 1/3 kick pattern and eighth-note hats; selection engine density weights determine final output.
     public sealed class VerseSimplifyOperator : DrumOperatorBase
     {
         private const string PopRockStyleId = "PopRock";

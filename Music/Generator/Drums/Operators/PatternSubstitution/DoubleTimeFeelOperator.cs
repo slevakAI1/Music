@@ -1,7 +1,6 @@
-// AI: purpose=PatternSubstitution operator generating double-time feel (dense kicks, driving pattern).
-// AI: invariants=Only applies at high energy (>=0.6); generates dense kick pattern; mutually exclusive with HalfTimeFeel.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.4; adjust energy threshold and pattern density based on style and listening tests.
+// AI: purpose=PatternSubstitution: produce double-time feel (denser kicks, driving energy) without tempo change.
+// AI: invariants=Apply in high-energy suitable sections; uses Bar.BackbeatBeats and BeatsPerBar; deterministic from seed.
+// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; integrates with section type for suitability decisions.
 
 
 using Music.Generator.Core;
@@ -12,19 +11,8 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.PatternSubstitution
 {
-    /// <summary>
-    /// Generates double-time feel pattern with denser kick patterns creating
-    /// a driving, urgent feel without actually doubling the tempo.
-    /// Story 3.4: Pattern Substitution Operators (Groove Swaps).
-    /// </summary>
-    /// <remarks>
-    /// Double-time feel characteristics:
-    /// - Kicks on every beat plus offbeats (8th note density)
-    /// - Standard backbeats maintained (2 and 4)
-    /// - Creates perception of double the energy
-    /// Best used in choruses, solos, or climactic sections.
-    /// Mutually exclusive with HalfTimeFeelOperator (enforced via energy thresholds).
-    /// </remarks>
+    // AI: purpose=Apply double-time feel: 8th-note dense kick pattern + strong backbeats.
+    // AI: note=Intended for choruses/solos; lower base score to keep sparing; mutually exclusive with half-time.
     public sealed class DoubleTimeFeelOperator : DrumOperatorBase
     {
         private const int KickDownbeatVelocityMin = 95;
@@ -35,23 +23,14 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
         private const int SnareVelocityMax = 120;
         private const double BaseScore = 0.45; // Lower for sparing use
 
-        /// <inheritdoc/>
         public override string OperatorId => "DrumDoubleTimeFeel";
 
-        /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.PatternSubstitution;
 
-        /// <summary>
-        /// Requires high energy for double-time feel.
-        /// This creates mutual exclusion with HalfTimeFeel (which caps at 0.6).
-        /// </summary>
-
-        /// <summary>
-        /// Requires kick role for dense kick pattern.
-        /// </summary>
+        // Requires kick role; prefer high-energy, chorus/solo/outro sections. Mutual exclusion with half-time handled externally.
         protected override string? RequiredRole => GrooveRoles.Kick;
 
-        /// <inheritdoc/>
+        // CanApply: check base, bar length, and section suitability for double-time feel.
         public override bool CanApply(DrummerContext context)
         {
             if (!base.CanApply(context))
@@ -74,7 +53,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
             return true;
         }
 
-        /// <inheritdoc/>
+        // Generate dense kick + snare backbeat candidates to realize double-time feel.
         public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -103,6 +82,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
             }
         }
 
+        // Produce kick candidates at downbeats and offbeats (8th-note density) deterministically.
         private IEnumerable<DrumCandidate> GenerateKickPattern(DrummerContext context, double baseScore)
         {
             int beatsPerBar = context.Bar.BeatsPerBar;
@@ -146,6 +126,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
             }
         }
 
+        // Produce snare backbeat candidates (from Bar.BackbeatBeats) with strong velocity hints.
         private IEnumerable<DrumCandidate> GenerateSnarePattern(DrummerContext context, double baseScore)
         {
             // Standard backbeats (2 and 4) with high velocity for double-time energy
@@ -169,6 +150,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
             }
         }
 
+        // Compute base score for this operator considering section and boundaries.
         private double ComputeScore(DrummerContext context)
         {
             double score = BaseScore;

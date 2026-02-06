@@ -1,36 +1,23 @@
-// AI: purpose=Weighted selection of groove candidates with deterministic RNG and tie-breaking (Story B3).
-// AI: invariants=Same seed => identical selections; deterministic tie-break by weight desc, then stable id.
-// AI: deps=DrumCandidateGroup, DrumOnsetCandidate, GrooveRngHelper for RNG access.
-// AI: change=Story B3 acceptance criteria: weighted selection using RngFor(bar, role, VariationPick).
+// AI: purpose=Weighted random selection of drum onset candidates with deterministic RNG.
+// AI: invariants=Same seed+inputs => same output; tie-break by weight desc then StableId asc for determinism.
+// AI: deps=Uses DrumCandidateGroup, DrumOnsetCandidate, GrooveRngHelper and Rng helper for deterministic RNG.
 
 using Music.Generator.Drums.Selection.Candidates;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Selection;
 
-/// <summary>
-/// Weighted candidate record with computed weight and group context.
-/// Used for selection sorting and tracking.
-/// </summary>
+// AI: record=WeightedCandidate pairs a mapped DrumOnsetCandidate with its Group and computed weight
 public sealed record WeightedCandidate(
     DrumOnsetCandidate Candidate,
     DrumCandidateGroup Group,
     double ComputedWeight,
     string StableId);
 
-/// <summary>
-/// Selects groove candidates using weighted random selection with deterministic RNG.
-/// Story B3: Implements weighted selection with stable tie-breaking.
-/// </summary>
+// AI: selector=Provides deterministic weighted selection utilities for drum onset candidates
 public static class DrumWeightedCandidateSelector
 {
-    /// <summary>
-    /// Computes the effective weight for a candidate.
-    /// Story B3: Weight = ProbabilityBias * Group.BaseProbabilityBias.
-    /// </summary>
-    /// <param name="candidate">The candidate to compute weight for.</param>
-    /// <param name="group">The group containing this candidate.</param>
-    /// <returns>Computed weight (0 or positive). Zero/negative bias treated as 0.</returns>
+    // AI: calc=Weight = candidate.ProbabilityBias * group.BaseProbabilityBias; non-positive treated as 0
     public static double ComputeWeight(DrumOnsetCandidate candidate, DrumCandidateGroup group)
     {
         ArgumentNullException.ThrowIfNull(candidate);
@@ -39,7 +26,6 @@ public static class DrumWeightedCandidateSelector
         double candidateBias = candidate.ProbabilityBias;
         double groupBias = group.BaseProbabilityBias;
 
-        // Story B3: Zero/negative weights treated as 0
         if (candidateBias <= 0 || groupBias <= 0)
         {
             return 0.0;
@@ -48,21 +34,13 @@ public static class DrumWeightedCandidateSelector
         return candidateBias * groupBias;
     }
 
-    /// <summary>
-    /// Creates a stable ID for a candidate for deterministic tie-breaking.
-    /// Format: "{GroupId}:{OnsetBeat}" for uniqueness within a group.
-    /// </summary>
+    // AI: id=Stable ID format "{GroupId}:{OnsetBeat:F4}" used for deterministic tie-breaking
     public static string CreateStableId(DrumCandidateGroup group, DrumOnsetCandidate candidate)
     {
         return $"{group.GroupId}:{candidate.OnsetBeat:F4}";
     }
 
-    /// <summary>
-    /// Builds weighted candidates from groups with computed weights.
-    /// Filters out zero-weight candidates.
-    /// </summary>
-    /// <param name="groups">Candidate groups to process.</param>
-    /// <returns>List of weighted candidates sorted for selection (weight desc, stable id asc).</returns>
+    // AI: build=Creates WeightedCandidate list, filtering zero-weight entries; sorts by weight desc then id asc
     public static IReadOnlyList<WeightedCandidate> BuildWeightedCandidates(
         IEnumerable<DrumCandidateGroup> groups)
     {
@@ -75,34 +53,21 @@ public static class DrumWeightedCandidateSelector
             foreach (var candidate in group.Candidates)
             {
                 double weight = ComputeWeight(candidate, group);
-
-                // Story B3: Filter out zero/negative weights
                 if (weight <= 0)
-                {
                     continue;
-                }
 
                 string stableId = CreateStableId(group, candidate);
                 weighted.Add(new WeightedCandidate(candidate, group, weight, stableId));
             }
         }
 
-        // Story B3: Deterministic tie-breaking - weight desc, then stable id asc
         return weighted
             .OrderByDescending(w => w.ComputedWeight)
             .ThenBy(w => w.StableId, StringComparer.Ordinal)
             .ToList();
     }
 
-    /// <summary>
-    /// Selects candidates using weighted random selection.
-    /// Story B3: Uses RngFor(bar, role, VariationPick) for deterministic selection.
-    /// </summary>
-    /// <param name="groups">Candidate groups to select from.</param>
-    /// <param name="targetCount">Maximum number of candidates to select.</param>
-    /// <param name="barNumber">Bar number for RNG seed derivation.</param>
-    /// <param name="role">Role for RNG seed derivation.</param>
-    /// <returns>Selected candidates in selection order.</returns>
+    // AI: select=Deterministic weighted random selection using GrooveRngHelper.RngFor(barNumber,role,streamKey)
     public static IReadOnlyList<WeightedCandidate> SelectCandidates(
         IEnumerable<DrumCandidateGroup> groups,
         int targetCount,
@@ -112,18 +77,12 @@ public static class DrumWeightedCandidateSelector
         ArgumentNullException.ThrowIfNull(groups);
 
         if (targetCount <= 0)
-        {
             return Array.Empty<WeightedCandidate>();
-        }
 
         var weightedCandidates = BuildWeightedCandidates(groups);
-
         if (weightedCandidates.Count == 0)
-        {
             return Array.Empty<WeightedCandidate>();
-        }
 
-        // Get RNG purpose for this selection
         var rngPurpose = GrooveRngHelper.RngFor(barNumber, role, GrooveRngStreamKey.CandidatePick);
 
         var selected = new List<WeightedCandidate>();
@@ -131,19 +90,12 @@ public static class DrumWeightedCandidateSelector
 
         while (selected.Count < targetCount && remaining.Count > 0)
         {
-            // Compute total weight for probability distribution
             double totalWeight = remaining.Sum(w => w.ComputedWeight);
-
             if (totalWeight <= 0)
-            {
-                // All remaining have zero weight, stop selection
                 break;
-            }
 
-            // Generate random value in [0, totalWeight)
             double randomValue = Rng.NextDouble(rngPurpose) * totalWeight;
 
-            // Select candidate based on cumulative weight
             double cumulative = 0;
             WeightedCandidate? selectedCandidate = null;
 
@@ -157,7 +109,6 @@ public static class DrumWeightedCandidateSelector
                 }
             }
 
-            // Fallback to last candidate if rounding causes no selection
             selectedCandidate ??= remaining[^1];
 
             selected.Add(selectedCandidate);
@@ -167,10 +118,7 @@ public static class DrumWeightedCandidateSelector
         return selected;
     }
 
-    /// <summary>
-    /// Selects candidates from a single group.
-    /// Convenience overload for single-group scenarios.
-    /// </summary>
+    // AI: helper=Convenience overload for selecting from a single group
     public static IReadOnlyList<WeightedCandidate> SelectFromGroup(
         DrumCandidateGroup group,
         int targetCount,
@@ -181,13 +129,7 @@ public static class DrumWeightedCandidateSelector
         return SelectCandidates(new[] { group }, targetCount, barNumber, role);
     }
 
-    /// <summary>
-    /// Gets candidates sorted by weight for deterministic ordering without random selection.
-    /// Useful when you want the top N by weight without randomness.
-    /// </summary>
-    /// <param name="groups">Candidate groups to sort.</param>
-    /// <param name="topN">Maximum number of candidates to return (0 = all).</param>
-    /// <returns>Candidates sorted by weight desc, then stable id asc.</returns>
+    // AI: top=Return top-N by deterministic weight ordering; topN<=0 returns all
     public static IReadOnlyList<WeightedCandidate> GetTopByWeight(
         IEnumerable<DrumCandidateGroup> groups,
         int topN = 0)
@@ -195,9 +137,7 @@ public static class DrumWeightedCandidateSelector
         var weighted = BuildWeightedCandidates(groups);
 
         if (topN <= 0 || topN >= weighted.Count)
-        {
             return weighted;
-        }
 
         return weighted.Take(topN).ToList();
     }

@@ -1,10 +1,11 @@
 namespace Music.Generator.Drums.Selection.Candidates;
 
-// AI: purpose=Drum-specific grouping of onset candidates with shared tags and constraints.
-// AI: invariants=MaxAddsPerBar is group-level cap; BaseProbabilityBias is group-level weight for selection.
-// AI: change=Conversion methods removed (GC-4); drum candidate groups stand alone, no generic conversion needed.
+// AI: purpose=Group onset candidates with shared tags, constraints and selection bias for drum selection.
+// AI: invariants=MaxAddsPerBar caps adds per bar; BaseProbabilityBias biases group selection weights.
+// AI: deps=Used by selection engine; Candidates contains DrumOnsetCandidate instances; not thread-safe.
 public sealed class DrumCandidateGroup
 {
+    // AI: contract=GroupId identifies group; GroupTags aid filtering; Candidates mutated during selection
     public string GroupId { get; set; } = "";
     public List<string> GroupTags { get; set; } = [];
     public int MaxAddsPerBar { get; set; }

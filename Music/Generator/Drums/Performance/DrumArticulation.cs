@@ -1,66 +1,37 @@
-// AI: purpose=Enum for drum articulation hints; used by operators to specify desired playing technique.
-// AI: invariants=Values are stable; None is default; mapped to MIDI note variations by DrumArticulationMapper (Story 6.3).
-// AI: deps=Consumed by DrumCandidate; mapped by DrumArticulationMapper to MIDI notes.
-// AI: change=Story 2.2; extend with additional articulations as needed (e.g., BrushSwirl, MalletHit).
+// AI: purpose=Enum of drum articulation hints used by operators to suggest playing technique.
+// AI: invariants=Values are stable identifiers; None is default; mapper translates to MIDI note variants.
+// AI: deps=Used by DrumCandidate and DrumArticulationMapper; extend cautiously to preserve backwards compatibility.
 
 namespace Music.Generator.Drums.Performance
 {
-    /// <summary>
-    /// Articulation hint for drum hits, specifying the desired playing technique.
-    /// Operators use this to suggest how a hit should sound; the articulation mapper
-    /// translates these to appropriate MIDI note variations.
-    /// Story 2.2: Define Drum Candidate Type.
-    /// </summary>
+    // Articulation hint for drum hits. Mapper converts to MIDI note/timbre variants.
     public enum DrumArticulation
     {
-        /// <summary>
-        /// No specific articulation; use standard hit for the role.
-        /// </summary>
+        // No specific articulation; use standard hit for the role
         None = 0,
 
-        /// <summary>
-        /// Rimshot: stick strikes both head and rim simultaneously.
-        /// Produces a loud, cutting snare sound.
-        /// </summary>
+        // Rimshot: head+rim strike for cutting snare sound
         Rimshot = 1,
 
-        /// <summary>
-        /// Side stick (cross stick): stick laid across head, striking rim.
-        /// Produces a quieter, woody click sound.
-        /// </summary>
+        // SideStick (cross stick): quiet woody click on snare
         SideStick = 2,
 
-        /// <summary>
-        /// Open hi-hat: foot releases pedal allowing cymbals to ring.
-        /// Used for accents and sustained hi-hat sounds.
-        /// </summary>
+        // Open hi-hat: sustained/open cymbal sound for accents
         OpenHat = 3,
 
-        /// <summary>
-        /// Crash cymbal hit with standard strike.
-        /// </summary>
+        // Crash cymbal standard strike
         Crash = 4,
 
-        /// <summary>
-        /// Ride cymbal hit on the bow (standard ride sound).
-        /// </summary>
+        // Ride cymbal bow hit (standard timekeeping)
         Ride = 5,
 
-        /// <summary>
-        /// Ride bell hit for cutting accent.
-        /// </summary>
+        // Ride bell hit for a bright cutting accent
         RideBell = 6,
 
-        /// <summary>
-        /// Crash choke: crash hit immediately muted by hand.
-        /// Produces a short, punchy accent.
-        /// </summary>
+        // Crash choke: muted crash for short punchy accent
         CrashChoke = 7,
 
-        /// <summary>
-        /// Flam: grace note immediately before main hit.
-        /// Adds thickness and emphasis to snare hits.
-        /// </summary>
+        // Flam: grace note before main hit to thicken attack
         Flam = 8
     }
 }

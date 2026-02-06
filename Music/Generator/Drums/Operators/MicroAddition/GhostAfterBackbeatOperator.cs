@@ -1,7 +1,7 @@
 // AI: purpose=MicroAddition operator generating ghost snare notes just after backbeats (2.25, 4.25).
 // AI: invariants=VelocityHint in [30,50]; only applies when Snare in ActiveRoles 
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.1, 9.3; adjust energy threshold or beat positions based on listening tests; reduces score when motif active.
+//
 
 
 using Music.Generator.Core;
@@ -12,39 +12,25 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.MicroAddition
 {
-    /// <summary>
-    /// Generates ghost snare notes just after backbeats (beats 2 and 4 in 4/4).
-    /// Places ghost notes at 2.25 and 4.25 as trailing embellishments.
-    /// Story 3.1: Micro-Addition Operators (Ghost Notes &amp; Embellishments).
-    /// Story 9.3: Reduces score by 20% when motif is active.
-    /// </summary>
+    // AI: purpose=Generate ghost snare notes shortly after backbeats (e.g., 2.25, 4.25).
+    // AI: invariants=VelocityHint in [30,50]; uses Bar.BackbeatBeats; skip when grid or bar length invalid.
     public sealed class GhostAfterBackbeatOperator : DrumOperatorBase
     {
         private const int VelocityMin = 30;
         private const int VelocityMax = 50;
         private const double BaseScore = 0.6;
 
-        /// <summary>
-        /// Story 9.3: Score reduction when motif is active (20% = 0.2).
-        /// </summary>
+        // Motif score reduction when motif active (fraction to subtract, e.g., 0.2 => -20%).
         private const double MotifScoreReduction = 0.2;
 
-        /// <inheritdoc/>
         public override string OperatorId => "DrumGhostAfterBackbeat";
 
-        /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.MicroAddition;
 
-        /// <summary>
-        /// Requires slightly higher energy than before-backbeat ghosts.
-        /// </summary>
-
-        /// <summary>
-        /// Requires snare to be in active roles.
-        /// </summary>
+        // Slightly higher energy expected than before-backbeat ghosts.
+        // Requires snare role to be active in groove preset.
         protected override string? RequiredRole => GrooveRoles.Snare;
 
-        /// <inheritdoc/>
         public override bool CanApply(DrummerContext context)
         {
             if (!base.CanApply(context))
@@ -57,7 +43,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
             return true;
         }
 
-        /// <inheritdoc/>
+        // Generate ghost snare candidates immediately after each backbeat (quarter after backbeat).
         public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -68,9 +54,9 @@ namespace Music.Generator.Drums.Operators.MicroAddition
             if (!CanApply(drummerContext))
                 yield break;
 
-            // Story 9.3: Get motif score multiplier (20% reduction when motif active)
+            // Compute motif multiplier: reduce score when motif active. Motif map not available in context here.
             double motifMultiplier = GetMotifScoreMultiplier(
-                null /* motif map removed from context */,
+                null,
                 drummerContext.Bar,
                 MotifScoreReduction);
 

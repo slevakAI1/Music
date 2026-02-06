@@ -1,7 +1,6 @@
-// AI: purpose=Implements IDrumOperatorCandidates for drummer agent; gathers operator candidates, maps, groups, filters.
-// AI: invariants=Deterministic: same context + seed → same groups; operators invoked in registry order; errors isolated.
-// AI: deps=IDrumOperatorCandidates, DrumOperatorRegistry, DrumCandidateMapper, DrummerContextBuilder.
-// AI: change=Story 2.4, 4.2; extend with diagnostics and additional filtering as physicality system matures.
+// AI: purpose=Collect and map drum operator candidates into grouped DrumCandidateGroups for selection.
+// AI: invariants=Deterministic given same context+seed; operators invoked in registry order; groups non-empty implies candidates.
+// AI: deps=Uses DrumOperatorRegistry, DrummerContextBuilder, DrumCandidateMapper; affects selection pipeline.
 
 using Music.Generator.Core;
 using Music.Generator.Drums.Context;
@@ -10,53 +9,26 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Selection.Candidates
 {
-    /// <summary>
-    /// Configuration for DrummerOperatorCandidates behavior.
-    /// </summary>
+    // AI: config=Settings for operator execution behavior; ContinueOnOperatorError controls exception policy
     public sealed record DrummerOperatorCandidatesSettings
     {
-        /// <summary>Whether to continue generation when an operator throws.</summary>
         public bool ContinueOnOperatorError { get; init; } = true;
-
-        /// <summary>Whether to collect verbose diagnostics (per-candidate detail).</summary>
         public bool VerboseDiagnostics { get; init; } = false;
-
-        /// <summary>Default settings instance.</summary>
         public static DrummerOperatorCandidatesSettings Default => new();
     }
 
-    /// <summary>
-    /// Diagnostic entry for operator execution during candidate generation.
-    /// </summary>
+    // AI: diag=Per-operator execution diagnostic: OperatorId, Family, CandidatesGenerated, ErrorMessage, WasSkipped
     public sealed record OperatorExecutionDiagnostic
     {
-        /// <summary>Operator ID that was executed.</summary>
         public required string OperatorId { get; init; }
-
-        /// <summary>Operator family.</summary>
         public required OperatorFamily Family { get; init; }
-
-        /// <summary>Number of candidates generated.</summary>
         public required int CandidatesGenerated { get; init; }
-
-        /// <summary>Error message if operator threw (null if successful).</summary>
         public string? ErrorMessage { get; init; }
-
-        /// <summary>Whether operator was skipped (CanApply returned false).</summary>
         public bool WasSkipped { get; init; }
     }
 
-    /// <summary>
-    /// Drummer agent implementation of IDrumOperatorCandidates.
-    /// Gathers candidates from registered operators, maps to DrumOnsetCandidate,
-    /// groups by operator family, and applies physicality filtering.
-    /// Story 2.4: Implement Drummer Candidate Source.
-    /// Story 4.2: Moved interface ownership from Groove to Drums namespace.
-    /// </summary>
-    /// <remarks>
-    /// Pipeline: Operators → DrumCandidates → Map → Group → PhysicalityFilter → DrumCandidateGroups
-    /// All operations are deterministic given same context, seed, and registry state.
-    /// </remarks>
+    // AI: purpose=IDrumOperatorCandidates implementation for drummer; pipeline: Operators->DrumCandidates->Map->Group
+    // AI: invariants=Deterministic given same inputs; errors isolated per-operator; groups sorted by family for determinism
     public sealed class DrummerOperatorCandidates : IDrumOperatorCandidates
     {
         private readonly DrumOperatorRegistry _registry;
@@ -66,12 +38,7 @@ namespace Music.Generator.Drums.Selection.Candidates
         // Cache for last execution diagnostics (for testing/debugging)
         private List<OperatorExecutionDiagnostic>? _lastExecutionDiagnostics;
 
-        /// <summary>
-        /// Creates a DrummerOperatorCandidates with the specified dependencies.
-        /// </summary>
-        /// <param name="registry">Registry of drum operators.</param>
-        /// <param name="diagnosticsCollector">Optional collector for structured diagnostics.</param>
-        /// <param name="settings">Optional settings for error handling and diagnostics.</param>
+        // AI: ctor=Requires registry; diagnosticsCollector optional; settings optional with sensible defaults
         public DrummerOperatorCandidates(
             DrumOperatorRegistry registry,
             GrooveDiagnosticsCollector? diagnosticsCollector = null,
@@ -84,7 +51,7 @@ namespace Music.Generator.Drums.Selection.Candidates
             _settings = settings ?? DrummerOperatorCandidatesSettings.Default;
         }
 
-        /// <inheritdoc />
+        // AI: entry=GetCandidateGroups builds context, runs enabled operators, maps and groups results
         public IReadOnlyList<DrumCandidateGroup> GetCandidateGroups(
             Bar bar,
             string role)
@@ -124,15 +91,10 @@ namespace Music.Generator.Drums.Selection.Candidates
             return groups;
         }
 
-        /// <summary>
-        /// Gets execution diagnostics from the last GetCandidateGroups call.
-        /// For testing and debugging purposes.
-        /// </summary>
+        // AI: diagnostics=LastExecutionDiagnostics contains per-operator diagnostics from last invocation
         public IReadOnlyList<OperatorExecutionDiagnostic>? LastExecutionDiagnostics => _lastExecutionDiagnostics;
 
-        /// <summary>
-        /// Builds DrummerContext from Bar.
-        /// </summary>
+        // AI: behavior=Builds DrummerContext from Bar and per-bar seed; stateless builder call
         private DrummerContext BuildDrummerContext(Bar bar, string role)
         {
             var input = new DrummerContextBuildInput
@@ -144,9 +106,7 @@ namespace Music.Generator.Drums.Selection.Candidates
             return DrummerContextBuilder.Build(input);
         }
 
-        /// <summary>
-        /// Gets enabled operators based on policy.
-        /// </summary>
+        // AI: policy=Returns enabled operators; TODO: apply DrummerPolicyProvider allow-list in future
         private IReadOnlyList<IDrumOperator> GetEnabledOperators(Bar bar, string role)
         {
             // TODO: Apply policy allow list filtering from DrummerPolicyProvider
@@ -154,9 +114,7 @@ namespace Music.Generator.Drums.Selection.Candidates
             return _registry.GetAllOperators();
         }
 
-        /// <summary>
-        /// Generates candidates from all enabled operators.
-        /// </summary>
+        // AI: behavior=Invokes each operator in order and aggregates validated DrumCandidates
         private List<DrumCandidate> GenerateCandidatesFromOperators(
             IReadOnlyList<IDrumOperator> operators,
             DrummerContext context)
@@ -172,9 +130,7 @@ namespace Music.Generator.Drums.Selection.Candidates
             return allCandidates;
         }
 
-        /// <summary>
-        /// Executes a single operator and collects its candidates.
-        /// </summary>
+        // AI: exec=Safely runs CanApply then GenerateCandidates; wraps exceptions into diagnostics per settings
         private OperatorExecutionDiagnostic ExecuteOperator(
             IDrumOperator op,
             DrummerContext context,
@@ -231,9 +187,7 @@ namespace Music.Generator.Drums.Selection.Candidates
             }
         }
 
-        /// <summary>
-        /// Handles operator exceptions based on settings.
-        /// </summary>
+        // AI: error=Converts operator exceptions into diagnostics; will rethrow if ContinueOnOperatorError is false
         private OperatorExecutionDiagnostic HandleOperatorError(
             IDrumOperator op,
             Exception ex,
@@ -256,9 +210,7 @@ namespace Music.Generator.Drums.Selection.Candidates
             return diagnostic;
         }
 
-        /// <summary>
-        /// Validates a candidate has required fields and no obvious errors.
-        /// </summary>
+        // AI: validate=Per-candidate quick checks; invalid candidates are dropped (diagnostics TODO)
         private static bool ValidateCandidate(DrumCandidate candidate, string operatorId)
         {
             if (candidate == null)
@@ -274,17 +226,13 @@ namespace Music.Generator.Drums.Selection.Candidates
             return true;
         }
 
-        /// <summary>
-        /// Maps DrumCandidates to GrooveOnsetCandidates.
-        /// </summary>
+        // AI: maps=Uses DrumCandidateMapper to convert to DrumOnsetCandidate preserving hints and tags
         private static IReadOnlyList<DrumOnsetCandidate> MapCandidates(List<DrumCandidate> candidates)
         {
             return DrumCandidateMapper.MapAll(candidates);
         }
 
-        /// <summary>
-        /// Groups candidates by operator family.
-        /// </summary>
+        // AI: grouping=Groups mapped candidates by operator family; sorts groups by family enum for determinism
         private List<DrumCandidateGroup> GroupByOperatorFamily(
             List<DrumCandidate> originalCandidates,
             IReadOnlyList<DrumOnsetCandidate> mappedCandidates)
@@ -337,9 +285,6 @@ namespace Music.Generator.Drums.Selection.Candidates
             return result;
         }
 
-        /// <summary>
-        /// Gets seed from bar context or defaults.
-        /// </summary>
         private static int GetSeed(Bar bar)
         {
             // Use bar number as component of seed for per-bar variation

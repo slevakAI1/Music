@@ -1,7 +1,6 @@
-// AI: purpose=StyleIdiom operator generating rock-style kick syncopation (4&→1 anticipation).
-// AI: invariants=Only applies when StyleId=="PopRock" and Kick in ActiveRoles; generates on beat 4.5 (the "and" of 4).
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.5; tune frequency and patterns based on listening tests.
+// AI: purpose=StyleIdiom operator: rock-style kick syncopation (primary 4.5 anticipation).
+// AI: invariants=Apply when style=PopRock and Kick role active; primary onset at 4.5; deterministic from (bar,seed).
+// AI: deps=DrummerContext, DrumCandidate, Groove; integrates with section type and per-bar hash for variation.
 
 
 using Music.Generator.Core;
@@ -12,19 +11,9 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.StyleIdiom
 {
-    /// <summary>
-    /// Generates rock-style kick syncopation, primarily the 4&amp;→1 anticipation pattern.
-    /// The kick on the "and" of beat 4 anticipates the downbeat of the next bar.
-    /// Story 3.5: Style Idiom Operators (Pop Rock Specifics).
-    /// </summary>
-    /// <remarks>
-    /// Syncopation patterns:
-    /// - Primary: 4.5 (the "and" of beat 4) - creates drive into next bar
-    /// - Secondary: 2.5 or 3.5 at higher energy for additional syncopation
-    /// 
-    /// Frequency controlled by score and style weight; expected in ~15-25% of eligible bars.
-    /// This operator is PopRock-specific and will not apply for other styles.
-    /// </remarks>
+    // AI: purpose=Emit 4&->1 rock kick anticipation; optional secondary syncopation at higher energy.
+    // AI: note=Primary pattern = 4.5; secondary = 2.5/3.5 chosen deterministically; target frequency ~15-25% bars.
+    // AI: invariants=PopRock style only; ensure BeatsPerBar>=4 for primary; preserve deterministic hash behavior.
     public sealed class RockKickSyncopationOperator : DrumOperatorBase
     {
         private const string PopRockStyleId = "PopRock";

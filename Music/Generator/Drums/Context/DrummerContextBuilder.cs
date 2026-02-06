@@ -1,42 +1,31 @@
-// AI: purpose=Builds DrummerContext from Bar and cross-bar state; minimal stateless builder.
-// AI: invariants=Builder is stateless; same inputs produce identical DrummerContext; bars/beats 1-based.
-// AI: deps=Bar (contains all bar-derivable properties); no policy dependencies.
-// AI: change=Epic DrummerContext-Dedup; simplified to minimal cross-bar state only.
+// AI: purpose=Stateless builder: construct DrummerContext from Bar + cross-bar state.
+// AI: invariants=Deterministic: same input => same output; builder holds no state; beats/bar 1-based.
+// AI: deps=Bar supplies bar-derived flags; consumed by DrummerOperators; no external policies.
+// AI: change=Epic DrummerContext-Dedup: minimize cross-bar state to LastKickBeat/LastSnareBeat.
 
 namespace Music.Generator.Drums.Context
 {
-    /// <summary>
-    /// Input configuration for building DrummerContext.
-    /// Groups required inputs to avoid large parameter lists.
-    /// </summary>
+    // AI: purpose=Container of inputs required to build a DrummerContext; avoids long param lists.
     public sealed record DrummerContextBuildInput
     {
-        /// <summary>Per-bar context (section, phrase position).</summary>
+        // Per-bar canonical context. Must be provided; Bar is authoritative for bar-derived flags.
         public required Bar Bar { get; init; }
 
-        /// <summary>Seed for deterministic generation.</summary>
+        // Deterministic seed for RNG. Default chosen for tests; change deliberately.
         public int Seed { get; init; } = 42;
 
-        /// <summary>Last kick beat position from previous bar (1-based, fractional). Null if unknown.</summary>
+        // Last kick beat from prior context (1-based fractional). Null when unknown.
         public decimal? LastKickBeat { get; init; }
 
-        /// <summary>Last snare beat position from previous bar (1-based, fractional). Null if unknown.</summary>
+        // Last snare beat from prior context (1-based fractional). Null when unknown.
         public decimal? LastSnareBeat { get; init; }
     }
 
-    /// <summary>
-    /// Builds DrummerContext from Bar and cross-bar state.
-    /// Stateless builder ensuring deterministic output for same inputs.
-    /// Story 2.1: DrummerContextBuilder builds from Bar + cross-bar state only.
-    /// </summary>
+    // AI: purpose=Create DrummerContext from DrummerContextBuildInput; keep deterministic and minimal.
     public static class DrummerContextBuilder
     {
-        /// <summary>
-        /// Builds a DrummerContext from the provided input configuration.
-        /// </summary>
-        /// <param name="input">Input configuration containing all required data.</param>
-        /// <returns>Immutable DrummerContext for operator decisions.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when input or input.Bar is null.</exception>
+        // Build a DrummerContext from inputs. Throws ArgumentNullException when input or input.Bar is null.
+        // Deterministic: RngStreamKey derived from bar number; do not include volatile state here.
         public static DrummerContext Build(DrummerContextBuildInput input)
         {
             ArgumentNullException.ThrowIfNull(input);

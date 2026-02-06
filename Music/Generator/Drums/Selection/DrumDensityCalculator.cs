@@ -1,40 +1,22 @@
-// AI: purpose=Compute density target count for drum candidate selection (moved from Groove in Story 4.3).
-// AI: invariants=Deterministic; same inputs => same output; no RNG; clamps to [0..MaxEvents].
-// AI: deps=Bar for context; RoleDensityTarget, DrumPolicyDecision.
-// AI: change=Story 5.3: Simplified, removed deleted policy dependencies.
-
+// AI: purpose=Compute density target count for drum selection; role-based, deterministic, no RNG.
+// AI: invariants=Result clamped to [0..MaxEventsPerBar]; same inputs produce same output; no side-effects.
+// AI: deps=Uses Bar context; external policy or role density may adjust density01 before calling.
 
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Selection
 {
-    /// <summary>
-    /// Result of density target computation with provenance for diagnostics.
-    /// Story C1: Contains target count and inputs used for calculation.
-    /// </summary>
+    // AI: result=Contains computed integer TargetCount and provenance for diagnostics
     public sealed record GrooveDensityResult(
         int TargetCount,
         double Density01Used,
         int MaxEventsPerBarUsed,
         string Explanation);
 
-    /// <summary>
-    /// Computes density target count for drum candidate selection.
-    /// Story C1: Implements role-based density calculation.
-    /// Story 4.3: Moved to Drum Generator namespace (part-generation concerns).
-    /// Story 5.3: Simplified after policy deletion.
-    /// </summary>
+    // AI: purpose=Deterministic density calculator; formula: round(Density01*MaxEvents) clamped to valid range
     public static class DrumDensityCalculator
     {
-        /// <summary>
-        /// Computes the target count of candidates to select for a role in a bar.
-        /// Story C1: TargetCount = round(Density01 * MaxEventsPerBar) clamped to [0..MaxEventsPerBar].
-        /// </summary>
-        /// <param name="bar">Bar context with segment profile.</param>
-        /// <param name="role">Role name (e.g., "Kick", "Snare").</param>
-        /// <param name="density01">Density value [0.0..1.0].</param>
-        /// <param name="maxEventsPerBar">Maximum events per bar.</param>
-        /// <returns>Density result with target count and provenance information.</returns>
+        // AI: behavior=Compute target count deterministically using MidpointRounding.AwayFromZero
         public static GrooveDensityResult ComputeDensityTarget(
             Bar bar,
             string role,
@@ -44,15 +26,12 @@ namespace Music.Generator.Drums.Selection
             ArgumentNullException.ThrowIfNull(bar);
             ArgumentException.ThrowIfNullOrWhiteSpace(role);
 
-            // Clamp inputs
             double densityEffective = Clamp01(density01);
             int maxEventsEffective = Math.Max(0, maxEventsPerBar);
 
-            // Compute target count with rounding (MidpointRounding.AwayFromZero)
             double raw = densityEffective * maxEventsEffective;
             int targetCount = (int)Math.Round(raw, MidpointRounding.AwayFromZero);
 
-            // Clamp target count to [0..maxEventsEffective]
             targetCount = Math.Clamp(targetCount, 0, maxEventsEffective);
 
             string explanation = $"Density={densityEffective:F2}, MaxEvents={maxEventsEffective}, Target={targetCount}";
@@ -64,18 +43,13 @@ namespace Music.Generator.Drums.Selection
                 Explanation: explanation);
         }
 
-
-        /// <summary>
-        /// Clamps density value to [0.0, 1.0] range.
-        /// </summary>
+        // AI: util=Clamp value to [0.0,1.0]
         private static double Clamp01(double value)
         {
             return Math.Clamp(value, 0.0, 1.0);
         }
 
-        /// <summary>
-        /// Builds a concise explanation string for diagnostics.
-        /// </summary>
+        // AI: util=BuildExplanation is retained for richer diagnostics; not used by default path
         private static string BuildExplanation(
             double densityBase,
             int maxEventsBase,

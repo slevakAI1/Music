@@ -1,7 +1,6 @@
 // AI: purpose=PatternSubstitution operator generating kick pattern variants (four-on-floor, syncopated, half-time).
-// AI: invariants=Only applies when Kick in ActiveRoles; generates full-bar kick pattern.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.4; adjust pattern selection and energy thresholds based on style and listening tests.
+// AI: invariants=Applies when Kick in ActiveRoles; produces full-bar kick positions; deterministic from (bar,seed).
+// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; integrates with section type for selection.
 
 
 using Music.Generator.Core;
@@ -12,20 +11,8 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.PatternSubstitution
 {
-    /// <summary>
-    /// Generates kick pattern variants to establish section character:
-    /// - Four-on-floor for driving choruses
-    /// - Syncopated for verse interest
-    /// - Half-time for bridges and breakdowns
-    /// Story 3.4: Pattern Substitution Operators (Groove Swaps).
-    /// </summary>
-    /// <remarks>
-    /// Pattern selection is section-aware:
-    /// - Chorus: four-on-floor for driving feel
-    /// - Verse: syncopated for groove interest
-    /// - Bridge: half-time (sparse) for contrast
-    /// Patterns adapt to time signature (3/4, 5/4, etc.).
-    /// </remarks>
+    // AI: purpose=Generate kick pattern variants to convey section character (four-on-floor, syncopated, half-time).
+    // AI: note=Selection is section-aware (Chorus->FourOnFloor, Verse->Syncopated, Bridge->HalfTime). Patterns adapt to time sig.
     public sealed class KickPatternVariantOperator : DrumOperatorBase
     {
         private const int FourOnFloorVelocityMin = 90;
@@ -36,18 +23,16 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
         private const int HalfTimeVelocityMax = 115;
         private const double BaseScore = 0.5; // Lower than MicroAddition for sparing use
 
-        /// <summary>
-        /// Kick pattern variants: determines groove character.
-        /// </summary>
+        // Kick pattern variants determine groove character for a bar.
         private enum KickPattern
         {
-            /// <summary>No pattern change (use anchor pattern).</summary>
+            // No pattern change (use anchor pattern)
             None,
-            /// <summary>Kick on every beat for driving feel.</summary>
+            // Kick on every beat for driving feel
             FourOnFloor,
-            /// <summary>Syncopated pattern with offbeat accents.</summary>
+            // Syncopated pattern with offbeat accents
             Syncopated,
-            /// <summary>Sparse pattern for half-time or breakdown feel.</summary>
+            // Sparse pattern for half-time or breakdown feel
             HalfTime
         }
 

@@ -1,77 +1,54 @@
-// AI: purpose=Drummer-specific context extending AgentContext; minimal contract for deterministic operator decisions.
-// AI: invariants=All fields immutable; Bar is canonical; cross-bar state only (LastKickBeat, LastSnareBeat).
-// AI: deps=AgentContext base type; Bar contains all bar-derivable properties; consumed by DrummerOperators.
-// AI: change=Story 2.1, Epic DrummerContext-Dedup; Bar owns IsAtSectionBoundary, IsFillWindow, BackbeatBeats, BeatsPerBar.
-
-
-// AI: purpose=Drummer-specific context extending AgentContext; minimal contract for deterministic operator decisions.
-// AI: invariants=All fields immutable; Bar is canonical; cross-bar state only (LastKickBeat, LastSnareBeat).
-// AI: deps=AgentContext base type; Bar contains all bar-derivable properties; consumed by DrummerOperators.
-// AI: change=Story 2.1, Epic DrummerContext-Dedup; Bar owns IsAtSectionBoundary, IsFillWindow, BackbeatBeats, BeatsPerBar.
+// AI: purpose=Drummer-specific context extending AgentContext; minimal contract for operator decisions.
+// AI: invariants=Immutable fields; Bar is canonical; only cross-bar state: LastKickBeat, LastSnareBeat.
+// AI: deps=GeneratorContext, Bar, Section; consumed by DrummerOperators; Bar owns bar-derived flags.
 
 using Music.Generator.Core;
 
 namespace Music.Generator.Drums.Context
 {
-    /// <summary>
-    /// Hi-hat mode: which cymbal is providing the timekeeping.
-    /// </summary>
+    // Hi-hat mode: which cymbal provides the timekeeping.
     public enum HatMode
     {
-        /// <summary>Closed hi-hat is active timekeeping cymbal.</summary>
+        // Closed hi-hat is active timekeeping cymbal.
         Closed,
 
-        /// <summary>Open hi-hat is active timekeeping cymbal.</summary>
+        // Open hi-hat is active timekeeping cymbal.
         Open,
 
-        /// <summary>Ride cymbal is active timekeeping cymbal (instead of hi-hat).</summary>
+        // Ride cymbal is active timekeeping cymbal (instead of hi-hat).
         Ride
     }
 
-    /// <summary>
-    /// Hi-hat subdivision: the rhythmic density of the hi-hat pattern.
-    /// </summary>
+    // Hi-hat subdivision: rhythmic density of the hi-hat pattern.
     public enum HatSubdivision
     {
-        /// <summary>No hi-hat subdivision (hats off or sparse).</summary>
+        // No hi-hat subdivision (hats off or sparse).
         None,
 
-        /// <summary>Eighth note subdivision (2 hits per beat).</summary>
+        // Eighth note subdivision (2 hits per beat).
         Eighth,
 
-        /// <summary>Sixteenth note subdivision (4 hits per beat).</summary>
+        // Sixteenth note subdivision (4 hits per beat).
         Sixteenth
     }
 
-    /// <summary>
-    /// Drummer-specific context extending AgentContext.
-    /// Contains only cross-bar state (LastKickBeat, LastSnareBeat); all bar-derivable data accessed via Bar property.
-    /// Story 2.1: Define Drummer-Specific Context.
-    /// </summary>
+    // AI: purpose=Drummer-specific GeneratorContext; minimal contract for deterministic operator choices.
+    // AI: invariants=Cross-bar state only; Bar supplies all bar-derived properties; instances immutable.
     public sealed record DrummerContext : GeneratorContext
     {
-        /// <summary>
-        /// Canonical bar context for the current decisions.
-        /// </summary>
+        // Canonical bar context for current decisions. Bar is authoritative for bar-derived flags.
         public required Bar Bar { get; init; }
 
-        /// <summary>
-        /// Beat position of the last kick hit in current/recent context (1-based, fractional).
-        /// Null if no recent kick hit is known.
-        /// Used for coordination with bass and ghost note placement.
-        /// </summary>
+        // Beat position of the last kick hit (1-based, fractional). Null when unknown.
+        // Used to coordinate bass and ghost-kick placement across operators.
         public decimal? LastKickBeat { get; init; }
 
-        /// <summary>
-        /// Beat position of the last snare hit in current/recent context (1-based, fractional).
-        /// Null if no recent snare hit is known.
-        /// Used for ghost note placement decisions.
-        /// </summary>
+        // Beat position of the last snare hit (1-based, fractional). Null when unknown.
+        // Used to influence ghost notes and snare-related decisions.
         public decimal? LastSnareBeat { get; init; }
 
-        /// <summary>
-        /// Creates a minimal DrummerContext for testing purposes.
-        /// </summary>
+        // Create a minimal DrummerContext for tests and examples. Deterministic seed and bar only.
+        // NOTE: This helper should not be used in production composition pipelines.
         public static DrummerContext CreateMinimal(
             int barNumber = 1,
             MusicConstants.eSectionType sectionType = MusicConstants.eSectionType.Verse,

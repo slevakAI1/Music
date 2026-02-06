@@ -1,33 +1,14 @@
-// AI: purpose=Select groove candidates until target count reached with pool exhaustion safety (Story C2).
-// AI: invariants=Deterministic; same seed => same selections; never exceeds target; respects anchors and caps.
-// AI: deps=Bar for context; DrumWeightedCandidateSelector, GrooveRngHelper for RNG; GrooveOnset for anchors.
-// AI: change=Story G1: Added optional diagnostics collection via GrooveDiagnosticsCollector.
-
-
 using Music.Generator.Drums.Selection.Candidates;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Selection;
 
-/// <summary>
-/// Selection engine for groove candidates with target count and pool exhaustion safety.
-/// Story C2: Implements safe candidate selection with anchor preservation and cap enforcement.
-/// Story G1: Supports optional diagnostics collection.
-/// </summary>
+// AI: purpose=Select candidates up to a target with deterministic RNG, anchor preservation and caps
+// AI: invariants=Deterministic given same inputs; never exceed targetCount; respects group/candidate caps
+// AI: deps=Uses DrumWeightedCandidateSelector, GrooveRngHelper, and GrooveDiagnosticsCollector (optional)
 public static class OperatorSelector
 {
-    /// <summary>
-    /// Selects candidates until target count is reached or pool is exhausted.
-    /// Story C2: Deterministic selection with RNG, respects anchors and per-group/per-candidate caps.
-    /// Story G1: Optional diagnostics collection for decision tracing.
-    /// </summary>
-    /// <param name="bar">Bar context for RNG seed derivation.</param>
-    /// <param name="role">Role name for selection.</param>
-    /// <param name="groups">Candidate groups to select from (should be merged and filtered by caller).</param>
-    /// <param name="targetCount">Target number of candidates to select.</param>
-    /// <param name="existingAnchors">Existing anchors for this role (to avoid duplicates).</param>
-    /// <param name="diagnostics">Optional diagnostics collector for decision tracing (Story G1).</param>
-    /// <returns>List of selected candidates in selection order.</returns>
+    // AI: entry=Select until targetCount or pool exhausted; diagnostics optional for decision tracing
     public static IReadOnlyList<DrumOnsetCandidate> SelectUntilTargetReached(
         Bar bar,
         string role,
@@ -47,13 +28,13 @@ public static class OperatorSelector
             return Array.Empty<DrumOnsetCandidate>();
         }
 
-        // Build set of anchor beats to detect conflicts
+        // AI: anchors=Collect beats for existing anchors of this role to avoid duplicate onset beats
         var anchorBeats = new HashSet<decimal>(
             existingAnchors
                 .Where(a => string.Equals(a.Role, role, StringComparison.Ordinal))
                 .Select(a => a.Beat));
 
-        // Build working pool: candidates that don't conflict with anchors
+        // AI: pool=Working pool excludes candidates conflicting with anchors; diagnostics record excluded ones
         var workingPool = BuildWorkingPool(groups, anchorBeats, diagnostics);
 
         // Story G1: Record candidate pool statistics
@@ -124,10 +105,7 @@ public static class OperatorSelector
         return selected;
     }
 
-    /// <summary>
-    /// Builds the working pool of candidates excluding those that conflict with anchors.
-    /// Story G1: Records filter decisions for excluded candidates.
-    /// </summary>
+    // AI: build=Compose pool of (candidate,group) excluding anchor conflicts; records filter events to diagnostics
     private static List<(DrumOnsetCandidate Candidate, DrumCandidateGroup Group)> BuildWorkingPool(
         IReadOnlyList<DrumCandidateGroup> groups,
         HashSet<decimal> anchorBeats,
@@ -139,10 +117,8 @@ public static class OperatorSelector
         {
             foreach (var candidate in group.Candidates)
             {
-                // Story C2: Exclude candidates that conflict with anchors (same beat)
                 if (anchorBeats.Contains(candidate.OnsetBeat))
                 {
-                    // Story G1: Record filter decision
                     if (diagnostics != null)
                     {
                         string candidateId = GrooveDiagnosticsCollector.MakeCandidateId(group.GroupId, candidate.OnsetBeat);
@@ -159,9 +135,7 @@ public static class OperatorSelector
         return pool;
     }
 
-    /// <summary>
-    /// Initializes allowance tracking for groups and candidates.
-    /// </summary>
+    // AI: allowances=Initialize group and candidate allowances; use int.MaxValue to represent unlimited
     private static void InitializeAllowances(
         List<(DrumOnsetCandidate Candidate, DrumCandidateGroup Group)> pool,
         Dictionary<string, int> groupAllowances,
@@ -169,7 +143,6 @@ public static class OperatorSelector
     {
         foreach (var (candidate, group) in pool)
         {
-            // Initialize group allowance (use int.MaxValue for unlimited)
             if (!groupAllowances.ContainsKey(group.GroupId))
             {
                 groupAllowances[group.GroupId] = group.MaxAddsPerBar > 0
@@ -177,7 +150,6 @@ public static class OperatorSelector
                     : int.MaxValue;
             }
 
-            // Initialize candidate allowance (use unique key: groupId:beat)
             string candidateKey = $"{group.GroupId}:{candidate.OnsetBeat:F4}";
             if (!candidateAllowances.ContainsKey(candidateKey))
             {
@@ -188,9 +160,7 @@ public static class OperatorSelector
         }
     }
 
-    /// <summary>
-    /// Filters remaining candidates by current allowances.
-    /// </summary>
+    // AI: filter=Return only remaining entries with positive group and candidate allowances
     private static List<(DrumOnsetCandidate Candidate, DrumCandidateGroup Group)> FilterByAllowances(
         List<(DrumOnsetCandidate Candidate, DrumCandidateGroup Group)> remaining,
         Dictionary<string, int> groupAllowances,
@@ -200,18 +170,12 @@ public static class OperatorSelector
 
         foreach (var (candidate, group) in remaining)
         {
-            // Check group allowance
             if (groupAllowances.TryGetValue(group.GroupId, out int groupRemaining) && groupRemaining <= 0)
-            {
                 continue;
-            }
 
-            // Check candidate allowance
             string candidateKey = $"{group.GroupId}:{candidate.OnsetBeat:F4}";
             if (candidateAllowances.TryGetValue(candidateKey, out int candidateRemaining) && candidateRemaining <= 0)
-            {
                 continue;
-            }
 
             selectable.Add((candidate, group));
         }
@@ -219,13 +183,10 @@ public static class OperatorSelector
         return selectable;
     }
 
-    /// <summary>
-    /// Builds groups for weighted selection from selectable candidates.
-    /// </summary>
+    // AI: buildGroups=Aggregate selectable tuples into DrumCandidateGroup instances for weighted selection
     private static List<DrumCandidateGroup> BuildGroupsForSelection(
         List<(DrumOnsetCandidate Candidate, DrumCandidateGroup Group)> selectable)
     {
-        // Group candidates by group ID
         var groupedByGroupId = selectable
             .GroupBy(s => s.Group.GroupId)
             .ToDictionary(g => g.Key, g => g.ToList());
@@ -249,15 +210,12 @@ public static class OperatorSelector
         return groups;
     }
 
-    /// <summary>
-    /// Updates allowances after a candidate is selected.
-    /// </summary>
+    // AI: update=Decrement group and candidate allowances unless they are int.MaxValue (representing unlimited)
     private static void UpdateAllowances(
         WeightedCandidate picked,
         Dictionary<string, int> groupAllowances,
         Dictionary<string, int> candidateAllowances)
     {
-        // Decrement group allowance
         if (groupAllowances.ContainsKey(picked.Group.GroupId))
         {
             if (groupAllowances[picked.Group.GroupId] != int.MaxValue)
@@ -266,7 +224,6 @@ public static class OperatorSelector
             }
         }
 
-        // Decrement candidate allowance
         string candidateKey = $"{picked.Group.GroupId}:{picked.Candidate.OnsetBeat:F4}";
         if (candidateAllowances.ContainsKey(candidateKey))
         {

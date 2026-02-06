@@ -1,12 +1,10 @@
-// AI: purpose=PhrasePunctuation operator generating setup hit on 4& leading into next section.
-// AI: invariants=Only applies when IsAtSectionBoundary=true; generates kick/snare on last 16th of bar.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.3; adjust velocity and beat position based on listening tests.
+// AI: purpose=PhrasePunctuation operator: emit a setup hit on the last "and" (e.g., 4.5) before a section change.
+// AI: invariants=Apply when Bar.IsAtSectionBoundary or Bar.IsFillWindow; requires Kick role; uses 16th grid positions.
+// AI: deps=DrummerContext, DrumCandidate, FillRole conventions; deterministic velocity from (barNumber,seed).
 
 
 using Music.Generator.Core;
 using Music.Generator.Drums.Context;
-using Music.Generator.Drums.Operators;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Drums.Selection.Candidates;
@@ -14,33 +12,22 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.PhrasePunctuation
 {
-    /// <summary>
-    /// Generates a setup hit (kick and/or snare) on beat 4 "and" leading into the next section.
-    /// Provides a subtle anticipation before section transitions without a full fill.
-    /// Story 3.3: Phrase Punctuation Operators (Boundaries &amp; Fills).
-    /// </summary>
+    // AI: purpose=Create a subtle setup hit on the bar's last "and" to lead into the next section.
+    // AI: note=Produces kick and optional snare; uses FillRole.Setup; avoid when BeatsPerBar < 4.
     public sealed class SetupHitOperator : DrumOperatorBase
     {
         private const int VelocityMin = 70;
         private const int VelocityMax = 100;
         private const double BaseScore = 0.65;
 
-        /// <inheritdoc/>
         public override string OperatorId => FillOperatorIds.SetupHit;
 
-        /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
-        /// <summary>
-        /// Requires moderate energy for setup hits.
-        /// </summary>
-
-        /// <summary>
-        /// Requires kick for setup hit (primary).
-        /// </summary>
+        // Requires kick role; snare optional. Energy gating handled by selection policies.
         protected override string? RequiredRole => GrooveRoles.Kick;
 
-        /// <inheritdoc/>
+        // Gate: apply only at section ends/fill windows and when BeatsPerBar >= 4.
         public override bool CanApply(DrummerContext context)
         {
             if (!base.CanApply(context))
@@ -61,7 +48,7 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
             return true;
         }
 
-        /// <inheritdoc/>
+        // Generate setup hit candidate(s) at beat = BeatsPerBar + 0.5 (the "and" of last beat).
         public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
         {
             ArgumentNullException.ThrowIfNull(context);

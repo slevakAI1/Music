@@ -1,7 +1,6 @@
-// AI: purpose=SubdivisionTransform operator adding open hi-hat accents on specific offbeats for emphasis.
-// AI: invariants=Only applies when ClosedHat/OpenHat in ActiveRoles ; places open hats on &s.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.2; adjust beat positions (1&, 3&) or velocity based on listening tests.
+// AI: purpose=SubdivisionTransform: add open hi-hat accents on selected offbeats for emphasis.
+// AI: invariants=Apply when OpenHat role active; positions limited to Bar.BeatsPerBar; deterministic selection.
+// AI: deps=DrummerContext, DrumCandidate, DrumArticulation; integrates with groove section type and energy.
 
 
 using Music.Generator.Core;
@@ -13,11 +12,8 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.SubdivisionTransform
 {
-    /// <summary>
-    /// Adds open hi-hat accents on specific offbeats (typically 1&amp; and 3&amp;) for rhythmic emphasis.
-    /// Creates open hi-hat "splashes" that add forward momentum to the groove.
-    /// Story 3.2: Subdivision Transform Operators (Timekeeping Changes).
-    /// </summary>
+    // AI: purpose=Place open hi-hat "splash" accents on offbeats (e.g., 1.5, 3.5) to add forward momentum.
+    // AI: note=Select up to N accents deterministically from AccentPositions; use DrumArticulation.OpenHat.
     public sealed class OpenHatAccentOperator : DrumOperatorBase
     {
         private const int VelocityMin = 85;
@@ -33,16 +29,10 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
         /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.SubdivisionTransform;
 
-        /// <summary>
-        /// Requires moderate-high energy (>= 0.5) for open hat accents.
-        /// </summary>
-
-        /// <summary>
-        /// Requires open hi-hat to be in active roles.
-        /// </summary>
+        // Requires open hi-hat role; energy gating handled by selector/policy.
         protected override string? RequiredRole => GrooveRoles.OpenHat;
 
-        /// <inheritdoc/>
+        // CanApply: ensure hat mode allows open hats and bar long enough for accent positions.
         public override bool CanApply(DrummerContext context)
         {
             if (!base.CanApply(context))

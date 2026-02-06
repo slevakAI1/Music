@@ -6,7 +6,6 @@
 
 using Music.Generator.Core;
 using Music.Generator.Drums.Context;
-using Music.Generator.Drums.Operators;
 using Music.Generator.Drums.Performance;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Drums.Selection.Candidates;
@@ -15,11 +14,8 @@ using Music.Generator.Material;
 
 namespace Music.Generator.Drums.Operators.Base
 {
-    /// <summary>
-    /// Abstract base class for drum operators providing common functionality.
-    /// Implements IDrumOperator with default behaviors that subclasses can override.
-    /// Story 3.1-3.5: Base for all drum operator implementations.
-    /// </summary>
+    // AI: purpose=Abstract base for drum operators; supplies common CanApply/Score/CreateCandidate helpers.
+    // AI: invariants=Subclasses must provide OperatorId and OperatorFamily; use context.Bar for bar-derived checks.
     public abstract class DrumOperatorBase : IDrumOperator
     {
         /// <inheritdoc/>
@@ -28,15 +24,10 @@ namespace Music.Generator.Drums.Operators.Base
         /// <inheritdoc/>
         public abstract OperatorFamily OperatorFamily { get; }
 
-        /// <summary>
-        /// Required drum role for this operator. Null = no role requirement.
-        /// Subclasses override to specify required ActiveRoles.
-        /// </summary>
+        // RequiredRole: when non-null operator is intended only for that role; null => no role restriction.
         protected virtual string? RequiredRole => null;
 
-        /// <summary>
-        /// Whether operator requires 16th grid subdivision to apply.
-        /// </summary>
+        // Requires16thGrid: set true when operator assumes 16th-note grid alignment for onsets.
         protected virtual bool Requires16thGrid => false;
 
         /// <inheritdoc/>
@@ -87,9 +78,7 @@ namespace Music.Generator.Drums.Operators.Base
             return Score(candidate, (GeneratorContext)context);
         }
 
-        /// <summary>
-        /// Creates a DrumCandidate with common fields set from this operator.
-        /// </summary>
+        // Create a DrumCandidate populated with common operator-provided fields.
         protected DrumCandidate CreateCandidate(
             string role,
             int barNumber,
@@ -117,10 +106,7 @@ namespace Music.Generator.Drums.Operators.Base
             };
         }
 
-        /// <summary>
-        /// Generates a deterministic velocity hint within the specified range.
-        /// Uses bar number and beat for deterministic jitter.
-        /// </summary>
+        // Generate deterministic velocity within [min,max] using bar/beat/seed for repeatable jitter.
         protected static int GenerateVelocityHint(int min, int max, int barNumber, decimal beat, int seed)
         {
             // Simple deterministic pseudo-random within range
@@ -129,14 +115,8 @@ namespace Music.Generator.Drums.Operators.Base
             return min + (Math.Abs(hash) % range);
         }
 
-        /// <summary>
-        /// Applies motif presence score reduction. Story 9.3.
-        /// Returns 1.0 if no motif is active or MotifPresenceMap is null.
-        /// </summary>
-        /// <param name="motifPresenceMap">Optional motif presence map for the current song.</param>
-        /// <param name="bar">Canonical bar context.</param>
-        /// <param name="reductionFactor">Score reduction factor when motif active (e.g., 0.5 = 50% reduction).</param>
-        /// <returns>Multiplier to apply to score (1.0 = no reduction, 0.5 = 50% of original score).</returns>
+        // Score multiplier when motif is active. Returns 1.0 when motif absent or map null.
+        // reductionFactor is fraction to subtract from 1.0 when motif active (e.g., 0.5 => 50% of score remains).
         protected static double GetMotifScoreMultiplier(MotifPresenceMap? motifPresenceMap, Bar bar, double reductionFactor)
         {
             ArgumentNullException.ThrowIfNull(bar);

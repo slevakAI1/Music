@@ -11,26 +11,23 @@ using Music.MyMidi;
 
 namespace Music.Generator.Drums.Generation
 {
-    /// <summary>
-    /// Settings for DrumTrackGenerator behavior.
-    /// </summary>
+    // AI: purpose=Configuration for DrumPhraseGenerator; controls roles, velocity, diagnostics.
+    // AI: invariants=Defaults chosen for sensible generation; ActiveRoles null => default set.
     public sealed record DrumGeneratorSettings
     {
-        /// <summary>Whether to enable diagnostics collection (default: false).</summary>
+        // Enable diagnostics collection. Keep false in production pipelines.
         public bool EnableDiagnostics { get; init; } = false;
 
-        /// <summary>
-        /// Active drum roles to generate (default: Kick, Snare, ClosedHat).
-        /// </summary>
+        // Active roles to generate. When null, GetActiveRoles() returns conservative default roles.
         public IReadOnlyList<string>? ActiveRoles { get; init; }
 
-        /// <summary>Default MIDI velocity for generated notes (default: 100).</summary>
+        // Default MIDI velocity applied when candidate/anchor provides no hint.
         public int DefaultVelocity { get; init; } = 100;
 
-        /// <summary>Default settings instance.</summary>
+        // Default settings instance used by parameterless constructor paths.
         public static DrumGeneratorSettings Default => new();
 
-        /// <summary>Gets the active roles, falling back to default if not set.</summary>
+        // Return configured roles or conservative default set used by generation logic.
         public IReadOnlyList<string> GetActiveRoles()
         {
             return ActiveRoles ?? new[] { GrooveRoles.Kick, GrooveRoles.Snare, GrooveRoles.ClosedHat };
@@ -60,25 +57,10 @@ namespace Music.Generator.Drums.Generation
                 settings: null);
         }
 
-        /// <summary>
-        /// Generates a drum track from the provided song context.
-        /// </summary>
-        /// <param name="songContext">Song context with section, groove, and timing data.</param>
-        /// <param name="maxBars">Maximum number of bars to generate. When 0, generates full song. When > 0, limits generation to first N bars.</param>
-        /// <returns>Generated drum PartTrack.</returns>
-        /// <exception cref="ArgumentNullException">If songContext is null.</exception>
-        /// <exception cref="ArgumentException">If required tracks are missing.</exception>
-        /// <remarks>
-        /// <para>Generation steps:</para>
-        /// <list type="number">
-        ///   <item>Validate song context</item>
-        ///   <item>Extract anchor onsets from groove preset</item>
-        ///   <item>Build per-bar contexts</item>
-        ///   <item>For each bar+role: get policy → calculate target → get candidates → select via GrooveSelectionEngine</item>
-        ///   <item>Combine anchors + selected operators</item>
-        ///   <item>Convert to MIDI events</item>
-        /// </list>
-        /// </remarks>
+        // AI: purpose=Generate a drum PartTrack for the song using anchors + operator selection.
+        // AI: invariants=Throws on null/missing tracks; respects maxBars limit when >0.
+        // AI: flow=validate -> extract anchors -> generate operator candidates -> combine -> to MIDI.
+        // AI: note=This pass does not perform timing/velocity shaping beyond candidate hints.
         public PartTrack Generate(SongContext songContext, int drumProgramNumber, int maxBars = 0)
         {
             ValidateSongContext(songContext);

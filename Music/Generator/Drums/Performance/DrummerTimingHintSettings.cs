@@ -1,95 +1,55 @@
-// AI: purpose=Per-style timing hint configuration for DrummerTimingShaper; immutable settings record.
-// AI: invariants=Tick offsets bounded to reasonable range; defaults conservative; role defaults deterministic.
-// AI: deps=TimingIntent enum; GrooveRoles for role constants; consumed by DrummerTimingShaper; stored in StyleConfiguration.
-// AI: change=Story 6.2; add additional settings as timing hinting requirements evolve.
-
-
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Performance
 {
-    /// <summary>
-    /// Per-style timing hint configuration for the DrummerTimingShaper.
-    /// Defines tick offsets for each timing intent and role-based defaults.
-    /// Story 6.2: Implement Drummer Timing Nuance.
-    /// </summary>
+    // AI: purpose=Per-style timing hint settings record for DrummerTimingShaper.
+    // AI: invariants=Tick offsets bounded; jitter and adjustments clamped by MaxAbsoluteOffset.
+    // AI: deps=TimingIntent enum; GrooveRoles constants; stored in StyleConfiguration and consumed by shaper.
     public sealed record DrummerTimingHintSettings
     {
-        /// <summary>
-        /// Tick offset for slightly ahead timing (negative = early).
-        /// Default: -5 ticks.
-        /// </summary>
+        // Tick offset for slightly ahead timing (negative = early).
         public int SlightlyAheadTicks { get; init; } = -5;
 
-        /// <summary>
-        /// Tick offset for slightly behind timing (positive = late).
-        /// Default: +5 ticks.
-        /// </summary>
+        // Tick offset for slightly behind timing (positive = late).
         public int SlightlyBehindTicks { get; init; } = 5;
 
-        /// <summary>
-        /// Tick offset for rushed timing (more negative).
-        /// Default: -10 ticks.
-        /// </summary>
+        // Tick offset for rushed timing (more negative).
         public int RushedTicks { get; init; } = -10;
 
-        /// <summary>
-        /// Tick offset for laid-back timing (more positive).
-        /// Default: +10 ticks.
-        /// </summary>
+        // Tick offset for laid-back timing (more positive).
         public int LaidBackTicks { get; init; } = 10;
 
-        /// <summary>
-        /// Maximum timing jitter for humanization (±ticks).
-        /// Applied deterministically based on candidate hash.
-        /// Default: 3 ticks.
-        /// </summary>
+        // Max deterministic jitter (±ticks) applied per candidate.
         public int MaxTimingJitter { get; init; } = 3;
 
-        /// <summary>
-        /// Maximum adjustment delta when existing hint is present.
-        /// Preserves operator intent while nudging toward style target.
-        /// Default: 5 ticks.
-        /// </summary>
+        // Max delta when nudging existing operator timing toward style target.
         public int MaxAdjustmentDelta { get; init; } = 5;
 
-        /// <summary>
-        /// Maximum absolute timing offset allowed after all adjustments.
-        /// Hints are clamped to [-MaxAbsoluteOffset, +MaxAbsoluteOffset].
-        /// Default: 20 ticks.
-        /// </summary>
+        // Absolute clamp for any timing hint after adjustments.
         public int MaxAbsoluteOffset { get; init; } = 20;
 
-        /// <summary>
-        /// Default timing intent per drum role.
-        /// Roles not in this dictionary default to OnTop.
-        /// </summary>
+        // Default timing intent per role; roles not present default to OnTop.
         public IReadOnlyDictionary<string, TimingIntent> RoleTimingIntentDefaults { get; init; }
             = DefaultRoleTimingIntents;
 
-        /// <summary>
-        /// Standard role timing intent defaults (genre-agnostic).
-        /// </summary>
+        // Standard role timing intent defaults (genre-agnostic).
         public static readonly IReadOnlyDictionary<string, TimingIntent> DefaultRoleTimingIntents =
             new Dictionary<string, TimingIntent>
             {
-                { GrooveRoles.Snare, TimingIntent.SlightlyBehind },  // Universal pocket feel
-                { GrooveRoles.Kick, TimingIntent.OnTop },            // Anchor
-                { GrooveRoles.ClosedHat, TimingIntent.OnTop },       // Consistent timekeeping
-                { GrooveRoles.OpenHat, TimingIntent.OnTop },         // Timekeeping
-                { GrooveRoles.Ride, TimingIntent.OnTop },            // Timekeeping
-                { GrooveRoles.Crash, TimingIntent.OnTop },           // Accent marker
-                { "Tom1", TimingIntent.OnTop },                      // Neutral
-                { "Tom2", TimingIntent.OnTop },                      // Neutral
-                { "FloorTom", TimingIntent.OnTop }                   // Neutral
+                { GrooveRoles.Snare, TimingIntent.SlightlyBehind },
+                { GrooveRoles.Kick, TimingIntent.OnTop },
+                { GrooveRoles.ClosedHat, TimingIntent.OnTop },
+                { GrooveRoles.OpenHat, TimingIntent.OnTop },
+                { GrooveRoles.Ride, TimingIntent.OnTop },
+                { GrooveRoles.Crash, TimingIntent.OnTop },
+                { "Tom1", TimingIntent.OnTop },
+                { "Tom2", TimingIntent.OnTop },
+                { "FloorTom", TimingIntent.OnTop }
             };
 
         #region Style Presets
 
-        /// <summary>
-        /// Conservative fallback defaults when no style-specific settings exist.
-        /// Smaller offsets and less jitter for safe, neutral timing.
-        /// </summary>
+        // Conservative fallback defaults for neutral timing.
         public static DrummerTimingHintSettings ConservativeDefaults => new()
         {
             SlightlyAheadTicks = -3,
@@ -101,10 +61,7 @@ namespace Music.Generator.Drums.Performance
             MaxAbsoluteOffset = 15
         };
 
-        /// <summary>
-        /// Pop/Rock timing defaults.
-        /// Standard pocket feel with moderate offset values.
-        /// </summary>
+        // Pop/Rock defaults: standard pocket with moderate offsets.
         public static DrummerTimingHintSettings PopRockDefaults => new()
         {
             SlightlyAheadTicks = -5,
@@ -116,10 +73,7 @@ namespace Music.Generator.Drums.Performance
             MaxAbsoluteOffset = 20
         };
 
-        /// <summary>
-        /// Jazz timing defaults.
-        /// More laid-back overall with wider pocket.
-        /// </summary>
+        // Jazz defaults: more laid-back pocket and slightly wider bounds.
         public static DrummerTimingHintSettings JazzDefaults => new()
         {
             SlightlyAheadTicks = -3,
@@ -131,11 +85,11 @@ namespace Music.Generator.Drums.Performance
             MaxAbsoluteOffset = 20,
             RoleTimingIntentDefaults = new Dictionary<string, TimingIntent>
             {
-                { GrooveRoles.Snare, TimingIntent.SlightlyBehind },  // Deeper pocket in jazz
-                { GrooveRoles.Kick, TimingIntent.SlightlyBehind },   // Jazz kick can lay back slightly
-                { GrooveRoles.ClosedHat, TimingIntent.OnTop },       // Timekeeping stays on
+                { GrooveRoles.Snare, TimingIntent.SlightlyBehind },
+                { GrooveRoles.Kick, TimingIntent.SlightlyBehind },
+                { GrooveRoles.ClosedHat, TimingIntent.OnTop },
                 { GrooveRoles.OpenHat, TimingIntent.OnTop },
-                { GrooveRoles.Ride, TimingIntent.OnTop },            // Ride is the timekeeper
+                { GrooveRoles.Ride, TimingIntent.OnTop },
                 { GrooveRoles.Crash, TimingIntent.OnTop },
                 { "Tom1", TimingIntent.OnTop },
                 { "Tom2", TimingIntent.OnTop },
@@ -143,10 +97,7 @@ namespace Music.Generator.Drums.Performance
             }
         };
 
-        /// <summary>
-        /// Metal timing defaults.
-        /// Tighter, more on-top feel with less laid-back.
-        /// </summary>
+        // Metal defaults: tighter, on-top feel with limited laid-back.
         public static DrummerTimingHintSettings MetalDefaults => new()
         {
             SlightlyAheadTicks = -5,
@@ -158,8 +109,8 @@ namespace Music.Generator.Drums.Performance
             MaxAbsoluteOffset = 25,
             RoleTimingIntentDefaults = new Dictionary<string, TimingIntent>
             {
-                { GrooveRoles.Snare, TimingIntent.OnTop },           // Metal snare is tight
-                { GrooveRoles.Kick, TimingIntent.OnTop },            // Precise kicks
+                { GrooveRoles.Snare, TimingIntent.OnTop },
+                { GrooveRoles.Kick, TimingIntent.OnTop },
                 { GrooveRoles.ClosedHat, TimingIntent.OnTop },
                 { GrooveRoles.OpenHat, TimingIntent.OnTop },
                 { GrooveRoles.Ride, TimingIntent.OnTop },
@@ -174,9 +125,7 @@ namespace Music.Generator.Drums.Performance
 
         #region Methods
 
-        /// <summary>
-        /// Gets the tick offset for a given timing intent.
-        /// </summary>
+        // Get tick offset for a given TimingIntent (maps intent -> configured tick offset).
         public int GetTickOffset(TimingIntent intent)
         {
             return intent switch
@@ -190,10 +139,7 @@ namespace Music.Generator.Drums.Performance
             };
         }
 
-        /// <summary>
-        /// Gets the default timing intent for a role.
-        /// Returns OnTop for unknown roles.
-        /// </summary>
+        // Get default TimingIntent for a role; unknown roles return OnTop.
         public TimingIntent GetRoleDefaultIntent(string role)
         {
             if (string.IsNullOrEmpty(role))
@@ -204,16 +150,12 @@ namespace Music.Generator.Drums.Performance
                 : TimingIntent.OnTop;
         }
 
-        /// <summary>
-        /// Computes deterministic jitter based on candidate properties.
-        /// Returns value in range [-MaxTimingJitter, +MaxTimingJitter].
-        /// </summary>
+        // Compute deterministic jitter in range [-MaxTimingJitter, +MaxTimingJitter] using candidate properties.
         public int ComputeJitter(int barNumber, decimal beat, string role, string candidateId)
         {
             if (MaxTimingJitter <= 0)
                 return 0;
 
-            // Deterministic hash-based jitter
             int hash = HashCode.Combine(barNumber, beat, role, candidateId);
             int range = 2 * MaxTimingJitter + 1;
             int jitter = (Math.Abs(hash) % range) - MaxTimingJitter;
@@ -221,9 +163,7 @@ namespace Music.Generator.Drums.Performance
             return jitter;
         }
 
-        /// <summary>
-        /// Validates that all timing values are within reasonable bounds.
-        /// </summary>
+        // Validate that timing values are within bounds and consistent with MaxAbsoluteOffset.
         public bool IsValid(out string? errorMessage)
         {
             if (MaxTimingJitter < 0)

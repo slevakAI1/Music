@@ -1,7 +1,6 @@
-// AI: purpose=Builder for DrumOperatorRegistry; registers all drum operators for discovery and filtering.
-// AI: invariants=RegisterAll() must be called before any operators can be used; operators registered in deterministic order.
-// AI: deps=DrumOperatorRegistry, all operator implementations across MicroAddition/SubdivisionTransform/PhrasePunctuation/PatternSubstitution/StyleIdiom families.
-// AI: change=Story 2.4 stub; Story 3.1 adds MicroAddition; Story 3.2 adds SubdivisionTransform; Story 3.3 adds PhrasePunctuation; Story 3.4 adds PatternSubstitution; Story 3.5 adds StyleIdiom; Story 3.6 completes with all families.
+// AI: purpose=Builder for DrumOperatorRegistry; registers all operators in deterministic order for startup/tests.
+// AI: invariants=Call RegisterAllOperators before Freeze; registry order is stable and reproducible across runs.
+// AI: deps=DrumOperatorRegistry and concrete operator classes; used by DrummerOperatorCandidates and tests.
 
 using Music.Generator.Drums.Operators.MicroAddition;
 using Music.Generator.Drums.Operators.SubdivisionTransform;
@@ -31,19 +30,15 @@ namespace Music.Generator.Drums.Operators
     /// </remarks>
     public static class DrumOperatorRegistryBuilder
     {
-        /// <summary>
-        /// Creates and populates a new registry with all available drum operators.
-        /// Operators are registered in deterministic order for reproducibility.
-        /// </summary>
-        /// <returns>A frozen registry ready for use.</returns>
-        /// <exception cref="InvalidOperationException">If operator count != 28.</exception>
+        // Create and populate a registry with all operators, validate expected count, then freeze.
+        // Throws InvalidOperationException when validation fails.
         public static DrumOperatorRegistry BuildComplete()
         {
             var registry = DrumOperatorRegistry.CreateEmpty();
 
             RegisterAllOperators(registry);
 
-            // Story 3.6: Validate total operator count (7+5+7+4+5=28)
+            // Validate total operator count to catch incomplete registrations in tests/dev
             const int ExpectedOperatorCount = 28;
             if (registry.Count != ExpectedOperatorCount)
             {
@@ -55,9 +50,7 @@ namespace Music.Generator.Drums.Operators
             return registry;
         }
 
-        /// <summary>
-        /// Builds diagnostic message for operator count validation failure.
-        /// </summary>
+        // Build a diagnostic message listing registered operators by family when validation fails.
         private static string BuildCountValidationMessage(DrumOperatorRegistry registry, int expected)
         {
             var sb = new System.Text.StringBuilder();
@@ -77,35 +70,19 @@ namespace Music.Generator.Drums.Operators
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Registers all operators into the provided registry.
-        /// Called by BuildComplete(); exposed for testing.
-        /// </summary>
-        /// <param name="registry">Registry to populate.</param>
+        // RegisterAllOperators: populate registry by calling family registration helpers. Exposed for tests.
         public static void RegisterAllOperators(DrumOperatorRegistry registry)
         {
             ArgumentNullException.ThrowIfNull(registry);
-
-            // Story 3.1: MicroAddition operators (7)
+            // Register families in deterministic order
             RegisterMicroAdditionOperators(registry);
-
-            // Story 3.2: SubdivisionTransform operators (5)
             RegisterSubdivisionTransformOperators(registry);
-
-            // Story 3.3: PhrasePunctuation operators (7)
             RegisterPhrasePunctuationOperators(registry);
-
-            // Story 3.4: PatternSubstitution operators (4)
             RegisterPatternSubstitutionOperators(registry);
-
-            // Story 3.5: StyleIdiom operators (5)
             RegisterStyleIdiomOperators(registry);
         }
 
-        /// <summary>
-        /// Registers MicroAddition family operators (ghost notes, pickups, embellishments).
-        /// Story 3.1: 7 operators.
-        /// </summary>
+        // Register MicroAddition operators (ghosts, pickups, embellishments)
         private static void RegisterMicroAdditionOperators(DrumOperatorRegistry registry)
         {
             registry.RegisterOperator(new GhostBeforeBackbeatOperator());
@@ -117,10 +94,7 @@ namespace Music.Generator.Drums.Operators
             registry.RegisterOperator(new FloorTomPickupOperator());
         }
 
-        /// <summary>
-        /// Registers SubdivisionTransform family operators (timekeeping density changes).
-        /// Story 3.2: 5 operators.
-        /// </summary>
+        // Register SubdivisionTransform operators (hat/ride swaps, partial lifts)
         private static void RegisterSubdivisionTransformOperators(DrumOperatorRegistry registry)
         {
             registry.RegisterOperator(new HatLiftOperator());
@@ -130,10 +104,7 @@ namespace Music.Generator.Drums.Operators
             registry.RegisterOperator(new OpenHatAccentOperator());
         }
 
-        /// <summary>
-        /// Registers PhrasePunctuation family operators (fills, crashes, section boundaries).
-        /// Story 3.3: 7 operators.
-        /// </summary>
+        // Register PhrasePunctuation operators (fills, crashes, setup/stop time)
         private static void RegisterPhrasePunctuationOperators(DrumOperatorRegistry registry)
         {
             registry.RegisterOperator(new CrashOnOneOperator());
@@ -145,10 +116,7 @@ namespace Music.Generator.Drums.Operators
             registry.RegisterOperator(new DropFillOperator());
         }
 
-        /// <summary>
-        /// Registers PatternSubstitution family operators (groove swaps, feel changes).
-        /// Story 3.4: 4 operators.
-        /// </summary>
+        // Register PatternSubstitution operators (groove swaps, half/double time)
         private static void RegisterPatternSubstitutionOperators(DrumOperatorRegistry registry)
         {
             registry.RegisterOperator(new BackbeatVariantOperator());
@@ -157,10 +125,7 @@ namespace Music.Generator.Drums.Operators
             registry.RegisterOperator(new DoubleTimeFeelOperator());
         }
 
-        /// <summary>
-        /// Registers StyleIdiom family operators (genre-specific Pop Rock moves).
-        /// Story 3.5: 5 operators.
-        /// </summary>
+        // Register StyleIdiom operators (PopRock specific behaviors)
         private static void RegisterStyleIdiomOperators(DrumOperatorRegistry registry)
         {
             registry.RegisterOperator(new PopRockBackbeatPushOperator());

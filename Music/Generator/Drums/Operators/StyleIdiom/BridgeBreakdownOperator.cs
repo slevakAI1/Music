@@ -1,7 +1,6 @@
-// AI: purpose=StyleIdiom operator generating half-time or minimal patterns for Pop Rock bridge sections.
-// AI: invariants=Only applies when StyleId=="PopRock" and SectionType==Bridge; generates breakdown patterns.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.5; breakdown variant (half-time vs minimal) configurable in PopRockStyleConfiguration.
+// AI: purpose=StyleIdiom operator for PopRock bridge breakdowns (half-time or minimal variants).
+// AI: invariants=Apply only when style=PopRock and Section=Bridge; deterministic from (bar,seed); no external side-effects.
+// AI: deps=DrummerContext, DrumCandidate; integrates with groove/section type; variant chosen by energy/seed.
 
 
 using Music.Generator.Core;
@@ -12,22 +11,8 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.StyleIdiom
 {
-    /// <summary>
-    /// Generates half-time or minimal patterns for Pop Rock bridge sections.
-    /// Provides contrast before the final chorus by reducing rhythmic density.
-    /// Story 3.5: Style Idiom Operators (Pop Rock Specifics).
-    /// </summary>
-    /// <remarks>
-    /// Breakdown variants:
-    /// - Half-time: Snare on beat 3 only (instead of 2 and 4)
-    /// - Minimal: Very sparse pattern, often just kick on 1 and snare on 3
-    /// 
-    /// Selection based on energy level:
-    /// - Higher energy (>0.4): Half-time feel
-    /// - Lower energy (≤0.4): Minimal breakdown
-    /// 
-    /// This operator is PopRock-specific and will not apply for other styles.
-    /// </remarks>
+    // AI: purpose=Emit bridge breakdown variants for PopRock: HalfTime or Minimal sparse patterns.
+    // AI: note=HalfTime => snare on 3; Minimal => sparse kick/snare and optional sparse hats; selection from energy/seed.
     public sealed class BridgeBreakdownOperator : DrumOperatorBase
     {
         private const string PopRockStyleId = "PopRock";

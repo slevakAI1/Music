@@ -1,4 +1,3 @@
-using Music.Generator.Drums.Selection;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Selection.Candidates;

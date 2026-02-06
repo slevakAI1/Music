@@ -1,7 +1,6 @@
-// AI: purpose=StyleIdiom operator generating consistent crash patterns for Pop Rock chorus sections.
-// AI: invariants=Only applies when StyleId=="PopRock", SectionType==Chorus, and Crash in ActiveRoles; crash on beat 1.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.5; crash pattern is a section signature (allowed repetition for consistency).
+// AI: purpose=StyleIdiom operator generating consistent crash patterns for PopRock chorus sections.
+// AI: invariants=Apply only when style=PopRock and Section=Chorus; Crash role required; crash usually on beat 1.
+// AI: deps=DrummerContext, DrumCandidate, DrumArticulation; deterministic selection from (barNumber,seed).
 
 
 using Music.Generator.Core;
@@ -13,21 +12,8 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.StyleIdiom
 {
-    /// <summary>
-    /// Generates consistent crash cymbal patterns for Pop Rock chorus sections.
-    /// Default: crash on beat 1 of each chorus bar, with optional every-other-bar variant.
-    /// Story 3.5: Style Idiom Operators (Pop Rock Specifics).
-    /// </summary>
-    /// <remarks>
-    /// Crash patterns:
-    /// - Default: crash on beat 1 of every chorus bar
-    /// - Every-other-bar: crash on beat 1 of bars 1, 3, 5... (lower energy)
-    /// - Phrase start only: crash only on first bar of chorus (minimal)
-    /// 
-    /// This pattern is treated as a section signature (low repetition penalty) because
-    /// consistency across choruses is musically desirable in Pop Rock.
-    /// This operator is PopRock-specific and will not apply for other styles.
-    /// </remarks>
+    // AI: purpose=Emit crash cymbal for PopRock choruses; default every-bar, alternate every-other or phrase-start patterns.
+    // AI: note=Pattern is a section signature (low repetition penalty); selection depends on energy/seed.
     public sealed class PopChorusCrashPatternOperator : DrumOperatorBase
     {
         private const string PopRockStyleId = "PopRock";
@@ -35,10 +21,8 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
         private const int VelocityMax = 120;
         private const double BaseScore = 0.8;
 
-        /// <inheritdoc/>
         public override string OperatorId => "DrumPopChorusCrashPattern";
 
-        /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.StyleIdiom;
 
         /// <summary>

@@ -1,7 +1,6 @@
-// AI: purpose=MicroAddition operator adding extra kicks on offbeats (1.5, 3.5 or 16th variants).
-// AI: invariants=VelocityHint in [60,80]; uses 8th positions (1.5, 3.5) or 16th (1.25/1.75) based on grid/energy.
+// AI: purpose=MicroAddition operator: add extra kick hits on offbeats (8th or 16th variants).
+// AI: invariants=VelocityHint in [60,80]; respects Bar.BeatsPerBar; deterministic selection from (bar,seed).
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.1; adjust position selection logic based on listening tests.
 
 
 using Music.Generator.Core;
@@ -12,12 +11,8 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.MicroAddition
 {
-    /// <summary>
-    /// Generates additional kick hits on offbeats to add rhythmic drive.
-    /// Uses 8th positions (1.5, 3.5) by default, or 16th positions (1.25/1.75, 3.25/3.75) 
-    /// when 16th grid is allowed and energy is high.
-    /// Story 3.1: Micro-Addition Operators (Ghost Notes &amp; Embellishments).
-    /// </summary>
+    // Add extra kick hits on offbeats to enhance rhythmic drive.
+    // Uses 8th positions by default; may use 16th variants when grid/energy allow.
     public sealed class KickDoubleOperator : DrumOperatorBase
     {
         private const int VelocityMin = 60;
@@ -25,22 +20,14 @@ namespace Music.Generator.Drums.Operators.MicroAddition
         private const double BaseScore = 0.55;
         private const double HighEnergyThreshold = 0.6;
 
-        /// <inheritdoc/>
         public override string OperatorId => "DrumKickDouble";
 
-        /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.MicroAddition;
 
-        /// <summary>
-        /// Requires moderate energy for kick doubles.
-        /// </summary>
-
-        /// <summary>
-        /// Requires kick to be in active roles.
-        /// </summary>
+        // Requires kick role active in groove preset; energy gating happens in selector/policy.
         protected override string? RequiredRole => GrooveRoles.Kick;
 
-        /// <inheritdoc/>
+        // CanApply: rely on base checks; no additional gating here.
         public override bool CanApply(DrummerContext context)
         {
             if (!base.CanApply(context))
@@ -49,7 +36,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
             return true;
         }
 
-        /// <inheritdoc/>
+        // Generate kick double candidates at selected offbeat positions deterministically.
         public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -90,9 +77,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
             }
         }
 
-        /// <summary>
-        /// Returns 8th note positions for kick doubles (1.5, 3.5).
-        /// </summary>
+        // Return 8th-note offbeat positions to place kick doubles (1.5, 3.5 when available).
         private static IEnumerable<decimal> Select8thPositions(DrummerContext context)
         {
             if (context.Bar.BeatsPerBar >= 2)
@@ -102,10 +87,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
                 yield return 3.5m;
         }
 
-        /// <summary>
-        /// Returns 16th note positions for kick doubles, selected deterministically.
-        /// Uses RNG to pick either early (1.25, 3.25) or late (1.75, 3.75) variants.
-        /// </summary>
+        // Return 16th-note positions for kick doubles; deterministically choose early/late variant per bar/seed.
         private static IEnumerable<decimal> Select16thPositions(DrummerContext context)
         {
             // Deterministic selection based on bar number and seed

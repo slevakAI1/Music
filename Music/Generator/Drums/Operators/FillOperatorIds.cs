@@ -5,6 +5,7 @@ namespace Music.Generator.Drums.Operators;
 
 public static class FillOperatorIds
 {
+    // AI: note=Contains canonical fill operator IDs and an immutable set for membership checks; keep values stable.
     public const string TurnaroundFillShort = "TurnaroundFillShort";
     public const string TurnaroundFillFull = "TurnaroundFillFull";
     public const string BuildFill = "BuildFill";

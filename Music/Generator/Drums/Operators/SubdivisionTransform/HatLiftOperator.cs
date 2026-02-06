@@ -1,7 +1,6 @@
-// AI: purpose=SubdivisionTransform operator switching hi-hat from 8ths to 16ths for energy increase.
-// AI: invariants=Applies in suitable sections; generates full 16th pattern for bar.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.2; adjust energy threshold or velocity curve based on listening tests.
+// AI: purpose=SubdivisionTransform operator switching hi-hat from 8ths to 16ths to increase density.
+// AI: invariants=Apply in suitable sections; produces full 16th grid candidates for the bar; deterministic by seed.
+// AI: deps=DrummerContext, DrumCandidate, Groove; avoid altering downbeat anchors; no runtime behavior changes.
 
 
 using Music.Generator.Core;
@@ -12,11 +11,8 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.SubdivisionTransform
 {
-    /// <summary>
-    /// Switches hi-hat pattern from 8ths to 16ths for increased rhythmic density.
-    /// Generates full bar of 16th hi-hat candidates when energy is high.
-    /// Story 3.2: Subdivision Transform Operators (Timekeeping Changes).
-    /// </summary>
+    // AI: purpose=Emit full-bar 16th hi-hat pattern (four 16th positions per beat) to raise hat density.
+    // AI: note=Downbeats get accents; skip positions beyond bar end; score boosted near transitions; deterministic.
     public sealed class HatLiftOperator : DrumOperatorBase
     {
         private const int VelocityMin = 60;

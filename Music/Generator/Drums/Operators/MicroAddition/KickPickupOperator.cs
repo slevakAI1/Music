@@ -1,7 +1,6 @@
-// AI: purpose=MicroAddition operator generating kick anticipation at 4.75 leading into next bar.
-// AI: invariants=VelocityHint in [60,80]; only applies when Kick in ActiveRoles 
+// AI: purpose=MicroAddition operator generating kick anticipation at bar end (beat +0.75).
+// AI: invariants=VelocityHint in [60,80]; requires Kick role and BeatsPerBar>=4; deterministic via Seed.
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.1; adjust energy threshold based on listening tests.
 
 
 using Music.Generator.Core;
@@ -12,33 +11,22 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.MicroAddition
 {
-    /// <summary>
-    /// Generates a kick pickup at beat 4.75 leading into the next bar's downbeat.
-    /// Creates forward motion and anticipation for phrase continuation.
-    /// Story 3.1: Micro-Addition Operators (Ghost Notes &amp; Embellishments).
-    /// </summary>
+    // AI: purpose=Create a kick pickup at bar end (e.g., 4.75 in 4/4) to lead into next downbeat.
+    // AI: invariants=Avoid at section boundaries; reduced score at boundaries; deterministic velocity via seed.
     public sealed class KickPickupOperator : DrumOperatorBase
     {
         private const int VelocityMin = 60;
         private const int VelocityMax = 80;
         private const double BaseScore = 0.65;
 
-        /// <inheritdoc/>
         public override string OperatorId => "DrumKickPickup";
 
-        /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.MicroAddition;
 
-        /// <summary>
-        /// Requires moderate energy for pickup to be musical.
-        /// </summary>
-
-        /// <summary>
-        /// Requires kick to be in active roles.
-        /// </summary>
+        // Requires kick role active in groove; energy gating handled elsewhere in policy/selector.
         protected override string? RequiredRole => GrooveRoles.Kick;
 
-        /// <inheritdoc/>
+        // Gate: needs at least BeatsPerBar >= 4 for pickup at BeatsPerBar + 0.75.
         public override bool CanApply(DrummerContext context)
         {
             if (!base.CanApply(context))
@@ -51,7 +39,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
             return true;
         }
 
-        /// <inheritdoc/>
+        // Generate a single kick pickup candidate at bar end minus quarter beat. Reduce score at section boundaries.
         public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
         {
             ArgumentNullException.ThrowIfNull(context);

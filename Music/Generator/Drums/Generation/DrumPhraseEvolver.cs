@@ -1,6 +1,7 @@
-// AI: purpose=Applies bounded evolution to drum phrases for purposeful variation in phrase placement.
-// AI: invariants=Never mutate original phrase/events; deterministic from (seed, phraseId, evolution) inputs.
-// AI: deps=MaterialPhrase events are phrase-relative ticks; uses DrumPhraseEvolutionParams and BarTrack bounds.
+// AI: purpose=Apply bounded, deterministic evolution to drum phrases for musical variation.
+// AI: invariants=Do not mutate inputs; output deterministic from (seed, phraseId, evolution).
+// AI: deps=MaterialPhrase uses phrase-relative ticks; relies on DrumPhraseEvolutionParams and BarTrack.
+// AI: change=Keep small diff: comments only; algorithms remain behaviorally identical.
 
 using Music.Generator.Drums.Planning;
 using Music.MyMidi;
@@ -24,7 +25,8 @@ public sealed class DrumPhraseEvolver
         _seed = seed;
     }
 
-    // AI: purpose=Applies evolution operators in order; returns original when evolution is null or all zeros.
+    // AI: purpose=Apply operators in fixed order: simplification, ghost, hat, random.
+    // AI: note=Deterministic RNG seeded by (_seed ^ phraseIdHash). Returns original when no evolution.
     public MaterialPhrase Evolve(MaterialPhrase original, DrumPhraseEvolutionParams? evolution, BarTrack barTrack)
     {
         ArgumentNullException.ThrowIfNull(original);

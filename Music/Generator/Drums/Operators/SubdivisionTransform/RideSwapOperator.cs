@@ -1,7 +1,6 @@
-// AI: purpose=SubdivisionTransform operator switching from hi-hat to ride cymbal for timbral variation.
-// AI: invariants=Only applies when CurrentHatMode!=Ride and Ride in ActiveRoles; generates full ride pattern for bar.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.2; adjust scoring for section types (bridges, choruses) based on listening tests.
+// AI: purpose=SubdivisionTransform: switch timekeeping from hi-hat to ride cymbal for timbral variation.
+// AI: invariants=Apply when hat!=Ride and Ride role available; emit ride events matching current subdivision.
+// AI: deps=DrummerContext.Bar provides BeatsPerBar/Subdivision; deterministic velocity from (bar,seed).
 
 
 using Music.Generator.Core;
@@ -13,11 +12,8 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.SubdivisionTransform
 {
-    /// <summary>
-    /// Switches timekeeping from hi-hat to ride cymbal for timbral variation.
-    /// Generates ride pattern matching current subdivision (8th or 16th).
-    /// Story 3.2: Subdivision Transform Operators (Timekeeping Changes).
-    /// </summary>
+    // AI: purpose=Emit ride cymbal timekeeping matching hat subdivision to change timbre/layout.
+    // AI: note=Use RideBell for bar 1 downbeat; preserve anchor hits; avoid replacing anchors produced by groove.
     public sealed class RideSwapOperator : DrumOperatorBase
     {
         private const int VelocityMin = 70;

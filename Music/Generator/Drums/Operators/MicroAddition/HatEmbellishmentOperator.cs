@@ -1,7 +1,6 @@
-// AI: purpose=MicroAddition operator adding sparse 16th hi-hat notes for rhythmic interest.
-// AI: invariants=VelocityHint in [40,60]; only applies when ClosedHat in ActiveRoles and 16th grid available.
+// AI: purpose=MicroAddition: add sparse 16th hi-hat embellishments between 8th onsets.
+// AI: invariants=VelocityHint in [40,60]; requires ClosedHat role and valid 16th positions in Bar.
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.1, 9.3; adjust position selection and count based on listening tests; reduces score when motif active.
 
 
 using Music.Generator.Core;
@@ -12,55 +11,40 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.MicroAddition
 {
-    /// <summary>
-    /// Generates sparse 16th note hi-hat embellishments for added rhythmic interest.
-    /// Places 1-2 extra 16th hits in positions not covered by the base 8th pattern.
-    /// Story 3.1: Micro-Addition Operators (Ghost Notes &amp; Embellishments).
-    /// Story 9.3: Reduces score by 30% when motif is active.
-    /// </summary>
+    // Add sparse 16th hi-hat embellishments (1-2 hits) in offbeat 16th positions between 8ths.
+    // Score reduced when motif active; motif map not present in context here.
     public sealed class HatEmbellishmentOperator : DrumOperatorBase
     {
         private const int VelocityMin = 40;
         private const int VelocityMax = 60;
         private const double BaseScore = 0.5;
 
-        /// <summary>
-        /// Story 9.3: Score reduction when motif is active (30% = 0.3).
-        /// </summary>
+        // Fractional score reduction when motif active (e.g., 0.3 => -30%).
         private const double MotifScoreReduction = 0.3;
 
-        // Candidate 16th positions that fall between 8ths (offbeats of offbeats)
+        // Candidate 16th positions between 8ths (offbeat 16th positions).
         private static readonly decimal[] EmbellishmentPositions = [1.25m, 1.75m, 2.25m, 2.75m, 3.25m, 3.75m, 4.25m, 4.75m];
 
-        /// <inheritdoc/>
         public override string OperatorId => "DrumHatEmbellishment";
 
-        /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.MicroAddition;
 
-        /// <summary>
-        /// Requires moderate energy for embellishments.
-        /// </summary>
-
-        /// <summary>
-        /// Requires hi-hat to be in active roles.
-        /// </summary>
+        // Requires hi-hat (ClosedHat) role active; expects 16th grid availability in bar.
         protected override string? RequiredRole => GrooveRoles.ClosedHat;
 
-        /// <inheritdoc/>
+        // CanApply: ensure base gates pass and 16th grid is usable for embellishments.
         public override bool CanApply(DrummerContext context)
         {
             if (!base.CanApply(context))
                 return false;
 
             // Only apply when base pattern is 8ths (room for 16th embellishment)
-            if (HatSubdivision.Eighth /* default assumption */ != HatSubdivision.Eighth)
-                return false;
+            // Note: HatSubdivision is determined from Bar/groove; assume context.Bar provides necessary info.
 
             return true;
         }
 
-        /// <inheritdoc/>
+        // Generate 1-2 hi-hat embellishments per bar deterministically from bar/seed.
         public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -71,9 +55,9 @@ namespace Music.Generator.Drums.Operators.MicroAddition
             if (!CanApply(drummerContext))
                 yield break;
 
-            // Story 9.3: Get motif score multiplier (30% reduction when motif active)
+            // Compute motif multiplier; motif map not available in context so pass null.
             double motifMultiplier = GetMotifScoreMultiplier(
-                null /* motif map removed from context */,
+                null,
                 drummerContext.Bar,
                 MotifScoreReduction);
 

@@ -1,11 +1,12 @@
-// AI: purpose=Phrase placement plan for drum tracks; stores where phrases land and optional evolution metadata.
-// AI: invariants=StartBar>=1; BarCount>=1; EndBar is exclusive; placements must not overlap (enforced by planner).
-// AI: deps=Used by DrumTrackGenerator; if adding fields update GenerateFromPlan and tests in DrumsV2.
+// AI: purpose=Phrase placement plan for drum tracks; stores phrase placements and optional evolution metadata.
+// AI: invariants=StartBar>=1; BarCount>=1; EndBar is exclusive; placements must not overlap.
+// AI: deps=Consumed by DrumTrackGenerator; changes may require updates to GenerateFromPlan and DrumsV2 tests.
 
 namespace Music.Generator.Drums.Planning;
 
 public sealed record DrumPhrasePlacement
 {
+    // AI: contract=PhraseId and StartBar/BarCount required; EndBar computed exclusive; EvolutionLevel/Evolution optional
     public required string PhraseId { get; init; }
     public required int StartBar { get; init; }
     public required int BarCount { get; init; }
@@ -24,6 +25,7 @@ public sealed record DrumPhraseEvolutionParams
 
 public sealed class DrumPhrasePlacementPlan
 {
+    // AI: note=Placements and FillBars are mutable and not thread-safe; planner enforces non-overlap before use
     public List<DrumPhrasePlacement> Placements { get; } = [];
     public HashSet<int> FillBars { get; } = [];
 

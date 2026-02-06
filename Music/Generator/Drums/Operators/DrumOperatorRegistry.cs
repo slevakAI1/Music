@@ -1,27 +1,13 @@
-// AI: purpose=Registry for drum operators; provides discovery and filtering by family/style for DrummerOperatorCandidates.
-// AI: invariants=Operators registered once; GetAllOperators returns deterministic order; thread-safe reads.
-// AI: deps=IDrumOperator, OperatorFamily, StyleConfiguration; consumed by DrummerOperatorCandidates.
-// AI: change=Story 2.4 stub; full implementation in Story 3.6 when operators exist.
-
-
-// AI: purpose=Registry for drum operators; provides discovery and filtering by family/style for DrummerOperatorCandidates.
-// AI: invariants=Operators registered once; GetAllOperators returns deterministic order; thread-safe reads.
-// AI: deps=IDrumOperator, OperatorFamily, StyleConfiguration; consumed by DrummerOperatorCandidates.
-// AI: change=Story 2.4 stub; full implementation in Story 3.6 when operators exist.
+// AI: purpose=Registry for drum operators; discovery/filtering by family/style for DrummerOperatorCandidates.
+// AI: invariants=Operators registered once; deterministic registration order; reads are thread-safe after Freeze.
+// AI: deps=IDrumOperator, OperatorFamily, StyleConfiguration; used by DrummerOperatorCandidates to source candidates.
 
 using Music.Generator.Core;
 
 namespace Music.Generator.Drums.Operators
 {
-    /// <summary>
-    /// Registry for drum operators. Provides discovery and filtering by family, style, and operator ID.
-    /// Story 2.4: Stub implementation for DrummerOperatorCandidates integration.
-    /// Story 3.6: Full implementation with all 28 operators.
-    /// </summary>
-    /// <remarks>
-    /// Operators are registered at startup and remain immutable during generation.
-    /// All query methods return deterministic ordering for reproducibility.
-    /// </remarks>
+    // AI: purpose=Holds registered IDrumOperator instances; supports queries by family, id, and style allow lists.
+    // AI: invariants=RegisterOperator must be called before Freeze(); after Freeze registry is immutable.
     public sealed class DrumOperatorRegistry
     {
         private readonly List<IDrumOperator> _operators = new();
@@ -29,11 +15,8 @@ namespace Music.Generator.Drums.Operators
         private readonly Dictionary<OperatorFamily, List<IDrumOperator>> _operatorsByFamily = new();
         private bool _frozen;
 
-        /// <summary>
-        /// Registers an operator. Must be called before any queries.
-        /// </summary>
-        /// <param name="op">Operator to register.</param>
-        /// <exception cref="InvalidOperationException">If registry is frozen or operator ID is duplicate.</exception>
+        // Register an operator. Throws InvalidOperationException if registry is frozen or duplicate ID.
+        // AI: errors=throws InvalidOperationException when frozen or duplicate operatorId.
         public void RegisterOperator(IDrumOperator op)
         {
             ArgumentNullException.ThrowIfNull(op);
@@ -55,25 +38,16 @@ namespace Music.Generator.Drums.Operators
             familyList.Add(op);
         }
 
-        /// <summary>
-        /// Freezes the registry, preventing further registrations.
-        /// Called after all operators are registered.
-        /// </summary>
+        // Freeze registry to prevent further registrations; call after startup registration completes.
         public void Freeze()
         {
             _frozen = true;
         }
 
-        /// <summary>
-        /// Gets all registered operators in deterministic order (registration order).
-        /// </summary>
+        // Return all registered operators in deterministic registration order.
         public IReadOnlyList<IDrumOperator> GetAllOperators() => _operators;
 
-        /// <summary>
-        /// Gets operators belonging to a specific family.
-        /// </summary>
-        /// <param name="family">Operator family to filter by.</param>
-        /// <returns>Operators in the family, or empty list if none.</returns>
+        // Get operators for a given family. Returns empty array when none found.
         public IReadOnlyList<IDrumOperator> GetOperatorsByFamily(OperatorFamily family)
         {
             return _operatorsByFamily.TryGetValue(family, out var list)
@@ -81,23 +55,14 @@ namespace Music.Generator.Drums.Operators
                 : Array.Empty<IDrumOperator>();
         }
 
-        /// <summary>
-        /// Gets a specific operator by ID.
-        /// </summary>
-        /// <param name="operatorId">Operator ID to look up.</param>
-        /// <returns>Operator if found, null otherwise.</returns>
+        // Lookup operator by ID. Returns null when not found. ArgumentNullException on null operatorId.
         public IDrumOperator? GetOperatorById(string operatorId)
         {
             ArgumentNullException.ThrowIfNull(operatorId);
             return _operatorById.TryGetValue(operatorId, out var op) ? op : null;
         }
 
-        /// <summary>
-        /// Gets operators enabled for a specific style configuration.
-        /// Filters by style's AllowedOperatorIds (empty = all allowed).
-        /// </summary>
-        /// <param name="style">Style configuration with allowed operator list.</param>
-        /// <returns>Operators allowed in the style, in deterministic order.</returns>
+        // Get operators enabled by a StyleConfiguration. Empty AllowedOperatorIds means all operators allowed.
         public IReadOnlyList<IDrumOperator> GetEnabledOperators(StyleConfiguration style)
         {
             ArgumentNullException.ThrowIfNull(style);
@@ -115,11 +80,7 @@ namespace Music.Generator.Drums.Operators
             return enabled;
         }
 
-        /// <summary>
-        /// Gets operators enabled by policy allow list.
-        /// </summary>
-        /// <param name="allowList">List of allowed operator IDs. Null = all allowed.</param>
-        /// <returns>Filtered operators in deterministic order.</returns>
+        // Get operators enabled by explicit allow list. Null or empty list => all operators allowed.
         public IReadOnlyList<IDrumOperator> GetEnabledOperators(IReadOnlyList<string>? allowList)
         {
             if (allowList is null || allowList.Count == 0)
@@ -135,9 +96,7 @@ namespace Music.Generator.Drums.Operators
             return enabled;
         }
 
-        /// <summary>
-        /// Creates an empty registry. Call RegisterOperator to add operators, then Freeze.
-        /// </summary>
+        // Create an empty registry. Call RegisterOperator then Freeze during startup.
         public static DrumOperatorRegistry CreateEmpty() => new();
 
         /// <summary>

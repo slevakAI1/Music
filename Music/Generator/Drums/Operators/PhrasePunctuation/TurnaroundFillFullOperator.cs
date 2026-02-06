@@ -1,12 +1,10 @@
-// AI: purpose=PhrasePunctuation operator generating 1-bar fills at section ends.
-// AI: invariants=Only applies when IsFillWindow=true and BarsUntilSectionEnd<=1; generates 8-16 hits based on energy.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate, DrummerMemory for anti-repetition.
-// AI: change=Story 3.3; adjust hit density and pattern selection based on listening tests.
+// AI: purpose=PhrasePunctuation operator: full-bar turnaround fills at section ends.
+// AI: invariants=Apply when Bar.IsFillWindow && BarsUntilSectionEnd<=1; deterministic positions from (seed,bar).
+// AI: deps=DrummerContext, DrumCandidate; prefers snare-led fills with optional kick downbeats; anti-repeat handled externally.
 
 
 using Music.Generator.Core;
 using Music.Generator.Drums.Context;
-using Music.Generator.Drums.Operators;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Drums.Selection.Candidates;
@@ -14,11 +12,8 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.PhrasePunctuation
 {
-    /// <summary>
-    /// Generates a full-bar turnaround fill at section ends.
-    /// Provides strong punctuation for major section transitions.
-    /// Story 3.3: Phrase Punctuation Operators (Boundaries &amp; Fills).
-    /// </summary>
+    // Create a full-bar turnaround fill for section ends; distributes accents and ghosts across 16ths.
+    // Note: hit density scales by energy; roles map to kick on downbeats and snare elsewhere.
     public sealed class TurnaroundFillFullOperator : DrumOperatorBase
     {
         private const int GhostVelocityMin = 45;

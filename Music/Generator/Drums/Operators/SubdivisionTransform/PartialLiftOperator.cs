@@ -1,7 +1,6 @@
-// AI: purpose=SubdivisionTransform operator lifting to 16ths only on last half of bar (beats 3-4 in 4/4).
-// AI: invariants=Applies in suitable sections; creates energy build within bar.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.2; adjust beat range or velocity curve based on listening tests.
+// AI: purpose=SubdivisionTransform operator: lift to 16ths only in second half of bar to build energy.
+// AI: invariants=Produces 8th grid in first half, 16th grid in second half; skip positions beyond bar end.
+// AI: deps=DrummerContext.Bar provides BeatsPerBar/IsAtSectionBoundary; deterministic positions from (seed,bar).
 
 
 using Music.Generator.Core;
@@ -12,11 +11,8 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.SubdivisionTransform
 {
-    /// <summary>
-    /// Partial lift: 16th notes only on the last half of the bar (beats 3-4 in 4/4).
-    /// Creates a natural energy build within the bar, keeping first half at 8ths.
-    /// Story 3.2: Subdivision Transform Operators (Timekeeping Changes).
-    /// </summary>
+    // AI: purpose=Apply 16th subdivision only for the latter half of the bar (e.g., beats 3-4 in 4/4).
+    // AI: note=Used to create intra-bar energy build; first half remains 8ths to preserve anchor hits.
     public sealed class PartialLiftOperator : DrumOperatorBase
     {
         private const int VelocityMin = 65;
@@ -25,22 +21,14 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
         private const int AccentVelocityMax = 100;
         private const double BaseScore = 0.6;
 
-        /// <inheritdoc/>
         public override string OperatorId => "DrumPartialLift";
 
-        /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.SubdivisionTransform;
 
-        /// <summary>
-        /// Requires moderate-high energy (>= 0.5) for partial lift.
-        /// </summary>
-
-        /// <summary>
-        /// Requires closed hi-hat to be in active roles.
-        /// </summary>
+        // Requires closed hi-hat role active; energy gating handled by selection/policy layer.
         protected override string? RequiredRole => GrooveRoles.ClosedHat;
 
-        /// <inheritdoc/>
+        // AI: gate=validate context type and hat/grid assumptions; require BeatsPerBar>=4 and non-ride hat mode.
         public override bool CanApply(DrummerContext context)
         {
             if (!base.CanApply(context))
@@ -61,7 +49,7 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
             return true;
         }
 
-        /// <inheritdoc/>
+        // AI: purpose=Emit 8th positions for first half and 16th positions for second half deterministically.
         public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
         {
             ArgumentNullException.ThrowIfNull(context);

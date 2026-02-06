@@ -1,6 +1,6 @@
-// AI: purpose=Plan drum phrase placements by section type with deterministic phrase selection per seed.
-// AI: invariants=Same seed+material order yields same section phrase map; placements non-overlapping per section.
-// AI: deps=MaterialBank phrases filtered by MIDI program; SectionTrack sections; MaterialPhrase.SectionTypes/Tags.
+// AI: purpose=Plan drum phrase placements by section; deterministic phrase selection using seed.
+// AI: invariants=StartBar>=1; BarCount>=1; placements non-overlapping per section; same seed->same assignment.
+// AI: deps=Uses MaterialBank and SectionTrack; changing fields impacts DrumTrackGenerator and related tests.
 
 using Music.Song.Material;
 
@@ -8,6 +8,7 @@ namespace Music.Generator.Drums.Planning;
 
 public sealed class DrumPhrasePlacementPlanner
 {
+    // AI: note=_materialBank and _seed are required; seed ensures deterministic RNG for phrase selection
     private readonly MaterialBank _materialBank;
     private readonly int _seed;
 
@@ -24,6 +25,7 @@ public sealed class DrumPhrasePlacementPlanner
         int midiProgramNumber,
         int maxBars = 0)
     {
+        // AI: returns=DrumPhrasePlacementPlan with Placements and FillBars; respects maxBars and avoids fill-bar overlap
         ArgumentNullException.ThrowIfNull(sectionTrack);
         if (midiProgramNumber < 0 || midiProgramNumber > 255)
             throw new ArgumentOutOfRangeException(nameof(midiProgramNumber), "MIDI program must be 0-255.");
@@ -62,6 +64,7 @@ public sealed class DrumPhrasePlacementPlanner
         IReadOnlyList<MaterialPhrase> phrases,
         SectionTrack sectionTrack)
     {
+        // AI: behavior=Selects one phrase per section type deterministically using RNG seeded with _seed
         var map = new Dictionary<MusicConstants.eSectionType, MaterialPhrase>();
         var rng = new Random(_seed);
         var sectionTypes = sectionTrack.Sections
@@ -88,6 +91,7 @@ public sealed class DrumPhrasePlacementPlanner
         Dictionary<MusicConstants.eSectionType, MaterialPhrase> phraseMap,
         int totalBars)
     {
+        // AI: note=Places repeats sequentially; skips placements that overlap any FillBar; evolution for repeats only
         if (!phraseMap.TryGetValue(section.SectionType, out var phrase))
             return;
 
@@ -127,6 +131,7 @@ public sealed class DrumPhrasePlacementPlanner
 
     private static bool OverlapsFillBar(DrumPhrasePlacementPlan plan, int startBar, int barCount)
     {
+        // AI: checks any bar in [startBar..endBar] belongs to FillBars
         int endBar = startBar + barCount - 1;
         for (int bar = startBar; bar <= endBar; bar++)
         {
@@ -141,6 +146,7 @@ public sealed class DrumPhrasePlacementPlanner
         int repeatIndex,
         MusicConstants.eSectionType sectionType)
     {
+        // AI: evolution variation scales with repeatIndex, capped to avoid excessive change
         if (repeatIndex <= 0)
             return null;
 

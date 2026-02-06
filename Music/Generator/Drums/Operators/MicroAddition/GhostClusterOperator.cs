@@ -1,7 +1,6 @@
-// AI: purpose=MicroAddition operator generating 2-3 ghost notes as a mini-fill cluster.
-// AI: invariants=VelocityHint in [30,50]; only applies when Snare in ActiveRoles 
+// AI: purpose=MicroAddition operator: produce a short cluster of ghost snare notes (2-3 hits).
+// AI: invariants=VelocityHint range [30,50]; placement stays within bar; uses Bar.BeatsPerBar and ClusterStarts.
 // AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
-// AI: change=Story 3.1, 9.3; adjust cluster patterns and placement based on listening tests; reduces score when motif active.
 
 
 using Music.Generator.Core;
@@ -12,21 +11,15 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.MicroAddition
 {
-    /// <summary>
-    /// Generates a cluster of 2-3 ghost notes as a mini-fill embellishment.
-    /// Typically placed mid-bar (around beat 2.5-3) for subtle rhythmic interest.
-    /// Story 3.1: Micro-Addition Operators (Ghost Notes &amp; Embellishments).
-    /// Story 9.3: Reduces score by 50% when motif is active (avoid clutter).
-    /// </summary>
+    // Place a compact cluster (2-3 ghost notes) typically mid-bar for subtle fill.
+    // Score reduced when motif active; motif map not present in context here.
     public sealed class GhostClusterOperator : DrumOperatorBase
     {
         private const int VelocityMin = 30;
         private const int VelocityMax = 50;
         private const double BaseScore = 0.5;
 
-        /// <summary>
-        /// Story 9.3: Score reduction when motif is active (50% = 0.5).
-        /// </summary>
+        // Fractional score reduction when motif active (e.g., 0.5 => -50%).
         private const double MotifScoreReduction = 0.5;
 
         // Pre-defined cluster patterns (offsets from starting beat)
@@ -40,19 +33,11 @@ namespace Music.Generator.Drums.Operators.MicroAddition
         // Starting beat positions for clusters (mid-bar placement)
         private static readonly decimal[] ClusterStarts = [2.25m, 2.5m, 3.25m];
 
-        /// <inheritdoc/>
         public override string OperatorId => "DrumGhostCluster";
 
-        /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.MicroAddition;
 
-        /// <summary>
-        /// Requires moderate-high energy for ghost clusters.
-        /// </summary>
-
-        /// <summary>
-        /// Requires snare to be in active roles.
-        /// </summary>
+        // Requires snare role active; expects BeatsPerBar >= 4 for comfortable cluster placement.
         protected override string? RequiredRole => GrooveRoles.Snare;
 
         /// <inheritdoc/>
@@ -68,7 +53,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
             return true;
         }
 
-        /// <inheritdoc/>
+        // Generate 2-3 ghost notes per chosen cluster pattern; deterministic selection from bar/seed.
         public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -80,9 +65,9 @@ namespace Music.Generator.Drums.Operators.MicroAddition
             if (!CanApply(drummerContext))
                 yield break;
 
-            // Story 9.3: Get motif score multiplier (50% reduction when motif active)
+            // Compute motif multiplier; motif map not available in context so pass null.
             double motifMultiplier = GetMotifScoreMultiplier(
-                null /* motif map removed from context */,
+                null,
                 drummerContext.Bar,
                 MotifScoreReduction);
 
