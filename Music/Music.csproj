@@ -70,12 +70,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="AI\Completed\2026-02-05-Epic-DrummerContext-Dedup.md" />
     <None Remove="AI\Completed\2026-02-05-Story2-AgentContext-Removal.md" />
+    <None Remove="AI\Completed\2026-02-05-Story2-Completed.md" />
+    <None Remove="AI\Completed\2026-02-05-Story2-InProgress.md" />
     <None Remove="AI\Completed\2026-02-05-Story3-AgentContext-Refactor.md" />
     <None Remove="AI\Completed\2026-02-05-Story4-Smoke-Validation.md" />
+    <None Remove="AI\Completed\CurrentEpic.md" />
     <None Remove="AI\Completed\CurrentEpic_2.md" />
     <None Remove="AI\Completed\CurrentEpic_3.md" />
     <None Remove="AI\Completed\CurrentEpic_barcontext_1.md" />
+    <None Remove="AI\Completed\CurrentEpic_old.md" />
+    <None Remove="AI\Completed\CurrentEpic_Story1_Implementation.md" />
+    <None Remove="AI\Completed\CurrentEpic_Story3_Implementation.md" />
+    <None Remove="AI\Completed\CurrentEpic_Story4_Implementation.md" />
+    <None Remove="AI\Completed\CurrentEpic_Story5_Implementation.md" />
     <None Remove="AI\Completed\Done_Story_10.8.1_Technical_Debt.md" />
     <None Remove="AI\Completed\DrummerAgentEpic.md" />
     <None Remove="AI\Completed\GrooveCleanUpEpic.md" />
@@ -209,6 +218,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="AI\Completed\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />

@@ -11,14 +11,6 @@ namespace Music.Generator.Drums.Generation;
 
 public sealed class DrumGenerator
 {
-    private readonly MaterialBank _materialBank;
-
-    public DrumGenerator(MaterialBank materialBank)
-    {
-        ArgumentNullException.ThrowIfNull(materialBank);
-        _materialBank = materialBank;
-    }
-
     public PartTrack Generate(SongContext songContext, int maxBars = 0)
         => Generate(songContext, seed: 0, maxBars);
 
@@ -26,13 +18,14 @@ public sealed class DrumGenerator
     public PartTrack Generate(SongContext songContext, int seed, int maxBars)
     {
         ArgumentNullException.ThrowIfNull(songContext);
+        ArgumentNullException.ThrowIfNull(songContext.MaterialBank);
         if (songContext.SectionTrack == null || songContext.SectionTrack.Sections.Count == 0)
             throw new ArgumentException("SectionTrack must have sections", nameof(songContext));
         if (songContext.BarTrack == null)
             throw new ArgumentException("BarTrack must be provided", nameof(songContext));
 
         const int drumProgramNumber = 255;
-        var phrases = _materialBank.GetPhrasesByMidiProgram(drumProgramNumber);
+        var phrases = songContext.MaterialBank.GetPhrasesByMidiProgram(drumProgramNumber);
         if (phrases.Count == 0)
             throw new InvalidOperationException("No drum phrases found for the drum program");
 
@@ -48,21 +41,28 @@ public sealed class DrumGenerator
 
         Tracer.DebugTrace($"[DrumGenerator] placements={plan.Placements.Count}; fillBars={plan.FillBars.Count}");
 
-        return GenerateFromPlan(plan, songContext.BarTrack, drumProgramNumber, effectiveSeed);
+        return GenerateFromPlan(
+            plan,
+            songContext.MaterialBank,
+            songContext.BarTrack,
+            drumProgramNumber,
+            effectiveSeed);
     }
 
     private PartTrack GenerateFromPlan(
         DrumPhrasePlacementPlan plan,
+        MaterialBank materialBank,
         BarTrack barTrack,
         int midiProgramNumber,
         int seed)
     {
+        ArgumentNullException.ThrowIfNull(materialBank);
         var allEvents = new List<PartTrackEvent>();
         var evolver = new DrumPhraseEvolver(seed);
 
         foreach (var placement in plan.Placements)
         {
-            var phrase = _materialBank.GetPhraseById(placement.PhraseId);
+            var phrase = materialBank.GetPhraseById(placement.PhraseId);
             if (phrase == null)
             {
                 Tracer.DebugTrace($"[DrumGenerator] missingPhraseId={placement.PhraseId}");

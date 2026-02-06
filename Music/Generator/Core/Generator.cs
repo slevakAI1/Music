@@ -61,7 +61,7 @@ namespace Music.Generator
 
             Tracer.DebugTrace($"[GenerateFromPhrases] phrases={materialBank.GetPhrases().Count}; seed={seed}; maxBars={maxBars}");
 
-            var generator = new DrumGenerator(materialBank);
+            var generator = new DrumGenerator();
             return generator.Generate(songContext, seed, maxBars);
         }
 
