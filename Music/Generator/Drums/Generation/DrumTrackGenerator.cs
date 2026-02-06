@@ -53,34 +53,8 @@ namespace Music.Generator.Drums.Generation
         private const int TomMidMidiNote = 47;
         private const int TomLowMidiNote = 45;
 
-        /// <summary>
-        /// Generates drum track using DrumGenerator pipeline (Story RF-4).
-        /// Uses operator registry + DrummerOperatorCandidates with PopRock style configuration.
-        /// </summary>
-        /// <param name="songContext">Song context containing all required data.</param>
-        /// <returns>Generated drum PartTrack.</returns>
-        /// <exception cref="ArgumentNullException">If songContext is null.</exception>
-        /// <remarks>
-        /// <para>Architecture (Story RF-4):</para>
-        /// <list type="bullet">
-        ///   <item>Builds operator registry + DrummerOperatorCandidates with PopRock style</item>
-        ///   <item>Creates DrumGenerator (pipeline orchestrator)</item>
-        ///   <item>Generates via proper groove system with GrooveSelectionEngine</item>
-        ///   <item>Enforces density targets, operator caps, weighted selection</item>
-        /// </list>
-        /// </remarks>
-        public static PartTrack Generate(SongContext songContext)
-        {
-            ArgumentNullException.ThrowIfNull(songContext);
-
-            int drumProgramNumber = VoiceSet.GetDrumProgramNumber(songContext.Voices);
-            return Generate(songContext, drumProgramNumber);
-
-        }
-
         private static PartTrack Generate(SongContext songContext, int drumProgramNumber)
         {
-
             // Use DrumGenerator pipeline with operator registry as data source
             var registry = DrumOperatorRegistryBuilder.BuildComplete();
             var drumOperatorCandidates = new DrummerOperatorCandidates(
