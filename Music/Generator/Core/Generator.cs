@@ -29,8 +29,9 @@ namespace Music.Generator
             ValidateTimeSignatureTrack(songContext.Song.TimeSignatureTrack);
             ValidateGrooveTrack(songContext.GroovePresetDefinition);
 
+            int drumProgramNumber = VoiceSet.GetDrumProgramNumber(songContext.Voices);
             var generator = new DrumPhraseGenerator();
-            return generator.Generate(songContext, maxBars);
+            return generator.Generate(songContext, drumProgramNumber, maxBars);
         }
 
         // AI: purpose=Phrase-based drum track generation using MaterialBank phrases.

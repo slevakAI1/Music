@@ -14,7 +14,7 @@ namespace Music.Generator.Drums.Selection;
 /// Story C2: Implements safe candidate selection with anchor preservation and cap enforcement.
 /// Story G1: Supports optional diagnostics collection.
 /// </summary>
-public static class DrumSelectionEngine
+public static class OperatorSelector
 {
     /// <summary>
     /// Selects candidates until target count is reached or pool is exhausted.

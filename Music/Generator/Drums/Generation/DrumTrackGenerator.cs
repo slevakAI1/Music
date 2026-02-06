@@ -73,18 +73,22 @@ namespace Music.Generator.Drums.Generation
         {
             ArgumentNullException.ThrowIfNull(songContext);
 
+            int drumProgramNumber = VoiceSet.GetDrumProgramNumber(songContext.Voices);
+            return Generate(songContext, drumProgramNumber);
 
-            //  OK ITS USING AGENT HERE
+        }
 
+        private static PartTrack Generate(SongContext songContext, int drumProgramNumber)
+        {
 
-            // Story RF-4: Use DrumGenerator pipeline with operator registry as data source
+            // Use DrumGenerator pipeline with operator registry as data source
             var registry = DrumOperatorRegistryBuilder.BuildComplete();
             var drumOperatorCandidates = new DrummerOperatorCandidates(
                 registry,
                 diagnosticsCollector: null,
                 settings: null);
             var generator = new DrumPhraseGenerator(drumOperatorCandidates);
-            return generator.Generate(songContext);
+            return generator.Generate(songContext, drumProgramNumber);
         }
 
         /// <summary>
@@ -109,7 +113,7 @@ namespace Music.Generator.Drums.Generation
             };
 
             // Use new pipeline entry point
-            return Generate(songContext);
+            return Generate(songContext, midiProgramNumber);
         }
 
         // AI: GetMidiNoteNumber maps DrumRole to General MIDI note; throws for unknown roles.

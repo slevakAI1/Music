@@ -43,5 +43,22 @@ namespace Music.Generator
             AddVoice("Drum Set", "DrumKit");  // MIDI track 10 reserved for drum set; percussion mapped by note number
             return Voices;
         }
+
+        // AI: GetDrumProgramNumber: resolves MIDI program number for DrumKit role from voice set; returns 255 default if not found.
+        public static int GetDrumProgramNumber(VoiceSet voiceSet)
+        {
+            const int DefaultDrumProgram = 255;
+
+            var voice = voiceSet.Voices.FirstOrDefault(v =>
+                string.Equals(v.GrooveRole, "DrumKit", StringComparison.OrdinalIgnoreCase));
+
+            if (voice == null)
+                return DefaultDrumProgram;
+
+            var midiVoice = Music.MyMidi.MidiVoices.MidiVoiceList()
+                .FirstOrDefault(mv => string.Equals(mv.Name, voice.VoiceName, StringComparison.OrdinalIgnoreCase));
+
+            return midiVoice?.ProgramNumber ?? DefaultDrumProgram;
+        }
     }
 }

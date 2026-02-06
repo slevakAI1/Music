@@ -1,6 +1,6 @@
 // AI: purpose=Generates a drum phrase (1-N bars) using operator-based variation over anchors.
 // AI: invariants=Output is a PartTrack representing a single phrase; reusable for MaterialBank storage.licy.
-// AI: deps=DrummerOperatorCandidates, DrumSelectionEngine, BarTrack bars, SongContext, PartTrack.
+// AI: deps=DrummerOperatorCandidates, OperatorSelector, BarTrack bars, SongContext, PartTrack.
 // AI: change=correct architecture replaces DrummerAgent.Generate() with proper groove integration.
 
 using Music.Generator.Drums.Operators;
@@ -40,7 +40,7 @@ namespace Music.Generator.Drums.Generation
     /// <summary>
     /// Pipeline orchestrator for drum generation using groove system integration.
     /// Story RF-2: Creates drum tracks by properly using IDrumPolicyProvider + IDrumOperatorCandidates
-    /// with DrumSelectionEngine for weighted selection and density enforcement.
+    /// with OperatorSelector for weighted selection and density enforcement.
     /// Story 4.2: Moved interface ownership from Groove to Drums namespace.
     /// </summary>
     /// <remarks>
@@ -48,7 +48,7 @@ namespace Music.Generator.Drums.Generation
     /// <list type="bullet">
     ///   <item>Takes policy provider + candidate source (built from operator registry)</item>
     ///   <item>Extracts anchors from groove preset</item>
-    ///   <item>For each bar+role: gets policy → calculates target → gets candidates → selects via DrumSelectionEngine</item>
+    ///   <item>For each bar+role: gets policy → calculates target → gets candidates → selects via OperatorSelector</item>
     ///   <item>Combines anchors + selected operators → converts to MIDI</item>
     /// </list>
     /// <para>Enforces density targets, operator caps, and weighted selection per policy decisions.</para>
@@ -108,7 +108,7 @@ namespace Music.Generator.Drums.Generation
         ///   <item>Convert to MIDI events</item>
         /// </list>
         /// </remarks>
-        public PartTrack Generate(SongContext songContext, int maxBars = 0)
+        public PartTrack Generate(SongContext songContext, int drumProgramNumber, int maxBars = 0)
         {
             ValidateSongContext(songContext);
 
@@ -123,9 +123,6 @@ namespace Music.Generator.Drums.Generation
                 totalBars = maxBars;
             }
 
-            // Resolve MIDI program number for drums
-            int drumProgramNumber = GetDrumProgramNumber(songContext);
-
             var bars = barTrack.Bars.Where(b => b.BarNumber <= totalBars).ToList();
 
             // Extract anchor onsets (foundation that's always present)
@@ -135,7 +132,7 @@ namespace Music.Generator.Drums.Generation
 
 
 
-            // Generate operator-based candidates for each bar using DrumSelectionEngine
+            // Generate operator-based candidates for each bar using OperatorSelector
             var operatorOnsets = GenerateOperatorOnsets(bars, anchorOnsets, totalBars);
 
 
@@ -165,22 +162,6 @@ namespace Music.Generator.Drums.Generation
 
             if (songContext.GroovePresetDefinition.AnchorLayer == null)
                 throw new ArgumentException("GroovePresetDefinition.AnchorLayer must be provided", nameof(songContext));
-        }
-
-        private int GetDrumProgramNumber(SongContext songContext)
-        {
-            const int DefaultDrumProgram = 255;
-
-            var voice = songContext.Voices.Voices.FirstOrDefault(v =>
-                string.Equals(v.GrooveRole, "DrumKit", StringComparison.OrdinalIgnoreCase));
-
-            if (voice == null)
-                return DefaultDrumProgram;
-
-            var midiVoice = MidiVoices.MidiVoiceList()
-                .FirstOrDefault(mv => string.Equals(mv.Name, voice.VoiceName, StringComparison.OrdinalIgnoreCase));
-
-            return midiVoice?.ProgramNumber ?? DefaultDrumProgram;
         }
 
         private List<GrooveOnset> ExtractAnchorOnsets(
@@ -272,13 +253,13 @@ namespace Music.Generator.Drums.Generation
                     if (candidateGroups.Count == 0)
                         continue; // No candidates available
 
-                    // Filter anchors for this role to pass to DrumSelectionEngine
+                    // Filter anchors for this role to pass to OperatorSelector
                     var roleAnchors = barAnchors
                         .Where(a => string.Equals(a.Role, role, StringComparison.OrdinalIgnoreCase))
                         .ToList();
 
-                    // SELECT using DrumSelectionEngine
-                    var selected = DrumSelectionEngine.SelectUntilTargetReached(
+                    // SELECT using OperatorSelector
+                    var selected = OperatorSelector.SelectUntilTargetReached(
                         bar,
                         role,
                         candidateGroups,
