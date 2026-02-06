@@ -1,16 +1,16 @@
-// AI: purpose=UI command: append repeating notes to selected PartTrack rows in the song grid.
-// AI: invariants=Selected rows must map to PartTrack instances (colData). Skips top FIXED_ROWS_COUNT rows.
-// AI: deps=Uses MusicCalculations, CreateRepeatingNotes, SongGridManager, GridControlLinesManager; changing those APIs breaks this handler.
-// AI: change=If PartTrack/Event model changes update AppendSongTrackNoteEventsToSelectedRows and grid population logic.
+// AI: purpose=Append repeating note events to selected PartTrack rows in the song grid.
+// AI: invariants=Rows with Index < SongGridManager.FIXED_ROWS_COUNT are non-editable; cell 'colData' must hold PartTrack.
+// AI: deps=MusicCalculations.CreateRepeatingNotes; SongGridManager.PopulatePartMeasureNoteCount; GridControlLinesManager.GetTimeSignatureTrack
+// AI: perf=Mutates PartTrack.PartTrackNoteEvents in-place; may trigger expensive UI updates for large selections.
 
 using Music.Generator;
 
 namespace Music.Writer
 {
-    // AI: Command group for repeating-note actions; methods accept minimal deps (formData + grid) to simplify testing.
+    // AI: purpose=UI command group to construct repeating notes and apply them to selected song tracks.
     public static class HandleRepeatNoteCommand
     {
-        // AI: Execute validates selection, builds a repeating PartTrack, appends events to selected PartTracks and updates grid counts.
+        // AI: entry=Validate selection, build repeating PartTrack, append events to selected rows, update measure counts in grid.
         public static void Execute(
             WriterFormData formData,
             DataGridView dgSong)
@@ -32,7 +32,7 @@ namespace Music.Writer
             AppendSongTrackNoteEventsToSelectedRows(dgSong, partTrack);
         }
 
-        // AI: returns false + shows informational dialog when no eligible part-track rows are selected.
+        // AI: purpose=Return false and show info dialog when no editable part-track rows are selected.
         private static bool ValidateSongTracksSelected(DataGridView dgSong)
         {
             var hasSongTrackSelection = dgSong.SelectedRows
@@ -52,8 +52,8 @@ namespace Music.Writer
             return true;
         }
 
-        // AI: Appends events to existing PartTrack.PartTrackNoteEvents (mutates in-place) and updates measure note counts in the grid.
-        // AI: note=Assumes cell "colData" contains a PartTrack; ignores rows that don't meet this contract.
+        // AI: effects=Mutates existing PartTrack.PartTrackNoteEvents by adding events from provided PartTrack.
+        // AI: invariants=Skips rows < FIXED_ROWS_COUNT; ignores rows where 'colData' is not a PartTrack; updates measure counts.
         private static void AppendSongTrackNoteEventsToSelectedRows(DataGridView dgSong, PartTrack songTrack)
         {
             foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)

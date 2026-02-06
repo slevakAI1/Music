@@ -1,14 +1,11 @@
-// AI: purpose=Handlers for grid row operations and playback control in WriterForm; UI-only helpers with predictable side-effects.
-// AI: invariants=Grid fixed rows indices and column names (colData,colType,colDescription) are stable contracts used across the app.
-// AI: deps=Relies on SongGridManager, GridControlLinesManager, Midi services, and PartTrack DTO; renaming breaks many callers.
-// AI: change=If adding new grid behaviors update unit tests and grid population helpers accordingly.
+// AI: purpose=Grid row and playback handlers for WriterForm UI; small helpers with predictable side-effects.
+// AI: invariants=Fixed row indices and column names (colData,colType,colDescription) are stable contracts.
+// AI: deps=Uses SongGridManager, GridControlLinesManager, MidiPlaybackService, PartTrack DTO; renaming breaks callers.
 
-using System.Globalization;
-using System.Reflection;
 using Music.Generator;
 using Music.MyMidi;
-using Music.Properties;
 using Music.Song.Material;
+using System.Reflection;
 
 namespace Music.Writer
 {

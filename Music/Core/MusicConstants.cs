@@ -1,7 +1,8 @@
-﻿// AI: purpose=central readonly constants and enums used across generator/UI; keep stable to avoid breaking serialization or logic
-// AI: invariants=TicksPerQuarterNote must be used everywhere for tick math; changing it requires updating all tick calculations/tests
-// AI: deps=consumers assume NoteValueMap keys display format used in UI; VoicesNotionJsonRelativePath is relative to AppContext.BaseDirectory
-
+// AI: purpose=Central readonly constants and enums used by generator and UI; keep stable to avoid breaking contracts
+// AI: invariants=TicksPerQuarterNote (480) is authoritative for all tick math; changing it breaks conversions/tests
+// AI: deps=NoteValueMap keys are UI display strings; VoicesNotionJsonRelativePath is relative to AppContext.BaseDirectory
+// AI: perf=Use constants for tick math; do not scatter magic tick values across codebase
+// AI: security=No secrets here; treat paths carefully when using external input
 namespace Music
 {
     // AI: ENums are authoritative lists for UI and algorithm mapping; preserve order and names to avoid index-based bugs

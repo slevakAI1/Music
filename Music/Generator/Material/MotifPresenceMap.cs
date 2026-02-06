@@ -1,21 +1,11 @@
-// AI: purpose=Queryable service mapping motif placements to per-bar presence/density for accompaniment ducking.
-// AI: invariants=Immutable after construction; same plan+sectionTrack → same query results; density always [0..1].
-// AI: deps=Consumes MotifPlacementPlan and SectionTrack; queried by DrummerPolicyProvider and operators (Story 9.3).
-// AI: change=Story 9.3; extend density computation if MotifSpec gains density attribute.
-
+// AI: purpose=Map motif placements to per-bar presence/density for accompaniment ducking and queries
+// AI: invariants=Immutable after construction; same plan+sectionTrack => same results; density in [0,1]
+// AI: deps=Consumes MotifPlacementPlan and SectionTrack; used by operators and policy providers for ducking
 using Music.Song.Material;
 
 namespace Music.Generator.Material;
 
-/// <summary>
-/// Queryable service for determining motif presence per bar.
-/// Used by accompaniment agents (drums, keys, bass, guitar) to make room for motifs.
-/// Story 9.3: Motif integration with accompaniment (call/response + ducking infrastructure).
-/// </summary>
-/// <remarks>
-/// Immutable after construction; all query methods are pure and deterministic.
-/// Thread-safe for concurrent reads (immutable data).
-/// </remarks>
+// AI: contract=Immutable query service; thread-safe for concurrent reads; returns empty results for out-of-range bars
 public sealed class MotifPresenceMap
 {
     private readonly MotifPlacementPlan _plan;
@@ -27,11 +17,7 @@ public sealed class MotifPresenceMap
     // Legacy lookup for section-relative queries
     private readonly Dictionary<(int section, int bar, string role), MotifPresence> _presenceByPosition;
 
-    /// <summary>
-    /// Creates a MotifPresenceMap from a placement plan and section track.
-    /// </summary>
-    /// <param name="plan">The motif placement plan (from MotifPlacementPlanner).</param>
-    /// <param name="sectionTrack">Song section structure (for bar → section mapping).</param>
+    // AI: ctor=Build map from MotifPlacementPlan and SectionTrack; throws on null inputs
     public MotifPresenceMap(MotifPlacementPlan plan, SectionTrack sectionTrack)
     {
         ArgumentNullException.ThrowIfNull(plan);
@@ -43,10 +29,7 @@ public sealed class MotifPresenceMap
         _presenceByPosition = BuildLegacyPresenceMap();
     }
 
-    /// <summary>
-    /// Legacy constructor for backward compatibility.
-    /// Uses section-relative queries only (no absolute bar number support).
-    /// </summary>
+    // AI: ctor_legacy=Legacy ctor supports section-relative queries only; absolute queries return empty
     public MotifPresenceMap(MotifPlacementPlan plan)
     {
         ArgumentNullException.ThrowIfNull(plan);
@@ -57,19 +40,12 @@ public sealed class MotifPresenceMap
         _presenceByPosition = BuildLegacyPresenceMap();
     }
 
-    /// <summary>
-    /// Creates an empty MotifPresenceMap (no motifs anywhere).
-    /// </summary>
+    // AI: sentinel=Empty map with no motifs; useful for tests and default fallbacks
     public static MotifPresenceMap Empty => new(MotifPlacementPlan.Empty(), new SectionTrack());
 
     #region Absolute Bar Number Queries (Story 9.3)
 
-    /// <summary>
-    /// Checks if any motif is active in the specified bar.
-    /// </summary>
-    /// <param name="barNumber">1-based absolute bar number.</param>
-    /// <param name="role">Optional role filter (e.g., "Lead", "Guitar"). Null = any role.</param>
-    /// <returns>True if at least one motif is active in this bar (matching the role filter).</returns>
+    // AI: query=Return true when at least one motif active at absolute 1-based barNumber; optional role filter
     public bool IsMotifActive(int barNumber, string? role = null)
     {
         if (barNumber < 1)
@@ -85,14 +61,7 @@ public sealed class MotifPresenceMap
             string.Equals(m.MotifSpec.IntendedRole, role, StringComparison.OrdinalIgnoreCase));
     }
 
-    /// <summary>
-    /// Gets the estimated motif density for a bar.
-    /// </summary>
-    /// <param name="barNumber">1-based absolute bar number.</param>
-    /// <param name="role">Optional role filter. Null = overall density.</param>
-    /// <returns>
-    /// Density value [0.0-1.0]. 0.0 = no motifs; 0.5 = one motif; 1.0 = two or more motifs.
-    /// </returns>
+    // AI: query=Estimate density in [0,1]; naive heuristic 0.5 per motif capped at 1.0; role filter optional
     public double GetMotifDensity(int barNumber, string? role = null)
     {
         if (barNumber < 1)
@@ -116,11 +85,7 @@ public sealed class MotifPresenceMap
         return Math.Min(count * 0.5, 1.0);
     }
 
-    /// <summary>
-    /// Gets all motif placements active in a bar.
-    /// </summary>
-    /// <param name="barNumber">1-based absolute bar number.</param>
-    /// <returns>List of active motif placements (empty if none).</returns>
+    // AI: query=Return list of MotifPlacement active at absolute barNumber; empty list when none
     public IReadOnlyList<MotifPlacement> GetActiveMotifs(int barNumber)
     {
         if (barNumber < 1)
@@ -132,12 +97,7 @@ public sealed class MotifPresenceMap
         return motifs;
     }
 
-    /// <summary>
-    /// Gets all motif placements active in a bar filtered by role.
-    /// </summary>
-    /// <param name="barNumber">1-based absolute bar number.</param>
-    /// <param name="role">Role filter (e.g., "Lead", "Guitar").</param>
-    /// <returns>List of active motif placements for the specified role.</returns>
+    // AI: query=Return active MotifPlacement for role at absolute barNumber; role is required and case-insensitive
     public IReadOnlyList<MotifPlacement> GetActiveMotifsForRole(int barNumber, string role)
     {
         ArgumentNullException.ThrowIfNull(role);
@@ -157,9 +117,7 @@ public sealed class MotifPresenceMap
 
     #region Section-Relative Queries (Legacy)
 
-    /// <summary>
-    /// Checks if a motif is active for the given role at the specified position.
-    /// </summary>
+    // AI: legacy_query=Return MotifPresence for section-relative (sectionIndex, barWithinSection, role)
     public MotifPresence GetPresence(int sectionIndex, int barWithinSection, string role)
     {
         var key = (sectionIndex, barWithinSection, role);
@@ -171,9 +129,7 @@ public sealed class MotifPresenceMap
         return MotifPresence.Absent;
     }
 
-    /// <summary>
-    /// Checks if any lead/melodic motif is active (for ducking accompaniment).
-    /// </summary>
+    // AI: legacy_query=Return true when common lead roles active at section-relative position
     public bool HasLeadMotif(int sectionIndex, int barWithinSection)
     {
         // Check for common lead roles
@@ -191,9 +147,7 @@ public sealed class MotifPresenceMap
 
     #region Private Helpers
 
-    /// <summary>
-    /// Builds the pre-computed bar → motifs lookup using absolute bar numbers.
-    /// </summary>
+    // AI: build=Precompute absoluteBar->placements lookup using SectionTrack; returns empty when SectionTrack null
     private Dictionary<int, List<MotifPlacement>> BuildBarToMotifsLookup()
     {
         var lookup = new Dictionary<int, List<MotifPlacement>>();
@@ -227,9 +181,7 @@ public sealed class MotifPresenceMap
         return lookup;
     }
 
-    /// <summary>
-    /// Builds the legacy section-relative presence map.
-    /// </summary>
+    // AI: build_legacy=Build section-relative presence map with density estimates per placement
     private Dictionary<(int section, int bar, string role), MotifPresence> BuildLegacyPresenceMap()
     {
         var presenceMap = new Dictionary<(int section, int bar, string role), MotifPresence>();
@@ -256,9 +208,7 @@ public sealed class MotifPresenceMap
         return presenceMap;
     }
 
-    /// <summary>
-    /// Gets the absolute start bar (1-based) for a section by index.
-    /// </summary>
+    // AI: helper=Return 1-based absolute section start bar or -1 when invalid or sectionTrack missing
     private int GetSectionStartBar(int absoluteSectionIndex)
     {
         if (_sectionTrack is null)
@@ -270,12 +220,9 @@ public sealed class MotifPresenceMap
         return _sectionTrack.Sections[absoluteSectionIndex].StartBar;
     }
 
-    /// <summary>
-    /// Estimates motif density from rhythm shape (for ducking magnitude).
-    /// </summary>
+    // AI: heuristics=Estimate density from MotifSpec rhythm shape; onsetCount->density clamped [0.1,1.0]
     private static double EstimateDensity(MotifSpec spec)
     {
-        // Simple heuristic: more onsets = higher density
         int onsetCount = spec.RhythmShape.Count;
         double density = Math.Clamp(onsetCount / 8.0, 0.1, 1.0);
         return density;

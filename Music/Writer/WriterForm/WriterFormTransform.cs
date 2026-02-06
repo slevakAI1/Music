@@ -1,14 +1,14 @@
-﻿// AI: purpose=Map between WriterForm controls and WriterFormData DTO; capture/apply UI state consistently.
+// AI: purpose=Map between WriterForm controls and WriterFormData; capture/apply UI state consistently.
 // AI: invariants=Capture/Apply must remain symmetrical; control names and expected item values are stable contracts.
-// AI: deps=Called by WriterForm to persist UI prefs; changing properties requires updating WriterForm and tests.
-// AI: change=If adding new controls, update CaptureFormData, ApplyFormData, WriterFormData, and tests in tandem.
+// AI: deps=Called by WriterForm to persist UI prefs; changes require updating WriterForm, tests, and serializers.
+// AI: perf=Capture runs on UI thread; keep allocations small and avoid long-running work here.
 
 namespace Music.Writer
 {
-    // AI: Pure transform class: keep UI logic here, avoid business logic; methods accept control refs to aid unit testing.
+    // AI: purpose=Pure transform: map UI controls to DTO; no business logic; methods accept control refs for testability.
     public class WriterFormTransform
     {
-        // AI: CaptureFormData: read control values into a WriterFormData; null-safe for optional controls, uses defaults.
+        // AI: entry=Read UI controls into WriterFormData; null-safe for optional controls; provide stable defaults.
         public WriterFormData CaptureFormData(
             ComboBox? cbCommand,
             CheckedListBox? clbParts,
@@ -62,10 +62,6 @@ namespace Music.Writer
             string? stepSelected = cbStep?.SelectedItem?.ToString();
             // Capture chord radio button state
             var isChord = rbChord.Checked;
-
-            // TO DO - LOW - stepchar = " " at program startup. is there a better way?
-            // I think this whole class needs to go.
-
             // Execute step string to char (use '\0' for Rest)
             char stepChar = ' ';
             if (!string.IsNullOrWhiteSpace(stepSelected))

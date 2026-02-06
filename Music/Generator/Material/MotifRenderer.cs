@@ -1,24 +1,18 @@
-// AI: purpose=Renders placed motifs into actual note events against harmony and groove context.
-// AI: invariants=Output deterministic by inputs+seed; events sorted by AbsoluteTimeTicks; no overlaps; valid MIDI range.
-// AI: deps=Consumes MotifSpec, MotifPlacement, HarmonyTrack, BarTrack, GroovePresetDefinition, SectionTrack; produces PartTrack.
-// AI: change=Story 9.2 implementation; converts MaterialLocal motif specs to SongAbsolute rendered tracks.
-
+// AI: purpose=Render MotifSpec+MotifPlacement into PartTrack events aligned to harmony+groove
+// AI: invariants=Deterministic for same inputs+seed; outputs sorted SongAbsolute notes; clamps MIDI to valid range
+// AI: deps=Uses HarmonyPitchContext, GroovePresetDefinition, BarTrack mapping; modifies events list in-memory
 using Music.Generator;
 using Music.Generator.Groove;
 using Music.MyMidi;
 
 namespace Music.Song.Material;
 
-/// <summary>
-/// Renders motif specs into note sequences against song harmony and groove.
-/// Story 9.2: converts MotifSpec + MotifPlacement into PartTrack in SongAbsolute domain.
-/// </summary>
+// AI: entry=Static renderer: convert motif spec+placement into a playable PartTrack
 public static class MotifRenderer
 {
-    /// <summary>
-    /// Renders a placed motif into a PartTrack (simplified generator-friendly overload).
-    /// Used by role generators that have already built harmony contexts and onset grids.
-    /// </summary>
+    // AI: entry=Simplified Render overload for generators with prebuilt harmonyContexts and onsetGrid
+    // AI: returns=PartTrack in SongAbsolute domain; velocityAccentBias applied to base velocity
+    
     public static PartTrack Render(
         MotifSpec spec,
         MotifPlacement placement,
@@ -109,18 +103,8 @@ public static class MotifRenderer
         };
     }
 
-    /// <summary>
-    /// Renders a placed motif into a PartTrack with actual pitches and timing.
-    /// </summary>
-    /// <param name="spec">The motif specification (rhythm, contour, register, tone policy).</param>
-    /// <param name="placement">Where/when the motif appears (section, bar, variation intensity, transforms).</param>
-    /// <param name="harmonyTrack">Song harmony for pitch realization.</param>
-    /// <param name="barTrack">Timing ruler for tick calculation.</param>
-    /// <param name="groovePreset">Groove preset definition for onset slot alignment.</param>
-    /// <param name="sectionTrack">Song section structure.</param>
-    /// <param name="seed">Seed for deterministic pitch selection.</param>
-    /// <param name="midiProgramNumber">MIDI program number for output track.</param>
-    /// <returns>PartTrack in SongAbsolute domain with rendered notes.</returns>
+    // AI: entry=Full Render: realize MotifSpec across bars using Harmony+BarTrack+GroovePreset
+    // AI: behavior=Maps rhythm->onsets, selects pitches per harmony, applies variation, prevents overlaps
     public static PartTrack Render(
         MotifSpec spec,
         MotifPlacement placement,
@@ -251,10 +235,8 @@ public static class MotifRenderer
         };
     }
 
-    /// <summary>
-    /// Maps motif rhythm shape ticks to absolute song ticks for a specific bar.
-    /// Returns list of (absoluteTick, durationTicks, isStrongBeat) tuples.
-    /// </summary>
+    // AI: map=Convert motif-local rhythm ticks to absolute song ticks for a given bar
+    // AI: notes=Assumes motif defined with motifTicksPerBar=4/4; scales ticks when bar length differs
     private static List<(long AbsoluteTick, int DurationTicks, bool IsStrongBeat)> MapRhythmToBar(
         IReadOnlyList<int> rhythmShape,
         int barOffsetInMotif,
@@ -308,9 +290,8 @@ public static class MotifRenderer
         return result;
     }
 
-    /// <summary>
-    /// Calculates duration from current onset to next onset or bar end.
-    /// </summary>
+    // AI: calc=Duration from onset to next onset or bar end, scaled to actualTicksPerBar
+    // AI: returns minimum duration of a 32nd note (TicksPerQuarterNote/8)
     private static int CalculateOnsetDuration(
         IReadOnlyList<int> rhythmShape,
         int currentIndex,
@@ -343,9 +324,7 @@ public static class MotifRenderer
         return Math.Max(durationInMotifTicks, MusicConstants.TicksPerQuarterNote / 8);
     }
 
-    /// <summary>
-    /// Calculates contour position (0..1) based on note position in the motif.
-    /// </summary>
+    // AI: calc=Contour position [0..1] for pitch contour mapping; safe when totals are zero
     private static double CalculateContourPosition(
         int barOffset,
         int onsetIndex,
@@ -362,10 +341,8 @@ public static class MotifRenderer
         return Math.Clamp(currentOnsetNumber / estimatedTotalOnsets, 0.0, 1.0);
     }
 
-    /// <summary>
-    /// Selects pitch based on contour intent, harmony context, and tone policy.
-    /// AI: Filters harmony chord/scale tones to motif register range before selection; prevents out-of-register notes.
-    /// </summary>
+    // AI: select=Choose pitch using contour, harmony, tone policy, register constraints and voice-leading
+    // AI: invariants=Filters chord/scale tones to register; transposes octaves when needed; clamps MIDI
     private static int SelectPitch(
         MotifSpec spec,
         HarmonyPitchContext harmony,
@@ -450,9 +427,7 @@ public static class MotifRenderer
         return Math.Clamp(selectedPitch, 21, 108);
     }
 
-    /// <summary>
-    /// Calculates target pitch from contour intent.
-    /// </summary>
+    // AI: calc=Map ContourIntent+position to a target MIDI pitch within register center+range
     private static int CalculateContourPitch(ContourIntent contour, RegisterIntent register, double position)
     {
         int center = register.CenterMidiNote;
@@ -486,9 +461,7 @@ public static class MotifRenderer
         return above ? center + offset : center - offset;
     }
 
-    /// <summary>
-    /// Gets scale tones in the register range.
-    /// </summary>
+    // AI: helper=Enumerate scale tones within register range (unbounded octaves trimmed)
     private static List<int> GetScaleTones(HarmonyPitchContext harmony, RegisterIntent register)
     {
         var result = new List<int>();
@@ -508,9 +481,7 @@ public static class MotifRenderer
         return result;
     }
 
-    /// <summary>
-    /// Finds the closest pitch from candidates to target, respecting register.
-    /// </summary>
+    // AI: find=Return candidate pitch nearest to target after octave transpositions; clamp to register
     private static int FindClosestPitch(IReadOnlyList<int> candidates, int target, RegisterIntent register)
     {
         if (candidates.Count == 0)
@@ -544,9 +515,7 @@ public static class MotifRenderer
         return Math.Clamp(bestPitch, 21, 108);
     }
 
-    /// <summary>
-    /// Applies voice-leading smoothing to prefer smaller intervals.
-    /// </summary>
+    // AI: voicelead=Prefer small intervals; attempt octave shifts to reduce large leaps when in register
     private static int ApplyVoiceLeading(int targetPitch, int previousPitch, RegisterIntent register)
     {
         // If jump is large (> perfect 5th), try octave adjustment
@@ -569,9 +538,7 @@ public static class MotifRenderer
         return targetPitch;
     }
 
-    /// <summary>
-    /// Applies variation operators based on placement settings.
-    /// </summary>
+    // AI: variation=Apply octave transforms and small pitch jitter based on VariationIntensity
     private static int ApplyVariation(
         int pitch,
         MotifSpec spec,
@@ -629,9 +596,7 @@ public static class MotifRenderer
         return Math.Clamp(result, 21, 108);
     }
 
-    /// <summary>
-    /// Applies octave displacement within register bounds.
-    /// </summary>
+    // AI: helper=Apply octave displacement if resulting pitch stays within register
     private static int ApplyOctaveDisplacement(int pitch, int semitones, RegisterIntent register)
     {
         int newPitch = pitch + semitones;
@@ -644,9 +609,7 @@ public static class MotifRenderer
         return pitch; // Stay in range
     }
 
-    /// <summary>
-    /// Calculates velocity based on beat strength.
-    /// </summary>
+    // AI: velocity=Deterministic base velocity with micro-variation; biased by strong beats
     private static int CalculateVelocity(bool isStrongBeat, double contourPosition, int seed)
     {
         // Base velocity
@@ -664,9 +627,7 @@ public static class MotifRenderer
         return Math.Clamp(baseVelocity, 40, 127);
     }
 
-    /// <summary>
-    /// Applies duration variation based on placement intensity.
-    /// </summary>
+    // AI: duration=Shorten durations slightly when VariationIntensity > 0; ensures minimum duration
     private static int ApplyDurationVariation(int durationTicks, MotifPlacement placement)
     {
         // High variation shortens notes slightly
@@ -674,9 +635,7 @@ public static class MotifRenderer
         return Math.Max((int)(durationTicks * multiplier), MusicConstants.TicksPerQuarterNote / 8);
     }
 
-    /// <summary>
-    /// Prevents overlaps with previous notes by shortening duration.
-    /// </summary>
+    // AI: overlap=If new note starts before last ends, shorten last event to create small gap; mutates existingEvents
     private static int PreventOverlaps(List<PartTrackEvent> existingEvents, long absoluteTick, int durationTicks)
     {
         if (existingEvents.Count == 0)
@@ -705,9 +664,7 @@ public static class MotifRenderer
         return durationTicks;
     }
 
-    /// <summary>
-    /// Creates an empty track for invalid placements.
-    /// </summary>
+    // AI: helper=Return empty PartTrack with Meta filled; used when placement invalid or out-of-range
     private static PartTrack CreateEmptyTrack(MotifSpec spec, MotifPlacement placement, int midiProgramNumber)
     {
         return new PartTrack(new List<PartTrackEvent>())

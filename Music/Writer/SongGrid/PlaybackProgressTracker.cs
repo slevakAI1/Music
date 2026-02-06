@@ -1,6 +1,10 @@
 using Music.Generator;
 using Music.MyMidi;
 
+// AI: purpose=Track MIDI playback progress and raise measure change events to UI subscribers.
+// AI: invariants=MeasureChanged fired only when measure increments; CurrentTick>=0; handler invoked on sync context if present.
+// AI: deps=MidiPlaybackService for ticks, Timingtrack for measure mapping; poll interval default 50ms.
+// AI: threading=RunAsync uses PeriodicTimer; cancellation token honors cooperative shutdown; not reentrant.
 namespace Music.Writer;
 
 internal sealed class PlaybackProgressTracker : IDisposable

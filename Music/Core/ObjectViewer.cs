@@ -1,17 +1,15 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Reflection;
 using System.Text.Json;
 
-// AI: purpose=debug-only safe serializer: build limited object graph, catch getter errors, avoid cycles, then JSON serialize
-// AI: invariants=visited uses reference equality; cycles produce "<cyclic reference>"; depth cutoff returns "<MaxDepth N reached>"
-// AI: deps=uses reflection and System.Text.Json; expensive—intended for debugging, not production hot paths
-// AI: security=can expose secrets via reflection; avoid running on PII or untrusted objects
+// AI: purpose=debug-only safe serializer; deps=reflection,System.Text.Json; perf=debug-only; not for production hot paths
+// AI: invariants=visited uses reference equality; cycles => "<cyclic reference>"; depth cutoff => "<MaxDepth N reached>"; security=may expose secrets
 
 namespace Music
 {
     public static class ObjectViewer
     {
-        // AI: Json: convenience wrapper using default maxDepth=6; returns indented JSON for readability
+        // AI: Json: convenience wrapper using default maxDepth=6; returns indented JSON
         public static string Json<T>(T obj) => Show(obj, maxDepth: 6);
 
         private static string Show<T>(T obj, int maxDepth)
@@ -21,8 +19,7 @@ namespace Music
             return JsonSerializer.Serialize(safe, new JsonSerializerOptions { WriteIndented = true });
         }
 
-        // AI: CreateSafeObject: core logic. Treats primitives/strings/DateTime/Guid/TimeSpan/decimal/enum as terminals.
-        // AI: Adds reference types to visited to prevent cycles; only inspects public instance properties/fields; catches exceptions.
+        // AI: CreateSafeObject: terminals=primitives,string,decimal,DateTime,enum,Guid,TimeSpan; inspects public props/fields; prevents cycles
         private static object? CreateSafeObject(object? obj, int depth, int maxDepth, HashSet<object> visited)
         {
             if (obj == null)
@@ -136,8 +133,7 @@ namespace Music
             return result;
         }
 
-        // Reference equality comparer for visited set to detect object identity cycles
-        // AI: ReferenceEqualityComparer: uses ReferenceEquals and RuntimeHelpers.GetHashCode to detect object identity
+        // AI: ReferenceEqualityComparer: uses ReferenceEquals + RuntimeHelpers.GetHashCode to detect object identity cycles
         private sealed class ReferenceEqualityComparer : IEqualityComparer<object>
         {
             public new bool Equals(object? x, object? y) => ReferenceEquals(x, y);

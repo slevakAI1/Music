@@ -1,7 +1,6 @@
-﻿// AI: purpose=Test helpers to populate WriterFormData from a SongContext for UI/tests.
-// AI: invariants=Produced WriterFormData uses designer values; PartsState/SectionsState keys are case-insensitive; defaults stable across tests.
-// AI: deps=Relies on SongContext.Voices and SectionTrack.Sections; changing those shapes breaks tests.
-// AI: change=If adding new WriterFormData fields update SetTestWriterG1 and WriterFormTransform.
+// AI: purpose=Test helpers to populate WriterFormData from SongContext for UI and unit tests.
+// AI: invariants=WriterFormData defaults stable; PartsState/SectionsState keys case-insensitive; do not rename properties.
+// AI: deps=Depends on SongContext.Voices and SectionTrack.Sections; update SetTestWriterG1 when WriterFormData fields change.
 
 using Music.Generator;
 
@@ -9,8 +8,8 @@ namespace Music.Writer
 {
     public class WriterFormTests
     {
-        // AI: SetTestWriterG1: builds a WriterFormData from a designer context; selects all voices and enumerates sections.
-        // AI: behavior=Leaves SectionsState unchecked by default; selects staff 1 and defaults common rhythm/pitch controls.
+        // AI: purpose=Create WriterFormData from SongContext; selects all voices and enumerates sections.
+        // AI: invariants=SectionsState entries default to false; SelectedStaffs contains 1; rhythm/pitch defaults defined.
         public static WriterFormData SetTestWriterG1(SongContext? designer)
         {
             var data = new WriterFormData();

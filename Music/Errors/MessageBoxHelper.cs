@@ -2,7 +2,7 @@
 // AI: invariants=ShowInternal is fire-and-forget for ownered messages; synchronous Show(...) returns DialogResult and may block UI
 // AI: threading=Show(Form,..) uses Invoke if required to ensure modal owner dialog; BeginInvoke used in ShowInternal to avoid deadlock
 // AI: behavior=ShowInternal swallows secondary exceptions to avoid crashing during error display; keep that behavior
-// AI: change=if altering threading or ownership rules update GlobalExceptionHandler and callers that rely on non-blocking calls
+// AI: note=if altering threading or ownership rules update GlobalExceptionHandler and callers that rely on non-blocking calls
 
 namespace Music.Writer
 
@@ -78,7 +78,7 @@ namespace Music.Writer
                 if (owner != null && owner.IsHandleCreated)
                 {
                     // Use BeginInvoke to avoid deadlock if caller is a worker thread and UI is waiting.
-                    // We intentionally do not capture and return the DialogResult here — for error/info messages
+                    // We intentionally do not capture and return the DialogResult here â€” for error/info messages
                     // we simply display them and return immediately.
                     owner.BeginInvoke(new Action(() =>
                     {

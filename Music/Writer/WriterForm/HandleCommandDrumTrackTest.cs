@@ -1,16 +1,17 @@
-// AI: purpose=Manual test for phrase-based DrumTrackGenerator; uses MaterialBank phrases to build full track.
-// AI: invariants=MaterialBank must contain phrases; always generates full song.
-// AI: deps=Generator.GenerateFromPhrases; DrumTrackTestSettingsDialog for seed input.
+// AI: purpose=Manual test handler: build a phrase-based drum PartTrack and append to current Song.
+// AI: invariants=MaterialBank contains at least one phrase; BarTrack initialized before call.
+// AI: deps=Generator.SongGenerator.GenerateFromPhrases; DrumTrackTestSettingsDialog; Rng.Initialize; SongGridManager
 
 using Music.Generator;
 
 namespace Music.Writer
 {
-    // AI: Command handler for phrase-based drum track generation; uses MaterialBank and updates grid with result.
+    // AI: purpose=Handle UI command to generate phrase-based drum track and update Song+grid.
     public static class HandleCommandDrumTrackTest
     {
-        // AI: HandleDrumTrackTest: shows input dialog, runs phrase-based generator, appends 1 drum PartTrack to Song and grid.
-        // AI: errors=any exception is shown via ShowError; no retry or partial-commit logic; invalid input caught by dialog validation.
+        // AI: entry=Validates SongContext and MaterialBank; shows seed dialog; generates deterministic drum PartTrack.
+        // AI: effects=Adds one drum PartTrack to songContext.Song.PartTracks and updates DataGridView via SongGridManager.
+        // AI: errors=All exceptions are presented via ShowError; dialog validation prevents invalid seed input.
         public static void HandleDrumTrackTest(
             SongContext songContext,
             DataGridView dgSong)
@@ -52,7 +53,7 @@ namespace Music.Writer
             }
         }
 
-        // AI: ShowSuccess: displays seed for reproduction; generates full song.
+        // AI: purpose=Notify user of successful creation and seed to reproduce the result.
         private static void ShowSuccess(int seed)
         {
             MessageBoxHelper.Show(
@@ -65,7 +66,7 @@ namespace Music.Writer
                 MessageBoxIcon.Information);
         }
 
-        // AI: ShowError: shows error message; overload for exception and string message.
+        // AI: purpose=Present generator errors to user via MessageBox; message must be safe for UI display.
         private static void ShowError(string message)
         {
             MessageBoxHelper.Show(

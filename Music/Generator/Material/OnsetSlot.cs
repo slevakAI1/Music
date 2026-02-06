@@ -1,17 +1,9 @@
-// AI: purpose=Simple onset slot record for generator-friendly MotifRenderer overload.
-// AI: deps=Used by MotifRenderer.Render simplified overload; provides pre-computed onset grid.
-// AI: invariants=StartTick >= 0; DurationTicks > 0; immutable record.
-
+// AI: purpose=Immutable onset slot for precomputed onset grids used by MotifRenderer simplified overload
+// AI: invariants=StartTick>=0; DurationTicks>0; IsStrongBeat indicates quarter-note boundary
+// AI: deps=Mapped to absolute song ticks; keep record shape stable for consumers and tests
 namespace Music.Song.Material;
 
-/// <summary>
-/// Represents a single onset slot in a pre-computed onset grid.
-/// Used by the simplified MotifRenderer overload for generator contexts
-/// that have already computed harmony contexts and onset positions.
-/// </summary>
-/// <param name="StartTick">Absolute song tick where this onset occurs.</param>
-/// <param name="DurationTicks">Duration in ticks until next onset or end of phrase.</param>
-/// <param name="IsStrongBeat">True if onset falls on a strong beat (quarter note boundary).</param>
+// AI: contract=StartTick absolute song tick; DurationTicks length in ticks; IsStrongBeat used for dynamics
 public sealed record OnsetSlot(
     long StartTick,
     int DurationTicks,

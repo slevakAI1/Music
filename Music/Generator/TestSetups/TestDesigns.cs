@@ -1,22 +1,20 @@
-// AI: purpose=Assemble a canonical SongContext for tests/demos so all design tracks align to TotalBars.
-// AI: invariants=After SetTestDesignD1 all design and song tracks cover TestDesigns.TotalBars and are contiguous.
-// AI: deps=Depends on SectionTests, HarmonyTests, TimingTests, TempoTests, GrooveTrackTestData, MotifLibrary, and BarTrack.RebuildFromTimingTrack.
-// AI: change=If you change defaults update all tests/fixtures and any code that asserts specific part names or TotalBars.
-
+// AI: purpose=Assemble canonical SongContext for tests/demos so design tracks align to TotalBars
+// AI: invariants=After SetTestDesignD1 tracks cover TotalBars contiguous; BarTrack rebuilt before motifs
+// AI: deps=SectionTests,HarmonyTests,TimingTests,TempoTests,GrooveTrackTestData,MotifLibrary,BarTrack.RebuildFromTimingTrack
+// AI: contract=Mutates provided SongContext in-place; callers expect these side-effects and alignment
 using Music.Song.Material;
 
 namespace Music.Generator
 {
-    // AI: mutates=This method populates many SongContext fields; callers expect these side-effects (no new SongContext created).
-    // AI: order=Builds sections->voices->harmony->timing->tempo->groove->bartrack->motifs; BarTrack.RebuildFromTimingTrack must run before motifs.
-    // Central defaults to keep tracks aligned
+    // AI: order=Builds sections->voices->harmony->timing->tempo->bartrack->motifs; BarTrack.RebuildFromTimingTrack must run before motifs
+    // AI: note=Do not create a new SongContext; this method mutates the provided instance
     public static class TestDesigns
     {
         public const int TotalBars = 48;  // TO DO THIS SHOULD BE COMPUTED FROM THE SECTION TRACK
         public const string GlobalTimeSignature = "4/4";
         public const int DefaultTempoBpm = 120;  // per ai, 120 is acutally an industry default
 
-        // Apply all defaults so the tracks end on the same beat
+        // AI: entry=Populate songContext with sections, voices, harmony, timing, tempo, barTrack, and test motifs
         public static void SetTestDesignD1(SongContext songContext)
         {
             // 1) Sections: apply default/test structure
@@ -48,8 +46,7 @@ namespace Music.Generator
             PopulateTestMotifs(songContext.MaterialBank);
         }
 
-        // AI: purpose=Populate MaterialBank with hardcoded test motifs for Stage 9+ placement/rendering testing.
-        // AI: invariants=Adds all motifs from MotifLibrary.GetAllTestMotifs(); converts each to PartTrack before storage.
+        // AI: helper=Add all MotifLibrary test motifs to MaterialBank as PartTracks; preserves MaterialLocal->PartTrack conversion
         private static void PopulateTestMotifs(MaterialBank bank)
         {
             var allMotifs = MotifLibrary.GetAllTestMotifs();

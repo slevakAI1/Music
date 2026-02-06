@@ -1,5 +1,5 @@
 // AI: purpose=stateless music math (MIDI, ticks, chord symbols); zero UI deps; invariants=TicksPerQuarterNote=480, MIDI 0-127
-// AI: contracts=input from WriterFormData; ChordQuality.Normalize for symbols; output to MusicXML layer
+// AI: contracts=input from WriterFormData; ChordQuality.Normalize for symbols;
 // AI: change=adding rhythms: update CalculateRhythm lookup tables; chords: sync with ChordQuality.All; keep TransposeNote sharp/flat logic
 using Music.Generator;
 
@@ -11,10 +11,7 @@ namespace Music.Writer
     /// </summary>
     public static class MusicCalculations
     {
-        // AI: extracts (noteNumber, ticks, count) from FormData; depends on FormData nullable conventions (null?default)
-        /// <summary>
-        /// Extracts all repeating note parameters from form data.
-        /// </summary>
+        // AI: purpose=Extract noteNumber, noteDurationTicks, repeatCount from WriterFormData; relies on DTO default semantics
         public static (int noteNumber, int noteDurationTicks, int repeatCount)
             GetRepeatingNotesParameters(WriterFormData formData)
         {
@@ -38,18 +35,7 @@ namespace Music.Writer
             return (noteNumber, noteDurationTicks, repeatCount);
         }
 
-        // AI: key format="C major"|"F# minor"; degree 1-7; quality=ChordQuality short symbol; bass="root"|"3rd"|"5th"|"7th"
-        // AI: output=standard symbol "Cmaj7/E"; must call ChordQuality.Normalize(quality) before building symbol
-        // AI: TransposeNote preserves sharp/flat preference from input; intervals= major/natural minor only
-        /// <summary>
-        /// Converts chord parameters to standard chord notation symbol (e.g., "Cmaj7", "Am", "G7/B").
-        /// Input quality should already be a standard chord symbol ("", "m7", "7", etc.).
-        /// </summary>
-        /// <param name="key">The key (e.g., "C major", "F# minor")</param>
-        /// <param name="degree">The scale degree (1-7)</param>
-        /// <param name="quality">The chord quality (standard chord symbol, e.g., "", "m7", "7")</param>
-        /// <param name="bass">The bass note (e.g., "root", "3rd", "5th")</param>
-        /// <returns>Chord symbol notation string</returns>
+        // AI: purpose=Build standard chord symbol from key, degree, quality, bass; depends on ChordQuality.Normalize; supports major/minor
         public static string ConvertToChordNotation(string key, int degree, string quality, string bass)
         {
             // Parse key to get root and mode
@@ -92,7 +78,6 @@ namespace Music.Writer
             return symbol;
         }
 
-        // AI: sharp/flat choice: input 'b'?flatNames, else?noteNames; wraps modulo 12; output always single accidental or natural
         private static string TransposeNote(string note, int semitones)
         {
             var noteNames = new[] { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
@@ -115,7 +100,6 @@ namespace Music.Writer
             return accidental == 'b' ? flatNames[newIndex] : noteNames[newIndex];
         }
 
-        // AI: quality=ChordQuality short symbol; noteIndex 0=root,1=3rd,2=5th,3=7th; returns semitones above root; extend for 9,11,13 if needed
         private static int GetChordInterval(string quality, int noteIndex)
         {
             // Get semitones for 3rd, 5th, 7th, etc. based on chord quality (uses standard chord symbols)
@@ -133,14 +117,7 @@ namespace Music.Writer
             };
         }
 
-        // AI: step=C-B; octave=any int; accidental="Sharp"|"Flat"|"Natural"|"#"|"b"; output MIDI 0-127; formula=(octave+1)*12+baseNote+alter
-        /// <summary>
-        /// Calculates MIDI note number from musical note components.
-        /// </summary>
-        /// <param name="step">The note step (C, D, E, F, G, A, B)</param>
-        /// <param name="octave">The octave number</param>
-        /// <param name="accidental">The accidental string ("Sharp", "Flat", "Natural", etc.)</param>
-        /// <returns>The MIDI note number (0-127)</returns>
+        // AI: purpose=Compute MIDI note number from step, octave and accidental; returns 0-127 using (octave+1)*12+base+alter
         public static int CalculateMidiNoteNumber(char step, int octave, string accidental)
         {
             // Convert accidental string to alter value
@@ -168,17 +145,7 @@ namespace Music.Writer
             return (octave + 1) * 12 + baseNote + alter;
         }
 
-        // AI: noteValue=display format from MusicConstants.NoteValueMap keys; ticks=480*4/duration*dotFactor*tupletRatio
-        // AI: tupletNumber non-empty ? apply tuplet; dots?iterative +half; nulls?treated as 0/empty
-        /// <summary>
-        /// Calculates note duration in MIDI ticks.
-        /// </summary>
-        /// <param name="noteValue">The note value string (e.g., "Quarter (1/4)" for quarter note)</param>
-        /// <param name="dots">Number of dots to apply</param>
-        /// <param name="tupletNumber">Optional tuplet identifier</param>
-        /// <param name="tupletCount">Tuplet count (m in m:n tuplet)</param>
-        /// <param name="tupletOf">Tuplet basis (n in m:n tuplet)</param>
-        /// <returns>Duration in MIDI ticks</returns>
+        // AI: purpose=Compute duration in ticks from noteValue,dots,tuplet; uses MusicConstants.TicksPerQuarterNote for base ticks
         public static int CalculateNoteDurationTicks(
             string noteValue,
             int dots,
@@ -200,12 +167,7 @@ namespace Music.Writer
             return ApplyTuplet(dottedTicks, tupletNumber, tupletCount, tupletOf);
         }
 
-        // AI: parses "Whole (1)"|"Quarter (1/4)" etc.; extracts denominator; "Whole (1)"?1, "Quarter (1/4)"?4; default=4 on parse fail
-        /// <summary>
-        /// Parses the numeric duration value from a note value display string.
-        /// </summary>
-        /// <param name="noteValue">Display string like "Quarter (1/4)" or "Eighth (1/8)"</param>
-        /// <returns>The numeric duration (1, 2, 4, 8, 16, 32), defaulting to 4 (quarter note)</returns>
+        // AI: purpose=Parse denominator from note value display like "Quarter (1/4)"; returns numeric duration or 4 on failure
         private static int ParseNoteValueDuration(string noteValue)
         {
             if (string.IsNullOrWhiteSpace(noteValue))
@@ -236,13 +198,7 @@ namespace Music.Writer
             return 4; // Default to quarter note
         }
 
-        // AI: dots?each adds half of previous extension; e.g. 1 dot=1.5x, 2 dots=1.75x
-        /// <summary>
-        /// Applies dot duration extensions to a base duration.
-        /// </summary>
-        /// <param name="baseTicks">The base duration in ticks</param>
-        /// <param name="dots">Number of dots to apply</param>
-        /// <returns>The dotted duration in ticks</returns>
+        // AI: purpose=Apply dot extensions: each dot adds half the previous increment (1 dot=1.5x, 2 dots=1.75x)
         private static int ApplyDots(int baseTicks, int dots)
         {
             int dottedTicks = baseTicks;
@@ -257,15 +213,7 @@ namespace Music.Writer
             return dottedTicks;
         }
 
-        // AI: tupletNumber empty/null?no change; else multiply by tupletOf/tupletCount (e.g. triplet=2/3)
-        /// <summary>
-        /// Applies tuplet adjustment to a duration.
-        /// </summary>
-        /// <param name="dottedTicks">The dotted duration in ticks</param>
-        /// <param name="tupletNumber">Optional tuplet identifier</param>
-        /// <param name="tupletCount">Tuplet count (m in m:n tuplet)</param>
-        /// <param name="tupletOf">Tuplet basis (n in m:n tuplet)</param>
-        /// <returns>The tuplet-adjusted duration in ticks</returns>
+        // AI: purpose=Apply tuplet adjustment when tupletNumber provided; returns (dottedTicks*tupletOf)/tupletCount
         private static int ApplyTuplet(
             int dottedTicks,
             string tupletNumber,
@@ -281,10 +229,7 @@ namespace Music.Writer
             return dottedTicks;
         }
 
-        // AI: inverse of CalculateMidiNoteNumber; MIDI?(Step, Alter, Octave); octave=(noteNumber/12)-1; always uses sharps (Alter=1)
-        /// <summary>
-        /// Calculates the pitch properties (Step, Alter, Octave) from MIDI note number.
-        /// </summary>
+        // AI: purpose=Inverse of CalculateMidiNoteNumber; returns (Step,Alter,Octave); favors sharps for accidentals
         public static (char Step, int Alter, int Octave) CalculatePitch(int noteNumber)
         {
             int octave = (noteNumber / 12) - 1;
@@ -308,12 +253,7 @@ namespace Music.Writer
             };
         }
 
-        // AI: inverse of CalculateNoteDurationTicks; ticks?(Duration,Dots,TupletActual?,TupletNormal?); checks tuplets first then standard
-        // AI: tolerance=±1 tick for tuplet match; extends lookup tables when adding new rhythms; fallback=nearest power-of-2 duration
-        /// <summary>
-        /// Calculates the rhythm properties (Duration, Dots) from note duration in ticks.
-        /// Assumes 480 ticks per quarter note.
-        /// </summary>
+        // AI: purpose=Map ticks to (Duration,Dots,TupletActual,TupletNormal); checks tuplets with Â±1 tick tolerance then standard durations
         public static (int Duration, int Dots, int? TupletActual, int? TupletNormal) CalculateRhythm(int noteDurationTicks)
         {
             const int ticksPerQuarterNote = 480;

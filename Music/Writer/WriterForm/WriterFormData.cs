@@ -1,41 +1,36 @@
-// AI: purpose=DTO for WriterForm control values; provides safe defaults to simplify callers and reduce repeated fallback logic.
-// AI: invariants=Getters return usable defaults (e.g., StartBar>=1, Octave resolved, PartsState non-null) so callers can read without null checks.
-// AI: deps=Consumed by UI command handlers and transforms; changing property names or default semantics breaks serialization and UI logic.
-// AI: change=If adding fields update WriterFormTransform and any serializers; keep getters' default behavior stable.
+// AI: purpose=Form DTO for writer UI; provides stable defaults so callers avoid null/fallback logic.
+// AI: invariants=Getters return usable defaults; property renames or default changes break UI/serialization.
+// AI: deps=Consumers: command handlers, WriterFormTransform, serializers; keep shape and default semantics stable.
 
 namespace Music.Writer
 {
-    // AI: WriterFormData is a lightweight, form-bound data holder; keep it free of business logic and side-effects.
-    // AI: design=backing fields nullable for serializer compatibility; getters supply pragmatic defaults for consumers.
+    // AI: purpose=Lightweight form-bound data holder; no business logic or side-effects here.
+    // AI: invariants=Backing fields nullable for serialization; getters must supply pragmatic defaults.
     public sealed class WriterFormData
     {
-        // General / ProposedPattern
         private string? _pattern;
         private string? _sectionsText;
 
-        // Target scope (Voices / Sections / Staff / Range)
         private Dictionary<string, bool>? _partsState;
         private Dictionary<string, bool>? _sectionsState;
-        private List<int>? _selectedStaffs; // Changed from Dictionary<int, bool>? _staffsState
+        private List<int>? _selectedStaffs;
         private int? _startBar;
         private int? _endBar;
         private int? _startBeat;
         private bool? _overwriteExisting;
 
-        // Pitch & Chord options
         private bool? _pitchAbsolute;
         private char _step;
         private string? _accidental;
         private int? _octaveAbsolute;
         private int? _degreeKeyRelative;
         private int? _octaveKeyRelative;
-        private bool? _isChord; // new backing field
+        private bool? _isChord;
         private string? _chordKey;
         private int? _chordDegree;
         private string? _chordQuality;
         private string? _chordBase;
 
-        // Rhythm options
         private string? _noteValue;
         private int _dots;
         private string? _tupletNumber;
@@ -53,8 +48,7 @@ namespace Music.Writer
         }
 
         // Voices / scope
-        // New: map of part name to checked state. Getter returns an empty dictionary when not set.
-        // AI: PartsState returns a case-insensitive map; callers may add keys; treat returned instance as mutable.
+        // AI: parts=case-insensitive map; getter returns non-null empty map for callers; returned map is mutable.
         public Dictionary<string, bool>? PartsState
         {
             get => _partsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -62,8 +56,7 @@ namespace Music.Writer
         }
 
         // Sections / scope
-        // New: map of section name to checked state. Getter returns an empty dictionary when not set.
-        // AI: SectionsState mirrors PartsState semantics; keep keys trimmed and case-insensitive when persisting.
+        // AI: sections=case-insensitive map; getter returns non-null empty map for callers.
         public Dictionary<string, bool>? SectionsState
         {
             get => _sectionsState ?? new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -122,12 +115,12 @@ namespace Music.Writer
             set => _isChord = value;
         }
 
-        // Always return a non-null accidental string for consumers (default "Natural").
+        // AI: accidental=default "Natural" to avoid null checks; values: "Natural"/"Sharp"/"Flat".
         public string? Accidental
         {
             get => _accidental ?? "Natural";
             set => _accidental = value;
-        } // "Natural"/"Sharp"/"Flat"
+        }
 
         public int? OctaveAbsolute
         {
@@ -147,10 +140,7 @@ namespace Music.Writer
             set => _octaveKeyRelative = value;
         }
 
-        // Derived effective octave (combines absolute/key-relative fallbacks).
-        // Consumers that previously did: data.OctaveAbsolute ?? data.OctaveKeyRelative ?? 4
-        // can now use this property to get the resolved octave.
-        // AI: Octave resolves to absolute then key-relative then 4; keep default 4 stable across versions.
+        // AI: octave=resolve absolute then key-relative then 4; default 4 is stable and relied upon by callers.
         public int Octave
         {
             get => _octaveAbsolute ?? _octaveKeyRelative ?? 4;
@@ -199,10 +189,9 @@ namespace Music.Writer
             set => _fermata = value;
         }
 
-        // Always provide a default of 1 note when not explicitly set.
-        // AI: NumberOfNotes default ensures callers don't need to check for null; keep default=1 stable.
         public int? NumberOfNotes
         {
+            // AI: default=1 to avoid null checks by callers
             get => _numberOfNotes ?? 1;
             set => _numberOfNotes = value;
         }
@@ -232,8 +221,7 @@ namespace Music.Writer
             set => _chordBase = value;
         }
 
-        // Staff selection - list of selected staff numbers
-        // AI: SelectedStaffs returns an empty list when unset; callers may mutate the returned list.
+        // AI: selectedStaffs=list of selected staff numbers; getter returns non-null empty list and is mutable.
         public List<int>? SelectedStaffs
         {
             get => _selectedStaffs ?? new List<int>();

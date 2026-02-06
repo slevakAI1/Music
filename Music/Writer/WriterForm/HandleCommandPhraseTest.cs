@@ -1,19 +1,19 @@
-// AI: purpose=Handler to test drummer agent phrase generation and add result to SongContext and UI grid.
-// AI: invariants=Uses groove anchor pattern; mutates songContext.Song.PartTracks and Grid.
-// AI: deps=Relies on Generator.Generator.Generate with maxBars, GrooveAnchorFactory; keep in sync with generator API.
-// AI: perf=Generation may allocate; run on UI thread currently; consider backgrounding if UI stalls for large songs.
+// AI: purpose=UI command: generate drummer-agent phrase-based drum PartTrack and append to Song+grid.
+// AI: invariants=Requires songContext.BarTrack; groove anchor must be available; seed makes generation deterministic.
+// AI: deps=Generator.SongGenerator.Generate; GrooveAnchorFactory; PhraseTestSettingsDialog; Rng.Initialize
+// AI: perf=Potentially expensive; runs on UI thread. Move to background thread if UI responsiveness degrades.
 
 using Music.Generator;
-using Music.Generator.Core;
 using Music.Generator.Groove;
 
 namespace Music.Writer
 {
-    // AI: Command handler for drummer agent test; wraps generator call with style configuration and updates UI grid with results.
+    // AI: purpose=Handle UI command to configure and run drummer generator; update Song and DataGridView.
     public static class HandleCommandPhraseTest
     {
-        // AI: HandlePhraseTest: shows input dialog, runs drummer agent generator with seed/genre/bars, appends 1 drum PartTrack to Song and grid.
-        // AI: errors=any exception is shown via ShowError; no retry or partial-commit logic; invalid input caught by dialog validation.
+        // AI: entry=Validate SongContext; show modal seed/genre/bars dialog; init RNG and groove preset.
+        // AI: effects=Appends one drum PartTrack to songContext.Song.PartTracks and updates grid via SongGridManager.
+        // AI: errors=All exceptions shown via ShowError; dialog prevents invalid inputs.
         public static void HandlePhraseTest(
             SongContext songContext,
             DataGridView dgSong)
@@ -75,7 +75,7 @@ namespace Music.Writer
 
         #region MessageBox
 
-        // AI: ShowSuccess: displays seed for reproduction; message stable for testing; shows if limited or full song.
+        // AI: purpose=Notify user of successful generation and provide seed for reproduction; indicates bars generated.
         private static void ShowSuccess(int seed, string genre, int bars)
         {
             string barsMessage = bars > 0 
@@ -93,7 +93,7 @@ namespace Music.Writer
                 MessageBoxIcon.Information);
         }
 
-        // AI: ShowError: shows error message; overload for exception and string message.
+        // AI: purpose=Present generator errors to the user via MessageBox; messages must be safe for UI display.
         private static void ShowError(string message)
         {
             MessageBoxHelper.Show(

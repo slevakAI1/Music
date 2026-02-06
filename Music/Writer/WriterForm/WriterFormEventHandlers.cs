@@ -1,7 +1,7 @@
-// AI: purpose=Event handlers for WriterForm; validate UI grid rows, convert between PartTrack and MIDI, and coordinate playback/export/import.
-// AI: invariants=Grid fixed rows are used for control lines; handlers expect colData to contain PartTrack/track objects.
-// AI: deps=Relies on SongGridManager, GridControlLinesManager, Convert* helpers, Midi services, and MessageBoxHelper.
-// AI: errors=Handlers show dialogs for recoverable/user errors; conversions throw NotSupportedException for unsupported MIDI events.
+// AI: purpose=WinForms event handlers coordinating grid validation, MIDI conversions, playback, import/export.
+// AI: invariants=fixed grid rows hold control tracks; 'colData' must contain expected types; selection skips FIXED_ROWS_COUNT.
+// AI: deps=SongGridManager; GridControlLinesManager; Convert* converters; MidiIoService; MidiPlaybackService; MessageBoxHelper
+// AI: errors=User dialogs for recoverable errors; NotSupportedException surfaced for unsupported MIDI events.
 
 using Music.Generator;
 using Music.MyMidi;
@@ -10,8 +10,8 @@ namespace Music.Writer
 {
     public class WriterFormEventHandlers
     {
-        // AI: HandlePlayAsync: validates selection, builds PartTrack list, converts to MidiSongDocument and plays via Player helper.
-        // AI: edge=Aborts if tempo/time signature missing, selected rows lack PartTrack, or instrument not chosen.
+        // AI: purpose=Validate grid & selection, convert selected PartTracks+tempo/time to MidiDoc and play async.
+        // AI: invariants=Abort if tempo/time signature missing, non-PartTrack in 'colData', or missing instrument selection.
         public async Task HandlePlayAsync(
             DataGridView dgSong,
             MidiPlaybackService midiPlaybackService)
@@ -145,7 +145,7 @@ namespace Music.Writer
             Tracer.DebugTrace("=== WriterFormEventHandlers.HandlePlayAsync END ===");
         }
 
-        // AI: HandleExport: similar validation to Play then converts selected PartTracks to MidiSongDocument and writes file via service.
+        // AI: purpose=Validate selection, convert PartTracks+tempo/time to MidiDoc and export via MidiIoService.
         public static void HandleExport(
             DataGridView dgSong,
             MidiIoService midiIoService)
@@ -292,8 +292,8 @@ namespace Music.Writer
             }
         }
 
-        // AI: HandleImport: loads Midi via service, converts to PartTrack list, extracts timing/tempo, and adds tracks to grid.
-        // AI: errors=Unsupported MIDI events throw NotSupportedException which is shown to user; other exceptions show generic import error.
+        // AI: purpose=Import MIDI, convert to PartTracks, extract tempo/time and attach control lines and tracks to grid.
+        // AI: errors=NotSupportedException signals unsupported MIDI events (shown to user); other exceptions show generic import error.
         public void HandleImport(
             DataGridView dgSong,
             MidiIoService midiIoService)
@@ -383,8 +383,8 @@ namespace Music.Writer
             }
         }
 
-        // AI: ExtractTempoAndTimingFromPartTracks: two-pass extraction. First collects time signatures, then tempos using beatsPerBar.
-        // AI: note=Calculates 1-based bar/beat from AbsoluteTimeTicks using ticksPerQuarterNote; assumes whole-bar durations.
+        // AI: purpose=Two-pass extraction of time signatures then tempos from PartTrack meta events to TempoTrack/Timingtrack.
+        // AI: invariants=Calculates 1-based bar/beat from AbsoluteTimeTicks using ticksPerQuarterNote; initial beatsPerBar=4.
         private static (TempoTrack?, Timingtrack?) ExtractTempoAndTimingFromPartTracks(
             List<Generator.PartTrack> partTracks,
             short ticksPerQuarterNote)
@@ -486,7 +486,7 @@ namespace Music.Writer
 
         // ========== GRID CELL EVENT HANDLERS ==========
 
-        // AI: HandleTrackDoubleClick: opens a JSON viewer for PartTrack rows; shows message if no track data available.
+        // AI: purpose=On double-click show PartTrack JSON viewer for track rows; no-op with info dialog if no PartTrack present.
         public void HandleTrackDoubleClick(DataGridView dgSong, DataGridViewCellEventArgs e)
         {
             // Skip fixed rows

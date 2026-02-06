@@ -1,42 +1,14 @@
-// AI: purpose=Deterministic motif placement planner; selects WHICH motifs appear WHERE.
-// AI: invariants=All outputs deterministic by seed; placement respects orchestration/register constraints; collision-free within register bands.
-// AI: deps=Consumes SectionTrack, MaterialBank; produces MotifPlacementPlan for renderer.
-
-
-// AI: purpose=Deterministic motif placement planner; selects WHICH motifs appear WHERE.
-// AI: invariants=All outputs deterministic by seed; placement respects orchestration/register constraints; collision-free within register bands.
-// AI: deps=Consumes SectionTrack, MaterialBank; produces MotifPlacementPlan for renderer.
-
+// AI: purpose=Deterministic motif placement planner: decide which motifs to place where in song structure
+// AI: invariants=Deterministic by seed; respects orchestration/register constraints; avoids same-register collisions
+// AI: deps=Consumes SectionTrack and MaterialBank; outputs MotifPlacementPlan for renderer
 using Music.Song.Material;
 
 namespace Music.Generator.Material;
 
-/// <summary>
-/// Deterministically places motifs in song structure based on section types, tension, and orchestration.
-/// Story 9.1: WHICH motifs WHERE; Story 9.2 handles rendering notes.
-/// </summary>
-/// <remarks>
-/// MVP placement heuristics:
-/// - Chorus: primary hook motif almost always
-/// - Intro: optional motif teaser
-/// - Pre-chorus: motif fragment or rhythmic foreshadowing (build anticipation)
-/// - Bridge: either new motif or transformed existing motif (contrast)
-/// - Verse: optional riff
-/// 
-/// Collision checks:
-/// - do not place when role absent in orchestration
-/// - do not place if register would be violated
-/// - avoid simultaneous dense motifs in same register band
-/// </remarks>
 public static class MotifPlacementPlanner
 {
-    /// <summary>
-    /// Creates a deterministic motif placement plan for the song.
-    /// </summary>
-    /// <param name="sectionTrack">Song structure (section types, lengths).</param>
-    /// <param name="motifBank">Available motifs (filtered by role/kind).</param>
-    /// <param name="seed">Seed for deterministic tie-breaking.</param>
-    /// <returns>Complete placement plan.</returns>
+    // AI: entry=CreatePlan builds deterministic MotifPlacementPlan; seed ensures repeatable choices
+    // AI: errors=Throws when sectionTrack or motifBank null; callers should validate inputs
     public static MotifPlacementPlan CreatePlan(
         SectionTrack sectionTrack,
         MaterialBank motifBank,
@@ -122,10 +94,7 @@ public static class MotifPlacementPlanner
         return MotifPlacementPlan.Create(placements, seed);
     }
 
-    /// <summary>
-    /// Determines if a motif should be placed in this section type.
-    /// MVP heuristics based on section type only.
-    /// </summary>
+    // AI: heuristics=Decide per-section placement probability deterministically from seed
     private static bool ShouldPlaceMotif(
         MusicConstants.eSectionType sectionType,
         int sectionIndex,
@@ -159,9 +128,7 @@ public static class MotifPlacementPlanner
         };
     }
 
-    /// <summary>
-    /// Selects appropriate motif for section and specific role, respecting A/A' reuse and variation.
-    /// </summary>
+    // AI: selection=Deterministically choose a motif for section+role; respects preferred MaterialKind and role filter
     private static PartTrack? SelectMotifForSectionAndRole(
         MusicConstants.eSectionType sectionType,
         string targetRole,
@@ -227,10 +194,7 @@ public static class MotifPlacementPlanner
         return candidates[index];
     }
 
-    /// <summary>
-    /// Gets preferred material kind based on section type.
-    /// AI: BassFill prioritized at section transitions; Outro commonly uses fills.
-    /// </summary>
+    // AI: helper=Return preferred MaterialKind for section type; used as a soft preference during selection
     private static MaterialKind GetPreferredMaterialKind(
         MusicConstants.eSectionType sectionType,
         int sectionIndex)
@@ -247,9 +211,7 @@ public static class MotifPlacementPlanner
         };
     }
 
-    /// <summary>
-    /// Creates placement for motif in section, determining bars and variation intensity.
-    /// </summary>
+    // AI: placement=Create MotifPlacement determining start/duration and converting motif to MotifSpec
     private static MotifPlacement? CreatePlacementForSection(
         PartTrack motif,
         int sectionIndex,
@@ -285,9 +247,7 @@ public static class MotifPlacementPlanner
             transformTags);
     }
 
-    /// <summary>
-    /// Determines duration in bars for motif placement.
-    /// </summary>
+    // AI: duration=Choose duration in bars for motif placement; chorus prefers full section
     private static int DetermineDuration(
         Section section,
         int sectionIndex,
@@ -307,22 +267,16 @@ public static class MotifPlacementPlanner
         return section.BarCount;
     }
 
-    /// <summary>
-    /// Determines start bar within section for motif.
-    /// </summary>
+    // AI: start=Compute start bar within section; MVP uses 0 (beginning)
     private static int DetermineStartBar(
         Section section,
         int sectionIndex,
         int seed)
     {
-        // Default: start at beginning (no delayed entry for MVP energy disconnect)
         return 0;
     }
 
-    /// <summary>
-    /// <summary>
-    /// Checks if role is a lead role (melody/hook carrier).
-    /// </summary>
+    // AI: helper=Return true for lead roles (lead/vocal/hook) using case-insensitive matching
     private static bool IsLeadRole(string role)
     {
         if (string.IsNullOrWhiteSpace(role))

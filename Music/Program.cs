@@ -1,14 +1,13 @@
-using System;
-using System.Windows.Forms;
 using Music.Generator;
 
+// AI: purpose=App entrypoint: configure global handlers, preload singletons, init RNG, start WinForms MainForm.
+// AI: invariants=GlobalExceptionHandler.Configure must run before any UI init; Rng.Initialize called once app-wide.
+// AI: deps=WordParser.EnsureLoaded; ApplicationConfiguration.Initialize; MainForm; STAThread required for WinForms.
 namespace Music
 {
     internal static class Program
     {
-        /// <summary>
-        ///  The main entry point for the application.
-        /// </summary>
+        // AI: entry=Main: initialize global services in this order then call Application.Run(MainForm).
         [STAThread]
         static void Main()
         {

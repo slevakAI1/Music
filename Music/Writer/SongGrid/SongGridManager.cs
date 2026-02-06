@@ -1,7 +1,7 @@
-// AI: purpose=Manage WriterForm song grid layout and fixed control rows (voice/section/harmony/time/tempo).
-// AI: invariants=Fixed rows 0..8 are reserved; MEASURE_START_COLUMN_INDEX is the canonical start for measure columns.
-// AI: deps=Grid consumers rely on hidden "colData" to store track objects; changing cell names breaks multiple callers.
-// AI: change=If adding control lines update InitializeFixedRows and GridControlLinesManager attachers to keep UI in sync.
+// AI: purpose=Manage song grid layout and fixed control rows (voice/section/harmony/time/tempo) for WriterForm UI.
+// AI: invariants=Fixed rows 0..8 reserved; MEASURE_START_COLUMN_INDEX is canonical start for measure columns.
+// AI: deps=Grid consumers rely on hidden "colData" cell to hold track objects; renaming cells breaks callers.
+// AI: note=If adding control lines update InitializeFixedRows and GridControlLinesManager attachers to stay in sync.
 
 using Music.Generator;
 using Music.MyMidi;

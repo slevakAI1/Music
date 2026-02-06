@@ -1,17 +1,17 @@
-// AI: purpose=Handler for groove preview audition; generates PartTrack from seed+genre and adds to UI grid.
-// AI: invariants=Shows input dialog for parameters; uses BarTrack from songContext; mutates Song.PartTracks and Grid.
-// AI: deps=Relies on Generator.GenerateGroovePreview, GroovePreviewDialog, SongGridManager.AddNewPartTrack.
-// AI: change=Story 3.1: user enters seed/genre/bars, hears groove instance for audition workflow.
+// AI: purpose=Generate a groove PartTrack for audition and append it to the current Song and UI grid.
+// AI: invariants=Requires songContext.BarTrack; dialog validates seed/genre/bars; operation is deterministic by seed.
+// AI: deps=Generator.SongGenerator.GenerateGroovePreview; PhraseTestSettingsDialog; SongGridManager.AddNewPartTrack
 
 using Music.Generator;
 
 namespace Music.Writer
 {
-    // AI: Command handler for groove preview; shows dialog, generates preview, updates grid, displays seed.
+    // AI: purpose=Handle UI command to generate groove preview and update Song+DataGridView.
     public static class HandleCommandGrooveTest
     {
-        // AI: HandleGrooveTest: shows input dialog, generates groove preview, adds to grid with seed in status.
-        // AI: errors=Any exception shown via ShowError; no retry logic; invalid input caught by dialog validation.
+        // AI: entry=Validate SongContext; show modal settings; generate deterministic groove PartTrack from phrases.
+        // AI: effects=Appends one PartTrack to songContext.Song.PartTracks and adds row via SongGridManager.
+        // AI: errors=All exceptions shown via ShowError; dialog validation prevents bad parameters.
         public static void HandleGrooveTest(
             SongContext songContext,
             DataGridView dgSong)
@@ -60,7 +60,7 @@ namespace Music.Writer
 
         #region MessageBox
 
-        // AI: ShowSuccess: displays seed for reproduction; message stable for testing.
+        // AI: purpose=Inform user of successful generation and provide seed to reproduce the groove.
         private static void ShowSuccess(int seed, string genre, int bars)
         {
             MessageBoxHelper.Show(
@@ -74,7 +74,7 @@ namespace Music.Writer
                 MessageBoxIcon.Information);
         }
 
-        // AI: ShowError: shows error message; overload for exception and string message.
+        // AI: purpose=Present generation errors to the user via MessageBox; keep messages safe for UI.
         private static void ShowError(string message)
         {
             MessageBoxHelper.Show(

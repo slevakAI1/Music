@@ -1,14 +1,12 @@
-// AI: purpose=Test that TestDesigns.SetTestDesignD1 properly populates MaterialBank with test motifs
-// AI: invariants=After SetTestDesignD1, MaterialBank should contain all 4 test motifs
-// AI: deps=Tests TestDesigns, SongContext, MaterialBank, MotifLibrary integration
+// AI: purpose=Integration tests for TestDesigns motif fixtures populating MaterialBank
+// AI: invariants=After SetTestDesignD1 MaterialBank contains 4 motifs; queries by role/kind must succeed
+// AI: deps=Relies on TestDesigns.SetTestDesignD1, SongContext, MaterialBank API (GetMotifByName/GetMotifsByRole)
 using Music.Generator;
 using Music.Song.Material;
 
 namespace Music.Tests.Integration;
 
-/// <summary>
-/// Tests that TestDesigns properly integrates with the motif system.
-/// </summary>
+// AI: tests=Validate TestDesigns D1 populates MaterialBank and motifs are queryable by role/kind
 public static class TestDesignsMotifIntegrationTests
 {
     public static void RunAll()
@@ -22,6 +20,7 @@ public static class TestDesignsMotifIntegrationTests
         Console.WriteLine("\n✓ All TestDesigns + Motif integration tests passed!");
     }
 
+    // AI: case=After SetTestDesignD1 MaterialBank.Count must equal 4
     private static void TestSetTestDesignD1PopulatesMaterialBank()
     {
         var songContext = new SongContext();
@@ -33,6 +32,7 @@ public static class TestDesignsMotifIntegrationTests
         Console.WriteLine("  ✓ SetTestDesignD1 populates MaterialBank with 4 motifs");
     }
 
+    // AI: case=Ensure each expected motif name exists in MaterialBank after setup
     private static void TestMaterialBankContainsAllTestMotifs()
     {
         var songContext = new SongContext();
@@ -55,6 +55,7 @@ public static class TestDesignsMotifIntegrationTests
         Console.WriteLine("  ✓ MaterialBank contains all expected test motifs");
     }
 
+    // AI: case=Verify role and kind queries return expected counts for test motifs
     private static void TestMaterialBankMotifsCanBeQueried()
     {
         var songContext = new SongContext();
