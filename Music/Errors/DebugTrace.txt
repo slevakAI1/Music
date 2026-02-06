@@ -8263,3 +8263,69 @@
 [2026-02-06T10:32:30.1481194-05:00] Rng.Initialize: seed=12345
 [2026-02-06T10:32:35.4203158-05:00] Rng.Initialize: seed=-947915012
 [2026-02-06T10:32:35.4203158-05:00] Rng.Initialize: seed=-947915012
+[2026-02-06T10:45:53.9776687-05:00] Rng.Initialize: seed=12345
+[2026-02-06T10:45:53.9776687-05:00] Rng.Initialize: seed=12345
+[2026-02-06T10:46:03.3769731-05:00] Rng.Initialize: seed=-1569933132
+[2026-02-06T10:46:03.3769731-05:00] Rng.Initialize: seed=-1569933132
+[2026-02-06T10:46:15.1975138-05:00] Rng.Initialize: seed=-301715963
+[2026-02-06T10:46:15.1975138-05:00] Rng.Initialize: seed=-301715963
+[2026-02-06T10:46:15.1986233-05:00] [GenerateFromPhrases] phrases=1; seed=-301715963; maxBars=0
+[2026-02-06T10:46:15.1986233-05:00] [GenerateFromPhrases] phrases=1; seed=-301715963; maxBars=0
+[2026-02-06T10:46:15.2002657-05:00] [DrumGenerator] phrases=1; seed=-301715963; maxBars=0
+[2026-02-06T10:46:15.2002657-05:00] [DrumGenerator] phrases=1; seed=-301715963; maxBars=0
+[2026-02-06T10:46:15.2009606-05:00] [DrumGenerator] phraseId=b6741907c172490c90de50e1f5a67b2a; bars=2; events=36
+[2026-02-06T10:46:15.2009606-05:00] [DrumGenerator] phraseId=b6741907c172490c90de50e1f5a67b2a; bars=2; events=36
+[2026-02-06T10:46:15.2084333-05:00] [DrumGenerator] placements=25; fillBars=7
+[2026-02-06T10:46:15.2084333-05:00] [DrumGenerator] placements=25; fillBars=7
+[2026-02-06T10:46:15.2118092-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a; start=1; bars=2; events=36; eligible=36; endTick=3840
+[2026-02-06T10:46:15.2118092-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a; start=1; bars=2; events=36; eligible=36; endTick=3840
+[2026-02-06T10:46:15.2148674-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=3; bars=2; events=36; eligible=36; endTick=7680
+[2026-02-06T10:46:15.2148674-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=3; bars=2; events=36; eligible=36; endTick=7680
+[2026-02-06T10:46:15.2155385-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=5; bars=2; events=36; eligible=36; endTick=11520
+[2026-02-06T10:46:15.2155385-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=5; bars=2; events=36; eligible=36; endTick=11520
+[2026-02-06T10:46:15.2161827-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a; start=9; bars=2; events=36; eligible=36; endTick=19200
+[2026-02-06T10:46:15.2161827-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a; start=9; bars=2; events=36; eligible=36; endTick=19200
+[2026-02-06T10:46:15.2167514-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=11; bars=2; events=36; eligible=36; endTick=23040
+[2026-02-06T10:46:15.2167514-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=11; bars=2; events=36; eligible=36; endTick=23040
+[2026-02-06T10:46:15.2173995-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=13; bars=2; events=36; eligible=36; endTick=26880
+[2026-02-06T10:46:15.2173995-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=13; bars=2; events=36; eligible=36; endTick=26880
+[2026-02-06T10:46:15.2180116-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a; start=17; bars=2; events=36; eligible=36; endTick=34560
+[2026-02-06T10:46:15.2180116-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a; start=17; bars=2; events=36; eligible=36; endTick=34560
+[2026-02-06T10:46:15.2196682-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=19; bars=2; events=37; eligible=37; endTick=38400
+[2026-02-06T10:46:15.2196682-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=19; bars=2; events=37; eligible=37; endTick=38400
+[2026-02-06T10:46:15.2202879-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=21; bars=2; events=37; eligible=37; endTick=42240
+[2026-02-06T10:46:15.2202879-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=21; bars=2; events=37; eligible=37; endTick=42240
+[2026-02-06T10:46:15.2207960-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a; start=25; bars=2; events=36; eligible=36; endTick=49920
+[2026-02-06T10:46:15.2207960-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a; start=25; bars=2; events=36; eligible=36; endTick=49920
+[2026-02-06T10:46:15.2213264-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=27; bars=2; events=36; eligible=36; endTick=53760
+[2026-02-06T10:46:15.2213264-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=27; bars=2; events=36; eligible=36; endTick=53760
+[2026-02-06T10:46:15.2218340-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=29; bars=2; events=36; eligible=36; endTick=57600
+[2026-02-06T10:46:15.2218340-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=29; bars=2; events=36; eligible=36; endTick=57600
+[2026-02-06T10:46:15.2223691-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a; start=33; bars=2; events=36; eligible=36; endTick=65280
+[2026-02-06T10:46:15.2223691-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a; start=33; bars=2; events=36; eligible=36; endTick=65280
+[2026-02-06T10:46:15.2228379-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=35; bars=2; events=37; eligible=37; endTick=69120
+[2026-02-06T10:46:15.2228379-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=35; bars=2; events=37; eligible=37; endTick=69120
+[2026-02-06T10:46:15.2233327-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=37; bars=2; events=37; eligible=37; endTick=72960
+[2026-02-06T10:46:15.2233327-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=37; bars=2; events=37; eligible=37; endTick=72960
+[2026-02-06T10:46:15.2237962-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a; start=41; bars=2; events=36; eligible=36; endTick=80640
+[2026-02-06T10:46:15.2237962-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a; start=41; bars=2; events=36; eligible=36; endTick=80640
+[2026-02-06T10:46:15.2242805-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=43; bars=2; events=36; eligible=36; endTick=84480
+[2026-02-06T10:46:15.2242805-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=43; bars=2; events=36; eligible=36; endTick=84480
+[2026-02-06T10:46:15.2247778-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=45; bars=2; events=36; eligible=36; endTick=88320
+[2026-02-06T10:46:15.2247778-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=45; bars=2; events=36; eligible=36; endTick=88320
+[2026-02-06T10:46:15.2253270-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a; start=49; bars=2; events=36; eligible=36; endTick=96000
+[2026-02-06T10:46:15.2253270-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a; start=49; bars=2; events=36; eligible=36; endTick=96000
+[2026-02-06T10:46:15.2258520-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=51; bars=2; events=37; eligible=37; endTick=99840
+[2026-02-06T10:46:15.2258520-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=51; bars=2; events=37; eligible=37; endTick=99840
+[2026-02-06T10:46:15.2263595-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=53; bars=2; events=37; eligible=37; endTick=103680
+[2026-02-06T10:46:15.2263595-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=53; bars=2; events=37; eligible=37; endTick=103680
+[2026-02-06T10:46:15.2269212-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a; start=57; bars=2; events=36; eligible=36; endTick=111360
+[2026-02-06T10:46:15.2269212-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a; start=57; bars=2; events=36; eligible=36; endTick=111360
+[2026-02-06T10:46:15.2276219-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=59; bars=2; events=36; eligible=36; endTick=115200
+[2026-02-06T10:46:15.2276219-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=59; bars=2; events=36; eligible=36; endTick=115200
+[2026-02-06T10:46:15.2281919-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=61; bars=2; events=36; eligible=36; endTick=119040
+[2026-02-06T10:46:15.2281919-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=61; bars=2; events=36; eligible=36; endTick=119040
+[2026-02-06T10:46:15.2287734-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=63; bars=2; events=36; eligible=36; endTick=122880
+[2026-02-06T10:46:15.2287734-05:00] [DrumGenerator] placement phraseId=b6741907c172490c90de50e1f5a67b2a_ev779; start=63; bars=2; events=36; eligible=36; endTick=122880
+[2026-02-06T10:46:15.2297076-05:00] [DrumGenerator] generatedEvents=906
+[2026-02-06T10:46:15.2297076-05:00] [DrumGenerator] generatedEvents=906

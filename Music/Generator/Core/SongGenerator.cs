@@ -29,7 +29,7 @@ namespace Music.Generator
             ValidateGrooveTrack(songContext.GroovePresetDefinition);
 
             int drumProgramNumber = VoiceSet.GetDrumProgramNumber(songContext.Voices);
-            var generator = DrumPhraseGenerator.CreateDefault();
+            var generator = new DrumPhraseGenerator();
             return generator.Generate(songContext, drumProgramNumber, maxBars);
         }
 
