@@ -37,7 +37,7 @@ namespace Music.Writer
 
                 Rng.Initialize(seed);
 
-                var result = Generator.Generator.GenerateFromPhrases(songContext, seed, maxBars: 0);
+                var result = Generator.SongGenerator.GenerateFromPhrases(songContext, seed, maxBars: 0);
 
                 result.MidiProgramName = $"Drums (Phrase-Based) (Seed: {seed})";
                 result.MidiProgramNumber = 255;

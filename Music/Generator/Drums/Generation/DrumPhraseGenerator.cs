@@ -45,21 +45,17 @@ namespace Music.Generator.Drums.Generation
         private readonly IDrumOperatorCandidates _drumOperatorCandidates;
         private readonly DrumGeneratorSettings _settings;
 
-        // AI: purpose=Create candidate source from operator registry; keeps generator style-free.
-        public DrumPhraseGenerator()
-            : this(BuildOperatorCandidates(), settings: null)
-        {
-        }
-
-        public DrumPhraseGenerator(
-            IDrumOperatorCandidates drumOperatorCandidates,
-            DrumGeneratorSettings? settings = null)
+        // AI: purpose=Requires a candidate source; use CreateDefault() to construct with the built registry.
+        public DrumPhraseGenerator(IDrumOperatorCandidates drumOperatorCandidates)
         {
             ArgumentNullException.ThrowIfNull(drumOperatorCandidates);
-
             _drumOperatorCandidates = drumOperatorCandidates;
-            _settings = settings ?? DrumGeneratorSettings.Default;
+            _settings = DrumGeneratorSettings.Default;
         }
+
+        // AI: convenience factory to construct using the built operator registry.
+        public static DrumPhraseGenerator CreateDefault()
+            => new DrumPhraseGenerator(BuildOperatorCandidates());
 
         private static IDrumOperatorCandidates BuildOperatorCandidates()
         {

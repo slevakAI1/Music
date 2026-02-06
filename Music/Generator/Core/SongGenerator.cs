@@ -9,7 +9,7 @@ using Music.Generator.Groove;
 
 namespace Music.Generator
 {
-    public static class Generator
+    public static class SongGenerator
     {
         // AI: Generate: validates harmony track before generation; fast-fail on invalid data prevents silent errors.
         // AI: behavior=Runs HarmonyValidator with default options (StrictDiatonicChordTones=true) to catch F# minor crashes.
@@ -29,7 +29,7 @@ namespace Music.Generator
             ValidateGrooveTrack(songContext.GroovePresetDefinition);
 
             int drumProgramNumber = VoiceSet.GetDrumProgramNumber(songContext.Voices);
-            var generator = new DrumPhraseGenerator();
+            var generator = DrumPhraseGenerator.CreateDefault();
             return generator.Generate(songContext, drumProgramNumber, maxBars);
         }
 

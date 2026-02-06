@@ -54,7 +54,7 @@ namespace Music.Writer
                 songContext.GroovePresetDefinition = groovePreset;
 
                 // Generate drum track using drummer agent pipeline (bars=0 means full song, >0 limits generation)
-                var result = Generator.Generator.Generate(songContext, bars);
+                var result = Generator.SongGenerator.Generate(songContext, bars);
 
                 // Set descriptive name with seed and mark as drum set for correct playback
                 string barsInfo = bars > 0 ? $" ({bars} bars)" : "";

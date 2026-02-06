@@ -36,7 +36,7 @@ namespace Music.Writer
                 int bars = dialog.Bars;
 
                 // Generate groove preview
-                PartTrack groovePreview = Generator.Generator.GenerateGroovePreview(
+                PartTrack groovePreview = Generator.SongGenerator.GenerateGroovePreview(
                     seed,
                     genre,
                     songContext.BarTrack,
