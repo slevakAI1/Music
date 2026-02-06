@@ -61,7 +61,7 @@ GrooveBasedDrumGenerator.Generate(songContext)
 3. For each bar+role:
    - Get policy from DrummerPolicyProvider
    - Calculate density target
-   - Get candidates from DrummerCandidateSource (28 operators)
+   - Get candidates from DrummerOperatorCandidates (28 operators)
    - Select via GrooveSelectionEngine
 4. Combine anchors + operator onsets
 5. Convert to MIDI PartTrackEvents

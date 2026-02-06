@@ -1,6 +1,6 @@
 // AI: purpose=Maps DrumCandidate to DrumOnsetCandidate for groove system integration.
 // AI: invariants=Deterministic: same input → same output; VelocityHint/TimingHint flow directly to DrumOnsetCandidate.
-// AI: deps=DrumCandidate, DrumOnsetCandidate, FillRole, DrumArticulation; consumed by DrummerCandidateSource.
+// AI: deps=DrumCandidate, DrumOnsetCandidate, FillRole, DrumArticulation; consumed by DrummerOperatorCandidates.
 // AI: change=VelocityHint/TimingHint now flow directly instead of via tags.
 
 

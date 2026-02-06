@@ -1,6 +1,6 @@
 // AI: purpose=Drum-specific operator interface extending IMusicalOperator<DrumCandidate>; specialized for drummer agent.
 // AI: invariants=Same determinism rules as base interface; OperatorId must be unique within DrumOperatorRegistry.
-// AI: deps=IMusicalOperator<TCandidate>, DrumCandidate, DrummerContext; consumed by DrummerCandidateSource.
+// AI: deps=IMusicalOperator<TCandidate>, DrumCandidate, DrummerContext; consumed by DrummerOperatorCandidates.
 // AI: change=Story 2.4; base interface for all drum operators in Stories 3.1-3.5.
 
 using Music.Generator.Core;
@@ -12,7 +12,7 @@ namespace Music.Generator.Drums.Operators
 {
     /// <summary>
     /// Drum-specific operator interface extending IMusicalOperator with DrumCandidate as output.
-    /// All drum operators (Stories 3.1-3.5) implement this interface for use with DrummerCandidateSource.
+    /// All drum operators (Stories 3.1-3.5) implement this interface for use with DrummerOperatorCandidates.
     /// Story 2.4: Implement Drummer Candidate Source.
     /// </summary>
     /// <remarks>

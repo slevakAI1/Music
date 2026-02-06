@@ -1,12 +1,12 @@
-// AI: purpose=Registry for drum operators; provides discovery and filtering by family/style for DrummerCandidateSource.
+// AI: purpose=Registry for drum operators; provides discovery and filtering by family/style for DrummerOperatorCandidates.
 // AI: invariants=Operators registered once; GetAllOperators returns deterministic order; thread-safe reads.
-// AI: deps=IDrumOperator, OperatorFamily, StyleConfiguration; consumed by DrummerCandidateSource.
+// AI: deps=IDrumOperator, OperatorFamily, StyleConfiguration; consumed by DrummerOperatorCandidates.
 // AI: change=Story 2.4 stub; full implementation in Story 3.6 when operators exist.
 
 
-// AI: purpose=Registry for drum operators; provides discovery and filtering by family/style for DrummerCandidateSource.
+// AI: purpose=Registry for drum operators; provides discovery and filtering by family/style for DrummerOperatorCandidates.
 // AI: invariants=Operators registered once; GetAllOperators returns deterministic order; thread-safe reads.
-// AI: deps=IDrumOperator, OperatorFamily, StyleConfiguration; consumed by DrummerCandidateSource.
+// AI: deps=IDrumOperator, OperatorFamily, StyleConfiguration; consumed by DrummerOperatorCandidates.
 // AI: change=Story 2.4 stub; full implementation in Story 3.6 when operators exist.
 
 using Music.Generator.Core;
@@ -15,7 +15,7 @@ namespace Music.Generator.Drums.Operators
 {
     /// <summary>
     /// Registry for drum operators. Provides discovery and filtering by family, style, and operator ID.
-    /// Story 2.4: Stub implementation for DrummerCandidateSource integration.
+    /// Story 2.4: Stub implementation for DrummerOperatorCandidates integration.
     /// Story 3.6: Full implementation with all 28 operators.
     /// </summary>
     /// <remarks>

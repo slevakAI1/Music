@@ -3,9 +3,6 @@
 // AI: deps=Bar for bar context; DrumCandidateGroup for return type.
 // AI: change=Story 4.2: moved from Groove namespace; Drum generator owns candidate contracts.
 
-
-using Music.Generator.Groove;
-
 namespace Music.Generator.Drums.Selection.Candidates
 {
     /// <summary>
@@ -13,7 +10,7 @@ namespace Music.Generator.Drums.Selection.Candidates
     /// Story 4.2: Moved from Groove namespace - Drum generator owns candidate contracts.
     /// Enables operator-based drummer logic to supply candidates.
     /// </summary>
-    public interface IDrumCandidateSource
+    public interface IDrumOperatorCandidates
     {
         /// <summary>
         /// Gets candidate groups for a specific bar and role.

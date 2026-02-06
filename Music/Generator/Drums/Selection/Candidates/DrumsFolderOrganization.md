@@ -19,8 +19,8 @@
     RoleDensityTarget.cs
 
 ## Candidates (Candidate models, mapping, grouping)
-    IDrumCandidateSource.cs
-    DrummerCandidateSource.cs
+    IDrumOperatorCandidates.cs
+    DrummerOperatorCandidates.cs
     DrumCandidate.cs
     DrumCandidateGroup.cs
     DrumCandidateMapper.cs

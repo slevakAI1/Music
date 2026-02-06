@@ -1,9 +1,8 @@
 // AI: purpose=Generates a drum phrase (1-N bars) using operator-based variation over anchors.
 // AI: invariants=Output is a PartTrack representing a single phrase; reusable for MaterialBank storage.licy.
-// AI: deps=DrummerCandidateSource, DrumSelectionEngine, BarTrack bars, SongContext, PartTrack.
+// AI: deps=DrummerOperatorCandidates, DrumSelectionEngine, BarTrack bars, SongContext, PartTrack.
 // AI: change=correct architecture replaces DrummerAgent.Generate() with proper groove integration.
 
-using Music.Generator.Core;
 using Music.Generator.Drums.Operators;
 using Music.Generator.Drums.Selection;
 using Music.Generator.Drums.Selection.Candidates;
@@ -40,7 +39,7 @@ namespace Music.Generator.Drums.Generation
 
     /// <summary>
     /// Pipeline orchestrator for drum generation using groove system integration.
-    /// Story RF-2: Creates drum tracks by properly using IDrumPolicyProvider + IDrumCandidateSource
+    /// Story RF-2: Creates drum tracks by properly using IDrumPolicyProvider + IDrumOperatorCandidates
     /// with DrumSelectionEngine for weighted selection and density enforcement.
     /// Story 4.2: Moved interface ownership from Groove to Drums namespace.
     /// </summary>
@@ -56,35 +55,35 @@ namespace Music.Generator.Drums.Generation
     /// </remarks>
     public sealed class DrumPhraseGenerator
     {
-        private readonly IDrumCandidateSource _candidateSource;
+        private readonly IDrumOperatorCandidates _drumOperatorCandidates;
         private readonly DrumGeneratorSettings _settings;
 
         // AI: purpose=Create candidate source from operator registry; keeps generator style-free.
         public DrumPhraseGenerator()
-            : this(BuildCandidateSource(), settings: null)
+            : this(BuildOperatorCandidates(), settings: null)
         {
         }
 
         /// <summary>
         /// Creates a DrumGenerator with the specified candidate provider.
         /// </summary>
-        /// <param name="candidateSource">Candidate source (provides operator-generated candidates).</param>
+        /// <param name="drumOperatorCandidates">Candidate source (provides operator-generated candidates).</param>
         /// <param name="settings">Optional settings (diagnostics, active roles, default velocity).</param>
-        /// <exception cref="ArgumentNullException">If candidateSource is null.</exception>
+        /// <exception cref="ArgumentNullException">If drumOperatorcandidates is null.</exception>
         public DrumPhraseGenerator(
-            IDrumCandidateSource candidateSource,
+            IDrumOperatorCandidates drumOperatorCandidates,
             DrumGeneratorSettings? settings = null)
         {
-            ArgumentNullException.ThrowIfNull(candidateSource);
+            ArgumentNullException.ThrowIfNull(drumOperatorCandidates);
 
-            _candidateSource = candidateSource;
+            _drumOperatorCandidates = drumOperatorCandidates;
             _settings = settings ?? DrumGeneratorSettings.Default;
         }
 
-        private static IDrumCandidateSource BuildCandidateSource()
+        private static IDrumOperatorCandidates BuildOperatorCandidates()
         {
             var registry = DrumOperatorRegistryBuilder.BuildComplete();
-            return new DrummerCandidateSource(
+            return new DrummerOperatorCandidates(
                 registry,
                 diagnosticsCollector: null,
                 settings: null);
@@ -268,7 +267,7 @@ namespace Music.Generator.Drums.Generation
                         continue; // No operators needed for this bar+role
 
                     // Get candidate groups from candidate source
-                    var candidateGroups = _candidateSource.GetCandidateGroups(bar, role);
+                    var candidateGroups = _drumOperatorCandidates.GetCandidateGroups(bar, role);
 
                     if (candidateGroups.Count == 0)
                         continue; // No candidates available

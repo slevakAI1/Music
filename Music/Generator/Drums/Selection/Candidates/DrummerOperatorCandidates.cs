@@ -1,6 +1,6 @@
-// AI: purpose=Implements IDrumCandidateSource for drummer agent; gathers operator candidates, maps, groups, filters.
+// AI: purpose=Implements IDrumOperatorCandidates for drummer agent; gathers operator candidates, maps, groups, filters.
 // AI: invariants=Deterministic: same context + seed → same groups; operators invoked in registry order; errors isolated.
-// AI: deps=IDrumCandidateSource, DrumOperatorRegistry, DrumCandidateMapper, DrummerContextBuilder.
+// AI: deps=IDrumOperatorCandidates, DrumOperatorRegistry, DrumCandidateMapper, DrummerContextBuilder.
 // AI: change=Story 2.4, 4.2; extend with diagnostics and additional filtering as physicality system matures.
 
 using Music.Generator.Core;
@@ -11,9 +11,9 @@ using Music.Generator.Groove;
 namespace Music.Generator.Drums.Selection.Candidates
 {
     /// <summary>
-    /// Configuration for DrummerCandidateSource behavior.
+    /// Configuration for DrummerOperatorCandidates behavior.
     /// </summary>
-    public sealed record DrummerCandidateSourceSettings
+    public sealed record DrummerOperatorCandidatesSettings
     {
         /// <summary>Whether to continue generation when an operator throws.</summary>
         public bool ContinueOnOperatorError { get; init; } = true;
@@ -22,7 +22,7 @@ namespace Music.Generator.Drums.Selection.Candidates
         public bool VerboseDiagnostics { get; init; } = false;
 
         /// <summary>Default settings instance.</summary>
-        public static DrummerCandidateSourceSettings Default => new();
+        public static DrummerOperatorCandidatesSettings Default => new();
     }
 
     /// <summary>
@@ -47,7 +47,7 @@ namespace Music.Generator.Drums.Selection.Candidates
     }
 
     /// <summary>
-    /// Drummer agent implementation of IDrumCandidateSource.
+    /// Drummer agent implementation of IDrumOperatorCandidates.
     /// Gathers candidates from registered operators, maps to DrumOnsetCandidate,
     /// groups by operator family, and applies physicality filtering.
     /// Story 2.4: Implement Drummer Candidate Source.
@@ -57,31 +57,31 @@ namespace Music.Generator.Drums.Selection.Candidates
     /// Pipeline: Operators → DrumCandidates → Map → Group → PhysicalityFilter → DrumCandidateGroups
     /// All operations are deterministic given same context, seed, and registry state.
     /// </remarks>
-    public sealed class DrummerCandidateSource : IDrumCandidateSource
+    public sealed class DrummerOperatorCandidates : IDrumOperatorCandidates
     {
         private readonly DrumOperatorRegistry _registry;
         private readonly GrooveDiagnosticsCollector? _diagnosticsCollector;
-        private readonly DrummerCandidateSourceSettings _settings;
+        private readonly DrummerOperatorCandidatesSettings _settings;
 
         // Cache for last execution diagnostics (for testing/debugging)
         private List<OperatorExecutionDiagnostic>? _lastExecutionDiagnostics;
 
         /// <summary>
-        /// Creates a DrummerCandidateSource with the specified dependencies.
+        /// Creates a DrummerOperatorCandidates with the specified dependencies.
         /// </summary>
         /// <param name="registry">Registry of drum operators.</param>
         /// <param name="diagnosticsCollector">Optional collector for structured diagnostics.</param>
         /// <param name="settings">Optional settings for error handling and diagnostics.</param>
-        public DrummerCandidateSource(
+        public DrummerOperatorCandidates(
             DrumOperatorRegistry registry,
             GrooveDiagnosticsCollector? diagnosticsCollector = null,
-            DrummerCandidateSourceSettings? settings = null)
+            DrummerOperatorCandidatesSettings? settings = null)
         {
             ArgumentNullException.ThrowIfNull(registry);
 
             _registry = registry;
             _diagnosticsCollector = diagnosticsCollector;
-            _settings = settings ?? DrummerCandidateSourceSettings.Default;
+            _settings = settings ?? DrummerOperatorCandidatesSettings.Default;
         }
 
         /// <inheritdoc />

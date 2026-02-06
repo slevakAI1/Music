@@ -1,6 +1,6 @@
 // AI: purpose=Generate drum track using DrumGenerator pipeline or fallback to anchor-based generation.
 // AI: deps=DrumGenerator for pipeline orchestration; candidate source built from operator registry; returns PartTrack sorted by AbsoluteTimeTicks.
-// AI: change= uses DrumGenerator pipeline with operator registry + DrummerCandidateSource; old anchor-based approach preserved as fallback.
+// AI: change= uses DrumGenerator pipeline with operator registry + DrummerOperatorCandidates; old anchor-based approach preserved as fallback.
 
 using Music.Generator.Core;
 using Music.Generator.Drums.Operators;
@@ -55,7 +55,7 @@ namespace Music.Generator.Drums.Generation
 
         /// <summary>
         /// Generates drum track using DrumGenerator pipeline (Story RF-4).
-        /// Uses operator registry + DrummerCandidateSource with PopRock style configuration.
+        /// Uses operator registry + DrummerOperatorCandidates with PopRock style configuration.
         /// </summary>
         /// <param name="songContext">Song context containing all required data.</param>
         /// <returns>Generated drum PartTrack.</returns>
@@ -63,7 +63,7 @@ namespace Music.Generator.Drums.Generation
         /// <remarks>
         /// <para>Architecture (Story RF-4):</para>
         /// <list type="bullet">
-        ///   <item>Builds operator registry + DrummerCandidateSource with PopRock style</item>
+        ///   <item>Builds operator registry + DrummerOperatorCandidates with PopRock style</item>
         ///   <item>Creates DrumGenerator (pipeline orchestrator)</item>
         ///   <item>Generates via proper groove system with GrooveSelectionEngine</item>
         ///   <item>Enforces density targets, operator caps, weighted selection</item>
@@ -79,11 +79,11 @@ namespace Music.Generator.Drums.Generation
 
             // Story RF-4: Use DrumGenerator pipeline with operator registry as data source
             var registry = DrumOperatorRegistryBuilder.BuildComplete();
-            var candidateSource = new DrummerCandidateSource(
+            var drumOperatorCandidates = new DrummerOperatorCandidates(
                 registry,
                 diagnosticsCollector: null,
                 settings: null);
-            var generator = new DrumPhraseGenerator(candidateSource);
+            var generator = new DrumPhraseGenerator(drumOperatorCandidates);
             return generator.Generate(songContext);
         }
 
