@@ -1,6 +1,6 @@
 // AI: purpose=Generate PartTrack using for Drums only, Section+Bar timing;
 // AI: invariants=BarTrack is read-only and must NOT be rebuilt here.
-// AI: deps=MusicConstants.TicksPerQuarterNote; DrumGenerator pipeline for drum generation.
+// AI: deps=MusicConstants.TicksPerQuarterNote; DrumTrackGenerator pipeline for drum generation.
 // AI: perf=Single-run generation; avoid allocations in inner loops; use seed for deterministic results.
 // AI: change=Story 1 removes style-based entry point; Generator uses default drum pipeline.
 
@@ -55,7 +55,7 @@ namespace Music.Generator
 
             Tracer.DebugTrace($"[GenerateFromPhrases] phrases={materialBank.GetPhrases().Count}; seed={seed}; maxBars={maxBars}");
 
-            var generator = new DrumGenerator();
+            var generator = new DrumTrackGenerator();
             return generator.Generate(songContext, seed, maxBars);
         }
 

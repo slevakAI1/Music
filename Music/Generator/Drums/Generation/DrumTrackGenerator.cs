@@ -1,108 +1,105 @@
-// AI: purpose=Generate drum track using DrumGenerator pipeline or fallback to anchor-based generation.
-// AI: deps=DrumGenerator for pipeline orchestration; candidate source built from operator registry; returns PartTrack sorted by AbsoluteTimeTicks.
-// AI: change= uses DrumGenerator pipeline with operator registry + DrummerOperatorCandidates; old anchor-based approach preserved as fallback.
+// AI: purpose=Builds a full drum track by placing stored drum phrases across song bars.
+// AI: invariants=Requires MaterialBank drum phrases; placement covers all bars unless maxBars limits.
+// AI: deps=MaterialPhrase.ToPartTrack for placement; BarTrack.GetBarEndTick for clipping.
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators;
-using Music.Generator.Drums.Selection.Candidates;
-using Music.Generator.Groove;
+using Music.Generator.Drums.Planning;
+using Music.MyMidi;
+using Music.Song.Material;
 
-namespace Music.Generator.Drums.Generation
+namespace Music.Generator.Drums.Generation;
+
+public sealed class DrumTrackGenerator
 {
-    // AI: DrumRole identifies drum instrument for MIDI mapping and onset processing; extend for additional kit pieces.
-    public enum DrumRole
+    public PartTrack Generate(SongContext songContext, int maxBars = 0)
+        => Generate(songContext, seed: 0, maxBars);
+
+    // AI: purpose=Generates drum track using phrase placement; seed controls section phrase selection.
+    public PartTrack Generate(SongContext songContext, int seed, int maxBars)
     {
-        Kick,
-        Snare,
-        ClosedHat,
-        OpenHat,
-        Ride,
-        Crash,
-        TomHigh,
-        TomMid,
-        TomLow
-    }
+        ArgumentNullException.ThrowIfNull(songContext);
+        ArgumentNullException.ThrowIfNull(songContext.MaterialBank);
+        if (songContext.SectionTrack == null || songContext.SectionTrack.Sections.Count == 0)
+            throw new ArgumentException("SectionTrack must have sections", nameof(songContext));
+        if (songContext.BarTrack == null)
+            throw new ArgumentException("BarTrack must be provided", nameof(songContext));
 
-    // AI: DrumOnset captures a single drum hit; minimal fields for MVP. Strength field.
-    // AI: invariants=Beat is 1-based within bar; BarNumber is 1-based; Velocity 1-127; TickPosition computed from BarTrack.
-    // AI: adds protection flags: IsMustHit, IsNeverRemove, IsProtected for enforcement logic.
-    public sealed record DrumOnset(
-        DrumRole Role,
-        int BarNumber,
-        decimal Beat,
-        int Velocity,
-        long TickPosition)
-    {
-        public bool IsMustHit { get; set; }
-        public bool IsNeverRemove { get; set; }
-        public bool IsProtected { get; set; }
-    }
+        const int drumProgramNumber = 255;
+        var phrases = songContext.MaterialBank.GetPhrasesByMidiProgram(drumProgramNumber);
+        if (phrases.Count == 0)
+            throw new InvalidOperationException("No drum phrases found for the drum program");
 
-    // AI: Bar holds bar context; avoid reintroducing BarContext/DrumBarContext types.
-
-    public static class DrumTrackGenerator
-    {
-        // AI: MIDI drum note numbers (General MIDI standard); extend mapping as roles are added.
-        private const int KickMidiNote = 36;
-        private const int SnareMidiNote = 38;
-        private const int ClosedHatMidiNote = 42;
-        private const int OpenHatMidiNote = 46;
-        private const int RideMidiNote = 51;
-        private const int CrashMidiNote = 49;
-        private const int TomHighMidiNote = 50;
-        private const int TomMidMidiNote = 47;
-        private const int TomLowMidiNote = 45;
-
-        private static PartTrack Generate(SongContext songContext, int drumProgramNumber)
+        Tracer.DebugTrace($"[DrumGenerator] phrases={phrases.Count}; seed={seed}; maxBars={maxBars}");
+        foreach (var phrase in phrases)
         {
-            // Use DrumGenerator pipeline with operator registry as data source
-            var registry = DrumOperatorRegistryBuilder.BuildComplete();
-            var drumOperatorCandidates = new DrummerOperatorCandidates(
-                registry,
-                diagnosticsCollector: null,
-                settings: null);
-            var generator = new DrumPhraseGenerator(drumOperatorCandidates);
-            return generator.Generate(songContext, drumProgramNumber);
+            Tracer.DebugTrace($"[DrumGenerator] phraseId={phrase.PhraseId}; bars={phrase.BarCount}; events={phrase.Events.Count}");
         }
 
-        /// <summary>
-        /// Original Generate method signature preserved for backward compatibility.
-        /// Builds SongContext and uses DrumGenerator pipeline.
-        /// Story RF-4: Updated to use new pipeline architecture.
-        /// </summary>
-        public static PartTrack Generate(
-            BarTrack barTrack,
-            SectionTrack sectionTrack,
-            IReadOnlyList<object>? segmentProfiles,
-            GroovePresetDefinition groovePresetDefinition,
-            int totalBars,
-            int midiProgramNumber)
+        int effectiveSeed = seed > 0 ? seed : Random.Shared.Next(1, 100_000);
+        var planner = new DrumPhrasePlacementPlanner(songContext, effectiveSeed);
+        var plan = planner.CreatePlan(songContext.SectionTrack, drumProgramNumber, maxBars);
+
+        Tracer.DebugTrace($"[DrumGenerator] placements={plan.Placements.Count}; fillBars={plan.FillBars.Count}");
+
+        return GenerateFromPlan(
+            plan,
+            songContext.MaterialBank,
+            songContext.BarTrack,
+            drumProgramNumber,
+            effectiveSeed);
+    }
+
+    private PartTrack GenerateFromPlan(
+        DrumPhrasePlacementPlan plan,
+        MaterialBank materialBank,
+        BarTrack barTrack,
+        int midiProgramNumber,
+        int seed)
+    {
+        ArgumentNullException.ThrowIfNull(materialBank);
+        var allEvents = new List<PartTrackEvent>();
+        var evolver = new DrumPhraseEvolver(seed);
+
+        foreach (var placement in plan.Placements)
         {
-            // Build minimal SongContext for pipeline
-            var songContext = new SongContext
+            var phrase = materialBank.GetPhraseById(placement.PhraseId);
+            if (phrase == null)
             {
-                BarTrack = barTrack,
-                SectionTrack = sectionTrack,
-                GroovePresetDefinition = groovePresetDefinition
-            };
+                Tracer.DebugTrace($"[DrumGenerator] missingPhraseId={placement.PhraseId}");
+                continue;
+            }
 
-            // Use new pipeline entry point
-            return Generate(songContext, midiProgramNumber);
+            if (placement.Evolution != null)
+                phrase = evolver.Evolve(phrase, placement.Evolution, barTrack);
+
+            var phraseTrack = phrase.ToPartTrack(barTrack, placement.StartBar, midiProgramNumber);
+            long placementEndTick = GetPlacementEndTick(barTrack, placement);
+
+            int eligibleCount = phraseTrack.PartTrackNoteEvents
+                .Count(e => e.AbsoluteTimeTicks < placementEndTick);
+
+            Tracer.DebugTrace(
+                $"[DrumGenerator] placement phraseId={phrase.PhraseId}; start={placement.StartBar}; bars={placement.BarCount}; " +
+                $"events={phraseTrack.PartTrackNoteEvents.Count}; eligible={eligibleCount}; endTick={placementEndTick}");
+
+            allEvents.AddRange(phraseTrack.PartTrackNoteEvents
+                .Where(e => e.AbsoluteTimeTicks < placementEndTick));
         }
 
-        // AI: GetMidiNoteNumber maps DrumRole to General MIDI note; throws for unknown roles.
-        public static int GetMidiNoteNumber(DrumRole role) => role switch
+        var ordered = allEvents.OrderBy(e => e.AbsoluteTimeTicks).ToList();
+
+        Tracer.DebugTrace($"[DrumGenerator] generatedEvents={ordered.Count}");
+
+        return new PartTrack(ordered)
         {
-            DrumRole.Kick => KickMidiNote,
-            DrumRole.Snare => SnareMidiNote,
-            DrumRole.ClosedHat => ClosedHatMidiNote,
-            DrumRole.OpenHat => OpenHatMidiNote,
-            DrumRole.Ride => RideMidiNote,
-            DrumRole.Crash => CrashMidiNote,
-            DrumRole.TomHigh => TomHighMidiNote,
-            DrumRole.TomMid => TomMidMidiNote,
-            DrumRole.TomLow => TomLowMidiNote,
-            _ => throw new ArgumentOutOfRangeException(nameof(role), $"Unknown drum role: {role}")
+            MidiProgramName = "Drums (Phrase-Based)",
+            MidiProgramNumber = midiProgramNumber
         };
+    }
+
+    private static long GetPlacementEndTick(BarTrack barTrack, DrumPhrasePlacement placement)
+    {
+        int lastBar = placement.EndBar - 1;
+        return barTrack.GetBarEndTick(lastBar);
     }
 }

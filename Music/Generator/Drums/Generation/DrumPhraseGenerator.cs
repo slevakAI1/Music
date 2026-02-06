@@ -12,7 +12,7 @@ using Music.MyMidi;
 namespace Music.Generator.Drums.Generation
 {
     /// <summary>
-    /// Settings for DrumGenerator behavior.
+    /// Settings for DrumTrackGenerator behavior.
     /// </summary>
     public sealed record DrumGeneratorSettings
     {
@@ -65,7 +65,7 @@ namespace Music.Generator.Drums.Generation
         }
 
         /// <summary>
-        /// Creates a DrumGenerator with the specified candidate provider.
+        /// Creates a DrumTrackGenerator with the specified candidate provider.
         /// </summary>
         /// <param name="drumOperatorCandidates">Candidate source (provides operator-generated candidates).</param>
         /// <param name="settings">Optional settings (diagnostics, active roles, default velocity).</param>

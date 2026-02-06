@@ -1,6 +1,6 @@
 // AI: purpose=Phrase placement plan for drum tracks; stores where phrases land and optional evolution metadata.
 // AI: invariants=StartBar>=1; BarCount>=1; EndBar is exclusive; placements must not overlap (enforced by planner).
-// AI: deps=Used by DrumGenerator; if adding fields update GenerateFromPlan and tests in DrumsV2.
+// AI: deps=Used by DrumTrackGenerator; if adding fields update GenerateFromPlan and tests in DrumsV2.
 
 namespace Music.Generator.Drums.Planning;
 

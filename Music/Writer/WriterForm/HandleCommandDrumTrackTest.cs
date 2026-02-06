@@ -1,4 +1,4 @@
-// AI: purpose=Manual test for phrase-based DrumGenerator; uses MaterialBank phrases to build full track.
+// AI: purpose=Manual test for phrase-based DrumTrackGenerator; uses MaterialBank phrases to build full track.
 // AI: invariants=MaterialBank must contain phrases; always generates full song.
 // AI: deps=Generator.GenerateFromPhrases; DrumTrackTestSettingsDialog for seed input.
 

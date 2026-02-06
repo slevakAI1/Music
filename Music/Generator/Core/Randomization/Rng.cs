@@ -28,7 +28,7 @@ namespace Music.Generator
     }
 
     // AI: public API=Initialize(seed), static NextInt(purpose[,min,max]), NextDouble(purpose); prefer static methods.
-    // AI: example=Rng.Initialize(); int n = Rng.NextInt(DrumGenerator); // short syntax, no dict lookup in caller code.
+    // AI: example=Rng.Initialize(); int n = Rng.NextInt(DrumTrackGenerator); // short syntax, no dict lookup in caller code.
     public sealed class Rng
     {
         private static Dictionary<RandomPurpose, Rng>? _instances;
