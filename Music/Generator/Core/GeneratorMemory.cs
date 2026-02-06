@@ -6,11 +6,8 @@
 
 namespace Music.Generator.Core
 {
-    /// <summary>
-    /// Tracks agent decisions to prevent repetition.
-    /// Uses circular buffer for efficient last-N-bars tracking.
-    /// Human musicians don't repeat the exact same pattern 8 times—this creates variation.
-    /// </summary>
+    // AI: purpose=Tracks recent decisions for anti-repetition using a circular buffer keyed by bar
+    // AI: invariants=Deterministic iteration order; windowSize controls memory; keys are 1-based bars
     public class GeneratorMemory : IGeneratorMemory
     {
         private readonly int _windowSize;
@@ -28,12 +25,7 @@ namespace Music.Generator.Core
 
         private int _currentBarNumber;
 
-        /// <summary>
-        /// Creates a new agent memory with configurable window and decay.
-        /// </summary>
-        /// <param name="windowSize">Number of recent bars to track (default 8).</param>
-        /// <param name="decayCurve">How penalty decays over the window (default Exponential).</param>
-        /// <param name="decayFactor">Base for exponential decay (default 0.7); ignored for Linear.</param>
+        // AI: ctor=windowSize>=1; decayFactor in (0,1); DecayCurve controls ComputeDecayWeight behavior
         public GeneratorMemory(int windowSize = 8, DecayCurve decayCurve = DecayCurve.Exponential, double decayFactor = 0.7)
         {
             ArgumentOutOfRangeException.ThrowIfLessThan(windowSize, 1);
@@ -45,10 +37,10 @@ namespace Music.Generator.Core
             _decayFactor = decayFactor;
         }
 
-        /// <inheritdoc />
+        // AI: prop=Latest recorded bar number; 0 when no decisions recorded
         public int CurrentBarNumber => _currentBarNumber;
 
-        /// <inheritdoc />
+        // AI: record=Add decision at barNumber; prunes entries older than window; barNumber>=1 required
         public void RecordDecision(int barNumber, string operatorId, string candidateId)
         {
             ArgumentNullException.ThrowIfNull(operatorId);
@@ -68,7 +60,7 @@ namespace Music.Generator.Core
             _currentBarNumber = Math.Max(_currentBarNumber, barNumber);
         }
 
-        /// <inheritdoc />
+        // AI: query=Return sorted map operatorId->count over the last N bars; deterministic ordering
         public IReadOnlyDictionary<string, int> GetRecentOperatorUsage(int lastNBars)
         {
             ArgumentOutOfRangeException.ThrowIfLessThan(lastNBars, 1);
@@ -89,12 +81,7 @@ namespace Music.Generator.Core
             return result;
         }
 
-        /// <summary>
-        /// Computes repetition penalty for an operator based on recent usage.
-        /// Returns 0.0 if never used, up to 1.0 for heavy recent use.
-        /// </summary>
-        /// <param name="operatorId">The operator to check.</param>
-        /// <returns>Penalty in range [0.0, 1.0].</returns>
+        // AI: penalty=Compute repetition penalty in [0.0,1.0] using configured decay over _windowSize bars
         public double GetRepetitionPenalty(string operatorId)
         {
             ArgumentNullException.ThrowIfNull(operatorId);
@@ -125,17 +112,17 @@ namespace Music.Generator.Core
             return normalizedPenalty;
         }
 
-        /// <inheritdoc />
+        // AI: query=Returns last recorded FillShape or null when none
         public FillShape? GetLastFillShape() => _lastFillShape;
 
-        /// <inheritdoc />
+        // AI: record=Store most recent FillShape; used by agents to avoid repeating fills
         public void RecordFillShape(FillShape fillShape)
         {
             ArgumentNullException.ThrowIfNull(fillShape);
             _lastFillShape = fillShape;
         }
 
-        /// <inheritdoc />
+        // AI: query=Return sorted operator IDs for sectionType; returns a copy to preserve internal set
         public IReadOnlyList<string> GetSectionSignature(MusicConstants.eSectionType sectionType)
         {
             if (_sectionSignatures.TryGetValue(sectionType, out var signature))
@@ -144,7 +131,7 @@ namespace Music.Generator.Core
             return Array.Empty<string>();
         }
 
-        /// <inheritdoc />
+        // AI: record=Add operatorId to sorted signature for sectionType; idempotent and deterministic
         public void RecordSectionSignature(MusicConstants.eSectionType sectionType, string operatorId)
         {
             ArgumentNullException.ThrowIfNull(operatorId);
@@ -158,7 +145,7 @@ namespace Music.Generator.Core
             signature.Add(operatorId);
         }
 
-        /// <inheritdoc />
+        // AI: operation=Clear all memory state including decisions, signatures and last fill
         public void Clear()
         {
             _decisions.Clear();
@@ -167,9 +154,7 @@ namespace Music.Generator.Core
             _currentBarNumber = 0;
         }
 
-        /// <summary>
-        /// Computes decay weight for a given age (bars from current).
-        /// </summary>
+        // Compute decay weight for age (bars from current) per configured DecayCurve
         private double ComputeDecayWeight(int age)
         {
             return _decayCurve switch
@@ -180,9 +165,7 @@ namespace Music.Generator.Core
             };
         }
 
-        /// <summary>
-        /// Removes entries outside the memory window.
-        /// </summary>
+        // Remove decision entries older than the sliding window
         private void PruneOldEntries(int currentBar)
         {
             int oldestAllowed = currentBar - _windowSize + 1;
@@ -194,9 +177,7 @@ namespace Music.Generator.Core
             }
         }
 
-        /// <summary>
-        /// Internal record for storing decisions.
-        /// </summary>
+        // Internal record for storing decisions: operatorId and candidateId
         private readonly record struct DecisionRecord(string OperatorId, string CandidateId);
     }
 }

@@ -1,71 +1,33 @@
-// AI: purpose=Interface for agent memory tracking; prevents repetitive patterns by recording decisions.
-// AI: invariants=Memory operations must be deterministic; same sequence of records = same memory state.
-// AI: deps=FillShape for fill memory; MusicConstants.eSectionType for section signatures.
-// AI: change=Implement AgentMemory in Story 1.2; may add additional query methods as agent needs emerge.
-
+// AI: purpose=Agent memory interface for anti-repetition; records decisions and exposes recent usage and fills
+// AI: invariants=Implementations must be deterministic; bar numbers are 1-based; methods must be stable over time
+// AI: deps=Uses FillShape and MusicConstants.eSectionType; changing surface affects consumers and tests
 namespace Music.Generator.Core
 {
-    /// <summary>
-    /// Interface for tracking agent decisions to prevent repetition.
-    /// Human musicians don't repeat the exact same pattern 8 times—memory
-    /// tracks recent choices and penalizes repetition.
-    /// </summary>
+    // AI: contract=Provides lightweight memory ops used by operators to avoid repetition; keep method signatures stable
     public interface IGeneratorMemory
     {
-        /// <summary>
-        /// Records a decision made by an operator at a specific bar.
-        /// </summary>
-        /// <param name="barNumber">1-based bar number where decision was made.</param>
-        /// <param name="operatorId">Stable identifier of the operator that was applied.</param>
-        /// <param name="candidateId">Identifier of the specific candidate that was selected.</param>
+        // AI: record=Record operator decision at 1-based bar; used for repetition penalties and diagnostics
         void RecordDecision(int barNumber, string operatorId, string candidateId);
 
-        /// <summary>
-        /// Gets usage counts for operators in the last N bars.
-        /// Used to compute repetition penalties.
-        /// </summary>
-        /// <param name="lastNBars">Number of recent bars to consider.</param>
-        /// <returns>Dictionary mapping operatorId to usage count in the window.</returns>
+        // AI: query=Return sorted operator usage counts over last N bars; deterministic ordering preferred
         IReadOnlyDictionary<string, int> GetRecentOperatorUsage(int lastNBars);
 
-        /// <summary>
-        /// Gets the most recent fill shape, if any.
-        /// Used by fill operators to vary fill patterns.
-        /// </summary>
-        /// <returns>The last fill shape, or null if no fills recorded.</returns>
+        // AI: query=Return last recorded FillShape or null; used to vary/avoid repeating fills
         FillShape? GetLastFillShape();
 
-        /// <summary>
-        /// Gets the signature choices made for a section type.
-        /// Signature = recurring operator choices that define section identity.
-        /// </summary>
-        /// <param name="sectionType">The section type to query.</param>
-        /// <returns>List of operator IDs that characterize this section type.</returns>
+        // AI: query=Return deterministic list of operator IDs that form the section signature
         IReadOnlyList<string> GetSectionSignature(MusicConstants.eSectionType sectionType);
 
-        /// <summary>
-        /// Records a fill shape for future reference.
-        /// </summary>
-        /// <param name="fillShape">The fill shape to record.</param>
+        // AI: record=Store FillShape for later queries; small immutable record preferred
         void RecordFillShape(FillShape fillShape);
 
-        /// <summary>
-        /// Records an operator as part of a section's signature.
-        /// </summary>
-        /// <param name="sectionType">The section type.</param>
-        /// <param name="operatorId">The operator ID to add to the signature.</param>
+        // AI: record=Add operatorId to section signature; idempotent and deterministic
         void RecordSectionSignature(MusicConstants.eSectionType sectionType, string operatorId);
 
-        /// <summary>
-        /// Clears all recorded decisions and resets memory state.
-        /// Used when starting a new generation pass.
-        /// </summary>
+        // AI: operation=Clear all recorded state; used at start of new generation pass
         void Clear();
 
-        /// <summary>
-        /// Gets the current bar number of the most recent decision.
-        /// Returns 0 if no decisions have been recorded.
-        /// </summary>
+        // AI: prop=Most recent bar number recorded; 0 indicates no records
         int CurrentBarNumber { get; }
     }
 }

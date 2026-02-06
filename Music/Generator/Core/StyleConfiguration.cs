@@ -1,39 +1,26 @@
-// AI: purpose=Style configuration model separating genre behavior from operator logic.
-// AI: invariants=StyleConfiguration is immutable record; StyleId stable for lookup; defaults applied for missing values.
-// AI: deps=GrooveFeel and AllowedSubdivision from Groove.cs; GrooveRoles for role constants; DrummerVelocityHintSettings, DrummerTimingHintSettings for performance hints.
-// AI: change=Add new styles by extending StyleConfigurationLibrary; Story 6.1 added DrummerVelocityHints; Story 6.2 added DrummerTimingHints.
-
+// AI: purpose=StyleConfiguration: separates genre behavior from operator logic; immutable record
+// AI: invariants=StyleId stable; defaults applied when values missing; records should remain backward compatible
+// AI: deps=Uses GrooveFeel, AllowedSubdivision, GrooveRoles, DrummerVelocity/TimingHintSettings
 using Music.Generator.Drums.Performance;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Core
 {
-    /// <summary>
-    /// Rules for rhythmic feel and timing behavior in a style.
-    /// </summary>
+    // AI: purpose=FeelRules: defines default feel and swing; AllowFeelOverrides controls per-section overrides
     public sealed record FeelRules
     {
-        /// <summary>Default feel for the style (Straight, Swing, Shuffle, TripletFeel).</summary>
         public required GrooveFeel DefaultFeel { get; init; }
-
-        /// <summary>Default swing amount (0.0 = no swing, 1.0 = full swing). Only meaningful when feel != Straight.</summary>
         public required double SwingAmount { get; init; }
-
-        /// <summary>Whether feel can be overridden per-section.</summary>
         public bool AllowFeelOverrides { get; init; } = true;
 
-        /// <summary>
-        /// Creates default straight feel rules.
-        /// </summary>
+        // AI: factory=Straight default: GrooveFeel.Straight, SwingAmount=0.0
         public static FeelRules Straight => new()
         {
             DefaultFeel = GrooveFeel.Straight,
             SwingAmount = 0.0
         };
 
-        /// <summary>
-        /// Creates swing feel rules with specified amount.
-        /// </summary>
+        // AI: factory=Swing default factory clamps amount to [0.0,1.0]
         public static FeelRules Swing(double amount = 0.5) => new()
         {
             DefaultFeel = GrooveFeel.Swing,
@@ -41,140 +28,84 @@ namespace Music.Generator.Core
         };
     }
 
-    /// <summary>
-    /// Rules for rhythmic grid and subdivision constraints in a style.
-    /// </summary>
+    // AI: purpose=GridRules: allowed rhythmic subdivisions for a style; convenience AllowTriplets check
     public sealed record GridRules
     {
-        /// <summary>Allowed subdivisions for this style (flags enum).</summary>
         public required AllowedSubdivision AllowedSubdivisions { get; init; }
 
-        /// <summary>Whether triplet subdivisions are allowed (convenience check).</summary>
+        // AI: convenience=Returns true when any triplet subdivision flag is set
         public bool AllowTriplets => AllowedSubdivisions.HasFlag(AllowedSubdivision.EighthTriplet) ||
                                       AllowedSubdivisions.HasFlag(AllowedSubdivision.SixteenthTriplet);
 
-        /// <summary>
-        /// Creates default sixteenth-note grid rules (common for Pop/Rock).
-        /// </summary>
+        // AI: factory=SixteenthGrid common default (Quarter/Eighth/Sixteenth)
         public static GridRules SixteenthGrid => new()
         {
             AllowedSubdivisions = AllowedSubdivision.Quarter | AllowedSubdivision.Eighth | AllowedSubdivision.Sixteenth
         };
 
-        /// <summary>
-        /// Creates eighth-note grid rules with triplets (common for Jazz/Shuffle).
-        /// </summary>
+        // AI: factory=EighthWithTriplets includes EighthTriplet flag
         public static GridRules EighthWithTriplets => new()
         {
             AllowedSubdivisions = AllowedSubdivision.Quarter | AllowedSubdivision.Eighth | AllowedSubdivision.EighthTriplet
         };
     }
 
-    /// <summary>
-    /// Complete style configuration separating genre behavior from operator logic.
-    /// Same operators work across genres with different weights, caps, and idioms.
-    /// </summary>
+    // AI: purpose=StyleConfiguration: complete style rules and operator weights/caps for a genre
     public sealed record StyleConfiguration
     {
-        /// <summary>Unique style identifier (e.g., "PopRock", "Jazz", "Metal").</summary>
         public required string StyleId { get; init; }
-
-        /// <summary>Human-readable style name.</summary>
         public required string DisplayName { get; init; }
-
-        /// <summary>List of operator IDs enabled for this style. Empty = all operators allowed.</summary>
         public required IReadOnlyList<string> AllowedOperatorIds { get; init; }
-
-        /// <summary>Per-operator weight multipliers (operatorId → weight). Missing = 0.5 default.</summary>
         public required IReadOnlyDictionary<string, double> OperatorWeights { get; init; }
-
-        /// <summary>Default density targets per role (role → density). Missing = style default.</summary>
         public required IReadOnlyDictionary<string, double> RoleDensityDefaults { get; init; }
-
-        /// <summary>Hard caps per role (role → max count). Missing = int.MaxValue (no cap).</summary>
         public required IReadOnlyDictionary<string, int> RoleCaps { get; init; }
-
-        /// <summary>Feel rules (straight, swing, shuffle).</summary>
         public required FeelRules FeelRules { get; init; }
-
-        /// <summary>Grid/subdivision rules.</summary>
         public required GridRules GridRules { get; init; }
 
-        /// <summary>
-        /// Optional drummer velocity hint settings for this style.
-        /// When null, conservative defaults are used.
-        /// Story 6.1: Drummer velocity shaping.
-        /// </summary>
+        // AI: optional=Drummer velocity/timing hint configs; null -> conservative defaults
         public DrummerVelocityHintSettings? DrummerVelocityHints { get; init; }
-
-        /// <summary>
-        /// Optional drummer timing hint settings for this style.
-        /// When null, conservative defaults are used.
-        /// Story 6.2: Drummer timing nuance.
-        /// </summary>
         public DrummerTimingHintSettings? DrummerTimingHints { get; init; }
 
-        /// <summary>Default style weight when operator not in OperatorWeights (0.5).</summary>
         public const double DefaultOperatorWeight = 0.5;
-
-        /// <summary>Default density when role not in RoleDensityDefaults.</summary>
         public const double DefaultRoleDensity = 0.5;
 
-        /// <summary>
-        /// Gets operator weight, returning default if not configured.
-        /// </summary>
+        // AI: util=Return per-operator weight or default when missing
         public double GetOperatorWeight(string operatorId)
         {
             ArgumentNullException.ThrowIfNull(operatorId);
             return OperatorWeights.TryGetValue(operatorId, out double weight) ? weight : DefaultOperatorWeight;
         }
 
-        /// <summary>
-        /// Gets role density target, returning default if not configured.
-        /// </summary>
+        // AI: util=Return role density or default when missing
         public double GetRoleDensity(string role)
         {
             ArgumentNullException.ThrowIfNull(role);
             return RoleDensityDefaults.TryGetValue(role, out double density) ? density : DefaultRoleDensity;
         }
 
-        /// <summary>
-        /// Gets role cap, returning int.MaxValue if not configured (no cap).
-        /// </summary>
+        // AI: util=Return role cap or int.MaxValue when missing (no cap)
         public int GetRoleCap(string role)
         {
             ArgumentNullException.ThrowIfNull(role);
             return RoleCaps.TryGetValue(role, out int cap) ? cap : int.MaxValue;
         }
 
-        /// <summary>
-        /// Checks if an operator is allowed in this style.
-        /// Empty AllowedOperatorIds = all operators allowed.
-        /// </summary>
+        // AI: check=AllowedOperatorIds empty implies all operators allowed; membership check otherwise
         public bool IsOperatorAllowed(string operatorId)
         {
             ArgumentNullException.ThrowIfNull(operatorId);
-
-            // Empty list = all operators allowed
             if (AllowedOperatorIds.Count == 0)
                 return true;
-
             return AllowedOperatorIds.Contains(operatorId);
         }
 
-        /// <summary>
-        /// Gets drummer velocity hint settings, returning conservative defaults if not configured.
-        /// Story 6.1: Drummer velocity shaping.
-        /// </summary>
+        // AI: helper=Return drummer velocity hints or conservative defaults
         public DrummerVelocityHintSettings GetDrummerVelocityHints()
         {
             return DrummerVelocityHints ?? DrummerVelocityHintSettings.ConservativeDefaults;
         }
 
-        /// <summary>
-        /// Gets drummer timing hint settings, returning conservative defaults if not configured.
-        /// Story 6.2: Drummer timing nuance.
-        /// </summary>
+        // AI: helper=Return drummer timing hints or conservative defaults
         public DrummerTimingHintSettings GetDrummerTimingHints()
         {
             return DrummerTimingHints ?? DrummerTimingHintSettings.ConservativeDefaults;

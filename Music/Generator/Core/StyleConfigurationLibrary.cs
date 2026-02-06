@@ -1,17 +1,13 @@
-// AI: purpose=Registry of style configurations; provides GetStyle lookup and predefined styles.
-// AI: invariants=Styles are immutable; StyleId lookup is case-insensitive; unknown style returns null.
-// AI: deps=StyleConfiguration, FeelRules, GridRules, GrooveRoles; DrummerVelocityHintSettings, DrummerTimingHintSettings for performance hints.
-// AI: change=Add new styles as static properties; Story 6.1 added velocity hints; Story 6.2 added timing hints.
-
+// AI: purpose=Registry of immutable StyleConfiguration instances and case-insensitive lookup helper
+// AI: invariants=Style entries immutable; StyleId lookup is case-insensitive; GetStyle returns null if missing
+// AI: deps=StyleConfiguration, FeelRules, GridRules, GrooveRoles, DrummerVelocity/TimingHintSettings
+// AI: note=Add new styles as static properties and register in static ctor to expose via GetStyle
 using Music.Generator.Drums.Performance;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Core
 {
-    /// <summary>
-    /// Registry of predefined style configurations.
-    /// Provides style lookup by ID and access to standard configurations.
-    /// </summary>
+    // AI: purpose=Expose predefined StyleConfiguration instances and lookup APIs
     public static class StyleConfigurationLibrary
     {
         private static readonly Dictionary<string, StyleConfiguration> _styles;
@@ -26,24 +22,17 @@ namespace Music.Generator.Core
             };
         }
 
-        /// <summary>
-        /// Gets a style configuration by ID (case-insensitive).
-        /// Returns null if style not found.
-        /// </summary>
+        // AI: lookup=Return StyleConfiguration by id (case-insensitive) or null when not found
         public static StyleConfiguration? GetStyle(string styleId)
         {
             ArgumentNullException.ThrowIfNull(styleId);
             return _styles.TryGetValue(styleId, out var style) ? style : null;
         }
 
-        /// <summary>
-        /// Gets all available style IDs.
-        /// </summary>
+        // AI: info=All available StyleIds (case-insensitive keys preserved); returns a snapshot list
         public static IReadOnlyList<string> AvailableStyleIds => _styles.Keys.ToList();
 
-        /// <summary>
-        /// Checks if a style ID exists.
-        /// </summary>
+        // AI: query=Return true when styleId exists (case-insensitive)
         public static bool StyleExists(string styleId)
         {
             ArgumentNullException.ThrowIfNull(styleId);
@@ -52,11 +41,7 @@ namespace Music.Generator.Core
 
         #region Predefined Styles
 
-        /// <summary>
-        /// Pop/Rock style configuration.
-        /// Straight feel, sixteenth grid, balanced density.
-        /// Operator weights to be populated in Phase 5.
-        /// </summary>
+        // AI: style=PopRock defaults: straight feel, sixteenth grid, balanced role densities
         public static StyleConfiguration PopRock => new()
         {
             StyleId = "PopRock",
@@ -101,11 +86,7 @@ namespace Music.Generator.Core
             DrummerTimingHints = DrummerTimingHintSettings.PopRockDefaults
         };
 
-        /// <summary>
-        /// Jazz style configuration.
-        /// Swing feel, eighth triplet grid, sparser density.
-        /// Operator weights to be populated in Phase 5.
-        /// </summary>
+        // AI: style=Jazz defaults: swing feel, triplet-capable grid, sparser densities
         public static StyleConfiguration Jazz => new()
         {
             StyleId = "Jazz",
@@ -146,11 +127,7 @@ namespace Music.Generator.Core
             DrummerTimingHints = DrummerTimingHintSettings.JazzDefaults
         };
 
-        /// <summary>
-        /// Metal style configuration.
-        /// Straight feel, sixteenth grid, dense driving patterns.
-        /// Operator weights to be populated in Phase 5.
-        /// </summary>
+        // AI: style=Metal defaults: straight feel, dense role densities, double-bass friendly caps
         public static StyleConfiguration Metal => new()
         {
             StyleId = "Metal",

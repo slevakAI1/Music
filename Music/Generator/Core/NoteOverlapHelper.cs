@@ -1,21 +1,16 @@
-// AI: purpose=Utility for preventing note overlap in generated tracks by trimming existing notes of same pitch.
-// AI: Extracted from duplicate code in BassTrackGenerator, GuitarTrackGenerator, KeysTrackGenerator, DrumTrackGenerator.
+// AI: purpose=Trim prior same-pitch notes so new note-ons do not produce overlapping note durations.
+// AI: invariants=Mutates existingNotes in-place; ensures NoteDurationTicks>=1; checks PartTrackEventType.NoteOn only.
+// AI: deps=Relies on Music.MyMidi.PartTrackEvent, PartTrackEventType and AbsoluteTimeTicks semantics.
+// AI: perf=O(n) over existingNotes; avoid huge existingNotes lists in hot paths.
 
 using Music.MyMidi;
 
 namespace Music.Generator
 {
-    /// <summary>
-    /// Helper for preventing note overlap across multiple generators.
-    /// </summary>
+    // AI: purpose=Prevent overlap by trimming prior notes of same pitch that extend into new noteStart
     internal static class NoteOverlapHelper
     {
-        /// <summary>
-        /// Trims previous notes of the same pitch that would extend past the new note-on time.
-        /// </summary>
-        /// <param name="existingNotes">List of existing notes to check and modify</param>
-        /// <param name="midiNote">The MIDI note number of the new note</param>
-        /// <param name="noteStart">The start time (in ticks) of the new note</param>
+        // AI: behavior=For each NoteOn of midiNote, shorten duration so it ends before noteStart; min duration 1
         public static void PreventOverlap(List<PartTrackEvent> existingNotes, int midiNote, long noteStart)
         {
             for (int j = 0; j < existingNotes.Count; j++)

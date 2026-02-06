@@ -8,10 +8,10 @@ using Music.MyMidi;
 
 namespace Music.Generator
 {
+    // AI: contract=Produces a PartTrack of ordered PartTrackEvent starting at tick 0; ordering and event ctor are external contracts
     public static class CreateRepeatingNotes
     {
-        // AI: params: noteNumber 0..127; noteDurationTicks ticks per event; repeatCount number of events; velocity 0..127.
-        // AI: returns PartTrack with events at 0, duration, 2*duration,...; preserve ordering when changing implementation.
+        // AI: params=noteNumber 0..127; noteDurationTicks>0; repeatCount>=0; noteOnVelocity 0..127; returns ordered PartTrack
         public static PartTrack Execute(
             int noteNumber,
             int noteDurationTicks,

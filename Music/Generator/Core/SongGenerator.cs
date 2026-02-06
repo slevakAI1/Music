@@ -1,8 +1,7 @@
-// AI: purpose=Generate PartTrack using for Drums only, Section+Bar timing;
-// AI: invariants=BarTrack is read-only and must NOT be rebuilt here.
-// AI: deps=MusicConstants.TicksPerQuarterNote; DrumTrackGenerator pipeline for drum generation.
-// AI: perf=Single-run generation; avoid allocations in inner loops; use seed for deterministic results.
-// AI: change=Story 1 removes style-based entry point; Generator uses default drum pipeline.
+// AI: purpose=Generate PartTrack for drums using Section+Bar timing only.
+// AI: invariants=BarTrack is read-only; do not rebuild or reorder SectionTrack here.
+// AI: deps=Uses DrumTrackGenerator and MusicConstants.TicksPerQuarterNote; keep seed for determinism.
+// AI: perf=Single-run generation; avoid large allocations in inner loops; preserve ordering.
 
 using Music.Generator.Drums.Generation;
 using Music.Generator.Groove;
@@ -11,16 +10,13 @@ namespace Music.Generator
 {
     public static class SongGenerator
     {
-        // AI: Generate: validates harmony track before generation; fast-fail on invalid data prevents silent errors.
-        // AI: behavior=Runs HarmonyValidator with default options (StrictDiatonicChordTones=true) to catch F# minor crashes.
-        // AI: Story RF-3: Original signature preserved for backward compatibility; uses DrumTrackGenerator fallback.
-        // AI: behavior=Validates required tracks; uses default style config for operator pipeline.
+        // AI: entry=Facade generate method: validate context then run default drum pipeline; fast-fail on invalid input
         public static PartTrack Generate(SongContext songContext)
         {
             return Generate(songContext, maxBars: 0);
         }
 
-        // AI: behavior=Uses PopRock defaults until style-free pipeline lands; maxBars limits phrase generator bars.
+        // AI: entry=Validate context then generate drum PartTrack; maxBars limits phrase generation scope
         public static PartTrack Generate(SongContext songContext, int maxBars = 0)
         {
             ValidateSongContext(songContext);
@@ -33,14 +29,13 @@ namespace Music.Generator
             return generator.Generate(songContext, drumProgramNumber, maxBars);
         }
 
-        // AI: purpose=Phrase-based drum track generation using MaterialBank phrases.
-        // AI: invariants=MaterialBank must contain drum phrases for requested genre.
+        // AI: entry=Generate PartTrack from material phrases; materialBank required
         public static PartTrack GenerateFromPhrases(
             SongContext songContext,
             int maxBars = 0)
             => GenerateFromPhrases(songContext, seed: 0, maxBars);
 
-        // AI: purpose=Phrase-based drum track generation with optional seed for deterministic section mapping.
+        // AI: entry=Phrase-based generation with explicit seed for deterministic mapping across sections
         public static PartTrack GenerateFromPhrases(
             SongContext songContext,
             int seed,
@@ -58,10 +53,7 @@ namespace Music.Generator
             return generator.Generate(songContext, seed, maxBars);
         }
 
-        // AI: purpose=Single-method groove preview for audition; generates groove from seed+genre, converts to playable PartTrack.
-        // AI: invariants=Deterministic: same seed+genre+barTrack always produces identical PartTrack; all events at same velocity.
-        // AI: deps=GrooveAnchorFactory.Generate for groove generation; GrooveInstanceLayer.ToPartTrack for MIDI conversion.
-        // AI: change=Story 2.2: Facade method combining groove generation + PartTrack conversion for quick audition workflow.
+        // AI: entry=Generate a simple groove preview PartTrack for audition; deterministic for same inputs
         public static PartTrack GenerateGroovePreview(
             int seed,
             string genre,
@@ -79,8 +71,7 @@ namespace Music.Generator
         #region Validation
 
 
-        // AI: Validation methods throw ArgumentException when required tracks are missing; callers rely on exceptions for invalid song contexts.
-
+        // AI: validation=Throw ArgumentException/ArgumentNullException when required tracks or contexts missing
         private static void ValidateSectionTrack(SectionTrack sectionTrack)
         {
             if (sectionTrack == null || sectionTrack.Sections.Count == 0)
@@ -99,13 +90,13 @@ namespace Music.Generator
                 throw new ArgumentException("Time signature track must have events", nameof(timeSignatureTrack));
         }
 
-        // ValidateSongContext: ensures caller provided a non-null SongContext; throws ArgumentNullException when null.
+        // AI: helper=Ensure SongContext is non-null; callers depend on thrown exception for invalid input
         private static void ValidateSongContext(SongContext songContext)
         {
             ArgumentNullException.ThrowIfNull(songContext);
         }
 
-        // ValidateGrooveTrack: ensures a preset definition exists and contains an anchor layer
+        // AI: validation=Ensure Groove preset and AnchorLayer present
         private static void ValidateGrooveTrack(GroovePresetDefinition groovePresetDefinition)
         {
             if (groovePresetDefinition == null)

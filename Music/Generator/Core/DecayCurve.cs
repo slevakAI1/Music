@@ -1,28 +1,15 @@
-// AI: purpose=Configurable decay curve for repetition penalty calculation in agent memory.
-// AI: invariants=Enum values stable for determinism; Linear=simple decay, Exponential=faster initial decay.
-// AI: deps=Used by AgentMemory.GetRepetitionPenalty(); affects how quickly penalty decreases with distance.
-// AI: change=Add new curves at END only to preserve ordinals.
-
+// AI: purpose=Configurable decay curves for repetition penalty used by AgentMemory.
+// AI: invariants=Enum ordinals are stable; add new curves only at end to preserve persisted values.
+// AI: deps=Consumed by AgentMemory.GetRepetitionPenalty(); changing semantics affects memory penalties.
 namespace Music.Generator.Core
 {
-    /// <summary>
-    /// Defines how repetition penalty decays over the memory window.
-    /// Affects how quickly the penalty decreases as decisions age.
-    /// </summary>
+    // AI: contract=Controls penalty decay shape; consumer computes numeric penalty based on this enum
     public enum DecayCurve
     {
-        /// <summary>
-        /// Linear decay: penalty decreases uniformly with distance.
-        /// penalty = (windowSize - age) / windowSize
-        /// More forgiving for repeated use across window.
-        /// </summary>
+        // AI: Linear=uniform decay across window; penalty=(windowSize-age)/windowSize
         Linear = 0,
 
-        /// <summary>
-        /// Exponential decay: penalty drops faster initially, then slows.
-        /// penalty = decayFactor ^ age
-        /// Strongly penalizes recent repetition, quickly forgives older use.
-        /// </summary>
+        // AI: Exponential=faster initial drop, then slower forgiveness; penalty ~= decayFactor^age
         Exponential = 1
     }
 }

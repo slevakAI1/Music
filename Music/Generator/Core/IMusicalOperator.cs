@@ -1,69 +1,24 @@
-// AI: purpose=Generic operator interface; all instrument agents implement specialized versions.
-// AI: invariants=OperatorId stable across runs; Score returns [0.0..1.0]; CanApply is fast pre-filter.
-// AI: deps=Generic over TCandidate; agent-specific contexts extend AgentContext.
-// AI: change=Extend with additional methods if cross-cutting operator behaviors emerge.
-
+// AI: purpose=Generic musical operator interface; instrument agents provide TCandidate-specific implementations
+// AI: invariants=OperatorId must be stable; implementations deterministic given same RNG/context; Score in [0,1]
+// AI: deps=Generic over TCandidate; GeneratorContext may be extended per instrument (DrummerContext etc.)
 namespace Music.Generator.Core
 {
-    /// <summary>
-    /// Generic interface for musical operators that generate and score candidates.
-    /// 
-    /// Operators are the decision-makers in the agent architecture:
-    /// - They generate candidates procedurally (not from a pattern library)
-    /// - They score candidates based on context
-    /// - Selection engine picks from valid, scored options
-    /// 
-    /// Each instrument agent (Drums, Guitar, Keys, Bass, Vocals) implements
-    /// specialized operators with instrument-specific TCandidate types.
-    /// </summary>
-    /// <typeparam name="TCandidate">The candidate type produced by this operator.
-    /// Examples: DrumCandidate, GuitarCandidate, KeysCandidate.</typeparam>
+    // AI: contract=Operator generates and scores candidates; keep signatures stable when evolving operator system
     public interface IMusicalOperator<TCandidate>
     {
-        /// <summary>
-        /// Stable string identifier for this operator.
-        /// Must be unique within an agent and consistent across runs for determinism.
-        /// Format recommendation: "{InstrumentPrefix}{OperatorName}" (e.g., "DrumGhostBeforeBackbeat").
-        /// </summary>
+        // AI: id=Stable operator identifier; unique per agent and consistent across runs for determinism
         string OperatorId { get; }
 
-        /// <summary>
-        /// Classification of this operator's functional category.
-        /// Used by selection engine for family-level weighting and filtering.
-        /// </summary>
+        // AI: family=OperatorFamily groups similar operators for weighting and selection policies
         OperatorFamily OperatorFamily { get; }
 
-        /// <summary>
-        /// Fast pre-filter check to determine if this operator can apply in the given context.
-        /// Should be cheap to evaluate (no RNG, no complex computation).
-        /// Returns false to skip candidate generation entirely.
-        /// </summary>
-        /// <param name="context">Current agent context with bar/section/energy info.</param>
-        /// <returns>True if operator should generate candidates; false to skip.</returns>
+        // AI: prefilter=Fast check to skip generation; should avoid RNG and heavy computation
         bool CanApply(GeneratorContext context);
 
-        /// <summary>
-        /// Generates candidate additions/modifications for the current context.
-        /// May return zero candidates if context doesn't warrant any.
-        /// Generation should be deterministic given the same context and RNG state.
-        /// </summary>
-        /// <param name="context">Current agent context.</param>
-        /// <returns>Enumerable of candidates (lazy evaluation encouraged).</returns>
+        // AI: generate=Yield candidates deterministically given same context and RNG streams
         IEnumerable<TCandidate> GenerateCandidates(GeneratorContext context);
 
-        /// <summary>
-        /// Scores a candidate for selection (0.0 = worst, 1.0 = best).
-        /// 
-        /// Final selection uses: finalScore = Score * styleWeight * (1.0 - memoryPenalty)
-        /// 
-        /// Scoring should consider:
-        /// - Musical appropriateness for the context
-        /// - Density contribution vs. target
-        /// - Stylistic fit
-        /// </summary>
-        /// <param name="candidate">The candidate to score.</param>
-        /// <param name="context">Current agent context for contextual scoring.</param>
-        /// <returns>Score in range [0.0, 1.0].</returns>
+        // AI: score=Return [0.0..1.0]; used by selection: final = Score * styleWeight * (1-memoryPenalty)
         double Score(TCandidate candidate, GeneratorContext context);
     }
 }

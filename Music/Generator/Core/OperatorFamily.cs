@@ -1,44 +1,24 @@
-// AI: purpose=Classification enum for musical operators; groups operators by functional category across all instruments.
-// AI: invariants=Enum values must remain stable (no reordering/renumbering) for determinism and serialization.
-// AI: deps=Used by IMusicalOperator<T>.OperatorFamily; selection engine may weight by family.
-// AI: change=Add new values at END only to preserve existing ordinals.
-
+// AI: purpose=Classify musical operators by functional family across instruments for weighting/filtering
+// AI: invariants=Enum ordinals stable: add new values only at end to preserve persisted semantics
+// AI: deps=Used by IMusicalOperator<T>.OperatorFamily and selection engine; keep names stable
 namespace Music.Generator.Core
 {
-    /// <summary>
-    /// Classifies musical operators by functional category.
-    /// Used across all instrument agents (Drums, Guitar, Keys, Bass, Vocals).
-    /// </summary>
+    // AI: contract=Functional categories used to group operators for selection and policy
     public enum OperatorFamily
     {
-        /// <summary>
-        /// Small decorative additions (ghost notes, grace notes, subtle embellishments).
-        /// Low density impact, high frequency of use.
-        /// </summary>
+        // AI: MicroAddition=Small decorative additions; low density impact
         MicroAddition = 0,
 
-        /// <summary>
-        /// Rhythmic subdivision changes (double-time, half-time, triplet overlays).
-        /// Transforms existing patterns to different rhythmic density.
-        /// </summary>
+        // AI: SubdivisionTransform=Change rhythmic subdivision (doubletime/triplet overlays)
         SubdivisionTransform = 1,
 
-        /// <summary>
-        /// Phrase boundary markers (fills, pickups, turnarounds, cadence figures).
-        /// Typically applied at phrase/section ends.
-        /// </summary>
+        // AI: PhrasePunctuation=Fill/pickup/turnaround markers at phrase boundaries
         PhrasePunctuation = 2,
 
-        /// <summary>
-        /// Full pattern replacements (swap in a different groove/riff for a bar or phrase).
-        /// High impact, low frequency of use.
-        /// </summary>
+        // AI: PatternSubstitution=Full pattern swap; high impact, low frequency
         PatternSubstitution = 3,
 
-        /// <summary>
-        /// Style-specific idioms (genre-defining figures, signature licks, characteristic motions).
-        /// Adds stylistic authenticity.
-        /// </summary>
+        // AI: StyleIdiom=Genre-specific idioms and signature figures
         StyleIdiom = 4
     }
 }
