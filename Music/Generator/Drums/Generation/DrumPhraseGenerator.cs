@@ -4,6 +4,7 @@
 // AI: change=correct architecture replaces DrummerAgent.Generate() with proper groove integration.
 
 using Music.Generator.Core;
+using Music.Generator.Drums.Operators;
 using Music.Generator.Drums.Selection;
 using Music.Generator.Drums.Selection.Candidates;
 using Music.Generator.Groove;
@@ -58,6 +59,12 @@ namespace Music.Generator.Drums.Generation
         private readonly IDrumCandidateSource _candidateSource;
         private readonly DrumGeneratorSettings _settings;
 
+        // AI: purpose=Create candidate source from operator registry; keeps generator style-free.
+        public DrumPhraseGenerator()
+            : this(BuildCandidateSource(), settings: null)
+        {
+        }
+
         /// <summary>
         /// Creates a DrumGenerator with the specified candidate provider.
         /// </summary>
@@ -72,6 +79,15 @@ namespace Music.Generator.Drums.Generation
 
             _candidateSource = candidateSource;
             _settings = settings ?? DrumGeneratorSettings.Default;
+        }
+
+        private static IDrumCandidateSource BuildCandidateSource()
+        {
+            var registry = DrumOperatorRegistryBuilder.BuildComplete();
+            return new DrummerCandidateSource(
+                registry,
+                diagnosticsCollector: null,
+                settings: null);
         }
 
         /// <summary>

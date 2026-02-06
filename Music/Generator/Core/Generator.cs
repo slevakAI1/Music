@@ -6,8 +6,6 @@
 
 using Music.Generator.Core;
 using Music.Generator.Drums.Generation;
-using Music.Generator.Drums.Operators;
-using Music.Generator.Drums.Selection.Candidates;
 using Music.Generator.Groove;
 
 namespace Music.Generator
@@ -31,12 +29,7 @@ namespace Music.Generator
             ValidateTimeSignatureTrack(songContext.Song.TimeSignatureTrack);
             ValidateGrooveTrack(songContext.GroovePresetDefinition);
 
-            var registry = DrumOperatorRegistryBuilder.BuildComplete();
-            var candidateSource = new DrummerCandidateSource(
-                registry,
-                diagnosticsCollector: null,
-                settings: null);
-            var generator = new DrumPhraseGenerator(candidateSource);
+            var generator = new DrumPhraseGenerator();
             return generator.Generate(songContext, maxBars);
         }
 
