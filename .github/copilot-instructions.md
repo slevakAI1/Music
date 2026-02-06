@@ -4,6 +4,8 @@
 - Always use the minimum changes possible to meet each and every acceptance criteria.
 - After code is completed, ensure each individual acceptance criterion is met.
 - Do not update the epic containing he story, only update what has been asked for.
+- Where possible, use existing classes, methods, constants as opposed to creating new classes.
+- Do not make assumptions outside of the context provided.
 
 ## Response Format
 - When the request is to implement a story, do not write the summary to the Copilot chat pane, write story implementation summaries to C:\Users\sleva\source\repos\Music\Music\AI\Completed\.
@@ -18,6 +20,7 @@
 - Do NOT repeat what is obvious from code. Document intent, constraints, edge cases, and “don’t break” rules only.
 - Do NOT add comments to every method by default—only where it materially reduces ambiguity for future changes.
 - Do NOT introduce newlines inside a comment to “cheat” the limits.
+- Do NOT write comments documentating what changed (Example: Story 5.1 Move this method from some other class).
 
 ### Code Change Rules
 - If the file is missing critical context, add 1–3 lines of `// TODO?` questions at the top (counting toward the limit).

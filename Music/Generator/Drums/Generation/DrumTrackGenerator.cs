@@ -2,7 +2,6 @@
 // AI: invariants=Requires MaterialBank drum phrases; placement covers all bars unless maxBars limits.
 // AI: deps=MaterialPhrase.ToPartTrack for placement; BarTrack.GetBarEndTick for clipping.
 
-using Music.Generator.Core;
 using Music.Generator.Drums.Planning;
 using Music.MyMidi;
 using Music.Song.Material;

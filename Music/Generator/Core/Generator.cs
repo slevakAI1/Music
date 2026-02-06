@@ -4,7 +4,6 @@
 // AI: perf=Single-run generation; avoid allocations in inner loops; use seed for deterministic results.
 // AI: change=Story 1 removes style-based entry point; Generator uses default drum pipeline.
 
-using Music.Generator.Core;
 using Music.Generator.Drums.Generation;
 using Music.Generator.Groove;
 
