@@ -108,6 +108,9 @@ namespace Music.Writer
                     // Only add updatedPartTrack if it has notes
                     if (updatedPartTrack.PartTrackNoteEvents.Count > 0)
                     {
+                        // Sort by time after pairing; drum tracks may pair out of order
+                        updatedPartTrack.PartTrackNoteEvents.Sort(
+                            (a, b) => a.AbsoluteTimeTicks.CompareTo(b.AbsoluteTimeTicks));
                         updatedPartTracks.Add(updatedPartTrack);
                     }
                 }
