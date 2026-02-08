@@ -91,7 +91,7 @@ namespace Music.Generator.Drums.Generation
 
             // This will return the updated onsets after applying the operators
             // New Approach call:
-            // var allOnsets = ApplyOperators(bars, anchorOnsets, totalBars, NumberOfOperators);
+            // var allOnsets = ApplyDrumOperators(bars, anchorOnsets, totalBars, NumberOfOperators);
 
 
             // AI: disconnect=Performance; no timing/velocity shaping in this phrase pass.
