@@ -89,7 +89,7 @@ namespace Music.Generator.Groove
 
         /// <summary>
         /// Creates a stable candidate ID from group ID and beat position.
-        /// Uses same format as GrooveDiagnosticsCollector.MakeCandidateId for consistency.
+        /// Uses same format as GrooveDiagnosticsCollector_Save.MakeCandidateId for consistency.
         /// </summary>
         /// <param name="groupId">Group identifier.</param>
         /// <param name="beat">Beat position of the candidate.</param>

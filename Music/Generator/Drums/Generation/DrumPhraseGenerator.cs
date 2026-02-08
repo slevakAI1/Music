@@ -1,6 +1,6 @@
 // AI: purpose=Generates a drum phrase (1-N bars) using operator-based variation over anchors.
 // AI: invariants=Output is a PartTrack representing a single phrase; reusable for MaterialBank storage.licy.
-// AI: deps=DrummerOperatorCandidates, OperatorSelector, BarTrack bars, SongContext, PartTrack.
+// AI: deps=DrummerOperatorCandidates, OperatorSelector_Save, BarTrack bars, SongContext, PartTrack.
 // AI: change=correct architecture replaces DrummerAgent.Generate() with proper groove integration.
 
 using Music.Generator.Drums.Operators;
@@ -34,7 +34,7 @@ namespace Music.Generator.Drums.Generation
         }
     }
 
-    // AI: purpose=Orchestrates drum generation: anchors from groove + operator candidates via OperatorSelector.
+    // AI: purpose=Orchestrates drum generation: anchors from groove + operator candidates via OperatorSelector_Save.
     // AI: arch=candidate source→anchors→per bar/role: policy→target→candidates→select→combine→MIDI
     // AI: enforces=density targets, operator caps, weighted selection per policy decisions
     public sealed class DrumPhraseGenerator
@@ -85,13 +85,13 @@ namespace Music.Generator.Drums.Generation
 
 
 
-            // Generate operator-based candidates for each bar using OperatorSelector
-            var operatorOnsets = GenerateOperatorOnsets(bars, anchorOnsets, totalBars);
+            // Generate operator-based candidates for each bar using OperatorSelector_Save
+            var operatorOnsets = GenerateOperatorOnsets_Save(bars, anchorOnsets, totalBars);
 
 
 
             // Combine anchors with operator onsets
-            var allOnsets = CombineOnsets(anchorOnsets, operatorOnsets);
+            var allOnsets = CombineOnsets_Save(anchorOnsets, operatorOnsets);
 
             // AI: disconnect=Performance; no timing/velocity shaping in this phrase pass.
             // Convert to MIDI events
@@ -172,7 +172,7 @@ namespace Music.Generator.Drums.Generation
             return onsets.OrderBy(o => o.BarNumber).ThenBy(o => o.Beat).ToList();
         }
 
-        private List<GrooveOnset> GenerateOperatorOnsets(
+        private List<GrooveOnset> GenerateOperatorOnsets_Save(
             IReadOnlyList<Bar> bars,
             List<GrooveOnset> anchors,
             int totalBars)
@@ -189,7 +189,7 @@ namespace Music.Generator.Drums.Generation
                 foreach (var role in activeRoles)
                 {
                     // AI: disconnect=Policy; use default density targets to isolate operator behavior.
-                    int targetCount = DrumDensityCalculator
+                    int targetCount = DrumDensityCalculator_Save
                         .ComputeDensityTarget(bar, role)
                         .TargetCount;
 
@@ -206,13 +206,13 @@ namespace Music.Generator.Drums.Generation
                     if (candidateGroups.Count == 0)
                         continue; // No candidates available
 
-                    // Filter anchors for this role to pass to OperatorSelector
+                    // Filter anchors for this role to pass to OperatorSelector_Save
                     var roleAnchors = barAnchors
                         .Where(a => string.Equals(a.Role, role, StringComparison.OrdinalIgnoreCase))
                         .ToList();
 
-                    // SELECT using OperatorSelector
-                    var selected = OperatorSelector.SelectUntilTargetReached(
+                    // SELECT using OperatorSelector_Save
+                    var selected = OperatorSelector_Save.SelectUntilTargetReached(
                         bar,
                         role,
                         candidateGroups,
@@ -239,7 +239,7 @@ namespace Music.Generator.Drums.Generation
             return result;
         }
 
-        private static List<GrooveOnset> CombineOnsets(
+        private static List<GrooveOnset> CombineOnsets_Save(
             List<GrooveOnset> anchors,
             List<GrooveOnset> operators)
         {

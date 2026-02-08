@@ -19,7 +19,7 @@ namespace Music.Generator.Groove
     {
         /// <summary>
         /// General weighted candidate selection with tie-breaking.
-        /// Used by: Drummer Agent's DrumWeightedCandidateSelector for selecting from weighted candidates.
+        /// Used by: Drummer Agent's DrumWeightedCandidateSelector_Save for selecting from weighted candidates.
         /// </summary>
         CandidatePick,
 

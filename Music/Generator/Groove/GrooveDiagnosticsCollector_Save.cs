@@ -10,7 +10,7 @@ namespace Music.Generator.Groove;
 /// Story G1: Opt-in diagnostics collection for decision tracing.
 /// Usage: Create when diagnostics enabled; null when disabled for zero-cost.
 /// </summary>
-public sealed class GrooveDiagnosticsCollector
+public sealed class GrooveDiagnosticsCollector_Save
 {
     private readonly int _barNumber;
     private readonly string _role;
@@ -31,7 +31,7 @@ public sealed class GrooveDiagnosticsCollector
     /// </summary>
     /// <param name="barNumber">Bar number (1-based).</param>
     /// <param name="role">Role name (e.g., "Kick", "Snare").</param>
-    public GrooveDiagnosticsCollector(int barNumber, string role)
+    public GrooveDiagnosticsCollector_Save(int barNumber, string role)
     {
         _barNumber = barNumber;
         _role = role;

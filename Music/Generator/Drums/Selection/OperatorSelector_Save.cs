@@ -5,8 +5,8 @@ namespace Music.Generator.Drums.Selection;
 
 // AI: purpose=Select candidates up to a target with deterministic RNG, anchor preservation and caps
 // AI: invariants=Deterministic given same inputs; never exceed targetCount; respects group/candidate caps
-// AI: deps=Uses DrumWeightedCandidateSelector, GrooveRngHelper, and GrooveDiagnosticsCollector (optional)
-public static class OperatorSelector
+// AI: deps=Uses DrumWeightedCandidateSelector_Save, GrooveRngHelper, and GrooveDiagnosticsCollector_Save (optional)
+public static class OperatorSelector_Save
 {
     // AI: entry=Select until targetCount or pool exhausted; diagnostics optional for decision tracing
     public static IReadOnlyList<DrumOnsetCandidate> SelectUntilTargetReached(
@@ -15,7 +15,7 @@ public static class OperatorSelector
         IReadOnlyList<DrumCandidateGroup> groups,
         int targetCount,
         IReadOnlyList<GrooveOnset> existingAnchors,
-        GrooveDiagnosticsCollector? diagnostics = null)
+        GrooveDiagnosticsCollector_Save? diagnostics = null)
     {
         ArgumentNullException.ThrowIfNull(bar);
         ArgumentException.ThrowIfNullOrWhiteSpace(role);
@@ -69,8 +69,14 @@ public static class OperatorSelector
             // Build groups for weighted selection
             var selectableGroups = BuildGroupsForSelection(selectable);
 
+
+
+            // THIS IS WHERE IT's RANDOMLY SELECTING
+
+
+
             // Use weighted selector to pick one candidate
-            var selectedCandidates = DrumWeightedCandidateSelector.SelectCandidates(
+            var selectedCandidates = DrumWeightedCandidateSelector_Save.SelectCandidates(
                 selectableGroups,
                 targetCount: 1,
                 barNumber: bar.BarNumber,
@@ -89,7 +95,7 @@ public static class OperatorSelector
             if (diagnostics != null)
             {
                 double weight = picked.Candidate.ProbabilityBias * picked.Group.BaseProbabilityBias;
-                string candidateId = GrooveDiagnosticsCollector.MakeCandidateId(picked.Group.GroupId, picked.Candidate.OnsetBeat);
+                string candidateId = GrooveDiagnosticsCollector_Save.MakeCandidateId(picked.Group.GroupId, picked.Candidate.OnsetBeat);
                 diagnostics.RecordSelection(candidateId, weight, RandomPurpose.GrooveCandidatePick);
             }
 
@@ -109,7 +115,7 @@ public static class OperatorSelector
     private static List<(DrumOnsetCandidate Candidate, DrumCandidateGroup Group)> BuildWorkingPool(
         IReadOnlyList<DrumCandidateGroup> groups,
         HashSet<decimal> anchorBeats,
-        GrooveDiagnosticsCollector? diagnostics = null)
+        GrooveDiagnosticsCollector_Save? diagnostics = null)
     {
         var pool = new List<(DrumOnsetCandidate, DrumCandidateGroup)>();
 
@@ -121,7 +127,7 @@ public static class OperatorSelector
                 {
                     if (diagnostics != null)
                     {
-                        string candidateId = GrooveDiagnosticsCollector.MakeCandidateId(group.GroupId, candidate.OnsetBeat);
+                        string candidateId = GrooveDiagnosticsCollector_Save.MakeCandidateId(group.GroupId, candidate.OnsetBeat);
                         diagnostics.RecordFilter(candidateId, "anchor conflict");
                     }
                 }

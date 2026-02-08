@@ -7,17 +7,17 @@ using Music.Generator.Groove;
 namespace Music.Generator.Drums.Selection
 {
     // AI: result=Contains computed integer TargetCount and provenance for diagnostics
-    public sealed record GrooveDensityResult(
+    public sealed record GrooveDensityResult_Save(
         int TargetCount,
         double Density01Used,
         int MaxEventsPerBarUsed,
         string Explanation);
 
     // AI: purpose=Deterministic density calculator; formula: round(Density01*MaxEvents) clamped to valid range
-    public static class DrumDensityCalculator
+    public static class DrumDensityCalculator_Save
     {
         // AI: behavior=Compute target count deterministically using MidpointRounding.AwayFromZero
-        public static GrooveDensityResult ComputeDensityTarget(
+        public static GrooveDensityResult_Save ComputeDensityTarget(
             Bar bar,
             string role,
             double density01 = 0.5,
@@ -36,7 +36,7 @@ namespace Music.Generator.Drums.Selection
 
             string explanation = $"Density={densityEffective:F2}, MaxEvents={maxEventsEffective}, Target={targetCount}";
 
-            return new GrooveDensityResult(
+            return new GrooveDensityResult_Save(
                 TargetCount: targetCount,
                 Density01Used: densityEffective,
                 MaxEventsPerBarUsed: maxEventsEffective,

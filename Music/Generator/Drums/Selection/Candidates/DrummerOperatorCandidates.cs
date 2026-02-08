@@ -32,7 +32,7 @@ namespace Music.Generator.Drums.Selection.Candidates
     public sealed class DrummerOperatorCandidates : IDrumOperatorCandidates
     {
         private readonly DrumOperatorRegistry _registry;
-        private readonly GrooveDiagnosticsCollector? _diagnosticsCollector;
+        private readonly GrooveDiagnosticsCollector_Save? _diagnosticsCollector;
         private readonly DrummerOperatorCandidatesSettings _settings;
 
         // Cache for last execution diagnostics (for testing/debugging)
@@ -41,7 +41,7 @@ namespace Music.Generator.Drums.Selection.Candidates
         // AI: ctor=Requires registry; diagnosticsCollector optional; settings optional with sensible defaults
         public DrummerOperatorCandidates(
             DrumOperatorRegistry registry,
-            GrooveDiagnosticsCollector? diagnosticsCollector = null,
+            GrooveDiagnosticsCollector_Save? diagnosticsCollector = null,
             DrummerOperatorCandidatesSettings? settings = null)
         {
             ArgumentNullException.ThrowIfNull(registry);

@@ -15,7 +15,7 @@ public sealed record WeightedCandidate(
     string StableId);
 
 // AI: selector=Provides deterministic weighted selection utilities for drum onset candidates
-public static class DrumWeightedCandidateSelector
+public static class DrumWeightedCandidateSelector_Save
 {
     // AI: calc=Weight = candidate.ProbabilityBias * group.BaseProbabilityBias; non-positive treated as 0
     public static double ComputeWeight(DrumOnsetCandidate candidate, DrumCandidateGroup group)
