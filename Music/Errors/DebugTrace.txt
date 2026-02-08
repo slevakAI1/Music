@@ -11845,3 +11845,103 @@
 [2026-02-07T22:46:59.5008661-05:00] === StartPlaybackWithMeasureTrackingAsync END ===
 [2026-02-07T22:46:59.5013937-05:00] <<< btnPlay_Click END
 [2026-02-07T22:46:59.5013937-05:00] <<< btnPlay_Click END
+[2026-02-08T04:35:01.9292620-05:00] Rng.Initialize: seed=12345
+[2026-02-08T04:35:01.9292620-05:00] Rng.Initialize: seed=12345
+[2026-02-08T04:35:58.8968534-05:00] >>> btnPlay_Click START
+[2026-02-08T04:35:58.8968534-05:00] >>> btnPlay_Click START
+[2026-02-08T04:35:58.8985766-05:00] === StartPlaybackWithMeasureTrackingAsync START ===
+[2026-02-08T04:35:58.8985766-05:00] === StartPlaybackWithMeasureTrackingAsync START ===
+[2026-02-08T04:35:58.8992304-05:00] StartPlaybackWithMeasureTracking: enableTracking=True
+[2026-02-08T04:35:58.8992304-05:00] StartPlaybackWithMeasureTracking: enableTracking=True
+[2026-02-08T04:35:58.8996185-05:00] StartPlaybackWithMeasureTracking: Setting up progress tracker
+[2026-02-08T04:35:58.8996185-05:00] StartPlaybackWithMeasureTracking: Setting up progress tracker
+[2026-02-08T04:35:58.9054609-05:00] StartPlaybackWithMeasureTracking: Progress tracker started, calling HandlePlayAsync
+[2026-02-08T04:35:58.9054609-05:00] StartPlaybackWithMeasureTracking: Progress tracker started, calling HandlePlayAsync
+[2026-02-08T04:35:58.9073834-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-08T04:35:58.9073834-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-08T04:35:58.9082334-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=1
+[2026-02-08T04:35:58.9082334-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=1
+[2026-02-08T04:35:58.9088062-05:00] HandlePlayAsync: Converting 1 tracks to MIDI document
+[2026-02-08T04:35:58.9088062-05:00] HandlePlayAsync: Converting 1 tracks to MIDI document
+[2026-02-08T04:36:03.7191357-05:00] HandlePlayAsync: MIDI document created, Duration=0ms
+[2026-02-08T04:36:03.7191357-05:00] HandlePlayAsync: MIDI document created, Duration=0ms
+[2026-02-08T04:36:03.7197704-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-08T04:36:03.7197704-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-08T04:36:03.7211894-05:00] === Player.PlayMidiFromSongTracksAsync START ===
+[2026-02-08T04:36:03.7211894-05:00] === Player.PlayMidiFromSongTracksAsync START ===
+[2026-02-08T04:36:03.7217099-05:00] Player: midiDoc is null, throwing exception
+[2026-02-08T04:36:03.7217099-05:00] Player: midiDoc is null, throwing exception
+[2026-02-08T04:36:04.1543296-05:00] StartPlaybackWithMeasureTracking: Exception caught - ArgumentNullException: Value cannot be null. (Parameter 'midiDoc')
+[2026-02-08T04:36:04.1543296-05:00] StartPlaybackWithMeasureTracking: Exception caught - ArgumentNullException: Value cannot be null. (Parameter 'midiDoc')
+[2026-02-08T04:36:04.1549959-05:00] StartPlaybackWithMeasureTracking: Attempting playback without tracking (after exception)
+[2026-02-08T04:36:04.1549959-05:00] StartPlaybackWithMeasureTracking: Attempting playback without tracking (after exception)
+[2026-02-08T04:36:04.1556246-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-08T04:36:04.1556246-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-08T04:36:04.1561832-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=1
+[2026-02-08T04:36:04.1561832-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=1
+[2026-02-08T04:36:04.1566450-05:00] HandlePlayAsync: Converting 1 tracks to MIDI document
+[2026-02-08T04:36:04.1566450-05:00] HandlePlayAsync: Converting 1 tracks to MIDI document
+[2026-02-08T04:36:05.5641621-05:00] HandlePlayAsync: MIDI document created, Duration=0ms
+[2026-02-08T04:36:05.5641621-05:00] HandlePlayAsync: MIDI document created, Duration=0ms
+[2026-02-08T04:36:05.5648795-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-08T04:36:05.5648795-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-08T04:36:05.5653430-05:00] === Player.PlayMidiFromSongTracksAsync START ===
+[2026-02-08T04:36:05.5653430-05:00] === Player.PlayMidiFromSongTracksAsync START ===
+[2026-02-08T04:36:05.5658370-05:00] Player: midiDoc is null, throwing exception
+[2026-02-08T04:36:05.5658370-05:00] Player: midiDoc is null, throwing exception
+[2026-02-08T04:36:05.6173087-05:00] StartPlaybackWithMeasureTracking: Playback without tracking also failed, rethrowing
+[2026-02-08T04:36:05.6173087-05:00] StartPlaybackWithMeasureTracking: Playback without tracking also failed, rethrowing
+[2026-02-08T04:36:05.6328886-05:00] StartPlaybackWithMeasureTracking: FINALLY block - stopping tracker and clearing highlights
+[2026-02-08T04:36:05.6328886-05:00] StartPlaybackWithMeasureTracking: FINALLY block - stopping tracker and clearing highlights
+[2026-02-08T04:36:05.6338497-05:00] === StartPlaybackWithMeasureTrackingAsync END ===
+[2026-02-08T04:36:05.6338497-05:00] === StartPlaybackWithMeasureTrackingAsync END ===
+[2026-02-08T04:59:20.3031454-05:00] Rng.Initialize: seed=12345
+[2026-02-08T04:59:20.3031454-05:00] Rng.Initialize: seed=12345
+[2026-02-08T05:00:01.3476674-05:00] >>> btnPlay_Click START
+[2026-02-08T05:00:01.3476674-05:00] >>> btnPlay_Click START
+[2026-02-08T05:00:01.3493142-05:00] === StartPlaybackWithMeasureTrackingAsync START ===
+[2026-02-08T05:00:01.3493142-05:00] === StartPlaybackWithMeasureTrackingAsync START ===
+[2026-02-08T05:00:01.3500053-05:00] StartPlaybackWithMeasureTracking: enableTracking=True
+[2026-02-08T05:00:01.3500053-05:00] StartPlaybackWithMeasureTracking: enableTracking=True
+[2026-02-08T05:00:01.3505052-05:00] StartPlaybackWithMeasureTracking: Setting up progress tracker
+[2026-02-08T05:00:01.3505052-05:00] StartPlaybackWithMeasureTracking: Setting up progress tracker
+[2026-02-08T05:00:01.3573887-05:00] StartPlaybackWithMeasureTracking: Progress tracker started, calling HandlePlayAsync
+[2026-02-08T05:00:01.3573887-05:00] StartPlaybackWithMeasureTracking: Progress tracker started, calling HandlePlayAsync
+[2026-02-08T05:00:01.3593027-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-08T05:00:01.3593027-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-08T05:00:01.3602079-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=8
+[2026-02-08T05:00:01.3602079-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=8
+[2026-02-08T05:00:01.3607232-05:00] HandlePlayAsync: Converting 8 tracks to MIDI document
+[2026-02-08T05:00:01.3607232-05:00] HandlePlayAsync: Converting 8 tracks to MIDI document
+[2026-02-08T05:00:03.8634249-05:00] HandlePlayAsync: MIDI document created, Duration=0ms
+[2026-02-08T05:00:03.8634249-05:00] HandlePlayAsync: MIDI document created, Duration=0ms
+[2026-02-08T05:00:03.8641567-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-08T05:00:03.8641567-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-08T05:00:03.8656708-05:00] === Player.PlayMidiFromSongTracksAsync START ===
+[2026-02-08T05:00:03.8656708-05:00] === Player.PlayMidiFromSongTracksAsync START ===
+[2026-02-08T05:00:03.8660872-05:00] Player: midiDoc is null, throwing exception
+[2026-02-08T05:00:03.8660872-05:00] Player: midiDoc is null, throwing exception
+[2026-02-08T05:00:03.9340091-05:00] StartPlaybackWithMeasureTracking: Exception caught - ArgumentNullException: Value cannot be null. (Parameter 'midiDoc')
+[2026-02-08T05:00:03.9340091-05:00] StartPlaybackWithMeasureTracking: Exception caught - ArgumentNullException: Value cannot be null. (Parameter 'midiDoc')
+[2026-02-08T05:00:03.9346476-05:00] StartPlaybackWithMeasureTracking: Attempting playback without tracking (after exception)
+[2026-02-08T05:00:03.9346476-05:00] StartPlaybackWithMeasureTracking: Attempting playback without tracking (after exception)
+[2026-02-08T05:00:03.9352637-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-08T05:00:03.9352637-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-08T05:00:03.9357663-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=8
+[2026-02-08T05:00:03.9357663-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=8
+[2026-02-08T05:00:03.9363430-05:00] HandlePlayAsync: Converting 8 tracks to MIDI document
+[2026-02-08T05:00:03.9363430-05:00] HandlePlayAsync: Converting 8 tracks to MIDI document
+[2026-02-08T05:00:05.9738395-05:00] HandlePlayAsync: MIDI document created, Duration=0ms
+[2026-02-08T05:00:05.9738395-05:00] HandlePlayAsync: MIDI document created, Duration=0ms
+[2026-02-08T05:00:05.9745460-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-08T05:00:05.9745460-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-08T05:00:05.9751185-05:00] === Player.PlayMidiFromSongTracksAsync START ===
+[2026-02-08T05:00:05.9751185-05:00] === Player.PlayMidiFromSongTracksAsync START ===
+[2026-02-08T05:00:05.9755284-05:00] Player: midiDoc is null, throwing exception
+[2026-02-08T05:00:05.9755284-05:00] Player: midiDoc is null, throwing exception
+[2026-02-08T05:00:06.0282911-05:00] StartPlaybackWithMeasureTracking: Playback without tracking also failed, rethrowing
+[2026-02-08T05:00:06.0282911-05:00] StartPlaybackWithMeasureTracking: Playback without tracking also failed, rethrowing
+[2026-02-08T05:00:06.0444267-05:00] StartPlaybackWithMeasureTracking: FINALLY block - stopping tracker and clearing highlights
+[2026-02-08T05:00:06.0444267-05:00] StartPlaybackWithMeasureTracking: FINALLY block - stopping tracker and clearing highlights
+[2026-02-08T05:00:06.0454459-05:00] === StartPlaybackWithMeasureTrackingAsync END ===
+[2026-02-08T05:00:06.0454459-05:00] === StartPlaybackWithMeasureTrackingAsync END ===
