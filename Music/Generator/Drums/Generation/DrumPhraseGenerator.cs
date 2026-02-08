@@ -1,11 +1,8 @@
-// AI: purpose=Generates a drum phrase (1-N bars) using operator-based variation over anchors.
-// AI: invariants=Output is a PartTrack representing a single phrase; reusable for MaterialBank storage.licy.
-// AI: deps=DrummerOperatorCandidates, OperatorSelector_Save, BarTrack bars, SongContext, PartTrack.
-// AI: change=correct architecture replaces DrummerAgent.Generate() with proper groove integration.
+// AI: purpose=Generate drum phrase (1-N bars) using operator-based variation over anchor onsets.
+// AI: invariants=Output is a PartTrack; reusable for MaterialBank storage.
+// AI: deps=DrumOperatorApplicator; DrumOperatorRegistry; BarTrack; SongContext; PartTrack.
 
 using Music.Generator.Drums.Operators;
-using Music.Generator.Drums.Selection;
-using Music.Generator.Drums.Selection.Candidates;
 using Music.Generator.Groove;
 using Music.MyMidi;
 
@@ -34,33 +31,23 @@ namespace Music.Generator.Drums.Generation
         }
     }
 
-    // AI: purpose=Orchestrates drum generation: anchors from groove + operator candidates via OperatorSelector_Save.
-    // AI: arch=candidate source→anchors→per bar/role: policy→target→candidates→select→combine→MIDI
-    // AI: enforces=density targets, operator caps, weighted selection per policy decisions
+    // AI: purpose=Orchestrates drum generation: anchors from groove + random operator application via DrumOperatorApplicator.
+    // AI: arch=validate → extract anchors → apply N random operators (dedup) → convert to MIDI PartTrack.
     public sealed class DrumPhraseGenerator
     {
-        private readonly IDrumOperatorCandidates _drumOperatorCandidates;
+        private readonly DrumOperatorRegistry _registry;
         private readonly DrumGeneratorSettings _settings;
 
-        // AI: purpose=Default entry point; builds operator candidates from registry; settings fixed to defaults.
+        // AI: purpose=Default entry point; builds operator registry; settings fixed to defaults.
         public DrumPhraseGenerator()
         {
-            _drumOperatorCandidates = BuildOperatorCandidates();
+            _registry = DrumOperatorRegistryBuilder.BuildComplete();
             _settings = DrumGeneratorSettings.Default;
         }
-        private static IDrumOperatorCandidates BuildOperatorCandidates()
-        {
-            var registry = DrumOperatorRegistryBuilder.BuildComplete();
-            return new DrummerOperatorCandidates(
-                registry,
-                diagnosticsCollector: null,
-                settings: null);
-        }
 
-        // AI: purpose=Generate a drum PartTrack for the song using anchors + operator selection.
+        // AI: purpose=Generate a drum PartTrack using anchors + random operator application.
         // AI: invariants=Throws on null/missing tracks; respects maxBars limit when >0.
-        // AI: flow=validate -> extract anchors -> generate operator candidates -> combine -> to MIDI.
-        // AI: note=This pass does not perform timing/velocity shaping beyond candidate hints.
+        // AI: flow=validate → extract anchors → apply random operators → convert to MIDI.
         public PartTrack Generate(SongContext songContext, int drumProgramNumber, int maxBars = 0)
         {
             ValidateSongContext(songContext);
@@ -81,20 +68,9 @@ namespace Music.Generator.Drums.Generation
             // Extract anchor onsets (foundation that's always present)
             var anchorOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars, barTrack);
 
+        var NumberOfOperators = 10;
+        var allOnsets = ApplyDrumOperators(bars, anchorOnsets, totalBars, NumberOfOperators);
 
-            // THIS NEEDS TO BE REPLACED WITH A SIMPLER APPROACH
-            // Generate operator-based candidates for each bar using OperatorSelector_Save
-            // and Combine anchors with operator onsets
-            var operatorOnsets = GenerateOperatorOnsets_Save(bars, anchorOnsets, totalBars);
-            var allOnsets = CombineOnsets_Save(anchorOnsets, operatorOnsets);
-
-
-            // This will return the updated onsets after applying the operators
-            // New Approach call:
-            // var allOnsets = ApplyDrumOperators(bars, anchorOnsets, totalBars, NumberOfOperators);
-
-
-            // AI: disconnect=Performance; no timing/velocity shaping in this phrase pass.
             // Convert to MIDI events
             return ConvertToPartTrack(allOnsets, barTrack, drumProgramNumber);
         }
@@ -173,102 +149,14 @@ namespace Music.Generator.Drums.Generation
             return onsets.OrderBy(o => o.BarNumber).ThenBy(o => o.Beat).ToList();
         }
 
-        private List<GrooveOnset> GenerateOperatorOnsets_Save(
+        // AI: purpose=Delegate to DrumOperatorApplicator; simple random operator application over anchors.
+        private List<GrooveOnset> ApplyDrumOperators(
             IReadOnlyList<Bar> bars,
-            List<GrooveOnset> anchors,
-            int totalBars)
+            List<GrooveOnset> anchorOnsets,
+            int totalBars,
+            int numberOfOperators)
         {
-            var result = new List<GrooveOnset>();
-            var activeRoles = _settings.GetActiveRoles();
-
-            // Iterate only through bars up to totalBars (respects maxBars limit)
-            foreach (var bar in bars.Where(b => b.BarNumber <= totalBars))
-            {
-                                // Get anchors for this bar to avoid conflicts
-                var barAnchors = anchors.Where(a => a.BarNumber == bar.BarNumber).ToList();
-
-                foreach (var role in activeRoles)
-                {
-                    // AI: disconnect=Policy; use default density targets to isolate operator behavior.
-                    int targetCount = DrumDensityCalculator_Save
-                        .ComputeDensityTarget(bar, role)
-                        .TargetCount;
-
-
-                    targetCount = 2;
-
-
-                    if (targetCount <= 0)
-                        continue; // No operators needed for this bar+role
-
-                    // Get candidate groups from candidate source
-                    var candidateGroups = _drumOperatorCandidates.GetCandidateGroups(bar, role);
-
-                    if (candidateGroups.Count == 0)
-                        continue; // No candidates available
-
-                    // Filter anchors for this role to pass to OperatorSelector_Save
-                    var roleAnchors = barAnchors
-                        .Where(a => string.Equals(a.Role, role, StringComparison.OrdinalIgnoreCase))
-                        .ToList();
-
-                    // SELECT using OperatorSelector_Save
-                    var selected = OperatorSelector_Save.SelectUntilTargetReached(
-                        bar,
-                        role,
-                        candidateGroups,
-                        targetCount,
-                        roleAnchors,
-                        diagnostics: null);
-
-                    // Convert selected candidates to GrooveOnset
-                    foreach (var candidate in selected)
-                    {
-                        result.Add(new GrooveOnset
-                        {
-                            Role = role,
-                            BarNumber = bar.BarNumber,
-                            Beat = candidate.OnsetBeat,
-                            Velocity = candidate.VelocityHint ?? _settings.DefaultVelocity,
-                            Strength = candidate.Strength,
-                            TimingOffsetTicks = candidate.TimingHint
-                        });
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        private static List<GrooveOnset> CombineOnsets_Save(
-            List<GrooveOnset> anchors,
-            List<GrooveOnset> operators)
-        {
-            // Create dictionary keyed by (bar, beat, role)
-            var combined = new Dictionary<(int Bar, decimal Beat, string Role), GrooveOnset>();
-
-            // Add all anchors first (they win conflicts)
-            foreach (var onset in anchors)
-            {
-                var key = (onset.BarNumber, onset.Beat, onset.Role);
-                combined[key] = onset;
-            }
-
-            // Add operators, skipping if position already occupied
-            foreach (var onset in operators)
-            {
-                var key = (onset.BarNumber, onset.Beat, onset.Role);
-                if (!combined.ContainsKey(key))
-                {
-                    combined[key] = onset;
-                }
-            }
-
-            // Return sorted by bar, then beat
-            return combined.Values
-                .OrderBy(o => o.BarNumber)
-                .ThenBy(o => o.Beat)
-                .ToList();
+            return DrumOperatorApplicator.Apply(bars, anchorOnsets, totalBars, numberOfOperators, _registry);
         }
 
         private static PartTrack ConvertToPartTrack(

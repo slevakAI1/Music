@@ -14,7 +14,7 @@ namespace Music.Generator.Drums.Selection
         string Explanation);
 
     // AI: purpose=Deterministic density calculator; formula: round(Density01*MaxEvents) clamped to valid range
-    public static class DrumDensityCalculator_Save
+    public static class Save_DrumDensityCalculator
     {
         // AI: behavior=Compute target count deterministically using MidpointRounding.AwayFromZero
         public static GrooveDensityResult_Save ComputeDensityTarget(
