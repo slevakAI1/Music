@@ -68,7 +68,7 @@ namespace Music.Generator.Drums.Generation
             // Extract anchor onsets (foundation that's always present)
             var anchorOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars, barTrack);
 
-        var NumberOfOperators = 10;
+        var NumberOfOperators = 2;
         var allOnsets = ApplyDrumOperators(bars, anchorOnsets, totalBars, NumberOfOperators);
 
             // Convert to MIDI events
