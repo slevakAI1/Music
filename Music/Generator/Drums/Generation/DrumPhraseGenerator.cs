@@ -82,16 +82,17 @@ namespace Music.Generator.Drums.Generation
             var anchorOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars, barTrack);
 
 
-
-
-
+            // THIS NEEDS TO BE REPLACED WITH A SIMPLER APPROACH
             // Generate operator-based candidates for each bar using OperatorSelector_Save
+            // and Combine anchors with operator onsets
             var operatorOnsets = GenerateOperatorOnsets_Save(bars, anchorOnsets, totalBars);
-
-
-
-            // Combine anchors with operator onsets
             var allOnsets = CombineOnsets_Save(anchorOnsets, operatorOnsets);
+
+
+            // This will return the updated onsets after applying the operators
+            // New Approach call:
+            // var allOnsets = ApplyOperators(bars, anchorOnsets, totalBars, NumberOfOperators);
+
 
             // AI: disconnect=Performance; no timing/velocity shaping in this phrase pass.
             // Convert to MIDI events
