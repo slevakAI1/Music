@@ -1,242 +1,242 @@
-using Music.Generator.Drums.Operators.Candidates;
-using Music.Generator.Groove;
+//using Music.Generator.Drums.Operators.Candidates;
+//using Music.Generator.Groove;
 
-namespace Music.Generator.Drums.Operators;
+//namespace Music.Generator.Drums.Operators;
 
-// AI: purpose=Select candidates up to a target with deterministic RNG, anchor preservation and caps
-// AI: invariants=Deterministic given same inputs; never exceed targetCount; respects group/candidate caps
-// AI: deps=Uses DrumWeightedCandidateSelector_Save, GrooveRngHelper, and GrooveDiagnosticsCollector_Save (optional)
-public static class Save_OperatorSelector
-{
-    // AI: entry=Select until targetCount or pool exhausted; diagnostics optional for decision tracing
-    public static IReadOnlyList<DrumOnsetCandidate> SelectUntilTargetReached(
-        Bar bar,
-        string role,
-        IReadOnlyList<DrumCandidateGroup> groups,
-        int targetCount,
-        IReadOnlyList<GrooveOnset> existingAnchors,
-        Save_GrooveDiagnosticsCollector? diagnostics = null)
-    {
-        ArgumentNullException.ThrowIfNull(bar);
-        ArgumentException.ThrowIfNullOrWhiteSpace(role);
-        ArgumentNullException.ThrowIfNull(groups);
-        ArgumentNullException.ThrowIfNull(existingAnchors);
+//// AI: purpose=Select candidates up to a target with deterministic RNG, anchor preservation and caps
+//// AI: invariants=Deterministic given same inputs; never exceed targetCount; respects group/candidate caps
+//// AI: deps=Uses DrumWeightedCandidateSelector_Save, GrooveRngHelper, and GrooveDiagnosticsCollector_Save (optional)
+//public static class Save_OperatorSelector
+//{
+//    // AI: entry=Select until targetCount or pool exhausted; diagnostics optional for decision tracing
+//    public static IReadOnlyList<DrumOnsetCandidate> SelectUntilTargetReached(
+//        Bar bar,
+//        string role,
+//        IReadOnlyList<DrumCandidateGroup> groups,
+//        int targetCount,
+//        IReadOnlyList<GrooveOnset> existingAnchors,
+//        Save_GrooveDiagnosticsCollector? diagnostics = null)
+//    {
+//        ArgumentNullException.ThrowIfNull(bar);
+//        ArgumentException.ThrowIfNullOrWhiteSpace(role);
+//        ArgumentNullException.ThrowIfNull(groups);
+//        ArgumentNullException.ThrowIfNull(existingAnchors);
 
-        // Story C2: Return empty if target <= 0
-        if (targetCount <= 0)
-        {
-            return Array.Empty<DrumOnsetCandidate>();
-        }
+//        // Story C2: Return empty if target <= 0
+//        if (targetCount <= 0)
+//        {
+//            return Array.Empty<DrumOnsetCandidate>();
+//        }
 
-        // AI: anchors=Collect beats for existing anchors of this role to avoid duplicate onset beats
-        var anchorBeats = new HashSet<decimal>(
-            existingAnchors
-                .Where(a => string.Equals(a.Role, role, StringComparison.Ordinal))
-                .Select(a => a.Beat));
+//        // AI: anchors=Collect beats for existing anchors of this role to avoid duplicate onset beats
+//        var anchorBeats = new HashSet<decimal>(
+//            existingAnchors
+//                .Where(a => string.Equals(a.Role, role, StringComparison.Ordinal))
+//                .Select(a => a.Beat));
 
-        // AI: pool=Working pool excludes candidates conflicting with anchors; diagnostics record excluded ones
-        var workingPool = BuildWorkingPool(groups, anchorBeats, diagnostics);
+//        // AI: pool=Working pool excludes candidates conflicting with anchors; diagnostics record excluded ones
+//        var workingPool = BuildWorkingPool(groups, anchorBeats, diagnostics);
 
-        // Story G1: Record candidate pool statistics
-        diagnostics?.RecordCandidatePool(groups.Count, workingPool.Count);
+//        // Story G1: Record candidate pool statistics
+//        diagnostics?.RecordCandidatePool(groups.Count, workingPool.Count);
 
-        if (workingPool.Count == 0)
-        {
-            return Array.Empty<DrumOnsetCandidate>();
-        }
+//        if (workingPool.Count == 0)
+//        {
+//            return Array.Empty<DrumOnsetCandidate>();
+//        }
 
-        // Track remaining allowances for groups and candidates
-        var groupAllowances = new Dictionary<string, int>(StringComparer.Ordinal);
-        var candidateAllowances = new Dictionary<string, int>(StringComparer.Ordinal);
+//        // Track remaining allowances for groups and candidates
+//        var groupAllowances = new Dictionary<string, int>(StringComparer.Ordinal);
+//        var candidateAllowances = new Dictionary<string, int>(StringComparer.Ordinal);
 
-        InitializeAllowances(workingPool, groupAllowances, candidateAllowances);
+//        InitializeAllowances(workingPool, groupAllowances, candidateAllowances);
 
-        // Selection loop
-        var selected = new List<DrumOnsetCandidate>();
-        var remaining = new List<(DrumOnsetCandidate Candidate, DrumCandidateGroup Group)>(workingPool);
+//        // Selection loop
+//        var selected = new List<DrumOnsetCandidate>();
+//        var remaining = new List<(DrumOnsetCandidate Candidate, DrumCandidateGroup Group)>(workingPool);
 
-        while (selected.Count < targetCount && remaining.Count > 0)
-        {
-            // Filter remaining by current allowances
-            var selectable = FilterByAllowances(remaining, groupAllowances, candidateAllowances);
+//        while (selected.Count < targetCount && remaining.Count > 0)
+//        {
+//            // Filter remaining by current allowances
+//            var selectable = FilterByAllowances(remaining, groupAllowances, candidateAllowances);
 
-            if (selectable.Count == 0)
-            {
-                // Pool exhausted due to caps
-                break;
-            }
+//            if (selectable.Count == 0)
+//            {
+//                // Pool exhausted due to caps
+//                break;
+//            }
 
-            // Build groups for weighted selection
-            var selectableGroups = BuildGroupsForSelection(selectable);
-
-
-
-            // THIS IS WHERE IT's RANDOMLY SELECTING
+//            // Build groups for weighted selection
+//            var selectableGroups = BuildGroupsForSelection(selectable);
 
 
 
-            // Use weighted selector to pick one candidate
-            var selectedCandidates = Save_DrumWeightedCandidateSelector.SelectCandidates(
-                selectableGroups,
-                targetCount: 1,
-                barNumber: bar.BarNumber,
-                role: role);
+//            // THIS IS WHERE IT's RANDOMLY SELECTING
 
-            if (selectedCandidates.Count == 0)
-            {
-                // No candidates selected (should not happen, but safety check)
-                break;
-            }
 
-            var picked = selectedCandidates[0];
-            selected.Add(picked.Candidate);
 
-            // Story G1: Record selection decision
-            if (diagnostics != null)
-            {
-                double weight = picked.Candidate.ProbabilityBias * picked.Group.BaseProbabilityBias;
-                string candidateId = Save_GrooveDiagnosticsCollector.MakeCandidateId(picked.Group.GroupId, picked.Candidate.OnsetBeat);
-                diagnostics.RecordSelection(candidateId, weight, RandomPurpose.GrooveCandidatePick);
-            }
+//            // Use weighted selector to pick one candidate
+//            var selectedCandidates = Save_DrumWeightedCandidateSelector.SelectCandidates(
+//                selectableGroups,
+//                targetCount: 1,
+//                barNumber: bar.BarNumber,
+//                role: role);
 
-            // Update allowances
-            UpdateAllowances(picked, groupAllowances, candidateAllowances);
+//            if (selectedCandidates.Count == 0)
+//            {
+//                // No candidates selected (should not happen, but safety check)
+//                break;
+//            }
 
-            // Remove picked candidate from remaining pool
-            remaining.RemoveAll(r =>
-                r.Group.GroupId == picked.Group.GroupId &&
-                r.Candidate.OnsetBeat == picked.Candidate.OnsetBeat);
-        }
+//            var picked = selectedCandidates[0];
+//            selected.Add(picked.Candidate);
 
-        return selected;
-    }
+//            // Story G1: Record selection decision
+//            if (diagnostics != null)
+//            {
+//                double weight = picked.Candidate.ProbabilityBias * picked.Group.BaseProbabilityBias;
+//                string candidateId = Save_GrooveDiagnosticsCollector.MakeCandidateId(picked.Group.GroupId, picked.Candidate.OnsetBeat);
+//                diagnostics.RecordSelection(candidateId, weight, RandomPurpose.GrooveCandidatePick);
+//            }
 
-    // AI: build=Compose pool of (candidate,group) excluding anchor conflicts; records filter events to diagnostics
-    private static List<(DrumOnsetCandidate Candidate, DrumCandidateGroup Group)> BuildWorkingPool(
-        IReadOnlyList<DrumCandidateGroup> groups,
-        HashSet<decimal> anchorBeats,
-        Save_GrooveDiagnosticsCollector? diagnostics = null)
-    {
-        var pool = new List<(DrumOnsetCandidate, DrumCandidateGroup)>();
+//            // Update allowances
+//            UpdateAllowances(picked, groupAllowances, candidateAllowances);
 
-        foreach (var group in groups)
-        {
-            foreach (var candidate in group.Candidates)
-            {
-                if (anchorBeats.Contains(candidate.OnsetBeat))
-                {
-                    if (diagnostics != null)
-                    {
-                        string candidateId = Save_GrooveDiagnosticsCollector.MakeCandidateId(group.GroupId, candidate.OnsetBeat);
-                        diagnostics.RecordFilter(candidateId, "anchor conflict");
-                    }
-                }
-                else
-                {
-                    pool.Add((candidate, group));
-                }
-            }
-        }
+//            // Remove picked candidate from remaining pool
+//            remaining.RemoveAll(r =>
+//                r.Group.GroupId == picked.Group.GroupId &&
+//                r.Candidate.OnsetBeat == picked.Candidate.OnsetBeat);
+//        }
 
-        return pool;
-    }
+//        return selected;
+//    }
 
-    // AI: allowances=Initialize group and candidate allowances; use int.MaxValue to represent unlimited
-    private static void InitializeAllowances(
-        List<(DrumOnsetCandidate Candidate, DrumCandidateGroup Group)> pool,
-        Dictionary<string, int> groupAllowances,
-        Dictionary<string, int> candidateAllowances)
-    {
-        foreach (var (candidate, group) in pool)
-        {
-            if (!groupAllowances.ContainsKey(group.GroupId))
-            {
-                groupAllowances[group.GroupId] = group.MaxAddsPerBar > 0
-                    ? group.MaxAddsPerBar
-                    : int.MaxValue;
-            }
+//    // AI: build=Compose pool of (candidate,group) excluding anchor conflicts; records filter events to diagnostics
+//    private static List<(DrumOnsetCandidate Candidate, DrumCandidateGroup Group)> BuildWorkingPool(
+//        IReadOnlyList<DrumCandidateGroup> groups,
+//        HashSet<decimal> anchorBeats,
+//        Save_GrooveDiagnosticsCollector? diagnostics = null)
+//    {
+//        var pool = new List<(DrumOnsetCandidate, DrumCandidateGroup)>();
 
-            string candidateKey = $"{group.GroupId}:{candidate.OnsetBeat:F4}";
-            if (!candidateAllowances.ContainsKey(candidateKey))
-            {
-                candidateAllowances[candidateKey] = candidate.MaxAddsPerBar > 0
-                    ? candidate.MaxAddsPerBar
-                    : int.MaxValue;
-            }
-        }
-    }
+//        foreach (var group in groups)
+//        {
+//            foreach (var candidate in group.Candidates)
+//            {
+//                if (anchorBeats.Contains(candidate.OnsetBeat))
+//                {
+//                    if (diagnostics != null)
+//                    {
+//                        string candidateId = Save_GrooveDiagnosticsCollector.MakeCandidateId(group.GroupId, candidate.OnsetBeat);
+//                        diagnostics.RecordFilter(candidateId, "anchor conflict");
+//                    }
+//                }
+//                else
+//                {
+//                    pool.Add((candidate, group));
+//                }
+//            }
+//        }
 
-    // AI: filter=Return only remaining entries with positive group and candidate allowances
-    private static List<(DrumOnsetCandidate Candidate, DrumCandidateGroup Group)> FilterByAllowances(
-        List<(DrumOnsetCandidate Candidate, DrumCandidateGroup Group)> remaining,
-        Dictionary<string, int> groupAllowances,
-        Dictionary<string, int> candidateAllowances)
-    {
-        var selectable = new List<(DrumOnsetCandidate, DrumCandidateGroup)>();
+//        return pool;
+//    }
 
-        foreach (var (candidate, group) in remaining)
-        {
-            if (groupAllowances.TryGetValue(group.GroupId, out int groupRemaining) && groupRemaining <= 0)
-                continue;
+//    // AI: allowances=Initialize group and candidate allowances; use int.MaxValue to represent unlimited
+//    private static void InitializeAllowances(
+//        List<(DrumOnsetCandidate Candidate, DrumCandidateGroup Group)> pool,
+//        Dictionary<string, int> groupAllowances,
+//        Dictionary<string, int> candidateAllowances)
+//    {
+//        foreach (var (candidate, group) in pool)
+//        {
+//            if (!groupAllowances.ContainsKey(group.GroupId))
+//            {
+//                groupAllowances[group.GroupId] = group.MaxAddsPerBar > 0
+//                    ? group.MaxAddsPerBar
+//                    : int.MaxValue;
+//            }
 
-            string candidateKey = $"{group.GroupId}:{candidate.OnsetBeat:F4}";
-            if (candidateAllowances.TryGetValue(candidateKey, out int candidateRemaining) && candidateRemaining <= 0)
-                continue;
+//            string candidateKey = $"{group.GroupId}:{candidate.OnsetBeat:F4}";
+//            if (!candidateAllowances.ContainsKey(candidateKey))
+//            {
+//                candidateAllowances[candidateKey] = candidate.MaxAddsPerBar > 0
+//                    ? candidate.MaxAddsPerBar
+//                    : int.MaxValue;
+//            }
+//        }
+//    }
 
-            selectable.Add((candidate, group));
-        }
+//    // AI: filter=Return only remaining entries with positive group and candidate allowances
+//    private static List<(DrumOnsetCandidate Candidate, DrumCandidateGroup Group)> FilterByAllowances(
+//        List<(DrumOnsetCandidate Candidate, DrumCandidateGroup Group)> remaining,
+//        Dictionary<string, int> groupAllowances,
+//        Dictionary<string, int> candidateAllowances)
+//    {
+//        var selectable = new List<(DrumOnsetCandidate, DrumCandidateGroup)>();
 
-        return selectable;
-    }
+//        foreach (var (candidate, group) in remaining)
+//        {
+//            if (groupAllowances.TryGetValue(group.GroupId, out int groupRemaining) && groupRemaining <= 0)
+//                continue;
 
-    // AI: buildGroups=Aggregate selectable tuples into DrumCandidateGroup instances for weighted selection
-    private static List<DrumCandidateGroup> BuildGroupsForSelection(
-        List<(DrumOnsetCandidate Candidate, DrumCandidateGroup Group)> selectable)
-    {
-        var groupedByGroupId = selectable
-            .GroupBy(s => s.Group.GroupId)
-            .ToDictionary(g => g.Key, g => g.ToList());
+//            string candidateKey = $"{group.GroupId}:{candidate.OnsetBeat:F4}";
+//            if (candidateAllowances.TryGetValue(candidateKey, out int candidateRemaining) && candidateRemaining <= 0)
+//                continue;
 
-        var groups = new List<DrumCandidateGroup>();
+//            selectable.Add((candidate, group));
+//        }
 
-        foreach (var kvp in groupedByGroupId)
-        {
-            var firstEntry = kvp.Value[0];
-            var group = new DrumCandidateGroup
-            {
-                GroupId = firstEntry.Group.GroupId,
-                GroupTags = firstEntry.Group.GroupTags,
-                BaseProbabilityBias = firstEntry.Group.BaseProbabilityBias,
-                MaxAddsPerBar = firstEntry.Group.MaxAddsPerBar,
-                Candidates = kvp.Value.Select(v => v.Candidate).ToList()
-            };
-            groups.Add(group);
-        }
+//        return selectable;
+//    }
 
-        return groups;
-    }
+//    // AI: buildGroups=Aggregate selectable tuples into DrumCandidateGroup instances for weighted selection
+//    private static List<DrumCandidateGroup> BuildGroupsForSelection(
+//        List<(DrumOnsetCandidate Candidate, DrumCandidateGroup Group)> selectable)
+//    {
+//        var groupedByGroupId = selectable
+//            .GroupBy(s => s.Group.GroupId)
+//            .ToDictionary(g => g.Key, g => g.ToList());
 
-    // AI: update=Decrement group and candidate allowances unless they are int.MaxValue (representing unlimited)
-    private static void UpdateAllowances(
-        WeightedCandidate picked,
-        Dictionary<string, int> groupAllowances,
-        Dictionary<string, int> candidateAllowances)
-    {
-        if (groupAllowances.ContainsKey(picked.Group.GroupId))
-        {
-            if (groupAllowances[picked.Group.GroupId] != int.MaxValue)
-            {
-                groupAllowances[picked.Group.GroupId]--;
-            }
-        }
+//        var groups = new List<DrumCandidateGroup>();
 
-        string candidateKey = $"{picked.Group.GroupId}:{picked.Candidate.OnsetBeat:F4}";
-        if (candidateAllowances.ContainsKey(candidateKey))
-        {
-            if (candidateAllowances[candidateKey] != int.MaxValue)
-            {
-                candidateAllowances[candidateKey]--;
-            }
-        }
-    }
-}
+//        foreach (var kvp in groupedByGroupId)
+//        {
+//            var firstEntry = kvp.Value[0];
+//            var group = new DrumCandidateGroup
+//            {
+//                GroupId = firstEntry.Group.GroupId,
+//                GroupTags = firstEntry.Group.GroupTags,
+//                BaseProbabilityBias = firstEntry.Group.BaseProbabilityBias,
+//                MaxAddsPerBar = firstEntry.Group.MaxAddsPerBar,
+//                Candidates = kvp.Value.Select(v => v.Candidate).ToList()
+//            };
+//            groups.Add(group);
+//        }
+
+//        return groups;
+//    }
+
+//    // AI: update=Decrement group and candidate allowances unless they are int.MaxValue (representing unlimited)
+//    private static void UpdateAllowances(
+//        WeightedCandidate picked,
+//        Dictionary<string, int> groupAllowances,
+//        Dictionary<string, int> candidateAllowances)
+//    {
+//        if (groupAllowances.ContainsKey(picked.Group.GroupId))
+//        {
+//            if (groupAllowances[picked.Group.GroupId] != int.MaxValue)
+//            {
+//                groupAllowances[picked.Group.GroupId]--;
+//            }
+//        }
+
+//        string candidateKey = $"{picked.Group.GroupId}:{picked.Candidate.OnsetBeat:F4}";
+//        if (candidateAllowances.ContainsKey(candidateKey))
+//        {
+//            if (candidateAllowances[candidateKey] != int.MaxValue)
+//            {
+//                candidateAllowances[candidateKey]--;
+//            }
+//        }
+//    }
+//}
