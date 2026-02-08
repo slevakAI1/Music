@@ -2,10 +2,10 @@
 // AI: invariants=Same seed+inputs => same output; tie-break by weight desc then StableId asc for determinism.
 // AI: deps=Uses DrumCandidateGroup, DrumOnsetCandidate, GrooveRngHelper and Rng helper for deterministic RNG.
 
-using Music.Generator.Drums.Selection.Candidates;
+using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
-namespace Music.Generator.Drums.Selection;
+namespace Music.Generator.Drums.Operators;
 
 // AI: record=WeightedCandidate pairs a mapped DrumOnsetCandidate with its Group and computed weight
 public sealed record WeightedCandidate(

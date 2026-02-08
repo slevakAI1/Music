@@ -3,10 +3,9 @@
 // AI: deps=DrumOperatorRegistry.GetAllOperators; DrummerContext; Rng(DrumGenerator); GrooveOnset
 
 using Music.Generator.Drums.Context;
-using Music.Generator.Drums.Operators;
 using Music.Generator.Groove;
 
-namespace Music.Generator.Drums.Generation
+namespace Music.Generator.Drums.Operators
 {
     // AI: purpose=Apply random operators to anchor onsets; no scoring, no weighting, no probability biases.
     public static class DrumOperatorApplicator

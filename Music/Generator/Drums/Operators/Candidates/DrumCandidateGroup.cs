@@ -1,4 +1,4 @@
-namespace Music.Generator.Drums.Selection.Candidates;
+namespace Music.Generator.Drums.Operators.Candidates;
 
 // AI: purpose=Group onset candidates with shared tags, constraints and selection bias for drum selection.
 // AI: invariants=MaxAddsPerBar caps adds per bar; BaseProbabilityBias biases group selection weights.

@@ -1,6 +1,7 @@
+using Music.Generator.Drums.Operators;
 using Music.Generator.Groove;
 
-namespace Music.Generator.Drums.Selection.Candidates;
+namespace Music.Generator.Drums.Operators.Candidates;
 
 // AI: purpose=Drum-specific factory for creating GrooveOnset from drum variation candidates with provenance.
 // AI: invariants=Creates GrooveOnset directly from drum types; no conversion to generic types needed.

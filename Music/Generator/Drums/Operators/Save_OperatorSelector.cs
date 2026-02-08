@@ -1,7 +1,7 @@
-using Music.Generator.Drums.Selection.Candidates;
+using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
-namespace Music.Generator.Drums.Selection;
+namespace Music.Generator.Drums.Operators;
 
 // AI: purpose=Select candidates up to a target with deterministic RNG, anchor preservation and caps
 // AI: invariants=Deterministic given same inputs; never exceed targetCount; respects group/candidate caps

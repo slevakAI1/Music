@@ -1,4 +1,4 @@
-namespace Music.Generator.Drums.Selection.Candidates
+namespace Music.Generator.Drums.Operators.Candidates
 {
     // AI: purpose=Provides drum candidate groups for a bar+role to the selection pipeline
     // AI: invariants=Implementations must be deterministic; same inputs => same outputs; return empty list if none

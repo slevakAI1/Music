@@ -1,6 +1,6 @@
 using Music.Generator.Groove;
 
-namespace Music.Generator.Drums.Selection.Candidates;
+namespace Music.Generator.Drums.Operators.Candidates;
 
 // AI: purpose=DrumOnsetCandidate: drum-specific onset data used by selection and groove layers.
 // AI: invariants=OnsetBeat is 1-based quarter-note units; MaxAddsPerBar caps adds; ProbabilityBias in [0,1].

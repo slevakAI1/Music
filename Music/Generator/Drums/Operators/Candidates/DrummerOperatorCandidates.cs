@@ -7,7 +7,7 @@ using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators;
 using Music.Generator.Groove;
 
-namespace Music.Generator.Drums.Selection.Candidates
+namespace Music.Generator.Drums.Operators.Candidates
 {
     // AI: config=Settings for operator execution behavior; ContinueOnOperatorError controls exception policy
     public sealed record DrummerOperatorCandidatesSettings

@@ -6,7 +6,7 @@ using Music.Generator.Drums.Performance;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
 
-namespace Music.Generator.Drums.Selection.Candidates
+namespace Music.Generator.Drums.Operators.Candidates
 {
     // AI: contract=Immutable record used by selection engine; keep property names stable when persisting/mapping
     public sealed record DrumCandidate

@@ -4,7 +4,7 @@
 
 using Music.Generator.Groove;
 
-namespace Music.Generator.Drums.Selection
+namespace Music.Generator.Drums.Operators
 {
     // AI: result=Contains computed integer TargetCount and provenance for diagnostics
     public sealed record GrooveDensityResult_Save(

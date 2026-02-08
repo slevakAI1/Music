@@ -6,7 +6,7 @@ using Music.Generator.Drums.Performance;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
 
-namespace Music.Generator.Drums.Selection.Candidates
+namespace Music.Generator.Drums.Operators.Candidates
 {
     // AI: contract=Static mapper; do not change tag prefixes (persisted in Tags); keep behavior deterministic
     public static class DrumCandidateMapper
