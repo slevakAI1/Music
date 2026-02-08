@@ -3,19 +3,35 @@
 // AI: deps=Melanchall.DryWetMidi.Core; Generator.PartTrack, PartTrackEvent factory methods; consumers expect meta events intact
 // AI: errors=unsupported events throw NotSupportedException with track/time debug info; Convert wraps track errors as InvalidOperationException
 // AI: perf=hotpath O(n) over events; avoid heavy allocations; GetEventDebugInfo uses limited reflection for error context
+// AI: Format0=SingleTrack MIDI files have all channels interleaved in one TrackChunk; SplitFormat0ByChannel separates them
 using Melanchall.DryWetMidi.Core;
 using Music.MyMidi;
 
 namespace Music.Writer
 {
-    // AI: class:stateless converter; input=midiDoc.Tracks; output=list with one PartTrack per TrackChunk
+    // AI: class:stateless converter; input=midiDoc.Tracks; output=list with one PartTrack per TrackChunk (or per channel for Format 0)
     public static class ConvertMidiSongDocumentToPartTracks_For_Import_Only
     {
+        // AI: Channel voice event types that carry a Channel parameter; used to split Format 0 tracks by channel
+        private static readonly HashSet<Generator.PartTrackEventType> ChannelEventTypes =
+        [
+            Generator.PartTrackEventType.NoteOn,
+            Generator.PartTrackEventType.NoteOff,
+            Generator.PartTrackEventType.PolyKeyPressure,
+            Generator.PartTrackEventType.ControlChange,
+            Generator.PartTrackEventType.ProgramChange,
+            Generator.PartTrackEventType.ChannelPressure,
+            Generator.PartTrackEventType.PitchBend,
+        ];
+
         // AI: Convert: null-checks input; wraps per-track exceptions into InvalidOperationException with track index
+        // AI: Format0 (SingleTrack) files are split by channel into separate PartTracks so downstream processing works per-instrument
         public static List<Generator.PartTrack> Convert(MidiSongDocument midiDoc)
         {
             if (midiDoc == null)
                 throw new ArgumentNullException(nameof(midiDoc));
+
+            bool isFormat0 = midiDoc.Raw.OriginalFormat == MidiFileFormat.SingleTrack;
 
             var result = new List<Generator.PartTrack>();
             int trackIndex = 0;
@@ -25,8 +41,18 @@ namespace Music.Writer
                 try
                 {
                     var trackEvents = ConvertTrack(trackChunk, trackIndex);
-                    var partTrack = new Generator.PartTrack(trackEvents);
-                    result.Add(partTrack);
+
+                    if (isFormat0)
+                    {
+                        var splitTracks = SplitFormat0ByChannel(trackEvents);
+                        result.AddRange(splitTracks);
+                    }
+                    else
+                    {
+                        var partTrack = new Generator.PartTrack(trackEvents);
+                        result.Add(partTrack);
+                    }
+
                     trackIndex++;
                 }
                 catch (Exception ex)
@@ -35,6 +61,50 @@ namespace Music.Writer
                         $"Error converting track {trackIndex}: {ex.Message}", 
                         ex);
                 }
+            }
+
+            return result;
+        }
+
+        // AI: SplitFormat0ByChannel: separates a single interleaved event list into per-channel PartTracks
+        // AI: Meta events (tempo, time sig, etc.) go into a dedicated track so ExtractTempoAndTimingFromPartTracks finds them
+        // AI: Each channel track gets its own PartTrack with only that channel's events
+        private static List<Generator.PartTrack> SplitFormat0ByChannel(List<PartTrackEvent> allEvents)
+        {
+            var metaEvents = new List<PartTrackEvent>();
+            var channelBuckets = new SortedDictionary<int, List<PartTrackEvent>>();
+
+            foreach (var evt in allEvents)
+            {
+                if (ChannelEventTypes.Contains(evt.Type) &&
+                    evt.Parameters.TryGetValue("Channel", out var chObj))
+                {
+                    int channel = System.Convert.ToInt32(chObj);
+                    if (!channelBuckets.TryGetValue(channel, out var bucket))
+                    {
+                        bucket = new List<PartTrackEvent>();
+                        channelBuckets[channel] = bucket;
+                    }
+                    bucket.Add(evt);
+                }
+                else
+                {
+                    metaEvents.Add(evt);
+                }
+            }
+
+            var result = new List<Generator.PartTrack>();
+
+            // Meta track first (tempo, time signature, etc.)
+            if (metaEvents.Count > 0)
+            {
+                result.Add(new Generator.PartTrack(metaEvents));
+            }
+
+            // One PartTrack per channel
+            foreach (var kvp in channelBuckets)
+            {
+                result.Add(new Generator.PartTrack(kvp.Value));
             }
 
             return result;
