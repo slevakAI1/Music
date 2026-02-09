@@ -13905,3 +13905,7 @@
 [2026-02-08T21:13:39.9047692-05:00] === StartPlaybackWithMeasureTrackingAsync END ===
 [2026-02-08T21:13:39.9052864-05:00] <<< btnPlay_Click END
 [2026-02-08T21:13:39.9052864-05:00] <<< btnPlay_Click END
+[2026-02-08T21:39:24.5019025-05:00] Rng.Initialize: seed=12345
+[2026-02-08T21:39:24.5019025-05:00] Rng.Initialize: seed=12345
+[2026-02-08T21:39:42.0997649-05:00] Rng.Initialize: seed=12345
+[2026-02-08T21:39:42.0997649-05:00] Rng.Initialize: seed=12345

@@ -17,6 +17,7 @@
     <Compile Remove="Generator\Agent\**" />
     <Compile Remove="Generator\Core\RandomizationOld\**" />
     <Compile Remove="Generator\DrumsOld\**" />
+    <Compile Remove="Generator\Drums\Diagnostics\**" />
     <Compile Remove="Generator\Energy\**" />
     <Compile Remove="Generator\Guitar\**" />
     <Compile Remove="Patches\**" />
@@ -30,6 +31,7 @@
     <EmbeddedResource Remove="Generator\Agent\**" />
     <EmbeddedResource Remove="Generator\Core\RandomizationOld\**" />
     <EmbeddedResource Remove="Generator\DrumsOld\**" />
+    <EmbeddedResource Remove="Generator\Drums\Diagnostics\**" />
     <EmbeddedResource Remove="Generator\Energy\**" />
     <EmbeddedResource Remove="Generator\Guitar\**" />
     <EmbeddedResource Remove="Patches\**" />
@@ -43,6 +45,7 @@
     <None Remove="Generator\Agent\**" />
     <None Remove="Generator\Core\RandomizationOld\**" />
     <None Remove="Generator\DrumsOld\**" />
+    <None Remove="Generator\Drums\Diagnostics\**" />
     <None Remove="Generator\Energy\**" />
     <None Remove="Generator\Guitar\**" />
     <None Remove="Patches\**" />
