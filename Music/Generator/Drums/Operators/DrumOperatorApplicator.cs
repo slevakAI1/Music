@@ -1,17 +1,18 @@
-// AI: purpose=Simple MVP: copy anchors, randomly apply N operators from registry, skip duplicates, return updated onsets.
+// AI: purpose=Copy anchors, randomly apply N operators (additive or removal) from registry, return updated onsets.
 // AI: invariants=Only counts successfully applied operators toward target; dedup by (BarNumber, Beat, Role).
-// AI: deps=DrumOperatorRegistry.GetAllOperators; DrummerContext; Rng(DrumGenerator); GrooveOnset
+// AI: deps=DrumOperatorRegistry.GetAllOperators; DrummerContext; Rng(DrumGenerator); GrooveOnset; IDrumRemovalOperator.
 
 using Music.Generator.Drums.Context;
+using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators
 {
-    // AI: purpose=Apply random operators to anchor onsets; no scoring, no weighting, no probability biases.
+    // AI: purpose=Apply random operators to anchor onsets; supports both additive and removal operators.
     public static class DrumOperatorApplicator
     {
-        // AI: entry=Copy anchors, randomly pick operators, apply if valid, skip duplicates, return combined onsets.
-        // AI: invariants=Loop counts only applied operators; maxAttempts prevents infinite loop if all operators fail.
+        // AI: entry=Copy anchors, randomly pick operators, apply if valid (add or remove), return combined onsets.
+        // AI: invariants=Loop counts only applied operators; maxAttempts prevents infinite loop; removal respects protection flags.
         public static List<GrooveOnset> Apply(
             IReadOnlyList<Bar> bars,
             List<GrooveOnset> anchorOnsets,
@@ -61,34 +62,91 @@ namespace Music.Generator.Drums.Operators
                 if (!op.CanApply(context))
                     continue;
 
-                // Generate candidates and try to apply them
-                var candidates = op.GenerateCandidates(context).ToList();
-
-                bool anyApplied = false;
-                foreach (var candidate in candidates)
+                // Route to removal path or additive path
+                if (op is IDrumRemovalOperator removalOp)
                 {
-                    var key = (candidate.BarNumber, candidate.Beat, candidate.Role);
-                    if (occupied.Contains(key))
-                        continue;
-
-                    occupied.Add(key);
-                    result.Add(new GrooveOnset
-                    {
-                        Role = candidate.Role,
-                        BarNumber = candidate.BarNumber,
-                        Beat = candidate.Beat,
-                        Velocity = candidate.VelocityHint ?? 100,
-                        Strength = candidate.Strength,
-                        TimingOffsetTicks = candidate.TimingHint
-                    });
-                    anyApplied = true;
+                    if (ApplyRemovals(removalOp, context, result, occupied))
+                        applied++;
                 }
-
-                if (anyApplied)
-                    applied++;
+                else
+                {
+                    if (ApplyAdditions(op, context, result, occupied))
+                        applied++;
+                }
             }
 
             return result.OrderBy(o => o.BarNumber).ThenBy(o => o.Beat).ToList();
+        }
+
+        // AI: purpose=Apply additive operator candidates; skip duplicates; returns true if any onset added.
+        private static bool ApplyAdditions(
+            IDrumOperator op,
+            DrummerContext context,
+            List<GrooveOnset> result,
+            HashSet<(int BarNumber, decimal Beat, string Role)> occupied)
+        {
+            var candidates = op.GenerateCandidates(context).ToList();
+
+            bool anyApplied = false;
+            foreach (var candidate in candidates)
+            {
+                var key = (candidate.BarNumber, candidate.Beat, candidate.Role);
+                if (occupied.Contains(key))
+                    continue;
+
+                occupied.Add(key);
+                result.Add(new GrooveOnset
+                {
+                    Role = candidate.Role,
+                    BarNumber = candidate.BarNumber,
+                    Beat = candidate.Beat,
+                    Velocity = candidate.VelocityHint ?? 100,
+                    Strength = candidate.Strength,
+                    TimingOffsetTicks = candidate.TimingHint
+                });
+                anyApplied = true;
+            }
+
+            return anyApplied;
+        }
+
+        // AI: purpose=Apply removal operator; skip protected/must-hit/never-remove onsets; returns true if any removed.
+        private static bool ApplyRemovals(
+            IDrumRemovalOperator removalOp,
+            DrummerContext context,
+            List<GrooveOnset> result,
+            HashSet<(int BarNumber, decimal Beat, string Role)> occupied)
+        {
+            var removals = removalOp.GenerateRemovals(context).ToList();
+
+            bool anyRemoved = false;
+            foreach (RemovalCandidate removal in removals)
+            {
+                var key = (removal.BarNumber, removal.Beat, removal.Role);
+                if (!occupied.Contains(key))
+                    continue;
+
+                // Find the onset and check protection flags
+                int index = result.FindIndex(o =>
+                    o.BarNumber == removal.BarNumber &&
+                    o.Beat == removal.Beat &&
+                    o.Role == removal.Role);
+
+                if (index < 0)
+                    continue;
+
+                GrooveOnset target = result[index];
+
+                // Respect protection flags from GrooveOnset
+                if (target.IsMustHit || target.IsNeverRemove)
+                    continue;
+
+                result.RemoveAt(index);
+                occupied.Remove(key);
+                anyRemoved = true;
+            }
+
+            return anyRemoved;
         }
     }
 }

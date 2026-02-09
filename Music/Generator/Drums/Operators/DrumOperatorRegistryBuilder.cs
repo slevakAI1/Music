@@ -3,6 +3,7 @@
 // AI: deps=DrumOperatorRegistry and concrete operator classes; used by DrummerOperatorCandidates and tests.
 
 using Music.Generator.Drums.Operators.MicroAddition;
+using Music.Generator.Drums.Operators.NoteRemoval;
 using Music.Generator.Drums.Operators.SubdivisionTransform;
 using Music.Generator.Drums.Operators.PhrasePunctuation;
 using Music.Generator.Drums.Operators.PatternSubstitution;
@@ -19,6 +20,7 @@ namespace Music.Generator.Drums.Operators
     /// Story 3.3: Registers PhrasePunctuation operators (7 operators).
     /// Story 3.4: Registers PatternSubstitution operators (4 operators).
     /// Story 3.6: Completes registration with StyleIdiom operators (full 28 operators).
+    /// NoteRemoval: Registers subtractive operators (3 operators, total 31).
     /// </summary>
     /// <remarks>
     /// Operators are registered in a deterministic order for reproducibility:
@@ -27,6 +29,7 @@ namespace Music.Generator.Drums.Operators
     /// 3. PhrasePunctuation family (fills, crashes, boundaries)
     /// 4. PatternSubstitution family (groove swaps) - Story 3.4
     /// 5. StyleIdiom family (genre-specific moves) - Story 3.5
+    /// 6. NoteRemoval family (subtractive operators for variance)
     /// </remarks>
     public static class DrumOperatorRegistryBuilder
     {
@@ -39,7 +42,7 @@ namespace Music.Generator.Drums.Operators
             RegisterAllOperators(registry);
 
             // Validate total operator count to catch incomplete registrations in tests/dev
-            const int ExpectedOperatorCount = 28;
+            const int ExpectedOperatorCount = 31;
             if (registry.Count != ExpectedOperatorCount)
             {
                 var message = BuildCountValidationMessage(registry, ExpectedOperatorCount);
@@ -80,6 +83,7 @@ namespace Music.Generator.Drums.Operators
             RegisterPhrasePunctuationOperators(registry);
             RegisterPatternSubstitutionOperators(registry);
             RegisterStyleIdiomOperators(registry);
+            RegisterNoteRemovalOperators(registry);
         }
 
         // Register MicroAddition operators (ghosts, pickups, embellishments)
@@ -133,6 +137,14 @@ namespace Music.Generator.Drums.Operators
             registry.RegisterOperator(new PopChorusCrashPatternOperator());
             registry.RegisterOperator(new VerseSimplifyOperator());
             registry.RegisterOperator(new BridgeBreakdownOperator());
+        }
+
+        // Register NoteRemoval operators (subtractive: thinning, pulling, sparsifying)
+        private static void RegisterNoteRemovalOperators(DrumOperatorRegistry registry)
+        {
+            registry.RegisterOperator(new HatThinningOperator());
+            registry.RegisterOperator(new KickPullOperator());
+            registry.RegisterOperator(new SparseGrooveOperator());
         }
     }
 }

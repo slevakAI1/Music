@@ -25,14 +25,14 @@ namespace Music.Tests.Generator.Agents.Drums
         #region Registry Construction and Validation Tests
 
         [Fact]
-        public void Registry_BuildComplete_ContainsExactly28Operators()
+        public void Registry_BuildComplete_ContainsExactly31Operators()
         {
             // Arrange & Act
             var registry = DrumOperatorRegistryBuilder.BuildComplete();
 
             // Assert
-            Assert.Equal(28, registry.Count);
-            Assert.Equal(28, registry.GetAllOperators().Count);
+            Assert.Equal(31, registry.Count);
+            Assert.Equal(31, registry.GetAllOperators().Count);
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace Music.Tests.Generator.Agents.Drums
             var registry = DrumOperatorRegistryBuilder.BuildComplete();
             var allOps = registry.GetAllOperators();
 
-            // Assert - verify family order: MicroAddition → SubdivisionTransform → PhrasePunctuation → PatternSubstitution → StyleIdiom
+            // Assert - verify family order: MicroAddition → SubdivisionTransform → PhrasePunctuation → PatternSubstitution → StyleIdiom → NoteRemoval
             var families = allOps.Select(op => op.OperatorFamily).ToList();
 
             // Find first occurrence of each family
@@ -78,12 +78,14 @@ namespace Music.Tests.Generator.Agents.Drums
             int phraseStart = families.IndexOf(OperatorFamily.PhrasePunctuation);
             int patternStart = families.IndexOf(OperatorFamily.PatternSubstitution);
             int styleStart = families.IndexOf(OperatorFamily.StyleIdiom);
+            int removalStart = families.IndexOf(OperatorFamily.NoteRemoval);
 
             // Verify order
             Assert.True(microStart < subdivStart, "MicroAddition should come before SubdivisionTransform");
             Assert.True(subdivStart < phraseStart, "SubdivisionTransform should come before PhrasePunctuation");
             Assert.True(phraseStart < patternStart, "PhrasePunctuation should come before PatternSubstitution");
             Assert.True(patternStart < styleStart, "PatternSubstitution should come before StyleIdiom");
+            Assert.True(styleStart < removalStart, "StyleIdiom should come before NoteRemoval");
         }
 
         [Fact]
@@ -182,9 +184,10 @@ namespace Music.Tests.Generator.Agents.Drums
             var phraseOps = registry.GetOperatorsByFamily(OperatorFamily.PhrasePunctuation);
             var patternOps = registry.GetOperatorsByFamily(OperatorFamily.PatternSubstitution);
             var styleOps = registry.GetOperatorsByFamily(OperatorFamily.StyleIdiom);
+            var removalOps = registry.GetOperatorsByFamily(OperatorFamily.NoteRemoval);
 
             // Assert - no overlap between families
-            var allFamilyOps = microOps.Concat(subdivOps).Concat(phraseOps).Concat(patternOps).Concat(styleOps).ToList();
+            var allFamilyOps = microOps.Concat(subdivOps).Concat(phraseOps).Concat(patternOps).Concat(styleOps).Concat(removalOps).ToList();
             var distinctIds = allFamilyOps.Select(op => op.OperatorId).Distinct().ToList();
             Assert.Equal(allFamilyOps.Count, distinctIds.Count); // No duplicates
         }

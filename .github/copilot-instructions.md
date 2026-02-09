@@ -3,8 +3,9 @@
 ## General Guidelines
 - Always use the minimum changes possible to meet each and every acceptance criteria.
 - After code is completed, ensure each individual acceptance criterion is met.
-- Do not update the epic containing he story, only update what has been asked for.
+- Do not update the epic containing the story, only update what has been asked for.
 - Where possible, use existing classes, methods, constants as opposed to creating new classes.
+- Do not create redundant base classes when an existing base class already provides the needed functionality. Removal operators and additive operators should share the same base class (DrumOperatorBase); differentiate behavior through interface implementation (IDrumRemovalOperator), not inheritance hierarchies.
 - Do not make assumptions outside of the context provided.
 
 ## Response Format
@@ -20,7 +21,7 @@
 - Do NOT repeat what is obvious from code. Document intent, constraints, edge cases, and “don’t break” rules only.
 - Do NOT add comments to every method by default—only where it materially reduces ambiguity for future changes.
 - Do NOT introduce newlines inside a comment to “cheat” the limits.
-- Do NOT write comments documentating what changed (Example: Story 5.1 Move this method from some other class).
+- Do NOT write comments documenting what changed (Example: Story 5.1 Move this method from some other class).
 
 ### Code Change Rules
 - If the file is missing critical context, add 1–3 lines of `// TODO?` questions at the top (counting toward the limit).

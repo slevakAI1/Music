@@ -19,6 +19,9 @@ namespace Music.Generator.Core
         PatternSubstitution = 3,
 
         // AI: StyleIdiom=Genre-specific idioms and signature figures
-        StyleIdiom = 4
+        StyleIdiom = 4,
+
+        // AI: NoteRemoval=Subtractive operators that remove existing onsets for variance and dynamics
+        NoteRemoval = 5
     }
 }
