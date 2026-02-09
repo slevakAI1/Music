@@ -54,6 +54,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Generator\Core\GeneratorMemory.cs" />
+    <Compile Remove="Generator\Core\NoteOverlapHelper.cs" />
+    <Compile Remove="Generator\Core\NoteOverlapPreventer.cs" />
+    <Compile Remove="Generator\Core\StyleConfiguration.cs" />
+    <Compile Remove="Generator\Core\StyleConfigurationLibrary.cs" />
     <Compile Remove="Generator\Drums\Performance\DrumArticulationMapper.cs" />
     <Compile Remove="Generator\Drums\Performance\DrummerTimingShaper.cs" />
     <Compile Remove="Generator\Drums\Performance\DrummerVelocityShaper.cs" />
@@ -231,6 +236,7 @@
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
+    <Folder Include="Generator\Bass\" />
   </ItemGroup>
 
   <ItemGroup>

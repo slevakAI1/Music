@@ -62,24 +62,6 @@ namespace Music.Generator.Drums.Operators
             return _operatorById.TryGetValue(operatorId, out var op) ? op : null;
         }
 
-        // Get operators enabled by a StyleConfiguration. Empty AllowedOperatorIds means all operators allowed.
-        public IReadOnlyList<IDrumOperator> GetEnabledOperators(StyleConfiguration style)
-        {
-            ArgumentNullException.ThrowIfNull(style);
-
-            // Empty AllowedOperatorIds means all operators are allowed
-            if (style.AllowedOperatorIds.Count == 0)
-                return _operators;
-
-            var enabled = new List<IDrumOperator>();
-            foreach (var op in _operators)
-            {
-                if (style.IsOperatorAllowed(op.OperatorId))
-                    enabled.Add(op);
-            }
-            return enabled;
-        }
-
         // Get operators enabled by explicit allow list. Null or empty list => all operators allowed.
         public IReadOnlyList<IDrumOperator> GetEnabledOperators(IReadOnlyList<string>? allowList)
         {
