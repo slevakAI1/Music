@@ -6,7 +6,6 @@
 
 using Music.Generator.Core;
 using Music.Generator.Drums.Operators.Candidates;
-using Music.Generator.Drums.Performance;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
 using Music.Generator.Material;

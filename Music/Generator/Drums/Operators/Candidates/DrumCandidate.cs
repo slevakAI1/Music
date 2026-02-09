@@ -2,7 +2,6 @@
 // AI: invariants=BarNumber>=1; Beat>=1.0; Score in [0,1]; VelocityHint in [0,127] when present.
 // AI: deps=Uses OnsetStrength, FillRole, DrumArticulation; consumed by selection and mapping layers.
 
-using Music.Generator.Drums.Performance;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
 

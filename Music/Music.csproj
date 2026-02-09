@@ -11,13 +11,13 @@
   <ItemGroup>
     <Compile Remove="AI\Completed\AIDialog\**" />
     <Compile Remove="AI\Completed\Dialog\**" />
+    <Compile Remove="Archived Drum Intel Code\**" />
     <Compile Remove="Archives\**" />
     <Compile Remove="Files\OutputSamples\**" />
     <Compile Remove="Future Ideas\**" />
     <Compile Remove="Generator\Agent\**" />
     <Compile Remove="Generator\Core\RandomizationOld\**" />
     <Compile Remove="Generator\DrumsOld\**" />
-    <Compile Remove="Generator\Drums\Diagnostics\**" />
     <Compile Remove="Generator\Energy\**" />
     <Compile Remove="Generator\Guitar\**" />
     <Compile Remove="Patches\**" />
@@ -25,13 +25,13 @@
     <Compile Remove="Tests\**" />
     <EmbeddedResource Remove="AI\Completed\AIDialog\**" />
     <EmbeddedResource Remove="AI\Completed\Dialog\**" />
+    <EmbeddedResource Remove="Archived Drum Intel Code\**" />
     <EmbeddedResource Remove="Archives\**" />
     <EmbeddedResource Remove="Files\OutputSamples\**" />
     <EmbeddedResource Remove="Future Ideas\**" />
     <EmbeddedResource Remove="Generator\Agent\**" />
     <EmbeddedResource Remove="Generator\Core\RandomizationOld\**" />
     <EmbeddedResource Remove="Generator\DrumsOld\**" />
-    <EmbeddedResource Remove="Generator\Drums\Diagnostics\**" />
     <EmbeddedResource Remove="Generator\Energy\**" />
     <EmbeddedResource Remove="Generator\Guitar\**" />
     <EmbeddedResource Remove="Patches\**" />
@@ -39,13 +39,13 @@
     <EmbeddedResource Remove="Tests\**" />
     <None Remove="AI\Completed\AIDialog\**" />
     <None Remove="AI\Completed\Dialog\**" />
+    <None Remove="Archived Drum Intel Code\**" />
     <None Remove="Archives\**" />
     <None Remove="Files\OutputSamples\**" />
     <None Remove="Future Ideas\**" />
     <None Remove="Generator\Agent\**" />
     <None Remove="Generator\Core\RandomizationOld\**" />
     <None Remove="Generator\DrumsOld\**" />
-    <None Remove="Generator\Drums\Diagnostics\**" />
     <None Remove="Generator\Energy\**" />
     <None Remove="Generator\Guitar\**" />
     <None Remove="Patches\**" />
@@ -62,11 +62,6 @@
     <Compile Remove="Generator\Core\NoteOverlapPreventer.cs" />
     <Compile Remove="Generator\Core\StyleConfiguration.cs" />
     <Compile Remove="Generator\Core\StyleConfigurationLibrary.cs" />
-    <Compile Remove="Generator\Drums\Performance\DrumArticulationMapper.cs" />
-    <Compile Remove="Generator\Drums\Performance\DrummerTimingShaper.cs" />
-    <Compile Remove="Generator\Drums\Performance\DrummerVelocityShaper.cs" />
-    <Compile Remove="Generator\Drums\Physicality\**" />
-    <Compile Remove="Generator\Drums\Policy\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -235,11 +230,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Archived Drum Intel Code\Performance\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
     <Folder Include="Generator\Bass\" />
-    <Folder Include="Generator\Drums\Context\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,7 +2,6 @@
 // AI: invariants=Mapping must be deterministic; tags used for diagnostics only; velocity/timing flow via properties
 // AI: deps=DrumCandidate, DrumOnsetCandidate, FillRole, DrumArticulation; consumed by DrummerOperatorCandidates
 
-using Music.Generator.Drums.Performance;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
 

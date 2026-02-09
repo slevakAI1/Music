@@ -6,7 +6,6 @@
 using Music.Generator.Core;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
-using Music.Generator.Drums.Performance;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.PatternSubstitution
