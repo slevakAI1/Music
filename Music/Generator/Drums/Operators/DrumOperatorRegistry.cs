@@ -78,6 +78,7 @@ namespace Music.Generator.Drums.Operators
             return enabled;
         }
 
+        // THIS CAN REMOVE
         // Create an empty registry. Call RegisterOperator then Freeze during startup.
         public static DrumOperatorRegistry CreateEmpty() => new();
 
