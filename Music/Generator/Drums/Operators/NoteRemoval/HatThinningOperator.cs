@@ -1,9 +1,8 @@
 // AI: purpose=NoteRemoval operator that removes every other hi-hat hit for breathing room.
 // AI: invariants=Targets ClosedHat only; skips protected/must-hit onsets (enforced by applicator).
-// AI: deps=DrumOperatorBase, IDrumRemovalOperator, DrummerContext, RemovalCandidate, GrooveRoles.
+// AI: deps=DrumOperatorBase, IDrumRemovalOperator, Bar, RemovalCandidate, GrooveRoles.
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
@@ -19,32 +18,16 @@ namespace Music.Generator.Drums.Operators.NoteRemoval
         public override OperatorFamily OperatorFamily => OperatorFamily.NoteRemoval;
 
         // Removal operators do not add onsets.
-        public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
+        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
             => [];
 
-        // Prefer verse/bridge sections where sparser feel is musical.
-        public override bool CanApply(DrummerContext context)
-        {
-            if (!base.CanApply(context))
-                return false;
-
-            // Most effective outside fill windows; fills have their own density logic.
-            if (context.Bar.IsFillWindow)
-                return false;
-
-            return true;
-        }
-
         // Remove offbeat hat hits (fractional beats like 1.5, 2.5, 3.5, 4.5) from current bar.
-        public IEnumerable<RemovalCandidate> GenerateRemovals(DrummerContext context)
+        public IEnumerable<RemovalCandidate> GenerateRemovals(Bar bar)
         {
-            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(bar);
 
-            if (!CanApply(context))
-                yield break;
-
-            int barNumber = context.Bar.BarNumber;
-            int beatsPerBar = context.Bar.BeatsPerBar;
+            int barNumber = bar.BarNumber;
+            int beatsPerBar = bar.BeatsPerBar;
 
             // Target offbeat hat positions (the "and" of each beat)
             for (int beat = 1; beat <= beatsPerBar; beat++)

@@ -1,10 +1,9 @@
 // AI: purpose=PhrasePunctuation operator: emit a setup hit on the last "and" (e.g., 4.5) before a section change.
 // AI: invariants=Apply when Bar.IsAtSectionBoundary or Bar.IsFillWindow; requires Kick role; uses 16th grid positions.
-// AI: deps=DrummerContext, DrumCandidate, FillRole conventions; deterministic velocity from (barNumber,seed).
+// AI: deps=Bar, DrumCandidate, FillRole conventions; deterministic velocity from (barNumber,seed).
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Planning;
@@ -24,55 +23,25 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
 
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
-        // Requires kick role; snare optional. Energy gating handled by selection policies.
-        protected override string? RequiredRole => GrooveRoles.Kick;
-
-        // Gate: apply only at section ends/fill windows and when BeatsPerBar >= 4.
-        public override bool CanApply(DrummerContext context)
-        {
-            if (!base.CanApply(context))
-                return false;
-
-            // Setup hits are at section boundaries (end of section leading to next)
-            if (!context.Bar.IsFillWindow && !context.Bar.IsAtSectionBoundary)
-                return false;
-
-            // Only in last bar of section or fill window
-            if (context.Bar.BarsUntilSectionEnd > 1 && !context.Bar.IsFillWindow)
-                return false;
-
-            // Need at least 4 beats for "4&" position
-            if (context.Bar.BeatsPerBar < 4)
-                return false;
-
-            return true;
-        }
-
         // Generate setup hit candidate(s) at beat = BeatsPerBar + 0.5 (the "and" of last beat).
-        public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
+        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
         {
-            ArgumentNullException.ThrowIfNull(context);
-
-            if (context is not DrummerContext drummerContext)
-                yield break;
-
-            if (!CanApply(drummerContext))
-                yield break;
+            ArgumentNullException.ThrowIfNull(bar);
 
             // Setup hit on the "and" of the last beat (e.g., 4.5 in 4/4)
-            decimal setupBeat = drummerContext.Bar.BeatsPerBar + 0.5m;
+            decimal setupBeat = bar.BeatsPerBar + 0.5m;
 
             // Generate kick on setup beat
             int kickVelocity = GenerateVelocityHint(
                 VelocityMin, VelocityMax,
-                drummerContext.Bar.BarNumber, setupBeat,
-                drummerContext.Seed);
+                bar.BarNumber, setupBeat,
+                seed);
 
-            double score = ComputeScore(drummerContext);
+            double score = ComputeScore(bar);
 
             yield return CreateCandidate(
                 role: GrooveRoles.Kick,
-                barNumber: drummerContext.Bar.BarNumber,
+                barNumber: bar.BarNumber,
                 beat: setupBeat,
                 strength: OnsetStrength.Pickup,
                 score: score,
@@ -84,12 +53,12 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
             {
                 int snareVelocity = GenerateVelocityHint(
                     VelocityMin - 10, VelocityMax - 10,
-                    drummerContext.Bar.BarNumber, setupBeat + 0.01m, // Slightly different seed
-                    drummerContext.Seed);
+                    bar.BarNumber, setupBeat + 0.01m, // Slightly different seed
+                    seed);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,
-                    barNumber: drummerContext.Bar.BarNumber,
+                    barNumber: bar.BarNumber,
                     beat: setupBeat,
                     strength: OnsetStrength.Pickup,
                     score: score * 0.9, // Slightly lower score than kick
@@ -98,12 +67,12 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
             }
         }
 
-        private static double ComputeScore(DrummerContext context)
+        private static double ComputeScore(Bar bar)
         {
             double score = BaseScore;
 
             // Higher at actual section end
-            if (context.Bar.BarsUntilSectionEnd <= 1)
+            if (bar.BarsUntilSectionEnd <= 1)
                 score *= 1.2;
 
             // Energy scaling

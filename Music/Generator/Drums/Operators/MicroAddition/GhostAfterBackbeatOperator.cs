@@ -5,7 +5,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
@@ -27,56 +26,34 @@ namespace Music.Generator.Drums.Operators.MicroAddition
 
         public override OperatorFamily OperatorFamily => OperatorFamily.MicroAddition;
 
-        // Slightly higher energy expected than before-backbeat ghosts.
-        // Requires snare role to be active in groove preset.
-        protected override string? RequiredRole => GrooveRoles.Snare;
-
-        public override bool CanApply(DrummerContext context)
-        {
-            if (!base.CanApply(context))
-                return false;
-
-            // Need backbeat beats defined
-            if (context.Bar.BackbeatBeats.Count == 0)
-                return false;
-
-            return true;
-        }
-
         // Generate ghost snare candidates immediately after each backbeat (quarter after backbeat).
-        public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
+        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
         {
-            ArgumentNullException.ThrowIfNull(context);
-
-            if (context is not DrummerContext drummerContext)
-                yield break;
-
-            if (!CanApply(drummerContext))
-                yield break;
+            ArgumentNullException.ThrowIfNull(bar);
 
             // Compute motif multiplier: reduce score when motif active. Motif map not available in context here.
             double motifMultiplier = GetMotifScoreMultiplier(
                 null,
-                drummerContext.Bar,
+                bar,
                 MotifScoreReduction);
 
             // Generate ghost note after each backbeat
-            foreach (int backbeat in drummerContext.Bar.BackbeatBeats)
+            foreach (int backbeat in bar.BackbeatBeats)
             {
                 // Ghost at 0.25 beats after backbeat (e.g., 2.25 after beat 2)
                 decimal ghostBeat = backbeat + 0.25m;
 
                 // Skip if ghost would land beyond valid 16th grid positions
                 // (BeatsPerBar + 0.75 is the last valid 16th position)
-                if (ghostBeat > drummerContext.Bar.BeatsPerBar + 0.75m)
+                if (ghostBeat > bar.BeatsPerBar + 0.75m)
                     continue;
 
                 int velocityHint = GenerateVelocityHint(
                     VelocityMin,
                     VelocityMax,
-                    drummerContext.Bar.BarNumber,
+                    bar.BarNumber,
                     ghostBeat,
-                    drummerContext.Seed);
+                    seed);
 
                 // Score increases with energy
                 // Story 9.3: Apply motif multiplier to reduce score when motif active
@@ -84,7 +61,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,
-                    barNumber: drummerContext.Bar.BarNumber,
+                    barNumber: bar.BarNumber,
                     beat: ghostBeat,
                     strength: OnsetStrength.Ghost,
                     score: Math.Clamp(score, 0.0, 1.0),

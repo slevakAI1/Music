@@ -1,10 +1,9 @@
 // AI: purpose=PatternSubstitution operator generating kick pattern variants (four-on-floor, syncopated, half-time).
 // AI: invariants=Applies when Kick in ActiveRoles; produces full-bar kick positions; deterministic from (bar,seed).
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; integrates with section type for selection.
+// AI: deps=DrumOperatorBase, Bar, DrumCandidate; integrates with section type for selection.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
@@ -42,48 +41,20 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
         /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.PatternSubstitution;
 
-        /// <summary>
-        /// Requires moderate energy for pattern changes.
-        /// </summary>
-
-        /// <summary>
-        /// Requires kick role.
-        /// </summary>
-        protected override string? RequiredRole => GrooveRoles.Kick;
-
         /// <inheritdoc/>
-        public override bool CanApply(DrummerContext context)
+        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
         {
-            if (!base.CanApply(context))
-                return false;
-
-            // Need at least 2 beats for meaningful pattern
-            if (context.Bar.BeatsPerBar < 2)
-                return false;
-
-            return true;
-        }
-
-        /// <inheritdoc/>
-        public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
-        {
-            ArgumentNullException.ThrowIfNull(context);
-
-            if (context is not DrummerContext drummerContext)
-                yield break;
-
-            if (!CanApply(drummerContext))
-                yield break;
+            ArgumentNullException.ThrowIfNull(bar);
 
             // Select pattern based on section type and energy
-            KickPattern pattern = SelectPattern(drummerContext);
+            KickPattern pattern = SelectPattern(bar);
 
             // Skip if no pattern change
             if (pattern == KickPattern.None)
                 yield break;
 
             // Generate pattern candidates
-            var positions = GetPatternPositions(pattern, drummerContext.Bar.BeatsPerBar, drummerContext);
+            var positions = GetPatternPositions(pattern, bar.BeatsPerBar, bar);
 
             foreach (var (beat, strength) in positions)
             {
@@ -92,14 +63,14 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
 
                 int velocityHint = GenerateVelocityHint(
                     velMin, velMax,
-                    drummerContext.Bar.BarNumber, beat,
-                    drummerContext.Seed);
+                    bar.BarNumber, beat,
+                    seed);
 
-                double score = ComputeScore(drummerContext, strength);
+                double score = ComputeScore(bar, strength);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Kick,
-                    barNumber: drummerContext.Bar.BarNumber,
+                    barNumber: bar.BarNumber,
                     beat: beat,
                     strength: strength,
                     score: score,
@@ -107,9 +78,9 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
             }
         }
 
-        private static KickPattern SelectPattern(DrummerContext context)
+        private static KickPattern SelectPattern(Bar bar)
         {
-            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            var sectionType = bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
             return sectionType switch
             {
                 // Chorus: four-on-floor for driving feel (high energy)
@@ -148,7 +119,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
         private static List<(decimal beat, OnsetStrength strength)> GetPatternPositions(
             KickPattern pattern,
             int beatsPerBar,
-            DrummerContext context)
+            Bar bar)
         {
             var positions = new List<(decimal, OnsetStrength)>();
 
@@ -211,12 +182,12 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
             };
         }
 
-        private double ComputeScore(DrummerContext context, OnsetStrength strength)
+        private double ComputeScore(Bar bar, OnsetStrength strength)
         {
             double score = BaseScore;
 
             // Boost at section boundaries (pattern change marks section)
-            if (context.Bar.IsAtSectionBoundary)
+            if (bar.IsAtSectionBoundary)
                 score += 0.15;
 
             // Downbeats score higher

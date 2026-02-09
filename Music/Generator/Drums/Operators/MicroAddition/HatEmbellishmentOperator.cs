@@ -4,7 +4,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
@@ -29,41 +28,20 @@ namespace Music.Generator.Drums.Operators.MicroAddition
 
         public override OperatorFamily OperatorFamily => OperatorFamily.MicroAddition;
 
-        // Requires hi-hat (ClosedHat) role active; expects 16th grid availability in bar.
-        protected override string? RequiredRole => GrooveRoles.ClosedHat;
-
-        // CanApply: ensure base gates pass and 16th grid is usable for embellishments.
-        public override bool CanApply(DrummerContext context)
-        {
-            if (!base.CanApply(context))
-                return false;
-
-            // Only apply when base pattern is 8ths (room for 16th embellishment)
-            // Note: HatSubdivision is determined from Bar/groove; assume context.Bar provides necessary info.
-
-            return true;
-        }
-
         // Generate 1-2 hi-hat embellishments per bar deterministically from bar/seed.
-        public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
+        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
         {
-            ArgumentNullException.ThrowIfNull(context);
-
-            if (context is not DrummerContext drummerContext)
-                yield break;
-
-            if (!CanApply(drummerContext))
-                yield break;
+            ArgumentNullException.ThrowIfNull(bar);
 
             // Compute motif multiplier; motif map not available in context so pass null.
             double motifMultiplier = GetMotifScoreMultiplier(
                 null,
-                drummerContext.Bar,
+                bar,
                 MotifScoreReduction);
 
             // Filter positions to those within the bar
             var validPositions = EmbellishmentPositions
-                .Where(p => p <= drummerContext.Bar.BeatsPerBar)
+                .Where(p => p <= bar.BeatsPerBar)
                 .ToList();
 
             if (validPositions.Count == 0)
@@ -73,23 +51,23 @@ namespace Music.Generator.Drums.Operators.MicroAddition
             int count = 1; // default
 
             // Select positions deterministically
-            var selectedPositions = SelectPositions(validPositions, count, drummerContext);
+            var selectedPositions = SelectPositions(validPositions, count, bar, seed);
 
             foreach (decimal beat in selectedPositions)
             {
                 int velocityHint = GenerateVelocityHint(
                     VelocityMin,
                     VelocityMax,
-                    drummerContext.Bar.BarNumber,
+                    bar.BarNumber,
                     beat,
-                    drummerContext.Seed);
+                    seed);
 
                 // Story 9.3: Apply motif multiplier to reduce score when motif active
                 double score = BaseScore * (0.5 + 0.5 /* default energy factor */) * motifMultiplier;
 
                 yield return CreateCandidate(
                     role: GrooveRoles.ClosedHat,
-                    barNumber: drummerContext.Bar.BarNumber,
+                    barNumber: bar.BarNumber,
                     beat: beat,
                     strength: OnsetStrength.Offbeat,
                     score: Math.Clamp(score, 0.0, 1.0),
@@ -103,10 +81,11 @@ namespace Music.Generator.Drums.Operators.MicroAddition
         private static IEnumerable<decimal> SelectPositions(
             List<decimal> validPositions,
             int count,
-            DrummerContext context)
+            Bar bar,
+            int seed)
         {
             // Use hash to shuffle positions deterministically
-            int hash = HashCode.Combine(context.Bar.BarNumber, context.Seed, "HatEmb");
+            int hash = HashCode.Combine(bar.BarNumber, seed, "HatEmb");
 
             // Simple deterministic selection: hash mod count to pick starting index
             int startIndex = Math.Abs(hash) % validPositions.Count;

@@ -4,7 +4,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
@@ -23,52 +22,30 @@ namespace Music.Generator.Drums.Operators.MicroAddition
 
         public override OperatorFamily OperatorFamily => OperatorFamily.MicroAddition;
 
-        // Requires kick role active in groove; energy gating handled elsewhere in policy/selector.
-        protected override string? RequiredRole => GrooveRoles.Kick;
-
-        // Gate: needs at least BeatsPerBar >= 4 for pickup at BeatsPerBar + 0.75.
-        public override bool CanApply(DrummerContext context)
-        {
-            if (!base.CanApply(context))
-                return false;
-
-            // Need at least 4 beats in bar for 4.75 pickup
-            if (context.Bar.BeatsPerBar < 4)
-                return false;
-
-            return true;
-        }
-
         // Generate a single kick pickup candidate at bar end minus quarter beat. Reduce score at section boundaries.
-        public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
+        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
         {
-            ArgumentNullException.ThrowIfNull(context);
-
-            if (context is not DrummerContext drummerContext)
-                yield break;
-
-            if (!CanApply(drummerContext))
-                yield break;
+            ArgumentNullException.ThrowIfNull(bar);
 
             // Pickup at 0.25 beats before the bar ends (e.g., 4.75 in 4/4)
-            decimal pickupBeat = drummerContext.Bar.BeatsPerBar + 0.75m;
+            decimal pickupBeat = bar.BeatsPerBar + 0.75m;
 
             int velocityHint = GenerateVelocityHint(
                 VelocityMin,
                 VelocityMax,
-                drummerContext.Bar.BarNumber,
+                bar.BarNumber,
                 pickupBeat,
-                drummerContext.Seed);
+                seed);
 
             // Score increases with energy and when not at section boundary
             // (section boundary pickups are handled by SetupHitOperator)
             double score = BaseScore * (0.6 + 0.5 /* default energy factor */);
-            if (context is DrummerContext dc && dc.Bar.IsAtSectionBoundary)
+            if (bar.IsAtSectionBoundary)
                 score *= 0.5; // Reduce score at section boundary
 
             yield return CreateCandidate(
                 role: GrooveRoles.Kick,
-                barNumber: drummerContext.Bar.BarNumber,
+                barNumber: bar.BarNumber,
                 beat: pickupBeat,
                 strength: OnsetStrength.Pickup,
                 score: Math.Clamp(score, 0.0, 1.0),

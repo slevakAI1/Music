@@ -1,10 +1,9 @@
 // AI: purpose=PhrasePunctuation operator: crash cymbal on beat 1 for section starts.
 // AI: invariants=Apply only when Bar.IsAtSectionBoundary && Bar.PhrasePosition near start; Crash role required.
-// AI: deps=DrummerContext, DrumCandidate, FillRole semantics; deterministic velocity from (bar,seed).
+// AI: deps=Bar, DrumCandidate, FillRole semantics; deterministic velocity from (bar,seed).
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Performance;
@@ -25,54 +24,24 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
 
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
-        // Requires crash cymbal to be an active role in the groove preset.
-        protected override string? RequiredRole => GrooveRoles.Crash;
-
-        public override bool CanApply(DrummerContext context)
-        {
-            if (!base.CanApply(context))
-                return false;
-
-            // Only at section boundaries (start of new section)
-            if (!context.Bar.IsAtSectionBoundary)
-                return false;
-
-            // Crash on 1 is for section STARTS, not ends
-            // Check if we're at the beginning of a section using PhrasePosition (0.0 = phrase start)
-            // or by checking BarsUntilSectionEnd is high (indicating we're early in section)
-            // A phrase position near 0.0 means we're at the start
-            bool isAtSectionStart = context.Bar.PhrasePosition < 0.1;
-
-            if (!isAtSectionStart)
-                return false;
-
-            return true;
-        }
-
         // Generate a single crash candidate at beat 1 when at section start. Use deterministic velocity hint.
-        public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
+        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
         {
-            ArgumentNullException.ThrowIfNull(context);
-
-            if (context is not DrummerContext drummerContext)
-                yield break;
-
-            if (!CanApply(drummerContext))
-                yield break;
+            ArgumentNullException.ThrowIfNull(bar);
 
             int velocityHint = GenerateVelocityHint(
                 VelocityMin,
                 VelocityMax,
-                drummerContext.Bar.BarNumber,
+                bar.BarNumber,
                 1.0m,
-                drummerContext.Seed);
+                seed);
 
             // Score increases with energy (crashes are more appropriate at higher energy)
             double score = BaseScore * (0.7 + 0.5 /* default energy factor */);
 
             yield return CreateCandidate(
                 role: GrooveRoles.Crash,
-                barNumber: drummerContext.Bar.BarNumber,
+                barNumber: bar.BarNumber,
                 beat: 1.0m,
                 strength: OnsetStrength.Downbeat,
                 score: Math.Clamp(score, 0.0, 1.0),

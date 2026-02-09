@@ -1,9 +1,8 @@
 // AI: purpose=NoteRemoval operator that removes weak offbeat onsets to open up the groove.
 // AI: invariants=Only targets offbeat/ghost-strength onsets; backbeats and downbeats are never targeted.
-// AI: deps=DrumOperatorBase, IDrumRemovalOperator, DrummerContext, RemovalCandidate, GrooveRoles.
+// AI: deps=DrumOperatorBase, IDrumRemovalOperator, Bar, RemovalCandidate, GrooveRoles.
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
@@ -22,31 +21,16 @@ namespace Music.Generator.Drums.Operators.NoteRemoval
         public override OperatorFamily OperatorFamily => OperatorFamily.NoteRemoval;
 
         // Removal operators do not add onsets.
-        public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
+        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
             => [];
 
-        public override bool CanApply(DrummerContext context)
-        {
-            if (!base.CanApply(context))
-                return false;
-
-            // Avoid fill windows; fills need their density.
-            if (context.Bar.IsFillWindow)
-                return false;
-
-            return true;
-        }
-
         // Remove kick and snare onsets on weak 16th-note positions ("e" and "a" of each beat).
-        public IEnumerable<RemovalCandidate> GenerateRemovals(DrummerContext context)
+        public IEnumerable<RemovalCandidate> GenerateRemovals(Bar bar)
         {
-            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(bar);
 
-            if (!CanApply(context))
-                yield break;
-
-            int barNumber = context.Bar.BarNumber;
-            int beatsPerBar = context.Bar.BeatsPerBar;
+            int barNumber = bar.BarNumber;
+            int beatsPerBar = bar.BeatsPerBar;
             string[] targetRoles = [GrooveRoles.Kick, GrooveRoles.Snare, GrooveRoles.ClosedHat];
 
             for (int beat = 1; beat <= beatsPerBar; beat++)

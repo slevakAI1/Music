@@ -1,11 +1,10 @@
 // AI: purpose=PhrasePunctuation operator generating descending tom fill for release/resolution.
 // AI: invariants=Only applies when IsFillWindow=true and toms are active; generates 6-12 descending hits.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; uses Tom1, Tom2, FloorTom for descending pattern.
+// AI: deps=DrumOperatorBase, Bar, DrumCandidate; uses Tom1, Tom2, FloorTom for descending pattern.
 // AI: change=Story 3.3; adjust pattern and velocity curve based on listening tests.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Planning;
@@ -33,48 +32,12 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
         /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
-        /// <summary>
-        /// Drop fills work at moderate-high energy (need substance to "drop" from).
-        /// </summary>
-
         /// <inheritdoc/>
-        public override bool CanApply(DrummerContext context)
+        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
         {
-            if (!base.CanApply(context))
-                return false;
+            ArgumentNullException.ThrowIfNull(bar);
 
-            // Only in fill window
-            if (!context.Bar.IsFillWindow)
-                return false;
-
-            // Need at least one tom OR snare for drop fill (snare is fallback)
-            bool hasTomOrSnare = true /* role check deferred */ ||
-                                 true /* role check deferred */ ||
-                                 true /* role check deferred */ ||
-                                 true /* role check deferred */;
-
-            if (!hasTomOrSnare)
-                return false;
-
-            // Need at least 2 beats for meaningful drop
-            if (context.Bar.BeatsPerBar < 2)
-                return false;
-
-            return true;
-        }
-
-        /// <inheritdoc/>
-        public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
-        {
-            ArgumentNullException.ThrowIfNull(context);
-
-            if (context is not DrummerContext drummerContext)
-                yield break;
-
-            if (!CanApply(drummerContext))
-                yield break;
-
-            int beatsPerBar = drummerContext.Bar.BeatsPerBar;
+            int beatsPerBar = bar.BeatsPerBar;
 
             // Drop fill occupies last 2 beats
             decimal fillStartBeat = Math.Max(1.0m, beatsPerBar - 1);
@@ -86,7 +49,7 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
             var availableToms = GetAvailableTomsDescending(new HashSet<string> { GrooveRoles.Tom1, GrooveRoles.Tom2, GrooveRoles.FloorTom });
 
             // Generate descending pattern
-            var positions = GenerateFillPositions(fillStartBeat, beatsPerBar, hitCount, drummerContext.Seed, drummerContext.Bar.BarNumber);
+            var positions = GenerateFillPositions(fillStartBeat, beatsPerBar, hitCount, seed, bar.BarNumber);
 
             int positionIndex = 0;
             int positionCount = positions.Count;
@@ -103,18 +66,18 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
 
                 int velocityHint = GenerateVelocityHint(
                     velMin, velMax,
-                    drummerContext.Bar.BarNumber, beat,
-                    drummerContext.Seed);
+                    bar.BarNumber, beat,
+                    seed);
 
                 FillRole fillRole = positionIndex == 0 ? FillRole.FillStart :
                                     positionIndex == positionCount - 1 ? FillRole.FillEnd :
                                     FillRole.FillBody;
 
-                double score = ComputeScore(drummerContext);
+                double score = ComputeScore(bar);
 
                 yield return CreateCandidate(
                     role: role,
-                    barNumber: drummerContext.Bar.BarNumber,
+                    barNumber: bar.BarNumber,
                     beat: beat,
                     strength: OnsetStrength.Strong,
                     score: score,
@@ -210,12 +173,12 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
             return selected.OrderBy(b => b).ToList();
         }
 
-        private static double ComputeScore(DrummerContext context)
+        private static double ComputeScore(Bar bar)
         {
             double score = BaseScore;
 
             // Drop fills are good after builds (at section end)
-            if (context.Bar.BarsUntilSectionEnd <= 1)
+            if (bar.BarsUntilSectionEnd <= 1)
                 score *= 1.15;
 
             // Energy scaling

@@ -1,10 +1,9 @@
 // AI: purpose=PhrasePunctuation operator: full-bar turnaround fills at section ends.
 // AI: invariants=Apply when Bar.IsFillWindow && BarsUntilSectionEnd<=1; deterministic positions from (seed,bar).
-// AI: deps=DrummerContext, DrumCandidate; prefers snare-led fills with optional kick downbeats; anti-repeat handled externally.
+// AI: deps=Bar, DrumCandidate; prefers snare-led fills with optional kick downbeats; anti-repeat handled externally.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Planning;
@@ -29,50 +28,18 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
         /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
-        /// <summary>
-        /// Requires minimum energy for full-bar fill.
-        /// </summary>
-
-        /// <summary>
-        /// Requires snare for fill hits (primary fill role).
-        /// </summary>
-        protected override string? RequiredRole => GrooveRoles.Snare;
-
         /// <inheritdoc/>
-        public override bool CanApply(DrummerContext context)
+        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
         {
-            if (!base.CanApply(context))
-                return false;
+            ArgumentNullException.ThrowIfNull(bar);
 
-            // Only in fill window
-            if (!context.Bar.IsFillWindow)
-                return false;
-
-            // Full-bar fills are for section ends (last bar of section)
-            if (context.Bar.BarsUntilSectionEnd > 1)
-                return false;
-
-            return true;
-        }
-
-        /// <inheritdoc/>
-        public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
-        {
-            ArgumentNullException.ThrowIfNull(context);
-
-            if (context is not DrummerContext drummerContext)
-                yield break;
-
-            if (!CanApply(drummerContext))
-                yield break;
-
-            int beatsPerBar = drummerContext.Bar.BeatsPerBar;
+            int beatsPerBar = bar.BeatsPerBar;
 
             // Compute hit count based on energy (8-16 hits for full bar fill)
             int hitCount = ComputeHitCount(0.5); // default energy
 
             // Generate fill pattern spanning full bar
-            var positions = GenerateFillPositions(beatsPerBar, hitCount, drummerContext.Seed, drummerContext.Bar.BarNumber);
+            var positions = GenerateFillPositions(beatsPerBar, hitCount, seed, bar.BarNumber);
 
             bool isFirst = true;
             int positionCount = positions.Count();
@@ -101,16 +68,16 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
 
                 int velocityHint = GenerateVelocityHint(
                     velMin, velMax,
-                    drummerContext.Bar.BarNumber, beat,
-                    drummerContext.Seed);
+                    bar.BarNumber, beat,
+                    seed);
 
                 OnsetStrength strength = isAccent ? OnsetStrength.Strong : OnsetStrength.Offbeat;
 
-                double score = ComputeScore(drummerContext);
+                double score = ComputeScore(bar);
 
                 yield return CreateCandidate(
                     role: role,
-                    barNumber: drummerContext.Bar.BarNumber,
+                    barNumber: bar.BarNumber,
                     beat: beat,
                     strength: strength,
                     score: score,
@@ -183,13 +150,13 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
             }
         }
 
-        private static double ComputeScore(DrummerContext context)
+        private static double ComputeScore(Bar bar)
         {
             double score = BaseScore;
 
             // Energy scaling
             // Higher at actual section end
-            if (context.Bar.BarsUntilSectionEnd == 0)
+            if (bar.BarsUntilSectionEnd == 0)
                 score *= 1.2;
 
             return Math.Clamp(score, 0.0, 1.0);

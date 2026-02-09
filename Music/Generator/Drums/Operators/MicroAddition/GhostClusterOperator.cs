@@ -4,7 +4,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
@@ -37,42 +36,20 @@ namespace Music.Generator.Drums.Operators.MicroAddition
 
         public override OperatorFamily OperatorFamily => OperatorFamily.MicroAddition;
 
-        // Requires snare role active; expects BeatsPerBar >= 4 for comfortable cluster placement.
-        protected override string? RequiredRole => GrooveRoles.Snare;
-
-        /// <inheritdoc/>
-        public override bool CanApply(DrummerContext context)
-        {
-            if (!base.CanApply(context))
-                return false;
-
-            // Need enough beats for cluster placement
-            if (context.Bar.BeatsPerBar < 4)
-                return false;
-
-            return true;
-        }
-
         // Generate 2-3 ghost notes per chosen cluster pattern; deterministic selection from bar/seed.
-        public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
+        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
         {
-            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(bar);
 
-            if (context is not DrummerContext drummerContext)
-                yield break;
-
-
-            if (!CanApply(drummerContext))
-                yield break;
 
             // Compute motif multiplier; motif map not available in context so pass null.
             double motifMultiplier = GetMotifScoreMultiplier(
                 null,
-                drummerContext.Bar,
+                bar,
                 MotifScoreReduction);
 
             // Select cluster pattern and start position deterministically
-            int hash = HashCode.Combine(drummerContext.Bar.BarNumber, drummerContext.Seed, "GhostCluster");
+            int hash = HashCode.Combine(bar.BarNumber, seed, "GhostCluster");
 
             int patternIndex = Math.Abs(hash) % ClusterPatterns.Length;
             int startIndex = Math.Abs(hash >> 8) % ClusterStarts.Length;
@@ -86,7 +63,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
                 decimal beat = startBeat + pattern[i];
 
                 // Skip if beat would exceed bar
-                if (beat > drummerContext.Bar.BeatsPerBar)
+                if (beat > bar.BeatsPerBar)
                     continue;
 
                 // Velocity decreases slightly through cluster for natural feel
@@ -94,9 +71,9 @@ namespace Music.Generator.Drums.Operators.MicroAddition
                 int velocityHint = GenerateVelocityHint(
                     VelocityMin,
                     Math.Max(VelocityMin, velocityBase),
-                    drummerContext.Bar.BarNumber,
+                    bar.BarNumber,
                     beat,
-                    drummerContext.Seed);
+                    seed);
 
                 // Score decreases for later notes in cluster (first note most important)
                 // Story 9.3: Apply motif multiplier to reduce score when motif active
@@ -104,7 +81,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,
-                    barNumber: drummerContext.Bar.BarNumber,
+                    barNumber: bar.BarNumber,
                     beat: beat,
                     strength: OnsetStrength.Ghost,
                     score: Math.Clamp(score, 0.0, 1.0),

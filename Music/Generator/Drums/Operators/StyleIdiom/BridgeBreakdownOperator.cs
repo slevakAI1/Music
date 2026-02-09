@@ -1,10 +1,9 @@
 // AI: purpose=StyleIdiom operator for PopRock bridge breakdowns (half-time or minimal variants).
 // AI: invariants=Apply only when style=PopRock and Section=Bridge; deterministic from (bar,seed); no external side-effects.
-// AI: deps=DrummerContext, DrumCandidate; integrates with groove/section type; variant chosen by energy/seed.
+// AI: deps=Bar, DrumCandidate; integrates with groove/section type; variant chosen by energy/seed.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
@@ -35,45 +34,17 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
         /// </summary>
 
         /// <inheritdoc/>
-        public override bool CanApply(DrummerContext context)
+        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
         {
-            if (!base.CanApply(context))
-                return false;
-
-            // Style gating: only PopRock
-            if (!IsPopRockStyle(context))
-                return false;
-
-            // Section gating: only bridge
-            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
-            if (sectionType != MusicConstants.eSectionType.Bridge)
-                return false;
-
-            // Need at least 4 beats for half-time pattern
-            if (context.Bar.BeatsPerBar < 4)
-                return false;
-
-            return true;
-        }
-
-        /// <inheritdoc/>
-        public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
-        {
-            ArgumentNullException.ThrowIfNull(context);
-
-            if (context is not DrummerContext drummerContext)
-                yield break;
-
-            if (!CanApply(drummerContext))
-                yield break;
+            ArgumentNullException.ThrowIfNull(bar);
 
             // Determine breakdown variant based on energy
-            BreakdownVariant variant = DetermineVariant(drummerContext);
+            BreakdownVariant variant = DetermineVariant(bar);
 
             // Generate kick pattern
             if (true /* role check deferred */)
             {
-                foreach (var candidate in GenerateKickPattern(drummerContext, variant))
+                foreach (var candidate in GenerateKickPattern(bar, seed, variant))
                 {
                     yield return candidate;
                 }
@@ -82,7 +53,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
             // Generate snare pattern (half-time: beat 3 only)
             if (true /* role check deferred */)
             {
-                foreach (var candidate in GenerateSnarePattern(drummerContext, variant))
+                foreach (var candidate in GenerateSnarePattern(bar, seed, variant))
                 {
                     yield return candidate;
                 }
@@ -92,34 +63,34 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
             if (variant == BreakdownVariant.Minimal &&
                 true /* role check deferred */)
             {
-                foreach (var candidate in GenerateMinimalHatPattern(drummerContext))
+                foreach (var candidate in GenerateMinimalHatPattern(bar, seed))
                 {
                     yield return candidate;
                 }
             }
         }
 
-        private static BreakdownVariant DetermineVariant(DrummerContext context)
+        private static BreakdownVariant DetermineVariant(Bar bar)
         {
             return true /* energy check removed */
                 ? BreakdownVariant.HalfTime
                 : BreakdownVariant.Minimal;
         }
 
-        private IEnumerable<DrumCandidate> GenerateKickPattern(DrummerContext context, BreakdownVariant variant)
+        private IEnumerable<DrumCandidate> GenerateKickPattern(Bar bar, int seed, BreakdownVariant variant)
         {
             // Kick on beat 1 for both variants
             int velocityHint = GenerateVelocityHint(
                 KickVelocityMin, KickVelocityMax,
-                context.Bar.BarNumber, 1.0m,
-                context.Seed);
+                bar.BarNumber, 1.0m,
+                seed);
 
             yield return CreateCandidate(
                 role: GrooveRoles.Kick,
-                barNumber: context.Bar.BarNumber,
+                barNumber: bar.BarNumber,
                 beat: 1.0m,
                 strength: OnsetStrength.Downbeat,
-                score: ComputeScore(context),
+                score: ComputeScore(bar),
                 velocityHint: velocityHint);
 
             // Half-time may add kick on beat 3 as well
@@ -127,39 +98,39 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
             {
                 velocityHint = GenerateVelocityHint(
                     KickVelocityMin - 10, KickVelocityMax - 10,
-                    context.Bar.BarNumber, 3.0m,
-                    context.Seed);
+                    bar.BarNumber, 3.0m,
+                    seed);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Kick,
-                    barNumber: context.Bar.BarNumber,
+                    barNumber: bar.BarNumber,
                     beat: 3.0m,
                     strength: OnsetStrength.Strong,
-                    score: ComputeScore(context) * 0.8,
+                    score: ComputeScore(bar) * 0.8,
                     velocityHint: velocityHint);
             }
         }
 
-        private IEnumerable<DrumCandidate> GenerateSnarePattern(DrummerContext context, BreakdownVariant variant)
+        private IEnumerable<DrumCandidate> GenerateSnarePattern(Bar bar, int seed, BreakdownVariant variant)
         {
             // Half-time: snare on beat 3 only (not 2 and 4)
             // Minimal: snare on beat 3 only (same pattern, lower velocity)
             decimal snareBeat = 3.0m;
 
             int velocityHint = variant == BreakdownVariant.HalfTime
-                ? GenerateVelocityHint(SnareVelocityMin, SnareVelocityMax, context.Bar.BarNumber, snareBeat, context.Seed)
-                : GenerateVelocityHint(SnareVelocityMin - 15, SnareVelocityMax - 15, context.Bar.BarNumber, snareBeat, context.Seed);
+                ? GenerateVelocityHint(SnareVelocityMin, SnareVelocityMax, bar.BarNumber, snareBeat, seed)
+                : GenerateVelocityHint(SnareVelocityMin - 15, SnareVelocityMax - 15, bar.BarNumber, snareBeat, seed);
 
             yield return CreateCandidate(
                 role: GrooveRoles.Snare,
-                barNumber: context.Bar.BarNumber,
+                barNumber: bar.BarNumber,
                 beat: snareBeat,
                 strength: OnsetStrength.Backbeat,
-                score: ComputeScore(context),
+                score: ComputeScore(bar),
                 velocityHint: velocityHint);
         }
 
-        private IEnumerable<DrumCandidate> GenerateMinimalHatPattern(DrummerContext context)
+        private IEnumerable<DrumCandidate> GenerateMinimalHatPattern(Bar bar, int seed)
         {
             // Very sparse hats: just quarters or less
             decimal[] hatBeats = [1.0m, 3.0m];
@@ -168,31 +139,25 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
             {
                 int velocityHint = GenerateVelocityHint(
                     HatVelocityMin, HatVelocityMax,
-                    context.Bar.BarNumber, beat,
-                    context.Seed);
+                    bar.BarNumber, beat,
+                    seed);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.ClosedHat,
-                    barNumber: context.Bar.BarNumber,
+                    barNumber: bar.BarNumber,
                     beat: beat,
                     strength: beat == 1.0m ? OnsetStrength.Downbeat : OnsetStrength.Strong,
-                    score: ComputeScore(context) * 0.6,
+                    score: ComputeScore(bar) * 0.6,
                     velocityHint: velocityHint);
             }
         }
 
-        private static bool IsPopRockStyle(DrummerContext context)
-        {
-            return context.RngStreamKey?.Contains(PopRockStyleId, StringComparison.OrdinalIgnoreCase) == true
-                || context.RngStreamKey?.StartsWith("Drummer_", StringComparison.Ordinal) == true;
-        }
-
-        private double ComputeScore(DrummerContext context)
+        private double ComputeScore(Bar bar)
         {
             double score = BaseScore;
 
             // Boost at section start for establishing breakdown feel
-            if (context.Bar.IsAtSectionBoundary)
+            if (bar.IsAtSectionBoundary)
                 score += 0.1;
 
             // Slight reduction at higher energy (less breakdown-y)

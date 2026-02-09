@@ -1,8 +1,7 @@
 // AI: purpose=PhrasePunctuation operator creating brief dropout (sparse accents) to emphasize transitions.
 // AI: invariants=During dropout generate only sparse accents (kick/snare); absence of hats produces "dropout".
-// AI: deps=DrummerContext; downstream systems interpret fewer candidates as thinning; deterministic from seed.
+// AI: deps=Bar; downstream systems interpret fewer candidates as thinning; deterministic from seed.
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Planning;
@@ -24,36 +23,10 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
         /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
-        // Requires kick role for accents; snare optional. Energy gating is handled by selector/policy.
-        protected override string? RequiredRole => GrooveRoles.Kick;
-
-        // CanApply: apply only in fill windows with at least 3 beats to make stop-time musical.
-        public override bool CanApply(DrummerContext context)
-        {
-            if (!base.CanApply(context))
-                return false;
-
-            // Stop-time is a fill window technique
-            if (!context.Bar.IsFillWindow)
-                return false;
-
-            // Need at least 3 beats for stop-time to make sense
-            if (context.Bar.BeatsPerBar < 3)
-                return false;
-
-            return true;
-        }
-
         // Generate sparse accents (kick on 1, optional snare on 3) to create a dropout; no hat candidates emitted.
-        public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
+        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
         {
-            ArgumentNullException.ThrowIfNull(context);
-
-            if (context is not DrummerContext drummerContext)
-                yield break;
-
-            if (!CanApply(drummerContext))
-                yield break;
+            ArgumentNullException.ThrowIfNull(bar);
 
             // Stop-time: generate only sparse accents (kick on 1, snare on 3)
             // The absence of dense hat/fill candidates creates the "dropout" effect
@@ -61,14 +34,14 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
             // Kick accent on beat 1
             int kickVelocity = GenerateVelocityHint(
                 VelocityMin, VelocityMax,
-                drummerContext.Bar.BarNumber, 1.0m,
-                drummerContext.Seed);
+                bar.BarNumber, 1.0m,
+                seed);
 
-            double score = ComputeScore(drummerContext);
+            double score = ComputeScore(bar);
 
             yield return CreateCandidate(
                 role: GrooveRoles.Kick,
-                barNumber: drummerContext.Bar.BarNumber,
+                barNumber: bar.BarNumber,
                 beat: 1.0m,
                 strength: OnsetStrength.Downbeat,
                 score: score,
@@ -76,16 +49,16 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
                 fillRole: FillRole.None); // Stop-time isn't really a "fill"
 
             // Snare accent on beat 3 (if 4/4 or longer)
-            if (drummerContext.Bar.BeatsPerBar >= 4 && true /* role check deferred */)
+            if (bar.BeatsPerBar >= 4 && true /* role check deferred */)
             {
                 int snareVelocity = GenerateVelocityHint(
                     VelocityMin - 5, VelocityMax - 5,
-                    drummerContext.Bar.BarNumber, 3.0m,
-                    drummerContext.Seed);
+                    bar.BarNumber, 3.0m,
+                    seed);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,
-                    barNumber: drummerContext.Bar.BarNumber,
+                    barNumber: bar.BarNumber,
                     beat: 3.0m,
                     strength: OnsetStrength.Backbeat,
                     score: score * 0.95,
@@ -98,12 +71,12 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
             // because IsFillWindow is true and they suppress during fills
         }
 
-        private static double ComputeScore(DrummerContext context)
+        private static double ComputeScore(Bar bar)
         {
             double score = BaseScore;
 
             // Stop-time is more effective near section boundaries
-            if (context.Bar.IsAtSectionBoundary)
+            if (bar.IsAtSectionBoundary)
                 score *= 1.1;
 
             // Moderate energy sweet spot

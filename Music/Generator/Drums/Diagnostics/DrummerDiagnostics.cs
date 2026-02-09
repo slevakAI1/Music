@@ -23,7 +23,7 @@ public sealed record DrummerDiagnostics
     public required string Role { get; init; }
 
     /// <summary>
-    /// Operators that were considered (CanApply returned true).
+    /// Operators that were considered by the pipeline.
     /// </summary>
     public required IReadOnlyList<OperatorTrace> OperatorsConsidered { get; init; }
 

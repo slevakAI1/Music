@@ -1,10 +1,9 @@
 // AI: purpose=StyleIdiom operator: rock-style kick syncopation (primary 4.5 anticipation).
 // AI: invariants=Apply when style=PopRock and Kick role active; primary onset at 4.5; deterministic from (bar,seed).
-// AI: deps=DrummerContext, DrumCandidate, Groove; integrates with section type and per-bar hash for variation.
+// AI: deps=Bar, DrumCandidate, Groove; integrates with section type and per-bar hash for variation.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
@@ -31,45 +30,13 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
         /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.StyleIdiom;
 
-        /// <summary>
-        /// Requires moderate energy for syncopation to feel natural.
-        /// </summary>
-
-        /// <summary>
-        /// Requires kick role.
-        /// </summary>
-        protected override string? RequiredRole => GrooveRoles.Kick;
-
         /// <inheritdoc/>
-        public override bool CanApply(DrummerContext context)
+        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
         {
-            if (!base.CanApply(context))
-                return false;
-
-            // Style gating: only PopRock
-            if (!IsPopRockStyle(context))
-                return false;
-
-            // Need at least 4 beats for the primary pattern
-            if (context.Bar.BeatsPerBar < 4)
-                return false;
-
-            return true;
-        }
-
-        /// <inheritdoc/>
-        public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
-        {
-            ArgumentNullException.ThrowIfNull(context);
-
-            if (context is not DrummerContext drummerContext)
-                yield break;
-
-            if (!CanApply(drummerContext))
-                yield break;
+            ArgumentNullException.ThrowIfNull(bar);
 
             // Primary pattern: kick on 4.5 (the "and" of 4)
-            foreach (var candidate in GeneratePrimaryPattern(drummerContext))
+            foreach (var candidate in GeneratePrimaryPattern(bar, seed))
             {
                 yield return candidate;
             }
@@ -77,65 +44,65 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
             // Secondary patterns at higher energy
             if (true /* assume suitable for syncopation */)
             {
-                foreach (var candidate in GenerateSecondaryPattern(drummerContext))
+                foreach (var candidate in GenerateSecondaryPattern(bar, seed))
                 {
                     yield return candidate;
                 }
             }
         }
 
-        private IEnumerable<DrumCandidate> GeneratePrimaryPattern(DrummerContext context)
+        private IEnumerable<DrumCandidate> GeneratePrimaryPattern(Bar bar, int seed)
         {
             // Always generate the 4& kick (primary rock syncopation)
             int velocityHint = GenerateVelocityHint(
                 VelocityMin, VelocityMax,
-                context.Bar.BarNumber, PrimaryAnticipationBeat,
-                context.Seed);
+                bar.BarNumber, PrimaryAnticipationBeat,
+                seed);
 
-            double score = ComputeScore(context, isPrimary: true);
+            double score = ComputeScore(bar, isPrimary: true);
 
             yield return CreateCandidate(
                 role: GrooveRoles.Kick,
-                barNumber: context.Bar.BarNumber,
+                barNumber: bar.BarNumber,
                 beat: PrimaryAnticipationBeat,
                 strength: OnsetStrength.Pickup,
                 score: score,
                 velocityHint: velocityHint);
         }
 
-        private IEnumerable<DrumCandidate> GenerateSecondaryPattern(DrummerContext context)
+        private IEnumerable<DrumCandidate> GenerateSecondaryPattern(Bar bar, int seed)
         {
             // Deterministic selection of secondary pattern based on bar and seed
-            int hash = HashCode.Combine(context.Bar.BarNumber, context.Seed, "RockKickSecondary");
+            int hash = HashCode.Combine(bar.BarNumber, seed, "RockKickSecondary");
             bool use2And = (Math.Abs(hash) % 3) == 0;
             bool use3And = (Math.Abs(hash) % 4) == 0;
 
-            if (use2And && context.Bar.BeatsPerBar >= 3)
+            if (use2And && bar.BeatsPerBar >= 3)
             {
                 int velocityHint = GenerateVelocityHint(
                     VelocityMin - 10, VelocityMax - 10,
-                    context.Bar.BarNumber, SecondaryAnticipationBeat2,
-                    context.Seed);
+                    bar.BarNumber, SecondaryAnticipationBeat2,
+                    seed);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Kick,
-                    barNumber: context.Bar.BarNumber,
+                    barNumber: bar.BarNumber,
                     beat: SecondaryAnticipationBeat2,
                     strength: OnsetStrength.Offbeat,
                     score: SecondaryPatternScore,
                     velocityHint: velocityHint);
             }
 
-            if (use3And && context.Bar.BeatsPerBar >= 4)
+            if (use3And && bar.BeatsPerBar >= 4)
             {
                 int velocityHint = GenerateVelocityHint(
                     VelocityMin - 10, VelocityMax - 10,
-                    context.Bar.BarNumber, SecondaryAnticipationBeat3,
-                    context.Seed);
+                    bar.BarNumber, SecondaryAnticipationBeat3,
+                    seed);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Kick,
-                    barNumber: context.Bar.BarNumber,
+                    barNumber: bar.BarNumber,
                     beat: SecondaryAnticipationBeat3,
                     strength: OnsetStrength.Offbeat,
                     score: SecondaryPatternScore,
@@ -143,23 +110,17 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
             }
         }
 
-        private static bool IsPopRockStyle(DrummerContext context)
-        {
-            return context.RngStreamKey?.Contains(PopRockStyleId, StringComparison.OrdinalIgnoreCase) == true
-                || context.RngStreamKey?.StartsWith("Drummer_", StringComparison.Ordinal) == true;
-        }
-
-        private double ComputeScore(DrummerContext context, bool isPrimary)
+        private double ComputeScore(Bar bar, bool isPrimary)
         {
             double score = isPrimary ? BaseScore : SecondaryPatternScore;
 
             // Boost for chorus (more energy, more drive)
-            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            var sectionType = bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
             if (sectionType == MusicConstants.eSectionType.Chorus)
                 score += 0.1;
 
             // Boost at section boundaries (drive into next section)
-            if (context.Bar.IsAtSectionBoundary && context.Bar.BarsUntilSectionEnd <= 1)
+            if (bar.IsAtSectionBoundary && bar.BarsUntilSectionEnd <= 1)
                 score += 0.15;
 
             // Energy scaling

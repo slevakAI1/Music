@@ -1,9 +1,8 @@
 // AI: purpose=Collect and map drum operator candidates into grouped DrumCandidateGroups for selection.
-// AI: invariants=Deterministic given same context+seed; operators invoked in registry order; groups non-empty implies candidates.
-// AI: deps=Uses DrumOperatorRegistry, DrummerContextBuilder, DrumCandidateMapper; affects selection pipeline.
+// AI: invariants=Deterministic given same bar+seed; operators invoked in registry order; groups non-empty implies candidates.
+// AI: deps=Uses DrumOperatorRegistry, DrumCandidateMapper; affects selection pipeline.
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators;
 using Music.Generator.Groove;
 
@@ -51,7 +50,7 @@ namespace Music.Generator.Drums.Operators.Candidates
             _settings = settings ?? DrummerOperatorCandidatesSettings.Default;
         }
 
-        // AI: entry=GetCandidateGroups builds context, runs enabled operators, maps and groups results
+        // AI: entry=GetCandidateGroups runs enabled operators for bar+seed, maps and groups results
         public IReadOnlyList<DrumCandidateGroup> GetCandidateGroups(
             Bar bar,
             string role)
@@ -61,8 +60,7 @@ namespace Music.Generator.Drums.Operators.Candidates
 
             _lastExecutionDiagnostics = new List<OperatorExecutionDiagnostic>();
 
-            // Build DrummerContext from Bar
-            var drummerContext = BuildDrummerContext(bar, role);
+            int seed = GetSeed(bar);
 
             // Get enabled operators (style + policy filtering)
             var enabledOperators = GetEnabledOperators(bar, role);
@@ -73,7 +71,7 @@ namespace Music.Generator.Drums.Operators.Candidates
             }
 
             // Generate candidates from all enabled operators
-            var allCandidates = GenerateCandidatesFromOperators(enabledOperators, drummerContext);
+            var allCandidates = GenerateCandidatesFromOperators(enabledOperators, bar, seed);
 
             if (allCandidates.Count == 0)
             {
@@ -94,18 +92,6 @@ namespace Music.Generator.Drums.Operators.Candidates
         // AI: diagnostics=LastExecutionDiagnostics contains per-operator diagnostics from last invocation
         public IReadOnlyList<OperatorExecutionDiagnostic>? LastExecutionDiagnostics => _lastExecutionDiagnostics;
 
-        // AI: behavior=Builds DrummerContext from Bar and per-bar seed; stateless builder call
-        private DrummerContext BuildDrummerContext(Bar bar, string role)
-        {
-            var input = new DrummerContextBuildInput
-            {
-                Bar = bar,
-                Seed = GetSeed(bar)
-            };
-
-            return DrummerContextBuilder.Build(input);
-        }
-
         // AI: policy=Returns enabled operators; TODO: apply DrummerPolicyProvider allow-list in future
         private IReadOnlyList<IDrumOperator> GetEnabledOperators(Bar bar, string role)
         {
@@ -117,51 +103,31 @@ namespace Music.Generator.Drums.Operators.Candidates
         // AI: behavior=Invokes each operator in order and aggregates validated DrumCandidates
         private List<DrumCandidate> GenerateCandidatesFromOperators(
             IReadOnlyList<IDrumOperator> operators,
-            DrummerContext context)
+            Bar bar,
+            int seed)
         {
             var allCandidates = new List<DrumCandidate>();
 
             foreach (var op in operators)
             {
-                var diagnostic = ExecuteOperator(op, context, allCandidates);
+                var diagnostic = ExecuteOperator(op, bar, seed, allCandidates);
                 _lastExecutionDiagnostics?.Add(diagnostic);
             }
 
             return allCandidates;
         }
 
-        // AI: exec=Safely runs CanApply then GenerateCandidates; wraps exceptions into diagnostics per settings
+        // AI: exec=Safely runs GenerateCandidates; wraps exceptions into diagnostics per settings
         private OperatorExecutionDiagnostic ExecuteOperator(
             IDrumOperator op,
-            DrummerContext context,
+            Bar bar,
+            int seed,
             List<DrumCandidate> allCandidates)
         {
-            // Check CanApply first
-            bool canApply;
-            try
-            {
-                canApply = op.CanApply(context);
-            }
-            catch (Exception ex)
-            {
-                return HandleOperatorError(op, ex, "CanApply");
-            }
-
-            if (!canApply)
-            {
-                return new OperatorExecutionDiagnostic
-                {
-                    OperatorId = op.OperatorId,
-                    Family = op.OperatorFamily,
-                    CandidatesGenerated = 0,
-                    WasSkipped = true
-                };
-            }
-
             // Generate candidates
             try
             {
-                var candidates = op.GenerateCandidates(context);
+                var candidates = op.GenerateCandidates(bar, seed);
                 int count = 0;
 
                 foreach (var candidate in candidates)

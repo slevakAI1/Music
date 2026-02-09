@@ -1,10 +1,9 @@
 // AI: purpose=StyleIdiom operator generating consistent crash patterns for PopRock chorus sections.
 // AI: invariants=Apply only when style=PopRock and Section=Chorus; Crash role required; crash usually on beat 1.
-// AI: deps=DrummerContext, DrumCandidate, DrumArticulation; deterministic selection from (barNumber,seed).
+// AI: deps=Bar, DrumCandidate, DrumArticulation; deterministic selection from (barNumber,seed).
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Performance;
@@ -25,61 +24,28 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
 
         public override OperatorFamily OperatorFamily => OperatorFamily.StyleIdiom;
 
-        /// <summary>
-        /// Crashes are most effective at moderate to high energy.
-        /// </summary>
-
-        /// <summary>
-        /// Requires crash role.
-        /// </summary>
-        protected override string? RequiredRole => GrooveRoles.Crash;
-
         /// <inheritdoc/>
-        public override bool CanApply(DrummerContext context)
+        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
         {
-            if (!base.CanApply(context))
-                return false;
-
-            // Style gating: only PopRock
-            if (!IsPopRockStyle(context))
-                return false;
-
-            // Section gating: only chorus
-            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
-            if (sectionType != MusicConstants.eSectionType.Chorus)
-                return false;
-
-            return true;
-        }
-
-        /// <inheritdoc/>
-        public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
-        {
-            ArgumentNullException.ThrowIfNull(context);
-
-            if (context is not DrummerContext drummerContext)
-                yield break;
-
-            if (!CanApply(drummerContext))
-                yield break;
+            ArgumentNullException.ThrowIfNull(bar);
 
             // Determine crash pattern based on energy
-            CrashPattern pattern = DetermineCrashPattern(drummerContext);
+            CrashPattern pattern = DetermineCrashPattern(bar);
 
-            if (!ShouldCrashThisBar(drummerContext, pattern))
+            if (!ShouldCrashThisBar(bar, pattern))
                 yield break;
 
             // Generate crash on beat 1
             int velocityHint = GenerateVelocityHint(
                 VelocityMin, VelocityMax,
-                drummerContext.Bar.BarNumber, 1.0m,
-                drummerContext.Seed);
+                bar.BarNumber, 1.0m,
+                seed);
 
-            double score = ComputeScore(drummerContext);
+            double score = ComputeScore(bar);
 
             yield return CreateCandidate(
                 role: GrooveRoles.Crash,
-                barNumber: drummerContext.Bar.BarNumber,
+                barNumber: bar.BarNumber,
                 beat: 1.0m,
                 strength: OnsetStrength.Downbeat,
                 score: score,
@@ -87,13 +53,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
                 articulationHint: DrumArticulation.Crash);
         }
 
-        private static bool IsPopRockStyle(DrummerContext context)
-        {
-            return context.RngStreamKey?.Contains(PopRockStyleId, StringComparison.OrdinalIgnoreCase) == true
-                || context.RngStreamKey?.StartsWith("Drummer_", StringComparison.Ordinal) == true;
-        }
-
-        private static CrashPattern DetermineCrashPattern(DrummerContext context)
+        private static CrashPattern DetermineCrashPattern(Bar bar)
         {
             // Higher energy = more crashes
             return 0.5 switch /* default energy */
@@ -104,35 +64,35 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
             };
         }
 
-        private static bool ShouldCrashThisBar(DrummerContext context, CrashPattern pattern)
+        private static bool ShouldCrashThisBar(Bar bar, CrashPattern pattern)
         {
             // Calculate position within section (0-based)
-            int barInSection = GetBarPositionInSection(context);
+            int barInSection = GetBarPositionInSection(bar);
 
             return pattern switch
             {
                 CrashPattern.EveryBar => true,
                 CrashPattern.EveryOtherBar => barInSection % 2 == 0,
-                CrashPattern.PhraseStartOnly => barInSection == 0 || context.Bar.IsAtSectionBoundary,
+                CrashPattern.PhraseStartOnly => barInSection == 0 || bar.IsAtSectionBoundary,
                 _ => false
             };
         }
 
-        private static int GetBarPositionInSection(DrummerContext context)
+        private static int GetBarPositionInSection(Bar bar)
         {
             // Approximate position based on BarsUntilSectionEnd
             // This is a simplification; actual implementation may use more context
-            int totalBarsInSection = context.Bar.BarsUntilSectionEnd + 1;
-            int barInSection = totalBarsInSection - context.Bar.BarsUntilSectionEnd - 1;
+            int totalBarsInSection = bar.BarsUntilSectionEnd + 1;
+            int barInSection = totalBarsInSection - bar.BarsUntilSectionEnd - 1;
             return Math.Max(0, barInSection);
         }
 
-        private double ComputeScore(DrummerContext context)
+        private double ComputeScore(Bar bar)
         {
             double score = BaseScore;
 
             // Boost at section boundary (first bar of chorus)
-            if (context.Bar.IsAtSectionBoundary)
+            if (bar.IsAtSectionBoundary)
                 score += 0.1;
 
             // Energy scaling

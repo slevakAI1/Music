@@ -1,8 +1,7 @@
 // AI: purpose=PhrasePunctuation: produce 2-beat turnaround fills (last 2 beats of bar) to punctuate phrases.
 // AI: invariants=Apply only when Bar.IsFillWindow true; 16th-grid positions within last 2 beats; deterministic from seed.
-// AI: deps=DrummerContext, DrumCandidate; roles map to snare primary; anti-repetition handled outside this operator.
+// AI: deps=Bar, DrumCandidate; roles map to snare primary; anti-repetition handled outside this operator.
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Planning;
@@ -27,52 +26,20 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
         /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
-        /// <summary>
-        /// Requires minimum energy for fill to sound musical (not too sparse).
-        /// </summary>
-
-        /// <summary>
-        /// Requires snare for fill hits (primary fill role).
-        /// </summary>
-        protected override string? RequiredRole => GrooveRoles.Snare;
-
         /// <inheritdoc/>
-        public override bool CanApply(DrummerContext context)
+        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
         {
-            if (!base.CanApply(context))
-                return false;
-
-            // Only in fill window
-            if (!context.Bar.IsFillWindow)
-                return false;
-
-            // Need at least 2 beats for a short fill
-            if (context.Bar.BeatsPerBar < 2)
-                return false;
-
-            return true;
-        }
-
-        /// <inheritdoc/>
-        public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
-        {
-            ArgumentNullException.ThrowIfNull(context);
-
-            if (context is not DrummerContext drummerContext)
-                yield break;
-
-            if (!CanApply(drummerContext))
-                yield break;
+            ArgumentNullException.ThrowIfNull(bar);
 
             // Fill occupies last 2 beats of the bar
-            int beatsPerBar = drummerContext.Bar.BeatsPerBar;
+            int beatsPerBar = bar.BeatsPerBar;
             decimal fillStartBeat = beatsPerBar - 1; // e.g., beat 3 in 4/4
 
             // Compute hit count based on energy (4-8 hits for 2-beat fill)
             int hitCount = ComputeHitCount(0.5); // default energy
 
             // Generate fill pattern positions (16th grid within last 2 beats)
-            var positions = GenerateFillPositions(fillStartBeat, beatsPerBar, hitCount, drummerContext.Seed, drummerContext.Bar.BarNumber);
+            var positions = GenerateFillPositions(fillStartBeat, beatsPerBar, hitCount, seed, bar.BarNumber);
 
             bool isFirst = true;
             foreach (var (beat, isAccent) in positions)
@@ -85,17 +52,17 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
 
                 int velocityHint = GenerateVelocityHint(
                     velMin, velMax,
-                    drummerContext.Bar.BarNumber, beat,
-                    drummerContext.Seed);
+                    bar.BarNumber, beat,
+                    seed);
 
                 OnsetStrength strength = isAccent ? OnsetStrength.Strong : OnsetStrength.Ghost;
 
                 // Score higher at section boundaries
-                double score = ComputeScore(drummerContext);
+                double score = ComputeScore(bar);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,
-                    barNumber: drummerContext.Bar.BarNumber,
+                    barNumber: bar.BarNumber,
                     beat: beat,
                     strength: strength,
                     score: score,
@@ -164,17 +131,17 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
             }
         }
 
-        private static double ComputeScore(DrummerContext context)
+        private static double ComputeScore(Bar bar)
         {
             double score = BaseScore;
 
             // Higher score at section boundaries
-            if (context.Bar.IsAtSectionBoundary)
+            if (bar.IsAtSectionBoundary)
                 score *= 1.15;
 
             // Energy scaling
             // Boost near section end
-            if (context.Bar.BarsUntilSectionEnd <= 1)
+            if (bar.BarsUntilSectionEnd <= 1)
                 score *= 1.1;
 
             return Math.Clamp(score, 0.0, 1.0);

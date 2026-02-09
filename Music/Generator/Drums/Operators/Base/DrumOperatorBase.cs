@@ -1,11 +1,10 @@
-// AI: purpose=Abstract base for all drum operators; provides common CanApply checks and helper methods.
-// AI: invariants=Subclasses must provide OperatorId and OperatorFamily; base CanApply validates context type.
-// AI: deps=IDrumOperator interface, DrummerContext (minimal: Bar + cross-bar state), DrumCandidate.
-// AI: change=Epic DrummerContext-Dedup; removed energy thresholds; bar properties accessed via context.Bar.
+// AI: purpose=Abstract base for all drum operators; provides helper methods.
+// AI: invariants=Subclasses must provide OperatorId and OperatorFamily.
+// AI: deps=IDrumOperator interface, Bar, DrumCandidate.
+// AI: change=Epic DrummerContext-Dedup; removed energy thresholds; bar properties accessed directly.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Performance;
 using Music.Generator.Drums.Planning;
@@ -14,8 +13,8 @@ using Music.Generator.Material;
 
 namespace Music.Generator.Drums.Operators.Base
 {
-    // AI: purpose=Abstract base for drum operators; supplies common CanApply/Score/CreateCandidate helpers.
-    // AI: invariants=Subclasses must provide OperatorId and OperatorFamily; use context.Bar for bar-derived checks.
+    // AI: purpose=Abstract base for drum operators; supplies common Score/CreateCandidate helpers.
+    // AI: invariants=Subclasses must provide OperatorId and OperatorFamily.
     public abstract class DrumOperatorBase : IDrumOperator
     {
         /// <inheritdoc/>
@@ -24,58 +23,14 @@ namespace Music.Generator.Drums.Operators.Base
         /// <inheritdoc/>
         public abstract OperatorFamily OperatorFamily { get; }
 
-        // RequiredRole: when non-null operator is intended only for that role; null => no role restriction.
-        protected virtual string? RequiredRole => null;
-
-        // Requires16thGrid: set true when operator assumes 16th-note grid alignment for onsets.
-        protected virtual bool Requires16thGrid => false;
+        /// <inheritdoc/>
+        public abstract IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed);
 
         /// <inheritdoc/>
-        public virtual bool CanApply(GeneratorContext context)
-        {
-            ArgumentNullException.ThrowIfNull(context);
-
-            if (context is not DrummerContext drummerContext)
-                return false;
-
-            return CanApply(drummerContext);
-        }
-
-        /// <inheritdoc/>
-        public virtual bool CanApply(DrummerContext context)
-        {
-            ArgumentNullException.ThrowIfNull(context);
-
-            // Required role check (if role is required, check against groove preset active roles)
-            if (RequiredRole is not null)
-            {
-                // TODO: Access active roles from groove preset via context.Bar
-                // For now, assume role is available (operators will self-gate if needed)
-            }
-
-            return true;
-        }
-
-        /// <inheritdoc/>
-        public abstract IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context);
-
-        /// <inheritdoc/>
-        public virtual IEnumerable<DrumCandidate> GenerateCandidates(DrummerContext context)
-        {
-            return GenerateCandidates((GeneratorContext)context);
-        }
-
-        /// <inheritdoc/>
-        public virtual double Score(DrumCandidate candidate, GeneratorContext context)
+        public virtual double Score(DrumCandidate candidate, Bar bar)
         {
             ArgumentNullException.ThrowIfNull(candidate);
             return candidate.Score;
-        }
-
-        /// <inheritdoc/>
-        public virtual double Score(DrumCandidate candidate, DrummerContext context)
-        {
-            return Score(candidate, (GeneratorContext)context);
         }
 
         // Create a DrumCandidate populated with common operator-provided fields.

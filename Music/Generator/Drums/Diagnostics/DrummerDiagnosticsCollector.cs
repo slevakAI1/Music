@@ -36,7 +36,7 @@ public sealed class DrummerDiagnosticsCollector
     }
 
     /// <summary>
-    /// Records an operator that was considered (CanApply returned true).
+    /// Records an operator that was considered by the pipeline.
     /// </summary>
     /// <param name="operatorId">Unique operator identifier.</param>
     /// <param name="operatorFamily">Operator family classification.</param>

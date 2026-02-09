@@ -1,6 +1,6 @@
 // AI: purpose=Drummer policy provider implementing IDrumPolicyProvider; computes per-bar policy decisions from style + context + memory.
 // AI: invariants=Deterministic: same inputs → same DrumPolicyDecision; read-only access to memory; never mutates inputs.
-// AI: deps=IDrumPolicyProvider, DrumPolicyDecision, StyleConfiguration, IAgentMemory, DrummerContext, MotifPresenceMap (Story 9.3).
+// AI: deps=IDrumPolicyProvider, DrumPolicyDecision, StyleConfiguration, IAgentMemory, Bar, MotifPresenceMap (Story 9.3).
 // AI: change=Story 2.3, 9.3, 4.2; extend with additional override logic as operators are implemented.
 
 using Music.Generator;
@@ -129,7 +129,7 @@ namespace Music.Generator.Agents.Drums
 
             // Apply energy modifier: higher energy increases density
             // EnergyLevel is computed from context upstream; for now we use section-based defaults
-            // until DrummerContext is passed (integration with Story 2.4)
+            // until Bar is passed (integration with Story 2.4)
             double energyModifier = GetEnergyModifier(sectionType);
             double adjustedDensity = baseDensity + (energyModifier * _settings.EnergyDensityScale);
 

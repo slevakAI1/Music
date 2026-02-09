@@ -1,10 +1,9 @@
 // AI: purpose=SubdivisionTransform: add open hi-hat accents on selected offbeats for emphasis.
 // AI: invariants=Apply when OpenHat role active; positions limited to Bar.BeatsPerBar; deterministic selection.
-// AI: deps=DrummerContext, DrumCandidate, DrumArticulation; integrates with groove section type and energy.
+// AI: deps=Bar, DrumCandidate, DrumArticulation; integrates with groove section type and energy.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Performance;
@@ -29,40 +28,14 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
         /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.SubdivisionTransform;
 
-        // Requires open hi-hat role; energy gating handled by selector/policy.
-        protected override string? RequiredRole => GrooveRoles.OpenHat;
-
-        // CanApply: ensure hat mode allows open hats and bar long enough for accent positions.
-        public override bool CanApply(DrummerContext context)
-        {
-            if (!base.CanApply(context))
-                return false;
-
-            // Requires hat mode (not ride)
-            if (HatMode.Closed /* default assumption */ == HatMode.Ride)
-                return false;
-
-            // Need at least 4 beats for standard accent positions
-            if (context.Bar.BeatsPerBar < 4)
-                return false;
-
-            return true;
-        }
-
         /// <inheritdoc/>
-        public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
+        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
         {
-            ArgumentNullException.ThrowIfNull(context);
-
-            if (context is not DrummerContext drummerContext)
-                yield break;
-
-            if (!CanApply(drummerContext))
-                yield break;
+            ArgumentNullException.ThrowIfNull(bar);
 
             // Filter positions to those within the bar
             var validPositions = AccentPositions
-                .Where(p => p <= drummerContext.Bar.BeatsPerBar)
+                .Where(p => p <= bar.BeatsPerBar)
                 .ToList();
 
             // Determine how many accents based on energy
@@ -70,20 +43,20 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
             int count = Math.Min(maxAccents, validPositions.Count);
 
             // Select positions deterministically
-            var selectedPositions = SelectPositions(validPositions, count, drummerContext);
+            var selectedPositions = SelectPositions(validPositions, count, bar, seed);
 
             foreach (decimal beat in selectedPositions)
             {
                 int velocityHint = GenerateVelocityHint(
                     VelocityMin, VelocityMax,
-                    drummerContext.Bar.BarNumber, beat,
-                    drummerContext.Seed);
+                    bar.BarNumber, beat,
+                    seed);
 
-                double score = ComputeScore(drummerContext, beat);
+                double score = ComputeScore(bar, beat);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.OpenHat,
-                    barNumber: drummerContext.Bar.BarNumber,
+                    barNumber: bar.BarNumber,
                     beat: beat,
                     strength: OnsetStrength.Offbeat,
                     score: score,
@@ -95,7 +68,8 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
         private static IEnumerable<decimal> SelectPositions(
             List<decimal> validPositions,
             int count,
-            DrummerContext context)
+            Bar bar,
+            int seed)
         {
             if (count >= validPositions.Count)
             {
@@ -103,7 +77,7 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
             }
 
             // Deterministic selection based on bar/seed
-            int hash = HashCode.Combine(context.Bar.BarNumber, context.Seed, "OpenHatAccent");
+            int hash = HashCode.Combine(bar.BarNumber, seed, "OpenHatAccent");
             int startIndex = Math.Abs(hash) % validPositions.Count;
 
             var result = new List<decimal>(count);
@@ -115,17 +89,17 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
             return result;
         }
 
-        private double ComputeScore(DrummerContext context, decimal beat)
+        private double ComputeScore(Bar bar, decimal beat)
         {
             double score = BaseScore;
-            
+
             // Open hats work well in choruses and high-energy sections
-            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            var sectionType = bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
             if (sectionType == MusicConstants.eSectionType.Chorus)
                 score *= 1.15;
-            
+
             // Section transitions can benefit from open hat emphasis
-            if (context.Bar.BarsUntilSectionEnd <= 2)
+            if (bar.BarsUntilSectionEnd <= 2)
                 score *= 1.1;
             
             // Energy scaling            

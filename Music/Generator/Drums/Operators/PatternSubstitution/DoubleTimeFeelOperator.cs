@@ -1,10 +1,9 @@
 // AI: purpose=PatternSubstitution: produce double-time feel (denser kicks, driving energy) without tempo change.
 // AI: invariants=Apply in high-energy suitable sections; uses Bar.BackbeatBeats and BeatsPerBar; deterministic from seed.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; integrates with section type for suitability decisions.
+// AI: deps=DrumOperatorBase, Bar, DrumCandidate; integrates with section type for suitability decisions.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Context;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
@@ -27,47 +26,15 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
 
         public override OperatorFamily OperatorFamily => OperatorFamily.PatternSubstitution;
 
-        // Requires kick role; prefer high-energy, chorus/solo/outro sections. Mutual exclusion with half-time handled externally.
-        protected override string? RequiredRole => GrooveRoles.Kick;
-
-        // CanApply: check base, bar length, and section suitability for double-time feel.
-        public override bool CanApply(DrummerContext context)
-        {
-            if (!base.CanApply(context))
-                return false;
-
-            // Need at least 3 beats for meaningful double-time
-            if (context.Bar.BeatsPerBar < 3)
-                return false;
-
-            // Best suited for high-energy sections
-            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
-            bool isSuitableSection = sectionType is
-                MusicConstants.eSectionType.Chorus or
-                MusicConstants.eSectionType.Solo or
-                MusicConstants.eSectionType.Outro;
-
-            if (!isSuitableSection)
-                return false;
-
-            return true;
-        }
-
         // Generate dense kick + snare backbeat candidates to realize double-time feel.
-        public override IEnumerable<DrumCandidate> GenerateCandidates(GeneratorContext context)
+        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
         {
-            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(bar);
 
-            if (context is not DrummerContext drummerContext)
-                yield break;
-
-            if (!CanApply(drummerContext))
-                yield break;
-
-            double baseScore = ComputeScore(drummerContext);
+            double baseScore = ComputeScore(bar);
 
             // Generate dense kick pattern (8th note density)
-            foreach (var kickCandidate in GenerateKickPattern(drummerContext, baseScore))
+            foreach (var kickCandidate in GenerateKickPattern(bar, seed, baseScore))
             {
                 yield return kickCandidate;
             }
@@ -75,7 +42,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
             // Generate backbeat snare candidates if snare is active
             if (true /* role check deferred */)
             {
-                foreach (var snareCandidate in GenerateSnarePattern(drummerContext, baseScore))
+                foreach (var snareCandidate in GenerateSnarePattern(bar, seed, baseScore))
                 {
                     yield return snareCandidate;
                 }
@@ -83,9 +50,9 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
         }
 
         // Produce kick candidates at downbeats and offbeats (8th-note density) deterministically.
-        private IEnumerable<DrumCandidate> GenerateKickPattern(DrummerContext context, double baseScore)
+        private IEnumerable<DrumCandidate> GenerateKickPattern(Bar bar, int seed, double baseScore)
         {
-            int beatsPerBar = context.Bar.BeatsPerBar;
+            int beatsPerBar = bar.BeatsPerBar;
 
             // Generate 8th note kick pattern (every beat + offbeats)
             for (int beatInt = 1; beatInt <= beatsPerBar; beatInt++)
@@ -93,14 +60,14 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
                 // Downbeat kick
                 int downbeatVelocity = GenerateVelocityHint(
                     KickDownbeatVelocityMin, KickDownbeatVelocityMax,
-                    context.Bar.BarNumber, beatInt,
-                    context.Seed);
+                    bar.BarNumber, beatInt,
+                    seed);
 
                 OnsetStrength downbeatStrength = beatInt == 1 ? OnsetStrength.Downbeat : OnsetStrength.Strong;
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Kick,
-                    barNumber: context.Bar.BarNumber,
+                    barNumber: bar.BarNumber,
                     beat: beatInt,
                     strength: downbeatStrength,
                     score: baseScore,
@@ -112,12 +79,12 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
                 {
                     int offbeatVelocity = GenerateVelocityHint(
                         KickOffbeatVelocityMin, KickOffbeatVelocityMax,
-                        context.Bar.BarNumber, offbeatPosition,
-                        context.Seed);
+                        bar.BarNumber, offbeatPosition,
+                        seed);
 
                     yield return CreateCandidate(
                         role: GrooveRoles.Kick,
-                        barNumber: context.Bar.BarNumber,
+                        barNumber: bar.BarNumber,
                         beat: offbeatPosition,
                         strength: OnsetStrength.Offbeat,
                         score: baseScore * 0.85, // Lower score for offbeats
@@ -127,22 +94,22 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
         }
 
         // Produce snare backbeat candidates (from Bar.BackbeatBeats) with strong velocity hints.
-        private IEnumerable<DrumCandidate> GenerateSnarePattern(DrummerContext context, double baseScore)
+        private IEnumerable<DrumCandidate> GenerateSnarePattern(Bar bar, int seed, double baseScore)
         {
             // Standard backbeats (2 and 4) with high velocity for double-time energy
-            foreach (int backbeat in context.Bar.BackbeatBeats)
+            foreach (int backbeat in bar.BackbeatBeats)
             {
-                if (backbeat > context.Bar.BeatsPerBar)
+                if (backbeat > bar.BeatsPerBar)
                     continue;
 
                 int snareVelocity = GenerateVelocityHint(
                     SnareVelocityMin, SnareVelocityMax,
-                    context.Bar.BarNumber, backbeat,
-                    context.Seed);
+                    bar.BarNumber, backbeat,
+                    seed);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Snare,
-                    barNumber: context.Bar.BarNumber,
+                    barNumber: bar.BarNumber,
                     beat: backbeat,
                     strength: OnsetStrength.Backbeat,
                     score: baseScore,
@@ -151,16 +118,16 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
         }
 
         // Compute base score for this operator considering section and boundaries.
-        private double ComputeScore(DrummerContext context)
+        private double ComputeScore(Bar bar)
         {
             double score = BaseScore;
 
             // Boost at section boundaries
-            if (context.Bar.IsAtSectionBoundary)
+            if (bar.IsAtSectionBoundary)
                 score += 0.15;
 
             // Boost in chorus (most natural home for double-time)
-            var sectionType = context.Bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
+            var sectionType = bar.Section?.SectionType ?? MusicConstants.eSectionType.Verse;
             if (sectionType == MusicConstants.eSectionType.Chorus)
                 score += 0.1;
 
