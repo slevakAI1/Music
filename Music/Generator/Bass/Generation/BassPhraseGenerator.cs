@@ -2,7 +2,6 @@
 // AI: invariants=Output is a PartTrack; reusable for MaterialBank storage.
 // AI: deps=bassOperatorApplicator; bassOperatorRegistry; BarTrack; SongContext; PartTrack.
 
-using Music.Generator.Bass.Operators;
 using Music.Generator.Drums.Operators;
 using Music.Generator.Groove;
 using Music.MyMidi;

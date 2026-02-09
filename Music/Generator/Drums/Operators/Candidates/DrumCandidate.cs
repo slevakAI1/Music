@@ -43,32 +43,6 @@ namespace Music.Generator.Drums.Operators.Candidates
         // AI: invariant=Operator score in [0.0,1.0] before style weighting and penalties
         public required double Score { get; init; }
 
-        // AI: helper=Creates a minimal candidate for tests using the default id format
-        public static DrumCandidate CreateMinimal(
-            string operatorId = "TestOperator",
-            string role = GrooveRoles.Snare,
-            int barNumber = 1,
-            decimal beat = 2.0m,
-            OnsetStrength strength = OnsetStrength.Backbeat,
-            double score = 0.5)
-        {
-            string candidateId = $"{operatorId}_{role}_{barNumber}_{beat}";
-            return new DrumCandidate
-            {
-                CandidateId = candidateId,
-                OperatorId = operatorId,
-                Role = role,
-                BarNumber = barNumber,
-                Beat = beat,
-                Strength = strength,
-                VelocityHint = null,
-                TimingHint = null,
-                ArticulationHint = null,
-                FillRole = FillRole.None,
-                Score = score
-            };
-        }
-
         // AI: util=Deterministic CandidateId generator; append articulation only if specified and not None
         public static string GenerateCandidateId(
             string operatorId,
