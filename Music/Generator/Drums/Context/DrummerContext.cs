@@ -1,4 +1,4 @@
-// AI: purpose=Drummer-specific context extending AgentContext; minimal contract for operator decisions.
+// AI: purpose=Drummer-specific context
 // AI: invariants=Immutable fields; Bar is canonical; only cross-bar state: LastKickBeat, LastSnareBeat.
 // AI: deps=GeneratorContext, Bar, Section; consumed by DrummerOperators; Bar owns bar-derived flags.
 

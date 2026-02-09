@@ -54,6 +54,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Generator\Core\DecayCurve.cs" />
     <Compile Remove="Generator\Core\FillShape.cs" />
     <Compile Remove="Generator\Core\GeneratorMemory.cs" />
     <Compile Remove="Generator\Core\IGeneratorMemory.cs" />
