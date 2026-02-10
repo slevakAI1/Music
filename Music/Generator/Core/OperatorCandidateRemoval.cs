@@ -1,10 +1,10 @@
-// AI: purpose=Identifies an existing onset to remove; used by IDrumRemovalOperator implementations.
-// AI: invariants=BarNumber>=1; Beat>=1.0; Role must match existing onset key (BarNumber,Beat,Role).
-// AI: deps=Consumed by DrumOperatorApplicator to filter onsets; respects GrooveOnset protection flags.
+// AI: purpose=Instrument-agnostic removal target; matched against existing onset (BarNumber,Beat,Role) tuples.
+// AI: invariants=BarNumber>=1; Beat>=1.0; Role must match existing onset key.
+// AI: deps=Consumed by instrument applicators to filter onsets; respects instrument-specific protection flags.
 
-namespace Music.Generator.Drums.Operators.Candidates
+namespace Music.Generator.Core
 {
-    // AI: contract=Immutable removal target; matched against GrooveOnset (BarNumber,Beat,Role) tuples.
+    // AI: contract=Immutable removal target; instrument layer matches against its onset model
     public sealed record OperatorCandidateRemoval
     {
         // AI: invariant=1-based bar number of the onset to remove
@@ -13,7 +13,7 @@ namespace Music.Generator.Drums.Operators.Candidates
         // AI: invariant=1-based beat position of the onset to remove; fractional values allowed
         public required decimal Beat { get; init; }
 
-        // AI: info=Role of the onset to remove (e.g., Kick, ClosedHat)
+        // AI: info=Role of the onset to remove (instrument-specific, e.g., Kick, ClosedHat, BassRoot)
         public required string Role { get; init; }
 
         // AI: info=Operator that proposed this removal; for diagnostics/provenance

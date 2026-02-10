@@ -5,6 +5,7 @@
 
 using Music.Generator.Core;
 using Music.Generator.Groove;
+using Music.Generator.Drums.Operators.Candidates;
 
 namespace Music.Generator.Drums.Operators.StyleIdiom
 {
@@ -51,10 +52,10 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
                     role: GrooveRoles.Snare,
                     barNumber: bar.BarNumber,
                     beat: beat,
-                    strength: OnsetStrength.Backbeat,
                     score: score,
                     velocityHint: velocityHint,
-                    timingHint: timingOffset);
+                    timingHint: timingOffset,
+                    instrumentData: DrumCandidateData.Create(strength: OnsetStrength.Backbeat));
             }
         }
 

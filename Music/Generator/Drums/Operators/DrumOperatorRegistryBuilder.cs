@@ -8,6 +8,7 @@ using Music.Generator.Drums.Operators.SubdivisionTransform;
 using Music.Generator.Drums.Operators.PhrasePunctuation;
 using Music.Generator.Drums.Operators.PatternSubstitution;
 using Music.Generator.Drums.Operators.StyleIdiom;
+using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Core;
 
 namespace Music.Generator.Drums.Operators
@@ -70,6 +71,7 @@ namespace Music.Generator.Drums.Operators
         public static void RegisterAllOperators(DrumOperatorRegistry registry)
         {
             ArgumentNullException.ThrowIfNull(registry);
+            OperatorBase.DefaultInstrumentAdapter = DrumOperatorCandidateInstrumentAdapter.Instance;
             // Register families in deterministic order
             RegisterMicroAdditionOperators(registry);
             RegisterSubdivisionTransformOperators(registry);

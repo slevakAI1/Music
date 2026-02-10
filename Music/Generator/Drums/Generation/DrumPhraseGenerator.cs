@@ -68,8 +68,8 @@ namespace Music.Generator.Drums.Generation
             // Extract anchor onsets (foundation that's always present)
             var anchorOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars, barTrack);
 
-        var NumberOfOperators = 2;
-        var allOnsets = ApplyDrumOperators(bars, anchorOnsets, totalBars, NumberOfOperators);
+        var numberOfOperators = 2;
+        var allOnsets = DrumOperatorApplicator.Apply(bars, anchorOnsets, totalBars, numberOfOperators, _registry);
 
             // Convert to MIDI events
             return ConvertToPartTrack(allOnsets, barTrack, drumProgramNumber);
@@ -147,16 +147,6 @@ namespace Music.Generator.Drums.Generation
             }
 
             return onsets.OrderBy(o => o.BarNumber).ThenBy(o => o.Beat).ToList();
-        }
-
-        // AI: purpose=Delegate to DrumOperatorApplicator; simple random operator application over anchors.
-        private List<GrooveOnset> ApplyDrumOperators(
-            IReadOnlyList<Bar> bars,
-            List<GrooveOnset> anchorOnsets,
-            int totalBars,
-            int numberOfOperators)
-        {
-            return DrumOperatorApplicator.Apply(bars, anchorOnsets, totalBars, numberOfOperators, _registry);
         }
 
         private static PartTrack ConvertToPartTrack(

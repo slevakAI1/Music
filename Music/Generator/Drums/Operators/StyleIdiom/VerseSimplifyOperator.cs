@@ -5,6 +5,7 @@
 
 using Music.Generator.Core;
 using Music.Generator.Groove;
+using Music.Generator.Drums.Operators.Candidates;
 
 namespace Music.Generator.Drums.Operators.StyleIdiom
 {
@@ -69,9 +70,9 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
                     role: GrooveRoles.Kick,
                     barNumber: bar.BarNumber,
                     beat: beat,
-                    strength: strength,
                     score: ComputeScore(bar),
-                    velocityHint: velocityHint);
+                    velocityHint: velocityHint,
+                    instrumentData: DrumCandidateData.Create(strength: strength));
             }
         }
 
@@ -96,9 +97,10 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
                     role: GrooveRoles.ClosedHat,
                     barNumber: bar.BarNumber,
                     beat: beat,
-                    strength: beatInt == 1 ? OnsetStrength.Downbeat : OnsetStrength.Strong,
                     score: score,
-                    velocityHint: velocityHint);
+                    velocityHint: velocityHint,
+                    instrumentData: DrumCandidateData.Create(
+                        strength: beatInt == 1 ? OnsetStrength.Downbeat : OnsetStrength.Strong));
             }
         }
 

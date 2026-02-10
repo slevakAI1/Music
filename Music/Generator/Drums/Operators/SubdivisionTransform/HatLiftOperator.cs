@@ -5,6 +5,7 @@
 
 using Music.Generator.Core;
 using Music.Generator.Groove;
+using Music.Generator.Drums.Operators.Candidates;
 
 namespace Music.Generator.Drums.Operators.SubdivisionTransform
 {
@@ -68,9 +69,9 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
                         role: GrooveRoles.ClosedHat,
                         barNumber: bar.BarNumber,
                         beat: beat,
-                        strength: strength,
-                        score: score,
-                        velocityHint: velocityHint);
+                score: score,
+                velocityHint: velocityHint,
+                instrumentData: DrumCandidateData.Create(strength: strength));
                 }
             }
         }

@@ -5,6 +5,7 @@
 
 using Music.Generator.Core;
 using Music.Generator.Groove;
+using Music.Generator.Drums.Operators.Candidates;
 
 namespace Music.Generator.Drums.Operators.PatternSubstitution
 {
@@ -70,9 +71,9 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
                     role: GrooveRoles.Kick,
                     barNumber: bar.BarNumber,
                     beat: beat,
-                    strength: strength,
                     score: score,
-                    velocityHint: velocityHint);
+                    velocityHint: velocityHint,
+                    instrumentData: DrumCandidateData.Create(strength: strength));
             }
         }
 

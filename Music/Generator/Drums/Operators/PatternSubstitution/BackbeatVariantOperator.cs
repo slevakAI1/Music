@@ -63,11 +63,12 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
                     role: GrooveRoles.Snare,
                     barNumber: bar.BarNumber,
                     beat: beat,
+                score: score,
+                velocityHint: velocityHint,
+                timingHint: timingHint,
+                instrumentData: DrumCandidateData.Create(
                     strength: OnsetStrength.Backbeat,
-                    score: score,
-                    velocityHint: velocityHint,
-                    timingHint: timingHint,
-                    articulationHint: articulation);
+                    articulationHint: articulation));
             }
         }
 

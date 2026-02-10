@@ -1,19 +1,36 @@
-// AI: purpose=Abstract base for drum operators; provides common helpers for candidate creation & scoring.
+// AI: purpose=Abstract base for instrument operators; provides helpers for candidate creation & scoring.
 // AI: invariants=Subclasses must provide OperatorId and OperatorFamily; methods must be deterministic.
-// AI: deps=Bar, OperatorCandidateAddition, OperatorCandidateRemoval; removed energy thresholds; bar accessed directly.
+// AI: deps=Bar, OperatorCandidateAddition, OperatorCandidateRemoval; adapter supplies instrument metadata.
 
 
-using Music.Generator.Drums.Operators.Candidates;
-using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
 using Music.Generator.Material;
 
 namespace Music.Generator.Core
 {
-    // AI: purpose=Abstract base for drum operators; supplies common Score/CreateCandidate helpers.
+    // AI: purpose=Abstract base for instrument operators; supplies common Score/CreateCandidate helpers.
     // AI: invariants=Subclasses must provide OperatorId and OperatorFamily; keep GenerateCandidates pure.
     public abstract class OperatorBase
     {
+        // AI: deps=Instrument adapter supplies metadata/discriminator; never null
+        protected OperatorBase(IOperatorCandidateInstrumentAdapter instrumentAdapter)
+        {
+            ArgumentNullException.ThrowIfNull(instrumentAdapter);
+            InstrumentAdapter = instrumentAdapter;
+        }
+
+        // AI: deps=Default adapter used by parameterless ctor; set by instrument layer before operator creation
+        public static IOperatorCandidateInstrumentAdapter DefaultInstrumentAdapter { get; set; }
+            = NullOperatorCandidateInstrumentAdapter.Instance;
+
+        // AI: deps=Fallback adapter when subclass does not inject one; yields no metadata/discriminator
+        protected OperatorBase() : this(DefaultInstrumentAdapter)
+        {
+        }
+
+        // AI: deps=Instrument adapter for candidate metadata and discriminator
+        protected IOperatorCandidateInstrumentAdapter InstrumentAdapter { get; }
+
         public abstract string OperatorId { get; }
 
         public abstract OperatorFamily OperatorFamily { get; }
@@ -34,31 +51,31 @@ namespace Music.Generator.Core
             return candidate.Score;
         }
 
-        // Create a OperatorCandidateAddition populated with common operator-provided fields.
+        // Create an OperatorCandidateAddition populated with common operator-provided fields.
         protected OperatorCandidateAddition CreateCandidate(
             string role,
             int barNumber,
             decimal beat,
-            OnsetStrength strength,
             double score,
             int? velocityHint = null,
             int? timingHint = null,
-            DrumArticulation? articulationHint = null,
-            FillRole fillRole = FillRole.None)
+            object? instrumentData = null,
+            string? discriminatorOverride = null)
         {
+            var discriminator = discriminatorOverride ?? InstrumentAdapter.GetDiscriminator(instrumentData);
+            var metadata = InstrumentAdapter.BuildMetadata(instrumentData);
+
             return new OperatorCandidateAddition
             {
-                CandidateId = OperatorCandidateAddition.GenerateCandidateId(OperatorId, role, barNumber, beat, articulationHint),
+                CandidateId = OperatorCandidateAddition.GenerateCandidateId(OperatorId, role, barNumber, beat, discriminator),
                 OperatorId = OperatorId,
                 Role = role,
                 BarNumber = barNumber,
                 Beat = beat,
-                Strength = strength,
                 VelocityHint = velocityHint,
                 TimingHint = timingHint,
-                ArticulationHint = articulationHint,
-                FillRole = fillRole,
-                Score = score
+                Score = score,
+                Metadata = metadata
             };
         }
 

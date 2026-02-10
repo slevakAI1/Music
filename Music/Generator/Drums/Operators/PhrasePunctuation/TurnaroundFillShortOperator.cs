@@ -3,6 +3,7 @@
 // AI: deps=Bar, OperatorCandidateAddition; roles map to snare primary; anti-repetition handled outside this operator.
 using Music.Generator.Core;
 using Music.Generator.Drums.Planning;
+using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.PhrasePunctuation
@@ -62,10 +63,11 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
                     role: GrooveRoles.Snare,
                     barNumber: bar.BarNumber,
                     beat: beat,
-                    strength: strength,
                     score: score,
                     velocityHint: velocityHint,
-                    fillRole: fillRole);
+                    instrumentData: DrumCandidateData.Create(
+                        strength: strength,
+                        fillRole: fillRole));
             }
         }
 

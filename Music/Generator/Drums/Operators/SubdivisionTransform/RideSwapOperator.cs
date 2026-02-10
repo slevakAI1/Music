@@ -75,10 +75,11 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
                         role: GrooveRoles.Ride,
                         barNumber: bar.BarNumber,
                         beat: beat,
-                        strength: strength,
                         score: score,
                         velocityHint: velocityHint,
-                        articulationHint: articulation);
+                        instrumentData: DrumCandidateData.Create(
+                            strength: strength,
+                            articulationHint: articulation));
                 }
             }
         }

@@ -31,7 +31,7 @@ namespace Music.Generator.Drums.Operators.Candidates
             {
                 Role = candidate.Role,
                 OnsetBeat = candidate.Beat,
-                Strength = candidate.Strength,
+                Strength = candidate.GetStrength(),
                 ProbabilityBias = candidate.Score,
                 MaxAddsPerBar = 1, // Default; can be overridden by operator
                 Tags = tags,
@@ -63,25 +63,28 @@ namespace Music.Generator.Drums.Operators.Candidates
             tags.Add($"{OperatorIdTagPrefix}{candidate.OperatorId}");
 
             // Fill role and protection
-            if (candidate.FillRole != FillRole.None)
+            var fillRole = candidate.GetFillRole();
+            if (fillRole != FillRole.None)
             {
-                tags.Add(candidate.FillRole.ToString());
-                if (candidate.FillRole == FillRole.FillEnd)
+                tags.Add(fillRole.ToString());
+                if (fillRole == FillRole.FillEnd)
                 {
                     tags.Add(ProtectedTag);
                 }
             }
 
             // Articulation
-            if (candidate.ArticulationHint.HasValue && candidate.ArticulationHint.Value != DrumArticulation.None)
+            var articulationHint = candidate.GetArticulationHint();
+            if (articulationHint.HasValue && articulationHint.Value != DrumArticulation.None)
             {
-                tags.Add(candidate.ArticulationHint.Value.ToString());
+                tags.Add(articulationHint.Value.ToString());
             }
 
             // Strength hint tag for downstream logic
-            if (candidate.Strength == OnsetStrength.Downbeat || candidate.Strength == OnsetStrength.Backbeat)
+            var strength = candidate.GetStrength();
+            if (strength == OnsetStrength.Downbeat || strength == OnsetStrength.Backbeat)
             {
-                tags.Add($"Strength:{candidate.Strength}");
+                tags.Add($"Strength:{strength}");
             }
 
             return tags;

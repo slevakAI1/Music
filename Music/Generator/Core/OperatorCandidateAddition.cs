@@ -1,23 +1,19 @@
-// AI: purpose=OperatorCandidateAddition: operator-generated drum event with position, strength, hints, and score.
+// AI: purpose=Instrument-agnostic candidate for adding onsets; timing, role, score, hints.
 // AI: invariants=BarNumber>=1; Beat>=1.0; Score in [0,1]; VelocityHint in [0,127] when present.
-// AI: deps=Uses OnsetStrength, FillRole, DrumArticulation; consumed by selection and mapping layers.
-
-using Music.Generator.Drums.Operators.Candidates;
-using Music.Generator.Drums.Planning;
-using Music.Generator.Groove;
+// AI: deps=Consumed by instrument layers via mapping; Metadata carries instrument-specific data.
 
 namespace Music.Generator.Core
 {
-    // AI: contract=Immutable record used by selection engine; keep property names stable when persisting/mapping
+    // AI: contract=Immutable record for cross-instrument candidate additions; Metadata extends for instrument needs
     public sealed record OperatorCandidateAddition
     {
-        // AI: id=Deterministic format "{OperatorId}_{Role}_{BarNumber}_{Beat}[_{Articulation}]"; used for dedupe
+        // AI: id=Deterministic format "{OperatorId}_{Role}_{BarNumber}_{Beat}[_{Discriminator}]"; used for dedupe
         public required string CandidateId { get; init; }
 
         // AI: info=Operator identifier; required and non-empty
         public required string OperatorId { get; init; }
 
-        // AI: info=Role name (e.g., Kick, Snare); used for mapping to MIDI program and articulations
+        // AI: info=Role name (instrument-specific, e.g., Kick, Snare, BassRoot); used by instrument mapper
         public required string Role { get; init; }
 
         // AI: invariant=1-based bar number
@@ -26,36 +22,30 @@ namespace Music.Generator.Core
         // AI: invariant=1-based beat position within bar; fractional values allowed
         public required decimal Beat { get; init; }
 
-        // AI: info=Onset strength classification guiding velocity shaping
-        public required OnsetStrength Strength { get; init; }
-
-        // AI: hint=Optional suggested velocity [0..127]; null means compute from strength/style
+        // AI: hint=Optional suggested velocity [0..127]; null means compute from instrument layer
         public int? VelocityHint { get; init; }
 
         // AI: hint=Optional timing offset in ticks (positive=late, negative=early); null means use timing shaper
         public int? TimingHint { get; init; }
 
-        // AI: hint=Optional articulation; null means default for role
-        public DrumArticulation? ArticulationHint { get; init; }
-
-        // AI: info=Fill role classification for fill operators and memory tracking
-        public required FillRole FillRole { get; init; }
-
         // AI: invariant=Operator score in [0.0,1.0] before style weighting and penalties
         public required double Score { get; init; }
 
-        // AI: util=Deterministic CandidateId generator; append articulation only if specified and not None
+        // AI: extension=Instrument-specific data; mapping layer owns key conventions; keep deterministic usage
+        public Dictionary<string, object>? Metadata { get; init; }
+
+        // AI: util=Deterministic CandidateId generator; append discriminator if provided for uniqueness
         public static string GenerateCandidateId(
             string operatorId,
             string role,
             int barNumber,
             decimal beat,
-            DrumArticulation? articulation = null)
+            string? discriminator = null)
         {
             var baseId = $"{operatorId}_{role}_{barNumber}_{beat}";
-            if (articulation.HasValue && articulation.Value != DrumArticulation.None)
+            if (!string.IsNullOrEmpty(discriminator))
             {
-                return $"{baseId}_{articulation.Value}";
+                return $"{baseId}_{discriminator}";
             }
             return baseId;
         }

@@ -3,6 +3,7 @@
 // AI: deps=Bar; downstream systems interpret fewer candidates as thinning; deterministic from seed.
 using Music.Generator.Core;
 using Music.Generator.Drums.Planning;
+using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.PhrasePunctuation
@@ -41,10 +42,11 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
                 role: GrooveRoles.Kick,
                 barNumber: bar.BarNumber,
                 beat: 1.0m,
-                strength: OnsetStrength.Downbeat,
                 score: score,
                 velocityHint: kickVelocity,
-                fillRole: FillRole.None); // Stop-time isn't really a "fill"
+                instrumentData: DrumCandidateData.Create(
+                    strength: OnsetStrength.Downbeat,
+                    fillRole: FillRole.None)); // Stop-time isn't really a "fill"
 
             // Snare accent on beat 3 (if 4/4 or longer)
             if (bar.BeatsPerBar >= 4 && true /* role check deferred */)
@@ -58,10 +60,11 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
                     role: GrooveRoles.Snare,
                     barNumber: bar.BarNumber,
                     beat: 3.0m,
-                    strength: OnsetStrength.Backbeat,
                     score: score * 0.95,
                     velocityHint: snareVelocity,
-                    fillRole: FillRole.None);
+                    instrumentData: DrumCandidateData.Create(
+                        strength: OnsetStrength.Backbeat,
+                        fillRole: FillRole.None));
             }
 
             // NO hat candidates generated = the "dropout" effect

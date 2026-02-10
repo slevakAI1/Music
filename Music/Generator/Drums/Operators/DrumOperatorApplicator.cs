@@ -4,6 +4,8 @@
 
 using Music.Generator.Groove;
 using Music.Generator.Core;
+using Music.Generator.Drums.Operators.Candidates;
+using OperatorRemovalCandidate = Music.Generator.Core.OperatorCandidateRemoval;
 
 namespace Music.Generator.Drums.Operators
 {
@@ -106,7 +108,7 @@ namespace Music.Generator.Drums.Operators
                     BarNumber = candidate.BarNumber,
                     Beat = candidate.Beat,
                     Velocity = candidate.VelocityHint ?? 100,
-                    Strength = candidate.Strength,
+                    Strength = candidate.GetStrength(),
                     TimingOffsetTicks = candidate.TimingHint
                 });
                 anyApplied = true;

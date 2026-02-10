@@ -6,6 +6,7 @@
 
 using Music.Generator.Core;
 using Music.Generator.Groove;
+using Music.Generator.Drums.Operators.Candidates;
 
 namespace Music.Generator.Drums.Operators.MicroAddition
 {
@@ -61,9 +62,9 @@ namespace Music.Generator.Drums.Operators.MicroAddition
                     role: GrooveRoles.Snare,
                     barNumber: bar.BarNumber,
                     beat: ghostBeat,
-                    strength: OnsetStrength.Ghost,
                     score: Math.Clamp(score, 0.0, 1.0),
-                    velocityHint: velocityHint);
+                    velocityHint: velocityHint,
+                    instrumentData: DrumCandidateData.Create(strength: OnsetStrength.Ghost));
             }
         }
     }

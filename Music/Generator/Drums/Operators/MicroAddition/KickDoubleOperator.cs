@@ -5,6 +5,7 @@
 
 using Music.Generator.Core;
 using Music.Generator.Groove;
+using Music.Generator.Drums.Operators.Candidates;
 
 namespace Music.Generator.Drums.Operators.MicroAddition
 {
@@ -50,9 +51,9 @@ namespace Music.Generator.Drums.Operators.MicroAddition
                     role: GrooveRoles.Kick,
                     barNumber: bar.BarNumber,
                     beat: beat,
-                    strength: OnsetStrength.Offbeat,
                     score: Math.Clamp(score, 0.0, 1.0),
-                    velocityHint: velocityHint);
+                    velocityHint: velocityHint,
+                    instrumentData: DrumCandidateData.Create(strength: OnsetStrength.Offbeat));
             }
         }
 

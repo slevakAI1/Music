@@ -45,10 +45,11 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
                 role: GrooveRoles.Crash,
                 barNumber: bar.BarNumber,
                 beat: 1.0m,
-                strength: OnsetStrength.Downbeat,
                 score: score,
                 velocityHint: velocityHint,
-                articulationHint: DrumArticulation.Crash);
+                instrumentData: DrumCandidateData.Create(
+                    strength: OnsetStrength.Downbeat,
+                    articulationHint: DrumArticulation.Crash));
         }
 
         private static CrashPattern DetermineCrashPattern(Bar bar)

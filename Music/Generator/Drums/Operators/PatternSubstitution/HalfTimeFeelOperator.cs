@@ -5,6 +5,7 @@
 
 using Music.Generator.Core;
 using Music.Generator.Groove;
+using Music.Generator.Drums.Operators.Candidates;
 
 namespace Music.Generator.Drums.Operators.PatternSubstitution
 {
@@ -54,9 +55,9 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
                 role: GrooveRoles.Snare,
                 barNumber: bar.BarNumber,
                 beat: beat,
-                strength: OnsetStrength.Backbeat,
                 score: baseScore,
-                velocityHint: velocityHint);
+                velocityHint: velocityHint,
+                instrumentData: DrumCandidateData.Create(strength: OnsetStrength.Backbeat));
         }
 
         // Generate complementary kick candidates for half-time feel (beat 1 and optional 3).
@@ -72,9 +73,9 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
                 role: GrooveRoles.Kick,
                 barNumber: bar.BarNumber,
                 beat: 1,
-                strength: OnsetStrength.Downbeat,
                 score: baseScore,
-                velocityHint: kickVelocity1);
+                velocityHint: kickVelocity1,
+                instrumentData: DrumCandidateData.Create(strength: OnsetStrength.Downbeat));
 
             // Add kick on 3 for slightly more energy (before the snare)
             if (true /* energy check removed */ && bar.BeatsPerBar >= 3)
@@ -88,9 +89,9 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
                     role: GrooveRoles.Kick,
                     barNumber: bar.BarNumber,
                     beat: 3,
-                    strength: OnsetStrength.Strong,
                     score: baseScore * 0.9, // Slightly lower score
-                    velocityHint: kickVelocity3);
+                    velocityHint: kickVelocity3,
+                    instrumentData: DrumCandidateData.Create(strength: OnsetStrength.Strong));
             }
         }
 

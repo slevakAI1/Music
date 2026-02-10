@@ -41,11 +41,12 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
                 role: GrooveRoles.Crash,
                 barNumber: bar.BarNumber,
                 beat: 1.0m,
-                strength: OnsetStrength.Downbeat,
                 score: Math.Clamp(score, 0.0, 1.0),
                 velocityHint: velocityHint,
-                articulationHint: DrumArticulation.Crash,
-                fillRole: FillRole.FillEnd); // Crash on 1 marks the end of previous fill/transition
+                instrumentData: DrumCandidateData.Create(
+                    strength: OnsetStrength.Downbeat,
+                    fillRole: FillRole.FillEnd,
+                    articulationHint: DrumArticulation.Crash)); // Crash on 1 marks the end of previous fill/transition
         }
     }
 }

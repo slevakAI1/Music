@@ -5,6 +5,7 @@
 
 using Music.Generator.Core;
 using Music.Generator.Drums.Planning;
+using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.PhrasePunctuation
@@ -41,10 +42,11 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
                 role: GrooveRoles.Kick,
                 barNumber: bar.BarNumber,
                 beat: setupBeat,
-                strength: OnsetStrength.Pickup,
                 score: score,
                 velocityHint: kickVelocity,
-                fillRole: FillRole.Setup);
+                instrumentData: DrumCandidateData.Create(
+                    strength: OnsetStrength.Pickup,
+                    fillRole: FillRole.Setup));
 
             // Optionally add snare if energy is high enough and snare is active
             if (true /* snare assumed available */)
@@ -58,10 +60,11 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
                     role: GrooveRoles.Snare,
                     barNumber: bar.BarNumber,
                     beat: setupBeat,
-                    strength: OnsetStrength.Pickup,
                     score: score * 0.9, // Slightly lower score than kick
                     velocityHint: snareVelocity,
-                    fillRole: FillRole.Setup);
+                    instrumentData: DrumCandidateData.Create(
+                        strength: OnsetStrength.Pickup,
+                        fillRole: FillRole.Setup));
             }
         }
 

@@ -4,6 +4,7 @@
 
 using Music.Generator.Core;
 using Music.Generator.Groove;
+using OperatorRemovalCandidate = Music.Generator.Core.OperatorCandidateRemoval;
 
 namespace Music.Generator.Drums.Operators.NoteRemoval
 {

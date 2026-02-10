@@ -120,7 +120,6 @@
     <None Remove="AI\Completed\PreAnalysis_8.1.md" />
     <None Remove="AI\Completed\PreAnalysis_9.3.md" />
     <None Remove="AI\Completed\RefactorEpic.md" />
-    <None Remove="AI\Completed\Story-1-Implementation.md" />
     <None Remove="AI\Completed\Story-2-Implementation.md" />
     <None Remove="AI\Completed\Story-3-Implementation.md" />
     <None Remove="AI\Completed\Story1.md" />
@@ -234,7 +233,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="AI\Completed\" />
     <Folder Include="Archived Drum Intel Code\Performance\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />

@@ -5,6 +5,7 @@
 
 using Music.Generator.Core;
 using Music.Generator.Groove;
+using Music.Generator.Drums.Operators.Candidates;
 
 namespace Music.Generator.Drums.Operators.PatternSubstitution
 {
@@ -67,9 +68,9 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
                     role: GrooveRoles.Kick,
                     barNumber: bar.BarNumber,
                     beat: beatInt,
-                    strength: downbeatStrength,
                     score: baseScore,
-                    velocityHint: downbeatVelocity);
+                    velocityHint: downbeatVelocity,
+                    instrumentData: DrumCandidateData.Create(strength: downbeatStrength));
 
                 // Offbeat kick (on the &)
                 decimal offbeatPosition = beatInt + 0.5m;
@@ -84,9 +85,9 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
                         role: GrooveRoles.Kick,
                         barNumber: bar.BarNumber,
                         beat: offbeatPosition,
-                        strength: OnsetStrength.Offbeat,
                         score: baseScore * 0.85, // Lower score for offbeats
-                        velocityHint: offbeatVelocity);
+                        velocityHint: offbeatVelocity,
+                        instrumentData: DrumCandidateData.Create(strength: OnsetStrength.Offbeat));
                 }
             }
         }
@@ -109,9 +110,9 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
                     role: GrooveRoles.Snare,
                     barNumber: bar.BarNumber,
                     beat: backbeat,
-                    strength: OnsetStrength.Backbeat,
                     score: baseScore,
-                    velocityHint: snareVelocity);
+                    velocityHint: snareVelocity,
+                    instrumentData: DrumCandidateData.Create(strength: OnsetStrength.Backbeat));
             }
         }
 

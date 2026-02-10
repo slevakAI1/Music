@@ -5,6 +5,7 @@
 
 using Music.Generator.Core;
 using Music.Generator.Groove;
+using Music.Generator.Drums.Operators.Candidates;
 
 namespace Music.Generator.Drums.Operators.StyleIdiom
 {
@@ -87,9 +88,9 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
                 role: GrooveRoles.Kick,
                 barNumber: bar.BarNumber,
                 beat: 1.0m,
-                strength: OnsetStrength.Downbeat,
                 score: ComputeScore(bar),
-                velocityHint: velocityHint);
+                velocityHint: velocityHint,
+                instrumentData: DrumCandidateData.Create(strength: OnsetStrength.Downbeat));
 
             // Half-time may add kick on beat 3 as well
             if (variant == BreakdownVariant.HalfTime && true /* energy check removed */)
@@ -103,9 +104,9 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
                     role: GrooveRoles.Kick,
                     barNumber: bar.BarNumber,
                     beat: 3.0m,
-                    strength: OnsetStrength.Strong,
                     score: ComputeScore(bar) * 0.8,
-                    velocityHint: velocityHint);
+                    velocityHint: velocityHint,
+                    instrumentData: DrumCandidateData.Create(strength: OnsetStrength.Strong));
             }
         }
 
@@ -123,9 +124,9 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
                 role: GrooveRoles.Snare,
                 barNumber: bar.BarNumber,
                 beat: snareBeat,
-                strength: OnsetStrength.Backbeat,
                 score: ComputeScore(bar),
-                velocityHint: velocityHint);
+                velocityHint: velocityHint,
+                instrumentData: DrumCandidateData.Create(strength: OnsetStrength.Backbeat));
         }
 
         private IEnumerable<OperatorCandidateAddition> GenerateMinimalHatPattern(Bar bar, int seed)
@@ -144,9 +145,10 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
                     role: GrooveRoles.ClosedHat,
                     barNumber: bar.BarNumber,
                     beat: beat,
-                    strength: beat == 1.0m ? OnsetStrength.Downbeat : OnsetStrength.Strong,
                     score: ComputeScore(bar) * 0.6,
-                    velocityHint: velocityHint);
+                    velocityHint: velocityHint,
+                    instrumentData: DrumCandidateData.Create(
+                        strength: beat == 1.0m ? OnsetStrength.Downbeat : OnsetStrength.Strong));
             }
         }
 

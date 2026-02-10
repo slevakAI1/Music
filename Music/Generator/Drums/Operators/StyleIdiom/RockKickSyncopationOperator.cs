@@ -5,6 +5,7 @@
 
 using Music.Generator.Core;
 using Music.Generator.Groove;
+using Music.Generator.Drums.Operators.Candidates;
 
 namespace Music.Generator.Drums.Operators.StyleIdiom
 {
@@ -63,9 +64,9 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
                 role: GrooveRoles.Kick,
                 barNumber: bar.BarNumber,
                 beat: PrimaryAnticipationBeat,
-                strength: OnsetStrength.Pickup,
                 score: score,
-                velocityHint: velocityHint);
+                velocityHint: velocityHint,
+                instrumentData: DrumCandidateData.Create(strength: OnsetStrength.Pickup));
         }
 
         private IEnumerable<OperatorCandidateAddition> GenerateSecondaryPattern(Bar bar, int seed)
@@ -86,9 +87,9 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
                     role: GrooveRoles.Kick,
                     barNumber: bar.BarNumber,
                     beat: SecondaryAnticipationBeat2,
-                    strength: OnsetStrength.Offbeat,
                     score: SecondaryPatternScore,
-                    velocityHint: velocityHint);
+                    velocityHint: velocityHint,
+                    instrumentData: DrumCandidateData.Create(strength: OnsetStrength.Offbeat));
             }
 
             if (use3And && bar.BeatsPerBar >= 4)
@@ -102,9 +103,9 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
                     role: GrooveRoles.Kick,
                     barNumber: bar.BarNumber,
                     beat: SecondaryAnticipationBeat3,
-                    strength: OnsetStrength.Offbeat,
                     score: SecondaryPatternScore,
-                    velocityHint: velocityHint);
+                    velocityHint: velocityHint,
+                    instrumentData: DrumCandidateData.Create(strength: OnsetStrength.Offbeat));
             }
         }
 

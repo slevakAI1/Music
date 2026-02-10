@@ -3,6 +3,7 @@
 // AI: deps=OperatorBase, Bar, OperatorCandidateAddition; uses Tom1/Tom2/FloorTom mapping for ascending pitch.
 using Music.Generator.Core;
 using Music.Generator.Drums.Planning;
+using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.PhrasePunctuation
@@ -71,10 +72,11 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
                     role: role,
                     barNumber: bar.BarNumber,
                     beat: beat,
-                    strength: OnsetStrength.Strong,
                     score: score,
                     velocityHint: velocityHint,
-                    fillRole: fillRole);
+                    instrumentData: DrumCandidateData.Create(
+                        strength: OnsetStrength.Strong,
+                        fillRole: fillRole));
 
                 positionIndex++;
             }
