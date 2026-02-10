@@ -1,6 +1,6 @@
 // AI: purpose=NoteRemoval operator that removes kick on beat 1 for anticipation/tension.
 // AI: invariants=Never removes from bar 1 of a section (preserves section entry downbeat).
-// AI: deps=DrumOperatorBase, IDrumRemovalOperator, Bar, RemovalCandidate, GrooveRoles.
+// AI: deps=DrumOperatorBase, Bar, RemovalCandidate, GrooveRoles.
 
 using Music.Generator.Core;
 using Music.Generator.Drums.Operators.Base;
@@ -11,7 +11,7 @@ namespace Music.Generator.Drums.Operators.NoteRemoval
 {
     // AI: purpose=Remove kick on beat 1 in interior bars to create "missing downbeat" anticipation.
     // AI: note=Common funk/pop technique; absence of expected kick creates forward momentum.
-    public sealed class KickPullOperator : DrumOperatorBase, IDrumRemovalOperator
+    public sealed class KickPullOperator : DrumOperatorBase
     {
         public override string OperatorId => "DrumKickPull";
 
@@ -22,7 +22,7 @@ namespace Music.Generator.Drums.Operators.NoteRemoval
             => [];
 
         // Remove kick on beat 1 of the current bar.
-        public IEnumerable<RemovalCandidate> GenerateRemovals(Bar bar)
+        public override IEnumerable<RemovalCandidate> GenerateRemovals(Bar bar)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

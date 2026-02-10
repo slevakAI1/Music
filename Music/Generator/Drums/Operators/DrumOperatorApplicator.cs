@@ -1,6 +1,6 @@
-// AI: purpose=Copy anchors, randomly apply N operators (additive or removal) from registry, return updated onsets.
+// AI: purpose=Copy anchors, randomly apply N operators from registry, return updated onsets.
 // AI: invariants=Only counts successfully applied operators toward target; dedup by (BarNumber, Beat, Role).
-// AI: deps=DrumOperatorRegistry.GetAllOperators; Rng(DrumGenerator); GrooveOnset; IDrumRemovalOperator.
+// AI: deps=DrumOperatorRegistry.GetAllOperators; Rng(DrumGenerator); GrooveOnset.
 
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Operators.Base;
@@ -8,11 +8,11 @@ using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators
 {
-    // AI: purpose=Apply random operators to anchor onsets; supports both additive and removal operators.
+    // AI: purpose=Apply random operators to anchor onsets; removal is optional via base hook.
     public static class DrumOperatorApplicator
     {
-        // AI: entry=Copy anchors, randomly pick operators, apply if valid (add or remove), return combined onsets.
-        // AI: invariants=Loop counts only applied operators; maxAttempts prevents infinite loop; removal respects protection flags.
+        // AI: entry=Copy anchors, randomly pick operators, apply if valid (add/remove), return combined onsets.
+        // AI: invariants=Loop counts only applied operators; maxAttempts prevents infinite loop.
         public static List<GrooveOnset> Apply(
             IReadOnlyList<Bar> bars,
             List<GrooveOnset> anchorOnsets,
@@ -53,17 +53,11 @@ namespace Music.Generator.Drums.Operators
 
                 int seed = bar.BarNumber;
 
-                // Route to removal path or additive path
-                if (op is IDrumRemovalOperator removalOp)
-                {
-                    if (ApplyRemovals(removalOp, bar, result, occupied))
-                        applied++;
-                }
-                else
-                {
-                    if (ApplyAdditions(op, bar, seed, result, occupied))
-                        applied++;
-                }
+            bool added = ApplyAdditions(op, bar, seed, result, occupied);
+            bool removed = ApplyRemovals(op, bar, result, occupied);
+
+            if (added || removed)
+                applied++;
             }
 
             return result.OrderBy(o => o.BarNumber).ThenBy(o => o.Beat).ToList();
@@ -102,14 +96,14 @@ namespace Music.Generator.Drums.Operators
             return anyApplied;
         }
 
-        // AI: purpose=Apply removal operator; skip protected/must-hit/never-remove onsets; returns true if any removed.
+        // AI: purpose=Apply removal targets; skip protected/must-hit/never-remove onsets; returns true if any removed.
         private static bool ApplyRemovals(
-            IDrumRemovalOperator removalOp,
+            DrumOperatorBase op,
             Bar bar,
             List<GrooveOnset> result,
             HashSet<(int BarNumber, decimal Beat, string Role)> occupied)
         {
-            var removals = removalOp.GenerateRemovals(bar).ToList();
+            var removals = op.GenerateRemovals(bar).ToList();
 
             bool anyRemoved = false;
             foreach (RemovalCandidate removal in removals)
@@ -140,5 +134,6 @@ namespace Music.Generator.Drums.Operators
 
             return anyRemoved;
         }
+
     }
 }

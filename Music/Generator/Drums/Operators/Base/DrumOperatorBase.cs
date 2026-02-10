@@ -22,6 +22,13 @@ namespace Music.Generator.Drums.Operators.Base
 
         public abstract IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed);
 
+        // AI: purpose=Optional removal targets; default empty for additive operators.
+        public virtual IEnumerable<RemovalCandidate> GenerateRemovals(Bar bar)
+        {
+            ArgumentNullException.ThrowIfNull(bar);
+            return [];
+        }
+
         public virtual double Score(OperatorCandidate candidate, Bar bar)
         {
             ArgumentNullException.ThrowIfNull(candidate);
