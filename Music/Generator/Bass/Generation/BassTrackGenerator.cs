@@ -30,17 +30,9 @@ public sealed class BassTrackGenerator
         if (phrases.Count == 0)
             throw new InvalidOperationException("No bass phrases found for the bass program");
 
-        Tracer.DebugTrace($"[bassGenerator] phrases={phrases.Count}; seed={seed}; maxBars={maxBars}");
-        foreach (var phrase in phrases)
-        {
-            Tracer.DebugTrace($"[bassGenerator] phraseId={phrase.PhraseId}; bars={phrase.BarCount}; events={phrase.Events.Count}");
-        }
-
         int effectiveSeed = seed > 0 ? seed : Random.Shared.Next(1, 100_000);
         var planner = new BassPhrasePlacementPlanner(songContext, effectiveSeed);
         var plan = planner.CreatePlan(songContext.SectionTrack, bassProgramNumber, maxBars);
-
-        Tracer.DebugTrace($"[bassGenerator] placements={plan.Placements.Count}; fillBars={plan.FillBars.Count}");
 
         return GenerateFromPlan(
             plan,
@@ -66,7 +58,6 @@ public sealed class BassTrackGenerator
             var phrase = materialBank.GetPhraseById(placement.PhraseId);
             if (phrase == null)
             {
-                Tracer.DebugTrace($"[bassGenerator] missingPhraseId={placement.PhraseId}");
                 continue;
             }
 
@@ -79,17 +70,11 @@ public sealed class BassTrackGenerator
             int eligibleCount = phraseTrack.PartTrackNoteEvents
                 .Count(e => e.AbsoluteTimeTicks < placementEndTick);
 
-            Tracer.DebugTrace(
-                $"[bassGenerator] placement phraseId={phrase.PhraseId}; start={placement.StartBar}; bars={placement.BarCount}; " +
-                $"events={phraseTrack.PartTrackNoteEvents.Count}; eligible={eligibleCount}; endTick={placementEndTick}");
-
             allEvents.AddRange(phraseTrack.PartTrackNoteEvents
                 .Where(e => e.AbsoluteTimeTicks < placementEndTick));
         }
 
         var ordered = allEvents.OrderBy(e => e.AbsoluteTimeTicks).ToList();
-
-        Tracer.DebugTrace($"[bassGenerator] generatedEvents={ordered.Count}");
 
         return new PartTrack(ordered)
         {

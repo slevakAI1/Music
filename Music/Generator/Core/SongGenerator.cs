@@ -47,8 +47,6 @@ namespace Music.Generator
             var materialBank = songContext.MaterialBank
                 ?? throw new ArgumentException("MaterialBank must be provided", nameof(songContext));
 
-            Tracer.DebugTrace($"[GenerateFromPhrases] phrases={materialBank.GetPhrases().Count}; seed={seed}; maxBars={maxBars}");
-
             var generator = new DrumTrackGenerator();
             return generator.Generate(songContext, seed, maxBars);
         }

@@ -17,13 +17,6 @@ public static class MotifPlacementPlanner
         ArgumentNullException.ThrowIfNull(sectionTrack);
         ArgumentNullException.ThrowIfNull(motifBank);
 
-        Tracer.DebugTrace("=== MotifPlacementPlanner.CreatePlan ===");
-        Tracer.DebugTrace($"MaterialBank has {motifBank.Count} items:");
-        foreach (var motif in motifBank.Tracks)
-        {
-            Tracer.DebugTrace($"  Motif: Name={motif.Meta.Name}, Role={motif.Meta.IntendedRole}, Kind={motif.Meta.MaterialKind}");
-        }
-
         var placements = new List<MotifPlacement>();
 
         // Track which motifs have been used per section type AND role for A/A' logic
@@ -38,19 +31,12 @@ public static class MotifPlacementPlanner
 
             // Check if motif should be placed in this section
             bool shouldPlace = ShouldPlaceMotif(section.SectionType, sectionIndex, seed);
-            Tracer.DebugTrace($"  ShouldPlaceMotif? {shouldPlace}");
-            
             if (!shouldPlace)
                 continue;
 
             // Try to place motifs for each role
             foreach (var targetRole in rolesToPlace)
             {
-                Tracer.DebugTrace($"  Trying role: {targetRole}");
-                
-                // All roles present (no orchestration gating)
-                Tracer.DebugTrace($"    IsRolePresent? true");
-
                 // Select motif for this section and role
                 var motif = SelectMotifForSectionAndRole(
                     section.SectionType,
@@ -62,11 +48,8 @@ public static class MotifPlacementPlanner
 
                 if (motif == null)
                 {
-                    Tracer.DebugTrace($"    No motif selected for role {targetRole}");
                     continue;
                 }
-
-                Tracer.DebugTrace($"    Selected: {motif.Meta.Name}");
 
                 // Create placement
                 var placement = CreatePlacementForSection(
@@ -78,19 +61,13 @@ public static class MotifPlacementPlanner
                 if (placement != null)
                 {
                     placements.Add(placement);
-                    Tracer.DebugTrace($"    Placement created: bars {placement.StartBarWithinSection}-{placement.StartBarWithinSection + placement.DurationBars - 1}");
 
                     // Track usage for A/A' logic
                     motifUsageByTypeAndRole[(section.SectionType, targetRole)] = motif.Meta.TrackId;
                 }
-                else
-                {
-                    Tracer.DebugTrace($"    Placement creation failed");
-                }
             }
         }
 
-        Tracer.DebugTrace($"=== Total placements: {placements.Count} ===");
         return MotifPlacementPlan.Create(placements, seed);
     }
 
@@ -137,11 +114,8 @@ public static class MotifPlacementPlanner
         Dictionary<(MusicConstants.eSectionType, string), PartTrack.PartTrackId> motifUsageByTypeAndRole,
         int seed)
     {
-        Tracer.DebugTrace($"    SelectMotifForSectionAndRole: sectionType={sectionType}, role={targetRole}");
-        
         // Get preferred material kind for this section type
         var preferredKind = GetPreferredMaterialKind(sectionType, sectionIndex);
-        Tracer.DebugTrace($"      PreferredKind for {sectionType}: {preferredKind}");
 
         // For lead roles, filter strictly by MaterialKind
         // For accompaniment roles (Bass, Guitar, Keys), be more flexible
@@ -153,8 +127,6 @@ public static class MotifPlacementPlanner
         {
             // Lead: strict MaterialKind filtering
             var allMotifs = motifBank.GetMotifsByKind(preferredKind);
-            Tracer.DebugTrace($"      Found {allMotifs.Count} motifs with kind={preferredKind}");
-            
             candidates = allMotifs
                 .Where(m => string.Equals(m.Meta.IntendedRole, targetRole, StringComparison.OrdinalIgnoreCase))
                 .ToList();
@@ -165,17 +137,8 @@ public static class MotifPlacementPlanner
             candidates = motifBank.Tracks
                 .Where(m => string.Equals(m.Meta.IntendedRole, targetRole, StringComparison.OrdinalIgnoreCase))
                 .ToList();
-            
-            Tracer.DebugTrace($"      Found {candidates.Count} motifs with role={targetRole} (any kind)");
-            Tracer.DebugTrace($"      PreferredKind={preferredKind}, IsTransitionBarOrFill=");
         }
         
-        Tracer.DebugTrace($"      After role filter ({targetRole}): {candidates.Count} candidates");
-        foreach (var c in candidates)
-        {
-            Tracer.DebugTrace($"        Candidate: {c.Meta.Name} (Kind={c.Meta.MaterialKind})");
-        }
-
         if (!candidates.Any())
             return null;
 
@@ -190,7 +153,6 @@ public static class MotifPlacementPlanner
         // Select deterministically by hash
         var hash = HashCode.Combine(seed, sectionIndex, sectionType, targetRole);
         var index = Math.Abs(hash) % candidates.Count;
-        Tracer.DebugTrace($"      Selected index {index} of {candidates.Count}");
         return candidates[index];
     }
 

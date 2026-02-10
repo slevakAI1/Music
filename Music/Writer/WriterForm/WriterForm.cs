@@ -299,9 +299,7 @@ namespace Music.Writer
 
         private async void btnPlay_Click(object sender, EventArgs e)
         {
-            Tracer.DebugTrace(">>> btnPlay_Click START");
             await StartPlaybackWithMeasureTrackingAsync();
-            Tracer.DebugTrace("<<< btnPlay_Click END");
         }
 
         private void btnSetDesignTestScenarioD1_Click(object sender, EventArgs e)
@@ -387,11 +385,9 @@ namespace Music.Writer
 
         private void btnStop_Click(object sender, EventArgs e)
         {
-            Tracer.DebugTrace(">>> btnStop_Click - User manually stopped playback");
             _midiPlaybackService.Stop();
             _progressTracker?.Stop();
             SongGridManager.ClearAllMeasureHighlights(dgSong);
-            Tracer.DebugTrace("<<< btnStop_Click END");
         }
 
         private void btnClearSelected_Click(object sender, EventArgs e)
@@ -401,20 +397,16 @@ namespace Music.Writer
 
         private void btnPause_Click(object sender, EventArgs e)
         {
-            Tracer.DebugTrace($">>> btnPause_Click - IsPaused={_midiPlaybackService.IsPaused}, IsPlaying={_midiPlaybackService.IsPlaying}");
-
             // Pause/resume MIDI playback
             _gridOperations.HandlePause(_midiPlaybackService);
 
             // Stop tracker during pause (simplest consistent behavior)
             if (_midiPlaybackService.IsPaused)
             {
-                Tracer.DebugTrace("btnPause: Now paused, stopping tracker");
                 _progressTracker?.Stop();
             }
             else if (_midiPlaybackService.IsPlaying)
             {
-                Tracer.DebugTrace("btnPause: Resumed, restarting tracker");
                 // Resume was triggered - restart tracker if we have time signature track
                 var timeSignatureTrack = GridControlLinesManager.GetTimeSignatureTrack(dgSong);
                 if (timeSignatureTrack != null && timeSignatureTrack.Events.Count > 0)
@@ -425,8 +417,6 @@ namespace Music.Writer
                     _progressTracker.Start();
                 }
             }
-
-            Tracer.DebugTrace("<<< btnPause_Click END");
         }
 
         private void btnSaveDesign_Click(object sender, EventArgs e)
@@ -477,7 +467,6 @@ namespace Music.Writer
 
         private async Task StartPlaybackWithMeasureTrackingAsync()
         {
-            Tracer.DebugTrace("=== StartPlaybackWithMeasureTrackingAsync START ===");
             try
             {
                 // Extract time signature track from fixed row
@@ -486,17 +475,12 @@ namespace Music.Writer
                 // If no time signature track, proceed with playback but without measure tracking
                 bool enableTracking = timeSignatureTrack != null && timeSignatureTrack.Events.Count > 0;
 
-                Tracer.DebugTrace($"StartPlaybackWithMeasureTracking: enableTracking={enableTracking}");
-
                 if (!enableTracking)
                 {
-                    Tracer.DebugTrace("StartPlaybackWithMeasureTracking: No tracking, calling HandlePlayAsync");
                     await _eventHandlers.HandlePlayAsync(dgSong, _midiPlaybackService);
-                    Tracer.DebugTrace("StartPlaybackWithMeasureTracking: HandlePlayAsync returned (no tracking)");
                     return;
                 }
 
-                Tracer.DebugTrace("StartPlaybackWithMeasureTracking: Setting up progress tracker");
                 _progressTracker?.Stop();
                 _progressTracker?.Dispose();
 
@@ -506,32 +490,25 @@ namespace Music.Writer
                 _progressTracker.MeasureChanged += OnMeasureChanged;
                 _progressTracker.Start();
 
-                Tracer.DebugTrace("StartPlaybackWithMeasureTracking: Progress tracker started, calling HandlePlayAsync");
                 await _eventHandlers.HandlePlayAsync(dgSong, _midiPlaybackService);
-                Tracer.DebugTrace("StartPlaybackWithMeasureTracking: HandlePlayAsync returned (with tracking)");
             }
             catch (Exception ex)
             {
-                Tracer.DebugTrace($"StartPlaybackWithMeasureTracking: Exception caught - {ex.GetType().Name}: {ex.Message}");
                 // If measure tracking setup fails, try playback without tracking
                 try
                 {
-                    Tracer.DebugTrace("StartPlaybackWithMeasureTracking: Attempting playback without tracking (after exception)");
                     await _eventHandlers.HandlePlayAsync(dgSong, _midiPlaybackService);
                 }
                 catch
                 {
-                    Tracer.DebugTrace("StartPlaybackWithMeasureTracking: Playback without tracking also failed, rethrowing");
                     // Let playback errors propagate normally
                     throw;
                 }
             }
             finally
             {
-                Tracer.DebugTrace("StartPlaybackWithMeasureTracking: FINALLY block - stopping tracker and clearing highlights");
                 _progressTracker?.Stop();
                 SongGridManager.ClearAllMeasureHighlights(dgSong);
-                Tracer.DebugTrace("=== StartPlaybackWithMeasureTrackingAsync END ===");
             }
         }
 
