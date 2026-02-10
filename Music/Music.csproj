@@ -83,6 +83,8 @@
     <None Remove="AI\Completed\2026-02-05-Story2-InProgress.md" />
     <None Remove="AI\Completed\2026-02-05-Story3-AgentContext-Refactor.md" />
     <None Remove="AI\Completed\2026-02-05-Story4-Smoke-Validation.md" />
+    <None Remove="AI\Completed\currente00pic.md" />
+    <None Remove="AI\Completed\CurrentEpic.md" />
     <None Remove="AI\Completed\CurrentEpic_12.md" />
     <None Remove="AI\Completed\CurrentEpic_2.md" />
     <None Remove="AI\Completed\CurrentEpic_3.md" />
@@ -120,8 +122,13 @@
     <None Remove="AI\Completed\PreAnalysis_8.1.md" />
     <None Remove="AI\Completed\PreAnalysis_9.3.md" />
     <None Remove="AI\Completed\RefactorEpic.md" />
+    <None Remove="AI\Completed\Story-1-BassGeneratorSettings.md" />
+    <None Remove="AI\Completed\Story-1-Implementation.md" />
+    <None Remove="AI\Completed\Story-2-BassPhraseGenerator.md" />
     <None Remove="AI\Completed\Story-2-Implementation.md" />
     <None Remove="AI\Completed\Story-3-Implementation.md" />
+    <None Remove="AI\Completed\Story-4-BassOperatorApplicator.md" />
+    <None Remove="AI\Completed\Story-5-BassOperatorFolders.md" />
     <None Remove="AI\Completed\Story1.md" />
     <None Remove="AI\Completed\Story2.md" />
     <None Remove="AI\Completed\Story3.3_Complete.md" />
@@ -233,6 +240,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="AI\Completed\" />
     <Folder Include="Archived Drum Intel Code\Performance\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />

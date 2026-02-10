@@ -132,3 +132,5 @@
 [2026-02-10T15:36:54.5906221-05:00] HandlePlayAsync: MIDI document created, Duration=7875ms
 [2026-02-10T15:36:54.5911594-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
 [2026-02-10T15:36:54.5911594-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-10T15:43:35.0132026-05:00] Rng.Initialize: seed=12345
+[2026-02-10T15:43:35.0132026-05:00] Rng.Initialize: seed=12345
