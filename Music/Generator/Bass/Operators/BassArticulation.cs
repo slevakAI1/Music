@@ -2,7 +2,7 @@
 // AI: invariants=Values are stable identifiers; None is default; mapper translates to MIDI note variants.
 // AI: deps=Used by bassCandidate and bassArticulationMapper; extend cautiously to preserve backwards compatibility.
 
-namespace Music.Generator.Bass.Operators.Candidates
+namespace Music.Generator.Bass.Operators
 {
     // Articulation hint for Bass hits. Mapper converts to MIDI note/timbre variants.
     public enum BassArticulation
