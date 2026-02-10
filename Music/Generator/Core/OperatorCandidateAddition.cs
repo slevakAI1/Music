@@ -28,6 +28,12 @@ namespace Music.Generator.Core
         // AI: hint=Optional timing offset in ticks (positive=late, negative=early); null means use timing shaper
         public int? TimingHint { get; init; }
 
+        // AI: hint=Optional MIDI note number [0..127]; pitched instruments (bass) set this; drums ignore (role maps to note).
+        public int? MidiNote { get; init; }
+
+        // AI: hint=Optional note duration in ticks; pitched instruments set per-note duration; null means use default.
+        public int? DurationTicks { get; init; }
+
         // AI: invariant=Operator score in [0.0,1.0] before style weighting and penalties
         public required double Score { get; init; }
 
@@ -68,6 +74,18 @@ namespace Music.Generator.Core
             if (VelocityHint.HasValue && (VelocityHint.Value < 0 || VelocityHint.Value > 127))
             {
                 errorMessage = $"VelocityHint must be in [0, 127], was {VelocityHint.Value}";
+                return false;
+            }
+
+            if (MidiNote.HasValue && (MidiNote.Value < 0 || MidiNote.Value > 127))
+            {
+                errorMessage = $"MidiNote must be in [0, 127], was {MidiNote.Value}";
+                return false;
+            }
+
+            if (DurationTicks.HasValue && DurationTicks.Value <= 0)
+            {
+                errorMessage = $"DurationTicks must be > 0, was {DurationTicks.Value}";
                 return false;
             }
 

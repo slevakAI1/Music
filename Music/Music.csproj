@@ -240,7 +240,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="AI\Completed\" />
     <Folder Include="Archived Drum Intel Code\Performance\" />
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />

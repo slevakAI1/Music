@@ -68,7 +68,7 @@ namespace Music.Generator.Bass.Generation
             // Extract anchor onsets (foundation that's always present)
             var anchorOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars, barTrack);
 
-            var allOnsets = ApplyBassOperators(bars, anchorOnsets, totalBars, numberOfOperators);
+            var allOnsets = ApplyBassOperators(bars, anchorOnsets, totalBars, numberOfOperators, songContext);
 
             // Convert to MIDI events
             return ConvertToPartTrack(allOnsets, barTrack, bassProgramNumber);
@@ -93,6 +93,7 @@ namespace Music.Generator.Bass.Generation
                 throw new ArgumentException("GroovePresetDefinition.AnchorLayer must be provided", nameof(songContext));
         }
 
+        // AI: purpose=Extract bass-role anchor onsets from groove; rhythm only—pitch set later by operators.
         private List<GrooveOnset> ExtractAnchorOnsets(
             GroovePresetDefinition groovePresetDefinition,
             int totalBars,
@@ -105,38 +106,11 @@ namespace Music.Generator.Bass.Generation
                 var groovePreset = groovePresetDefinition.GetActiveGroovePreset(bar);
                 var anchorLayer = groovePreset.AnchorLayer;
 
-                // Extract kick onsets
-                foreach (var beat in anchorLayer.KickOnsets)
+                foreach (var beat in anchorLayer.GetOnsets(GrooveRoles.Bass))
                 {
                     onsets.Add(new GrooveOnset
                     {
-                        Role = GrooveRoles.Kick,
-                        BarNumber = bar,
-                        Beat = beat,
-                        Velocity = _settings.DefaultVelocity,
-                        IsMustHit = true
-                    });
-                }
-
-                // Extract snare onsets
-                foreach (var beat in anchorLayer.SnareOnsets)
-                {
-                    onsets.Add(new GrooveOnset
-                    {
-                        Role = GrooveRoles.Snare,
-                        BarNumber = bar,
-                        Beat = beat,
-                        Velocity = _settings.DefaultVelocity,
-                        IsMustHit = true
-                    });
-                }
-
-                // Extract hat onsets
-                foreach (var beat in anchorLayer.HatOnsets)
-                {
-                    onsets.Add(new GrooveOnset
-                    {
-                        Role = GrooveRoles.ClosedHat,
+                        Role = GrooveRoles.Bass,
                         BarNumber = bar,
                         Beat = beat,
                         Velocity = _settings.DefaultVelocity,
@@ -148,72 +122,55 @@ namespace Music.Generator.Bass.Generation
             return onsets.OrderBy(o => o.BarNumber).ThenBy(o => o.Beat).ToList();
         }
 
-        // AI: purpose=Delegate to bassOperatorApplicator; simple random operator application over anchors.
+        // AI: purpose=Delegate to bassOperatorApplicator; passes songContext so operators can access HarmonyTrack.
         private List<GrooveOnset> ApplyBassOperators(
             IReadOnlyList<Bar> bars,
             List<GrooveOnset> anchorOnsets,
             int totalBars,
-            int numberOfOperators)
+            int numberOfOperators,
+            SongContext songContext)
         {
-            return BassOperatorApplicator.Apply(bars, anchorOnsets, totalBars, numberOfOperators, _registry);
+            return BassOperatorApplicator.Apply(bars, anchorOnsets, totalBars, numberOfOperators, _registry, songContext);
         }
 
+        // AI: purpose=Convert bass onsets to MIDI events; pitch and duration come from onset (set by operators).
+        // AI: invariants=Skips onsets without MidiNote (anchor rhythm-only onsets awaiting operator pitch).
         private static PartTrack ConvertToPartTrack(
             List<GrooveOnset> onsets,
             BarTrack barTrack,
             int bassProgramNumber)
         {
+            const int defaultDurationTicks = 120;
             var events = new List<PartTrackEvent>();
 
             foreach (var onset in onsets)
             {
-                // Get absolute tick position
+                // Bass onsets without a MidiNote have not been pitched by an operator; skip.
+                if (!onset.MidiNote.HasValue)
+                    continue;
+
                 long tickPosition = barTrack.ToTick(onset.BarNumber, onset.Beat);
 
-                // Apply timing offset if present
                 if (onset.TimingOffsetTicks.HasValue)
                 {
                     tickPosition += onset.TimingOffsetTicks.Value;
                 }
 
-                // Map role to MIDI note number
-                int midiNote = MapRoleToMidiNote(onset.Role);
-
-                // Get velocity
                 int velocity = onset.Velocity ?? 100;
 
-                // Create MIDI event
                 events.Add(new PartTrackEvent
                 {
                     AbsoluteTimeTicks = tickPosition,
                     Type = PartTrackEventType.NoteOn,
-                    NoteNumber = midiNote,
-                    NoteDurationTicks = 120, // Default 8th note duration
+                    NoteNumber = onset.MidiNote.Value,
+                    NoteDurationTicks = onset.DurationTicks ?? defaultDurationTicks,
                     NoteOnVelocity = velocity
                 });
             }
 
-            // CRITICAL: Sort events by AbsoluteTimeTicks for MIDI export validation
             events = events.OrderBy(e => e.AbsoluteTimeTicks).ToList();
 
             return new PartTrack(events) { MidiProgramNumber = bassProgramNumber };
-        }
-
-        private static int MapRoleToMidiNote(string role)
-        {
-            return role switch
-            {
-                GrooveRoles.Kick => 36,         // Acoustic Bass Bass
-                GrooveRoles.Snare => 38,        // Acoustic Snare
-                GrooveRoles.ClosedHat => 42,    // Closed Hi-Hat
-                GrooveRoles.OpenHat => 46,      // Open Hi-Hat
-                GrooveRoles.Crash => 49,        // Crash Cymbal 1
-                GrooveRoles.Ride => 51,         // Ride Cymbal 1
-                GrooveRoles.Tom1 => 50,         // High Tom
-                GrooveRoles.Tom2 => 47,         // Mid Tom
-                GrooveRoles.FloorTom => 45,     // Low Tom
-                _ => 38                         // Default to snare for unknown roles
-            };
         }
 
         #endregion

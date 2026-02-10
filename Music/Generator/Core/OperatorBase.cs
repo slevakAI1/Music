@@ -31,6 +31,10 @@ namespace Music.Generator.Core
         // AI: deps=Instrument adapter for candidate metadata
         protected IOperatorCandidateInstrumentAdapter InstrumentAdapter { get; }
 
+        // AI: purpose=Ambient song context set by applicator before GenerateCandidates; pitched operators use for harmony/groove.
+        // AI: invariants=Null when no context available; operators must guard access.
+        public SongContext? SongContext { get; set; }
+
         public abstract string OperatorId { get; }
 
         public abstract OperatorFamily OperatorFamily { get; }
@@ -59,7 +63,9 @@ namespace Music.Generator.Core
             double score,
             int? velocityHint = null,
             int? timingHint = null,
-            object? instrumentData = null)
+            object? instrumentData = null,
+            int? midiNote = null,
+            int? durationTicks = null)
         {
             var metadata = InstrumentAdapter.BuildMetadata(instrumentData);
 
@@ -72,6 +78,8 @@ namespace Music.Generator.Core
                 Beat = beat,
                 VelocityHint = velocityHint,
                 TimingHint = timingHint,
+                MidiNote = midiNote,
+                DurationTicks = durationTicks,
                 Score = score,
                 Metadata = metadata
             };

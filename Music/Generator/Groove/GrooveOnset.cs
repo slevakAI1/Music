@@ -53,6 +53,18 @@ namespace Music.Generator.Groove
         public int? TimingOffsetTicks { get; init; }
 
         /// <summary>
+        /// MIDI note number [0..127] set by pitched instrument operators (e.g., bass).
+        /// Nullable: drum onsets derive note from role mapping instead.
+        /// </summary>
+        public int? MidiNote { get; init; }
+
+        /// <summary>
+        /// Note duration in ticks set by pitched instrument operators.
+        /// Nullable: when null, converter uses a default duration.
+        /// </summary>
+        public int? DurationTicks { get; init; }
+
+        /// <summary>
         /// Origin tracking: where this onset came from (anchor, variation, etc.).
         /// Nullable: populated by Story G2 provenance system if diagnostics enabled.
         /// </summary>

@@ -2,6 +2,7 @@
 // AI: invariants=Counts only successful applications; dedup by (BarNumber, Beat, Role).
 // AI: deps=BassOperatorRegistry.GetAllOperators; Rng(DrumGenerator); GrooveOnset.
 
+using Music.Generator;
 using Music.Generator.Core;
 using Music.Generator.Groove;
 
@@ -11,12 +12,14 @@ namespace Music.Generator.Bass.Operators
     public static class BassOperatorApplicator
     {
         // AI: entry=Copy anchors, randomly pick operators, apply if valid (add/remove), return combined onsets.
+        // AI: invariants=Sets SongContext on each operator so bass operators can access HarmonyTrack for pitch selection.
         public static List<GrooveOnset> Apply(
             IReadOnlyList<Bar> bars,
             List<GrooveOnset> anchorOnsets,
             int totalBars,
             int numberOfOperators,
-            BassOperatorRegistry registry)
+            BassOperatorRegistry registry,
+            SongContext? songContext = null)
         {
             var result = new List<GrooveOnset>(anchorOnsets);
 
@@ -27,6 +30,13 @@ namespace Music.Generator.Bass.Operators
             var allOperators = registry.GetAllOperators();
             if (allOperators.Count == 0)
                 return result;
+
+            // Provide song context to operators so bass operators can access HarmonyTrack
+            if (songContext is not null)
+            {
+                foreach (var op in allOperators)
+                    op.SongContext = songContext;
+            }
 
             var barsInScope = bars.Where(b => b.BarNumber <= totalBars).ToList();
             if (barsInScope.Count == 0)
@@ -92,7 +102,9 @@ namespace Music.Generator.Bass.Operators
                     BarNumber = candidate.BarNumber,
                     Beat = candidate.Beat,
                     Velocity = candidate.VelocityHint ?? 100,
-                    TimingOffsetTicks = candidate.TimingHint
+                    TimingOffsetTicks = candidate.TimingHint,
+                    MidiNote = candidate.MidiNote,
+                    DurationTicks = candidate.DurationTicks
                 });
                 anyApplied = true;
             }
