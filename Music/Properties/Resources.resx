@@ -162,4 +162,7 @@
   <data name="PhraseTest_RepeatLabel" xml:space="preserve">
     <value>Repeat:</value>
   </data>
+  <data name="PhraseTest_OperatorsLabel" xml:space="preserve">
+    <value>Operators:</value>
+  </data>
 </root>

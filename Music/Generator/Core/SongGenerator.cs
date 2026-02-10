@@ -17,7 +17,7 @@ namespace Music.Generator
         }
 
         // AI: entry=Validate context then generate drum PartTrack; maxBars limits phrase generation scope
-        public static PartTrack Generate(SongContext songContext, int maxBars = 0)
+        public static PartTrack Generate(SongContext songContext, int maxBars = 0, int numberOfOperators = 2)
         {
             ValidateSongContext(songContext);
             ValidateSectionTrack(songContext.SectionTrack);
@@ -26,7 +26,7 @@ namespace Music.Generator
 
             int drumProgramNumber = VoiceSet.GetDrumProgramNumber(songContext.Voices);
             var generator = new DrumPhraseGenerator();
-            return generator.Generate(songContext, drumProgramNumber, maxBars);
+            return generator.Generate(songContext, drumProgramNumber, maxBars, numberOfOperators);
         }
 
         // AI: entry=Generate PartTrack from material phrases; materialBank required

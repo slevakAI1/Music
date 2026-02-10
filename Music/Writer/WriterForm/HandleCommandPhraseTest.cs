@@ -38,6 +38,7 @@ namespace Music.Writer
                 string genre = dialog.Genre;
                 int bars = dialog.Bars;
                 int repeat = dialog.Repeat;
+                int numberOfOperators = dialog.NumberOfOperators;
 
                 int effectiveBars = bars;
                 if (songContext.SectionTrack != null && bars > songContext.SectionTrack.TotalBars)
@@ -60,7 +61,7 @@ namespace Music.Writer
                 songContext.GroovePresetDefinition = groovePreset;
 
                 // Generate drum track using drummer agent pipeline (bars=0 means full song, >0 limits generation)
-                var result = Generator.SongGenerator.Generate(songContext, bars);
+                var result = Generator.SongGenerator.Generate(songContext, bars, numberOfOperators);
 
                 ApplyPhraseRepeat(result, songContext.BarTrack, effectiveBars, repeat);
 

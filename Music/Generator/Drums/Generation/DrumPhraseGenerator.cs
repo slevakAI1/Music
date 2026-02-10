@@ -48,7 +48,7 @@ namespace Music.Generator.Drums.Generation
         // AI: purpose=Generate a drum PartTrack using anchors + random operator application.
         // AI: invariants=Throws on null/missing tracks; respects maxBars limit when >0.
         // AI: flow=validate → extract anchors → apply random operators → convert to MIDI.
-        public PartTrack Generate(SongContext songContext, int drumProgramNumber, int maxBars = 0)
+        public PartTrack Generate(SongContext songContext, int drumProgramNumber, int maxBars = 0, int numberOfOperators = 2)
         {
             ValidateSongContext(songContext);
 
@@ -68,8 +68,7 @@ namespace Music.Generator.Drums.Generation
             // Extract anchor onsets (foundation that's always present)
             var anchorOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars, barTrack);
 
-        var numberOfOperators = 2;
-        var allOnsets = DrumOperatorApplicator.Apply(bars, anchorOnsets, totalBars, numberOfOperators, _registry);
+            var allOnsets = DrumOperatorApplicator.Apply(bars, anchorOnsets, totalBars, numberOfOperators, _registry);
 
             // Convert to MIDI events
             return ConvertToPartTrack(allOnsets, barTrack, drumProgramNumber);

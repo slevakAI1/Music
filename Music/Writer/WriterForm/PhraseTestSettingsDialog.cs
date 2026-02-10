@@ -1,5 +1,5 @@
-// AI: purpose=Simple input dialog for groove preview parameters (seed, genre, bars, repeat).
-// AI: invariants=Seed defaults to random; genre defaults to PopRock; bars defaults to 2; repeat defaults to 2.
+// AI: purpose=Simple input dialog for groove preview parameters (seed, genre, bars, repeat, operators).
+// AI: invariants=Seed defaults to random; genre defaults to PopRock; bars defaults to 2; repeat defaults to 2; operators defaults to 2.
 // AI: deps=Uses GrooveAnchorFactory.GetAvailableGenres for genre dropdown.
 
 using Music.Generator.Groove;
@@ -14,6 +14,7 @@ namespace Music.Writer
         private ComboBox cbGenre;
         private NumericUpDown numBars;
         private NumericUpDown numRepeat;
+        private NumericUpDown numOperators;
         private Button btnOK;
         private Button btnCancel;
         private Button btnRandomSeed;
@@ -21,12 +22,14 @@ namespace Music.Writer
         private Label lblGenre;
         private Label lblBars;
         private Label lblRepeat;
+        private Label lblOperators;
         private Label lblSeedDisplay;
 
         public int Seed { get; private set; }
         public string Genre { get; private set; }
         public int Bars { get; private set; }
         public int Repeat { get; private set; }
+        public int NumberOfOperators { get; private set; }
 
         public PhraseTestSettingsDialog()
         {
@@ -38,7 +41,7 @@ namespace Music.Writer
         {
             // Form properties
             Text = "Groove Preview";
-            Size = new Size(400, 290);
+            Size = new Size(400, 330);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             StartPosition = FormStartPosition.CenterParent;
             MaximizeBox = false;
@@ -145,11 +148,30 @@ namespace Music.Writer
                 Value = 2
             };
 
+            // Operators label
+            lblOperators = new Label
+            {
+                Text = Resources.ResourceManager.GetString("PhraseTest_OperatorsLabel") ?? "Operators:",
+                Location = new Point(20, 180),
+                Size = new Size(80, 23),
+                TextAlign = ContentAlignment.MiddleRight
+            };
+
+            // Operators numeric input
+            numOperators = new NumericUpDown
+            {
+                Location = new Point(110, 180),
+                Size = new Size(150, 23),
+                Minimum = 1,
+                Maximum = 100,
+                Value = 2
+            };
+
             // OK button
             btnOK = new Button
             {
                 Text = "OK",
-                Location = new Point(110, 190),
+                Location = new Point(110, 225),
                 Size = new Size(90, 30),
                 DialogResult = DialogResult.OK
             };
@@ -159,7 +181,7 @@ namespace Music.Writer
             btnCancel = new Button
             {
                 Text = "Cancel",
-                Location = new Point(210, 190),
+                Location = new Point(210, 225),
                 Size = new Size(90, 30),
                 DialogResult = DialogResult.Cancel
             };
@@ -175,6 +197,8 @@ namespace Music.Writer
             Controls.Add(numBars);
             Controls.Add(lblRepeat);
             Controls.Add(numRepeat);
+            Controls.Add(lblOperators);
+            Controls.Add(numOperators);
             Controls.Add(btnOK);
             Controls.Add(btnCancel);
 
@@ -211,6 +235,7 @@ namespace Music.Writer
             Genre = cbGenre.SelectedItem?.ToString() ?? "PopRock";
             Bars = (int)numBars.Value;
             Repeat = (int)numRepeat.Value;
+            NumberOfOperators = (int)numOperators.Value;
         }
     }
 }
