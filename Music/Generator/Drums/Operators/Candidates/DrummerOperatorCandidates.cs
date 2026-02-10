@@ -3,7 +3,7 @@
 // AI: deps=Uses DrumOperatorRegistry, DrumCandidateMapper; affects selection pipeline.
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators;
+using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.Candidates
@@ -93,7 +93,7 @@ namespace Music.Generator.Drums.Operators.Candidates
         public IReadOnlyList<OperatorExecutionDiagnostic>? LastExecutionDiagnostics => _lastExecutionDiagnostics;
 
         // AI: policy=Returns enabled operators; TODO: apply DrummerPolicyProvider allow-list in future
-        private IReadOnlyList<IDrumOperator> GetEnabledOperators(Bar bar, string role)
+        private IReadOnlyList<DrumOperatorBase> GetEnabledOperators(Bar bar, string role)
         {
             // TODO: Apply policy allow list filtering from DrummerPolicyProvider
             // For now, return all registered operators
@@ -102,7 +102,7 @@ namespace Music.Generator.Drums.Operators.Candidates
 
         // AI: behavior=Invokes each operator in order and aggregates validated DrumCandidates
         private List<OperatorCandidate> GenerateCandidatesFromOperators(
-            IReadOnlyList<IDrumOperator> operators,
+            IReadOnlyList<DrumOperatorBase> operators,
             Bar bar,
             int seed)
         {
@@ -119,7 +119,7 @@ namespace Music.Generator.Drums.Operators.Candidates
 
         // AI: exec=Safely runs GenerateCandidates; wraps exceptions into diagnostics per settings
         private OperatorExecutionDiagnostic ExecuteOperator(
-            IDrumOperator op,
+            DrumOperatorBase op,
             Bar bar,
             int seed,
             List<OperatorCandidate> allCandidates)
@@ -155,7 +155,7 @@ namespace Music.Generator.Drums.Operators.Candidates
 
         // AI: error=Converts operator exceptions into diagnostics; will rethrow if ContinueOnOperatorError is false
         private OperatorExecutionDiagnostic HandleOperatorError(
-            IDrumOperator op,
+            DrumOperatorBase op,
             Exception ex,
             string method)
         {

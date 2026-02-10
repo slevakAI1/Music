@@ -1,6 +1,6 @@
 // AI: purpose=Abstract base for all drum operators; provides helper methods.
 // AI: invariants=Subclasses must provide OperatorId and OperatorFamily.
-// AI: deps=IDrumOperator interface, Bar, OperatorCandidate.
+// AI: deps=Bar, OperatorCandidate.
 // AI: change=Epic DrummerContext-Dedup; removed energy thresholds; bar properties accessed directly.
 
 
@@ -14,18 +14,14 @@ namespace Music.Generator.Drums.Operators.Base
 {
     // AI: purpose=Abstract base for drum operators; supplies common Score/CreateCandidate helpers.
     // AI: invariants=Subclasses must provide OperatorId and OperatorFamily.
-    public abstract class DrumOperatorBase : IDrumOperator
+    public abstract class DrumOperatorBase
     {
-        /// <inheritdoc/>
         public abstract string OperatorId { get; }
 
-        /// <inheritdoc/>
         public abstract OperatorFamily OperatorFamily { get; }
 
-        /// <inheritdoc/>
         public abstract IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed);
 
-        /// <inheritdoc/>
         public virtual double Score(OperatorCandidate candidate, Bar bar)
         {
             ArgumentNullException.ThrowIfNull(candidate);

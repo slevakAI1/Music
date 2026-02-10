@@ -399,57 +399,5 @@ namespace Music.Generator.Agents.Common.Tests
         }
     }
 
-    /// <summary>
-    /// Mock drum candidate for testing IMusicalOperator.
-    /// </summary>
-    internal class MockDrumCandidate
-    {
-        public required string CandidateId { get; init; }
-        public required decimal Beat { get; init; }
-        public required string Role { get; init; }
-        public double Score { get; init; } = 0.8;
-    }
-
-    /// <summary>
-    /// Mock ghost note operator for testing IMusicalOperator interface.
-    /// Demonstrates the operator pattern from Story 1.1 appendix.
-    /// </summary>
-    internal class MockGhostNoteOperator : IMusicalOperator<MockDrumCandidate>
-    {
-        public string OperatorId => "MockGhostNote";
-        public OperatorFamily OperatorFamily => OperatorFamily.MicroAddition;
-
-        public bool CanApply(AgentContext context)
-        {
-            // Only apply if energy > 0.5 and not in fill window
-            return context.EnergyLevel > 0.5 && context.BarsUntilSectionEnd > 1;
-        }
-
-        public IEnumerable<MockDrumCandidate> GenerateCandidates(AgentContext context)
-        {
-            // Generate ghost note candidates before backbeats
-            yield return new MockDrumCandidate
-            {
-                CandidateId = "ghost-1.75",
-                Beat = 1.75m,
-                Role = "Snare",
-                Score = 0.8
-            };
-            yield return new MockDrumCandidate
-            {
-                CandidateId = "ghost-3.75",
-                Beat = 3.75m,
-                Role = "Snare",
-                Score = 0.7
-            };
-        }
-
-        public double Score(MockDrumCandidate candidate, AgentContext context)
-        {
-            // Simple scoring based on energy
-            return candidate.Score * context.EnergyLevel;
-        }
-    }
-
     #endregion
 }

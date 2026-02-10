@@ -3,6 +3,7 @@
 // AI: deps=DrumOperatorRegistry.GetAllOperators; Rng(DrumGenerator); GrooveOnset; IDrumRemovalOperator.
 
 using Music.Generator.Drums.Operators.Candidates;
+using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators
@@ -70,7 +71,7 @@ namespace Music.Generator.Drums.Operators
 
         // AI: purpose=Apply additive operator candidates; skip duplicates; returns true if any onset added.
         private static bool ApplyAdditions(
-            IDrumOperator op,
+            DrumOperatorBase op,
             Bar bar,
             int seed,
             List<GrooveOnset> result,
