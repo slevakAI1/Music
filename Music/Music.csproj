@@ -237,12 +237,6 @@
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
-    <Folder Include="Generator\Bass\Operators\MicroAddition\" />
-    <Folder Include="Generator\Bass\Operators\NoteRemoval\" />
-    <Folder Include="Generator\Bass\Operators\PatternSubstitution\" />
-    <Folder Include="Generator\Bass\Operators\PhrasePunctuation\" />
-    <Folder Include="Generator\Bass\Operators\StyleIdiom\" />
-    <Folder Include="Generator\Bass\Operators\SubdivisionTransform\" />
     <Folder Include="Generator\Drums\Operators\Base\" />
   </ItemGroup>
 
