@@ -68,6 +68,7 @@
     <Compile Remove="Song\Material\MaterialBank_Saved_Code.cs" />
   </ItemGroup>
 
+
   <ItemGroup>
     <EmbeddedResource Remove="Writer\WriterForm\ConsoleTransform.resx" />
     <EmbeddedResource Remove="Writer\WriterForm\WriterForm.DataBinder.resx" />
