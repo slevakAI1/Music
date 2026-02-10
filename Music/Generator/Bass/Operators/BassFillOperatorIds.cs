@@ -5,23 +5,30 @@ namespace Music.Generator.Bass.Operators;
 
 public static class BassFillOperatorIds
 {
-    // AI: note=Contains canonical fill operator IDs and an immutable set for membership checks; keep values stable.
-    public const string TurnaroundFillShort = "TurnaroundFillShort";
-    public const string TurnaroundFillFull = "TurnaroundFillFull";
-    public const string BuildFill = "BuildFill";
-    public const string DropFill = "DropFill";
-    public const string SetupHit = "SetupHit";
-    public const string StopTime = "StopTime";
-    public const string CrashOnOne = "CrashOnOne";
+
+    // AI: note=Contains canonical bass fill operator IDs and an immutable set for membership checks; keep values stable.
+    public const string BassTurnaroundShort = "BassTurnaroundShort";
+    public const string BassTurnaroundFull = "BassTurnaroundFull";
+    public const string BassPickup = "BassPickup";
+    public const string BassWalkUp = "BassWalkUp";
+    public const string BassWalkDown = "BassWalkDown";
+    public const string BassOctavePush = "BassOctavePush";
+    public const string BassRhythmPush = "BassRhythmPush";
+    public const string BassDropToPedal = "BassDropToPedal";
+    public const string BassStopTimeHit = "BassStopTimeHit";
+    public const string BassDownbeatReinforce = "BassDownbeatReinforce";
 
     public static readonly IReadOnlySet<string> All = new HashSet<string>
     {
-        TurnaroundFillShort,
-        TurnaroundFillFull,
-        BuildFill,
-        DropFill,
-        SetupHit,
-        StopTime,
-        CrashOnOne
+        BassTurnaroundShort,
+        BassTurnaroundFull,
+        BassPickup,
+        BassWalkUp,
+        BassWalkDown,
+        BassOctavePush,
+        BassRhythmPush,
+        BassDropToPedal,
+        BassStopTimeHit,
+        BassDownbeatReinforce
     };
 }

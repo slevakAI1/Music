@@ -14,13 +14,6 @@ namespace Music.Generator.Drums.Operators
 {
     /// <summary>
     /// Builds and populates a DrumOperatorRegistry with all available drum operators.
-    /// Story 2.4: Stub implementation.
-    /// Story 3.1: Registers MicroAddition operators (7 operators).
-    /// Story 3.2: Registers SubdivisionTransform operators (5 operators).
-    /// Story 3.3: Registers PhrasePunctuation operators (7 operators).
-    /// Story 3.4: Registers PatternSubstitution operators (4 operators).
-    /// Story 3.6: Completes registration with StyleIdiom operators (full 28 operators).
-    /// NoteRemoval: Registers subtractive operators (3 operators, total 31).
     /// </summary>
     /// <remarks>
     /// Operators are registered in a deterministic order for reproducibility:
