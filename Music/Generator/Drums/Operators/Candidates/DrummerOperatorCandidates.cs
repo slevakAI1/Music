@@ -3,7 +3,6 @@
 // AI: deps=Uses DrumOperatorRegistry, DrumCandidateMapper; affects selection pipeline.
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.Candidates
@@ -26,9 +25,9 @@ namespace Music.Generator.Drums.Operators.Candidates
         public bool WasSkipped { get; init; }
     }
 
-    // AI: purpose=IDrumOperatorCandidates implementation for drummer; pipeline: Operators->DrumCandidates->Map->Group
+    // AI: purpose=Drummer candidate provider; pipeline: Operators->DrumCandidates->Map->Group
     // AI: invariants=Deterministic given same inputs; errors isolated per-operator; groups sorted by family for determinism
-    public sealed class DrummerOperatorCandidates : IDrumOperatorCandidates
+    public sealed class DrummerOperatorCandidates
     {
         private readonly DrumOperatorRegistry _registry;
         private readonly Save_GrooveDiagnosticsCollector? _diagnosticsCollector;
@@ -93,7 +92,7 @@ namespace Music.Generator.Drums.Operators.Candidates
         public IReadOnlyList<OperatorExecutionDiagnostic>? LastExecutionDiagnostics => _lastExecutionDiagnostics;
 
         // AI: policy=Returns enabled operators; TODO: apply DrummerPolicyProvider allow-list in future
-        private IReadOnlyList<DrumOperatorBase> GetEnabledOperators(Bar bar, string role)
+        private IReadOnlyList<OperatorBase> GetEnabledOperators(Bar bar, string role)
         {
             // TODO: Apply policy allow list filtering from DrummerPolicyProvider
             // For now, return all registered operators
@@ -102,7 +101,7 @@ namespace Music.Generator.Drums.Operators.Candidates
 
         // AI: behavior=Invokes each operator in order and aggregates validated DrumCandidates
         private List<OperatorCandidate> GenerateCandidatesFromOperators(
-            IReadOnlyList<DrumOperatorBase> operators,
+            IReadOnlyList<OperatorBase> operators,
             Bar bar,
             int seed)
         {
@@ -119,7 +118,7 @@ namespace Music.Generator.Drums.Operators.Candidates
 
         // AI: exec=Safely runs GenerateCandidates; wraps exceptions into diagnostics per settings
         private OperatorExecutionDiagnostic ExecuteOperator(
-            DrumOperatorBase op,
+            OperatorBase op,
             Bar bar,
             int seed,
             List<OperatorCandidate> allCandidates)
@@ -155,7 +154,7 @@ namespace Music.Generator.Drums.Operators.Candidates
 
         // AI: error=Converts operator exceptions into diagnostics; will rethrow if ContinueOnOperatorError is false
         private OperatorExecutionDiagnostic HandleOperatorError(
-            DrumOperatorBase op,
+            OperatorBase op,
             Exception ex,
             string method)
         {

@@ -1,11 +1,10 @@
 // AI: purpose=MicroAddition operator generating ghost snare notes just after backbeats (2.25, 4.25).
 // AI: invariants=VelocityHint in [30,50]; only applies when Snare in ActiveRoles 
-// AI: deps=DrumOperatorBase, DrummerContext, OperatorCandidate; registered in DrumOperatorRegistry.
+// AI: deps=OperatorBase, DrummerContext, OperatorCandidate; registered in DrumOperatorRegistry.
 //
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
@@ -13,7 +12,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
 {
     // AI: purpose=Generate ghost snare notes shortly after backbeats (e.g., 2.25, 4.25).
     // AI: invariants=VelocityHint in [30,50]; uses Bar.BackbeatBeats; skip when grid or bar length invalid.
-    public sealed class GhostAfterBackbeatOperator : DrumOperatorBase
+    public sealed class GhostAfterBackbeatOperator : OperatorBase
     {
         private const int VelocityMin = 30;
         private const int VelocityMax = 50;

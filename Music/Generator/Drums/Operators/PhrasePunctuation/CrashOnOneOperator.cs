@@ -4,7 +4,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
@@ -13,13 +12,13 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
 {
     // AI: purpose=Emit crash cymbal at bar 1 for section starts; marks transitions and fill ends.
     // AI: note=VelocityHint range [100,127]; reduced when not high energy; uses FillRole.FillEnd by convention.
-    public sealed class CrashOnOneOperator : DrumOperatorBase
+    public sealed class CrashOnOneOperator : OperatorBase
     {
         private const int VelocityMin = 100;
         private const int VelocityMax = 127;
         private const double BaseScore = 0.85;
 
-        public override string OperatorId => FillOperatorIds.CrashOnOne;
+        public override string OperatorId => DrumFillOperatorIds.CrashOnOne;
 
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 

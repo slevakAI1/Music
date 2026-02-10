@@ -240,6 +240,7 @@
     <Folder Include="Generator\Bass\Operators\PhrasePunctuation\" />
     <Folder Include="Generator\Bass\Operators\StyleIdiom\" />
     <Folder Include="Generator\Bass\Operators\SubdivisionTransform\" />
+    <Folder Include="Generator\Drums\Operators\Base\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,10 +1,9 @@
 // AI: purpose=MicroAddition: add sparse 16th hi-hat embellishments between 8th onsets.
 // AI: invariants=VelocityHint in [40,60]; requires ClosedHat role and valid 16th positions in Bar.
-// AI: deps=DrumOperatorBase, DrummerContext, OperatorCandidate; registered in DrumOperatorRegistry.
+// AI: deps=OperatorBase, DrummerContext, OperatorCandidate; registered in DrumOperatorRegistry.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
@@ -12,7 +11,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
 {
     // Add sparse 16th hi-hat embellishments (1-2 hits) in offbeat 16th positions between 8ths.
     // Score reduced when motif active; motif map not present in context here.
-    public sealed class HatEmbellishmentOperator : DrumOperatorBase
+    public sealed class HatEmbellishmentOperator : OperatorBase
     {
         private const int VelocityMin = 40;
         private const int VelocityMax = 60;

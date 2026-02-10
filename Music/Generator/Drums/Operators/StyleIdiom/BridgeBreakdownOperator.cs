@@ -4,7 +4,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
@@ -12,7 +11,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
 {
     // AI: purpose=Emit bridge breakdown variants for PopRock: HalfTime or Minimal sparse patterns.
     // AI: note=HalfTime => snare on 3; Minimal => sparse kick/snare and optional sparse hats; selection from energy/seed.
-    public sealed class BridgeBreakdownOperator : DrumOperatorBase
+    public sealed class BridgeBreakdownOperator : OperatorBase
     {
         private const string PopRockStyleId = "PopRock";
         private const int KickVelocityMin = 75;

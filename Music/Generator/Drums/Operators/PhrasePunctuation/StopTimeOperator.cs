@@ -2,7 +2,6 @@
 // AI: invariants=During dropout generate only sparse accents (kick/snare); absence of hats produces "dropout".
 // AI: deps=Bar; downstream systems interpret fewer candidates as thinning; deterministic from seed.
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
@@ -11,14 +10,14 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
 {
     // AI: purpose=Emit sparse accents (kick on 1, optional snare on 3) during fill windows to create stop-time.
     // AI: note=Produces no hat candidates; keep behavior deterministic and minimal; use FillRole.None for accents.
-    public sealed class StopTimeOperator : DrumOperatorBase
+    public sealed class StopTimeOperator : OperatorBase
     {
         private const int VelocityMin = 90;
         private const int VelocityMax = 115;
         private const double BaseScore = 0.6;
 
         /// <inheritdoc/>
-        public override string OperatorId => FillOperatorIds.StopTime;
+        public override string OperatorId => DrumFillOperatorIds.StopTime;
 
         /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;

@@ -38,30 +38,10 @@ namespace Music.Generator.Bass.Operators
         // Throws InvalidOperationException when validation fails.
         public static DrumOperatorRegistry BuildComplete()
         {
-            var registry = DrumOperatorRegistry.CreateEmpty();
+            var registry = new DrumOperatorRegistry();
             RegisterAllOperators(registry);
             registry.Freeze();
             return registry;
-        }
-
-        // Build a diagnostic message listing registered operators by family when validation fails.
-        private static string BuildCountValidationMessage(DrumOperatorRegistry registry, int expected)
-        {
-            var sb = new System.Text.StringBuilder();
-            sb.AppendLine($"Operator count validation failed. Expected {expected}, found {registry.Count}.");
-            sb.AppendLine("Registered operators by family:");
-
-            foreach (OperatorFamily family in Enum.GetValues<OperatorFamily>())
-            {
-                var ops = registry.GetOperatorsByFamily(family);
-                sb.AppendLine($"  {family}: {ops.Count} operators");
-                foreach (var op in ops)
-                {
-                    sb.AppendLine($"    - {op.OperatorId}");
-                }
-            }
-
-            return sb.ToString();
         }
 
         // RegisterAllOperators: populate registry by calling family registration helpers. Exposed for tests.

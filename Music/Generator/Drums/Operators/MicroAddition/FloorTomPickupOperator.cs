@@ -1,9 +1,8 @@
 // AI: purpose=MicroAddition operator generating floor tom anticipation at 4.75.
 // AI: invariants=VelocityHint in [60,80]; only applies when FloorTom in ActiveRoles 
-// AI: deps=DrumOperatorBase, DrummerContext, OperatorCandidate; registered in DrumOperatorRegistry.
+// AI: deps=OperatorBase, DrummerContext, OperatorCandidate; registered in DrumOperatorRegistry.
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
@@ -11,7 +10,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
 {
     // AI: purpose=MicroAddition operator: floor-tom pickup anticipation at bar end (beat +0.75).
     // AI: invariants=VelocityHint in [60,80]; only applies when GrooveRoles.FloorTom active; deterministic via Seed.
-    public sealed class FloorTomPickupOperator : DrumOperatorBase
+    public sealed class FloorTomPickupOperator : OperatorBase
     {
         private const int VelocityMin = 60;
         private const int VelocityMax = 80;

@@ -4,7 +4,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
@@ -13,13 +12,13 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
 {
     // AI: purpose=Create a subtle setup hit on the bar's last "and" to lead into the next section.
     // AI: note=Produces kick and optional snare; uses FillRole.Setup; avoid when BeatsPerBar < 4.
-    public sealed class SetupHitOperator : DrumOperatorBase
+    public sealed class SetupHitOperator : OperatorBase
     {
         private const int VelocityMin = 70;
         private const int VelocityMax = 100;
         private const double BaseScore = 0.65;
 
-        public override string OperatorId => FillOperatorIds.SetupHit;
+        public override string OperatorId => DrumFillOperatorIds.SetupHit;
 
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 

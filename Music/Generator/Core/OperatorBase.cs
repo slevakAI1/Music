@@ -1,20 +1,18 @@
-// AI: purpose=Abstract base for all drum operators; provides helper methods.
-// AI: invariants=Subclasses must provide OperatorId and OperatorFamily.
-// AI: deps=Bar, OperatorCandidate.
-// AI: change=Epic DrummerContext-Dedup; removed energy thresholds; bar properties accessed directly.
+// AI: purpose=Abstract base for drum operators; provides common helpers for candidate creation & scoring.
+// AI: invariants=Subclasses must provide OperatorId and OperatorFamily; methods must be deterministic.
+// AI: deps=Bar, OperatorCandidate, RemovalCandidate; removed energy thresholds; bar accessed directly.
 
 
-using Music.Generator.Core;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
 using Music.Generator.Material;
 
-namespace Music.Generator.Drums.Operators.Base
+namespace Music.Generator.Core
 {
     // AI: purpose=Abstract base for drum operators; supplies common Score/CreateCandidate helpers.
-    // AI: invariants=Subclasses must provide OperatorId and OperatorFamily.
-    public abstract class DrumOperatorBase
+    // AI: invariants=Subclasses must provide OperatorId and OperatorFamily; keep GenerateCandidates pure.
+    public abstract class OperatorBase
     {
         public abstract string OperatorId { get; }
 
@@ -22,11 +20,12 @@ namespace Music.Generator.Drums.Operators.Base
 
         public abstract IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed);
 
-        // AI: purpose=Optional removal targets; default empty for additive operators.
+        // AI: purpose=Optional removal targets; additive operators return empty by default.
+        // AI: contract=Must return deterministic sequence; do not return null.
         public virtual IEnumerable<RemovalCandidate> GenerateRemovals(Bar bar)
         {
             ArgumentNullException.ThrowIfNull(bar);
-            return [];
+            return Array.Empty<RemovalCandidate>();
         }
 
         public virtual double Score(OperatorCandidate candidate, Bar bar)

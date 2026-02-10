@@ -4,7 +4,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
@@ -12,7 +11,7 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
 {
     // AI: purpose=Emit ride cymbal timekeeping matching hat subdivision to change timbre/layout.
     // AI: note=Use RideBell for bar 1 downbeat; preserve anchor hits; avoid replacing anchors produced by groove.
-    public sealed class RideSwapOperator : DrumOperatorBase
+    public sealed class RideSwapOperator : OperatorBase
     {
         private const int VelocityMin = 70;
         private const int VelocityMax = 90;

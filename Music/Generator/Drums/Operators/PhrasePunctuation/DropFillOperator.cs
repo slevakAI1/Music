@@ -1,11 +1,10 @@
 // AI: purpose=PhrasePunctuation operator generating descending tom fill for release/resolution.
 // AI: invariants=Only applies when IsFillWindow=true and toms are active; generates 6-12 descending hits.
-// AI: deps=DrumOperatorBase, Bar, OperatorCandidate; uses Tom1, Tom2, FloorTom for descending pattern.
+// AI: deps=OperatorBase, Bar, OperatorCandidate; uses Tom1, Tom2, FloorTom for descending pattern.
 // AI: change=Story 3.3; adjust pattern and velocity curve based on listening tests.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
@@ -17,7 +16,7 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
     /// Moves from high tom to floor tom (low), creating downward relaxation energy.
     /// Story 3.3: Phrase Punctuation Operators (Boundaries &amp; Fills).
     /// </summary>
-    public sealed class DropFillOperator : DrumOperatorBase
+    public sealed class DropFillOperator : OperatorBase
     {
         private const int VelocityStartMin = 90;
         private const int VelocityStartMax = 115;
@@ -27,7 +26,7 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
         private const string FillTag = "DropFill_Descending";
 
         /// <inheritdoc/>
-        public override string OperatorId => FillOperatorIds.DropFill;
+        public override string OperatorId => DrumFillOperatorIds.DropFill;
 
         /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;

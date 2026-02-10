@@ -4,7 +4,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
@@ -12,7 +11,7 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
 {
     // AI: purpose=Emit full-bar 16th hi-hat pattern (four 16th positions per beat) to raise hat density.
     // AI: note=Downbeats get accents; skip positions beyond bar end; score boosted near transitions; deterministic.
-    public sealed class HatLiftOperator : DrumOperatorBase
+    public sealed class HatLiftOperator : OperatorBase
     {
         private const int VelocityMin = 60;
         private const int VelocityMax = 85;

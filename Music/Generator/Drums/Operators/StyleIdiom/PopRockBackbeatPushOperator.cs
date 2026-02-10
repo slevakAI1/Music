@@ -4,7 +4,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
@@ -12,7 +11,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
 {
     // AI: purpose=Apply a small early timing offset to snare backbeats to create urgency in PopRock bridges/chorus.
     // AI: note=Timing offset chosen from energy bands; use negative timingHint ticks; deterministic from seed.
-    public sealed class PopRockBackbeatPushOperator : DrumOperatorBase
+    public sealed class PopRockBackbeatPushOperator : OperatorBase
     {
         private const string PopRockStyleId = "PopRock";
         private const int DefaultTimingOffsetTicks = -6;

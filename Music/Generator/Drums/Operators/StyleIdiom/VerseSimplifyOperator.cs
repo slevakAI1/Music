@@ -4,7 +4,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
@@ -12,7 +11,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
 {
     // AI: purpose=Produce simplified verse candidates (sparser kick/hat patterns, lower velocities).
     // AI: note=Prefer 1/3 kick pattern and eighth-note hats; selection engine density weights determine final output.
-    public sealed class VerseSimplifyOperator : DrumOperatorBase
+    public sealed class VerseSimplifyOperator : OperatorBase
     {
         private const string PopRockStyleId = "PopRock";
         private const int KickVelocityMin = 70;

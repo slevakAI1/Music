@@ -4,7 +4,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
@@ -12,7 +11,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
 {
     // AI: purpose=Generate alternative snare articulations for backbeat hits to change section character.
     // AI: note=Selection is section-aware (verse/chorus/bridge/etc.); lower base score to encourage sparing use.
-    public sealed class BackbeatVariantOperator : DrumOperatorBase
+    public sealed class BackbeatVariantOperator : OperatorBase
     {
         private const int SideStickVelocityMin = 60;
         private const int SideStickVelocityMax = 80;

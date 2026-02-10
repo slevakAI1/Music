@@ -4,7 +4,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
@@ -12,7 +11,7 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
 {
     // AI: purpose=Apply 16th subdivision only for the latter half of the bar (e.g., beats 3-4 in 4/4).
     // AI: note=Used to create intra-bar energy build; first half remains 8ths to preserve anchor hits.
-    public sealed class PartialLiftOperator : DrumOperatorBase
+    public sealed class PartialLiftOperator : OperatorBase
     {
         private const int VelocityMin = 65;
         private const int VelocityMax = 85;

@@ -1,24 +1,23 @@
 // AI: purpose=Registry for drum operators; discovery/filtering by family/style for DrummerOperatorCandidates.
 // AI: invariants=Operators registered once; deterministic registration order; reads are thread-safe after Freeze.
-// AI: deps=DrumOperatorBase, OperatorFamily, StyleConfiguration; used by DrummerOperatorCandidates to source candidates.
+// AI: deps=OperatorBase, OperatorFamily, StyleConfiguration; used by DrummerOperatorCandidates to source candidates.
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 
 namespace Music.Generator.Drums.Operators
 {
-    // AI: purpose=Holds registered DrumOperatorBase instances; supports queries by family, id, and style allow lists.
+    // AI: purpose=Holds registered OperatorBase instances; supports queries by family, id, and style allow lists.
     // AI: invariants=RegisterOperator must be called before Freeze(); after Freeze registry is immutable.
     public sealed class DrumOperatorRegistry
     {
-        private readonly List<DrumOperatorBase> _operators = new();
-        private readonly Dictionary<string, DrumOperatorBase> _operatorById = new();
-        private readonly Dictionary<OperatorFamily, List<DrumOperatorBase>> _operatorsByFamily = new();
+        private readonly List<OperatorBase> _operators = new();
+        private readonly Dictionary<string, OperatorBase> _operatorById = new();
+        private readonly Dictionary<OperatorFamily, List<OperatorBase>> _operatorsByFamily = new();
         private bool _frozen;
 
         // Register an operator. Throws InvalidOperationException if registry is frozen or duplicate ID.
         // AI: errors=throws InvalidOperationException when frozen or duplicate operatorId.
-        public void RegisterOperator(DrumOperatorBase op)
+        public void RegisterOperator(OperatorBase op)
         {
             ArgumentNullException.ThrowIfNull(op);
 
@@ -33,7 +32,7 @@ namespace Music.Generator.Drums.Operators
 
             if (!_operatorsByFamily.TryGetValue(op.OperatorFamily, out var familyList))
             {
-                familyList = new List<DrumOperatorBase>();
+                familyList = new List<OperatorBase>();
                 _operatorsByFamily[op.OperatorFamily] = familyList;
             }
             familyList.Add(op);
@@ -46,31 +45,31 @@ namespace Music.Generator.Drums.Operators
         }
 
         // Return all registered operators in deterministic registration order.
-        public IReadOnlyList<DrumOperatorBase> GetAllOperators() => _operators;
+        public IReadOnlyList<OperatorBase> GetAllOperators() => _operators;
 
         // Get operators for a given family. Returns empty array when none found.
-        public IReadOnlyList<DrumOperatorBase> GetOperatorsByFamily(OperatorFamily family)
+        public IReadOnlyList<OperatorBase> GetOperatorsByFamily(OperatorFamily family)
         {
             return _operatorsByFamily.TryGetValue(family, out var list)
                 ? list
-                : Array.Empty<DrumOperatorBase>();
+                : Array.Empty<OperatorBase>();
         }
 
         // Lookup operator by ID. Returns null when not found. ArgumentNullException on null operatorId.
-        public DrumOperatorBase? GetOperatorById(string operatorId)
+        public OperatorBase? GetOperatorById(string operatorId)
         {
             ArgumentNullException.ThrowIfNull(operatorId);
             return _operatorById.TryGetValue(operatorId, out var op) ? op : null;
         }
 
         // Get operators enabled by explicit allow list. Null or empty list => all operators allowed.
-        public IReadOnlyList<DrumOperatorBase> GetEnabledOperators(IReadOnlyList<string>? allowList)
+        public IReadOnlyList<OperatorBase> GetEnabledOperators(IReadOnlyList<string>? allowList)
         {
             if (allowList is null || allowList.Count == 0)
                 return _operators;
 
             var allowSet = new HashSet<string>(allowList);
-            var enabled = new List<DrumOperatorBase>();
+            var enabled = new List<OperatorBase>();
             foreach (var op in _operators)
             {
                 if (allowSet.Contains(op.OperatorId))
@@ -78,10 +77,6 @@ namespace Music.Generator.Drums.Operators
             }
             return enabled;
         }
-
-        // THIS CAN REMOVE
-        // Create an empty registry
-        public static DrumOperatorRegistry CreateEmpty() => new();
 
         /// <summary>
         /// Total number of registered operators.

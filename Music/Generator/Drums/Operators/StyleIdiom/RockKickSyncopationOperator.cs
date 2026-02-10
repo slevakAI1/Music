@@ -4,7 +4,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
@@ -13,7 +12,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
     // AI: purpose=Emit 4&->1 rock kick anticipation; optional secondary syncopation at higher energy.
     // AI: note=Primary pattern = 4.5; secondary = 2.5/3.5 chosen deterministically; target frequency ~15-25% bars.
     // AI: invariants=PopRock style only; ensure BeatsPerBar>=4 for primary; preserve deterministic hash behavior.
-    public sealed class RockKickSyncopationOperator : DrumOperatorBase
+    public sealed class RockKickSyncopationOperator : OperatorBase
     {
         private const string PopRockStyleId = "PopRock";
         private const decimal PrimaryAnticipationBeat = 4.5m;

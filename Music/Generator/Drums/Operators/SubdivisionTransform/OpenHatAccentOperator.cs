@@ -4,7 +4,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
@@ -12,7 +11,7 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
 {
     // AI: purpose=Place open hi-hat "splash" accents on offbeats (e.g., 1.5, 3.5) to add forward momentum.
     // AI: note=Select up to N accents deterministically from AccentPositions; use DrumArticulation.OpenHat.
-    public sealed class OpenHatAccentOperator : DrumOperatorBase
+    public sealed class OpenHatAccentOperator : OperatorBase
     {
         private const int VelocityMin = 85;
         private const int VelocityMax = 105;

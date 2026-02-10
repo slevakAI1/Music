@@ -1,10 +1,9 @@
 // AI: purpose=MicroAddition operator: add extra kick hits on offbeats (8th or 16th variants).
 // AI: invariants=VelocityHint in [60,80]; respects Bar.BeatsPerBar; deterministic selection from (bar,seed).
-// AI: deps=DrumOperatorBase, DrummerContext, OperatorCandidate; registered in DrumOperatorRegistry.
+// AI: deps=OperatorBase, DrummerContext, OperatorCandidate; registered in DrumOperatorRegistry.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
@@ -12,7 +11,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
 {
     // Add extra kick hits on offbeats to enhance rhythmic drive.
     // Uses 8th positions by default; may use 16th variants when grid/energy allow.
-    public sealed class KickDoubleOperator : DrumOperatorBase
+    public sealed class KickDoubleOperator : OperatorBase
     {
         private const int VelocityMin = 60;
         private const int VelocityMax = 80;

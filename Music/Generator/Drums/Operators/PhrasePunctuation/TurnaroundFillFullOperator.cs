@@ -4,7 +4,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
@@ -13,7 +12,7 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
 {
     // Create a full-bar turnaround fill for section ends; distributes accents and ghosts across 16ths.
     // Note: hit density scales by energy; roles map to kick on downbeats and snare elsewhere.
-    public sealed class TurnaroundFillFullOperator : DrumOperatorBase
+    public sealed class TurnaroundFillFullOperator : OperatorBase
     {
         private const int GhostVelocityMin = 45;
         private const int GhostVelocityMax = 65;
@@ -23,7 +22,7 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
         private const string FillTag = "TurnaroundFull";
 
         /// <inheritdoc/>
-        public override string OperatorId => FillOperatorIds.TurnaroundFillFull;
+        public override string OperatorId => DrumFillOperatorIds.TurnaroundFillFull;
 
         /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;

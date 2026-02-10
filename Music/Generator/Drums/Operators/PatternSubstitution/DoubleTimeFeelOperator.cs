@@ -1,10 +1,9 @@
 // AI: purpose=PatternSubstitution: produce double-time feel (denser kicks, driving energy) without tempo change.
 // AI: invariants=Apply in high-energy suitable sections; uses Bar.BackbeatBeats and BeatsPerBar; deterministic from seed.
-// AI: deps=DrumOperatorBase, Bar, OperatorCandidate; integrates with section type for suitability decisions.
+// AI: deps=OperatorBase, Bar, OperatorCandidate; integrates with section type for suitability decisions.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
@@ -12,7 +11,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
 {
     // AI: purpose=Apply double-time feel: 8th-note dense kick pattern + strong backbeats.
     // AI: note=Intended for choruses/solos; lower base score to keep sparing; mutually exclusive with half-time.
-    public sealed class DoubleTimeFeelOperator : DrumOperatorBase
+    public sealed class DoubleTimeFeelOperator : OperatorBase
     {
         private const int KickDownbeatVelocityMin = 95;
         private const int KickDownbeatVelocityMax = 115;

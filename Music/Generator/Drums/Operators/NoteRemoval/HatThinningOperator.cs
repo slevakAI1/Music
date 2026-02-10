@@ -1,9 +1,8 @@
 // AI: purpose=NoteRemoval operator that removes every other hi-hat hit for breathing room.
 // AI: invariants=Targets ClosedHat only; skips protected/must-hit onsets (enforced by applicator).
-// AI: deps=DrumOperatorBase, Bar, RemovalCandidate, GrooveRoles.
+// AI: deps=OperatorBase, Bar, RemovalCandidate, GrooveRoles.
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
@@ -11,7 +10,7 @@ namespace Music.Generator.Drums.Operators.NoteRemoval
 {
     // AI: purpose=Thin hi-hat pattern by removing offbeat hat hits; creates open feel for verses/bridges.
     // AI: note=Real drummers often play quarter-note hats in verses and eighth-note hats in choruses.
-    public sealed class HatThinningOperator : DrumOperatorBase
+    public sealed class HatThinningOperator : OperatorBase
     {
         public override string OperatorId => "DrumHatThinning";
 

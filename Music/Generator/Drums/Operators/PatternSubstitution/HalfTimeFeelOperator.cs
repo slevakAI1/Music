@@ -4,7 +4,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
@@ -12,7 +11,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
 {
     // AI: purpose=Generate half-time feel: snare on 3, sparse kicks to create heavy, slower feel.
     // AI: note=Best in bridge/breakdown/verse for contrast; score computed to prefer section starts/boundaries.
-    public sealed class HalfTimeFeelOperator : DrumOperatorBase
+    public sealed class HalfTimeFeelOperator : OperatorBase
     {
         private const int SnareVelocityMin = 95;
         private const int SnareVelocityMax = 115;

@@ -1,10 +1,9 @@
 // AI: purpose=PatternSubstitution operator generating kick pattern variants (four-on-floor, syncopated, half-time).
 // AI: invariants=Applies when Kick in ActiveRoles; produces full-bar kick positions; deterministic from (bar,seed).
-// AI: deps=DrumOperatorBase, Bar, OperatorCandidate; integrates with section type for selection.
+// AI: deps=OperatorBase, Bar, OperatorCandidate; integrates with section type for selection.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
@@ -12,7 +11,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
 {
     // AI: purpose=Generate kick pattern variants to convey section character (four-on-floor, syncopated, half-time).
     // AI: note=Selection is section-aware (Chorus->FourOnFloor, Verse->Syncopated, Bridge->HalfTime). Patterns adapt to time sig.
-    public sealed class KickPatternVariantOperator : DrumOperatorBase
+    public sealed class KickPatternVariantOperator : OperatorBase
     {
         private const int FourOnFloorVelocityMin = 90;
         private const int FourOnFloorVelocityMax = 110;

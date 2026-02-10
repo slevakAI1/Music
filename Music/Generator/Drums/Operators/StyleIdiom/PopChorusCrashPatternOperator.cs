@@ -4,7 +4,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
@@ -12,7 +11,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
 {
     // AI: purpose=Emit crash cymbal for PopRock choruses; default every-bar, alternate every-other or phrase-start patterns.
     // AI: note=Pattern is a section signature (low repetition penalty); selection depends on energy/seed.
-    public sealed class PopChorusCrashPatternOperator : DrumOperatorBase
+    public sealed class PopChorusCrashPatternOperator : OperatorBase
     {
         private const string PopRockStyleId = "PopRock";
         private const int VelocityMin = 100;

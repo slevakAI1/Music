@@ -30,7 +30,7 @@ namespace Music.Generator.Drums.Operators
         // Throws InvalidOperationException when validation fails.
         public static DrumOperatorRegistry BuildComplete()
         {
-            var registry = DrumOperatorRegistry.CreateEmpty();
+            var registry = new DrumOperatorRegistry();
 
             RegisterAllOperators(registry);
 

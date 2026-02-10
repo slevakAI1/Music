@@ -2,7 +2,6 @@
 // AI: invariants=Apply only when Bar.IsFillWindow true; 16th-grid positions within last 2 beats; deterministic from seed.
 // AI: deps=Bar, OperatorCandidate; roles map to snare primary; anti-repetition handled outside this operator.
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
@@ -11,7 +10,7 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
 {
     // AI: purpose=Create short 2-beat fills occupying the final two beats; velocity accents on downbeats.
     // AI: note=Positions selected deterministically from 16th grid; hitCount scales with energy; no external side-effects.
-    public sealed class TurnaroundFillShortOperator : DrumOperatorBase
+    public sealed class TurnaroundFillShortOperator : OperatorBase
     {
         private const int GhostVelocityMin = 40;
         private const int GhostVelocityMax = 60;
@@ -21,7 +20,7 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
         private const string FillTag = "TurnaroundShort";
 
         /// <inheritdoc/>
-        public override string OperatorId => FillOperatorIds.TurnaroundFillShort;
+        public override string OperatorId => DrumFillOperatorIds.TurnaroundFillShort;
 
         /// <inheritdoc/>
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
