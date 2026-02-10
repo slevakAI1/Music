@@ -1,10 +1,9 @@
 // AI: purpose=StyleIdiom operator: apply slight early timing offset to snare backbeats for PopRock urgency.
 // AI: invariants=Apply only when style=PopRock and Snare role active; timingHint is negative (early) in ticks.
-// AI: deps=Bar, OperatorCandidate; deterministic timing from seed; no pattern mutation performed.
+// AI: deps=Bar, OperatorCandidateAddition; deterministic timing from seed; no pattern mutation performed.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.StyleIdiom
@@ -28,7 +27,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
         public override OperatorFamily OperatorFamily => OperatorFamily.StyleIdiom;
 
         // Generate candidates for each backbeat with a negative timingHint (early) determined by energy/seed.
-        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidateAddition> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

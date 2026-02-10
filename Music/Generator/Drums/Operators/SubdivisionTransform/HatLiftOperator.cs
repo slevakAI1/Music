@@ -1,10 +1,9 @@
 // AI: purpose=SubdivisionTransform operator switching hi-hat from 8ths to 16ths to increase density.
 // AI: invariants=Apply in suitable sections; produces full 16th grid candidates for the bar; deterministic by seed.
-// AI: deps=Bar, OperatorCandidate, Groove; avoid altering downbeat anchors; no runtime behavior changes.
+// AI: deps=Bar, OperatorCandidateAddition, Groove; avoid altering downbeat anchors; no runtime behavior changes.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.SubdivisionTransform
@@ -26,7 +25,7 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
         public override OperatorFamily OperatorFamily => OperatorFamily.SubdivisionTransform;
 
         /// <inheritdoc/>
-        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidateAddition> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

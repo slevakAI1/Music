@@ -1,10 +1,9 @@
 // AI: purpose=PatternSubstitution: apply half-time feel (snare on beat 3, sparse kicks) for contrast.
 // AI: invariants=Intended for low-moderate energy sections; uses Bar.BeatsPerBar and Bar.BackbeatBeats.
-// AI: deps=Bar, OperatorCandidate; deterministic from (barNumber, seed); avoid high-energy misuse.
+// AI: deps=Bar, OperatorCandidateAddition; deterministic from (barNumber, seed); avoid high-energy misuse.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.PatternSubstitution
@@ -24,7 +23,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
         public override OperatorFamily OperatorFamily => OperatorFamily.PatternSubstitution;
 
         // Generate snare on beat 3 and complementary sparse kick pattern; deterministic via (bar,seed).
-        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidateAddition> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 
@@ -44,7 +43,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
         }
 
         // Create snare candidate at specified beat with deterministic velocity hint.
-        private OperatorCandidate CreateSnareCandidate(Bar bar, int seed, int beat, double baseScore)
+        private OperatorCandidateAddition CreateSnareCandidate(Bar bar, int seed, int beat, double baseScore)
         {
             int velocityHint = GenerateVelocityHint(
                 SnareVelocityMin, SnareVelocityMax,
@@ -61,7 +60,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
         }
 
         // Generate complementary kick candidates for half-time feel (beat 1 and optional 3).
-        private IEnumerable<OperatorCandidate> GenerateKickPattern(Bar bar, int seed, double baseScore)
+        private IEnumerable<OperatorCandidateAddition> GenerateKickPattern(Bar bar, int seed, double baseScore)
         {
             // Half-time kick: beat 1 always, beat 3 optional based on energy
             int kickVelocity1 = GenerateVelocityHint(

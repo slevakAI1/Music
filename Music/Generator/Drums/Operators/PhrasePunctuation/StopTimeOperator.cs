@@ -2,7 +2,6 @@
 // AI: invariants=During dropout generate only sparse accents (kick/snare); absence of hats produces "dropout".
 // AI: deps=Bar; downstream systems interpret fewer candidates as thinning; deterministic from seed.
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
 
@@ -23,7 +22,7 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
         // Generate sparse accents (kick on 1, optional snare on 3) to create a dropout; no hat candidates emitted.
-        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidateAddition> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

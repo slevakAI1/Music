@@ -4,7 +4,6 @@
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.SubdivisionTransform
@@ -24,7 +23,7 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
         public override OperatorFamily OperatorFamily => OperatorFamily.SubdivisionTransform;
 
         // AI: purpose=Emit 8th positions for first half and 16th positions for second half deterministically.
-        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidateAddition> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

@@ -2,7 +2,6 @@
 // AI: invariants=Only counts successfully applied operators toward target; dedup by (BarNumber, Beat, Role).
 // AI: deps=DrumOperatorRegistry.GetAllOperators; Rng(DrumGenerator); GrooveOnset.
 
-using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 using Music.Generator.Core;
 
@@ -126,7 +125,7 @@ namespace Music.Generator.Drums.Operators
             var removals = op.GenerateRemovals(bar).ToList();
 
             bool anyRemoved = false;
-            foreach (RemovalCandidate removal in removals)
+            foreach (OperatorRemovalCandidate removal in removals)
             {
                 var key = (removal.BarNumber, removal.Beat, removal.Role);
                 if (!occupied.Contains(key))

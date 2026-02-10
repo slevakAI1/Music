@@ -1,8 +1,7 @@
 // AI: purpose=PhrasePunctuation: produce 2-beat turnaround fills (last 2 beats of bar) to punctuate phrases.
 // AI: invariants=Apply only when Bar.IsFillWindow true; 16th-grid positions within last 2 beats; deterministic from seed.
-// AI: deps=Bar, OperatorCandidate; roles map to snare primary; anti-repetition handled outside this operator.
+// AI: deps=Bar, OperatorCandidateAddition; roles map to snare primary; anti-repetition handled outside this operator.
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
 
@@ -26,7 +25,7 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
         /// <inheritdoc/>
-        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidateAddition> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

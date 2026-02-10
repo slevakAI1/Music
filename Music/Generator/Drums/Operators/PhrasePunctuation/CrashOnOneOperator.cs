@@ -1,6 +1,6 @@
 // AI: purpose=PhrasePunctuation operator: crash cymbal on beat 1 for section starts.
 // AI: invariants=Apply only when Bar.IsAtSectionBoundary && Bar.PhrasePosition near start; Crash role required.
-// AI: deps=Bar, OperatorCandidate, FillRole semantics; deterministic velocity from (bar,seed).
+// AI: deps=Bar, OperatorCandidateAddition, FillRole semantics; deterministic velocity from (bar,seed).
 
 
 using Music.Generator.Core;
@@ -23,7 +23,7 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
         // Generate a single crash candidate at beat 1 when at section start. Use deterministic velocity hint.
-        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidateAddition> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

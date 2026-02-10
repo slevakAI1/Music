@@ -1,10 +1,9 @@
 // AI: purpose=MicroAddition: add sparse 16th hi-hat embellishments between 8th onsets.
 // AI: invariants=VelocityHint in [40,60]; requires ClosedHat role and valid 16th positions in Bar.
-// AI: deps=OperatorBase, DrummerContext, OperatorCandidate; registered in DrumOperatorRegistry.
+// AI: deps=OperatorBase, DrummerContext, OperatorCandidateAddition; registered in DrumOperatorRegistry.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.MicroAddition
@@ -28,7 +27,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
         public override OperatorFamily OperatorFamily => OperatorFamily.MicroAddition;
 
         // Generate 1-2 hi-hat embellishments per bar deterministically from bar/seed.
-        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidateAddition> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

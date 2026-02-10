@@ -1,6 +1,6 @@
 // AI: purpose=Enum of drum articulation hints used by operators to suggest playing technique.
 // AI: invariants=Values are stable identifiers; None is default; mapper translates to MIDI note variants.
-// AI: deps=Used by OperatorCandidate and DrumArticulationMapper; extend cautiously to preserve backwards compatibility.
+// AI: deps=Used by OperatorCandidateAddition and DrumArticulationMapper; extend cautiously to preserve backwards compatibility.
 
 namespace Music.Generator.Drums.Operators.Candidates
 {

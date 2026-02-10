@@ -1,7 +1,8 @@
-// AI: purpose=Map OperatorCandidate -> DrumOnsetCandidate for groove layer; pass hints directly and add trace tags
+// AI: purpose=Map OperatorCandidateAddition -> DrumOnsetCandidate for groove layer; pass hints directly and add trace tags
 // AI: invariants=Mapping must be deterministic; tags used for diagnostics only; velocity/timing flow via properties
-// AI: deps=OperatorCandidate, DrumOnsetCandidate, FillRole, DrumArticulation; consumed by DrummerOperatorCandidates
+// AI: deps=OperatorCandidateAddition, DrumOnsetCandidate, FillRole, DrumArticulation; consumed by DrummerOperatorCandidates
 
+using Music.Generator.Core;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
 
@@ -19,8 +20,8 @@ namespace Music.Generator.Drums.Operators.Candidates
         // AI: tag=Tag value marking candidates that should be protected from pruning
         public const string ProtectedTag = "Protected";
 
-        // AI: maps=Convert OperatorCandidate to DrumOnsetCandidate; deterministic; preserves hints and adds tags
-        public static DrumOnsetCandidate Map(OperatorCandidate candidate)
+        // AI: maps=Convert OperatorCandidateAddition to DrumOnsetCandidate; deterministic; preserves hints and adds tags
+        public static DrumOnsetCandidate Map(OperatorCandidateAddition candidate)
         {
             ArgumentNullException.ThrowIfNull(candidate);
 
@@ -39,8 +40,8 @@ namespace Music.Generator.Drums.Operators.Candidates
             };
         }
 
-        // AI: maps=Map collection of OperatorCandidate to DrumOnsetCandidate preserving order
-        public static IReadOnlyList<DrumOnsetCandidate> MapAll(IEnumerable<OperatorCandidate> candidates)
+        // AI: maps=Map collection of OperatorCandidateAddition to DrumOnsetCandidate preserving order
+        public static IReadOnlyList<DrumOnsetCandidate> MapAll(IEnumerable<OperatorCandidateAddition> candidates)
         {
             ArgumentNullException.ThrowIfNull(candidates);
 
@@ -53,7 +54,7 @@ namespace Music.Generator.Drums.Operators.Candidates
         }
 
         // AI: tags=Builds tags for traceability and selection; does NOT carry VelocityHint/TimingHint
-        private static List<string> BuildTags(OperatorCandidate candidate)
+        private static List<string> BuildTags(OperatorCandidateAddition candidate)
         {
             var tags = new List<string>();
 

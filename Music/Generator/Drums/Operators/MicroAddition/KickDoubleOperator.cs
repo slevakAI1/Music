@@ -1,10 +1,9 @@
 // AI: purpose=MicroAddition operator: add extra kick hits on offbeats (8th or 16th variants).
 // AI: invariants=VelocityHint in [60,80]; respects Bar.BeatsPerBar; deterministic selection from (bar,seed).
-// AI: deps=OperatorBase, DrummerContext, OperatorCandidate; registered in DrumOperatorRegistry.
+// AI: deps=OperatorBase, DrummerContext, OperatorCandidateAddition; registered in DrumOperatorRegistry.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.MicroAddition
@@ -23,7 +22,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
         public override OperatorFamily OperatorFamily => OperatorFamily.MicroAddition;
 
         // Generate kick double candidates at selected offbeat positions deterministically.
-        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidateAddition> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

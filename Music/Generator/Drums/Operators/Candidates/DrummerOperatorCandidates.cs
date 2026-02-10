@@ -100,12 +100,12 @@ namespace Music.Generator.Drums.Operators.Candidates
         }
 
         // AI: behavior=Invokes each operator in order and aggregates validated DrumCandidates
-        private List<OperatorCandidate> GenerateCandidatesFromOperators(
+        private List<OperatorCandidateAddition> GenerateCandidatesFromOperators(
             IReadOnlyList<OperatorBase> operators,
             Bar bar,
             int seed)
         {
-            var allCandidates = new List<OperatorCandidate>();
+            var allCandidates = new List<OperatorCandidateAddition>();
 
             foreach (var op in operators)
             {
@@ -121,7 +121,7 @@ namespace Music.Generator.Drums.Operators.Candidates
             OperatorBase op,
             Bar bar,
             int seed,
-            List<OperatorCandidate> allCandidates)
+            List<OperatorCandidateAddition> allCandidates)
         {
             // Generate candidates
             try
@@ -176,7 +176,7 @@ namespace Music.Generator.Drums.Operators.Candidates
         }
 
         // AI: validate=Per-candidate quick checks; invalid candidates are dropped (diagnostics TODO)
-        private static bool ValidateCandidate(OperatorCandidate candidate, string operatorId)
+        private static bool ValidateCandidate(OperatorCandidateAddition candidate, string operatorId)
         {
             if (candidate == null)
                 return false;
@@ -192,14 +192,14 @@ namespace Music.Generator.Drums.Operators.Candidates
         }
 
         // AI: maps=Uses DrumCandidateMapper to convert to DrumOnsetCandidate preserving hints and tags
-        private static IReadOnlyList<DrumOnsetCandidate> MapCandidates(List<OperatorCandidate> candidates)
+        private static IReadOnlyList<DrumOnsetCandidate> MapCandidates(List<OperatorCandidateAddition> candidates)
         {
             return DrumCandidateMapper.MapAll(candidates);
         }
 
         // AI: grouping=Groups mapped candidates by operator family; sorts groups by family enum for determinism
         private List<DrumCandidateGroup> GroupByOperatorFamily(
-            List<OperatorCandidate> originalCandidates,
+            List<OperatorCandidateAddition> originalCandidates,
             IReadOnlyList<DrumOnsetCandidate> mappedCandidates)
         {
             // Build lookup from candidate ID to mapped candidate

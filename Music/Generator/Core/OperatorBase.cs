@@ -1,6 +1,6 @@
 // AI: purpose=Abstract base for drum operators; provides common helpers for candidate creation & scoring.
 // AI: invariants=Subclasses must provide OperatorId and OperatorFamily; methods must be deterministic.
-// AI: deps=Bar, OperatorCandidate, RemovalCandidate; removed energy thresholds; bar accessed directly.
+// AI: deps=Bar, OperatorCandidateAddition, OperatorCandidateRemoval; removed energy thresholds; bar accessed directly.
 
 
 using Music.Generator.Drums.Operators.Candidates;
@@ -18,24 +18,24 @@ namespace Music.Generator.Core
 
         public abstract OperatorFamily OperatorFamily { get; }
 
-        public abstract IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed);
+        public abstract IEnumerable<OperatorCandidateAddition> GenerateCandidates(Bar bar, int seed);
 
         // AI: purpose=Optional removal targets; additive operators return empty by default.
         // AI: contract=Must return deterministic sequence; do not return null.
-        public virtual IEnumerable<RemovalCandidate> GenerateRemovals(Bar bar)
+        public virtual IEnumerable<OperatorCandidateRemoval> GenerateRemovals(Bar bar)
         {
             ArgumentNullException.ThrowIfNull(bar);
-            return Array.Empty<RemovalCandidate>();
+            return Array.Empty<OperatorCandidateRemoval>();
         }
 
-        public virtual double Score(OperatorCandidate candidate, Bar bar)
+        public virtual double Score(OperatorCandidateAddition candidate, Bar bar)
         {
             ArgumentNullException.ThrowIfNull(candidate);
             return candidate.Score;
         }
 
-        // Create a OperatorCandidate populated with common operator-provided fields.
-        protected OperatorCandidate CreateCandidate(
+        // Create a OperatorCandidateAddition populated with common operator-provided fields.
+        protected OperatorCandidateAddition CreateCandidate(
             string role,
             int barNumber,
             decimal beat,
@@ -46,9 +46,9 @@ namespace Music.Generator.Core
             DrumArticulation? articulationHint = null,
             FillRole fillRole = FillRole.None)
         {
-            return new OperatorCandidate
+            return new OperatorCandidateAddition
             {
-                CandidateId = OperatorCandidate.GenerateCandidateId(OperatorId, role, barNumber, beat, articulationHint),
+                CandidateId = OperatorCandidateAddition.GenerateCandidateId(OperatorId, role, barNumber, beat, articulationHint),
                 OperatorId = OperatorId,
                 Role = role,
                 BarNumber = barNumber,

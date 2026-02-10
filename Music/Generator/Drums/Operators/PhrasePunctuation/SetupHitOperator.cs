@@ -1,10 +1,9 @@
 // AI: purpose=PhrasePunctuation operator: emit a setup hit on the last "and" (e.g., 4.5) before a section change.
 // AI: invariants=Apply when Bar.IsAtSectionBoundary or Bar.IsFillWindow; requires Kick role; uses 16th grid positions.
-// AI: deps=Bar, OperatorCandidate, FillRole conventions; deterministic velocity from (barNumber,seed).
+// AI: deps=Bar, OperatorCandidateAddition, FillRole conventions; deterministic velocity from (barNumber,seed).
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
 
@@ -23,7 +22,7 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
         // Generate setup hit candidate(s) at beat = BeatsPerBar + 0.5 (the "and" of last beat).
-        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidateAddition> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

@@ -1,11 +1,10 @@
 // AI: purpose=PhrasePunctuation operator generating descending tom fill for release/resolution.
 // AI: invariants=Only applies when IsFillWindow=true and toms are active; generates 6-12 descending hits.
-// AI: deps=OperatorBase, Bar, OperatorCandidate; uses Tom1, Tom2, FloorTom for descending pattern.
+// AI: deps=OperatorBase, Bar, OperatorCandidateAddition; uses Tom1, Tom2, FloorTom for descending pattern.
 // AI: change=Story 3.3; adjust pattern and velocity curve based on listening tests.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
 
@@ -32,7 +31,7 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
         /// <inheritdoc/>
-        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidateAddition> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

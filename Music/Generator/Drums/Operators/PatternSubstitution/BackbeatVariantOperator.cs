@@ -1,6 +1,6 @@
 // AI: purpose=Produce backbeat articulation variants (flam, rimshot, sidestick) to vary snare tone.
 // AI: invariants=Uses Bar.BackbeatBeats; applies only when Snare role active; deterministic selection by (bar,seed).
-// AI: deps=Bar, DrumArticulation, OperatorCandidate; integrates with Groove section types for selection.
+// AI: deps=Bar, DrumArticulation, OperatorCandidateAddition; integrates with Groove section types for selection.
 
 
 using Music.Generator.Core;
@@ -26,7 +26,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
         public override OperatorFamily OperatorFamily => OperatorFamily.PatternSubstitution;
 
         // Generate articulation-variant candidates for each backbeat; velocity/timing reflect articulation.
-        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidateAddition> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

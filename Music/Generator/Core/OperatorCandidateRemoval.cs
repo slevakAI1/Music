@@ -5,7 +5,7 @@
 namespace Music.Generator.Drums.Operators.Candidates
 {
     // AI: contract=Immutable removal target; matched against GrooveOnset (BarNumber,Beat,Role) tuples.
-    public sealed record RemovalCandidate
+    public sealed record OperatorCandidateRemoval
     {
         // AI: invariant=1-based bar number of the onset to remove
         public required int BarNumber { get; init; }

@@ -1,10 +1,9 @@
 // AI: purpose=PhrasePunctuation operator: full-bar turnaround fills at section ends.
 // AI: invariants=Apply when Bar.IsFillWindow && BarsUntilSectionEnd<=1; deterministic positions from (seed,bar).
-// AI: deps=Bar, OperatorCandidate; prefers snare-led fills with optional kick downbeats; anti-repeat handled externally.
+// AI: deps=Bar, OperatorCandidateAddition; prefers snare-led fills with optional kick downbeats; anti-repeat handled externally.
 
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
 
@@ -28,7 +27,7 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
         /// <inheritdoc/>
-        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidateAddition> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

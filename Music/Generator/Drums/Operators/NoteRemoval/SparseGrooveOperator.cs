@@ -1,9 +1,8 @@
 // AI: purpose=NoteRemoval operator that removes weak offbeat onsets to open up the groove.
 // AI: invariants=Only targets offbeat/ghost-strength onsets; backbeats and downbeats are never targeted.
-// AI: deps=OperatorBase, Bar, RemovalCandidate, GrooveRoles.
+// AI: deps=OperatorBase, Bar, OperatorCandidateRemoval, GrooveRoles.
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.NoteRemoval
@@ -20,11 +19,11 @@ namespace Music.Generator.Drums.Operators.NoteRemoval
         public override OperatorFamily OperatorFamily => OperatorFamily.NoteRemoval;
 
         // Removal operators do not add onsets.
-        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidateAddition> GenerateCandidates(Bar bar, int seed)
             => [];
 
         // Remove kick and snare onsets on weak 16th-note positions ("e" and "a" of each beat).
-        public override IEnumerable<RemovalCandidate> GenerateRemovals(Bar bar)
+        public override IEnumerable<OperatorRemovalCandidate> GenerateRemovals(Bar bar)
         {
             ArgumentNullException.ThrowIfNull(bar);
 
@@ -39,7 +38,7 @@ namespace Music.Generator.Drums.Operators.NoteRemoval
                     decimal position = beat + fraction;
                     foreach (string role in targetRoles)
                     {
-                        yield return new RemovalCandidate
+                        yield return new OperatorRemovalCandidate
                         {
                             BarNumber = barNumber,
                             Beat = position,

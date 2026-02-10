@@ -1,9 +1,8 @@
 // AI: purpose=NoteRemoval operator that removes kick on beat 1 for anticipation/tension.
 // AI: invariants=Never removes from bar 1 of a section (preserves section entry downbeat).
-// AI: deps=OperatorBase, Bar, RemovalCandidate, GrooveRoles.
+// AI: deps=OperatorBase, Bar, OperatorCandidateRemoval, GrooveRoles.
 
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators.Candidates;
 using Music.Generator.Groove;
 
 namespace Music.Generator.Drums.Operators.NoteRemoval
@@ -17,15 +16,15 @@ namespace Music.Generator.Drums.Operators.NoteRemoval
         public override OperatorFamily OperatorFamily => OperatorFamily.NoteRemoval;
 
         // Removal operators do not add onsets.
-        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidateAddition> GenerateCandidates(Bar bar, int seed)
             => [];
 
         // Remove kick on beat 1 of the current bar.
-        public override IEnumerable<RemovalCandidate> GenerateRemovals(Bar bar)
+        public override IEnumerable<OperatorRemovalCandidate> GenerateRemovals(Bar bar)
         {
             ArgumentNullException.ThrowIfNull(bar);
 
-            yield return new RemovalCandidate
+            yield return new OperatorRemovalCandidate
             {
                 BarNumber = bar.BarNumber,
                 Beat = 1.0m,
