@@ -65,6 +65,18 @@ namespace Music.Writer
 
                 // Update Grid with drum track
                 SongGridManager.AddNewPartTrack(result, dgSong);
+                if (dgSong.Rows.Count > SongGridManager.FIXED_ROWS_COUNT)
+                {
+                    int newRowIndex = dgSong.Rows.Count - 1;
+                    dgSong.ClearSelection();
+                    dgSong.Rows[newRowIndex].Selected = true;
+
+                    var instrumentCol = dgSong.Columns["colInstrument"];
+                    if (instrumentCol != null && dgSong.Rows[newRowIndex].Cells[instrumentCol.Index] != null)
+                    {
+                        dgSong.CurrentCell = dgSong.Rows[newRowIndex].Cells[instrumentCol.Index];
+                    }
+                }
                 ShowSuccess(seed, genre, bars);
             }
             catch (Exception ex)

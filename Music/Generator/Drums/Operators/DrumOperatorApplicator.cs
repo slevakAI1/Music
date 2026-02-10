@@ -12,7 +12,7 @@ namespace Music.Generator.Drums.Operators
     public static class DrumOperatorApplicator
     {
         // AI: entry=Copy anchors, randomly pick operators, apply if valid (add/remove), return combined onsets.
-        // AI: invariants=Loop counts only applied operators; maxAttempts prevents infinite loop.
+        // AI: invariants=Counts only successful applications; avoids infinite loops by iterating a shuffled plan.
         public static List<GrooveOnset> Apply(
             IReadOnlyList<Bar> bars,
             List<GrooveOnset> anchorOnsets,
@@ -35,29 +35,49 @@ namespace Music.Generator.Drums.Operators
             if (barsInScope.Count == 0)
                 return result;
 
-            int applied = 0;
-            int maxAttempts = numberOfOperators * 10;
-            int attempts = 0;
-
-            while (applied < numberOfOperators && attempts < maxAttempts)
+            // Build a uniform "plan": every (operator, bar, mode) combination appears exactly once.
+            // mode = 0 => additions only, mode = 1 => removals only
+            var plan = new List<(int OpIndex, int BarIndex, int Mode)>(allOperators.Count * barsInScope.Count * 2);
+            for (int opIndex = 0; opIndex < allOperators.Count; opIndex++)
             {
-                attempts++;
+                for (int barIndex = 0; barIndex < barsInScope.Count; barIndex++)
+                {
+                    plan.Add((opIndex, barIndex, 0));
+                    plan.Add((opIndex, barIndex, 1));
+                }
+            }
 
-                // Pick a random operator
-                int opIndex = Rng.NextInt(RandomPurpose.DrumGenerator, 0, allOperators.Count);
+            // Shuffle plan uniformly using Rng (Fisher-Yates).
+            for (int i = plan.Count - 1; i > 0; i--)
+            {
+                int j = Rng.NextInt(RandomPurpose.DrumGenerator, 0, i + 1);
+                (plan[i], plan[j]) = (plan[j], plan[i]);
+            }
+
+            int applied = 0;
+
+            // Walk the shuffled plan until we've successfully applied enough operations.
+            // Each step is ONE decision: add OR remove (not both).
+            for (int k = 0; k < plan.Count && applied < numberOfOperators; k++)
+            {
+                var (opIndex, barIndex, mode) = plan[k];
+
                 var op = allOperators[opIndex];
-
-                // Pick a random bar
-                int barIndex = Rng.NextInt(RandomPurpose.DrumGenerator, 0, barsInScope.Count);
                 var bar = barsInScope[barIndex];
-
                 int seed = bar.BarNumber;
 
-            bool added = ApplyAdditions(op, bar, seed, result, occupied);
-            bool removed = ApplyRemovals(op, bar, result, occupied);
+                bool changed;
+                if (mode == 0)
+                {
+                    changed = ApplyAdditions(op, bar, seed, result, occupied);
+                }
+                else
+                {
+                    changed = ApplyRemovals(op, bar, result, occupied);
+                }
 
-            if (added || removed)
-                applied++;
+                if (changed)
+                    applied++;
             }
 
             return result.OrderBy(o => o.BarNumber).ThenBy(o => o.Beat).ToList();
@@ -134,6 +154,5 @@ namespace Music.Generator.Drums.Operators
 
             return anyRemoved;
         }
-
     }
 }
