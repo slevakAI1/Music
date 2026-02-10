@@ -159,4 +159,7 @@
   <data name="SavePhrase_NoSongContextTitle" xml:space="preserve">
     <value>Save Phrase</value>
   </data>
+  <data name="PhraseTest_RepeatLabel" xml:space="preserve">
+    <value>Repeat:</value>
+  </data>
 </root>

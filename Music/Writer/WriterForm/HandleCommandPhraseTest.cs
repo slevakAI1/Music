@@ -5,6 +5,7 @@
 
 using Music.Generator;
 using Music.Generator.Groove;
+using Music.MyMidi;
 
 namespace Music.Writer
 {
@@ -36,6 +37,11 @@ namespace Music.Writer
                 int seed = dialog.Seed;
                 string genre = dialog.Genre;
                 int bars = dialog.Bars;
+                int repeat = dialog.Repeat;
+
+                int effectiveBars = bars;
+                if (songContext.SectionTrack != null && bars > songContext.SectionTrack.TotalBars)
+                    effectiveBars = songContext.SectionTrack.TotalBars;
 
                 // Initialize RNG with seed for deterministic generation
                 Rng.Initialize(seed);
@@ -55,6 +61,8 @@ namespace Music.Writer
 
                 // Generate drum track using drummer agent pipeline (bars=0 means full song, >0 limits generation)
                 var result = Generator.SongGenerator.Generate(songContext, bars);
+
+                ApplyPhraseRepeat(result, songContext.BarTrack, effectiveBars, repeat);
 
                 // Set descriptive name with seed and mark as drum set for correct playback
                 string barsInfo = bars > 0 ? $" ({bars} bars)" : "";
@@ -86,6 +94,59 @@ namespace Music.Writer
         }
 
         #region MessageBox
+
+        private static void ApplyPhraseRepeat(
+            PartTrack track,
+            BarTrack barTrack,
+            int phraseBars,
+            int repeatCount)
+        {
+            ArgumentNullException.ThrowIfNull(track);
+            ArgumentNullException.ThrowIfNull(barTrack);
+
+            if (repeatCount <= 1 || phraseBars <= 0)
+                return;
+
+            long phraseLengthTicks = barTrack.GetBarEndTick(phraseBars);
+            if (phraseLengthTicks <= 0)
+                return;
+
+            List<PartTrackEvent> originalEvents = track.PartTrackNoteEvents;
+            var repeatedEvents = new List<PartTrackEvent>(originalEvents.Count * repeatCount);
+
+            for (int repeatIndex = 0; repeatIndex < repeatCount; repeatIndex++)
+            {
+                long offset = phraseLengthTicks * repeatIndex;
+                foreach (PartTrackEvent source in originalEvents)
+                {
+                    repeatedEvents.Add(CloneEventWithOffset(source, offset));
+                }
+            }
+
+            track.PartTrackNoteEvents = repeatedEvents
+                .OrderBy(e => e.AbsoluteTimeTicks)
+                .ToList();
+        }
+
+        private static PartTrackEvent CloneEventWithOffset(PartTrackEvent source, long offset)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+
+            var parameters = source.Parameters.Count == 0
+                ? new Dictionary<string, object>()
+                : new Dictionary<string, object>(source.Parameters);
+
+            return new PartTrackEvent
+            {
+                AbsoluteTimeTicks = source.AbsoluteTimeTicks + offset,
+                DeltaTicks = source.DeltaTicks,
+                Type = source.Type,
+                Parameters = parameters,
+                NoteNumber = source.NoteNumber,
+                NoteDurationTicks = source.NoteDurationTicks,
+                NoteOnVelocity = source.NoteOnVelocity
+            };
+        }
 
         // AI: purpose=Notify user of successful generation and provide seed for reproduction; indicates bars generated.
         private static void ShowSuccess(int seed, string genre, int bars)
