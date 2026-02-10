@@ -1,6 +1,6 @@
 // AI: purpose=SubdivisionTransform: add open hi-hat accents on selected offbeats for emphasis.
 // AI: invariants=Apply when OpenHat role active; positions limited to Bar.BeatsPerBar; deterministic selection.
-// AI: deps=Bar, DrumCandidate, DrumArticulation; integrates with groove section type and energy.
+// AI: deps=Bar, OperatorCandidate, DrumArticulation; integrates with groove section type and energy.
 
 
 using Music.Generator.Core;
@@ -28,7 +28,7 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
         public override OperatorFamily OperatorFamily => OperatorFamily.SubdivisionTransform;
 
         /// <inheritdoc/>
-        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

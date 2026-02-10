@@ -21,7 +21,7 @@ namespace Music.Generator.Drums.Operators.NoteRemoval
         public override OperatorFamily OperatorFamily => OperatorFamily.NoteRemoval;
 
         // Removal operators do not add onsets.
-        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
             => [];
 
         // Remove kick and snare onsets on weak 16th-note positions ("e" and "a" of each beat).

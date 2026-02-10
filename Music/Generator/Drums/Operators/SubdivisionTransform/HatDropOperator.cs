@@ -1,6 +1,6 @@
 // AI: purpose=SubdivisionTransform operator switching hats from 16ths to 8ths to decrease rhythmic density.
 // AI: invariants=Apply in verse/bridge/intro; produces full-bar 8th hat candidates (beat.00 and beat.50).
-// AI: deps=Bar, DrumCandidate, Groove; uses Bar.BeatsPerBar for positions; deterministic via seed.
+// AI: deps=Bar, OperatorCandidate, Groove; uses Bar.BeatsPerBar for positions; deterministic via seed.
 
 
 using Music.Generator.Core;
@@ -27,7 +27,7 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
         public override OperatorFamily OperatorFamily => OperatorFamily.SubdivisionTransform;
 
         /// <inheritdoc/>
-        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

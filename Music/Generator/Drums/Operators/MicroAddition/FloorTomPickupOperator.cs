@@ -1,6 +1,6 @@
 // AI: purpose=MicroAddition operator generating floor tom anticipation at 4.75.
 // AI: invariants=VelocityHint in [60,80]; only applies when FloorTom in ActiveRoles 
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
+// AI: deps=DrumOperatorBase, DrummerContext, OperatorCandidate; registered in DrumOperatorRegistry.
 
 using Music.Generator.Core;
 using Music.Generator.Drums.Operators.Base;
@@ -23,7 +23,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
 
         // Generate a single pickup candidate at end-of-bar minus quarter (e.g., 4.75 in 4/4).
         // Velocity determined deterministically via GenerateVelocityHint; score reduced at section boundaries.
-        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

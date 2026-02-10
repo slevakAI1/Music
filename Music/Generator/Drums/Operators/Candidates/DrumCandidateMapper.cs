@@ -1,6 +1,6 @@
-// AI: purpose=Map DrumCandidate -> DrumOnsetCandidate for groove layer; pass hints directly and add trace tags
+// AI: purpose=Map OperatorCandidate -> DrumOnsetCandidate for groove layer; pass hints directly and add trace tags
 // AI: invariants=Mapping must be deterministic; tags used for diagnostics only; velocity/timing flow via properties
-// AI: deps=DrumCandidate, DrumOnsetCandidate, FillRole, DrumArticulation; consumed by DrummerOperatorCandidates
+// AI: deps=OperatorCandidate, DrumOnsetCandidate, FillRole, DrumArticulation; consumed by DrummerOperatorCandidates
 
 using Music.Generator.Drums.Planning;
 using Music.Generator.Groove;
@@ -19,8 +19,8 @@ namespace Music.Generator.Drums.Operators.Candidates
         // AI: tag=Tag value marking candidates that should be protected from pruning
         public const string ProtectedTag = "Protected";
 
-        // AI: maps=Convert DrumCandidate to DrumOnsetCandidate; deterministic; preserves hints and adds tags
-        public static DrumOnsetCandidate Map(DrumCandidate candidate)
+        // AI: maps=Convert OperatorCandidate to DrumOnsetCandidate; deterministic; preserves hints and adds tags
+        public static DrumOnsetCandidate Map(OperatorCandidate candidate)
         {
             ArgumentNullException.ThrowIfNull(candidate);
 
@@ -39,8 +39,8 @@ namespace Music.Generator.Drums.Operators.Candidates
             };
         }
 
-        // AI: maps=Map collection of DrumCandidate to DrumOnsetCandidate preserving order
-        public static IReadOnlyList<DrumOnsetCandidate> MapAll(IEnumerable<DrumCandidate> candidates)
+        // AI: maps=Map collection of OperatorCandidate to DrumOnsetCandidate preserving order
+        public static IReadOnlyList<DrumOnsetCandidate> MapAll(IEnumerable<OperatorCandidate> candidates)
         {
             ArgumentNullException.ThrowIfNull(candidates);
 
@@ -53,7 +53,7 @@ namespace Music.Generator.Drums.Operators.Candidates
         }
 
         // AI: tags=Builds tags for traceability and selection; does NOT carry VelocityHint/TimingHint
-        private static List<string> BuildTags(DrumCandidate candidate)
+        private static List<string> BuildTags(OperatorCandidate candidate)
         {
             var tags = new List<string>();
 

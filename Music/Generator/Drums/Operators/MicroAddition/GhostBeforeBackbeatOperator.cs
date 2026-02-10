@@ -1,6 +1,6 @@
 // AI: purpose=MicroAddition operator generating ghost snare notes just before backbeats (e.g., 1.75→2).
 // AI: invariants=VelocityHint in [30,50]; uses Bar.BackbeatBeats; skips ghosts outside valid 16th grid.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
+// AI: deps=DrumOperatorBase, DrummerContext, OperatorCandidate; registered in DrumOperatorRegistry.
 
 
 using Music.Generator.Core;
@@ -27,7 +27,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
 
         // Generate ghost snare candidates immediately before each backbeat (0.25 beats before).
         // Skip ghosts that would fall before beat 1 or outside valid 16th grid positions.
-        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

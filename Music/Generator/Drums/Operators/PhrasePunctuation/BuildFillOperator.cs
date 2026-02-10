@@ -1,6 +1,6 @@
 // AI: purpose=PhrasePunctuation operator generating ascending tom fill for tension building.
 // AI: invariants=Apply only when Bar.IsFillWindow true and at least one tom/snare active; produces 6-12 hits.
-// AI: deps=DrumOperatorBase, Bar, DrumCandidate; uses Tom1/Tom2/FloorTom mapping for ascending pitch.
+// AI: deps=DrumOperatorBase, Bar, OperatorCandidate; uses Tom1/Tom2/FloorTom mapping for ascending pitch.
 using Music.Generator.Core;
 using Music.Generator.Drums.Operators.Base;
 using Music.Generator.Drums.Operators.Candidates;
@@ -27,7 +27,7 @@ namespace Music.Generator.Drums.Operators.PhrasePunctuation
         public override OperatorFamily OperatorFamily => OperatorFamily.PhrasePunctuation;
 
         /// <inheritdoc/>
-        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

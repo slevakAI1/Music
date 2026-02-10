@@ -1,6 +1,6 @@
 // AI: purpose=PatternSubstitution operator generating kick pattern variants (four-on-floor, syncopated, half-time).
 // AI: invariants=Applies when Kick in ActiveRoles; produces full-bar kick positions; deterministic from (bar,seed).
-// AI: deps=DrumOperatorBase, Bar, DrumCandidate; integrates with section type for selection.
+// AI: deps=DrumOperatorBase, Bar, OperatorCandidate; integrates with section type for selection.
 
 
 using Music.Generator.Core;
@@ -42,7 +42,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
         public override OperatorFamily OperatorFamily => OperatorFamily.PatternSubstitution;
 
         /// <inheritdoc/>
-        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

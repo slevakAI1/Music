@@ -1,6 +1,6 @@
 // AI: purpose=PatternSubstitution: produce double-time feel (denser kicks, driving energy) without tempo change.
 // AI: invariants=Apply in high-energy suitable sections; uses Bar.BackbeatBeats and BeatsPerBar; deterministic from seed.
-// AI: deps=DrumOperatorBase, Bar, DrumCandidate; integrates with section type for suitability decisions.
+// AI: deps=DrumOperatorBase, Bar, OperatorCandidate; integrates with section type for suitability decisions.
 
 
 using Music.Generator.Core;
@@ -27,7 +27,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
         public override OperatorFamily OperatorFamily => OperatorFamily.PatternSubstitution;
 
         // Generate dense kick + snare backbeat candidates to realize double-time feel.
-        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 
@@ -50,7 +50,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
         }
 
         // Produce kick candidates at downbeats and offbeats (8th-note density) deterministically.
-        private IEnumerable<DrumCandidate> GenerateKickPattern(Bar bar, int seed, double baseScore)
+        private IEnumerable<OperatorCandidate> GenerateKickPattern(Bar bar, int seed, double baseScore)
         {
             int beatsPerBar = bar.BeatsPerBar;
 
@@ -94,7 +94,7 @@ namespace Music.Generator.Drums.Operators.PatternSubstitution
         }
 
         // Produce snare backbeat candidates (from Bar.BackbeatBeats) with strong velocity hints.
-        private IEnumerable<DrumCandidate> GenerateSnarePattern(Bar bar, int seed, double baseScore)
+        private IEnumerable<OperatorCandidate> GenerateSnarePattern(Bar bar, int seed, double baseScore)
         {
             // Standard backbeats (2 and 4) with high velocity for double-time energy
             foreach (int backbeat in bar.BackbeatBeats)

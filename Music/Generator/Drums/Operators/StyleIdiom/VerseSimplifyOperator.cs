@@ -1,6 +1,6 @@
 // AI: purpose=StyleIdom operator that thins verse grooves for contrast with chorus.
 // AI: invariants=Apply in PopRock verses only; reduces density via lower velocities and scores.
-// AI: deps=Bar, DrumCandidate; deterministic outputs from (barNumber,seed); no stylistic side-effects.
+// AI: deps=Bar, OperatorCandidate; deterministic outputs from (barNumber,seed); no stylistic side-effects.
 
 
 using Music.Generator.Core;
@@ -28,7 +28,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
         public override OperatorFamily OperatorFamily => OperatorFamily.StyleIdiom;
 
         /// <inheritdoc/>
-        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 
@@ -51,7 +51,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
             }
         }
 
-        private IEnumerable<DrumCandidate> GenerateSimplifiedKickPattern(Bar bar, int seed)
+        private IEnumerable<OperatorCandidate> GenerateSimplifiedKickPattern(Bar bar, int seed)
         {
             // Simple "1 and 3" kick pattern for verses
             decimal[] kickBeats = bar.BeatsPerBar >= 4
@@ -77,7 +77,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
             }
         }
 
-        private IEnumerable<DrumCandidate> GenerateSimplifiedHatPattern(Bar bar, int seed)
+        private IEnumerable<OperatorCandidate> GenerateSimplifiedHatPattern(Bar bar, int seed)
         {
             // Eighth note pattern only (simpler than 16ths)
             for (int beatInt = 1; beatInt <= bar.BeatsPerBar; beatInt++)

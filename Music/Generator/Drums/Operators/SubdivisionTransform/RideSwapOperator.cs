@@ -27,7 +27,7 @@ namespace Music.Generator.Drums.Operators.SubdivisionTransform
         public override OperatorFamily OperatorFamily => OperatorFamily.SubdivisionTransform;
 
         /// <inheritdoc/>
-        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

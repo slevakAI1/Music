@@ -2,7 +2,7 @@ namespace Music.Generator.Drums.Planning
 {
     // AI: purpose=Classifies a candidate's role within a fill pattern; used by fill operators and memory
     // AI: invariants=Enum order must remain stable; None is default; one role per candidate
-    // AI: deps=Used by DrumCandidate, fill operators, and DrummerMemory for fill-shape tracking
+    // AI: deps=Used by OperatorCandidate, fill operators, and DrummerMemory for fill-shape tracking
     public enum FillRole
     {
         None = 0,

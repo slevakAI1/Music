@@ -101,12 +101,12 @@ namespace Music.Generator.Drums.Operators.Candidates
         }
 
         // AI: behavior=Invokes each operator in order and aggregates validated DrumCandidates
-        private List<DrumCandidate> GenerateCandidatesFromOperators(
+        private List<OperatorCandidate> GenerateCandidatesFromOperators(
             IReadOnlyList<IDrumOperator> operators,
             Bar bar,
             int seed)
         {
-            var allCandidates = new List<DrumCandidate>();
+            var allCandidates = new List<OperatorCandidate>();
 
             foreach (var op in operators)
             {
@@ -122,7 +122,7 @@ namespace Music.Generator.Drums.Operators.Candidates
             IDrumOperator op,
             Bar bar,
             int seed,
-            List<DrumCandidate> allCandidates)
+            List<OperatorCandidate> allCandidates)
         {
             // Generate candidates
             try
@@ -177,7 +177,7 @@ namespace Music.Generator.Drums.Operators.Candidates
         }
 
         // AI: validate=Per-candidate quick checks; invalid candidates are dropped (diagnostics TODO)
-        private static bool ValidateCandidate(DrumCandidate candidate, string operatorId)
+        private static bool ValidateCandidate(OperatorCandidate candidate, string operatorId)
         {
             if (candidate == null)
                 return false;
@@ -193,14 +193,14 @@ namespace Music.Generator.Drums.Operators.Candidates
         }
 
         // AI: maps=Uses DrumCandidateMapper to convert to DrumOnsetCandidate preserving hints and tags
-        private static IReadOnlyList<DrumOnsetCandidate> MapCandidates(List<DrumCandidate> candidates)
+        private static IReadOnlyList<DrumOnsetCandidate> MapCandidates(List<OperatorCandidate> candidates)
         {
             return DrumCandidateMapper.MapAll(candidates);
         }
 
         // AI: grouping=Groups mapped candidates by operator family; sorts groups by family enum for determinism
         private List<DrumCandidateGroup> GroupByOperatorFamily(
-            List<DrumCandidate> originalCandidates,
+            List<OperatorCandidate> originalCandidates,
             IReadOnlyList<DrumOnsetCandidate> mappedCandidates)
         {
             // Build lookup from candidate ID to mapped candidate

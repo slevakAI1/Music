@@ -1,6 +1,6 @@
 // AI: purpose=Abstract base for all drum operators; provides helper methods.
 // AI: invariants=Subclasses must provide OperatorId and OperatorFamily.
-// AI: deps=IDrumOperator interface, Bar, DrumCandidate.
+// AI: deps=IDrumOperator interface, Bar, OperatorCandidate.
 // AI: change=Epic DrummerContext-Dedup; removed energy thresholds; bar properties accessed directly.
 
 
@@ -23,17 +23,17 @@ namespace Music.Generator.Drums.Operators.Base
         public abstract OperatorFamily OperatorFamily { get; }
 
         /// <inheritdoc/>
-        public abstract IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed);
+        public abstract IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed);
 
         /// <inheritdoc/>
-        public virtual double Score(DrumCandidate candidate, Bar bar)
+        public virtual double Score(OperatorCandidate candidate, Bar bar)
         {
             ArgumentNullException.ThrowIfNull(candidate);
             return candidate.Score;
         }
 
-        // Create a DrumCandidate populated with common operator-provided fields.
-        protected DrumCandidate CreateCandidate(
+        // Create a OperatorCandidate populated with common operator-provided fields.
+        protected OperatorCandidate CreateCandidate(
             string role,
             int barNumber,
             decimal beat,
@@ -44,9 +44,9 @@ namespace Music.Generator.Drums.Operators.Base
             DrumArticulation? articulationHint = null,
             FillRole fillRole = FillRole.None)
         {
-            return new DrumCandidate
+            return new OperatorCandidate
             {
-                CandidateId = DrumCandidate.GenerateCandidateId(OperatorId, role, barNumber, beat, articulationHint),
+                CandidateId = OperatorCandidate.GenerateCandidateId(OperatorId, role, barNumber, beat, articulationHint),
                 OperatorId = OperatorId,
                 Role = role,
                 BarNumber = barNumber,

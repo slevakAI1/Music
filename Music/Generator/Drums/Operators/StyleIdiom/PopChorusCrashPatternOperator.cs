@@ -1,6 +1,6 @@
 // AI: purpose=StyleIdiom operator generating consistent crash patterns for PopRock chorus sections.
 // AI: invariants=Apply only when style=PopRock and Section=Chorus; Crash role required; crash usually on beat 1.
-// AI: deps=Bar, DrumCandidate, DrumArticulation; deterministic selection from (barNumber,seed).
+// AI: deps=Bar, OperatorCandidate, DrumArticulation; deterministic selection from (barNumber,seed).
 
 
 using Music.Generator.Core;
@@ -24,7 +24,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
         public override OperatorFamily OperatorFamily => OperatorFamily.StyleIdiom;
 
         /// <inheritdoc/>
-        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

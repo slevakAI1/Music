@@ -1,6 +1,6 @@
 // AI: purpose=MicroAddition operator generating kick anticipation at bar end (beat +0.75).
 // AI: invariants=VelocityHint in [60,80]; requires Kick role and BeatsPerBar>=4; deterministic via Seed.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
+// AI: deps=DrumOperatorBase, DrummerContext, OperatorCandidate; registered in DrumOperatorRegistry.
 
 
 using Music.Generator.Core;
@@ -23,7 +23,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
         public override OperatorFamily OperatorFamily => OperatorFamily.MicroAddition;
 
         // Generate a single kick pickup candidate at bar end minus quarter beat. Reduce score at section boundaries.
-        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

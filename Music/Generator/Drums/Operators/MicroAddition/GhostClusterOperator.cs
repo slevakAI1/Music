@@ -1,6 +1,6 @@
 // AI: purpose=MicroAddition operator: produce a short cluster of ghost snare notes (2-3 hits).
 // AI: invariants=VelocityHint range [30,50]; placement stays within bar; uses Bar.BeatsPerBar and ClusterStarts.
-// AI: deps=DrumOperatorBase, DrummerContext, DrumCandidate; registered in DrumOperatorRegistry.
+// AI: deps=DrumOperatorBase, DrummerContext, OperatorCandidate; registered in DrumOperatorRegistry.
 
 
 using Music.Generator.Core;
@@ -37,7 +37,7 @@ namespace Music.Generator.Drums.Operators.MicroAddition
         public override OperatorFamily OperatorFamily => OperatorFamily.MicroAddition;
 
         // Generate 2-3 ghost notes per chosen cluster pattern; deterministic selection from bar/seed.
-        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 

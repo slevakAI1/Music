@@ -1,4 +1,4 @@
-// AI: purpose=DrumCandidate: operator-generated drum event with position, strength, hints, and score.
+// AI: purpose=OperatorCandidate: operator-generated drum event with position, strength, hints, and score.
 // AI: invariants=BarNumber>=1; Beat>=1.0; Score in [0,1]; VelocityHint in [0,127] when present.
 // AI: deps=Uses OnsetStrength, FillRole, DrumArticulation; consumed by selection and mapping layers.
 
@@ -8,7 +8,7 @@ using Music.Generator.Groove;
 namespace Music.Generator.Drums.Operators.Candidates
 {
     // AI: contract=Immutable record used by selection engine; keep property names stable when persisting/mapping
-    public sealed record DrumCandidate
+    public sealed record OperatorCandidate
     {
         // AI: id=Deterministic format "{OperatorId}_{Role}_{BarNumber}_{Beat}[_{Articulation}]"; used for dedupe
         public required string CandidateId { get; init; }

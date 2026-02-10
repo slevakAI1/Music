@@ -1,6 +1,6 @@
 // AI: purpose=StyleIdiom operator: rock-style kick syncopation (primary 4.5 anticipation).
 // AI: invariants=Apply when style=PopRock and Kick role active; primary onset at 4.5; deterministic from (bar,seed).
-// AI: deps=Bar, DrumCandidate, Groove; integrates with section type and per-bar hash for variation.
+// AI: deps=Bar, OperatorCandidate, Groove; integrates with section type and per-bar hash for variation.
 
 
 using Music.Generator.Core;
@@ -31,7 +31,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
         public override OperatorFamily OperatorFamily => OperatorFamily.StyleIdiom;
 
         /// <inheritdoc/>
-        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 
@@ -51,7 +51,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
             }
         }
 
-        private IEnumerable<DrumCandidate> GeneratePrimaryPattern(Bar bar, int seed)
+        private IEnumerable<OperatorCandidate> GeneratePrimaryPattern(Bar bar, int seed)
         {
             // Always generate the 4& kick (primary rock syncopation)
             int velocityHint = GenerateVelocityHint(
@@ -70,7 +70,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
                 velocityHint: velocityHint);
         }
 
-        private IEnumerable<DrumCandidate> GenerateSecondaryPattern(Bar bar, int seed)
+        private IEnumerable<OperatorCandidate> GenerateSecondaryPattern(Bar bar, int seed)
         {
             // Deterministic selection of secondary pattern based on bar and seed
             int hash = HashCode.Combine(bar.BarNumber, seed, "RockKickSecondary");

@@ -1,6 +1,6 @@
 // AI: purpose=StyleIdiom operator for PopRock bridge breakdowns (half-time or minimal variants).
 // AI: invariants=Apply only when style=PopRock and Section=Bridge; deterministic from (bar,seed); no external side-effects.
-// AI: deps=Bar, DrumCandidate; integrates with groove/section type; variant chosen by energy/seed.
+// AI: deps=Bar, OperatorCandidate; integrates with groove/section type; variant chosen by energy/seed.
 
 
 using Music.Generator.Core;
@@ -34,7 +34,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
         /// </summary>
 
         /// <inheritdoc/>
-        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
         {
             ArgumentNullException.ThrowIfNull(bar);
 
@@ -77,7 +77,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
                 : BreakdownVariant.Minimal;
         }
 
-        private IEnumerable<DrumCandidate> GenerateKickPattern(Bar bar, int seed, BreakdownVariant variant)
+        private IEnumerable<OperatorCandidate> GenerateKickPattern(Bar bar, int seed, BreakdownVariant variant)
         {
             // Kick on beat 1 for both variants
             int velocityHint = GenerateVelocityHint(
@@ -111,7 +111,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
             }
         }
 
-        private IEnumerable<DrumCandidate> GenerateSnarePattern(Bar bar, int seed, BreakdownVariant variant)
+        private IEnumerable<OperatorCandidate> GenerateSnarePattern(Bar bar, int seed, BreakdownVariant variant)
         {
             // Half-time: snare on beat 3 only (not 2 and 4)
             // Minimal: snare on beat 3 only (same pattern, lower velocity)
@@ -130,7 +130,7 @@ namespace Music.Generator.Drums.Operators.StyleIdiom
                 velocityHint: velocityHint);
         }
 
-        private IEnumerable<DrumCandidate> GenerateMinimalHatPattern(Bar bar, int seed)
+        private IEnumerable<OperatorCandidate> GenerateMinimalHatPattern(Bar bar, int seed)
         {
             // Very sparse hats: just quarters or less
             decimal[] hatBeats = [1.0m, 3.0m];

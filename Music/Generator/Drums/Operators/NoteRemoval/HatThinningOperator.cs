@@ -18,7 +18,7 @@ namespace Music.Generator.Drums.Operators.NoteRemoval
         public override OperatorFamily OperatorFamily => OperatorFamily.NoteRemoval;
 
         // Removal operators do not add onsets.
-        public override IEnumerable<DrumCandidate> GenerateCandidates(Bar bar, int seed)
+        public override IEnumerable<OperatorCandidate> GenerateCandidates(Bar bar, int seed)
             => [];
 
         // Remove offbeat hat hits (fractional beats like 1.5, 2.5, 3.5, 4.5) from current bar.
