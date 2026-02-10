@@ -6,25 +6,10 @@ using Music.Generator.Core;
 
 namespace Music.Generator.Drums.Operators.Candidates
 {
-    // AI: contract=Adapter from DrumCandidateData to core candidate metadata and discriminator
+    // AI: contract=Adapter from DrumCandidateData to core candidate metadata
     public sealed class DrumOperatorCandidateInstrumentAdapter : IOperatorCandidateInstrumentAdapter
     {
         public static DrumOperatorCandidateInstrumentAdapter Instance { get; } = new();
-
-        public string? GetDiscriminator(object? instrumentData)
-        {
-            if (instrumentData is not DrumCandidateData drumData)
-            {
-                return null;
-            }
-
-            if (drumData.ArticulationHint.HasValue && drumData.ArticulationHint.Value != DrumArticulation.None)
-            {
-                return drumData.ArticulationHint.Value.ToString();
-            }
-
-            return null;
-        }
 
         public Dictionary<string, object>? BuildMetadata(object? instrumentData)
         {

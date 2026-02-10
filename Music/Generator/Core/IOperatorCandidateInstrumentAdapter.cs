@@ -7,7 +7,6 @@ namespace Music.Generator.Core
     // AI: contract=Adapter from instrument data to core candidate metadata and discriminator
     public interface IOperatorCandidateInstrumentAdapter
     {
-        string? GetDiscriminator(object? instrumentData);
         Dictionary<string, object>? BuildMetadata(object? instrumentData);
     }
 
@@ -15,8 +14,6 @@ namespace Music.Generator.Core
     internal sealed class NullOperatorCandidateInstrumentAdapter : IOperatorCandidateInstrumentAdapter
     {
         public static NullOperatorCandidateInstrumentAdapter Instance { get; } = new();
-
-        public string? GetDiscriminator(object? instrumentData) => null;
 
         public Dictionary<string, object>? BuildMetadata(object? instrumentData) => null;
     }

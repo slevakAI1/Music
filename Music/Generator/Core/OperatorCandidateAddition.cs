@@ -7,7 +7,7 @@ namespace Music.Generator.Core
     // AI: contract=Immutable record for cross-instrument candidate additions; Metadata extends for instrument needs
     public sealed record OperatorCandidateAddition
     {
-        // AI: id=Deterministic format "{OperatorId}_{Role}_{BarNumber}_{Beat}[_{Discriminator}]"; used for dedupe
+        // AI: id=Deterministic format "{OperatorId}_{Role}_{BarNumber}_{Beat}"; used for dedupe
         public required string CandidateId { get; init; }
 
         // AI: info=Operator identifier; required and non-empty
@@ -34,20 +34,14 @@ namespace Music.Generator.Core
         // AI: extension=Instrument-specific data; mapping layer owns key conventions; keep deterministic usage
         public Dictionary<string, object>? Metadata { get; init; }
 
-        // AI: util=Deterministic CandidateId generator; append discriminator if provided for uniqueness
+        // AI: util=Deterministic CandidateId generator
         public static string GenerateCandidateId(
             string operatorId,
             string role,
             int barNumber,
-            decimal beat,
-            string? discriminator = null)
+            decimal beat)
         {
-            var baseId = $"{operatorId}_{role}_{barNumber}_{beat}";
-            if (!string.IsNullOrEmpty(discriminator))
-            {
-                return $"{baseId}_{discriminator}";
-            }
-            return baseId;
+            return $"{operatorId}_{role}_{barNumber}_{beat}";
         }
 
         // AI: validate=Checks invariants; returns false with errorMessage when invalid

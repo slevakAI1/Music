@@ -12,7 +12,7 @@ namespace Music.Generator.Core
     // AI: invariants=Subclasses must provide OperatorId and OperatorFamily; keep GenerateCandidates pure.
     public abstract class OperatorBase
     {
-        // AI: deps=Instrument adapter supplies metadata/discriminator; never null
+        // AI: deps=Instrument adapter supplies metadata; never null
         protected OperatorBase(IOperatorCandidateInstrumentAdapter instrumentAdapter)
         {
             ArgumentNullException.ThrowIfNull(instrumentAdapter);
@@ -28,7 +28,7 @@ namespace Music.Generator.Core
         {
         }
 
-        // AI: deps=Instrument adapter for candidate metadata and discriminator
+        // AI: deps=Instrument adapter for candidate metadata
         protected IOperatorCandidateInstrumentAdapter InstrumentAdapter { get; }
 
         public abstract string OperatorId { get; }
@@ -59,15 +59,13 @@ namespace Music.Generator.Core
             double score,
             int? velocityHint = null,
             int? timingHint = null,
-            object? instrumentData = null,
-            string? discriminatorOverride = null)
+            object? instrumentData = null)
         {
-            var discriminator = discriminatorOverride ?? InstrumentAdapter.GetDiscriminator(instrumentData);
             var metadata = InstrumentAdapter.BuildMetadata(instrumentData);
 
             return new OperatorCandidateAddition
             {
-                CandidateId = OperatorCandidateAddition.GenerateCandidateId(OperatorId, role, barNumber, beat, discriminator),
+                CandidateId = OperatorCandidateAddition.GenerateCandidateId(OperatorId, role, barNumber, beat),
                 OperatorId = OperatorId,
                 Role = role,
                 BarNumber = barNumber,
