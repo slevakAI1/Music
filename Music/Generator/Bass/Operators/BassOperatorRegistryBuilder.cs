@@ -1,6 +1,6 @@
-// AI: purpose=Builder for bassOperatorRegistry; registers all operators in deterministic order for startup/tests.
-// AI: invariants=Call RegisterAllOperators before Freeze; registry order is stable and reproducible across runs.
-// AI: deps=bassOperatorRegistry and concrete operator classes; used by bassmerOperatorCandidates and tests.
+// AI: purpose=Builder for BassOperatorRegistry; registers operators in deterministic order for startup/tests.
+// AI: invariants=Call RegisterAllOperators before Freeze; registration order is stable and reproducible.
+// AI: deps=BassOperatorRegistry; no operators registered yet (empty registry expected).
 
 //using Music.Generator.Bass.Operators.MicroAddition;
 //using Music.Generator.Bass.Operators.NoteRemoval;
@@ -9,43 +9,25 @@
 //using Music.Generator.Bass.Operators.PatternSubstitution;
 //using Music.Generator.Bass.Operators.StyleIdiom;
 using Music.Generator.Core;
-using Music.Generator.Drums.Operators;
 
 namespace Music.Generator.Bass.Operators
 {
-    /// <summary>
-    /// Builds and populates a bassOperatorRegistry with all available Bass operators.
-    /// Story 2.4: Stub implementation.
-    /// Story 3.1: Registers MicroAddition operators (7 operators).
-    /// Story 3.2: Registers SubdivisionTransform operators (5 operators).
-    /// Story 3.3: Registers PhrasePunctuation operators (7 operators).
-    /// Story 3.4: Registers PatternSubstitution operators (4 operators).
-    /// Story 3.6: Completes registration with StyleIdiom operators (full 28 operators).
-    /// NoteRemoval: Registers subtractive operators (3 operators, total 31).
-    /// </summary>
-    /// <remarks>
-    /// Operators are registered in a deterministic order for reproducibility:
-    /// 1. MicroAddition family (ghost notes, pickups, embellishments)
-    /// 2. SubdivisionTransform family (timekeeping density changes)
-    /// 3. PhrasePunctuation family (fills, crashes, boundaries)
-    /// 4. PatternSubstitution family (groove swaps) - Story 3.4
-    /// 5. StyleIdiom family (genre-specific moves) - Story 3.5
-    /// 6. NoteRemoval family (subtractive operators for variance)
-    /// </remarks>
+    // AI: purpose=Builds and populates a BassOperatorRegistry; empty until bass operators are implemented.
+    // AI: invariants=Register family groups in deterministic order when operators exist.
     public static class BassOperatorRegistryBuilder
     {
         // Create and populate a registry with all operators, validate expected count, then freeze.
         // Throws InvalidOperationException when validation fails.
-        public static DrumOperatorRegistry BuildComplete()
+        public static BassOperatorRegistry BuildComplete()
         {
-            var registry = new DrumOperatorRegistry();
+            var registry = new BassOperatorRegistry();
             RegisterAllOperators(registry);
             registry.Freeze();
             return registry;
         }
 
         // RegisterAllOperators: populate registry by calling family registration helpers. Exposed for tests.
-        public static void RegisterAllOperators(DrumOperatorRegistry registry)
+        public static void RegisterAllOperators(BassOperatorRegistry registry)
         {
             ArgumentNullException.ThrowIfNull(registry);
             // Register families in deterministic order
@@ -58,7 +40,7 @@ namespace Music.Generator.Bass.Operators
         }
 
         // Register MicroAddition operators (ghosts, pickups, embellishments)
-        private static void RegisterMicroAdditionOperators(DrumOperatorRegistry registry)
+        private static void RegisterMicroAdditionOperators(BassOperatorRegistry registry)
         {
             //registry.RegisterOperator(new GhostBeforeBackbeatOperator());
             //registry.RegisterOperator(new GhostAfterBackbeatOperator());
@@ -70,7 +52,7 @@ namespace Music.Generator.Bass.Operators
         }
 
         // Register SubdivisionTransform operators (hat/ride swaps, partial lifts)
-        private static void RegisterSubdivisionTransformOperators(DrumOperatorRegistry registry)
+        private static void RegisterSubdivisionTransformOperators(BassOperatorRegistry registry)
         {
             //registry.RegisterOperator(new HatLiftOperator());
             //registry.RegisterOperator(new HatDropOperator());
@@ -80,7 +62,7 @@ namespace Music.Generator.Bass.Operators
         }
 
         // Register PhrasePunctuation operators (fills, crashes, setup/stop time)
-        private static void RegisterPhrasePunctuationOperators(DrumOperatorRegistry registry)
+        private static void RegisterPhrasePunctuationOperators(BassOperatorRegistry registry)
         {
             //registry.RegisterOperator(new CrashOnOneOperator());
             //registry.RegisterOperator(new TurnaroundFillShortOperator());
@@ -92,7 +74,7 @@ namespace Music.Generator.Bass.Operators
         }
 
         // Register PatternSubstitution operators (groove swaps, half/double time)
-        private static void RegisterPatternSubstitutionOperators(DrumOperatorRegistry registry)
+        private static void RegisterPatternSubstitutionOperators(BassOperatorRegistry registry)
         {
             //registry.RegisterOperator(new BackbeatVariantOperator());
             //registry.RegisterOperator(new KickPatternVariantOperator());
@@ -101,7 +83,7 @@ namespace Music.Generator.Bass.Operators
         }
 
         // Register StyleIdiom operators (PopRock specific behaviors)
-        private static void RegisterStyleIdiomOperators(DrumOperatorRegistry registry)
+        private static void RegisterStyleIdiomOperators(BassOperatorRegistry registry)
         {
             //registry.RegisterOperator(new PopRockBackbeatPushOperator());
             //registry.RegisterOperator(new RockKickSyncopationOperator());
@@ -111,7 +93,7 @@ namespace Music.Generator.Bass.Operators
         }
 
         // Register NoteRemoval operators (subtractive: thinning, pulling, sparsifying)
-        private static void RegisterNoteRemovalOperators(DrumOperatorRegistry registry)
+        private static void RegisterNoteRemovalOperators(BassOperatorRegistry registry)
         {
             //registry.RegisterOperator(new HatThinningOperator());
             //registry.RegisterOperator(new KickPullOperator());

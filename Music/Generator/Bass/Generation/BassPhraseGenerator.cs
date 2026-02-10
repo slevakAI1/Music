@@ -2,6 +2,7 @@
 // AI: invariants=Output is a PartTrack; reusable for MaterialBank storage.
 // AI: deps=bassOperatorApplicator; bassOperatorRegistry; BarTrack; SongContext; PartTrack.
 
+using Music.Generator.Bass.Operators;
 using Music.Generator.Drums.Operators;
 using Music.Generator.Groove;
 using Music.MyMidi;
@@ -35,20 +36,20 @@ namespace Music.Generator.Bass.Generation
     // AI: arch=validate → extract anchors → apply N random operators (dedup) → convert to MIDI PartTrack.
     public sealed class BassPhraseGenerator
     {
-        private readonly DrumOperatorRegistry _registry;
+        private readonly BassOperatorRegistry _registry;
         private readonly BassGeneratorSettings _settings;
 
         // AI: purpose=Default entry point; builds operator registry; settings fixed to defaults.
         public BassPhraseGenerator()
         {
-            _registry = DrumOperatorRegistryBuilder.BuildComplete();
+            _registry = BassOperatorRegistryBuilder.BuildComplete();
             _settings = BassGeneratorSettings.Default;
         }
 
         // AI: purpose=Generate a Bass PartTrack using anchors + random operator application.
         // AI: invariants=Throws on null/missing tracks; respects maxBars limit when >0.
         // AI: flow=validate → extract anchors → apply random operators → convert to MIDI.
-        public PartTrack Generate(SongContext songContext, int bassProgramNumber, int maxBars = 0)
+        public PartTrack Generate(SongContext songContext, int bassProgramNumber, int maxBars = 0, int numberOfOperators = 2)
         {
             ValidateSongContext(songContext);
 
@@ -68,8 +69,7 @@ namespace Music.Generator.Bass.Generation
             // Extract anchor onsets (foundation that's always present)
             var anchorOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars, barTrack);
 
-        var NumberOfOperators = 2;
-        var allOnsets = ApplyBassOperators(bars, anchorOnsets, totalBars, NumberOfOperators);
+            var allOnsets = ApplyBassOperators(bars, anchorOnsets, totalBars, numberOfOperators);
 
             // Convert to MIDI events
             return ConvertToPartTrack(allOnsets, barTrack, bassProgramNumber);
@@ -156,7 +156,7 @@ namespace Music.Generator.Bass.Generation
             int totalBars,
             int numberOfOperators)
         {
-            return DrumOperatorApplicator.Apply(bars, anchorOnsets, totalBars, numberOfOperators, _registry);
+            return BassOperatorApplicator.Apply(bars, anchorOnsets, totalBars, numberOfOperators, _registry);
         }
 
         private static PartTrack ConvertToPartTrack(
