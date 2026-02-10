@@ -27,7 +27,7 @@ namespace Music.Generator.Bass.Generation
         // Return configured roles or conservative default set used by generation logic.
         public IReadOnlyList<string> GetActiveRoles()
         {
-            return ActiveRoles ?? new[] { GrooveRoles.Kick, GrooveRoles.Snare, GrooveRoles.ClosedHat };
+            return ActiveRoles ?? new[] { GrooveRoles.Bass };
         }
     }
 
