@@ -1,19 +1,20 @@
-// AI: purpose=UI command: generate drummer-agent phrase-based drum PartTrack and append to Song+grid.
+// AI: purpose=UI command: generate bass phrase PartTrack and append to Song+grid.
 // AI: invariants=Requires songContext.BarTrack; groove anchor must be available; seed makes generation deterministic.
-// AI: deps=Generator.SongGenerator.Generate; GrooveAnchorFactory; CreateDrumPhraseSettingsDialog; Rng.Initialize
+// AI: deps=BassPhraseGenerator.Generate; GrooveAnchorFactory; CreateBassPhraseSettingsDialog; Rng.Initialize
 // AI: perf=Potentially expensive; runs on UI thread. Move to background thread if UI responsiveness degrades.
 
 using Music.Generator;
+using Music.Generator.Bass.Generation;
 using Music.Generator.Groove;
 using Music.MyMidi;
 
 namespace Music.Writer
 {
-    // AI: purpose=Handle UI command to configure and run drummer generator; update Song and DataGridView.
+    // AI: purpose=Handle UI command to configure and run bass phrase generator; update Song and DataGridView.
     public static class HandleCommandCreateBassPhrase
     {
         // AI: entry=Validate SongContext; show modal seed/genre/bars dialog; init RNG and groove preset.
-        // AI: effects=Appends one drum PartTrack to songContext.Song.PartTracks and updates grid via SongGridManager.
+        // AI: effects=Appends one bass PartTrack to songContext.Song.PartTracks and updates grid via SongGridManager.
         // AI: errors=All exceptions shown via ShowError; dialog prevents invalid inputs.
         public static void HandleBassPhraseTest(
             SongContext songContext,
@@ -21,6 +22,8 @@ namespace Music.Writer
         {
             try
             {
+                const int bassProgramNumber = 33;
+
                 // Validate song context has required data
                 if (songContext?.BarTrack == null)
                 {
@@ -29,7 +32,7 @@ namespace Music.Writer
                 }
 
                 // Show input dialog
-                using var dialog = new CreateDrumPhraseSettingsDialog();
+                using var dialog = new CreateBassPhraseSettingsDialog();
                 if (dialog.ShowDialog() != DialogResult.OK)
                     return;
 
@@ -60,19 +63,20 @@ namespace Music.Writer
                 };
                 songContext.GroovePresetDefinition = groovePreset;
 
-                // Generate drum track using drummer agent pipeline (bars=0 means full song, >0 limits generation)
-                var result = Generator.SongGenerator.Generate(songContext, bars, numberOfOperators);
+                // Generate bass phrase (bars=0 means full song, >0 limits generation)
+                var generator = new BassPhraseGenerator();
+                var result = generator.Generate(songContext, bassProgramNumber, bars, numberOfOperators);
 
                 ApplyPhraseRepeat(result, songContext.BarTrack, effectiveBars, repeat);
 
-                // Set descriptive name with seed and mark as drum set for correct playback
+                // Set descriptive name for playback and grid display
                 string barsInfo = bars > 0 ? $" ({bars} bars)" : "";
-                result.MidiProgramName = $"Drummer Agent{barsInfo} (Seed: {seed})";
-                result.MidiProgramNumber = 255; // 255 = Drum Set sentinel in MidiVoices
+                result.MidiProgramName = $"Bass Phrase{barsInfo} (Seed: {seed})";
+                result.MidiProgramNumber = bassProgramNumber;
 
                 songContext.Song.PartTracks.Add(result);
 
-                // Update Grid with drum track
+                // Update Grid with bass track
                 SongGridManager.AddNewPartTrack(result, dgSong);
                 if (dgSong.Rows.Count > SongGridManager.FIXED_ROWS_COUNT)
                 {
@@ -157,12 +161,12 @@ namespace Music.Writer
                 : "Generated full song.";
 
             MessageBoxHelper.Show(
-                $"Drummer agent track created successfully.\n\n" +
+                $"Bass phrase track created successfully.\n\n" +
                 $"Genre: {genre}\n" +
                 $"Seed: {seed}\n" +
                 $"{barsMessage}\n\n" +
-                $"Use this seed to reproduce the same drum track.",
-                "Drummer Agent Test",
+                $"Use this seed to reproduce the same bass phrase.",
+                "Bass Phrase Test",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
         }
