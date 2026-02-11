@@ -338,7 +338,7 @@ namespace Music.Writer
                     break;
 
                 case "Phrase Test":
-                    HandleCommandPhraseTest.HandlePhraseTest(_songContext, dgSong);
+                    HandleCommandCreateDrumPhrase.HandleDrumPhraseTest(_songContext, dgSong);
                     break;
 
                 case "Drum Track Test":
@@ -538,6 +538,11 @@ namespace Music.Writer
 
             if (_songContext != null)
                 Globals.SongContext = _songContext;
+        }
+
+        private void btnBassPhrase_Click(object sender, EventArgs e)
+        {
+            HandleCommandCreateBassPhrase.HandleBassPhraseTest(_songContext, dgSong);
         }
     }
 }

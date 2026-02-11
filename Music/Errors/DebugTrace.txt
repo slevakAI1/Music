@@ -250,3 +250,5 @@
 [2026-02-10T22:02:48.3745575-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
 [2026-02-10T22:02:56.8397194-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
 [2026-02-10T22:02:56.8397194-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-10T22:58:31.2952906-05:00] Rng.Initialize: seed=12345
+[2026-02-10T22:58:31.2952906-05:00] Rng.Initialize: seed=12345

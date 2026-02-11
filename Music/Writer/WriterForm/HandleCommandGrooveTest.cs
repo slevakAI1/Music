@@ -1,6 +1,6 @@
 // AI: purpose=Generate a groove PartTrack for audition and append it to the current Song and UI grid.
 // AI: invariants=Requires songContext.BarTrack; dialog validates seed/genre/bars; operation is deterministic by seed.
-// AI: deps=Generator.SongGenerator.GenerateGroovePreview; PhraseTestSettingsDialog; SongGridManager.AddNewPartTrack
+// AI: deps=Generator.SongGenerator.GenerateGroovePreview; CreateDrumPhraseSettingsDialog; SongGridManager.AddNewPartTrack
 
 using Music.Generator;
 
@@ -26,7 +26,7 @@ namespace Music.Writer
                 }
 
                 // Show input dialog
-                using var dialog = new PhraseTestSettingsDialog();
+                using var dialog = new CreateDrumPhraseSettingsDialog();
                 if (dialog.ShowDialog() != DialogResult.OK)
                     return;
 

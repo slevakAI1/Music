@@ -8,7 +8,7 @@ using Music.Properties;
 namespace Music.Writer
 {
     // AI: Modal dialog for groove preview parameter input; returns OK/Cancel with captured values.
-    public sealed class PhraseTestSettingsDialog : Form
+    public sealed class CreateDrumPhraseSettingsDialog : Form
     {
         private NumericUpDown numSeed;
         private ComboBox cbGenre;
@@ -31,7 +31,7 @@ namespace Music.Writer
         public int Repeat { get; private set; }
         public int NumberOfOperators { get; private set; }
 
-        public PhraseTestSettingsDialog()
+        public CreateDrumPhraseSettingsDialog()
         {
             InitializeDialog();
             SetDefaultValues();

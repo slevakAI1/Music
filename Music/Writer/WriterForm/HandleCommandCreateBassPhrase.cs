@@ -1,6 +1,6 @@
 // AI: purpose=UI command: generate drummer-agent phrase-based drum PartTrack and append to Song+grid.
 // AI: invariants=Requires songContext.BarTrack; groove anchor must be available; seed makes generation deterministic.
-// AI: deps=Generator.SongGenerator.Generate; GrooveAnchorFactory; PhraseTestSettingsDialog; Rng.Initialize
+// AI: deps=Generator.SongGenerator.Generate; GrooveAnchorFactory; CreateDrumPhraseSettingsDialog; Rng.Initialize
 // AI: perf=Potentially expensive; runs on UI thread. Move to background thread if UI responsiveness degrades.
 
 using Music.Generator;
@@ -10,12 +10,12 @@ using Music.MyMidi;
 namespace Music.Writer
 {
     // AI: purpose=Handle UI command to configure and run drummer generator; update Song and DataGridView.
-    public static class HandleCommandPhraseTest
+    public static class HandleCommandCreateBassPhrase
     {
         // AI: entry=Validate SongContext; show modal seed/genre/bars dialog; init RNG and groove preset.
         // AI: effects=Appends one drum PartTrack to songContext.Song.PartTracks and updates grid via SongGridManager.
         // AI: errors=All exceptions shown via ShowError; dialog prevents invalid inputs.
-        public static void HandlePhraseTest(
+        public static void HandleBassPhraseTest(
             SongContext songContext,
             DataGridView dgSong)
         {
@@ -29,7 +29,7 @@ namespace Music.Writer
                 }
 
                 // Show input dialog
-                using var dialog = new PhraseTestSettingsDialog();
+                using var dialog = new CreateDrumPhraseSettingsDialog();
                 if (dialog.ShowDialog() != DialogResult.OK)
                     return;
 
