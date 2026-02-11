@@ -2,10 +2,10 @@
 // AI: invariants=Call RegisterAllOperators before Freeze; registration order is stable and reproducible.
 // AI: deps=BassOperatorRegistry; no operators registered yet (empty registry expected).
 
+using Music.Generator.Bass.Operators.FoundationVariation;
 //using Music.Generator.Bass.Operators.NoteRemoval;
 //using Music.Generator.Bass.Operators.SubdivisionTransform;
 //using Music.Generator.Bass.Operators.PhrasePunctuation;
-//using Music.Generator.Bass.Operators.PatternSubstitution;
 //using Music.Generator.Bass.Operators.StyleIdiom;
 using Music.Generator.Core;
 
@@ -33,7 +33,7 @@ namespace Music.Generator.Bass.Operators
             RegisterMicroAdditionOperators(registry);
             //RegisterSubdivisionTransformOperators(registry);
             //RegisterPhrasePunctuationOperators(registry);
-            //RegisterPatternSubstitutionOperators(registry);
+            RegisterPatternSubstitutionOperators(registry);
             //RegisterStyleIdiomOperators(registry);
             //RegisterNoteRemovalOperators(registry);
         }
@@ -68,10 +68,9 @@ namespace Music.Generator.Bass.Operators
         // Register PatternSubstitution operators (groove swaps, half/double time)
         private static void RegisterPatternSubstitutionOperators(BassOperatorRegistry registry)
         {
-            //registry.RegisterOperator(new BackbeatVariantOperator());
-            //registry.RegisterOperator(new KickPatternVariantOperator());
-            //registry.RegisterOperator(new HalfTimeFeelOperator());
-            //registry.RegisterOperator(new DoubleTimeFeelOperator());
+            registry.RegisterOperator(new BassPedalRootBarOperator());
+            registry.RegisterOperator(new BassRootFifthOstinatoOperator());
+            registry.RegisterOperator(new BassChordTonePulseOperator());
         }
 
         // Register StyleIdiom operators (PopRock specific behaviors)
