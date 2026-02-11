@@ -66,7 +66,7 @@ namespace Music.Generator.Bass.Generation
             var bars = barTrack.Bars.Where(b => b.BarNumber <= totalBars).ToList();
 
             // Extract anchor onsets (foundation that's always present)
-            var anchorOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars, barTrack);
+            var anchorOnsets = ExtractAnchorOnsets(groovePresetDefinition, totalBars, barTrack, songContext);
 
             var allOnsets = ApplyBassOperators(bars, anchorOnsets, totalBars, numberOfOperators, songContext);
 
@@ -91,30 +91,69 @@ namespace Music.Generator.Bass.Generation
 
             if (songContext.GroovePresetDefinition.AnchorLayer == null)
                 throw new ArgumentException("GroovePresetDefinition.AnchorLayer must be provided", nameof(songContext));
+
+            if (songContext.HarmonyTrack == null || songContext.HarmonyTrack.Events.Count == 0)
+                throw new ArgumentException("HarmonyTrack must have events", nameof(songContext));
         }
 
-        // AI: purpose=Extract bass-role anchor onsets from groove; rhythm only—pitch set later by operators.
+        // AI: purpose=Extract bass-role anchor onsets from groove; pitch set from HarmonyTrack for a playable baseline.
         private List<GrooveOnset> ExtractAnchorOnsets(
             GroovePresetDefinition groovePresetDefinition,
             int totalBars,
-            BarTrack barTrack)
+            BarTrack barTrack,
+            SongContext songContext)
         {
             var onsets = new List<GrooveOnset>();
+            const string bassRoot = "root";
+            const int baseOctave = 2;
 
             for (int bar = 1; bar <= totalBars; bar++)
             {
                 var groovePreset = groovePresetDefinition.GetActiveGroovePreset(bar);
                 var anchorLayer = groovePreset.AnchorLayer;
 
-                foreach (var beat in anchorLayer.GetOnsets(GrooveRoles.Bass))
+                var anchorBeats = anchorLayer.GetOnsets(GrooveRoles.Bass);
+                if (anchorBeats.Count == 0)
+                    continue;
+
+                var orderedBeats = anchorBeats.OrderBy(b => b).ToList();
+
+                for (int i = 0; i < orderedBeats.Count; i++)
                 {
+                    decimal beat = orderedBeats[i];
+                    var harmonyEvent = songContext.HarmonyTrack.GetActiveHarmonyEvent(bar, beat);
+                    if (harmonyEvent == null)
+                        continue;
+
+                    var chordMidiNotes = ChordVoicingHelper.GenerateChordMidiNotes(
+                        harmonyEvent.Key,
+                        harmonyEvent.Degree,
+                        harmonyEvent.Quality,
+                        bassRoot,
+                        baseOctave);
+
+                    if (chordMidiNotes.Count == 0)
+                        continue;
+
+                    long tickPosition = barTrack.ToTick(bar, beat);
+                    long nextTick = i + 1 < orderedBeats.Count
+                        ? barTrack.ToTick(bar, orderedBeats[i + 1])
+                        : barTrack.GetBarEndTick(bar);
+
+                    long rawDurationTicks = nextTick - tickPosition;
+                    int durationTicks = rawDurationTicks > 0
+                        ? (int)Math.Min(int.MaxValue, rawDurationTicks)
+                        : MusicConstants.TicksPerQuarterNote;
+
                     onsets.Add(new GrooveOnset
                     {
                         Role = GrooveRoles.Bass,
                         BarNumber = bar,
                         Beat = beat,
                         Velocity = _settings.DefaultVelocity,
-                        IsMustHit = true
+                        IsMustHit = true,
+                        MidiNote = chordMidiNotes[0],
+                        DurationTicks = durationTicks
                     });
                 }
             }
