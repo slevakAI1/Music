@@ -3,6 +3,7 @@
 // AI: deps=BassOperatorRegistry; no operators registered yet (empty registry expected).
 
 using Music.Generator.Bass.Operators.FoundationVariation;
+using Music.Generator.Bass.Operators.HarmonicTargeting;
 //using Music.Generator.Bass.Operators.NoteRemoval;
 //using Music.Generator.Bass.Operators.SubdivisionTransform;
 //using Music.Generator.Bass.Operators.PhrasePunctuation;
@@ -41,6 +42,8 @@ namespace Music.Generator.Bass.Operators
         // Register MicroAddition operators (ghosts, pickups, embellishments)
         private static void RegisterMicroAdditionOperators(BassOperatorRegistry registry)
         {
+            registry.RegisterOperator(new BassTargetNextChordRootOperator());
+            registry.RegisterOperator(new BassApproachNoteOperator());
         }
 
         // Register SubdivisionTransform operators (hat/ride swaps, partial lifts)
@@ -71,6 +74,7 @@ namespace Music.Generator.Bass.Operators
             registry.RegisterOperator(new BassPedalRootBarOperator());
             registry.RegisterOperator(new BassRootFifthOstinatoOperator());
             registry.RegisterOperator(new BassChordTonePulseOperator());
+            registry.RegisterOperator(new BassPedalWithTurnaroundOperator());
         }
 
         // Register StyleIdiom operators (PopRock specific behaviors)

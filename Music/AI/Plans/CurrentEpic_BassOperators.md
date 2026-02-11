@@ -11,6 +11,9 @@ Implement 18 bass phrase operators so `BassPhraseGenerator` randomly selects and
 - Humanization operators: **deferred**
 - No unit tests
 - No architecture changes — operators extend `OperatorBase`, register in `BassOperatorRegistryBuilder`, selected by `BassOperatorApplicator`
+- Operator scores must be uniform (use `score: 1.0`); no probability constants in bass operators
+- When implementing stories, respond only with "Completed" (no summary files or chat summaries)
+- Each story must wire its operator into `BassOperatorRegistryBuilder` so it is audible immediately
 
 ## Family-to-OperatorFamily Mapping
 

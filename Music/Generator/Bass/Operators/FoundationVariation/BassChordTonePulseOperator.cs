@@ -10,7 +10,6 @@ namespace Music.Generator.Bass.Operators.FoundationVariation
 {
     public sealed class BassChordTonePulseOperator : OperatorBase
     {
-        private const double BaseScore = 0.9;
         private const int BaseOctave = 2;
         private const string BassRoot = "root";
 
@@ -56,7 +55,7 @@ namespace Music.Generator.Bass.Operators.FoundationVariation
                     role: GrooveRoles.Bass,
                     barNumber: bar.BarNumber,
                     beat: beat,
-                    score: BaseScore,
+                    score: 1.0,
                     midiNote: targetNote);
             }
         }
