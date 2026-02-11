@@ -16,11 +16,11 @@ Implement 18 bass phrase operators so `BassPhraseGenerator` randomly selects and
 
 | Plan Family | OperatorFamily Enum | Folder |
 |---|---|---|
-| FoundationVariation | PatternSubstitution | PatternSubstitution/ |
-| HarmonicTargeting | MicroAddition | MicroAddition/ |
-| RhythmicPlacement | SubdivisionTransform | SubdivisionTransform/ |
-| DensityAndSubdivision | PhrasePunctuation | PhrasePunctuation/ |
-| RegisterAndContour | StyleIdiom | StyleIdiom/ |
+| FoundationVariation | PatternSubstitution | FoundationVariation/ |
+| HarmonicTargeting | MicroAddition | HarmonicTargeting/ |
+| RhythmicPlacement | SubdivisionTransform | RhythmicPlacement/ |
+| DensityAndSubdivision | PhrasePunctuation | DensityAndSubdivision/ |
+| RegisterAndContour | StyleIdiom | RegisterAndContour/ |
 
 ## Shared Helper
 
@@ -50,7 +50,7 @@ Create `BassOperatorHelper` static class with shared methods used by multiple op
 
 ## Story 1: BassPedalRootBarOperator
 
-**Files:** `Music/Generator/Bass/Operators/PatternSubstitution/BassPedalRootBarOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/FoundationVariation/BassPedalRootBarOperator.cs` (new)
 
 Converts each bar to a single sustained root note covering the full bar. Yields one candidate at beat 1 with chord root pitch and duration spanning to bar end. Also yields removals for all other bass beats in the bar.
 
@@ -64,7 +64,7 @@ Converts each bar to a single sustained root note covering the full bar. Yields 
 
 ## Story 2: BassRootFifthOstinatoOperator
 
-**Files:** `Music/Generator/Bass/Operators/PatternSubstitution/BassRootFifthOstinatoOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/FoundationVariation/BassRootFifthOstinatoOperator.cs` (new)
 
 Rewrites anchor pitches into root–5th alternation. Even-indexed onsets get chord root, odd-indexed get perfect 5th (7 semitones above root), octave-clamped to range.
 
@@ -78,7 +78,7 @@ Rewrites anchor pitches into root–5th alternation. Even-indexed onsets get cho
 
 ## Story 3: BassChordTonePulseOperator
 
-**Files:** `Music/Generator/Bass/Operators/PatternSubstitution/BassChordTonePulseOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/FoundationVariation/BassChordTonePulseOperator.cs` (new)
 
 Replaces anchor pitches with rotating chord tones (R, 3, 5, 7) to imply richer harmony.
 
@@ -93,7 +93,7 @@ Replaces anchor pitches with rotating chord tones (R, 3, 5, 7) to imply richer h
 
 ## Story 4: BassPedalWithTurnaroundOperator
 
-**Files:** `Music/Generator/Bass/Operators/PatternSubstitution/BassPedalWithTurnaroundOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/FoundationVariation/BassPedalWithTurnaroundOperator.cs` (new)
 
 Pedals root for most of the bar, then adds 2-3 approach notes on beat 4 leading into next bar's chord root. Skips if bar is last bar in generation.
 
@@ -109,7 +109,7 @@ Pedals root for most of the bar, then adds 2-3 approach notes on beat 4 leading 
 
 ## Story 5: BassTargetNextChordRootOperator
 
-**Files:** `Music/Generator/Bass/Operators/MicroAddition/BassTargetNextChordRootOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/HarmonicTargeting/BassTargetNextChordRootOperator.cs` (new)
 
 On chord changes within a bar, forces the first onset after the change to the new chord root.
 
@@ -123,7 +123,7 @@ On chord changes within a bar, forces the first onset after the change to the ne
 
 ## Story 6: BassApproachNoteOperator
 
-**Files:** `Music/Generator/Bass/Operators/MicroAddition/BassApproachNoteOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/HarmonicTargeting/BassApproachNoteOperator.cs` (new)
 
 Adds a chromatic or diatonic approach note 0.5 beats before beat 1 targets (or chord-change targets).
 
@@ -138,7 +138,7 @@ Adds a chromatic or diatonic approach note 0.5 beats before beat 1 targets (or c
 
 ## Story 7: BassEnclosureOperator
 
-**Files:** `Music/Generator/Bass/Operators/MicroAddition/BassEnclosureOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/HarmonicTargeting/BassEnclosureOperator.cs` (new)
 
 Adds a 2-note enclosure (above then below) before a target onset, typically on beat 1 or last onset.
 
@@ -153,7 +153,7 @@ Adds a 2-note enclosure (above then below) before a target onset, typically on b
 
 ## Story 8: BassGuideToneEmphasisOperator
 
-**Files:** `Music/Generator/Bass/Operators/MicroAddition/BassGuideToneEmphasisOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/HarmonicTargeting/BassGuideToneEmphasisOperator.cs` (new)
 
 On weak beats, replaces pitch with chord 3rd or 7th; keeps root on strong beats.
 
@@ -168,7 +168,7 @@ On weak beats, replaces pitch with chord 3rd or 7th; keeps root on strong beats.
 
 ## Story 9: BassStepwiseVoiceLeadingOperator
 
-**Files:** `Music/Generator/Bass/Operators/MicroAddition/BassStepwiseVoiceLeadingOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/HarmonicTargeting/BassStepwiseVoiceLeadingOperator.cs` (new)
 
 Minimizes leaps between consecutive onsets by choosing the closest octave variant of each chord tone.
 
@@ -183,7 +183,7 @@ Minimizes leaps between consecutive onsets by choosing the closest octave varian
 
 ## Story 10: BassAnticipateDownbeatOperator
 
-**Files:** `Music/Generator/Bass/Operators/SubdivisionTransform/BassAnticipateDownbeatOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/RhythmicPlacement/BassAnticipateDownbeatOperator.cs` (new)
 
 Moves beat-1 onset earlier by 0.5 beats (anticipation), creating a push feel.
 
@@ -198,7 +198,7 @@ Moves beat-1 onset earlier by 0.5 beats (anticipation), creating a push feel.
 
 ## Story 11: BassSyncopationSwapOperator
 
-**Files:** `Music/Generator/Bass/Operators/SubdivisionTransform/BassSyncopationSwapOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/RhythmicPlacement/BassSyncopationSwapOperator.cs` (new)
 
 Swaps one on-beat onset with an off-beat onset for moderate syncopation.
 
@@ -213,7 +213,7 @@ Swaps one on-beat onset with an off-beat onset for moderate syncopation.
 
 ## Story 12: BassKickLockOperator
 
-**Files:** `Music/Generator/Bass/Operators/SubdivisionTransform/BassKickLockOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/RhythmicPlacement/BassKickLockOperator.cs` (new)
 
 Adds bass onsets aligned to kick drum anchor beats where bass is not already present.
 
@@ -228,7 +228,7 @@ Adds bass onsets aligned to kick drum anchor beats where bass is not already pre
 
 ## Story 13: BassRestStrategicSpaceOperator
 
-**Files:** `Music/Generator/Bass/Operators/SubdivisionTransform/BassRestStrategicSpaceOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/RhythmicPlacement/BassRestStrategicSpaceOperator.cs` (new)
 
 Removes one weak-beat onset per bar to create intentional space.
 
@@ -244,7 +244,7 @@ Removes one weak-beat onset per bar to create intentional space.
 
 ## Story 14: BassPickupIntoNextBarOperator
 
-**Files:** `Music/Generator/Bass/Operators/SubdivisionTransform/BassPickupIntoNextBarOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/RhythmicPlacement/BassPickupIntoNextBarOperator.cs` (new)
 
 Adds a short pickup note at beat 4.5 leading into next bar's chord root.
 
@@ -259,7 +259,7 @@ Adds a short pickup note at beat 4.5 leading into next bar's chord root.
 
 ## Story 15: BassSplitLongNoteOperator
 
-**Files:** `Music/Generator/Bass/Operators/PhrasePunctuation/BassSplitLongNoteOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/DensityAndSubdivision/BassSplitLongNoteOperator.cs` (new)
 
 Splits one long sustained note into repeated shorter notes (same pitch) to create pulse.
 
@@ -274,7 +274,7 @@ Splits one long sustained note into repeated shorter notes (same pitch) to creat
 
 ## Story 16: BassAddPassingEighthsOperator
 
-**Files:** `Music/Generator/Bass/Operators/PhrasePunctuation/BassAddPassingEighthsOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/DensityAndSubdivision/BassAddPassingEighthsOperator.cs` (new)
 
 Between two existing onsets separated by ≥ 1 beat, inserts passing eighth notes stepping toward the next pitch.
 
@@ -290,7 +290,7 @@ Between two existing onsets separated by ≥ 1 beat, inserts passing eighth note
 
 ## Story 17: BassReduceToQuarterNotesOperator
 
-**Files:** `Music/Generator/Bass/Operators/PhrasePunctuation/BassReduceToQuarterNotesOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/DensityAndSubdivision/BassReduceToQuarterNotesOperator.cs` (new)
 
 Simplifies a bar into quarter-note grid (beats 1, 2, 3, 4) using chord root.
 
@@ -304,7 +304,7 @@ Simplifies a bar into quarter-note grid (beats 1, 2, 3, 4) using chord root.
 
 ## Story 18: BassBurstSixteenthsOperator
 
-**Files:** `Music/Generator/Bass/Operators/PhrasePunctuation/BassBurstSixteenthsOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/DensityAndSubdivision/BassBurstSixteenthsOperator.cs` (new)
 
 Adds a 3-4 note 16th-note burst on beat 4, alternating root and octave.
 
@@ -319,7 +319,7 @@ Adds a 3-4 note 16th-note burst on beat 4, alternating root and octave.
 
 ## Story 19: BassOctavePopAccentsOperator
 
-**Files:** `Music/Generator/Bass/Operators/StyleIdiom/BassOctavePopAccentsOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/RegisterAndContour/BassOctavePopAccentsOperator.cs` (new)
 
 On strong beats, jumps pitch up one octave for accent, then returns.
 
@@ -334,7 +334,7 @@ On strong beats, jumps pitch up one octave for accent, then returns.
 
 ## Story 20: BassRangeClampOperator
 
-**Files:** `Music/Generator/Bass/Operators/StyleIdiom/BassRangeClampOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/RegisterAndContour/BassRangeClampOperator.cs` (new)
 
 Enforces playable range [28, 55] by octave-shifting notes. Safety operator.
 
@@ -348,7 +348,7 @@ Enforces playable range [28, 55] by octave-shifting notes. Safety operator.
 
 ## Story 21: BassContourSmootherOperator
 
-**Files:** `Music/Generator/Bass/Operators/StyleIdiom/BassContourSmootherOperator.cs` (new)
+**Files:** `Music/Generator/Bass/Operators/RegisterAndContour/BassContourSmootherOperator.cs` (new)
 
 Reduces large leaps (>9 semitones) between consecutive onsets by re-octaving.
 
