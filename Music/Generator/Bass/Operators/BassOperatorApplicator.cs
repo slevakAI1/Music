@@ -93,7 +93,29 @@ namespace Music.Generator.Bass.Operators
             {
                 var key = (candidate.BarNumber, candidate.Beat, candidate.Role);
                 if (occupied.Contains(key))
+                {
+                    if (!HasCandidateUpdates(candidate))
+                        continue;
+
+                    int index = result.FindIndex(o =>
+                        o.BarNumber == candidate.BarNumber &&
+                        o.Beat == candidate.Beat &&
+                        o.Role == candidate.Role);
+
+                    if (index < 0)
+                        continue;
+
+                    GrooveOnset existing = result[index];
+                    result[index] = existing with
+                    {
+                        Velocity = candidate.VelocityHint ?? existing.Velocity,
+                        TimingOffsetTicks = candidate.TimingHint ?? existing.TimingOffsetTicks,
+                        MidiNote = candidate.MidiNote ?? existing.MidiNote,
+                        DurationTicks = candidate.DurationTicks ?? existing.DurationTicks
+                    };
+                    anyApplied = true;
                     continue;
+                }
 
                 occupied.Add(key);
                 result.Add(new GrooveOnset
@@ -110,6 +132,14 @@ namespace Music.Generator.Bass.Operators
             }
 
             return anyApplied;
+        }
+
+        private static bool HasCandidateUpdates(OperatorCandidateAddition candidate)
+        {
+            return candidate.VelocityHint.HasValue ||
+                   candidate.TimingHint.HasValue ||
+                   candidate.MidiNote.HasValue ||
+                   candidate.DurationTicks.HasValue;
         }
 
         private static bool ApplyRemovals(

@@ -2,7 +2,7 @@
 // AI: invariants=Call RegisterAllOperators before Freeze; registration order is stable and reproducible.
 // AI: deps=BassOperatorRegistry; no operators registered yet (empty registry expected).
 
-//using Music.Generator.Bass.Operators.MicroAddition;
+using Music.Generator.Bass.Operators.MicroAddition;
 //using Music.Generator.Bass.Operators.NoteRemoval;
 //using Music.Generator.Bass.Operators.SubdivisionTransform;
 //using Music.Generator.Bass.Operators.PhrasePunctuation;
@@ -31,7 +31,7 @@ namespace Music.Generator.Bass.Operators
         {
             ArgumentNullException.ThrowIfNull(registry);
             // Register families in deterministic order
-            //RegisterMicroAdditionOperators(registry);
+            RegisterMicroAdditionOperators(registry);
             //RegisterSubdivisionTransformOperators(registry);
             //RegisterPhrasePunctuationOperators(registry);
             //RegisterPatternSubstitutionOperators(registry);
@@ -42,13 +42,7 @@ namespace Music.Generator.Bass.Operators
         // Register MicroAddition operators (ghosts, pickups, embellishments)
         private static void RegisterMicroAdditionOperators(BassOperatorRegistry registry)
         {
-            //registry.RegisterOperator(new GhostBeforeBackbeatOperator());
-            //registry.RegisterOperator(new GhostAfterBackbeatOperator());
-            //registry.RegisterOperator(new KickPickupOperator());
-            //registry.RegisterOperator(new KickDoubleOperator());
-            //registry.RegisterOperator(new HatEmbellishmentOperator());
-            //registry.RegisterOperator(new GhostClusterOperator());
-            //registry.RegisterOperator(new FloorTomPickupOperator());
+            registry.RegisterOperator(new BassChordRootHalfNoteOperator());
         }
 
         // Register SubdivisionTransform operators (hat/ride swaps, partial lifts)
