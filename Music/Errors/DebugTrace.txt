@@ -324,3 +324,25 @@
 [2026-02-10T23:14:11.4714464-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
 [2026-02-10T23:14:28.0514321-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
 [2026-02-10T23:14:28.0514321-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-11T08:22:51.6296876-05:00] Rng.Initialize: seed=12345
+[2026-02-11T08:22:51.6296876-05:00] Rng.Initialize: seed=12345
+[2026-02-11T08:23:41.3949999-05:00] Rng.Initialize: seed=83461045
+[2026-02-11T08:23:41.3949999-05:00] Rng.Initialize: seed=83461045
+[2026-02-11T08:23:59.1819833-05:00] Rng.Initialize: seed=656362002
+[2026-02-11T08:23:59.1819833-05:00] Rng.Initialize: seed=656362002
+[2026-02-11T08:24:18.8198130-05:00] Rng.Initialize: seed=374276621
+[2026-02-11T08:24:18.8198130-05:00] Rng.Initialize: seed=374276621
+[2026-02-11T08:24:25.5042359-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-11T08:24:25.5042359-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-11T08:24:25.5055486-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=2
+[2026-02-11T08:24:25.5055486-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=2
+[2026-02-11T08:24:25.5063646-05:00] HandlePlayAsync: Converting 2 tracks to MIDI document
+[2026-02-11T08:24:25.5063646-05:00] HandlePlayAsync: Converting 2 tracks to MIDI document
+[2026-02-11T08:24:25.5710304-05:00] HandlePlayAsync: MIDI document created, Duration=16000ms
+[2026-02-11T08:24:25.5710304-05:00] HandlePlayAsync: MIDI document created, Duration=16000ms
+[2026-02-11T08:24:25.5716293-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-11T08:24:25.5716293-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-11T08:24:38.7557919-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-11T08:24:38.7557919-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-11T08:25:09.5306347-05:00] Rng.Initialize: seed=-758978688
+[2026-02-11T08:25:09.5306347-05:00] Rng.Initialize: seed=-758978688
