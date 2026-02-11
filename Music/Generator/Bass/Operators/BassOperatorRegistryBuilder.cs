@@ -4,10 +4,9 @@
 
 using Music.Generator.Bass.Operators.FoundationVariation;
 using Music.Generator.Bass.Operators.HarmonicTargeting;
-//using Music.Generator.Bass.Operators.NoteRemoval;
-//using Music.Generator.Bass.Operators.SubdivisionTransform;
-//using Music.Generator.Bass.Operators.PhrasePunctuation;
-//using Music.Generator.Bass.Operators.StyleIdiom;
+//using Music.Generator.Bass.Operators.DensityAndSubdivision;
+//using Music.Generator.Bass.Operators.RegisterAndContour;
+//using Music.Generator.Bass.Operators.RhythmicPlacement;
 using Music.Generator.Core;
 
 namespace Music.Generator.Bass.Operators
@@ -31,45 +30,22 @@ namespace Music.Generator.Bass.Operators
         {
             ArgumentNullException.ThrowIfNull(registry);
             // Register families in deterministic order
-            RegisterMicroAdditionOperators(registry);
-            //RegisterSubdivisionTransformOperators(registry);
-            //RegisterPhrasePunctuationOperators(registry);
-            RegisterPatternSubstitutionOperators(registry);
-            //RegisterStyleIdiomOperators(registry);
-            //RegisterNoteRemovalOperators(registry);
+            RegisterHarmonicTargetingOperators(registry);
+            //RegisterRhythmicPlacementOperators(registry);
+            //RegisterDensityAndSubdivisionOperators(registry);
+            RegisterFoundationVariationOperators(registry);
+            //RegisterRegisterAndContourOperators(registry);
         }
 
-        // Register MicroAddition operators (ghosts, pickups, embellishments)
-        private static void RegisterMicroAdditionOperators(BassOperatorRegistry registry)
+        // Register HarmonicTargeting operators (chord-change targeting, approaches)
+        private static void RegisterHarmonicTargetingOperators(BassOperatorRegistry registry)
         {
             registry.RegisterOperator(new BassTargetNextChordRootOperator());
             registry.RegisterOperator(new BassApproachNoteOperator());
         }
 
-        // Register SubdivisionTransform operators (hat/ride swaps, partial lifts)
-        private static void RegisterSubdivisionTransformOperators(BassOperatorRegistry registry)
-        {
-            //registry.RegisterOperator(new HatLiftOperator());
-            //registry.RegisterOperator(new HatDropOperator());
-            //registry.RegisterOperator(new RideSwapOperator());
-            //registry.RegisterOperator(new PartialLiftOperator());
-            //registry.RegisterOperator(new OpenHatAccentOperator());
-        }
-
-        // Register PhrasePunctuation operators (fills, crashes, setup/stop time)
-        private static void RegisterPhrasePunctuationOperators(BassOperatorRegistry registry)
-        {
-            //registry.RegisterOperator(new CrashOnOneOperator());
-            //registry.RegisterOperator(new TurnaroundFillShortOperator());
-            //registry.RegisterOperator(new TurnaroundFillFullOperator());
-            //registry.RegisterOperator(new SetupHitOperator());
-            //registry.RegisterOperator(new StopTimeOperator());
-            //registry.RegisterOperator(new BuildFillOperator());
-            //registry.RegisterOperator(new DropFillOperator());
-        }
-
-        // Register PatternSubstitution operators (groove swaps, half/double time)
-        private static void RegisterPatternSubstitutionOperators(BassOperatorRegistry registry)
+        // Register FoundationVariation operators (pedals, root/fifth, chord tone pulse)
+        private static void RegisterFoundationVariationOperators(BassOperatorRegistry registry)
         {
             registry.RegisterOperator(new BassPedalRootBarOperator());
             registry.RegisterOperator(new BassRootFifthOstinatoOperator());
@@ -77,22 +53,19 @@ namespace Music.Generator.Bass.Operators
             registry.RegisterOperator(new BassPedalWithTurnaroundOperator());
         }
 
-        // Register StyleIdiom operators (PopRock specific behaviors)
-        private static void RegisterStyleIdiomOperators(BassOperatorRegistry registry)
+        // Register RhythmicPlacement operators (syncopation, anticipations)
+        private static void RegisterRhythmicPlacementOperators(BassOperatorRegistry registry)
         {
-            //registry.RegisterOperator(new PopRockBackbeatPushOperator());
-            //registry.RegisterOperator(new RockKickSyncopationOperator());
-            //registry.RegisterOperator(new PopChorusCrashPatternOperator());
-            //registry.RegisterOperator(new VerseSimplifyOperator());
-            //registry.RegisterOperator(new BridgeBreakdownOperator());
         }
 
-        // Register NoteRemoval operators (subtractive: thinning, pulling, sparsifying)
-        private static void RegisterNoteRemovalOperators(BassOperatorRegistry registry)
+        // Register DensityAndSubdivision operators (splits, passing notes)
+        private static void RegisterDensityAndSubdivisionOperators(BassOperatorRegistry registry)
         {
-            //registry.RegisterOperator(new HatThinningOperator());
-            //registry.RegisterOperator(new KickPullOperator());
-            //registry.RegisterOperator(new SparseGrooveOperator());
+        }
+
+        // Register RegisterAndContour operators (range, octave contour)
+        private static void RegisterRegisterAndContourOperators(BassOperatorRegistry registry)
+        {
         }
     }
 }
