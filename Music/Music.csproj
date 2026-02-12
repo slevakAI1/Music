@@ -244,9 +244,7 @@
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
-    <Folder Include="Generator\Bass\Operators\DensityAndSubdivision\" />
     <Folder Include="Generator\Bass\Operators\RegisterAndContour\" />
-    <Folder Include="Generator\Bass\Operators\RhythmicPlacement\" />
     <Folder Include="Generator\Drums\Operators\Base\" />
   </ItemGroup>
 
