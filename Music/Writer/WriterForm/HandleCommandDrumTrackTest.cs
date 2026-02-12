@@ -3,6 +3,7 @@
 // AI: deps=Generator.SongGenerator.GenerateFromPhrases; DrumTrackTestSettingsDialog; Rng.Initialize; SongGridManager
 
 using Music.Generator;
+using Music.Writer.OptionForm;
 
 namespace Music.Writer
 {

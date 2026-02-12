@@ -4,6 +4,7 @@
 
 using Music.Generator.Bass.Operators.FoundationVariation;
 using Music.Generator.Bass.Operators.HarmonicTargeting;
+using Music.Generator.Bass.Operators.CleanupAndConstraints;
 using Music.Generator.Bass.Operators.DensityAndSubdivision;
 using Music.Generator.Bass.Operators.RegisterAndContour;
 using Music.Generator.Bass.Operators.RhythmicPlacement;
@@ -41,6 +42,8 @@ namespace Music.Generator.Bass.Operators
         private static void RegisterCleanupAndConstraintsOperators(BassOperatorRegistry registry)
         {
             registry.RegisterOperator(new BassSnapBeatsToSubdivisionOperator());
+            registry.RegisterOperator(new BassResolveOverlapsAndOrderOperator());
+            registry.RegisterOperator(new BassPreventOverDensityOperator());
         }
 
         // Register HarmonicTargeting operators (chord-change targeting, approaches)

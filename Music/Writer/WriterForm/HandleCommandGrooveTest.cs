@@ -3,6 +3,7 @@
 // AI: deps=Generator.SongGenerator.GenerateGroovePreview; CreateDrumPhraseSettingsDialog; SongGridManager.AddNewPartTrack
 
 using Music.Generator;
+using Music.Writer.OptionForm;
 
 namespace Music.Writer
 {

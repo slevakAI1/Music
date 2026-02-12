@@ -10,7 +10,8 @@ namespace Music.Generator.Bass.Operators.RhythmicPlacement
     public sealed class BassAnticipateDownbeatOperator : OperatorBase
     {
         private const int BaseOctave = 2;
-        private const decimal AnticipationBeat = 0.5m;
+        // AI: contract=Beat must stay >=1 for BarTrack.ToTick; use negative TimingHint to anticipate within bar.
+        private const int AnticipationBeatOffsetTicks = -240;
 
         public override string OperatorId => "BassAnticipateDownbeat";
 
@@ -42,8 +43,9 @@ namespace Music.Generator.Bass.Operators.RhythmicPlacement
             yield return CreateCandidate(
                 role: GrooveRoles.Bass,
                 barNumber: bar.BarNumber,
-                beat: AnticipationBeat,
+                beat: 1.0m,
                 score: 1.0,
+                timingHint: AnticipationBeatOffsetTicks,
                 midiNote: rootNote.Value,
                 durationTicks: durationTicks);
         }

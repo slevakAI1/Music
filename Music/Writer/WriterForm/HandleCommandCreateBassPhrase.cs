@@ -7,6 +7,7 @@ using Music.Generator;
 using Music.Generator.Bass.Generation;
 using Music.Generator.Groove;
 using Music.MyMidi;
+using Music.Writer.OptionForm;
 
 namespace Music.Writer
 {

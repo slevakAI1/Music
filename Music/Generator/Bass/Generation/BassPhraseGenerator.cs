@@ -5,6 +5,7 @@
 using Music.Generator.Bass.Operators;
 using Music.Generator.Groove;
 using Music.MyMidi;
+using Music.Writer;
 
 namespace Music.Generator.Bass.Generation
 {
@@ -187,6 +188,13 @@ namespace Music.Generator.Bass.Generation
                 // Bass onsets without a MidiNote have not been pitched by an operator; skip.
                 if (!onset.MidiNote.HasValue)
                     continue;
+
+                if (onset.Beat < 1.0m)
+                {
+                    MessageBoxHelper.ShowError(
+                        text: $"Invalid bass onset beat: Bar={onset.BarNumber}, Beat={onset.Beat}, TimingOffsetTicks={onset.TimingOffsetTicks}, MidiNote={onset.MidiNote}, DurationTicks={onset.DurationTicks}",
+                        caption: "Generation Error");
+                }
 
                 long tickPosition = barTrack.ToTick(onset.BarNumber, onset.Beat);
 

@@ -634,3 +634,35 @@
 [2026-02-12T08:02:48.3220726-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
 [2026-02-12T08:02:57.0308246-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
 [2026-02-12T08:02:57.0308246-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-12T10:27:29.7006539-05:00] Rng.Initialize: seed=12345
+[2026-02-12T10:27:29.7006539-05:00] Rng.Initialize: seed=12345
+[2026-02-12T10:27:49.6086185-05:00] Rng.Initialize: seed=2025403042
+[2026-02-12T10:27:49.6086185-05:00] Rng.Initialize: seed=2025403042
+[2026-02-12T10:28:16.4735248-05:00] Rng.Initialize: seed=-1588186862
+[2026-02-12T10:28:16.4735248-05:00] Rng.Initialize: seed=-1588186862
+[2026-02-12T10:28:22.4637661-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-12T10:28:22.4637661-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-12T10:28:22.4650884-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=2
+[2026-02-12T10:28:22.4650884-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=2
+[2026-02-12T10:28:22.4657668-05:00] HandlePlayAsync: Converting 2 tracks to MIDI document
+[2026-02-12T10:28:22.4657668-05:00] HandlePlayAsync: Converting 2 tracks to MIDI document
+[2026-02-12T10:28:22.5109297-05:00] HandlePlayAsync: MIDI document created, Duration=16000ms
+[2026-02-12T10:28:22.5109297-05:00] HandlePlayAsync: MIDI document created, Duration=16000ms
+[2026-02-12T10:28:22.5116940-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-12T10:28:22.5116940-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-12T10:28:38.9980770-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-12T10:28:38.9980770-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-12T10:29:07.0923202-05:00] Rng.Initialize: seed=-752008144
+[2026-02-12T10:29:07.0923202-05:00] Rng.Initialize: seed=-752008144
+[2026-02-12T10:35:59.2593695-05:00] Rng.Initialize: seed=12345
+[2026-02-12T10:35:59.2593695-05:00] Rng.Initialize: seed=12345
+[2026-02-12T10:36:16.6712427-05:00] Rng.Initialize: seed=-677311946
+[2026-02-12T10:36:16.6712427-05:00] Rng.Initialize: seed=-677311946
+[2026-02-12T10:36:43.2553226-05:00] Rng.Initialize: seed=-834704433
+[2026-02-12T10:36:43.2553226-05:00] Rng.Initialize: seed=-834704433
+[2026-02-12T10:39:33.9926027-05:00] Rng.Initialize: seed=12345
+[2026-02-12T10:39:33.9926027-05:00] Rng.Initialize: seed=12345
+[2026-02-12T10:48:18.5647335-05:00] Rng.Initialize: seed=12345
+[2026-02-12T10:48:18.5647335-05:00] Rng.Initialize: seed=12345
+[2026-02-12T10:50:23.9464239-05:00] Rng.Initialize: seed=1053422685
+[2026-02-12T10:50:23.9464239-05:00] Rng.Initialize: seed=1053422685

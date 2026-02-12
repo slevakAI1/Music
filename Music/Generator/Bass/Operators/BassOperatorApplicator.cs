@@ -11,6 +11,14 @@ namespace Music.Generator.Bass.Operators
     // AI: purpose=Apply random operators to anchor onsets; removal optional via base hook.
     public static class BassOperatorApplicator
     {
+        // AI: cleanup=Always run after random ops; deterministic order; not part of random pool.
+        private static readonly string[] CleanupOperatorIds =
+        {
+            "BassSnapBeatsToSubdivision",
+            "BassResolveOverlapsAndOrder",
+            "BassPreventOverDensity"
+        };
+
         // AI: entry=Copy anchors, randomly pick operators, apply if valid (add/remove), return combined onsets.
         // AI: invariants=Sets SongContext on each operator so bass operators can access HarmonyTrack for pitch selection.
         public static List<GrooveOnset> Apply(
@@ -27,7 +35,9 @@ namespace Music.Generator.Bass.Operators
             foreach (var onset in result)
                 occupied.Add((onset.BarNumber, onset.Beat, onset.Role));
 
-            var allOperators = registry.GetAllOperators();
+            var allOperators = registry.GetAllOperators()
+                .Where(op => !CleanupOperatorIds.Contains(op.OperatorId))
+                .ToList();
             if (allOperators.Count == 0)
                 return result;
 
@@ -76,7 +86,33 @@ namespace Music.Generator.Bass.Operators
                     applied++;
             }
 
+            ApplyCleanupPostPass(registry, barsInScope, result, occupied);
+
             return result.OrderBy(o => o.BarNumber).ThenBy(o => o.Beat).ToList();
+        }
+
+        private static void ApplyCleanupPostPass(
+            BassOperatorRegistry registry,
+            IReadOnlyList<Bar> barsInScope,
+            List<GrooveOnset> result,
+            HashSet<(int BarNumber, decimal Beat, string Role)> occupied)
+        {
+            if (!result.Any(o => o.Role == GrooveRoles.Bass))
+                return;
+
+            foreach (string operatorId in CleanupOperatorIds)
+            {
+                var op = registry.GetOperatorById(operatorId);
+                if (op is null)
+                    continue;
+
+                foreach (var bar in barsInScope)
+                {
+                    int seed = bar.BarNumber;
+                    ApplyAdditions(op, bar, seed, result, occupied);
+                    ApplyRemovals(op, bar, result, occupied);
+                }
+            }
         }
 
         private static bool ApplyAdditions(

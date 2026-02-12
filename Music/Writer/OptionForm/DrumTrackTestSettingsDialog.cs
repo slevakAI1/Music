@@ -2,7 +2,7 @@
 // AI: invariants=Seed defaults to random value.
 // AI: deps=None; standalone modal dialog.
 
-namespace Music.Writer
+namespace Music.Writer.OptionForm
 {
     // AI: Modal dialog for drum track test parameter input; returns OK/Cancel with seed value.
     public sealed class DrumTrackTestSettingsDialog : Form

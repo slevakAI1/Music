@@ -1,14 +1,14 @@
-// AI: purpose=Simple input dialog for groove preview parameters (seed, genre, bars, repeat, operators).
-// AI: invariants=Seed defaults to random; genre defaults to PopRock; bars defaults to 2; repeat defaults to 2; operators defaults to 2.
+// AI: purpose=Simple input dialog for bass phrase parameters (seed, genre, bars, repeat, operators).
+// AI: invariants=Seed defaults to random; genre defaults to PopRock; bars defaults to 1; repeat defaults to 2; operators defaults to 1.
 // AI: deps=Uses GrooveAnchorFactory.GetAvailableGenres for genre dropdown.
 
 using Music.Generator.Groove;
 using Music.Properties;
 
-namespace Music.Writer
+namespace Music.Writer.OptionForm
 {
-    // AI: Modal dialog for groove preview parameter input; returns OK/Cancel with captured values.
-    public sealed class CreateDrumPhraseSettingsDialog : Form
+    // AI: Modal dialog for bass phrase parameter input; returns OK/Cancel with captured values.
+    public sealed class CreateBassPhraseSettingsDialog : Form
     {
         private NumericUpDown numSeed;
         private ComboBox cbGenre;
@@ -31,7 +31,7 @@ namespace Music.Writer
         public int Repeat { get; private set; }
         public int NumberOfOperators { get; private set; }
 
-        public CreateDrumPhraseSettingsDialog()
+        public CreateBassPhraseSettingsDialog()
         {
             InitializeDialog();
             SetDefaultValues();
@@ -40,7 +40,7 @@ namespace Music.Writer
         private void InitializeDialog()
         {
             // Form properties
-            Text = "Groove Preview";
+            Text = "Base Phrase Settings";
             Size = new Size(400, 330);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             StartPosition = FormStartPosition.CenterParent;
@@ -126,7 +126,7 @@ namespace Music.Writer
                 Size = new Size(150, 23),
                 Minimum = 1,
                 Maximum = 100,
-                Value = 2
+                Value = 1
             };
 
             // Repeat label
@@ -164,7 +164,7 @@ namespace Music.Writer
                 Size = new Size(150, 23),
                 Minimum = 1,
                 Maximum = 100,
-                Value = 2
+                Value = 1
             };
 
             // OK button
