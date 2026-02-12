@@ -35,6 +35,12 @@ namespace Music.Generator.Bass.Operators
             RegisterRhythmicPlacementOperators(registry);
             RegisterDensityAndSubdivisionOperators(registry);
             RegisterRegisterAndContourOperators(registry);
+            RegisterCleanupAndConstraintsOperators(registry);
+        }
+
+        private static void RegisterCleanupAndConstraintsOperators(BassOperatorRegistry registry)
+        {
+            registry.RegisterOperator(new BassSnapBeatsToSubdivisionOperator());
         }
 
         // Register HarmonicTargeting operators (chord-change targeting, approaches)

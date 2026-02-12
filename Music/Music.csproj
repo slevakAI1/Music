@@ -83,6 +83,8 @@
     <None Remove="AI\Completed\2026-02-05-Story2-InProgress.md" />
     <None Remove="AI\Completed\2026-02-05-Story3-AgentContext-Refactor.md" />
     <None Remove="AI\Completed\2026-02-05-Story4-Smoke-Validation.md" />
+    <None Remove="AI\Completed\BassGenerator-PitchDuration-FromOperators.md" />
+    <None Remove="AI\Completed\BassOperators.md" />
     <None Remove="AI\Completed\currente00pic.md" />
     <None Remove="AI\Completed\CurrentEpic.md" />
     <None Remove="AI\Completed\CurrentEpic_12.md" />
@@ -244,6 +246,7 @@
     <Folder Include="Files\Debug\" />
     <Folder Include="Files\Downloaded Samples\NewFolder\" />
     <Folder Include="Files\NotionExchange\" />
+    <Folder Include="Generator\Bass\Operators\CleanupAndConstraints\" />
     <Folder Include="Generator\Drums\Operators\Base\" />
   </ItemGroup>
 
