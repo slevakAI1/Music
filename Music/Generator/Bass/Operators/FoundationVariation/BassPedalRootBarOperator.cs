@@ -2,6 +2,7 @@
 // AI: invariants=Requires SongContext harmony+groove; returns no candidates when missing.
 // AI: deps=ChordVoicingHelper, GroovePresetDefinition.AnchorLayer; removal targets anchor beats != 1.
 
+using Music.Generator.Bass.Operators;
 using Music.Generator.Core;
 using Music.Generator.Groove;
 using Music;
@@ -11,8 +12,6 @@ namespace Music.Generator.Bass.Operators.FoundationVariation
     public sealed class BassPedalRootBarOperator : OperatorBase
     {
         private const int BaseOctave = 2;
-        private const string BassRoot = "root";
-
         public override string OperatorId => "BassPedalRootBar";
 
         public override OperatorFamily OperatorFamily => OperatorFamily.PatternSubstitution;
@@ -21,21 +20,11 @@ namespace Music.Generator.Bass.Operators.FoundationVariation
         {
             ArgumentNullException.ThrowIfNull(bar);
 
-            if (SongContext?.HarmonyTrack == null || SongContext.GroovePresetDefinition?.AnchorLayer == null)
+            if (SongContext == null || SongContext.GroovePresetDefinition?.AnchorLayer == null)
                 yield break;
 
-            var harmonyEvent = SongContext.HarmonyTrack.GetActiveHarmonyEvent(bar.BarNumber, 1.0m);
-            if (harmonyEvent == null)
-                yield break;
-
-            var chordMidiNotes = ChordVoicingHelper.GenerateChordMidiNotes(
-                harmonyEvent.Key,
-                harmonyEvent.Degree,
-                harmonyEvent.Quality,
-                BassRoot,
-                BaseOctave);
-
-            if (chordMidiNotes.Count == 0)
+            int? rootNote = BassOperatorHelper.GetChordRootMidiNote(SongContext, bar.BarNumber, 1.0m, BaseOctave);
+            if (!rootNote.HasValue)
                 yield break;
 
             long rawDurationTicks = bar.EndTick - bar.StartTick;
@@ -49,7 +38,7 @@ namespace Music.Generator.Bass.Operators.FoundationVariation
                 barNumber: bar.BarNumber,
                 beat: 1.0m,
                 score: 1.0,
-                midiNote: chordMidiNotes[0],
+                midiNote: rootNote.Value,
                 durationTicks: durationTicks);
         }
 
@@ -57,11 +46,10 @@ namespace Music.Generator.Bass.Operators.FoundationVariation
         {
             ArgumentNullException.ThrowIfNull(bar);
 
-            if (SongContext?.GroovePresetDefinition?.AnchorLayer == null)
+            if (SongContext == null || SongContext.GroovePresetDefinition?.AnchorLayer == null)
                 yield break;
 
-            var groovePreset = SongContext.GroovePresetDefinition.GetActiveGroovePreset(bar.BarNumber);
-            var bassOnsets = groovePreset.AnchorLayer.GetOnsets(GrooveRoles.Bass);
+            var bassOnsets = BassOperatorHelper.GetBassAnchorBeats(SongContext, bar.BarNumber);
             if (bassOnsets.Count == 0)
                 yield break;
 

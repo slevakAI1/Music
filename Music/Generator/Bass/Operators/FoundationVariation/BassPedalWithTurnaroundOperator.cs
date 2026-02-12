@@ -2,6 +2,7 @@
 // AI: invariants=Requires HarmonyTrack+GroovePresetDefinition; skips turnaround when next bar harmony missing.
 // AI: deps=ChordVoicingHelper; durations use Bar ticks; beat 4 turnarounds assume 4+ beats.
 
+using Music.Generator.Bass.Operators;
 using Music.Generator.Core;
 using Music.Generator.Groove;
 using Music;
@@ -11,7 +12,6 @@ namespace Music.Generator.Bass.Operators.FoundationVariation
     public sealed class BassPedalWithTurnaroundOperator : OperatorBase
     {
         private const int BaseOctave = 2;
-        private const string BassRoot = "root";
         private const int ApproachStep1 = -2;
         private const int ApproachStep2 = -1;
 
@@ -23,24 +23,14 @@ namespace Music.Generator.Bass.Operators.FoundationVariation
         {
             ArgumentNullException.ThrowIfNull(bar);
 
-            if (SongContext?.HarmonyTrack == null || SongContext.GroovePresetDefinition?.AnchorLayer == null)
+            if (SongContext == null || SongContext.GroovePresetDefinition?.AnchorLayer == null)
                 yield break;
 
-            var harmonyEvent = SongContext.HarmonyTrack.GetActiveHarmonyEvent(bar.BarNumber, 1.0m);
-            if (harmonyEvent == null)
+            int? rootNote = BassOperatorHelper.GetChordRootMidiNote(SongContext, bar.BarNumber, 1.0m, BaseOctave);
+            if (!rootNote.HasValue)
                 yield break;
 
-            var chordMidiNotes = ChordVoicingHelper.GenerateChordMidiNotes(
-                harmonyEvent.Key,
-                harmonyEvent.Degree,
-                harmonyEvent.Quality,
-                BassRoot,
-                BaseOctave);
-
-            if (chordMidiNotes.Count == 0)
-                yield break;
-
-            int root = chordMidiNotes[0];
+            int root = rootNote.Value;
             int beatsPerBar = bar.BeatsPerBar;
             if (beatsPerBar <= 0 || bar.TicksPerBeat <= 0)
                 yield break;
@@ -65,21 +55,11 @@ namespace Music.Generator.Bass.Operators.FoundationVariation
             if (totalBars <= 0 || bar.BarNumber >= totalBars)
                 yield break;
 
-            var nextHarmonyEvent = SongContext.HarmonyTrack.GetActiveHarmonyEvent(bar.BarNumber + 1, 1.0m);
-            if (nextHarmonyEvent == null)
+            int? nextRoot = BassOperatorHelper.GetChordRootMidiNote(SongContext, bar.BarNumber + 1, 1.0m, BaseOctave);
+            if (!nextRoot.HasValue)
                 yield break;
 
-            var nextChordNotes = ChordVoicingHelper.GenerateChordMidiNotes(
-                nextHarmonyEvent.Key,
-                nextHarmonyEvent.Degree,
-                nextHarmonyEvent.Quality,
-                BassRoot,
-                BaseOctave);
-
-            if (nextChordNotes.Count == 0)
-                yield break;
-
-            int targetRoot = nextChordNotes[0];
+            int targetRoot = nextRoot.Value;
             int halfBeatTicks = Math.Max(1, bar.TicksPerBeat / 2);
 
             yield return CreateCandidate(

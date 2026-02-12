@@ -2,6 +2,7 @@
 // AI: invariants=Requires SongContext harmony+groove; skips beats with missing harmony.
 // AI: deps=ChordVoicingHelper; fifth is +7 semitones from root; clamp to range [28,52].
 
+using Music.Generator.Bass.Operators;
 using Music.Generator.Core;
 using Music.Generator.Groove;
 using Music;
@@ -11,7 +12,6 @@ namespace Music.Generator.Bass.Operators.FoundationVariation
     public sealed class BassRootFifthOstinatoOperator : OperatorBase
     {
         private const int BaseOctave = 2;
-        private const string BassRoot = "root";
         private const int FifthIntervalSemitones = 7;
         private const int MinNote = 28;
         private const int MaxNote = 52;
@@ -24,11 +24,10 @@ namespace Music.Generator.Bass.Operators.FoundationVariation
         {
             ArgumentNullException.ThrowIfNull(bar);
 
-            if (SongContext?.HarmonyTrack == null || SongContext.GroovePresetDefinition?.AnchorLayer == null)
+            if (SongContext == null || SongContext.GroovePresetDefinition?.AnchorLayer == null)
                 yield break;
 
-            var groovePreset = SongContext.GroovePresetDefinition.GetActiveGroovePreset(bar.BarNumber);
-            var bassOnsets = groovePreset.AnchorLayer.GetOnsets(GrooveRoles.Bass);
+            var bassOnsets = BassOperatorHelper.GetBassAnchorBeats(SongContext, bar.BarNumber);
             if (bassOnsets.Count == 0)
                 yield break;
 
@@ -37,26 +36,16 @@ namespace Music.Generator.Bass.Operators.FoundationVariation
             for (int i = 0; i < orderedBeats.Count; i++)
             {
                 decimal beat = orderedBeats[i];
-                var harmonyEvent = SongContext.HarmonyTrack.GetActiveHarmonyEvent(bar.BarNumber, beat);
-                if (harmonyEvent == null)
+                int? rootNote = BassOperatorHelper.GetChordRootMidiNote(SongContext, bar.BarNumber, beat, BaseOctave);
+                if (!rootNote.HasValue)
                     continue;
 
-                var chordMidiNotes = ChordVoicingHelper.GenerateChordMidiNotes(
-                    harmonyEvent.Key,
-                    harmonyEvent.Degree,
-                    harmonyEvent.Quality,
-                    BassRoot,
-                    BaseOctave);
-
-                if (chordMidiNotes.Count == 0)
-                    continue;
-
-                int root = chordMidiNotes[0];
+                int root = rootNote.Value;
                 int targetNote = i % 2 == 0
                     ? root
                     : root + FifthIntervalSemitones;
 
-                targetNote = ClampToRange(targetNote, MinNote, MaxNote);
+                targetNote = BassOperatorHelper.ClampToRange(targetNote, MinNote, MaxNote);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Bass,
@@ -67,15 +56,5 @@ namespace Music.Generator.Bass.Operators.FoundationVariation
             }
         }
 
-        private static int ClampToRange(int midiNote, int minNote, int maxNote)
-        {
-            int adjusted = midiNote;
-            while (adjusted < minNote)
-                adjusted += 12;
-            while (adjusted > maxNote)
-                adjusted -= 12;
-
-            return Math.Clamp(adjusted, minNote, maxNote);
-        }
     }
 }

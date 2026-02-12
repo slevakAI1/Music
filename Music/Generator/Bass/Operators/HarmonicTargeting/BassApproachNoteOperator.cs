@@ -2,6 +2,7 @@
 // AI: invariants=Requires HarmonyTrack+GroovePresetDefinition; skips if approach beat < 1.0.
 // AI: deps=ChordVoicingHelper; approach pitch = target root - 1 semitone.
 
+using Music.Generator.Bass.Operators;
 using Music.Generator.Core;
 using Music.Generator.Groove;
 using Music;
@@ -11,7 +12,6 @@ namespace Music.Generator.Bass.Operators.HarmonicTargeting
     public sealed class BassApproachNoteOperator : OperatorBase
     {
         private const int BaseOctave = 2;
-        private const string BassRoot = "root";
         private const decimal ApproachOffsetBeats = 0.5m;
 
         public override string OperatorId => "BassApproachNote";
@@ -22,14 +22,13 @@ namespace Music.Generator.Bass.Operators.HarmonicTargeting
         {
             ArgumentNullException.ThrowIfNull(bar);
 
-            if (SongContext?.HarmonyTrack == null || SongContext.GroovePresetDefinition?.AnchorLayer == null)
+            if (SongContext == null || SongContext.GroovePresetDefinition?.AnchorLayer == null)
                 yield break;
 
             if (bar.TicksPerBeat <= 0)
                 yield break;
 
-            var groovePreset = SongContext.GroovePresetDefinition.GetActiveGroovePreset(bar.BarNumber);
-            var bassOnsets = groovePreset.AnchorLayer.GetOnsets(GrooveRoles.Bass);
+            var bassOnsets = BassOperatorHelper.GetBassAnchorBeats(SongContext, bar.BarNumber);
             if (bassOnsets.Count == 0)
                 yield break;
 
@@ -64,17 +63,16 @@ namespace Music.Generator.Bass.Operators.HarmonicTargeting
                 if (harmonyEvent == null)
                     continue;
 
-                var chordMidiNotes = ChordVoicingHelper.GenerateChordMidiNotes(
-                    harmonyEvent.Key,
-                    harmonyEvent.Degree,
-                    harmonyEvent.Quality,
-                    BassRoot,
+                int? rootNote = BassOperatorHelper.GetChordRootMidiNote(
+                    SongContext,
+                    bar.BarNumber,
+                    targetBeat,
                     BaseOctave);
 
-                if (chordMidiNotes.Count == 0)
+                if (!rootNote.HasValue)
                     continue;
 
-                int approachNote = Math.Clamp(chordMidiNotes[0] - 1, 0, 127);
+                int approachNote = Math.Clamp(rootNote.Value - 1, 0, 127);
 
                 yield return CreateCandidate(
                     role: GrooveRoles.Bass,
