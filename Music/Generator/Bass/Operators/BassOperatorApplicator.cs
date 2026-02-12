@@ -30,6 +30,7 @@ namespace Music.Generator.Bass.Operators
             SongContext? songContext = null)
         {
             var result = new List<GrooveOnset>(anchorOnsets);
+            var barTrack = songContext?.BarTrack;
 
             var occupied = new HashSet<(int BarNumber, decimal Beat, string Role)>();
             foreach (var onset in result)
@@ -79,14 +80,14 @@ namespace Music.Generator.Bass.Operators
                 int seed = bar.BarNumber;
 
                 bool changed = mode == 0
-                    ? ApplyAdditions(op, bar, seed, result, occupied)
-                    : ApplyRemovals(op, bar, result, occupied);
+                    ? ApplyAdditions(op, bar, seed, result, occupied, barTrack)
+                    : ApplyRemovals(op, bar, result, occupied, barTrack);
 
                 if (changed)
                     applied++;
             }
 
-            ApplyCleanupPostPass(registry, barsInScope, result, occupied);
+            ApplyCleanupPostPass(registry, barsInScope, result, occupied, barTrack);
 
             return result.OrderBy(o => o.BarNumber).ThenBy(o => o.Beat).ToList();
         }
@@ -95,7 +96,8 @@ namespace Music.Generator.Bass.Operators
             BassOperatorRegistry registry,
             IReadOnlyList<Bar> barsInScope,
             List<GrooveOnset> result,
-            HashSet<(int BarNumber, decimal Beat, string Role)> occupied)
+            HashSet<(int BarNumber, decimal Beat, string Role)> occupied,
+            BarTrack? barTrack)
         {
             if (!result.Any(o => o.Role == GrooveRoles.Bass))
                 return;
@@ -109,8 +111,8 @@ namespace Music.Generator.Bass.Operators
                 foreach (var bar in barsInScope)
                 {
                     int seed = bar.BarNumber;
-                    ApplyAdditions(op, bar, seed, result, occupied);
-                    ApplyRemovals(op, bar, result, occupied);
+                    ApplyAdditions(op, bar, seed, result, occupied, barTrack);
+                    ApplyRemovals(op, bar, result, occupied, barTrack);
                 }
             }
         }
@@ -120,11 +122,33 @@ namespace Music.Generator.Bass.Operators
             Bar bar,
             int seed,
             List<GrooveOnset> result,
-            HashSet<(int BarNumber, decimal Beat, string Role)> occupied)
+            HashSet<(int BarNumber, decimal Beat, string Role)> occupied,
+            BarTrack? barTrack)
         {
             var candidates = op.GenerateCandidates(bar, seed).ToList();
+            if (candidates.Count == 0)
+                return false;
 
+            var previewResult = new List<GrooveOnset>(result);
+            var previewOccupied = new HashSet<(int BarNumber, decimal Beat, string Role)>(occupied);
+            bool anyPreviewApplied = ApplyAdditionCandidates(candidates, previewResult, previewOccupied);
+
+            if (!anyPreviewApplied)
+                return false;
+
+            if (!IsBassOnsetSetValid(previewResult, barTrack))
+                return false;
+
+            return ApplyAdditionCandidates(candidates, result, occupied);
+        }
+
+        private static bool ApplyAdditionCandidates(
+            IReadOnlyList<OperatorCandidateAddition> candidates,
+            List<GrooveOnset> result,
+            HashSet<(int BarNumber, decimal Beat, string Role)> occupied)
+        {
             bool anyApplied = false;
+
             foreach (var candidate in candidates)
             {
                 var key = (candidate.BarNumber, candidate.Beat, candidate.Role);
@@ -182,11 +206,33 @@ namespace Music.Generator.Bass.Operators
             OperatorBase op,
             Bar bar,
             List<GrooveOnset> result,
-            HashSet<(int BarNumber, decimal Beat, string Role)> occupied)
+            HashSet<(int BarNumber, decimal Beat, string Role)> occupied,
+            BarTrack? barTrack)
         {
             var removals = op.GenerateRemovals(bar).ToList();
+            if (removals.Count == 0)
+                return false;
 
+            var previewResult = new List<GrooveOnset>(result);
+            var previewOccupied = new HashSet<(int BarNumber, decimal Beat, string Role)>(occupied);
+            bool anyPreviewRemoved = ApplyRemovalCandidates(removals, previewResult, previewOccupied);
+
+            if (!anyPreviewRemoved)
+                return false;
+
+            if (!IsBassOnsetSetValid(previewResult, barTrack))
+                return false;
+
+            return ApplyRemovalCandidates(removals, result, occupied);
+        }
+
+        private static bool ApplyRemovalCandidates(
+            IReadOnlyList<OperatorCandidateRemoval> removals,
+            List<GrooveOnset> result,
+            HashSet<(int BarNumber, decimal Beat, string Role)> occupied)
+        {
             bool anyRemoved = false;
+
             foreach (OperatorCandidateRemoval removal in removals)
             {
                 var key = (removal.BarNumber, removal.Beat, removal.Role);
@@ -212,6 +258,77 @@ namespace Music.Generator.Bass.Operators
             }
 
             return anyRemoved;
+        }
+
+        // AI: validate=Rejects overlapping/same-tick bass onsets using BarTrack ticks; skip when BarTrack missing.
+        private static bool IsBassOnsetSetValid(IReadOnlyList<GrooveOnset> onsets, BarTrack? barTrack)
+        {
+            if (barTrack is null)
+                return true;
+
+            var bassOnsets = onsets
+                .Where(o => o.Role == GrooveRoles.Bass && o.MidiNote.HasValue)
+                .ToList();
+
+            if (bassOnsets.Count <= 1)
+                return true;
+
+            var intervals = new List<(long StartTick, long EndTick)>(bassOnsets.Count);
+            foreach (var onset in bassOnsets)
+            {
+                if (!TryGetOnsetTicks(onset, barTrack, out long startTick, out long endTick))
+                    return false;
+
+                intervals.Add((startTick, endTick));
+            }
+
+            intervals.Sort((left, right) => left.StartTick.CompareTo(right.StartTick));
+
+            long currentEnd = intervals[0].EndTick;
+            long previousStart = intervals[0].StartTick;
+
+            for (int i = 1; i < intervals.Count; i++)
+            {
+                var interval = intervals[i];
+                if (interval.StartTick == previousStart)
+                    return false;
+
+                if (interval.StartTick < currentEnd)
+                    return false;
+
+                if (interval.EndTick > currentEnd)
+                    currentEnd = interval.EndTick;
+
+                previousStart = interval.StartTick;
+            }
+
+            return true;
+        }
+
+        private static bool TryGetOnsetTicks(
+            GrooveOnset onset,
+            BarTrack barTrack,
+            out long startTick,
+            out long endTick)
+        {
+            const int defaultDurationTicks = MusicConstants.TicksPerQuarterNote / 4;
+
+            startTick = 0;
+            endTick = 0;
+
+            if (!barTrack.IsBeatInBar(onset.BarNumber, onset.Beat))
+                return false;
+
+            startTick = barTrack.ToTick(onset.BarNumber, onset.Beat);
+            if (onset.TimingOffsetTicks.HasValue)
+                startTick += onset.TimingOffsetTicks.Value;
+
+            int durationTicks = onset.DurationTicks ?? defaultDurationTicks;
+            if (durationTicks <= 0)
+                return false;
+
+            endTick = startTick + durationTicks;
+            return true;
         }
     }
 }
