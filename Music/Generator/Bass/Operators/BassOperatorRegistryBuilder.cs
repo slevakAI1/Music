@@ -5,7 +5,7 @@
 using Music.Generator.Bass.Operators.FoundationVariation;
 using Music.Generator.Bass.Operators.HarmonicTargeting;
 using Music.Generator.Bass.Operators.DensityAndSubdivision;
-//using Music.Generator.Bass.Operators.RegisterAndContour;
+using Music.Generator.Bass.Operators.RegisterAndContour;
 using Music.Generator.Bass.Operators.RhythmicPlacement;
 using Music.Generator.Core;
 
@@ -30,11 +30,11 @@ namespace Music.Generator.Bass.Operators
         {
             ArgumentNullException.ThrowIfNull(registry);
             // Register families in deterministic order
+            RegisterFoundationVariationOperators(registry);
             RegisterHarmonicTargetingOperators(registry);
             RegisterRhythmicPlacementOperators(registry);
             RegisterDensityAndSubdivisionOperators(registry);
-            RegisterFoundationVariationOperators(registry);
-            //RegisterRegisterAndContourOperators(registry);
+            RegisterRegisterAndContourOperators(registry);
         }
 
         // Register HarmonicTargeting operators (chord-change targeting, approaches)
@@ -72,11 +72,15 @@ namespace Music.Generator.Bass.Operators
             registry.RegisterOperator(new BassSplitLongNoteOperator());
             registry.RegisterOperator(new BassAddPassingEighthsOperator());
             registry.RegisterOperator(new BassReduceToQuarterNotesOperator());
+            registry.RegisterOperator(new BassBurstSixteenthsOperator());
         }
 
         // Register RegisterAndContour operators (range, octave contour)
         private static void RegisterRegisterAndContourOperators(BassOperatorRegistry registry)
         {
+            registry.RegisterOperator(new BassOctavePopAccentsOperator());
+            registry.RegisterOperator(new BassRangeClampOperator());
+            registry.RegisterOperator(new BassContourSmootherOperator());
         }
     }
 }
