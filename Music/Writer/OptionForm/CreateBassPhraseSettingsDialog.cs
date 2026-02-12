@@ -162,7 +162,7 @@ namespace Music.Writer.OptionForm
             {
                 Location = new Point(110, 180),
                 Size = new Size(150, 23),
-                Minimum = 1,
+                Minimum = 0,
                 Maximum = 100,
                 Value = 1
             };
