@@ -12,6 +12,7 @@ using Music.Designer;
 using Music.Generator;
 using Music.MyMidi;
 using MusicGen.Lyrics;
+using System.Text;
 
 namespace Music.Writer
 {
@@ -461,8 +462,127 @@ namespace Music.Writer
 
             // Parse lyrics with phonetics
             var phrase = new LyricPhrase();
-            LyricPhoneticsHelper.ParseTextToLyricPhrase(phrase, "I love music");
+            var phraseText = "I love music";
+            LyricPhoneticsHelper.ParseTextToLyricPhrase(phrase, phraseText);
             LyricPhoneticsHelper.MarkBreathPoints(phrase);
+            LyricPhoneticsHelper.MarkRhymeGroups(new List<LyricPhrase> { phrase });
+
+            var reportText = BuildLyricPhraseReport(phrase, phraseText);
+            ShowLyricPhraseReport(reportText);
+        }
+
+        private static string BuildLyricPhraseReport(LyricPhrase phrase, string sourceText)
+        {
+            ArgumentNullException.ThrowIfNull(phrase);
+
+            var report = new StringBuilder();
+            report.AppendLine("Lyric Phonetics Report");
+            report.AppendLine("=======================");
+            report.AppendLine($"Source Text: {sourceText}");
+            report.AppendLine($"Raw Text: {phrase.RawText}");
+            report.AppendLine($"Words: {phrase.Words.Count}");
+            report.AppendLine($"Syllables: {phrase.Syllables.Count}");
+            report.AppendLine($"SectionId: {phrase.SectionId ?? "(none)"}");
+            report.AppendLine($"StartTime: {phrase.StartTime?.Ticks.ToString() ?? "(none)"}");
+            report.AppendLine($"DurationBudget: {FormatDurationBudget(phrase.DurationBudget)}");
+            report.AppendLine();
+
+            for (int wordIndex = 0; wordIndex < phrase.Words.Count; wordIndex++)
+            {
+                var word = phrase.Words[wordIndex];
+                report.AppendLine($"Word {wordIndex + 1}: \"{word.Text}\"");
+                report.AppendLine($"  IsPunctuation: {word.IsPunctuation}");
+
+                if (word.Syllables.Count == 0)
+                {
+                    report.AppendLine("  Syllables: (none)");
+                    report.AppendLine();
+                    continue;
+                }
+
+                for (int syllableIndex = 0; syllableIndex < word.Syllables.Count; syllableIndex++)
+                {
+                    var syllable = word.Syllables[syllableIndex];
+                    report.AppendLine($"  Syllable {syllableIndex + 1}: {syllable.Text}");
+                    report.AppendLine($"    Id: {syllable.Id}");
+                    report.AppendLine($"    Stress: {syllable.Stress}");
+                    report.AppendLine($"    Emphasis: {syllable.Emphasis}");
+                    report.AppendLine($"    BreathAfter: {syllable.BreathAfter}");
+                    report.AppendLine($"    RhymeGroup: {syllable.RhymeGroup ?? "(none)"}");
+                    report.AppendLine($"    AnchorTime: {syllable.AnchorTime?.Ticks.ToString() ?? "(none)"}");
+                    report.AppendLine($"    ConsonantTiming: {FormatConsonantTiming(syllable.ConsonantTiming)}");
+                    report.AppendLine($"    Melisma: {FormatMelisma(syllable.Melisma)}");
+                    report.AppendLine($"    Phones: {FormatPhones(syllable.Phones)}");
+                }
+
+                report.AppendLine();
+            }
+
+            return report.ToString();
+        }
+
+        private static string FormatDurationBudget(TickSpanConstraint? budget)
+        {
+            if (budget == null)
+                return "(none)";
+
+            var min = budget.MinTicks?.ToString() ?? "-";
+            var target = budget.TargetTicks?.ToString() ?? "-";
+            var max = budget.MaxTicks?.ToString() ?? "-";
+
+            return $"Min={min}, Target={target}, Max={max}, Weight={budget.Weight}";
+        }
+
+        private static string FormatConsonantTiming(ConsonantTimingHints timing)
+        {
+            ArgumentNullException.ThrowIfNull(timing);
+
+            return $"LeadInTicks={timing.LeadInTicks}, TailOutTicks={timing.TailOutTicks}";
+        }
+
+        private static string FormatMelisma(MelismaConstraint melisma)
+        {
+            ArgumentNullException.ThrowIfNull(melisma);
+
+            return $"MinNotes={melisma.MinNotes}, MaxNotes={melisma.MaxNotes}, PreferMelisma={melisma.PreferMelisma}";
+        }
+
+        private static string FormatPhones(SyllablePhones phones)
+        {
+            ArgumentNullException.ThrowIfNull(phones);
+
+            var onset = phones.Onset.Count == 0 ? "-" : string.Join(" ", phones.Onset);
+            var nucleus = phones.Nucleus.Count == 0 ? "-" : string.Join(" ", phones.Nucleus);
+            var coda = phones.Coda.Count == 0 ? "-" : string.Join(" ", phones.Coda);
+
+            return $"Onset=[{onset}] Nucleus=[{nucleus}] Coda=[{coda}] VariantId={phones.VariantId ?? "(none)"}";
+        }
+
+        private void ShowLyricPhraseReport(string reportText)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(reportText);
+
+            using var reportForm = new Form();
+            using var reportFont = new Font(FontFamily.GenericMonospace, 9f);
+            var reportBox = new TextBox
+            {
+                Multiline = true,
+                ReadOnly = true,
+                Dock = DockStyle.Fill,
+                ScrollBars = ScrollBars.Both,
+                WordWrap = false,
+                Font = reportFont,
+                Text = reportText
+            };
+
+            reportForm.Text = "Lyric Phonetics Report";
+            reportForm.StartPosition = FormStartPosition.CenterParent;
+            reportForm.Size = new Size(800, 600);
+            reportForm.MinimizeBox = false;
+            reportForm.MaximizeBox = false;
+            reportForm.FormBorderStyle = FormBorderStyle.SizableToolWindow;
+            reportForm.Controls.Add(reportBox);
+            reportForm.ShowDialog(this);
         }
 
         private async Task StartPlaybackWithMeasureTrackingAsync()
