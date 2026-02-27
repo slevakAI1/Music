@@ -126,6 +126,7 @@ namespace Music.MyMidi
 
         // AI: PlayToDevice: starts playback on a specific named output device instead of auto-selecting first.
         // AI: use=For sending MIDI to external USB-MIDI interfaces (e.g., to a DAW).
+        // AI: throws InvalidOperationException if named device not found among available outputs.
         public void PlayToDevice(MidiSongDocument doc, string deviceName)
         {
             ArgumentNullException.ThrowIfNull(doc);
@@ -137,7 +138,11 @@ namespace Music.MyMidi
             _outputDevice = OutputDevice.GetAll().FirstOrDefault(d => d.Name == deviceName);
 
             if (_outputDevice == null)
-                return;
+            {
+                var available = string.Join(", ", OutputDevice.GetAll().Select(d => d.Name));
+                throw new InvalidOperationException(
+                    $"MIDI output device '{deviceName}' not found. Available: [{available}]");
+            }
 
             _playback = doc.Raw.GetPlayback(_outputDevice);
             _playback.Start();

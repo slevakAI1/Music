@@ -536,10 +536,20 @@ namespace Music.Writer
                 timeSignatureTrack);
 
             if (midiDoc == null)
+            {
+                MessageBoxHelper.Show("MIDI conversion failed.", "Send MIDI", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
+            }
 
             // Stop any current playback and send to the chosen device
             _midiPlaybackService.PlayToDevice(midiDoc, selectedDevice);
+
+            MessageBoxHelper.Show(
+                $"Sending {songTracks.Count} track(s) to '{selectedDevice}'\n" +
+                $"Duration: {midiDoc.Duration.TotalSeconds:F1}s | Events: {midiDoc.EventCount} | Tracks: {midiDoc.TrackCount}",
+                "Send MIDI - Started",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
 
             // Wait for playback duration then release resources
             var cancellationToken = _midiPlaybackService.GetCancellationToken();
