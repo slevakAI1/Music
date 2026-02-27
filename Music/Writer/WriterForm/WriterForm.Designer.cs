@@ -36,6 +36,7 @@ namespace Music.Writer
             btnClearAll = new Button();
             btnPlayTracks = new Button();
             dgSong = new DataGridView();
+            btnSendMidi = new Button();
             btnBassPhrase = new Button();
             groupBox3.SuspendLayout();
             gbSong.SuspendLayout();
@@ -103,6 +104,7 @@ namespace Music.Writer
             // gbSong
             // 
             gbSong.BackColor = Color.Black;
+            gbSong.Controls.Add(btnSendMidi);
             gbSong.Controls.Add(btnSavePhrase);
             gbSong.Controls.Add(btnSaveWav);
             gbSong.Controls.Add(btnLoadDesign);
@@ -178,6 +180,17 @@ namespace Music.Writer
             btnPause.Text = "Pause";
             btnPause.UseVisualStyleBackColor = true;
             btnPause.Click += btnPause_Click;
+            // 
+            // btnSendMidi
+            // 
+            btnSendMidi.ForeColor = Color.FromArgb(0, 192, 0);
+            btnSendMidi.Location = new Point(920, 774);
+            btnSendMidi.Name = "btnSendMidi";
+            btnSendMidi.Size = new Size(80, 23);
+            btnSendMidi.TabIndex = 50;
+            btnSendMidi.Text = "Send MIDI";
+            btnSendMidi.UseVisualStyleBackColor = true;
+            btnSendMidi.Click += btnSendMidi_Click;
             // 
             // btnClearSelectedTracks
             // 
@@ -324,5 +337,6 @@ namespace Music.Writer
         private Button btnSaveWav;
         private Button btnSavePhrase;
         private Button btnBassPhrase;
+        private Button btnSendMidi;
     }
 }

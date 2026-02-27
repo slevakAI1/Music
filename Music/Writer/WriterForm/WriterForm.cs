@@ -420,6 +420,146 @@ namespace Music.Writer
             }
         }
 
+        // AI: btnSendMidi_Click: lets user pick an external MIDI output device and sends selected tracks to it.
+        // AI: reuses HandlePlayAsync validation+conversion logic but targets a user-chosen device (e.g., USB-MIDI to DAW).
+        private async void btnSendMidi_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                await SendToExternalMidiAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBoxHelper.Show(
+                    $"Failed to send MIDI: {ex.Message}",
+                    "Send MIDI Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        private async Task SendToExternalMidiAsync()
+        {
+            var devices = _midiPlaybackService.EnumerateOutputDevices().ToList();
+            if (devices.Count == 0)
+            {
+                MessageBoxHelper.Show(
+                    "No MIDI output devices found on this system.",
+                    "Send MIDI",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            string? selectedDevice;
+            using (var selector = new MyMidi.MidiDeviceSelectorDialog(devices))
+            {
+                if (selector.ShowDialog(this) != DialogResult.OK)
+                    return;
+
+                selectedDevice = selector.SelectedDeviceName;
+            }
+
+            if (string.IsNullOrWhiteSpace(selectedDevice))
+                return;
+
+            // Validate grid has tracks beyond fixed rows
+            if (dgSong.Rows.Count <= SongGridManager.FIXED_ROWS_COUNT)
+            {
+                MessageBoxHelper.Show("No tracks to send.", "Send MIDI", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            var hasTrackSelection = dgSong.SelectedRows
+                .Cast<DataGridViewRow>()
+                .Any(r => r.Index >= SongGridManager.FIXED_ROWS_COUNT);
+
+            if (!hasTrackSelection)
+            {
+                MessageBoxHelper.Show("Please select one or more tracks to send.", "Send MIDI", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Extract tempo track
+            var tempoRow = dgSong.Rows[SongGridManager.FIXED_ROW_TEMPO];
+            var tempoTrack = tempoRow.Cells["colData"].Value as Music.Generator.TempoTrack;
+            if (tempoTrack == null || tempoTrack.Events.Count == 0)
+            {
+                MessageBoxHelper.Show("No tempo events defined.", "Missing Tempo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Extract time signature track
+            var timeSignatureRow = dgSong.Rows[SongGridManager.FIXED_ROW_TIME_SIGNATURE];
+            var timeSignatureTrack = timeSignatureRow.Cells["colData"].Value as Music.Generator.Timingtrack;
+            if (timeSignatureTrack == null || timeSignatureTrack.Events.Count == 0)
+            {
+                MessageBoxHelper.Show("No time signature events defined.", "Missing Time Signature", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Collect selected PartTracks
+            var songTracks = new List<Music.Generator.PartTrack>();
+            foreach (DataGridViewRow selectedRow in dgSong.SelectedRows)
+            {
+                if (selectedRow.Index < SongGridManager.FIXED_ROWS_COUNT)
+                    continue;
+
+                if (selectedRow.Cells["colData"].Value is not Music.Generator.PartTrack songTrack
+                    || songTrack.PartTrackNoteEvents.Count == 0)
+                {
+                    continue;
+                }
+
+                var instrObj = selectedRow.Cells["colType"].Value;
+                if (instrObj == null || instrObj == DBNull.Value)
+                    continue;
+
+                int programNumber = Convert.ToInt32(instrObj);
+                if (programNumber == -1)
+                    continue;
+
+                songTrack.MidiProgramNumber = programNumber;
+                songTracks.Add(songTrack);
+            }
+
+            if (songTracks.Count == 0)
+            {
+                MessageBoxHelper.Show("No valid tracks selected to send.", "Send MIDI", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Convert to MIDI document
+            var midiDoc = ConvertPartTracksToMidiSongDocument_For_Play_And_Export.Convert(
+                songTracks,
+                tempoTrack,
+                timeSignatureTrack);
+
+            if (midiDoc == null)
+                return;
+
+            // Stop any current playback and send to the chosen device
+            _midiPlaybackService.PlayToDevice(midiDoc, selectedDevice);
+
+            // Wait for playback duration then release resources
+            var cancellationToken = _midiPlaybackService.GetCancellationToken();
+            var totalDelay = midiDoc.Duration.TotalMilliseconds + 250;
+
+            if (totalDelay > 0)
+            {
+                try
+                {
+                    await Task.Delay((int)Math.Min(totalDelay, int.MaxValue), cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    return;
+                }
+            }
+
+            _midiPlaybackService.Stop();
+        }
+
         private void btnSaveDesign_Click(object sender, EventArgs e)
         {
             if (_songContext == null)

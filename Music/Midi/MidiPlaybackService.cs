@@ -123,5 +123,24 @@ namespace Music.MyMidi
                 _outputDevice = null;
             }
         }
+
+        // AI: PlayToDevice: starts playback on a specific named output device instead of auto-selecting first.
+        // AI: use=For sending MIDI to external USB-MIDI interfaces (e.g., to a DAW).
+        public void PlayToDevice(MidiSongDocument doc, string deviceName)
+        {
+            ArgumentNullException.ThrowIfNull(doc);
+            ArgumentException.ThrowIfNullOrWhiteSpace(deviceName);
+
+            Stop();
+
+            _cancellationTokenSource = new CancellationTokenSource();
+            _outputDevice = OutputDevice.GetAll().FirstOrDefault(d => d.Name == deviceName);
+
+            if (_outputDevice == null)
+                return;
+
+            _playback = doc.Raw.GetPlayback(_outputDevice);
+            _playback.Start();
+        }
     }
 }

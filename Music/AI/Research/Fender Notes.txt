@@ -1,0 +1,4 @@
+
+
+Fender Studio Pro Installation Notes
+   * It installed Melodyne 5

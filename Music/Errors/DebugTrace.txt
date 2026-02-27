@@ -788,3 +788,117 @@
 [2026-02-15T14:40:39.4758604-05:00] Rng.Initialize: seed=12345
 [2026-02-15T14:50:12.3244974-05:00] Rng.Initialize: seed=12345
 [2026-02-15T14:50:12.3244974-05:00] Rng.Initialize: seed=12345
+[2026-02-16T20:28:12.0409518-05:00] Rng.Initialize: seed=12345
+[2026-02-16T20:28:12.0409518-05:00] Rng.Initialize: seed=12345
+[2026-02-17T20:07:18.6888664-05:00] Rng.Initialize: seed=12345
+[2026-02-17T20:07:18.6888664-05:00] Rng.Initialize: seed=12345
+[2026-02-17T20:08:37.9950666-05:00] Rng.Initialize: seed=166500939
+[2026-02-17T20:08:37.9950666-05:00] Rng.Initialize: seed=166500939
+[2026-02-17T20:08:43.6146255-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-17T20:08:43.6146255-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-17T20:08:43.6157233-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=2
+[2026-02-17T20:08:43.6157233-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=2
+[2026-02-17T20:08:43.6161633-05:00] HandlePlayAsync: Converting 2 tracks to MIDI document
+[2026-02-17T20:08:43.6161633-05:00] HandlePlayAsync: Converting 2 tracks to MIDI document
+[2026-02-17T20:08:43.6388831-05:00] HandlePlayAsync: MIDI document created, Duration=16695ms
+[2026-02-17T20:08:43.6388831-05:00] HandlePlayAsync: MIDI document created, Duration=16695ms
+[2026-02-17T20:08:43.6394214-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-17T20:08:43.6394214-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-17T20:09:00.8913188-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-17T20:09:00.8913188-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-17T20:09:25.1315385-05:00] Rng.Initialize: seed=1805605120
+[2026-02-17T20:09:25.1315385-05:00] Rng.Initialize: seed=1805605120
+[2026-02-17T20:09:30.0143248-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-17T20:09:30.0143248-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-17T20:09:30.0149891-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=2
+[2026-02-17T20:09:30.0149891-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=2
+[2026-02-17T20:09:30.0155362-05:00] HandlePlayAsync: Converting 2 tracks to MIDI document
+[2026-02-17T20:09:30.0155362-05:00] HandlePlayAsync: Converting 2 tracks to MIDI document
+[2026-02-17T20:09:30.0164615-05:00] HandlePlayAsync: MIDI document created, Duration=16695ms
+[2026-02-17T20:09:30.0164615-05:00] HandlePlayAsync: MIDI document created, Duration=16695ms
+[2026-02-17T20:09:30.0169464-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-17T20:09:30.0169464-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-17T20:09:47.2212779-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-17T20:09:47.2212779-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-17T20:09:50.3037122-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-17T20:09:50.3037122-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-17T20:09:50.3043923-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=2
+[2026-02-17T20:09:50.3043923-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=2
+[2026-02-17T20:09:50.3049013-05:00] HandlePlayAsync: Converting 2 tracks to MIDI document
+[2026-02-17T20:09:50.3049013-05:00] HandlePlayAsync: Converting 2 tracks to MIDI document
+[2026-02-17T20:09:50.3058888-05:00] HandlePlayAsync: MIDI document created, Duration=16695ms
+[2026-02-17T20:09:50.3058888-05:00] HandlePlayAsync: MIDI document created, Duration=16695ms
+[2026-02-17T20:09:50.3063559-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-17T20:09:50.3063559-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-17T20:09:52.6367327-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-17T20:09:52.6367327-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-17T20:10:20.1796352-05:00] Rng.Initialize: seed=1545007932
+[2026-02-17T20:10:20.1796352-05:00] Rng.Initialize: seed=1545007932
+[2026-02-17T20:10:25.1919833-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-17T20:10:25.1919833-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-17T20:10:25.1926020-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=2
+[2026-02-17T20:10:25.1926020-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=2
+[2026-02-17T20:10:25.1931395-05:00] HandlePlayAsync: Converting 2 tracks to MIDI document
+[2026-02-17T20:10:25.1931395-05:00] HandlePlayAsync: Converting 2 tracks to MIDI document
+[2026-02-17T20:10:25.1942121-05:00] HandlePlayAsync: MIDI document created, Duration=16000ms
+[2026-02-17T20:10:25.1942121-05:00] HandlePlayAsync: MIDI document created, Duration=16000ms
+[2026-02-17T20:10:25.1946533-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-17T20:10:25.1946533-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-17T20:10:40.9359882-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-17T20:10:40.9359882-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-17T20:11:01.1235494-05:00] Rng.Initialize: seed=-1568287298
+[2026-02-17T20:11:01.1235494-05:00] Rng.Initialize: seed=-1568287298
+[2026-02-17T20:11:10.6955209-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-17T20:11:10.6955209-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-17T20:11:10.6962170-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=2
+[2026-02-17T20:11:10.6962170-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=2
+[2026-02-17T20:11:10.6966534-05:00] HandlePlayAsync: Converting 2 tracks to MIDI document
+[2026-02-17T20:11:10.6966534-05:00] HandlePlayAsync: Converting 2 tracks to MIDI document
+[2026-02-17T20:11:10.6975317-05:00] HandlePlayAsync: MIDI document created, Duration=16000ms
+[2026-02-17T20:11:10.6975317-05:00] HandlePlayAsync: MIDI document created, Duration=16000ms
+[2026-02-17T20:11:10.6979333-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-17T20:11:10.6979333-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-17T20:11:17.7013145-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-17T20:11:17.7013145-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-17T20:11:33.9430552-05:00] Rng.Initialize: seed=-459478152
+[2026-02-17T20:11:33.9430552-05:00] Rng.Initialize: seed=-459478152
+[2026-02-17T20:11:38.7652370-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-17T20:11:38.7652370-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-17T20:11:38.7657856-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=2
+[2026-02-17T20:11:38.7657856-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=2
+[2026-02-17T20:11:38.7661571-05:00] HandlePlayAsync: Converting 2 tracks to MIDI document
+[2026-02-17T20:11:38.7661571-05:00] HandlePlayAsync: Converting 2 tracks to MIDI document
+[2026-02-17T20:11:38.7670934-05:00] HandlePlayAsync: MIDI document created, Duration=15875ms
+[2026-02-17T20:11:38.7670934-05:00] HandlePlayAsync: MIDI document created, Duration=15875ms
+[2026-02-17T20:11:38.7674697-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-17T20:11:38.7674697-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-17T20:11:49.3867187-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-17T20:11:49.3867187-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-17T20:11:55.2173591-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-17T20:11:55.2173591-05:00] === WriterFormEventHandlers.HandlePlayAsync START ===
+[2026-02-17T20:11:55.2179656-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=2
+[2026-02-17T20:11:55.2179656-05:00] HandlePlayAsync: Track selection validated, SelectedRows.Count=2
+[2026-02-17T20:11:55.2184286-05:00] HandlePlayAsync: Converting 2 tracks to MIDI document
+[2026-02-17T20:11:55.2184286-05:00] HandlePlayAsync: Converting 2 tracks to MIDI document
+[2026-02-17T20:11:55.2193347-05:00] HandlePlayAsync: MIDI document created, Duration=15875ms
+[2026-02-17T20:11:55.2193347-05:00] HandlePlayAsync: MIDI document created, Duration=15875ms
+[2026-02-17T20:11:55.2198282-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-17T20:11:55.2198282-05:00] HandlePlayAsync: Calling Player.PlayMidiFromSongTracksAsync
+[2026-02-17T20:12:02.4870669-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-17T20:12:02.4870669-05:00] === WriterFormEventHandlers.HandlePlayAsync END ===
+[2026-02-26T23:07:59.1723413-05:00] Rng.Initialize: seed=12345
+[2026-02-26T23:07:59.1723413-05:00] Rng.Initialize: seed=12345
+[2026-02-27T09:25:37.7006569-05:00] Rng.Initialize: seed=12345
+[2026-02-27T09:25:37.7006569-05:00] Rng.Initialize: seed=12345
+[2026-02-27T09:25:54.8298060-05:00] Rng.Initialize: seed=-943051978
+[2026-02-27T09:25:54.8298060-05:00] Rng.Initialize: seed=-943051978
+[2026-02-27T09:26:00.0713664-05:00] Rng.Initialize: seed=1219128869
+[2026-02-27T09:26:00.0713664-05:00] Rng.Initialize: seed=1219128869
+[2026-02-27T09:26:41.0206023-05:00] Rng.Initialize: seed=-1272042224
+[2026-02-27T09:26:41.0206023-05:00] Rng.Initialize: seed=-1272042224
+[2026-02-27T09:27:02.7409880-05:00] Rng.Initialize: seed=1461427579
+[2026-02-27T09:27:02.7409880-05:00] Rng.Initialize: seed=1461427579
+[2026-02-27T09:32:46.6182681-05:00] Rng.Initialize: seed=12345
+[2026-02-27T09:32:46.6182681-05:00] Rng.Initialize: seed=12345
+[2026-02-27T09:33:33.6005808-05:00] Rng.Initialize: seed=-688140356
+[2026-02-27T09:33:33.6005808-05:00] Rng.Initialize: seed=-688140356
